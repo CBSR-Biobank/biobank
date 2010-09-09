@@ -38,15 +38,15 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
-import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
-import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
-import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
-import edu.ualberta.med.biobank.widgets.grids.ScanLinkPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
+import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
+import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -62,7 +62,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private LinkFormPatientManagement linkFormPatientManagement;
 
-    private ScanLinkPalletWidget spw;
+    private ScanPalletWidget spw;
 
     // choose selection mode - deactivated by default
     private Composite radioComponents;
@@ -88,6 +88,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     private Composite fieldsComposite;
 
     private boolean processScanResult;
+
+    private boolean isFakeScanRandom;
 
     @Override
     protected void init() throws Exception {
@@ -136,7 +138,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.grabExcessHorizontalSpace = true;
         client.setLayoutData(gd);
 
-        spw = new ScanLinkPalletWidget(client);
+        spw = new ScanPalletWidget(client,
+            CellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
         spw.setVisible(true);
         toolkit.adapt(spw);
         spw.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false));
@@ -233,7 +236,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                                 PalletCell pCell = (PalletCell) cell;
                                 if (pCell != null && pCell.getValue() != null) {
                                     pCell.setType(null);
-                                    pCell.setStatus(AliquotCellStatus.NO_TYPE);
+                                    pCell.setStatus(CellStatus.NO_TYPE);
                                 }
                             }
 
@@ -293,7 +296,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         .getSelectedCells()) {
                         PalletCell pCell = (PalletCell) cell;
                         pCell.setType(type);
-                        pCell.setStatus(AliquotCellStatus.TYPE);
+                        pCell.setStatus(CellStatus.TYPE);
                     }
                     spw.getMultiSelectionManager().clearMultiSelection();
                     customSelectionWidget.resetValues(true);
@@ -436,8 +439,14 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     @Override
+    protected void beforeScanThreadStart() {
+        isFakeScanRandom = fakeScanRandom != null
+            && fakeScanRandom.getSelection();
+    }
+
+    @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
-        if (fakeScanRandom != null && fakeScanRandom.getSelection()) {
+        if (isFakeScanRandom) {
             return PalletCell.getRandomScanLink();
         }
         try {
@@ -472,12 +481,11 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 PalletCell cell = null;
                 cell = cells.get(rcp);
                 if (!isRescanMode()
-                    || (cell != null
-                        && cell.getStatus() != AliquotCellStatus.TYPE && cell
-                        .getStatus() != AliquotCellStatus.NO_TYPE)) {
+                    || (cell != null && cell.getStatus() != CellStatus.TYPE && cell
+                        .getStatus() != CellStatus.NO_TYPE)) {
                     processCellStatus(cell, false);
                 }
-                everythingOk = cell.getStatus() != AliquotCellStatus.ERROR
+                everythingOk = cell.getStatus() != CellStatus.ERROR
                     && everythingOk;
                 if (PalletCell.hasValue(cell)) {
                     typesRowsCount++;
@@ -531,10 +539,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     /**
      * Process the cell: apply a status and set correct information
      */
-    private AliquotCellStatus processCellStatus(PalletCell cell,
+    private CellStatus processCellStatus(PalletCell cell,
         boolean independantProcess) throws ApplicationException {
         if (cell == null) {
-            return AliquotCellStatus.EMPTY;
+            return CellStatus.EMPTY;
         } else {
             String value = cell.getValue();
             if (value != null) {
@@ -542,7 +550,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     .getAliquotsInSite(appService, value, SessionManager
                         .getInstance().getCurrentSite());
                 if (aliquots.size() > 0) {
-                    cell.setStatus(AliquotCellStatus.ERROR);
+                    cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages
                         .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
                     AliquotWrapper aliquot = aliquots.get(0);
@@ -553,7 +561,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                             .getFormattedDateProcessed(), aliquot
                             .getPatientVisit().getPatient().getPnumber());
                 } else {
-                    cell.setStatus(AliquotCellStatus.NO_TYPE);
+                    cell.setStatus(CellStatus.NO_TYPE);
                     if (independantProcess) {
                         SampleTypeSelectionWidget widget = sampleTypeWidgets
                             .get(cell.getRow());
@@ -561,12 +569,12 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         SampleTypeWrapper type = widget.getSelection();
                         if (type != null) {
                             cell.setType(type);
-                            cell.setStatus(AliquotCellStatus.TYPE);
+                            cell.setStatus(CellStatus.TYPE);
                         }
                     }
                 }
             } else {
-                cell.setStatus(AliquotCellStatus.EMPTY);
+                cell.setStatus(CellStatus.EMPTY);
             }
             return cell.getStatus();
         }
@@ -586,7 +594,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             .getSampleStorageCollection();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
-                && cell.getStatus() == AliquotCellStatus.TYPE) {
+                && cell.getStatus() == CellStatus.TYPE) {
                 patientVisit.addNewAliquot(cell.getValue(), cell.getType(),
                     sampleStorages, ActivityStatusWrapper.getActivityStatus(
                         appService, "Active"));
@@ -622,7 +630,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                             PalletCell cell = cells.get(rcp);
                             if (PalletCell.hasValue(cell)) {
                                 cell.setType(type);
-                                cell.setStatus(AliquotCellStatus.TYPE);
+                                cell.setStatus(CellStatus.TYPE);
                             }
                         }
                     }
@@ -646,7 +654,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         cancelConfirmWidget.reset();
         removeRescanMode();
         setScanHasBeenLauched(false);
-        setScanNotLauched();
         if (resetAll) {
             resetPlateToScan();
             spw.setCells(null);
@@ -685,8 +692,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        AliquotCellStatus status = processCellStatus(cell, true);
-        boolean ok = isScanValid() && (status != AliquotCellStatus.ERROR);
+        CellStatus status = processCellStatus(cell, true);
+        boolean ok = isScanValid() && (status != CellStatus.ERROR);
         setScanValid(ok);
         typesSelectionPerRowComposite.setEnabled(ok);
         spw.redraw();

@@ -39,15 +39,15 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerStatus;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
-import edu.ualberta.med.biobank.widgets.grids.MultiSelectionEvent;
-import edu.ualberta.med.biobank.widgets.grids.MultiSelectionListener;
-import edu.ualberta.med.biobank.widgets.grids.MultiSelectionSpecificBehaviour;
+import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
+import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
+import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
 
 public class ContainerViewForm extends BiobankViewForm {
@@ -187,10 +187,10 @@ public class ContainerViewForm extends BiobankViewForm {
                     ContainerWrapper container = childrenMap.get(new RowColPos(
                         i, j));
                     if (container == null) {
-                        cell.setStatus(ContainerStatus.NOT_INITIALIZED);
+                        cell.setStatus(CellStatus.NOT_INITIALIZED);
                     } else {
                         cell.setContainer(container);
-                        cell.setStatus(ContainerStatus.INITIALIZED);
+                        cell.setStatus(CellStatus.INITIALIZED);
                     }
                 }
             }
@@ -220,9 +220,9 @@ public class ContainerViewForm extends BiobankViewForm {
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));
         }
-        containerWidget = new ContainerDisplayWidget(client);
+        containerWidget = new ContainerDisplayWidget(client,
+            CellStatus.DEFAULT_CONTAINER_STATUS_LIST);
         containerWidget.setContainer(container);
-        containerWidget.initLegend();
         containerWidget.setCells(cells);
 
         containerWidget.addDragDetectListener(new DragDetectListener() {
@@ -432,7 +432,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void openFormFor(ContainerCell cell) {
         ContainerAdapter newAdapter = null;
-        if (cell.getStatus() == ContainerStatus.NOT_INITIALIZED) {
+        if (cell.getStatus() == CellStatus.NOT_INITIALIZED) {
             if (canCreate) {
                 ContainerWrapper containerToOpen = cell.getContainer();
                 if (containerToOpen == null) {

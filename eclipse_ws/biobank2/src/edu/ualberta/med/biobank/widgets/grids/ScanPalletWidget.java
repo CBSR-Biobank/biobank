@@ -1,34 +1,44 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
+import java.util.List;
+
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.util.RowColPos;
-
-//    public static final int SAMPLE_WIDTH = 50;
-//
-//    /**
-//     * Pallets are always 8*12 = fixed size
-//     */
-//    public static final int PALLET_WIDTH = SAMPLE_WIDTH * ScanCell.COL_MAX;
-//    public static final int PALLET_HEIGHT = SAMPLE_WIDTH * ScanCell.ROW_MAX;
-//
-//    protected List<AliquotCellStatus> statusAvailable;
+import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.model.CellStatus;
+import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileManager;
+import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileSettings;
 
 public class ScanPalletWidget extends ContainerDisplayWidget {
 
     public ScanPalletWidget(Composite parent) {
-        this(parent, true);
+        this(parent, null);
     }
 
-    public ScanPalletWidget(Composite parent, boolean hasLegend) {
-        super(parent);
-        containerDisplay = new ScanPalletDisplay(this, hasLegend);
+    public ScanPalletWidget(Composite parent, List<CellStatus> cellStatus) {
+        super(parent, cellStatus);
+        setContainerDisplay(new ScanPalletDisplay(this));
     }
 
-    public RowColPos getPositionAtCoordinates(int x, int y) {
-        return ((ScanPalletDisplay) containerDisplay).getPositionAtCoordinates(
-            x, y);
+    public boolean isEverythingTyped() {
+        if (cells != null) {
+            for (Cell cell : cells.values()) {
+                PalletCell pCell = (PalletCell) cell;
+                if (PalletCell.hasValue(pCell) && pCell.getType() == null) {
+                    return false;
+                }
+            }
+            return true;
+        }
+        return false;
+    }
 
+    public void loadProfile(String profile) {
+        ProfileSettings profileData = ProfileManager.instance().getProfile(
+            profile);
+        ((ScanPalletDisplay) getContainerDisplay()).setProfile(profileData);
+        this.redraw();
     }
 
 }

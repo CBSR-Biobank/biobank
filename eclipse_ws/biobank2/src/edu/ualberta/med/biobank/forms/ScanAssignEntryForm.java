@@ -46,7 +46,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.model.AliquotCellStatus;
+import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -91,7 +91,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private String oldPalletLabel;
 
     // global state of the pallet process
-    private AliquotCellStatus currentScanState;
+    private CellStatus currentScanState;
 
     // contains moved and missing aliquots. a missing one is set to into the
     // missing rowColPos. A moved one is set into its old RowColPos
@@ -119,6 +119,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         Boolean.class);
 
     protected boolean useNewProductBarcode;
+
+    private boolean isFakeScanLinkedOnly;
 
     @Override
     protected void init() throws Exception {
@@ -394,7 +396,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         palletComposite.setLayout(getNeutralGridLayout());
         palletComposite.setLayoutData(new GridData());
         palletLabel = toolkit.createLabel(palletComposite, "Pallet"); //$NON-NLS-1$
-        palletWidget = new ScanPalletWidget(palletComposite);
+        palletWidget = new ScanPalletWidget(palletComposite,
+            CellStatus.DEFAULT_PALLET_SCAN_ASSIGN_STATUS_LIST);
         toolkit.adapt(palletWidget);
         palletWidget.addMouseListener(new MouseAdapter() {
             @Override
@@ -429,14 +432,14 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     @Override
     protected boolean canScanTubeAlone(PalletCell cell) {
         return super.canScanTubeAlone(cell)
-            || cell.getStatus() == AliquotCellStatus.MISSING;
+            || cell.getStatus() == CellStatus.MISSING;
     }
 
     @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
         processCellStatus(cell);
         currentScanState = currentScanState.mergeWith(cell.getStatus());
-        setScanValid(currentScanState != AliquotCellStatus.ERROR);
+        setScanValid(currentScanState != CellStatus.ERROR);
         palletWidget.redraw();
     }
 
@@ -493,8 +496,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     @Override
-    protected void beforeScan() {
-        showOnlyPallet(false, true);
+    protected void beforeScanThreadStart() {
+        showOnlyPallet(false, false);
+        isFakeScanLinkedOnly = fakeScanLinkedOnlyButton != null
+            && fakeScanLinkedOnlyButton.getSelection();
     }
 
     @Override
@@ -514,8 +519,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
-        if (fakeScanLinkedOnlyButton != null
-            && fakeScanLinkedOnlyButton.getSelection()) {
+        if (isFakeScanLinkedOnly) {
             return PalletCell.getRandomAliquotsNotAssigned(appService,
                 SessionManager.getInstance().getCurrentSite().getId());
         }
@@ -531,7 +535,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, AliquotWrapper> expectedAliquots = currentPalletWrapper
             .getAliquots();
-        currentScanState = AliquotCellStatus.EMPTY;
+        currentScanState = CellStatus.EMPTY;
         for (int row = 0; row < currentPalletWrapper.getRowCapacity(); row++) {
             for (int col = 0; col < currentPalletWrapper.getColCapacity(); col++) {
                 RowColPos rcp = new RowColPos(row, col);
@@ -539,9 +543,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                     + LabelingScheme.rowColToSbs(rcp));
                 PalletCell cell = getCells().get(rcp);
                 if (!isRescanMode() || cell == null || cell.getStatus() == null
-                    || cell.getStatus() == AliquotCellStatus.EMPTY
-                    || cell.getStatus() == AliquotCellStatus.ERROR
-                    || cell.getStatus() == AliquotCellStatus.MISSING) {
+                    || cell.getStatus() == CellStatus.EMPTY
+                    || cell.getStatus() == CellStatus.ERROR
+                    || cell.getStatus() == CellStatus.MISSING) {
                     AliquotWrapper expectedAliquot = null;
                     if (expectedAliquots != null) {
                         expectedAliquot = expectedAliquots.get(rcp);
@@ -558,7 +562,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                         processCellStatus(cell);
                     }
                 }
-                AliquotCellStatus newStatus = AliquotCellStatus.EMPTY;
+                CellStatus newStatus = CellStatus.EMPTY;
                 if (cell != null) {
                     newStatus = cell.getStatus();
                 }
@@ -566,7 +570,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             }
         }
         setScanValid(!getCells().isEmpty()
-            && currentScanState != AliquotCellStatus.ERROR);
+            && currentScanState != CellStatus.ERROR);
     }
 
     private void showOnlyPallet(boolean show) {
@@ -639,7 +643,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                     if (expectedAliquot != null) {
                         // aliquot scanned is already registered at this
                         // position (everything is ok !)
-                        scanCell.setStatus(AliquotCellStatus.FILLED);
+                        scanCell.setStatus(CellStatus.FILLED);
                         scanCell.setTitle(foundAliquot.getPatientVisit()
                             .getPatient().getPnumber());
                         scanCell.setAliquot(expectedAliquot);
@@ -649,7 +653,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                                 processCellWithPreviousPosition(scanCell,
                                     positionString, foundAliquot);
                             } else { // new
-                                scanCell.setStatus(AliquotCellStatus.NEW);
+                                scanCell.setStatus(CellStatus.NEW);
                                 scanCell.setTitle(foundAliquot
                                     .getPatientVisit().getPatient()
                                     .getPnumber());
@@ -690,7 +694,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 } else {
                     // missing position has already been processed: remove the
                     // MISSING flag
-                    missingAliquot.setStatus(AliquotCellStatus.EMPTY);
+                    missingAliquot.setStatus(CellStatus.EMPTY);
                     missingAliquot.setTitle("");
                     movedAndMissingAliquotsFromPallet.remove(movedFromPosition);
                 }
@@ -705,7 +709,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         PalletCell scanCell) {
         String cellValue = scanCell.getValue();
 
-        scanCell.setStatus(AliquotCellStatus.ERROR);
+        scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages.getFormattedString(
             "ScanAssign.scanStatus.aliquot.inventoryIdError", cellValue)); //$NON-NLS-1$
         scanCell.setTitle("!"); //$NON-NLS-1$
@@ -720,7 +724,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
         scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
             .getPnumber());
-        scanCell.setStatus(AliquotCellStatus.ERROR);
+        scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages.getFormattedString(
             "ScanAssign.scanStatus.aliquot.typeError", palletType, sampleType)); //$NON-NLS-1$
         appendLogNLS(
@@ -735,7 +739,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             expectedPosition = "none"; //$NON-NLS-1$
         }
 
-        scanCell.setStatus(AliquotCellStatus.MOVED);
+        scanCell.setStatus(CellStatus.MOVED);
         scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
             .getPnumber());
         scanCell.setInformation(Messages.getFormattedString(
@@ -752,7 +756,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private void updateCellAsPositionAlreadyTaken(String position,
         PalletCell scanCell, AliquotWrapper expectedAliquot,
         AliquotWrapper foundAliquot) {
-        scanCell.setStatus(AliquotCellStatus.ERROR);
+        scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.positionTakenError")); //$NON-NLS-1$
         scanCell.setTitle("!"); //$NON-NLS-1$
@@ -767,7 +771,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      * aliquot not found in site (not yet linked ?)
      */
     private void updateCellAsNotLinked(String position, PalletCell scanCell) {
-        scanCell.setStatus(AliquotCellStatus.ERROR);
+        scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages
             .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
         appendLogNLS(
@@ -782,7 +786,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
         PalletCell movedAliquot = movedAndMissingAliquotsFromPallet.get(rcp);
         if (movedAliquot == null) {
-            scanCell.setStatus(AliquotCellStatus.MISSING);
+            scanCell.setStatus(CellStatus.MISSING);
             scanCell
                 .setInformation(Messages
                     .getFormattedString(
@@ -796,7 +800,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             movedAndMissingAliquotsFromPallet.put(rcp, scanCell);
         } else {
             movedAndMissingAliquotsFromPallet.remove(rcp);
-            scanCell.setStatus(AliquotCellStatus.EMPTY);
+            scanCell.setStatus(CellStatus.EMPTY);
         }
     }
 
@@ -815,8 +819,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 for (RowColPos rcp : cells.keySet()) {
                     PalletCell cell = cells.get(rcp);
                     if (cell != null
-                        && (cell.getStatus() == AliquotCellStatus.NEW || cell
-                            .getStatus() == AliquotCellStatus.MOVED)) {
+                        && (cell.getStatus() == CellStatus.NEW || cell
+                            .getStatus() == CellStatus.MOVED)) {
                         AliquotWrapper aliquot = cell.getAliquot();
                         if (aliquot != null) {
                             aliquot.setPosition(rcp);
@@ -833,7 +837,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                     }
                 }
             } catch (Exception ex) {
-                setScanNotLauched();
+                setScanHasBeenLauched(false);
                 throw ex;
             }
             appendLog(sb.toString());
@@ -854,7 +858,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private boolean saveEvenIfAliquotsMissing() {
-        if (currentScanState == AliquotCellStatus.MISSING
+        if (currentScanState == CellStatus.MISSING
             && movedAndMissingAliquotsFromPallet.size() > 0) {
             boolean save = BioBankPlugin.openConfirm(
                 Messages.getString("ScanAssign.dialog.reallySave.title"), //$NON-NLS-1$
@@ -914,7 +918,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             palletWidget.setCells(null);
         }
         movedAndMissingAliquotsFromPallet.clear();
-        setScanNotLauched();
+        setScanHasBeenLauched(false);
         initPalletValues();
 
         currentPalletWrapper.setProductBarcode(productBarcode);

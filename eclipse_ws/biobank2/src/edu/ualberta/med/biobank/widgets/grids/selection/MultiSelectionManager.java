@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.grids;
+package edu.ualberta.med.biobank.widgets.grids.selection;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -18,6 +18,7 @@ import org.eclipse.swt.events.MouseTrackListener;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 
 public class MultiSelectionManager {
 

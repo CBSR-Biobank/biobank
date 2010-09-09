@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets.grids;
+package edu.ualberta.med.biobank.widgets.grids.selection;
 
 import java.util.EventObject;
 

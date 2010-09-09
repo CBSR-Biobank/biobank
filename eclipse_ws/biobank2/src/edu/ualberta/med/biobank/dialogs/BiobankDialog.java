@@ -37,7 +37,7 @@ public abstract class BiobankDialog extends TitleAreaDialog {
 
     protected Boolean okButtonEnabled;
 
-    private boolean setupFinished = false;
+    protected boolean setupFinished = false;
 
     protected BiobankDialog(Shell parentShell) {
         super(parentShell);
@@ -151,20 +151,22 @@ public abstract class BiobankDialog extends TitleAreaDialog {
             public void handleChange(ChangeEvent event) {
                 IObservableValue validationStatus = (IObservableValue) event
                     .getSource();
-                IStatus status = (IStatus) validationStatus.getValue();
-
-                if (status.getSeverity() == IStatus.OK) {
-                    setErrorMessage(null);
-                    setOkButtonEnabled(true);
-                } else {
-                    if (setupFinished) {
-                        setErrorMessage(status.getMessage());
-                    }
-                    setOkButtonEnabled(false);
-                }
+                handleStatusChanged((IStatus) validationStatus.getValue());
             }
         });
         widgetCreator.addGlobalBindValue(statusObservable);
+    }
+
+    protected void handleStatusChanged(IStatus status) {
+        if (status.getSeverity() == IStatus.OK) {
+            setErrorMessage(null);
+            setOkButtonEnabled(true);
+        } else {
+            if (setupFinished) {
+                setErrorMessage(status.getMessage());
+            }
+            setOkButtonEnabled(false);
+        }
     }
 
     protected void setOkButtonEnabled(boolean enabled) {
@@ -195,4 +197,5 @@ public abstract class BiobankDialog extends TitleAreaDialog {
     protected WidgetCreator getWidgetCreator() {
         return widgetCreator;
     }
+
 }

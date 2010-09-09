@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.widgets.grids;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.swt.events.PaintEvent;
@@ -9,41 +7,17 @@ import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.model.ContainerStatus;
 
 public class GridContainerDisplay extends AbstractGridDisplay {
 
     private static final int HEIGHT_TWO_LINES = 40;
 
-    private List<ContainerStatus> legendStatus;
-
     /**
      * Default status when cell doesn't have any status
      */
-    private ContainerStatus defaultStatus = ContainerStatus.NOT_INITIALIZED;
-
-    @Override
-    public Cell getObjectAtCoordinates(ContainerDisplayWidget displayWidget,
-        int x, int y) {
-        if (displayWidget.getCells() == null) {
-            return null;
-        }
-        int col = x / getCellWidth();
-        int row = y / getCellHeight();
-        if (col >= 0 && col < getCols() && row >= 0 && row < getRows()) {
-            return displayWidget.getCells().get(new RowColPos(row, col));
-        }
-        return null;
-    }
-
-    @Override
-    public void initLegend() {
-        List<ContainerStatus> legendStatus = new ArrayList<ContainerStatus>();
-        legendStatus.add(ContainerStatus.NOT_INITIALIZED);
-        legendStatus.add(ContainerStatus.INITIALIZED);
-        setLegend(legendStatus);
-    }
+    private CellStatus defaultStatus = CellStatus.NOT_INITIALIZED;
 
     @Override
     protected void paintGrid(PaintEvent e, ContainerDisplayWidget displayWidget) {
@@ -53,7 +27,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
         }
         if (hasLegend) {
             for (int i = 0; i < legendStatus.size(); i++) {
-                ContainerStatus status = legendStatus.get(i);
+                CellStatus status = legendStatus.get(i);
                 drawLegend(e, status.getColor(), i, status.getLegend());
             }
         }
@@ -69,7 +43,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
             if (cell == null) {
                 cell = new ContainerCell();
             }
-            ContainerStatus status = cell.getStatus();
+            CellStatus status = cell.getStatus();
             if (status == null)
                 status = defaultStatus;
             e.gc.setBackground(status.getColor());
@@ -118,13 +92,23 @@ public class GridContainerDisplay extends AbstractGridDisplay {
         return sname;
     }
 
-    public void setLegend(List<ContainerStatus> legendStatus) {
-        hasLegend = true;
-        this.legendStatus = legendStatus;
+    // public void setLegend(List<CellStatus> legendStatus) {
+    // hasLegend = true;
+    // this.legendStatus = legendStatus;
+    // }
+
+    public void setDefaultStatus(CellStatus status) {
+        this.defaultStatus = status;
     }
 
-    public void setDefaultStatus(ContainerStatus status) {
-        this.defaultStatus = status;
+    @Override
+    public RowColPos getPositionAtCoordinates(int x, int y) {
+        int col = x / getCellWidth();
+        int row = y / getCellHeight();
+        if (col >= 0 && col < getCols() && row >= 0 && row < getRows()) {
+            return new RowColPos(row, col);
+        }
+        return null;
     }
 
 }

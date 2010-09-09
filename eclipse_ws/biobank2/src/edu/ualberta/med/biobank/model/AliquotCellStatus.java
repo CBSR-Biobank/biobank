@@ -5,6 +5,7 @@ import org.eclipse.swt.graphics.Color;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 
+@Deprecated
 public enum AliquotCellStatus {
     EMPTY(SWT.COLOR_WHITE, "Empty"), FILLED(SWT.COLOR_DARK_GRAY, "Filled"), NEW(
         SWT.COLOR_DARK_GREEN, "New"), MOVED(217, 161, 65, "Moved"), MISSING(

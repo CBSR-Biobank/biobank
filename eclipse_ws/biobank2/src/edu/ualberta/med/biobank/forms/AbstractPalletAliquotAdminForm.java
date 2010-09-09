@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
-import edu.ualberta.med.biobank.model.AliquotCellStatus;
+import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
@@ -117,19 +117,20 @@ public abstract class AbstractPalletAliquotAdminForm extends
         palletScanManagement = new PalletScanManagement() {
 
             @Override
-            protected void beforeScanAndProcess() {
-                AbstractPalletAliquotAdminForm.this.beforeScan();
+            protected void beforeThreadStart() {
                 currentPlateToScan = plateToScanValue.getValue().toString();
+                AbstractPalletAliquotAdminForm.this.beforeScanThreadStart();
             }
 
             @Override
             protected void beforeScan() {
-                setScanNotLauched(true);
+                setScanHasBeenLauched(false, true);
                 String msgKey = "linkAssign.activitylog.scanning";//$NON-NLS-1$
                 if (isRescanMode()) {
                     msgKey = "linkAssign.activitylog.rescanning";//$NON-NLS-1$
                 }
                 appendLogNLS(msgKey, currentPlateToScan);
+
             }
 
             @Override
@@ -170,12 +171,12 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
             @Override
             protected void plateError() {
-                setScanNotLauched(true);
+                setScanHasBeenLauched(false, true);
             }
         };
     }
 
-    protected void beforeScan() {
+    protected void beforeScanThreadStart() {
 
     }
 
@@ -208,12 +209,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void createScanButton(Composite parent) {
         scanButtonTitle = Messages.getString("linkAssign.scanButton.text");
-        if (BioBankPlugin.isRealScanEnabled()) {
-            toolkit.createLabel(parent, "Decode Type:");
-
-            Composite composite = toolkit.createComposite(parent);
-            composite.setLayout(new GridLayout(2, false));
-        } else {
+        if (!BioBankPlugin.isRealScanEnabled()) {
             createFakeOptions(parent);
             scanButtonTitle = "Fake scan"; //$NON-NLS-1$
         }
@@ -339,22 +335,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected abstract boolean fieldsValid();
 
-    protected void setScanNotLauched() {
-        scanHasBeenLaunchedValue.setValue(false);
-    }
-
-    protected void setScanNotLauched(boolean async) {
-        if (async)
-            Display.getDefault().asyncExec(new Runnable() {
-                @Override
-                public void run() {
-                    setScanNotLauched();
-                }
-            });
-        else
-            setScanNotLauched();
-    }
-
     protected void setScanValid(final boolean valid) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
@@ -368,24 +348,24 @@ public abstract class AbstractPalletAliquotAdminForm extends
         return scanValidValue.getValue().equals(true);
     }
 
-    protected void setScanHasBeenLauched() {
-        scanHasBeenLaunchedValue.setValue(true);
+    protected void setScanHasBeenLauched(boolean launched) {
+        scanHasBeenLaunchedValue.setValue(launched);
     }
 
     protected boolean isScanHasBeenLaunched() {
         return scanHasBeenLaunchedValue.getValue().equals(true);
     }
 
-    protected void setScanHasBeenLauched(boolean async) {
+    protected void setScanHasBeenLauched(final boolean launched, boolean async) {
         if (async)
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    setScanHasBeenLauched();
+                    setScanHasBeenLauched(launched);
                 }
             });
         else
-            setScanHasBeenLauched();
+            setScanHasBeenLauched(launched);
     }
 
     protected boolean isRescanMode() {
@@ -452,7 +432,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected boolean canScanTubeAlone(PalletCell cell) {
-        return cell == null || cell.getStatus() == AliquotCellStatus.EMPTY;
+        return cell == null || cell.getStatus() == CellStatus.EMPTY;
     }
 
     protected abstract void postprocessScanTubeAlone(PalletCell cell)

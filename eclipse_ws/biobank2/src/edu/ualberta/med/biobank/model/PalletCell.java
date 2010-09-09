@@ -15,7 +15,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class PalletCell extends Cell {
 
-    private AliquotCellStatus status;
+    private CellStatus status;
 
     private String information;
 
@@ -105,11 +105,11 @@ public class PalletCell extends Cell {
         return palletScanned;
     }
 
-    public AliquotCellStatus getStatus() {
+    public CellStatus getStatus() {
         return status;
     }
 
-    public void setStatus(AliquotCellStatus status) {
+    public void setStatus(CellStatus status) {
         this.status = status;
     }
 
