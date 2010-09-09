@@ -294,7 +294,8 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
         IStructuredSelection asSelection = (IStructuredSelection) activityStatusComboViewer
             .getSelection();
         if ((asSelection != null) && (asSelection.size() > 0)) {
-            activityStatus = (ActivityStatusWrapper) asSelection;
+            activityStatus = (ActivityStatusWrapper) asSelection
+                .getFirstElement();
         }
         shipment.setActivityStatus(activityStatus);
         boolean newShipment = shipment.isNew();

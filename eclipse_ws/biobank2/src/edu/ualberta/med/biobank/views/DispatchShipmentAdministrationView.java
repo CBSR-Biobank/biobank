@@ -11,10 +11,14 @@ public class DispatchShipmentAdministrationView extends
 
     public static final String ID = "edu.ualberta.med.biobank.views.DispatchShipmentAdmininistrationView";
 
+    private static DispatchShipmentAdministrationView currentInstance;
+
     public SentDispatchShipmentGroup sentNode;
+
     public ReceivedDispatchShipmentGroup receivedNode;
 
     public DispatchShipmentAdministrationView() {
+        currentInstance = this;
         SessionManager.addView(DispatchShipmentAdministrationView.ID, this);
     }
 
