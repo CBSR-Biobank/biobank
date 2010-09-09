@@ -32,9 +32,12 @@ public enum CellStatus {
     public static List<CellStatus> DEFAULT_PALLET_SCAN_LINK_STATUS_LIST = Arrays
         .asList(EMPTY, NO_TYPE, TYPE, ERROR);
 
-    public static List<CellStatus> DEFAULT_PALLET_DISPATCH_STATUS_LIST = Arrays
-        .asList(EMPTY, ERROR, IN_SHIPMENT_ACCEPTED, IN_SHIPMENT_PENDING,
-            NOT_IN_SHIPMENT);
+    public static List<CellStatus> DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST = Arrays
+        .asList(EMPTY, IN_SHIPMENT_ACCEPTED, IN_SHIPMENT_PENDING,
+            NOT_IN_SHIPMENT, ERROR);
+
+    public static List<CellStatus> DEFAULT_PALLET_DISPATCH_CREATE_STATUS_LIST = Arrays
+        .asList(EMPTY, FILLED, IN_SHIPMENT_PENDING, MISSING, ERROR);
 
     private CellStatus(int color, String legend) {
         this.color = BioBankPlugin.getDefault().getWorkbench().getDisplay()
