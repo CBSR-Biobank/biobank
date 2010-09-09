@@ -18,19 +18,27 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotInvoiceByClinicTest extends AbstractReportTest {
-    private static final Comparator<AliquotWrapper> ORDER_BY_CLINIC_ID_PHNUMBER = new Comparator<AliquotWrapper>() {
+    private static final Comparator<AliquotWrapper> ORDER_BY_CLINIC_ID_PNUMBER = new Comparator<AliquotWrapper>() {
         public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
-            int comparedClinicId = lhs
+            int cmp = lhs
                 .getPatientVisit()
                 .getShipment()
                 .getClinic()
                 .getId()
                 .compareTo(
                     rhs.getPatientVisit().getShipment().getClinic().getId());
-            int comparedPnumber = lhs.getPatientVisit().getPatient()
-                .getPnumber()
+            if (cmp != 0) {
+                return cmp;
+            }
+
+            cmp = lhs.getPatientVisit().getPatient().getPnumber()
                 .compareTo(rhs.getPatientVisit().getPatient().getPnumber());
-            return comparedClinicId != 0 ? comparedClinicId : comparedPnumber;
+
+            if (cmp != 0) {
+                return cmp;
+            }
+
+            return lhs.getInventoryId().compareTo(rhs.getInventoryId());
         }
 
     };
@@ -76,7 +84,7 @@ public class AliquotInvoiceByClinicTest extends AbstractReportTest {
                 ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER,
                 aliquotSite(isInSite(), getSiteId()))));
 
-        Collections.sort(filteredAliquots, ORDER_BY_CLINIC_ID_PHNUMBER);
+        Collections.sort(filteredAliquots, ORDER_BY_CLINIC_ID_PNUMBER);
 
         List<Object> expectedResults = new ArrayList<Object>();
 

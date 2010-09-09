@@ -15,7 +15,7 @@ public class AliquotInvoiceByPatientImpl extends AbstractReport {
         + "')) and Alias.linkDate between ? and ? and Alias.patientVisit.shipment.site "
         + SITE_OPERATOR
         + SITE_ID
-        + " ORDER BY Alias.patientVisit.patient.pnumber";
+        + " ORDER BY Alias.patientVisit.patient.pnumber, Alias.inventoryId";
 
     public AliquotInvoiceByPatientImpl(BiobankReport report) {
         super(QUERY, report);

@@ -19,7 +19,7 @@ public class AliquotInvoiceByClinicImpl extends AbstractReport {
         + SITE_OPERATOR
         + SITE_ID
         + " ORDER BY "
-        + "Alias.patientVisit.shipment.clinic.id, Alias.patientVisit.patient.pnumber";
+        + "Alias.patientVisit.shipment.clinic.id, Alias.patientVisit.patient.pnumber, Alias.inventoryId";
 
     public AliquotInvoiceByClinicImpl(BiobankReport report) {
         super(QUERY_STRING, report);

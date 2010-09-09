@@ -20,8 +20,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class AliquotInvoiceByPatientTest extends AbstractReportTest {
     private static final Comparator<AliquotWrapper> ORDER_BY_ALIQUOT_PNUMBER = new Comparator<AliquotWrapper>() {
         public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
-            return lhs.getPatientVisit().getPatient().getPnumber()
+            int cmp = lhs.getPatientVisit().getPatient().getPnumber()
                 .compareTo(rhs.getPatientVisit().getPatient().getPnumber());
+
+            if (cmp != 0) {
+                return cmp;
+            }
+
+            return lhs.getInventoryId().compareTo(rhs.getInventoryId());
         }
     };
 
