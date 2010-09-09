@@ -57,5 +57,4 @@ gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2
 #mysql --safe-updates=0 -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v123_v130.sql
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v123_v130.sql
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < $DUMPFILE
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < security-logs/schemaLog.sql
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < security-logs/addCBSRSiteSecurity.sql

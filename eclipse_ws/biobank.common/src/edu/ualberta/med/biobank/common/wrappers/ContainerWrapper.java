@@ -1099,4 +1099,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             barcode);
     }
 
+    public ContainerWrapper getTop() {
+        return objectWithPositionManagement.getTop();
+    }
+
 }

@@ -22,7 +22,7 @@ public class AliquotRequestImpl extends AbstractReport {
         + SITE_ID + " and p.container.label not like '"
         + SENT_SAMPLES_FREEZER_NAME
         + "' and p.aliquot.patientVisit.patient.pnumber like ? and"
-        + " datediff(p.aliquot.patientVisit.dateDrawn, ?) =0  and"
+        + " datediff(p.aliquot.patientVisit.dateDrawn, ?) = 0  and"
         + " p.aliquot.sampleType.nameShort like ? ORDER BY RAND()";
 
     public AliquotRequestImpl(BiobankReport report) {
@@ -92,16 +92,22 @@ public class AliquotRequestImpl extends AbstractReport {
                     results.add(queried.get(j));
             }
             if (queried.size() < maxResults)
-                results.add(new Object[] { pnumber, "",
-                    DateFormatter.formatAsDate(dateDrawn), typeName,
-                    "NOT FOUND (" + (maxResults - queried.size()) + ")" });
+                results.add(getNotFoundRow(pnumber, dateDrawn, typeName,
+                    maxResults, queried.size()));
         }
         return results;
     }
 
+    public static Object[] getNotFoundRow(String pnumber, Date dateDrawn,
+        String typeName, Integer maxResults, Integer numResultsFound) {
+        return new Object[] { pnumber, "",
+            DateFormatter.formatAsDate(dateDrawn), typeName,
+            "NOT FOUND (" + (maxResults - numResultsFound) + ")" };
+    }
+
     // Database calls are made so can't use RowPostProcess
     @Override
-    protected List<Object> postProcess(WritableApplicationService appService,
+    public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         for (Object ob : results) {

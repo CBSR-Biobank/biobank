@@ -25,7 +25,7 @@ public class PsByStudyImpl extends AbstractReport {
     }
 
     @Override
-    protected AbstractRowPostProcess getRowPostProcess() {
+    public AbstractRowPostProcess getRowPostProcess() {
         return dateRangePostProcess;
     }
 
