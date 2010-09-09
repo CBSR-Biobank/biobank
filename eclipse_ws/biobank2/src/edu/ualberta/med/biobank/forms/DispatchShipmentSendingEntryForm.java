@@ -252,6 +252,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         shipment.setShippingMethod(shippingMethod);
 
         shipment.persist();
+        // DispatchShipmentAdministrationView.reload();
     }
 
     @Override
