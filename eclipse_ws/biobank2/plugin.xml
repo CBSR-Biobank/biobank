@@ -242,8 +242,8 @@
             name="Clinic Shipment administration">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.sessionReload"
-            name="Session Reload">
+            id="edu.ualberta.med.biobank.commands.reloadViewWithTree"
+            name="Reload">
       </command>
       <command
             defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMail"
@@ -256,10 +256,6 @@
       <command
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.todayNodeReload"
-            name="Reload Today Node in Administration Tree">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.print"
@@ -282,7 +278,7 @@
             name="Edit">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.reload"
+            id="edu.ualberta.med.biobank.commands.reloadViewForm"
             name="Reload">
 	  </command>
 	  <command
@@ -837,8 +833,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.SessionReloadHandler"
-            commandId="edu.ualberta.med.biobank.commands.sessionReload">
+            class="edu.ualberta.med.biobank.handlers.ReloadViewWithTreeHandler"
+            commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree">
          <activeWhen>
                <reference
                      definitionId="biobank2.loggedIn">
@@ -955,8 +951,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.ReloadHandler"
-            commandId="edu.ualberta.med.biobank.commands.reload">
+            class="edu.ualberta.med.biobank.handlers.ReloadViewFormHandler"
+            commandId="edu.ualberta.med.biobank.commands.reloadViewForm">
          <activeWhen>
             <with
                   variable="activeEditor">
@@ -966,7 +962,7 @@
             </with>
             </activeWhen>
             </handler>
-<handler
+	   <handler
             class="edu.ualberta.med.biobank.handlers.EditActivityStatusHandler"
             commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods">
          <activeWhen>
@@ -1468,7 +1464,7 @@
                   tooltip="Search">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.sessionReload"
+                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
                   style="push"
@@ -1587,17 +1583,11 @@
                   tooltip="Search">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.todayNodeReload"
+                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
                   style="push"
                   tooltip="Reload Today Node">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
          </toolbar>
          <toolbar
@@ -1634,17 +1624,11 @@
                   tooltip="Search">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.todayNodeReload"
+                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
                   style="push"
                   tooltip="Reload Today Node">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.shipmentsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
          </toolbar>
          <toolbar
@@ -1660,6 +1644,13 @@
                         definitionId="biobank2.dispatchShipmentsPerspectiveSelected">
                   </reference>
                </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
+                  icon="icons/reload.png"
+                  label="Reload"
+                  style="push"
+                  tooltip="Reload tree">
             </command>
          </toolbar>
       </menuContribution>
@@ -2413,7 +2404,7 @@
             sequence="M1+M2+K">
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.reload"
+            commandId="edu.ualberta.med.biobank.commands.reloadViewForm"
             schemeId="biobank2.scheme"
             sequence="M1+T">
       </key>
