@@ -283,7 +283,8 @@ public class DispatchShipmentWrapper extends
             }
         }
         ActivityStatusWrapper dispatchedStatus = ActivityStatusWrapper
-            .getActivityStatus(getAppService(), "Dispatched");
+            .getActivityStatus(getAppService(),
+                ActivityStatusWrapper.DISPATCHED_STATUS_STRING);
         // new aliquots added
         for (AliquotWrapper aliquot : newAliquots) {
             if (aliquot.isNew()) {

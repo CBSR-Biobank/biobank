@@ -196,6 +196,12 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
     }
 
     private void reloadAliquotsTables() {
+        try {
+            shipment.reload();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         aliquotsToBeReceivedTable.reloadCollection(shipment
             .getNotReceivedAliquots());
         aliquotsReceivedTable.reloadCollection(shipment.getReceivedAliquots());

@@ -17,7 +17,8 @@ public class SampleStorageHelper extends DbHelper {
         sampleStorage.setQuantity(r.nextInt(10));
         sampleStorage.setVolume(r.nextDouble());
         sampleStorage.setActivityStatus(ActivityStatusWrapper
-            .getActivityStatus(appService, "Active"));
+            .getActivityStatus(appService,
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         return sampleStorage;
     }
 

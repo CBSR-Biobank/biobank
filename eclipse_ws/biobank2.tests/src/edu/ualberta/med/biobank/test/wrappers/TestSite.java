@@ -332,8 +332,8 @@ public class TestSite extends TestDatabase {
         SiteWrapper site = new SiteWrapper(appService);
         site.setName(name);
         site.setNameShort(name);
-        site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        site.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
 
         try {
             site.persist();
@@ -388,8 +388,8 @@ public class TestSite extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        site.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         SiteHelper.createdSites.add(site);
         site.persist();
         int newTotal = SiteWrapper.getSites(appService).size();

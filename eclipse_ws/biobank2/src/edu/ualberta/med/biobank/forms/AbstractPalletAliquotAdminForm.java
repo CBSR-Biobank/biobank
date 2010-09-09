@@ -147,7 +147,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
             @Override
             protected void beforeScanMerge() {
-                setScanHasBeenLauched(true);
+                setScanHasBeenLauched(true, true);
             }
 
             @Override

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.client.config.calgary;
 import java.util.List;
 
 import edu.ualberta.med.biobank.client.config.ConfigSite;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -14,7 +15,8 @@ public class CalgarySite extends ConfigSite {
         site = new SiteWrapper(appService);
         site.setName("Calgary Foothills");
         site.setNameShort("Calgary-F");
-        site.setActivityStatus(getActiveActivityStatus());
+        site.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         site.setStreet1("");
         site.setStreet2("");
         site.setCity("Calgary");

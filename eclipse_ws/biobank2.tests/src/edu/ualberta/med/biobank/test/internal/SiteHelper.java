@@ -22,7 +22,7 @@ public class SiteHelper extends DbHelper {
             }
         }
         site.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         site.setStreet1(Utils.getRandomString(32));
         site.setCity(Utils.getRandomString(32));
         return site;

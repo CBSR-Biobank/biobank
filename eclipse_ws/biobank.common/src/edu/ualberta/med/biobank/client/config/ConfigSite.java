@@ -63,11 +63,6 @@ public class ConfigSite {
         return ActivityStatusWrapper.getActivityStatus(appService, name);
     }
 
-    public static ActivityStatusWrapper getActiveActivityStatus()
-        throws Exception {
-        return ActivityStatusWrapper.getActivityStatus(appService, "Active");
-    }
-
     protected static void siteDeleteSubObjects(SiteWrapper site)
         throws Exception {
         List<StudyWrapper> studies = site.getStudyCollection(false);

@@ -459,8 +459,8 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        container.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        container.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         container.persist();
     }
 
@@ -965,8 +965,8 @@ public class TestContainer extends TestDatabase {
 
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
-                childL3.addAliquot(row, col,
-                    AliquotHelper.newAliquot(sampleType, "Active"));
+                childL3.addAliquot(row, col, AliquotHelper.newAliquot(
+                    sampleType, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
                 AliquotWrapper aliquot = childL3.getAliquot(row, col);
                 aliquot.setPatientVisit(pv);
                 aliquot.persist();
