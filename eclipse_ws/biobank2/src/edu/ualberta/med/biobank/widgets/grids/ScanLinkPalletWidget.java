@@ -5,7 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileManager;
-import edu.ualberta.med.scannerconfig.preferences.profiles.TriIntC;
+import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileSettings;
 
 /**
  * Widget to draw a pallet for scan link screen. Can do selections inside the
@@ -31,7 +31,7 @@ public class ScanLinkPalletWidget extends ScanPalletWidget {
     }
 
     public void loadProfile(String profile) {
-        TriIntC profileData = ProfileManager.instance().getProfile(profile);
+        ProfileSettings profileData = ProfileManager.instance().getProfile(profile);
         ((ScanPalletDisplay) containerDisplay).setProfile(profileData);
         this.redraw();
 

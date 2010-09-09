@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.AliquotCellStatus;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
-import edu.ualberta.med.scannerconfig.preferences.profiles.TriIntC;
+import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileSettings;
 
 /**
  * Specific widget to draw a 8*12 pallet for scan features
@@ -39,7 +39,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     public static final int PALLET_HEIGHT_AND_LEGEND = PALLET_HEIGHT
         + LEGEND_HEIGHT + 4;
 
-    private TriIntC loadedProfile;
+    private ProfileSettings loadedProfile;
 
     public ScanPalletDisplay(final ScanPalletWidget widget, boolean hasLegend) {
         super();
@@ -85,7 +85,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         legendWidth = PALLET_WIDTH / statusAvailable.size();
     }
 
-    protected void setProfile(TriIntC profile) {
+    protected void setProfile(ProfileSettings profile) {
         this.loadedProfile = profile;
     }
 
@@ -108,7 +108,7 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
         if (this.loadedProfile != null) {
-            if (this.loadedProfile.isSetBit(indexCol + indexRow * 12)) {
+            if (this.loadedProfile.get(indexCol + indexRow * 12)) {
                 e.gc.setBackground(new Color(e.display, 185, 211, 238));
                 e.gc.fillRectangle(rectangle);
             }
