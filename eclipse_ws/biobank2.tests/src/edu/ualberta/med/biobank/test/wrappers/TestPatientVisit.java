@@ -508,8 +508,9 @@ public class TestPatientVisit extends TestDatabase {
         visit.reload();
 
         // lock an attribute
-        study.setStudyPvAttrActivityStatus("Worksheet",
-            ActivityStatusWrapper.getActivityStatus(appService, "Disabled"));
+        study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
+            .getActivityStatus(appService,
+                ActivityStatusWrapper.DISABLED_STATUS_STRING));
         study.persist();
         visit.reload();
         try {
@@ -521,7 +522,7 @@ public class TestPatientVisit extends TestDatabase {
 
         // unlock the attribute
         study.setStudyPvAttrActivityStatus("Worksheet",
-            ActivityStatusWrapper.getActivityStatus(appService, "Active"));
+            ActivityStatusWrapper.getActiveActivityStatus(appService));
         study.persist();
         visit.reload();
         visit.setPvAttrValue("Worksheet", "xyz");
@@ -691,7 +692,7 @@ public class TestPatientVisit extends TestDatabase {
         ss3.persist();
         AliquotWrapper newSample = visit.addNewAliquot("newid", sampleType,
             Arrays.asList(ss1, ss2, ss3),
-            ActivityStatusWrapper.getActivityStatus(appService, "Active"));
+            ActivityStatusWrapper.getActiveActivityStatus(appService));
         Aliquot dbSample = ModelUtils.getObjectWithId(appService,
             Aliquot.class, newSample.getId());
         Assert.assertEquals(dbSample.getSampleType().getId(), newSample

@@ -3,20 +3,25 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.ReceivedDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.SentDispatchShipmentGroup;
 
 public class DispatchShipmentAdministrationView extends
     AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.DispatchShipmentAdmininistrationView";
+    public static final String ID = "edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView";
 
     public SentDispatchShipmentGroup sentNode;
 
     public ReceivedDispatchShipmentGroup receivedNode;
 
+    private static DispatchShipmentAdministrationView currentInstance;
+
     public DispatchShipmentAdministrationView() {
-        SessionManager.addView(DispatchShipmentAdministrationView.ID, this);
+        currentInstance = this;
+        SessionManager.addView(DispatchShipmentAdministrationPerspective.ID,
+            this);
     }
 
     @Override
@@ -50,6 +55,10 @@ public class DispatchShipmentAdministrationView extends
     @Override
     protected void internalSearch() {
 
+    }
+
+    public static DispatchShipmentAdministrationView getCurrent() {
+        return currentInstance;
     }
 
 }

@@ -608,8 +608,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             if (PalletCell.hasValue(cell)
                 && cell.getStatus() == CellStatus.TYPE) {
                 patientVisit.addNewAliquot(cell.getValue(), cell.getType(),
-                    sampleStorages, ActivityStatusWrapper.getActivityStatus(
-                        appService, "Active"));
+                    sampleStorages,
+                    ActivityStatusWrapper.getActiveActivityStatus(appService));
                 sb.append(Messages.getFormattedString(
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),

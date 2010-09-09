@@ -174,8 +174,8 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = new ClinicWrapper(appService);
         clinic.setName(name);
         clinic.setNameShort(name);
-        clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        clinic.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         try {
             clinic.persist();
             Assert.fail("Should not insert the clinic : no address");
@@ -204,8 +204,8 @@ public class TestClinic extends TestDatabase {
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
-        clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        clinic.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         clinic.persist();
         ClinicHelper.createdClinics.add(clinic);
     }

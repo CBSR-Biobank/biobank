@@ -546,14 +546,15 @@ public class TestStudy extends TestDatabase {
         study.reload();
 
         // attributes are not locked by default
-        Assert.assertEquals("Active",
-            study.getStudyPvAttrActivityStatus("Worksheet").getName());
+        Assert.assertEquals(ActivityStatusWrapper.ACTIVE_STATUS_STRING, study
+            .getStudyPvAttrActivityStatus("Worksheet").getName());
 
         // lock the attribute
-        study.setStudyPvAttrActivityStatus("Worksheet",
-            ActivityStatusWrapper.getActivityStatus(appService, "Closed"));
-        Assert.assertEquals("Closed",
-            study.getStudyPvAttrActivityStatus("Worksheet").getName());
+        study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
+            .getActivityStatus(appService,
+                ActivityStatusWrapper.CLOSED_STATUS_STRING));
+        Assert.assertEquals(ActivityStatusWrapper.CLOSED_STATUS_STRING, study
+            .getStudyPvAttrActivityStatus("Worksheet").getName());
 
         // get lock for non existing label, expect exception
         try {
@@ -566,15 +567,16 @@ public class TestStudy extends TestDatabase {
         // set activity status for non existing label, expect exception
         try {
             study.setStudyPvAttrActivityStatus(Utils.getRandomString(10, 20),
-                ActivityStatusWrapper.getActivityStatus(appService, "Active"));
+                ActivityStatusWrapper.getActiveActivityStatus(appService));
             Assert.fail("call should generate an exception");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
         // add patient visit that uses the locked attribute
         study.setStudyPvAttr("Worksheet", "text");
-        study.setStudyPvAttrActivityStatus("Worksheet",
-            ActivityStatusWrapper.getActivityStatus(appService, "Closed"));
+        study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
+            .getActivityStatus(appService,
+                ActivityStatusWrapper.CLOSED_STATUS_STRING));
         study.persist();
         study.reload();
         List<PatientVisitWrapper> visits = studyAddPatientVisits(study);
@@ -1081,8 +1083,8 @@ public class TestStudy extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        s1.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        s1.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         s1.persist();
         StudyHelper.createdStudies.add(s1);
     }

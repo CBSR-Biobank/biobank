@@ -9,6 +9,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -320,8 +321,9 @@ public class TestDispatchShipment extends TestDatabase {
         List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
         for (int i = 0; i < colCapacity; ++i) {
             aliquots.add(AliquotHelper.addAliquot(
-                sampleTypes.get(r.nextInt(numSampletypes)), "Active",
-                container, visit, row, i));
+                sampleTypes.get(r.nextInt(numSampletypes)),
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, visit,
+                row, i));
         }
         container.reload();
         visit.reload();

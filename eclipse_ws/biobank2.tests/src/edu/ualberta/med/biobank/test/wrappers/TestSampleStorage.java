@@ -114,8 +114,8 @@ public class TestSampleStorage extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        ss.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        ss.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         ss.persist();
     }
 

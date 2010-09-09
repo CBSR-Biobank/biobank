@@ -1370,8 +1370,8 @@ public class Importer {
         aliquot.setLinkDate(Importer.getDateFromStr(linkDateStr));
         aliquot.setPatientVisit(visit);
         aliquot.setQuantity(ss.getVolume());
-        aliquot.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        aliquot.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         return aliquot;
     }
 

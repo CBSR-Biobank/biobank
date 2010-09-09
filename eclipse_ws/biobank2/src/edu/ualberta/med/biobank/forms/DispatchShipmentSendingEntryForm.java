@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
+import edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
@@ -252,7 +253,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         shipment.setShippingMethod(shippingMethod);
 
         shipment.persist();
-        // DispatchShipmentAdministrationView.reload();
+        DispatchShipmentAdministrationView.getCurrent().reload();
     }
 
     @Override

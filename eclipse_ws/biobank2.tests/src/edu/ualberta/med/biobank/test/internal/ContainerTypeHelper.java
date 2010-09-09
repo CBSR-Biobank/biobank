@@ -40,7 +40,7 @@ public class ContainerTypeHelper extends DbHelper {
             ct.setColCapacity(colCapacity);
         ct.setTopLevel(isTopLevel);
         ct.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         return ct;
     }
 
@@ -80,8 +80,8 @@ public class ContainerTypeHelper extends DbHelper {
      */
     public static ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,
         String name, boolean topContainer) throws Exception {
-        return addContainerType(site, name, name, 1, r.nextInt(10) + 1, r
-            .nextInt(10) + 1, topContainer);
+        return addContainerType(site, name, name, 1, r.nextInt(10) + 1,
+            r.nextInt(10) + 1, topContainer);
     }
 
     public static ContainerTypeWrapper addContainerTypeRandom(SiteWrapper site,

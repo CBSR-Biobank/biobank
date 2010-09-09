@@ -56,19 +56,32 @@ public class CalgaryStudies extends ConfigStudies {
         addStudySourceVessel("HEART", "8.5ml P100 orange top tube");
         addStudySourceVessel("HEART", "urine cup");
 
-        addSampleStorage("HEART", "DNA E 1000", "5", "1", "Active");
-        addSampleStorage("HEART", "DNA L 1000", "5", "1", "Active");
-        addSampleStorage("HEART", "LH PFP 200", "10", "0.2", "Active");
-        addSampleStorage("HEART", "LH PFP 500", "5", "0.5", "Active");
-        addSampleStorage("HEART", "P100 500", "8", "0.5", "Active");
-        addSampleStorage("HEART", "PlasmaE200", "10", "0.2", "Active");
-        addSampleStorage("HEART", "PlasmaE500", "5", "0.5", "Active");
-        addSampleStorage("HEART", "PlasmaE800", "3", "0.8", "Active");
-        addSampleStorage("HEART", "PlasmaL200", "10", "0.2", "Active");
-        addSampleStorage("HEART", "PlasmaL500", "5", "0.5", "Active");
-        addSampleStorage("HEART", "SerumG500", "5", "0.5", "Active");
-        addSampleStorage("HEART", "UrineC900", "6", "0.9", "Active");
-        addSampleStorage("HEART", "UrineSA900", "12", "0.9", "Active");
+        addSampleStorage("HEART", "DNA E 1000", "5", "1",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "DNA L 1000", "5", "1",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "LH PFP 200", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "LH PFP 500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "P100 500", "8", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaE200", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaE500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaE800", "3", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaL200", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaL500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "SerumG500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "UrineC900", "6", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "UrineSA900", "12", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
         addContact("HEART", "Andrijana Lawton", "CL1-Foothills");
     }

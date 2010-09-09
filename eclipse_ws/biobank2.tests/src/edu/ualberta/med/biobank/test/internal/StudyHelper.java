@@ -16,7 +16,7 @@ public class StudyHelper extends DbHelper {
         StudyWrapper study = new StudyWrapper(appService);
         study.setName(name);
         study.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         if (name != null) {
             if (name.length() < 50) {
                 study.setNameShort(name);

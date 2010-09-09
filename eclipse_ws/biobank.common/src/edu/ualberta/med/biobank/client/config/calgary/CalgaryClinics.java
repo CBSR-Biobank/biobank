@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.client.config.calgary;
 import java.util.HashMap;
 
 import edu.ualberta.med.biobank.client.config.ConfigClinics;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -14,7 +15,8 @@ public class CalgaryClinics extends ConfigClinics {
         clinicsMap = new HashMap<String, ClinicWrapper>();
         contactsMap = new HashMap<String, ContactWrapper>();
 
-        addClinic("CL1-Foothills", "CL1-Foothills", false, "Active", null,
+        addClinic("CL1-Foothills", "CL1-Foothills", false,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
             "Foothills Medical Centre", "1403 29 Street", "Calgary", "Alberta",
             "t2n2t9");
 

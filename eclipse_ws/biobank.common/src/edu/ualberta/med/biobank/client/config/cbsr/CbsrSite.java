@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.client.config.cbsr;
 import java.util.List;
 
 import edu.ualberta.med.biobank.client.config.ConfigSite;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -14,7 +15,8 @@ public class CbsrSite extends ConfigSite {
         site = new SiteWrapper(appService);
         site.setName("Canadian BioSample Repository");
         site.setNameShort("CBSR");
-        site.setActivityStatus(getActiveActivityStatus());
+        site.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         site.setStreet1("471 Medical Sciences Building");
         site.setStreet2("University of Alberta");
         site.setCity("Edmonton");

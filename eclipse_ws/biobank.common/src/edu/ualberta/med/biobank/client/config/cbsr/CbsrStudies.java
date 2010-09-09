@@ -60,7 +60,8 @@ public class CbsrStudies extends ConfigStudies {
             site,
             "Centre of Excellence for Gastrointestinal Inflammation and Immunity Research",
             "CEGIIR", ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
-        addStudy(site, "Critical Care Cohort Study", "CCCS", "Closed", null);
+        addStudy(site, "Critical Care Cohort Study", "CCCS",
+            ActivityStatusWrapper.CLOSED_STATUS_STRING, null);
 
         addStudy(
             site,
@@ -71,7 +72,8 @@ public class CbsrStudies extends ConfigStudies {
         addStudy(site,
             "Exploring the Renoprotective effects of fluid prophylaxis "
                 + "strategies for Contrast Induced Nephropathy (Study)",
-            "ERCIN", "Disabled", "Precath visit - only urine is collected");
+            "ERCIN", ActivityStatusWrapper.DISABLED_STATUS_STRING,
+            "Precath visit - only urine is collected");
         addStudy(site, "Fedorak Iron Deficiency Study", "FIDS",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
         addStudy(site, "Heart failure Etiology and Analysis Research Team",
@@ -221,143 +223,273 @@ public class CbsrStudies extends ConfigStudies {
         addStudySourceVessel("VAS", "10ml orange top PAXgene tube");
         addStudySourceVessel("VAS", "6mL beige top tube");
 
-        addSampleStorage("AHFEM", "Lith Hep Plasma", "25", "0.2", "Active");
-        addSampleStorage("AHFEM", "PF Plasma", "2", "0.2", "Active");
-        addSampleStorage("AHFEM", "Plasma", "10", "0.2", "Active");
-        addSampleStorage("AHFEM", "Serum", "10", "0.2", "Active");
-        addSampleStorage("BBPSP", "CDPA Plasma", "3", "1", "Active");
-        addSampleStorage("BBPSP", "Cells", "10", "0.5", "Active");
-        addSampleStorage("BBPSP", "DNA (WBC)", "2", "0.4", "Disabled");
-        addSampleStorage("BBPSP", "DNA(Blood)", "2", "0.4", "Active");
-        addSampleStorage("BBPSP", "F Urine", "10", "0.9", "Disabled");
-        addSampleStorage("BBPSP", "Paxgene", "11", "0.8", "Active");
-        addSampleStorage("BBPSP", "Plasma", "16", "0.2", "Active");
-        addSampleStorage("BBPSP", "Urine", "10", "0.9", "Active");
-        addSampleStorage("CCCS", "C Urine", "6", "0.9", "Active");
-        addSampleStorage("CCCS", "Plasma", "6", "0.4", "Active");
-        addSampleStorage("CCCS", "Serum B", "6", "0.9", "Active");
-        addSampleStorage("CCCS", "WBE", "6", "0.9", "Active");
-        addSampleStorage("CCCS", "Z Urine", "6", "0.9", "Active");
-        addSampleStorage("CEGIIR", "Cells", "5", "0.5", "Active");
-        addSampleStorage("CEGIIR", "Colon, A", "2", "0", "Active");
-        addSampleStorage("CEGIIR", "Colon, D", "2", "0", "Active");
-        addSampleStorage("CEGIIR", "Colon, T", "2", "0", "Active");
-        addSampleStorage("CEGIIR", "DNA(Blood)", "2", "0.4", "Active");
-        addSampleStorage("CEGIIR", "Duodenum", "2", "0", "Active");
-        addSampleStorage("CEGIIR", "Ileum", "2", "0", "Active");
-        addSampleStorage("CEGIIR", "Plasma", "5", "0.4", "Active");
-        addSampleStorage("CEGIIR", "Serum B", "6", "0.8", "Active");
-        addSampleStorage("CEGIIR", "Stomach, A", "2", "0", "Active");
-        addSampleStorage("CEGIIR", "Stomach, B", "2", "0", "Active");
-        addSampleStorage("CEGIIR", "WB DMSO", "2", "0.8", "Active");
-        addSampleStorage("CEGIIR", "WBE", "2", "0.8", "Disabled");
-        addSampleStorage("CEGIIR", "Z Urine", "6", "0.9", "Active");
+        addSampleStorage("AHFEM", "Lith Hep Plasma", "25", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("AHFEM", "PF Plasma", "2", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("AHFEM", "Plasma", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("AHFEM", "Serum", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("BBPSP", "CDPA Plasma", "3", "1",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("BBPSP", "Cells", "10", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("BBPSP", "DNA (WBC)", "2", "0.4",
+            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+        addSampleStorage("BBPSP", "DNA(Blood)", "2", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("BBPSP", "F Urine", "10", "0.9",
+            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+        addSampleStorage("BBPSP", "Paxgene", "11", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("BBPSP", "Plasma", "16", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("BBPSP", "Urine", "10", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CCCS", "C Urine", "6", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CCCS", "Plasma", "6", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CCCS", "Serum B", "6", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CCCS", "WBE", "6", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CCCS", "Z Urine", "6", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Cells", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Colon, A", "2", "0",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Colon, D", "2", "0",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Colon, T", "2", "0",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "DNA(Blood)", "2", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Duodenum", "2", "0",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Ileum", "2", "0",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Plasma", "5", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Serum B", "6", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Stomach, A", "2", "0",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Stomach, B", "2", "0",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "WB DMSO", "2", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "WBE", "2", "0.8",
+            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Z Urine", "6", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
-        addSampleStorage("CEGIIR", "R-ColonA", "1", "0.2", "Active");
-        addSampleStorage("CEGIIR", "R-ColonD", "1", "0.2", "Active");
-        addSampleStorage("CEGIIR", "R-ColonT", "1", "0.2", "Active");
-        addSampleStorage("CEGIIR", "R-Duodenum", "1", "0.2", "Active");
-        addSampleStorage("CEGIIR", "R-Ilieum", "1", "0.2", "Active");
-        addSampleStorage("CEGIIR", "R-Jejunum", "1", "0.2", "Active");
-        addSampleStorage("CEGIIR", "R-StomachA", "1", "0.2", "Active");
-        addSampleStorage("CEGIIR", "R-StomachB", "1", "0.2", "Active");
-        addSampleStorage("CEGIIR", "Jejunum", "2", "0", "Active");
+        addSampleStorage("CEGIIR", "R-ColonA", "1", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "R-ColonD", "1", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "R-ColonT", "1", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "R-Duodenum", "1", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "R-Ilieum", "1", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "R-Jejunum", "1", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "R-StomachA", "1", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "R-StomachB", "1", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CEGIIR", "Jejunum", "2", "0",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
-        addSampleStorage("CHILD", "CBMC", null, null, "Active");
-        addSampleStorage("CHILD", "CBMC RNA", null, null, "Active");
-        addSampleStorage("CHILD", "Cells", null, null, "Active");
-        addSampleStorage("CHILD", "Meconium", null, null, "Active");
-        addSampleStorage("CHILD", "Plasma SH", null, null, "Active");
-        addSampleStorage("CHILD", "Serum", null, null, "Active");
-        addSampleStorage("CHILD", "Serum B", null, null, "Active");
-        addSampleStorage("CHILD", "Serum Pel", null, null, "Active");
-        addSampleStorage("CHILD", "WB Plasma", null, null, "Active");
-        addSampleStorage("CHILD", "WB RNA", null, null, "Active");
-        addSampleStorage("CHILD", "WB Serum", null, null, "Active");
-        addSampleStorage("CHILD", "WBlood", null, null, "Active");
-        addSampleStorage("ERCIN", "C Urine", "6", "0.9", "Active");
-        addSampleStorage("ERCIN", "Serum", "12", "0.4", "Active");
-        addSampleStorage("ERCIN", "Serum B", "12", "0.4", "Disabled");
-        addSampleStorage("ERCIN", "Z Urine", "12", "0.9", "Active");
+        addSampleStorage("CHILD", "CBMC", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "CBMC RNA", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "Cells", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "Meconium", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "Plasma SH", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "Serum", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "Serum B", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "Serum Pel", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "WB Plasma", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "WB RNA", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "WB Serum", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("CHILD", "WBlood", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("ERCIN", "C Urine", "6", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("ERCIN", "Serum", "12", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("ERCIN", "Serum B", "12", "0.4",
+            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+        addSampleStorage("ERCIN", "Z Urine", "12", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
-        addSampleStorage("FABRY", "LH PFP 200", "10", "0.2", "Active");
-        addSampleStorage("FABRY", "LH PFP 500", "5", "0.5", "Active");
-        addSampleStorage("FABRY", "P100 500", "8", "0.5", "Active");
-        addSampleStorage("FABRY", "PlasmaE200", "10", "0.2", "Active");
-        addSampleStorage("FABRY", "PlasmaE500", "5", "0.5", "Active");
-        addSampleStorage("FABRY", "SerumG500", "5", "0.5", "Active");
+        addSampleStorage("FABRY", "LH PFP 200", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("FABRY", "LH PFP 500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("FABRY", "P100 500", "8", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("FABRY", "PlasmaE200", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("FABRY", "PlasmaE500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("FABRY", "SerumG500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
-        addSampleStorage("FIDS", "PlasmaE250", "1", "0.25", "Active");
-        addSampleStorage("FIDS", "PlasmaE500", "1", "0.5", "Active");
-        addSampleStorage("FIDS", "UrineSA700", "3", "0.7", "Disabled");
+        addSampleStorage("FIDS", "PlasmaE250", "1", "0.25",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("FIDS", "PlasmaE500", "1", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("FIDS", "UrineSA700", "3", "0.7",
+            ActivityStatusWrapper.DISABLED_STATUS_STRING);
 
-        addSampleStorage("HEART", "DNA E 1000", "5", "1", "Active");
-        addSampleStorage("HEART", "DNA L 1000", "5", "1", "Active");
-        addSampleStorage("HEART", "LH PFP 200", "10", "0.2", "Active");
-        addSampleStorage("HEART", "LH PFP 500", "5", "0.5", "Active");
-        addSampleStorage("HEART", "P100 500", "8", "0.5", "Active");
-        addSampleStorage("HEART", "PlasmaE200", "10", "0.2", "Active");
-        addSampleStorage("HEART", "PlasmaE500", "5", "0.5", "Active");
-        addSampleStorage("HEART", "PlasmaE800", "3", "0.8", "Active");
-        addSampleStorage("HEART", "PlasmaL200", "10", "0.2", "Active");
-        addSampleStorage("HEART", "PlasmaL500", "5", "0.5", "Active");
-        addSampleStorage("HEART", "SerumG500", "5", "0.5", "Active");
-        addSampleStorage("HEART", "UrineC900", "6", "0.9", "Active");
-        addSampleStorage("HEART", "UrineSA900", "12", "0.9", "Active");
-        addSampleStorage("KDCS", "Cells", "10", "0.4", "Active");
-        addSampleStorage("KDCS", "Dialysate", "3", "0.4", "Active");
-        addSampleStorage("KDCS", "DNA(Blood)", "2", "0.4", "Active");
-        addSampleStorage("KDCS", "F Nails", null, null, "Active");
-        addSampleStorage("KDCS", "Hair", null, null, "Active");
-        addSampleStorage("KDCS", "Paxgene", "11", "0.8", "Active");
-        addSampleStorage("KDCS", "Plasma", "12", "0.4", "Active");
-        addSampleStorage("KDCS", "S Water", "3", "0.9", "Active");
-        addSampleStorage("KDCS", "Serum", "8", "0.4", "Disabled");
-        addSampleStorage("KDCS", "Serum B", "8", "0.4", "Active");
-        addSampleStorage("KDCS", "T Nails", null, null, "Active");
-        addSampleStorage("KDCS", "T Water", "3", "0.9", "Active");
-        addSampleStorage("KDCS", "Urine", null, null, "Active");
-        addSampleStorage("KDCS", "WBE", "4", "0.8", "Active");
-        addSampleStorage("KDCS", "Z Urine", "3", "0.4", "Active");
-        addSampleStorage("KMS", "Plasma", "20", "0.1", "Active");
+        addSampleStorage("HEART", "DNA E 1000", "5", "1",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "DNA L 1000", "5", "1",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "LH PFP 200", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "LH PFP 500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "P100 500", "8", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaE200", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaE500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaE800", "3", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaL200", "10", "0.2",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "PlasmaL500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "SerumG500", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "UrineC900", "6", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("HEART", "UrineSA900", "12", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "Cells", "10", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "Dialysate", "3", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "DNA(Blood)", "2", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "F Nails", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "Hair", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "Paxgene", "11", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "Plasma", "12", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "S Water", "3", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "Serum", "8", "0.4",
+            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+        addSampleStorage("KDCS", "Serum B", "8", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "T Nails", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "T Water", "3", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "Urine", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "WBE", "4", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KDCS", "Z Urine", "3", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("KMS", "Plasma", "20", "0.1",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
-        addSampleStorage("LCS", "BC", "5", "0.4", "Active");
-        addSampleStorage("LCS", "Colon, T", "20", "0.5", "Active");
+        addSampleStorage("LCS", "BC", "5", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("LCS", "Colon, T", "20", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
-        addSampleStorage("MPS", "Plasma", "3", "1", "Active");
-        addSampleStorage("NHS", "Cells", "10", "0.5", "Active");
-        addSampleStorage("NHS", "Plasma", "12", "0.4", "Active");
-        addSampleStorage("NHS", "Serum", "16", "0.4", "Active");
-        addSampleStorage("RVS", "Cells", "10", "0.5", "Active");
-        addSampleStorage("RVS", "Paxgene", "22", "0.8", "Active");
-        addSampleStorage("RVS", "Plasma", "16", "0.4", "Active");
-        addSampleStorage("RVS", "Serum", "4", "0.4", "Active");
-        addSampleStorage("RVS", "Z Urine", "6", "0.9", "Active");
-        addSampleStorage("SPARK", "C Urine", "5", "0.5", "Active");
-        addSampleStorage("SPARK", "Plasma", "5", "0.5", "Active");
-        addSampleStorage("SPARK", "WB DMSO", "1", "0.5", "Active");
-        addSampleStorage("TCKS", "Cells", "10", "0.5", "Active");
-        addSampleStorage("TCKS", "DNA(Blood)", "2", "0.4", "Active");
-        addSampleStorage("TCKS", "F Nails", null, null, "Active");
-        addSampleStorage("TCKS", "Hair", null, null, "Active");
-        addSampleStorage("TCKS", "Paxgene", "11", "0.8", "Active");
-        addSampleStorage("TCKS", "Plasma", "12", "0.4", "Active");
-        addSampleStorage("TCKS", "Serum B", "8", "0.4", "Active");
-        addSampleStorage("TCKS", "T Nails", null, null, "Active");
-        addSampleStorage("TCKS", "Urine", null, null, "Active");
-        addSampleStorage("TCKS", "WBE", "4", "0.8", "Active");
-        addSampleStorage("TCKS", "Z Urine", "3", "0.4", "Active");
-        addSampleStorage("VAS", "Cells", "10", "0.5", "Active");
-        addSampleStorage("VAS", "Dialysate", null, null, "Active");
-        addSampleStorage("VAS", "DNA(Blood)", "2", "0.4", "Active");
-        addSampleStorage("VAS", "F Nails", null, null, "Active");
-        addSampleStorage("VAS", "Hair", null, null, "Active");
-        addSampleStorage("VAS", "Paxgene", "11", "0.8", "Active");
-        addSampleStorage("VAS", "Plasma", "12", "0.4", "Active");
-        addSampleStorage("VAS", "Serum", "8", "0.4", "Disabled");
-        addSampleStorage("VAS", "Serum B", "8", "0.4", "Active");
-        addSampleStorage("VAS", "T Nails", null, null, "Active");
-        addSampleStorage("VAS", "WBE", "4", "0.8", "Active");
+        addSampleStorage("MPS", "Plasma", "3", "1",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("NHS", "Cells", "10", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("NHS", "Plasma", "12", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("NHS", "Serum", "16", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("RVS", "Cells", "10", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("RVS", "Paxgene", "22", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("RVS", "Plasma", "16", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("RVS", "Serum", "4", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("RVS", "Z Urine", "6", "0.9",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("SPARK", "C Urine", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("SPARK", "Plasma", "5", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("SPARK", "WB DMSO", "1", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "Cells", "10", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "DNA(Blood)", "2", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "F Nails", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "Hair", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "Paxgene", "11", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "Plasma", "12", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "Serum B", "8", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "T Nails", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "Urine", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "WBE", "4", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("TCKS", "Z Urine", "3", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "Cells", "10", "0.5",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "Dialysate", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "DNA(Blood)", "2", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "F Nails", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "Hair", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "Paxgene", "11", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "Plasma", "12", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "Serum", "8", "0.4",
+            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+        addSampleStorage("VAS", "Serum B", "8", "0.4",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "T Nails", null, null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        addSampleStorage("VAS", "WBE", "4", "0.8",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
         addPvAttr("AHFEM", "PBMC Count (x10^6)", "number");
         addPvAttr("AHFEM", "Worksheet", "text");

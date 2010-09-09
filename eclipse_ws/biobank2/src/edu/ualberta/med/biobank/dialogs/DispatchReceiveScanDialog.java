@@ -222,7 +222,6 @@ public class DispatchReceiveScanDialog extends BiobankDialog {
             Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
             cancelButton.setEnabled(false);
         } else if (IDialogConstants.FINISH_ID == buttonId) {
-            System.out.println("Finish");
             setReturnCode(OK);
             close();
         } else if (IDialogConstants.NEXT_ID == buttonId) {

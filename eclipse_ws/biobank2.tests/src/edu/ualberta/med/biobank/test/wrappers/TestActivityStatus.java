@@ -54,7 +54,7 @@ public class TestActivityStatus extends TestDatabase {
     public void testConstructors() throws Exception {
         new ActivityStatusWrapper(appService);
         ActivityStatusWrapper activeAs = ActivityStatusWrapper
-            .getActivityStatus(appService, "Active");
+            .getActiveActivityStatus(appService);
         new ActivityStatusWrapper(appService, activeAs.getWrappedObject());
     }
 
@@ -184,7 +184,7 @@ public class TestActivityStatus extends TestDatabase {
     @Test
     public void testGetWrappedClass() throws Exception {
         ActivityStatusWrapper activeAs = ActivityStatusWrapper
-            .getActivityStatus(appService, "Active");
+            .getActiveActivityStatus(appService);
         Assert.assertEquals(ActivityStatus.class, activeAs.getWrappedClass());
     }
 
@@ -270,16 +270,18 @@ public class TestActivityStatus extends TestDatabase {
     @Test
     public void testGetName() throws Exception {
         ActivityStatusWrapper activeAs = ActivityStatusWrapper
-            .getActivityStatus(appService, "Active");
-        Assert.assertEquals("Active", activeAs.getName());
+            .getActiveActivityStatus(appService);
+        Assert.assertEquals(ActivityStatusWrapper.ACTIVE_STATUS_STRING,
+            activeAs.getName());
     }
 
     @Test
     public void testCompareTo() throws Exception {
         ActivityStatusWrapper activeAs = ActivityStatusWrapper
-            .getActivityStatus(appService, "Active");
+            .getActiveActivityStatus(appService);
         ActivityStatusWrapper closedAs = ActivityStatusWrapper
-            .getActivityStatus(appService, "Closed");
+            .getActivityStatus(appService,
+                ActivityStatusWrapper.CLOSED_STATUS_STRING);
 
         Assert.assertTrue(activeAs.compareTo(closedAs) < 0);
         Assert.assertTrue(closedAs.compareTo(activeAs) > 0);
@@ -295,10 +297,16 @@ public class TestActivityStatus extends TestDatabase {
         for (ActivityStatusWrapper as : list) {
             names.add(as.getName());
         }
-        Assert.assertTrue(names.contains("Active"));
-        Assert.assertTrue(names.contains("Closed"));
-        Assert.assertTrue(names.contains("Disabled"));
-        Assert.assertTrue(names.contains("Flagged"));
+        Assert.assertTrue(names
+            .contains(ActivityStatusWrapper.ACTIVE_STATUS_STRING));
+        Assert.assertTrue(names
+            .contains(ActivityStatusWrapper.CLOSED_STATUS_STRING));
+        Assert.assertTrue(names
+            .contains(ActivityStatusWrapper.DISABLED_STATUS_STRING));
+        Assert.assertTrue(names
+            .contains(ActivityStatusWrapper.FLAGGED_STATUS_STRING));
+        Assert.assertTrue(names
+            .contains(ActivityStatusWrapper.DISPATCHED_STATUS_STRING));
 
         // invoke one more time to make sure a database access is not made
         list = ActivityStatusWrapper.getAllActivityStatuses(appService);
@@ -306,7 +314,7 @@ public class TestActivityStatus extends TestDatabase {
 
     @Test
     public void testGetActivityStatus() throws Exception {
-        ActivityStatusWrapper.getActivityStatus(appService, "Active");
+        ActivityStatusWrapper.getActiveActivityStatus(appService);
 
         try {
             ActivityStatusWrapper.getActivityStatus(appService,
@@ -320,12 +328,12 @@ public class TestActivityStatus extends TestDatabase {
 
     @Test
     public void testIsActive() throws Exception {
-        ActivityStatusWrapper active = ActivityStatusWrapper.getActivityStatus(
-            appService, "Active");
+        ActivityStatusWrapper active = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
         Assert.assertTrue(active.isActive());
 
         ActivityStatusWrapper closed = ActivityStatusWrapper.getActivityStatus(
-            appService, "Closed");
+            appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
         Assert.assertFalse(closed.isActive());
     }
 }
