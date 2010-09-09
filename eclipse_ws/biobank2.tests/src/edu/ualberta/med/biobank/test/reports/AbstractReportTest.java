@@ -405,7 +405,11 @@ public abstract class AbstractReportTest {
                 if (DateCompare.compare((Date) a1[i], (Date) a2[i]) != 0) {
                     return false;
                 }
-            } else if (!a1[i].equals(a2[i])) {
+            } else if (a1[i] != null) {
+                if (!a1[i].equals(a2[i])) {
+                    return false;
+                }
+            } else if (a2[i] != null) {
                 return false;
             }
         }
