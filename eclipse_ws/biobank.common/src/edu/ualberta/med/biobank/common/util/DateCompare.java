@@ -6,12 +6,20 @@ import java.util.Date;
 /**
  * This class should be used to compare dates since Hibernate can return
  * java.sql.Timestamp for some java.util.Date fields. Note that
- * java.util.Date.equals() will always return false if passed a
- * java.sqlTimestamp.
+ * java.util.Timestamp.equals() will always return false if passed a
+ * java.sql.Date, as the later does not have any nanonseconds.
+ * 
+ * <pre>
+ * java.util.Date date = new java.util.Date();
+ * java.util.Date stamp = new java.sql.Timestamp(date.getTime());
+ * assertTrue(date.equals(stamp));
+ * assertTrue(date.compareTo(stamp) == 0);
+ * assertTrue(stamp.compareTo(date) == 0);
+ * assertTrue(stamp.equals(date)); // &lt;-- FAILS
+ * </pre>
  * 
  */
 public class DateCompare {
-
     public static int compare(Date date1, Date date2) {
         Calendar cal1 = Calendar.getInstance();
         Calendar cal2 = Calendar.getInstance();
@@ -32,5 +40,4 @@ public class DateCompare {
 
         return 0;
     }
-
 }

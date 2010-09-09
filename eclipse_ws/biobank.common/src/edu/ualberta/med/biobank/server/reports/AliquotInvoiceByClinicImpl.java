@@ -10,16 +10,16 @@ public class AliquotInvoiceByClinicImpl extends AbstractReport {
         + "Alias.patientVisit.patient.pnumber, "
         + "Alias.linkDate, Alias.sampleType.name  from "
         + Aliquot.class.getName()
-        + " as Alias where Alias.aliquotPosition not in (from "
+        + " as Alias left join Alias.aliquotPosition p where (p is null or p not in (from "
         + AliquotPosition.class.getName()
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME
-        + "') and Alias.linkDate > ? and Alias.linkDate < ? and "
+        + "')) and Alias.linkDate between ? and ? and "
         + "Alias.patientVisit.shipment.site.id "
         + SITE_OPERATOR
         + SITE_ID
         + " ORDER BY "
-        + "Alias.patientVisit.shipment.clinic.id, Alias.patientVisit.patient.pnumber";
+        + "Alias.patientVisit.shipment.clinic.id, Alias.patientVisit.patient.pnumber, Alias.inventoryId";
 
     public AliquotInvoiceByClinicImpl(BiobankReport report) {
         super(QUERY_STRING, report);

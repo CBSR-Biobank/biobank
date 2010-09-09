@@ -25,7 +25,7 @@ public class ContainerCapacityImpl extends AbstractReport {
     }
 
     @Override
-    protected AbstractRowPostProcess getRowPostProcess() {
+    public AbstractRowPostProcess getRowPostProcess() {
         return rowPostProcess;
     }
 

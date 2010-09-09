@@ -88,6 +88,15 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
         return parent;
     }
 
+    public ContainerWrapper getTop() {
+        ContainerWrapper top = getParent();
+
+        while (top != null && top.getParent() != null) {
+            top = top.getParent();
+        }
+        return top;
+    }
+
     /**
      * Set the parent of this object
      */

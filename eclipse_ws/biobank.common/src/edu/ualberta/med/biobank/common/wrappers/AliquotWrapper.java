@@ -566,4 +566,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         ActivityStatusWrapper status = getActivityStatus();
         return status != null && status.isDispatched();
     }
+
+    public ContainerWrapper getTop() {
+        return objectWithPositionManagement.getTop();
+    }
 }
