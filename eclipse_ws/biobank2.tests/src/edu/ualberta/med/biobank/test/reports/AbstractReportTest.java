@@ -313,23 +313,24 @@ public abstract class AbstractReportTest {
 
     private Collection<Object> compareResults(EnumSet<CompareResult> cmpOptions)
         throws Exception {
-        System.out.print("compareResults(" + cmpOptions + ") for "
-            + getReport().getClassName() + " w/ params "
-            + Arrays.toString(getReport().getParams().toArray())
-            + (isInSite() ? "" : " not") + " in site " + getSiteId());
-
-        if ((getReport().getGroupBy() != null)
-            && (getReport().getGroupBy().length() > 0)) {
-            System.out.print(" grouped by " + getReport().getGroupBy());
-        }
-
-        if ((getReport().getContainerList() != null)
-            && (getReport().getContainerList().length() > 0)) {
-            System.out
-                .print(" in containers " + getReport().getContainerList());
-        }
-
-        System.out.println();
+        // TODO: logging?
+        // System.out.print("compareResults(" + cmpOptions + ") for "
+        // + getReport().getClassName() + " w/ params "
+        // + Arrays.toString(getReport().getParams().toArray())
+        // + (isInSite() ? "" : " not") + " in site " + getSiteId());
+        //
+        // if ((getReport().getGroupBy() != null)
+        // && (getReport().getGroupBy().length() > 0)) {
+        // System.out.print(" grouped by " + getReport().getGroupBy());
+        // }
+        //
+        // if ((getReport().getContainerList() != null)
+        // && (getReport().getContainerList().length() > 0)) {
+        // System.out
+        // .print(" in containers " + getReport().getContainerList());
+        // }
+        //
+        // System.out.println();
 
         Collection<Object> expectedResults = getExpectedResults();
 
@@ -364,8 +365,9 @@ public abstract class AbstractReportTest {
                 Assert.fail("did not expect this row in actual results: "
                     + Arrays.toString((Object[]) actualRow));
             } else {
-                System.out.println("found: "
-                    + Arrays.toString((Object[]) actualRow));
+                // TODO: logging?
+                // System.out.println("found: "
+                // + Arrays.toString((Object[]) actualRow));
             }
 
             actualResultsSize++;
