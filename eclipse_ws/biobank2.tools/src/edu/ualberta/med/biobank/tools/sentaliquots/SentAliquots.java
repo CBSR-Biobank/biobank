@@ -73,7 +73,6 @@ public class SentAliquots {
             String[] header = reader.getCSVHeader(true);
             PatientInfo info;
             while ((info = reader.read(PatientInfo.class, header, processors)) != null) {
-                System.out.println(info.getPatientNo());
                 List<AliquotWrapper> aliquots = AliquotWrapper
                     .getAliquotsInSite(appService, info.getInventoryId(), site);
 

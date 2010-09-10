@@ -1,13 +1,22 @@
 package edu.ualberta.med.biobank.forms.reports;
 
+import java.io.FileReader;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
+import org.supercsv.cellprocessor.ParseDate;
+import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
+import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.exception.SuperCSVException;
+import org.supercsv.io.CsvBeanReader;
+import org.supercsv.io.ICsvBeanReader;
+import org.supercsv.prefs.CsvPreference;
 
+import edu.ualberta.med.biobank.server.reports.AliquotRequest;
 import edu.ualberta.med.biobank.widgets.FileBrowser;
 
 public class AliquotRequestEditor extends ReportsEditor {
@@ -45,28 +54,30 @@ public class AliquotRequestEditor extends ReportsEditor {
     }
 
     protected List<Object> parseCSV() throws Exception {
-        List<Object> params = new ArrayList<Object>();
-        String csv = csvSelector.getText();
-        if (csv != null) {
-            StringTokenizer stnewline = new StringTokenizer(csv, "\n");
-            int lines = 0;
-            while (stnewline.hasMoreTokens()) {
-                StringTokenizer stseparator = new StringTokenizer(
-                    stnewline.nextToken(), ",\" ");
-                lines++;
-                if (stseparator.countTokens() != 4)
-                    throw new Exception("Failed to parse CSV: Line " + lines
-                        + " \n4 Columns Required: " + stseparator.countTokens()
-                        + " found.");
-                else {
-                    while (stseparator.hasMoreTokens())
-                        params.add(stseparator.nextToken());
-                }
+        ICsvBeanReader reader = new CsvBeanReader(new FileReader(
+            csvSelector.getFilePath()), CsvPreference.EXCEL_PREFERENCE);
+
+        final CellProcessor[] processors = new CellProcessor[] {
+            new StrNotNullOrEmpty(), new ParseDate("yyyy-MM-dd"),
+            new StrNotNullOrEmpty(), new ParseInt() };
+
+        List<Object> requests = new ArrayList<Object>();
+
+        try {
+            String[] header = new String[] { "pnumber", "dateDrawn",
+                "sampleTypeNameShort", "maxAliquots" };
+            AliquotRequest request;
+            while ((request = reader.read(AliquotRequest.class, header,
+                processors)) != null) {
+                requests.add(request);
             }
-        } else
-            throw new Exception(
-                "Not a valid file. Please select a valid CSV and try again.");
-        return params;
+        } catch (SuperCSVException e) {
+            throw new Exception("Parse error at line " + reader.getLineNumber()
+                + "\n" + e.getCsvContext());
+        } finally {
+            reader.close();
+        }
+        return requests;
     }
 
     @Override
