@@ -21,8 +21,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.MouseAdapter;
@@ -32,7 +30,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
@@ -188,17 +185,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             Messages.getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
             null, BeansObservables.observeValue(currentPalletWrapper,
                 "productBarcode"), productBarcodeValidator); //$NON-NLS-1$
-        palletproductBarcodeText.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.character == SWT.CR && !afterKeyCancel
-                    && !afterInitialization) {
-                    ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
-                }
-                afterKeyCancel = false;
-                afterInitialization = false;
-            }
-        });
+        palletproductBarcodeText.addKeyListener(textFieldKeyListener);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         palletproductBarcodeText.setLayoutData(gd);

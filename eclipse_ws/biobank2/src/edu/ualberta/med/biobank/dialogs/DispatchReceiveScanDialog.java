@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -17,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
@@ -46,7 +48,6 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
-        setScanNotLaunched(true);
         Map<RowColPos, PalletCell> cells = getCells();
         pendingAliquotsNumber = 0;
         if (cells != null) {
@@ -128,5 +129,17 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     @Override
     protected List<CellStatus> getPalletCellStatus() {
         return CellStatus.DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST;
+    }
+
+    @Override
+    protected Map<RowColPos, PalletCell> getFakeScanCells() {
+        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
+        if (currentShipment.getAliquotCollection().size() > 0) {
+            AliquotWrapper aliquot = currentShipment.getAliquotCollection()
+                .get(0);
+            palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
+                0, 0, aliquot.getInventoryId())));
+        }
+        return palletScanned;
     }
 }

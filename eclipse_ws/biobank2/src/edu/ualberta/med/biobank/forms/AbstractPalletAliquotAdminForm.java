@@ -76,31 +76,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected ComboViewer profilesCombo;
 
-    IPropertyChangeListener propertyListener = new IPropertyChangeListener() {
+    private IPropertyChangeListener propertyListener;
 
-        @Override
-        public void propertyChange(PropertyChangeEvent event) {
-            int plateEnabledCount = 0;
-
-            for (int i = 0; i < edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED.length; ++i) {
-                if (!event
-                    .getProperty()
-                    .equals(
-                        edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED[i]))
-                    continue;
-
-                int plateId = i + 1;
-                if (ScannerConfigPlugin.getDefault().getPlateEnabled(plateId)) {
-                    ++plateEnabledCount;
-                }
-            }
-
-            // force an error check
-            String plateText = plateToScanText.getText();
-            plateToScanText.setText("");
-            plateToScanText.setText(plateText);
-        }
-    };
     protected String currentPlateToScan;
 
     @Override
@@ -111,8 +88,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         palletNameContains = store
             .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
 
-        ScannerConfigPlugin.getDefault().getPreferenceStore()
-            .addPropertyChangeListener(propertyListener);
+        addScannerPreferencesPropertyListener();
 
         palletScanManagement = new PalletScanManagement() {
 
@@ -174,6 +150,37 @@ public abstract class AbstractPalletAliquotAdminForm extends
                 setScanHasBeenLauched(false, true);
             }
         };
+    }
+
+    private void addScannerPreferencesPropertyListener() {
+        propertyListener = new IPropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent event) {
+                int plateEnabledCount = 0;
+
+                for (int i = 0; i < edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED.length; ++i) {
+                    if (!event
+                        .getProperty()
+                        .equals(
+                            edu.ualberta.med.scannerconfig.preferences.PreferenceConstants.SCANNER_PALLET_ENABLED[i]))
+                        continue;
+
+                    int plateId = i + 1;
+                    if (ScannerConfigPlugin.getDefault().getPlateEnabled(
+                        plateId)) {
+                        ++plateEnabledCount;
+                    }
+                }
+
+                // force an error check
+                String plateText = plateToScanText.getText();
+                plateToScanText.setText("");
+                plateToScanText.setText(plateText);
+            }
+        };
+        ScannerConfigPlugin.getDefault().getPreferenceStore()
+            .addPropertyChangeListener(propertyListener);
+
     }
 
     protected void beforeScanThreadStart() {

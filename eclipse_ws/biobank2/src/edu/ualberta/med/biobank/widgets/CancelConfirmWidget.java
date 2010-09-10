@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.forms.BiobankEntryForm;
+import edu.ualberta.med.biobank.forms.AbstractAliquotAdminForm;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 public class CancelConfirmWidget extends BiobankWidget {
@@ -25,13 +25,13 @@ public class CancelConfirmWidget extends BiobankWidget {
 
     private Button cancelButton;
 
-    private BiobankEntryForm form;
+    private AbstractAliquotAdminForm form;
 
-    public CancelConfirmWidget(Composite parent, BiobankEntryForm form) {
+    public CancelConfirmWidget(Composite parent, AbstractAliquotAdminForm form) {
         this(parent, form, false);
     }
 
-    public CancelConfirmWidget(Composite parent, BiobankEntryForm form,
+    public CancelConfirmWidget(Composite parent, AbstractAliquotAdminForm form,
         boolean showTextField) {
         super(parent, SWT.NONE);
         setLayout(new GridLayout(4, false));

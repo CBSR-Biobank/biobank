@@ -121,8 +121,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         }
     };
 
-    protected boolean afterKeyCancel = false;
-
     public BiobankEntryForm() {
         super();
         firstControl = null;
@@ -469,9 +467,5 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      * performed and the current form closed
      */
     public abstract String getNextOpenedFormID();
-
-    public void setAfterKeyCancel() {
-        afterKeyCancel = true;
-    }
 
 }
