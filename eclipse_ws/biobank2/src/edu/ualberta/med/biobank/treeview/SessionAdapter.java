@@ -71,6 +71,10 @@ public class SessionAdapter extends AdapterBase {
         return appService;
     }
 
+    public void resetAppService() {
+        appService = null;
+    }
+
     @Override
     protected String getLabelInternal() {
         return "";

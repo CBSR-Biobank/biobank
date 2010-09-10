@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank.common.security;
 
-import java.lang.reflect.Constructor;
-
-import org.apache.log4j.Logger;
-
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+import java.lang.reflect.Constructor;
+
+import org.apache.log4j.Logger;
 
 public class SecurityHelper {
     private static Logger LOGGER = Logger.getLogger(SecurityHelper.class
@@ -19,6 +19,8 @@ public class SecurityHelper {
      */
     public static boolean canCreate(WritableApplicationService appService,
         Class<?> modelWrapperType) {
+        if (appService == null)
+            return false;
         try {
             Constructor<?> constructor = modelWrapperType
                 .getConstructor(WritableApplicationService.class);
@@ -39,6 +41,8 @@ public class SecurityHelper {
      */
     public static boolean canDelete(WritableApplicationService appService,
         Class<?> modelWrapperType) {
+        if (appService == null)
+            return false;
         try {
             Constructor<?> constructor = modelWrapperType
                 .getConstructor(WritableApplicationService.class);
@@ -59,6 +63,8 @@ public class SecurityHelper {
      */
     public static boolean canView(WritableApplicationService appService,
         Class<?> modelWrapperType) {
+        if (appService == null)
+            return false;
         try {
             Constructor<?> constructor = modelWrapperType
                 .getConstructor(WritableApplicationService.class);
@@ -78,6 +84,8 @@ public class SecurityHelper {
      */
     public static boolean canUpdate(WritableApplicationService appService,
         Class<?> modelWrapperType) {
+        if (appService == null)
+            return false;
         try {
             Constructor<?> constructor = modelWrapperType
                 .getConstructor(WritableApplicationService.class);
@@ -93,6 +101,8 @@ public class SecurityHelper {
 
     public static boolean isContainerAdministrator(
         WritableApplicationService appService) {
+        if (appService == null)
+            return false;
         try {
             return ((BiobankApplicationService) appService)
                 .isContainerAdministrator();
