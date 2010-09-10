@@ -124,4 +124,9 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(false);
     }
+
+    @Override
+    protected List<CellStatus> getPalletCellStatus() {
+        return CellStatus.DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST;
+    }
 }

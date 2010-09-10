@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -139,13 +140,14 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         });
         scanButton.setEnabled(false);
 
-        spw = new ScanPalletWidget(contents,
-            CellStatus.DEFAULT_PALLET_DISPATCH_STATUS_LIST);
+        spw = new ScanPalletWidget(contents, getPalletCellStatus());
         GridData gd = new GridData();
         gd.horizontalSpan = 3;
         spw.setLayoutData(gd);
 
     }
+
+    protected abstract List<CellStatus> getPalletCellStatus();
 
     private void launchScan() {
         setScanOkValue(false);
