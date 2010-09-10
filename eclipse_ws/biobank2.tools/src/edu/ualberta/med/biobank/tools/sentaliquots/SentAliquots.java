@@ -9,6 +9,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import java.io.FileReader;
 import java.util.List;
 
+import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.constraint.Unique;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvBeanReader;
@@ -63,14 +64,15 @@ public class SentAliquots {
             appArgs.csvFileName), CsvPreference.EXCEL_PREFERENCE);
 
         final CellProcessor[] processors = new CellProcessor[] { new Unique(),
-            new Unique(), null };
+            new Unique(), new StrNotNullOrEmpty() };
 
         ActivityStatusWrapper closedStatus = ActivityStatusWrapper
             .getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING);
 
         try {
-            String[] header = reader.getCSVHeader(true);
+            String[] header = new String[] { "patientNo", "inventoryId",
+                "closeComment" };
             PatientInfo info;
             while ((info = reader.read(PatientInfo.class, header, processors)) != null) {
                 List<AliquotWrapper> aliquots = AliquotWrapper
