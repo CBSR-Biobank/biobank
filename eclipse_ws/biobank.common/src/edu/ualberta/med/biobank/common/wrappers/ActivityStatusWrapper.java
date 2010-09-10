@@ -32,6 +32,12 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     public static final String CLOSED_STATUS_STRING = "Closed";
 
+    public static final String DISABLED_STATUS_STRING = "Disabled";
+
+    public static final String DISPATCHED_STATUS_STRING = "Dispatched";
+
+    public static final String FLAGGED_STATUS_STRING = "Flagged";
+
     public ActivityStatusWrapper(WritableApplicationService appService,
         ActivityStatus wrappedObject) {
         super(appService, wrappedObject);
@@ -132,7 +138,8 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     public static ActivityStatusWrapper getActivityStatus(
-        WritableApplicationService appService, String name) throws Exception {
+        WritableApplicationService appService, String name)
+        throws ApplicationException, BiobankCheckException {
 
         HQLCriteria c = new HQLCriteria("from "
             + ActivityStatus.class.getName() + " where name = ?",
@@ -158,9 +165,13 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     /**
      * return activity status "Active". Facility method to avoid using "Active"
      * string everywhere
+     * 
+     * @throws BiobankCheckException
+     * @throws ApplicationException
      */
     public static ActivityStatusWrapper getActiveActivityStatus(
-        WritableApplicationService appService) throws Exception {
+        WritableApplicationService appService) throws ApplicationException,
+        BiobankCheckException {
         return getActivityStatus(appService, ACTIVE_STATUS_STRING);
     }
 
@@ -193,6 +204,15 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public boolean isActive() {
         String name = getName();
         return name != null && name.equals(ACTIVE_STATUS_STRING);
+    }
+
+    /**
+     * return true if this Activity status name is "Dispatched". Facility method
+     * to avoid using "Dispatched" string everywhere
+     */
+    public boolean isDispatched() {
+        String name = getName();
+        return name != null && name.equals(DISPATCHED_STATUS_STRING);
     }
 
     @Override

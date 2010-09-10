@@ -33,7 +33,7 @@ public class AbstractReport {
 
     protected static final String CONTAINER_LIST_SEARCH_STRING = replacePatternString(CONTAINER_LIST);
 
-    protected static final String FTA_CARD_SAMPLE_TYPE_NAME = "'DNA(Blood)'";
+    public static final String FTA_CARD_SAMPLE_TYPE_NAME = "DNA(Blood)";
 
     protected AbstractReport(String queryString, BiobankReport report) {
         this.queryString = queryString;
@@ -48,7 +48,7 @@ public class AbstractReport {
     /**
      * Post process the whole collection after its retrieval
      */
-    protected List<Object> postProcess(
+    public List<Object> postProcess(
         @SuppressWarnings("unused") WritableApplicationService appService,
         List<Object> results) {
         return results;
@@ -73,7 +73,7 @@ public class AbstractReport {
      * Will process line by line on the client side (if is called from the
      * client side)
      */
-    protected AbstractRowPostProcess getRowPostProcess() {
+    public AbstractRowPostProcess getRowPostProcess() {
         return null;
     }
 

@@ -1,0 +1,150 @@
+package edu.ualberta.med.biobank.test.reports;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.EnumSet;
+import java.util.List;
+import java.util.Map;
+
+import junit.framework.Assert;
+
+import org.junit.Test;
+
+import edu.ualberta.med.biobank.common.util.CollectionsUtil;
+import edu.ualberta.med.biobank.common.util.Mapper;
+import edu.ualberta.med.biobank.common.util.MapperUtil;
+import edu.ualberta.med.biobank.common.util.PredicateUtil;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+
+public class InvoicingReportTest extends AbstractReportTest {
+    private static final Mapper<AliquotWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<String>, Long>() {
+        public List<String> getKey(AliquotWrapper aliquot) {
+            return Arrays.asList(aliquot.getPatientVisit().getPatient()
+                .getStudy().getNameShort(), aliquot.getPatientVisit()
+                .getShipment().getClinic().getNameShort(), aliquot
+                .getSampleType().getNameShort());
+        }
+
+        public Long getValue(AliquotWrapper aliquot, Long aliquotCount) {
+            return aliquotCount == null ? new Long(1) : new Long(
+                aliquotCount + 1);
+        }
+    };
+    private static final Mapper<PatientVisitWrapper, List<String>, Long> GROUP_PVS_BY_STUDY_CLINIC = new Mapper<PatientVisitWrapper, List<String>, Long>() {
+        public List<String> getKey(PatientVisitWrapper patientVisit) {
+            return Arrays.asList(patientVisit.getPatient().getStudy()
+                .getNameShort(), patientVisit.getShipment().getClinic()
+                .getNameShort());
+        }
+
+        public Long getValue(PatientVisitWrapper patientVisit, Long pvCount) {
+            return pvCount == null ? new Long(1) : new Long(pvCount + 1);
+        }
+    };
+    private static final Comparator<List<String>> ORDER_STUDY_CLINIC_SAMPLE = new Comparator<List<String>>() {
+        public int compare(List<String> lhs, List<String> rhs) {
+            return CollectionsUtil.compareTo(lhs, rhs);
+        }
+    };
+
+    @Test
+    public void testResults() throws Exception {
+        checkResults(new Date(0), new Date());
+    }
+
+    @Test
+    public void testEmptyDateRange() throws Exception {
+        checkResults(new Date(), new Date(0));
+    }
+
+    @Test
+    public void testSmallDatePoint() throws Exception {
+        List<AliquotWrapper> aliquots = getAliquots();
+        Assert.assertTrue(aliquots.size() > 0);
+
+        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
+        checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
+    }
+
+    @Test
+    public void testSmallDateRange() throws Exception {
+        List<AliquotWrapper> aliquots = getAliquots();
+        Assert.assertTrue(aliquots.size() > 0);
+
+        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(aliquot.getLinkDate());
+        // consider a 2 day range since patient visits are often processed the
+        // following day
+        calendar.add(Calendar.DAY_OF_YEAR, 2);
+
+        checkResults(aliquot.getLinkDate(), calendar.getTime());
+    }
+
+    @Override
+    protected Collection<Object> getExpectedResults() throws Exception {
+        Date processedAndLinkedAfter = (Date) getReport().getParams().get(0);
+        Date processedAndLinkedBefore = (Date) getReport().getParams().get(1);
+
+        Collection<AliquotWrapper> allAliquots = getAliquots();
+        @SuppressWarnings("unchecked")
+        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
+            allAliquots, PredicateUtil.andPredicate(
+                aliquotSite(isInSite(), getSiteId()), AbstractReportTest
+                    .aliquotLinkedBetween(processedAndLinkedAfter,
+                        processedAndLinkedBefore),
+                ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER));
+        Map<List<String>, Long> groupedAliquots = MapperUtil.map(
+            filteredAliquots, GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE);
+
+        Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
+        Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
+            .filter(
+                allPatientVisits,
+                patientVisitProcessedBetween(processedAndLinkedAfter,
+                    processedAndLinkedBefore));
+        Map<List<String>, Long> groupedPatientVisits = MapperUtil.map(
+            filteredPatientVisits, GROUP_PVS_BY_STUDY_CLINIC);
+
+        List<Object> expectedResults = new ArrayList<Object>();
+
+        List<List<String>> keys = new ArrayList<List<String>>(
+            groupedAliquots.keySet());
+        Collections.sort(keys, ORDER_STUDY_CLINIC_SAMPLE);
+
+        for (List<String> key : keys) {
+            Long aliquotCount = groupedAliquots.get(key);
+            List<String> studyAndClinic = key.subList(0, 2);
+            Long pvCount = groupedPatientVisits.get(studyAndClinic);
+
+            if (pvCount == null) {
+                // There might not be any patient visits with a date processed
+                // in the same range
+                pvCount = new Long(0);
+            }
+
+            List<Object> objects = new ArrayList<Object>();
+            objects.add(key.get(0));
+            objects.add(key.get(1));
+            objects.add(pvCount);
+            objects.add(key.get(2));
+            objects.add(aliquotCount);
+
+            expectedResults.add(objects.toArray());
+        }
+
+        return expectedResults;
+    }
+
+    private void checkResults(Date after, Date before) throws Exception {
+        getReport().setParams(Arrays.asList((Object) after, (Object) before));
+        checkResults(EnumSet.of(CompareResult.SIZE));
+    }
+}

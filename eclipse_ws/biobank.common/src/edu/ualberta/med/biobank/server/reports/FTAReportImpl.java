@@ -12,21 +12,31 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class FTAReportImpl extends AbstractReport {
 
-    private static final String QUERY = "aliquots from "
+    // note that this will consider patient visits without any aliquots or
+    // patient visits without any aliquots of the specific sample type wanted
+    private static final String QUERY = "select a from "
+        + Aliquot.class.getName()
+        + " a where a in (select min(a2) from "
+        + Aliquot.class.getName()
+        + " a2 where a2.patientVisit.dateProcessed = "
+        + " (select min(pv.dateProcessed) from "
         + PatientVisit.class.getName()
-        + " pv join pv.aliquotCollection as aliquots where aliquots.sampleType.nameShort ="
-        + FTA_CARD_SAMPLE_TYPE_NAME
-        + " and a.patientVisit.patient.study.nameShort = ? and a.patientVisit.shipment.site "
+        + " pv where pv.patient.id = a2.patientVisit.patient "
+        + " and pv.patient.study.nameShort = ? and pv.shipment.site "
         + SITE_OPERATOR
         + SITE_ID
-        + " group by a.patientVisit.patient.pnumber having min(a.patientVisit.dateProcessed) > ? order by a.patientVisit.patient.pnumber";
+        + ")"
+        + " and a2.sampleType.nameShort = '"
+        + FTA_CARD_SAMPLE_TYPE_NAME
+        + "' and a2.patientVisit.dateProcessed > ? group by a2.patientVisit.patient.pnumber)"
+        + " order by a.patientVisit.patient.pnumber";
 
     public FTAReportImpl(BiobankReport report) {
         super(QUERY, report);
     }
 
     @Override
-    protected List<Object> postProcess(WritableApplicationService appService,
+    public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
         ArrayList<Object> modifiedResults = new ArrayList<Object>();
         // get the info

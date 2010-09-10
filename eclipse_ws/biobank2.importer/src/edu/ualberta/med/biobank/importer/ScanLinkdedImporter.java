@@ -1,5 +1,10 @@
 package edu.ualberta.med.biobank.importer;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -10,11 +15,6 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ScanLinkdedImporter {
 
@@ -199,7 +199,8 @@ public class ScanLinkdedImporter {
 
             if (aliquot != null) {
                 aliquot.setActivityStatus(ActivityStatusWrapper
-                    .getActivityStatus(appService, "Flagged"));
+                    .getActivityStatus(appService,
+                        ActivityStatusWrapper.FLAGGED_STATUS_STRING));
                 logger.info("flagging duplicate inventory id: "
                     + "inventoryId/" + inventoryId + " visitId/" + visitId
                     + " patientNr/" + patientNr + " sampleTypeNameShort/"
@@ -223,7 +224,8 @@ public class ScanLinkdedImporter {
 
             if ((dupInvIdPnumberErr != null) || (dupInvIdSampleTypeErr != null)) {
                 aliquot.setActivityStatus(ActivityStatusWrapper
-                    .getActivityStatus(appService, "Flagged"));
+                    .getActivityStatus(appService,
+                        ActivityStatusWrapper.FLAGGED_STATUS_STRING));
                 logger.info("flagging duplicate inventory id: "
                     + "inventoryId/" + inventoryId + " visitId/" + visitId
                     + " patientNr/" + patientNr + " sampleTypeNameShort/"
@@ -252,10 +254,10 @@ public class ScanLinkdedImporter {
             // check if this is a duplicate
             for (AliquotWrapper a : aliquots) {
                 if (a.getPatientVisit().getId().equals(visitId)
-                    && a.getPatientVisit().getPatient().getPnumber().equals(
-                        patientNr)
-                    && a.getSampleType().getNameShort().equals(
-                        sampleTypeNameShort)) {
+                    && a.getPatientVisit().getPatient().getPnumber()
+                        .equals(patientNr)
+                    && a.getSampleType().getNameShort()
+                        .equals(sampleTypeNameShort)) {
                     return a;
                 }
             }

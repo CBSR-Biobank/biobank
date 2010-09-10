@@ -1004,7 +1004,7 @@ public class TestContainerType extends TestDatabase {
         }
 
         topType.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         topType.persist();
     }
 

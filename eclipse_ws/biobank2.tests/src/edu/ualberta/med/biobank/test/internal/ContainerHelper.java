@@ -40,7 +40,7 @@ public class ContainerHelper extends DbHelper {
         container.setSite(site);
         container.setContainerType(type);
         container.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         return container;
     }
 

@@ -227,7 +227,7 @@
       </command>
        <command
              id="edu.ualberta.med.biobank.commands.patients.patientMerge"
-             name="Merge patient">
+             name="Merge patients">
        </command>
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
@@ -242,8 +242,8 @@
             name="Clinic Shipment administration">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.sessionReload"
-            name="Session Reload">
+            id="edu.ualberta.med.biobank.commands.reloadViewWithTree"
+            name="Reload">
       </command>
       <command
             defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMail"
@@ -256,10 +256,6 @@
       <command
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.todayNodeReload"
-            name="Reload Today Node in Administration Tree">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.print"
@@ -282,7 +278,7 @@
             name="Edit">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.reload"
+            id="edu.ualberta.med.biobank.commands.reloadViewForm"
             name="Reload">
 	  </command>
 	  <command
@@ -837,8 +833,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.SessionReloadHandler"
-            commandId="edu.ualberta.med.biobank.commands.sessionReload">
+            class="edu.ualberta.med.biobank.handlers.ReloadViewWithTreeHandler"
+            commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree">
          <activeWhen>
                <reference
                      definitionId="biobank2.loggedIn">
@@ -878,35 +874,6 @@
 			   </or>
              </and>
          </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.ReloadTodayNodeHandler"
-            commandId="edu.ualberta.med.biobank.commands.todayNodeReload">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.siteSelected">
-               </reference>
-               <or>
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-                  <reference
-                        definitionId="biobank2.shipmentsPerspectiveSelected">
-                  </reference>
-               </or>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <or>
-               <reference
-                     definitionId="biobank2.shipmentsPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.patientsPerspectiveSelected">
-               </reference>
-            </or>
-         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.DecodePlateHandler"
@@ -955,8 +922,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.ReloadHandler"
-            commandId="edu.ualberta.med.biobank.commands.reload">
+            class="edu.ualberta.med.biobank.handlers.ReloadViewFormHandler"
+            commandId="edu.ualberta.med.biobank.commands.reloadViewForm">
          <activeWhen>
             <with
                   variable="activeEditor">
@@ -966,7 +933,7 @@
             </with>
             </activeWhen>
             </handler>
-<handler
+	   <handler
             class="edu.ualberta.med.biobank.handlers.EditActivityStatusHandler"
             commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods">
          <activeWhen>
@@ -1164,7 +1131,14 @@
                   icon="icons/patient_add.png"
                   label="Add Patient"
                   style="push">
+            </command>      
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+                  icon="icons/patient_merge.png"
+                  label="Merge Patients"
+                  style="push">
             </command>
+            
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
                   icon="icons/patient_delete.png"
@@ -1468,7 +1442,7 @@
                   tooltip="Search">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.sessionReload"
+                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
                   style="push"
@@ -1490,6 +1464,12 @@
                </visibleWhen>
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+                  icon="icons/patient_merge.png"
+                  label="Merge Patients"
+                  style="push">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
                   icon="icons/patient_delete.png"
                   label="Delete Patient"
@@ -1500,12 +1480,6 @@
                         definitionId="biobank2.patientsPerspectiveSelected">
                   </reference>
                </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
-                  icon="icons/merge.png"
-                  label="Merge Patient"
-                  style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
@@ -1587,17 +1561,11 @@
                   tooltip="Search">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.todayNodeReload"
+                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
                   style="push"
                   tooltip="Reload Today Node">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
          </toolbar>
          <toolbar
@@ -1634,17 +1602,11 @@
                   tooltip="Search">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.todayNodeReload"
+                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
                   style="push"
                   tooltip="Reload Today Node">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.shipmentsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
          </toolbar>
          <toolbar
@@ -1660,6 +1622,13 @@
                         definitionId="biobank2.dispatchShipmentsPerspectiveSelected">
                   </reference>
                </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
+                  icon="icons/reload.png"
+                  label="Reload"
+                  style="push"
+                  tooltip="Reload tree">
             </command>
          </toolbar>
       </menuContribution>
@@ -2413,7 +2382,7 @@
             sequence="M1+M2+K">
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.reload"
+            commandId="edu.ualberta.med.biobank.commands.reloadViewForm"
             schemeId="biobank2.scheme"
             sequence="M1+T">
       </key>

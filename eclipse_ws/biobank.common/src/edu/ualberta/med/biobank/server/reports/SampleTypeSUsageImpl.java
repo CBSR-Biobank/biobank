@@ -20,7 +20,7 @@ public class SampleTypeSUsageImpl extends AbstractReport {
     private final static String QUERY2 = "select st.nameShort from "
         + SampleType.class.getName()
         + " st where st not in (select ss.sampleType from "
-        + SampleStorage.class.getName() + " ss)";
+        + SampleStorage.class.getName() + " ss) ORDER BY st.nameShort";
 
     public SampleTypeSUsageImpl(BiobankReport report) {
         super("", report);

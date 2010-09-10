@@ -26,7 +26,8 @@ public class AliquotHelper extends DbHelper {
 
     public static AliquotWrapper newAliquot(SampleTypeWrapper sampleType)
         throws Exception {
-        return newAliquot(sampleType, "Active");
+        return newAliquot(sampleType,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
     }
 
     public static AliquotWrapper newAliquot(SampleTypeWrapper sampleType,
@@ -46,7 +47,8 @@ public class AliquotHelper extends DbHelper {
     public static AliquotWrapper newAliquot(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) throws Exception {
-        return newAliquot(sampleType, "Active", container, pv, row, col);
+        return newAliquot(sampleType,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, pv, row, col);
     }
 
     public static AliquotWrapper addAliquot(SampleTypeWrapper sampleType,
@@ -61,8 +63,8 @@ public class AliquotHelper extends DbHelper {
     public static AliquotWrapper addAliquot(SampleTypeWrapper sampleType,
         ContainerWrapper container, PatientVisitWrapper pv, Integer row,
         Integer col) throws Exception {
-        AliquotWrapper aliquot = addAliquot(sampleType, "Active", container,
-            pv, row, col);
+        AliquotWrapper aliquot = addAliquot(sampleType,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, pv, row, col);
         if (container != null)
             container.reload();
         return aliquot;

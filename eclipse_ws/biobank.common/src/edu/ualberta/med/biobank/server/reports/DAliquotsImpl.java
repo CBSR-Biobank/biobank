@@ -37,7 +37,7 @@ public class DAliquotsImpl extends AbstractReport {
     }
 
     @Override
-    protected AbstractRowPostProcess getRowPostProcess() {
+    public AbstractRowPostProcess getRowPostProcess() {
         return dateRangePostProcess;
     }
 }

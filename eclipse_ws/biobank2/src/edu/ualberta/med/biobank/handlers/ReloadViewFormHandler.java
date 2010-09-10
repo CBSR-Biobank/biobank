@@ -11,7 +11,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.BiobankViewForm;
 
-public class ReloadHandler extends AbstractHandler implements IHandler {
+public class ReloadViewFormHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

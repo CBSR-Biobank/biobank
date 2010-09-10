@@ -19,6 +19,7 @@ public class ReceivedDispatchShipmentGroup extends
         throws Exception {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
+            site.reload();
             // FIXME want to see only pending shipment
             return site.getReceivedDispatchShipmentCollection();
         }

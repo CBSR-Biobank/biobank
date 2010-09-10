@@ -678,6 +678,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                                 processCellWithPreviousPosition(scanCell,
                                     positionString, foundAliquot);
                             } else { // new
+                                if (foundAliquot.isDispatched()) {
+                                    updateCellAsDispatchedError(positionString,
+                                        scanCell, foundAliquot);
+                                }
                                 scanCell.setStatus(CellStatus.NEW);
                                 scanCell.setTitle(foundAliquot
                                     .getPatientVisit().getPatient()
@@ -696,6 +700,20 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 updateCellAsInventoryIdError(positionString, scanCell);
             }
         }
+    }
+
+    private void updateCellAsDispatchedError(String positionString,
+        PalletCell scanCell, AliquotWrapper foundAliquot) {
+        scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+            .getPnumber());
+        scanCell.setStatus(CellStatus.ERROR);
+        scanCell.setInformation(Messages.getFormattedString(
+            "ScanAssign.scanStatus.aliquot.dispatchedError",
+            ActivityStatusWrapper.DISPATCHED_STATUS_STRING)); //$NON-NLS-1$
+        appendLogNLS(Messages.getFormattedString(
+            "ScanAssign.activitylog.aliquot.dispatchedError", positionString,
+            ActivityStatusWrapper.DISPATCHED_STATUS_STRING));
+
     }
 
     /**

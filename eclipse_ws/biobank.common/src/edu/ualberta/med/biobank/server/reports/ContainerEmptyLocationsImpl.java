@@ -27,7 +27,7 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
     }
 
     @Override
-    protected List<Object> postProcess(WritableApplicationService appService,
+    public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
         List<Object> processedResults = new ArrayList<Object>();
         for (Object c : results) {

@@ -15,7 +15,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.dialogs.ActivityLogDialog;
+import edu.ualberta.med.biobank.dialogs.ActivityLogLocationDialog;
 import edu.ualberta.med.biobank.dialogs.LoginDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
@@ -77,7 +77,7 @@ public class BiobankStartup implements IStartup {
                                 PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH);
 
                         if (logSave && logPath.equals("")) {
-                            ActivityLogDialog dlg2 = new ActivityLogDialog(
+                            ActivityLogLocationDialog dlg2 = new ActivityLogLocationDialog(
                                 window.getShell());
                             dlg2.open();
                         }

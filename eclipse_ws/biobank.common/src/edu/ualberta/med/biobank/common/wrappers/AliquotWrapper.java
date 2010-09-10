@@ -443,17 +443,16 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return list;
     }
 
+    // FIXME : do we want this search to be specific to a site ?
     public static List<AliquotWrapper> getAliquotsNonActive(
         WritableApplicationService appService, SiteWrapper site)
-        throws Exception {
-        ActivityStatusWrapper activeStatus = ActivityStatusWrapper
-            .getActivityStatus(appService, "Active");
+        throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Aliquot.class.getName()
-                + " a where a.patientVisit.shipment.site.id = ? and activityStatus != ?",
+                + " a where a.patientVisit.shipment.site.id = ? and (activityStatus is null || activityStatus.name != ?",
             Arrays.asList(new Object[] { site.getId(),
-                activeStatus.getWrappedObject() }));
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
 
@@ -560,12 +559,15 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public boolean isActive() {
         ActivityStatusWrapper status = getActivityStatus();
-        try {
-            return status != null
-                && status.equals(ActivityStatusWrapper
-                    .getActiveActivityStatus(appService));
-        } catch (Exception e) {
-            return false;
-        }
+        return status != null && status.isActive();
+    }
+
+    public boolean isDispatched() {
+        ActivityStatusWrapper status = getActivityStatus();
+        return status != null && status.isDispatched();
+    }
+
+    public ContainerWrapper getTop() {
+        return objectWithPositionManagement.getTop();
     }
 }

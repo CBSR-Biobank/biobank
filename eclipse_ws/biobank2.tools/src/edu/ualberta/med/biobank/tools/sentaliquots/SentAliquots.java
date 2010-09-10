@@ -72,7 +72,8 @@ public class SentAliquots {
         }
 
         ActivityStatusWrapper closedStatus = ActivityStatusWrapper
-            .getActivityStatus(appService, "Closed");
+            .getActivityStatus(appService,
+                ActivityStatusWrapper.CLOSED_STATUS_STRING);
 
         // now process the file contents
         for (String[] cols : content) {

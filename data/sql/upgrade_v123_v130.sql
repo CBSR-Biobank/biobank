@@ -127,15 +127,19 @@ ALTER TABLE study_source_vessel
 #
 
 ALTER TABLE container_labeling_scheme
-      ADD `MAX_ROWS` int(11) NULL DEFAULT NULL COMMENT '' AFTER NAME,
+      ADD `MIN_CHARS` int(11) NULL DEFAULT NULL COMMENT '' AFTER NAME,
+      ADD `MAX_CHARS` int(11) NULL DEFAULT NULL COMMENT '' AFTER MIN_CHARS,
+      ADD `MAX_ROWS` int(11) NULL DEFAULT NULL COMMENT '' AFTER MAX_CHARS,
       ADD `MAX_COLS` int(11) NULL DEFAULT NULL COMMENT '' AFTER MAX_ROWS,
       ADD `MAX_CAPACITY` int(11) NULL DEFAULT NULL COMMENT '' AFTER MAX_COLS;
 
-UPDATE container_labeling_scheme set max_rows=16,max_cols=24,max_capacity=384 where id=1;
-UPDATE container_labeling_scheme set max_capacity=576 where id=2;
-UPDATE container_labeling_scheme set max_capacity=99 where id=3;
-UPDATE container_labeling_scheme set max_rows=2,max_cols=2,max_capacity=4 where id=4;
+UPDATE container_labeling_scheme set min_chars=2,max_chars=3,max_rows=16,max_cols=24,max_capacity=384 where id=1;
+UPDATE container_labeling_scheme set min_chars=2,max_chars=2,max_capacity=576 where id=2;
+UPDATE container_labeling_scheme set min_chars=2,max_chars=2,max_capacity=99 where id=3;
+UPDATE container_labeling_scheme set min_chars=2,max_chars=2,max_rows=2,max_cols=2,max_capacity=4 where id=4;
+INSERT INTO container_labeling_scheme values (5,"Box81",2,2,9,9,81);
 
+UPDATE container_type set child_labeling_scheme_id=5 where name="Box 81";
 
 DROP TABLE IF EXISTS  abstract_shipment;
 

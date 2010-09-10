@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.client.config.cbsr;
 import java.util.HashMap;
 
 import edu.ualberta.med.biobank.client.config.ConfigClinics;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -14,107 +15,137 @@ public class CbsrClinics extends ConfigClinics {
         clinicsMap = new HashMap<String, ClinicWrapper>();
         contactsMap = new HashMap<String, ContactWrapper>();
 
-        addClinic("CL1-Foothills", "CL1-Foothills", true, "Active", null,
+        addClinic("CL1-Foothills", "CL1-Foothills", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
             "Foothills Medical Centre", "1403 29 Street", "Calgary", "Alberta",
             "t2n2t9");
-        addClinic("CL1-Heritage", "CL1-Heritage", true, "Active",
-            "Shirley Cole", "Heritage Medical Research Clinic",
+        addClinic("CL1-Heritage", "CL1-Heritage", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, "Shirley Cole",
+            "Heritage Medical Research Clinic",
             "Suite 1140, 3350 Hospital Drive", "Calgary", "Alberta", "T2N4N1");
-        addClinic("CL1-Sunridge", "CL1-Sunridge", true, "Active",
+        addClinic("CL1-Sunridge", "CL1-Sunridge", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING,
             "Charlynn Ursu, Sharon Gulewich and Coralea Bignell",
             "Sunridge Medical Gallery, Alberta Health Services Building",
             "#200, 2580- 32 street NE Room 3001", "Calgary", "Alberta",
             "T1Y7M8");
         addClinic("CL2-Alberta's Children's Hospital", "CL2-Children Hosp",
-            true, "Active", null, "Alberta Children's Hospital",
-            "2888 Shaganappi Trail NW", "Calgary", "Alberta", "t3b6a8");
-        addClinic("ED1-UofA", "ED1-UofA", false, "Active", null,
+            true, ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Alberta Children's Hospital", "2888 Shaganappi Trail NW",
+            "Calgary", "Alberta", "t3b6a8");
+        addClinic("ED1-UofA", "ED1-UofA", false,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
             "University of Alberta Hospital", null, "Edmonton", "Alberta",
             "T6G2B7");
-        addClinic("FM1-Phillo King", "FM1-King", true, "Active", "Philo King",
+        addClinic("FM1-Phillo King", "FM1-King", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, "Philo King",
             "124 Beardsley Crescent", null, "Fort McMurray", "Alberta",
             "T9H2S2");
         addClinic("GP1-Queen Elizabeth Hospital", "GP1-QE Hosp", true,
-            "Active", "Sharon Mollins", "Renal Dialysis 2W", "10409-98 Street",
-            "Grande Prairie", "Alberta", "T8V0E2");
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, "Sharon Mollins",
+            "Renal Dialysis 2W", "10409-98 Street", "Grande Prairie",
+            "Alberta", "T8V0E2");
         addClinic("HL1-Queen Elizabeth II Hospital", "HL1-QE II", true,
-            "Active", null, "QE11 Health Sciences Centre",
-            "5788 University Avenue", "Halifax", "Nova Scotia", "B3H1V8");
-        addClinic("HL2-IWK Health Center", "HL2-IWK", true, "Active", null,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "QE11 Health Sciences Centre", "5788 University Avenue", "Halifax",
+            "Nova Scotia", "B3H1V8");
+        addClinic("HL2-IWK Health Center", "HL2-IWK", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
             "IWK Health Centre", "5850 University Ave PO Box 9700", "Halifax",
             "Nova Scotia", "B3K6R8");
-        addClinic("HM1-McMaster University", "HM1-McMaster", true, "Active",
-            null, "McMaster University Medical Centre",
-            "1200 Main street West", "Hamilton", "Ontario", "L8N3Z5");
+        addClinic("HM1-McMaster University", "HM1-McMaster", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "McMaster University Medical Centre", "1200 Main street West",
+            "Hamilton", "Ontario", "L8N3Z5");
         addClinic("KN1-Kingston Cancer Center", "KN1-Cancer Ctr", true,
-            "Active", null, "Kingston Cancer Centre", "25 King Street",
-            "Kingston", "Ontario", "K7L5P9");
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Kingston Cancer Centre", "25 King Street", "Kingston", "Ontario",
+            "K7L5P9");
         addClinic("LM1-Lloydminister Hospital", "LM1-Lloyd Hosp", true,
-            "Active", "", "3820 43 Avenue", "Room 307", "Lloydminister",
-            "Saskatchewan", "S9V1Y5");
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, "", "3820 43 Avenue",
+            "Room 307", "Lloydminister", "Saskatchewan", "S9V1Y5");
         addClinic("LN1-St Joseph's Health Center", "LN1-St Joseph", true,
-            "Active", null, "St Joseph's Health Centre",
-            "800 Comissioners Road East", "London", "Ontario", "N6A4V2");
-        addClinic("MC1-Moncton Hospital", "MC1-Moncton Hosp", true, "Active",
-            null, "Moncton Hospital", "135 MacBeath", "Moncton",
-            "New Brunswick", "E1C6Z8");
-        addClinic("MN1-Hopital Ste-Justine", "MN1-Ste-Justine", true, "Active",
-            null, "Hopital Ste-Justine", "3175 Cote Ste-Catherine", "Montreal",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "St Joseph's Health Centre", "800 Comissioners Road East",
+            "London", "Ontario", "N6A4V2");
+        addClinic("MC1-Moncton Hospital", "MC1-Moncton Hosp", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Moncton Hospital", "135 MacBeath", "Moncton", "New Brunswick",
+            "E1C6Z8");
+        addClinic("MN1-Hopital Ste-Justine", "MN1-Ste-Justine", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Hopital Ste-Justine", "3175 Cote Ste-Catherine", "Montreal",
             "Quebec", "H3T1C5");
         addClinic("MN2-Montreal Children's Hospital", "MN2-Children Hosp",
-            true, "Active", null, "Montreal Children's Hospital",
-            "2300 rue Tupper", "Montreal", "Quebec", "H3H1P3");
-        addClinic("OL1-Jodie Hingst", "OL1-Hingst", true, "Active", "",
-            "5123 42 Street", null, "Olds", "Alberta", "T4H1X1");
-        addClinic("OT1-Ottawa Hospital", "OT1-Ottawa Hosp", true, "Active",
-            null, "Ottawa Hospital", "501 Smyth Road", "Ottawa", "Ontario",
-            "K1H8L6");
+            true, ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Montreal Children's Hospital", "2300 rue Tupper", "Montreal",
+            "Quebec", "H3H1P3");
+        addClinic("OL1-Jodie Hingst", "OL1-Hingst", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, "", "5123 42 Street",
+            null, "Olds", "Alberta", "T4H1X1");
+        addClinic("OT1-Ottawa Hospital", "OT1-Ottawa Hosp", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Ottawa Hospital", "501 Smyth Road", "Ottawa", "Ontario", "K1H8L6");
         addClinic("OT2-Children's Hospital of Eastern Ontario",
-            "OT2-Children Hosp", true, "Active", null,
+            "OT2-Children Hosp", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
             "Children's Hospital of Eastern Ontario", "401 Smyth Road",
             "Ottawa", "Ontario", "K1G4X3");
         addClinic("QB1-Hopital Enfant-Jesus", "QB1-Enfant-Jesus", true,
-            "Active", null, "CHA Hopital Enfant-Jesus", "1401 18e Rue",
-            "Quebec City", "Quebec", "G1J1Z4");
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "CHA Hopital Enfant-Jesus", "1401 18e Rue", "Quebec City",
+            "Quebec", "G1J1Z4");
         addClinic("RD1-Red Deer Regional Hospital", "RD1-Red Deer Hosp", true,
-            "Active", "", "Red Deer Regional Hospital",
-            "Room 120, 3942 50A Avenue", "Red Deer", "Alberta", "T4N6R2");
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, "",
+            "Red Deer Regional Hospital", "Room 120, 3942 50A Avenue",
+            "Red Deer", "Alberta", "T4N6R2");
         addClinic("SB1-Saint Johns NB Regional Hospital",
-            "SB1-St John NB Hosp", true, "Active", null,
+            "SB1-St John NB Hosp", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
             "Saint Johns Regional Hospital", "400 University Avenue",
             "St John", "New Brunswick", "E2L4L2");
         addClinic("SD1-Sudbury Regional Hospital", "SD1-Sudbury Hosp", true,
-            "Active", null, "Sudbury Regional Hospital", "41 Ramsey Lake Road",
-            "Sudbury", "Ontario", "P3E5J1");
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Sudbury Regional Hospital", "41 Ramsey Lake Road", "Sudbury",
+            "Ontario", "P3E5J1");
         addClinic("SF1-Health Science Center", "SF1-Health NFLD", true,
-            "Active", "", "Health Science Centre, Eastern Health",
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, "",
+            "Health Science Centre, Eastern Health",
             "300 Prince Philip Drive, Room 4304D", "St John's",
             "Newfoundland and Labrador", "A1B3V6");
         addClinic("SP1-St Therese Hospital", "SP1-St Therese Hosp", false,
-            "Active", "", "St Therese Hospital", "4713 48 Avenue, PO Box 880",
-            "St Paul", "Alberta", "T0A3A3");
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, "",
+            "St Therese Hospital", "4713 48 Avenue, PO Box 880", "St Paul",
+            "Alberta", "T0A3A3");
         addClinic("SS1-Royal University Hospital", "SS1-Royal Hosp", true,
-            "Active", null, "Royal University Hospital", "103 Hospital Drive",
-            "Saskatoon", "Alberta", "S7N0W8");
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Royal University Hospital", "103 Hospital Drive", "Saskatoon",
+            "Alberta", "S7N0W8");
         addClinic("TH1-Thunder Bay Regional Hospital", "TH1-Regional Hosp",
-            true, "Active", null, "Thunder Bay Regional Hospital",
-            "980 Oliver Road", "Thunder Bay", "Ontario", "P7B6V4");
-        addClinic("TR1-St Michael's Hospital", "TR1-St Mikes", true, "Closed",
-            null, null, null, "Toronto", "Ontario", null);
-        addClinic("VN1-St Paul's Hospital", "VN1-St Paul", true, "Active", "",
+            true, ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Thunder Bay Regional Hospital", "980 Oliver Road", "Thunder Bay",
+            "Ontario", "P7B6V4");
+        addClinic("TR1-St Michael's Hospital", "TR1-St Mikes", true,
+            ActivityStatusWrapper.CLOSED_STATUS_STRING, null, null, null,
+            "Toronto", "Ontario", null);
+        addClinic("VN1-St Paul's Hospital", "VN1-St Paul", true,
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, "",
             "St Paul's Hospital",
             "1081 Burrard Street, Room 318 Comox Building", "Vancouver",
             "British Columbia", "V6Z1Y6");
         addClinic("VN2-BC Women and Children's Hospital", "VN2-Childrens Hosp",
-            true, "Active", null, "Women's and Children's Health Centre",
-            "4480 Oak Street", "Vancouver", "British Columbia", "V6H3V4");
+            true, ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Women's and Children's Health Centre", "4480 Oak Street",
+            "Vancouver", "British Columbia", "V6H3V4");
         addClinic("WL1-Westlock Health Care Center", "WL1-Westlock Hosp",
-            false, "Active", "", "Westlock Health Care Centre",
+            false, ActivityStatusWrapper.ACTIVE_STATUS_STRING, "",
+            "Westlock Health Care Centre",
             "Clinical Laboratory, 10020 93 Street", "Westlock", "Alberta",
             "T7P2G4");
         addClinic("WN1-Cancer Care Manitoba", "WN1-Cancer Care", true,
-            "Active", null, "Cancer Care Manitoba", "675 McDermot Avenue",
-            "Winnipeg", "Manitoba", "R3E0V9");
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING, null,
+            "Cancer Care Manitoba", "675 McDermot Avenue", "Winnipeg",
+            "Manitoba", "R3E0V9");
 
         addContact("CL1-Foothills", "Morna Brown", null, "403-944-4057",
             "403-944-1745", "morna.brown@calgaryhealthregion.ca");

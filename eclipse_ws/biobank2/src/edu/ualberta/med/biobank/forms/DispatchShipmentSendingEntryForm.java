@@ -12,9 +12,13 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -24,8 +28,10 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.dialogs.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
+import edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
@@ -202,6 +208,16 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                 "The current site does not have any dispatch studies associated with it.\n"
                     + "Please close the form.");
         }
+
+        Button palletButton = toolkit.createButton(page, "Scan pallet",
+            SWT.PUSH);
+        palletButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                new DispatchCreateScanDialog(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), shipment).open();
+            }
+        });
     }
 
     private void createAliquotsSection() {
@@ -252,7 +268,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         shipment.setShippingMethod(shippingMethod);
 
         shipment.persist();
-        // DispatchShipmentAdministrationView.reload();
+        DispatchShipmentAdministrationView.getCurrent().reload();
     }
 
     @Override

@@ -81,7 +81,8 @@ public class TestAliquot extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt());
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomString(4), study);
-        ClinicWrapper clinic = ClinicHelper.addClinic("clinicname");
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinicname"
+            + r.nextInt());
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
         study.addContacts(Arrays.asList(contact));
@@ -119,8 +120,8 @@ public class TestAliquot extends TestDatabase {
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
-        pAliquot.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        pAliquot.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         pAliquot.persist();
     }
 
@@ -397,26 +398,27 @@ public class TestAliquot extends TestDatabase {
         aliquot.setQuantityFromType();
         // no sample storages defined yet, should be null
         Assert.assertTrue(quantity == null);
+
+        ActivityStatusWrapper activeStatus = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
+
         SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
         ss1.setSampleType(SampleTypeHelper.addSampleType("ss1"));
         ss1.setVolume(1.0);
         ss1.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
-        ss1.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        ss1.setActivityStatus(activeStatus);
         ss1.persist();
         SampleStorageWrapper ss2 = new SampleStorageWrapper(appService);
         ss2.setSampleType(SampleTypeHelper.addSampleType("ss2"));
         ss2.setVolume(2.0);
         ss2.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
-        ss2.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        ss2.setActivityStatus(activeStatus);
         ss2.persist();
         SampleStorageWrapper ss3 = new SampleStorageWrapper(appService);
         ss3.setSampleType(aliquot.getSampleType());
         ss3.setVolume(3.0);
         ss3.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
-        ss3.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, "Active"));
+        ss3.setActivityStatus(activeStatus);
         ss3.persist();
         aliquot.getPatientVisit().getPatient().getStudy()
             .addSampleStorage(Arrays.asList(ss1, ss2, ss3));
@@ -643,6 +645,11 @@ public class TestAliquot extends TestDatabase {
         Assert.assertEquals(2, aliquotDispatchShipments.size());
         Assert.assertTrue(aliquotDispatchShipments.contains(dShipment));
         Assert.assertTrue(aliquotDispatchShipments.contains(dShipment2));
+    }
+
+    @Override
+    public void tearDown() {
+
     }
 
 }
