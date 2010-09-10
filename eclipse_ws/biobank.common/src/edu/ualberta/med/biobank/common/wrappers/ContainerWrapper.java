@@ -539,7 +539,20 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @SuppressWarnings("unchecked")
-    public int getChildCount() {
+    public long getChildCount(boolean fast) throws BiobankCheckException,
+        ApplicationException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria("select count(pos) from "
+                + ContainerPosition.class.getName()
+                + " as pos where pos.parentContainer.id = ?",
+                Arrays.asList(new Object[] { getId() }));
+            List<Long> results = appService.query(criteria);
+            if (results.size() != 1) {
+                throw new BiobankCheckException(
+                    "Invalid size for HQL query result");
+            }
+            return results.get(0);
+        }
         Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) propertiesMap
             .get("children");
         if (children != null) {
@@ -547,10 +560,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         }
         Collection<ContainerPosition> positions = wrappedObject
             .getChildPositionCollection();
-        if (positions != null)
-            return positions.size();
-        else
+        if (positions == null)
             return 0;
+        return positions.size();
     }
 
     @SuppressWarnings("unchecked")
@@ -1005,9 +1017,12 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     /**
      * @return true if there is no free position for a new child container
+     * @throws ApplicationException
+     * @throws BiobankCheckException
      */
-    public boolean isContainerFull() {
-        return (this.getChildCount() == this.getContainerType()
+    public boolean isContainerFull() throws BiobankCheckException,
+        ApplicationException {
+        return (this.getChildCount(true) == this.getContainerType()
             .getRowCapacity() * this.getContainerType().getColCapacity());
     }
 

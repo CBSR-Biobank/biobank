@@ -310,8 +310,6 @@ public class LoginDialog extends TitleAreaDialog {
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
 
         Collection<SiteWrapper> sites = sessionHelper.getSites();
-        String realUsername = sessionHelper.getUserName();
-
         if (sites != null) {
             // login successful
             pluginPrefs.put(LAST_SERVER, serverWidget.getText());
@@ -348,7 +346,7 @@ public class LoginDialog extends TitleAreaDialog {
 
             SessionManager.getInstance().addSession(
                 sessionHelper.getAppService(), serverWidget.getText(),
-                realUsername, sites);
+                sessionHelper.getUserName(), sites);
         }
         super.okPressed();
     }
