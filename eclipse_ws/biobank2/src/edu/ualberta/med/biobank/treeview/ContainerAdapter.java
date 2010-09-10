@@ -199,13 +199,11 @@ public class ContainerAdapter extends AdapterBase {
         throws Exception {
         final ContainerWrapper container = getContainer();
         final String oldLabel = container.getLabel();
-        String newParentContainerLabel = newLabel.substring(0,
-            newLabel.length() - 2);
         List<ContainerWrapper> newParentContainers = container
-            .getPossibleParents(newParentContainerLabel);
+            .getPossibleParents(newLabel);
         if (newParentContainers.size() == 0) {
             BioBankPlugin.openError("Move Error",
-                "A parent container with label \"" + newParentContainerLabel
+                "A parent container with child \"" + newLabel
                     + "\" does not exist.");
             return false;
         }
