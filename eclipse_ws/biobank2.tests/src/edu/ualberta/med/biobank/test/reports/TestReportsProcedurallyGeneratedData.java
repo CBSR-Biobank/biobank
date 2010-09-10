@@ -68,10 +68,10 @@ public final class TestReportsProcedurallyGeneratedData implements
     ReportDataSource {
     private static TestReportsProcedurallyGeneratedData instance = null;
 
-    private static final int NUM_SITES = 2;
-    private static final int NUM_STUDIES_PER_SITE = 11;
+    private static final int NUM_SITES = 2; // <-- PUT BACK TO 2
+    private static final int NUM_STUDIES_PER_SITE = 2; // <-- PUT BACK TO 11
     private static final int NUM_SAMPLE_TYPES = 2; // 5
-    private static final int NUM_CLINICS = 7;
+    private static final int NUM_CLINICS = 2; // <-- PUT BACK TO 7
     private static final int NUM_CONTAINER_ROWS = 3; // 5
     private static final int NUM_CONTAINER_COLS = 3; // 5
     // the maximum ratio of "filled positions" / "total positions" for a
@@ -177,7 +177,7 @@ public final class TestReportsProcedurallyGeneratedData implements
 
         for (SampleTypeWrapper sampleType : SampleTypeWrapper
             .getAllSampleTypes(getInstance().getAppService(), true)) {
-            if (sampleType.getName().equals(
+            if (sampleType.getNameShort().equals(
                 AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME)) {
                 sampleTypes.add(sampleType);
             }
@@ -188,7 +188,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         Assert.assertTrue(PredicateUtil.filter(sampleTypes,
             new Predicate<SampleTypeWrapper>() {
                 public boolean evaluate(SampleTypeWrapper sampleType) {
-                    return sampleType.getName().equals(
+                    return sampleType.getNameShort().equals(
                         AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
                 }
 

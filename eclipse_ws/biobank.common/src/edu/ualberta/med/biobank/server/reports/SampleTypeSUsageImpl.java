@@ -15,7 +15,7 @@ public class SampleTypeSUsageImpl extends AbstractReport {
 
     private final static String QUERY1 = "select ss.sampleType.nameShort, "
         + "ss.study.nameShort from " + SampleStorage.class.getName() + " ss "
-        + " ORDER BY ss.sampleType.nameShort";
+        + " ORDER BY ss.sampleType.nameShort, ss.study.nameShort";
 
     private final static String QUERY2 = "select st.nameShort from "
         + SampleType.class.getName()

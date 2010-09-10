@@ -12,6 +12,7 @@ import java.util.Map;
 
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.Predicate;
@@ -38,7 +39,7 @@ public class SampleTypePvCountTest extends AbstractReportTest {
             String lhsPnumber = (String) lhs.get(0);
             String rhsPnumber = (String) rhs.get(0);
 
-            int cmp = lhsPnumber.compareTo(rhsPnumber);
+            int cmp = compareStrings(lhsPnumber, rhsPnumber);
             if (cmp != 0) {
                 return cmp;
             }
@@ -46,7 +47,7 @@ public class SampleTypePvCountTest extends AbstractReportTest {
             Date lhsDateProcessed = (Date) lhs.get(1);
             Date rhsDateProcessed = (Date) rhs.get(1);
 
-            return lhsDateProcessed.compareTo(rhsDateProcessed);
+            return DateCompare.compare(lhsDateProcessed, rhsDateProcessed);
         }
     };
 

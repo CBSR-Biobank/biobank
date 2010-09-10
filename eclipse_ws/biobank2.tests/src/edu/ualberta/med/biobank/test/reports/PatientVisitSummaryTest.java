@@ -75,10 +75,13 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
 
     private static final Comparator<List<String>> ORDER_BY_STUDY_CLINIC = new Comparator<List<String>>() {
         public int compare(List<String> lhs, List<String> rhs) {
-            int comparedStudyName = lhs.get(0).compareTo(rhs.get(0));
-            int comparedClinicName = lhs.get(1).compareTo(rhs.get(1));
-            return comparedStudyName != 0 ? comparedStudyName
-                : comparedClinicName;
+            int cmp = compareStrings(lhs.get(0), rhs.get(0)); // clinic name
+
+            if (cmp != 0) {
+                return cmp;
+            }
+
+            return compareStrings(lhs.get(1), rhs.get(1)); // study name
         }
     };
 

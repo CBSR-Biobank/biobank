@@ -65,12 +65,11 @@ public abstract class AbstractReportTest {
     };
     public static final Comparator<AliquotWrapper> ORDER_ALIQUOT_BY_PNUMBER = new Comparator<AliquotWrapper>() {
         public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
-            return lhs.getPatientVisit().getPatient().getPnumber()
-                .compareTo(rhs.getPatientVisit().getPatient().getPnumber());
+            return compareStrings(lhs.getPatientVisit().getPatient()
+                .getPnumber(), rhs.getPatientVisit().getPatient().getPnumber());
         }
     };
 
-    private static final String[] SITE_OPS = { "=", "!=" };
     private BiobankReport report;
     private static ReportDataSource dataSource;
 
@@ -266,11 +265,13 @@ public abstract class AbstractReportTest {
     protected void checkResults(EnumSet<CompareResult> cmpOptions)
         throws Exception {
         for (SiteWrapper site : getSites()) {
-            for (String op : SITE_OPS) {
-                getReport().setSiteInfo(op, site.getId());
-                compareResults(cmpOptions);
-            }
+            getReport().setSiteInfo("=", site.getId());
+            compareResults(cmpOptions);
         }
+
+        // run report across all sites
+        getReport().setSiteInfo("!=", 0);
+        compareResults(cmpOptions);
     }
 
     protected final WritableApplicationService getAppService() {
@@ -452,5 +453,18 @@ public abstract class AbstractReportTest {
             getAppService(), postProcessedExpectedResults);
 
         return postProcessedExpectedResults;
+    }
+
+    /**
+     * Database may or may not ignore case when comparing strings. All local
+     * Java String comparisons should use this method so we can easily change to
+     * match the db's behaviour.
+     * 
+     * @param left
+     * @param right
+     * @return
+     */
+    public static int compareStrings(String left, String right) {
+        return left.compareToIgnoreCase(right);
     }
 }
