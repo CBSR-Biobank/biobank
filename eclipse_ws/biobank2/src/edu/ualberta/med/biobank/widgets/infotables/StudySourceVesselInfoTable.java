@@ -17,8 +17,8 @@ public class StudySourceVesselInfoTable extends
     protected class TableRowData {
         StudySourceVesselWrapper studySourceVessel;
         public String name;
-        public Boolean needTimeDrawn;
-        public Boolean needOriginalVolume;
+        public String needTimeDrawn;
+        public String needOriginalVolume;
 
         @Override
         public String toString() {
@@ -56,12 +56,9 @@ public class StudySourceVesselInfoTable extends
                 case 0:
                     return info.name;
                 case 1:
-                    return (info.needTimeDrawn != null) ? info.needTimeDrawn
-                        .toString() : Boolean.FALSE.toString();
+                    return info.needTimeDrawn;
                 case 2:
-                    return (info.needOriginalVolume != null) ? info.needOriginalVolume
-                        .toString()
-                        : Boolean.FALSE.toString();
+                    return info.needOriginalVolume;
                 default:
                     return "";
                 }
@@ -77,8 +74,10 @@ public class StudySourceVesselInfoTable extends
         Assert.isNotNull(studySourceVessel.getSourceVessel(),
             "study source vessel has null for source vessel");
         info.name = studySourceVessel.getSourceVessel().getName();
-        info.needTimeDrawn = studySourceVessel.getNeedTimeDrawn();
-        info.needOriginalVolume = studySourceVessel.getNeedOriginalVolume();
+        info.needTimeDrawn = (studySourceVessel.getNeedTimeDrawn() != null) ? (studySourceVessel
+            .getNeedTimeDrawn() ? "Yes" : "No") : "No";
+        info.needOriginalVolume = (studySourceVessel.getNeedOriginalVolume() != null) ? (studySourceVessel
+            .getNeedOriginalVolume() ? "Yes" : "No") : "No";
         return info;
     }
 
