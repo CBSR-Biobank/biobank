@@ -25,7 +25,7 @@ public class SampleTypePvCountTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, List<Object>, Long> GROUP_BY_PV_AND_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<Object>, Long>() {
         public List<Object> getKey(AliquotWrapper aliquot) {
             PatientVisitWrapper visit = aliquot.getPatientVisit();
-            return Arrays.asList(new Object[] {
+            return Arrays.asList(new Object[] { visit.getId(),
                 visit.getPatient().getPnumber(), visit.getDateProcessed(),
                 visit.getDateDrawn(), aliquot.getSampleType().getName() });
         }
@@ -36,18 +36,18 @@ public class SampleTypePvCountTest extends AbstractReportTest {
     };
     private static final Comparator<List<Object>> ORDER_BY_PNUMBER_DATE_PROCESSED = new Comparator<List<Object>>() {
         public int compare(List<Object> lhs, List<Object> rhs) {
-            String lhsPnumber = (String) lhs.get(0);
-            String rhsPnumber = (String) rhs.get(0);
+            String lhsPnumber = (String) lhs.get(1);
+            String rhsPnumber = (String) rhs.get(1);
 
             int cmp = compareStrings(lhsPnumber, rhsPnumber);
             if (cmp != 0) {
                 return cmp;
             }
 
-            Date lhsDateProcessed = (Date) lhs.get(1);
-            Date rhsDateProcessed = (Date) rhs.get(1);
+            Date lhsDateProcessed = (Date) lhs.get(2);
+            Date rhsDateProcessed = (Date) rhs.get(2);
 
-            return DateCompare.compare(lhsDateProcessed, rhsDateProcessed);
+            return DateCompare.compare(rhsDateProcessed, lhsDateProcessed);
         }
     };
 
@@ -88,7 +88,10 @@ public class SampleTypePvCountTest extends AbstractReportTest {
 
         for (List<Object> key : keys) {
             List<Object> params = new ArrayList<Object>();
-            params.addAll(key);
+            params.add(key.get(1));
+            params.add(key.get(2));
+            params.add(key.get(3));
+            params.add(key.get(4));
             params.add(groupedData.get(key));
 
             expectedResults.add(params.toArray());
