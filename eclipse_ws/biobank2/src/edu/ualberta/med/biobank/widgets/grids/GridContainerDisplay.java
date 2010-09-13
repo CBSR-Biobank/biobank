@@ -37,9 +37,9 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected void drawRectangle(PaintEvent e,
+    protected Color getDefaultBackgroundColor(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
-        int indexRow, int indexCol, Color defaultBackgroundColor) {
+        int indexRow, int indexCol) {
         if (displayWidget.getCells() != null) {
             ContainerCell cell = (ContainerCell) displayWidget.getCells().get(
                 new RowColPos(indexRow, indexCol));
@@ -49,11 +49,10 @@ public class GridContainerDisplay extends AbstractGridDisplay {
             CellStatus status = cell.getStatus();
             if (status == null)
                 status = defaultStatus;
-            e.gc.setBackground(status.getColor());
-            e.gc.fillRectangle(rectangle);
+            return status.getColor();
         }
-        super.drawRectangle(e, displayWidget, rectangle, indexRow, indexCol,
-            defaultBackgroundColor);
+        return super.getDefaultBackgroundColor(e, displayWidget, rectangle,
+            indexRow, indexCol);
     }
 
     @Override
