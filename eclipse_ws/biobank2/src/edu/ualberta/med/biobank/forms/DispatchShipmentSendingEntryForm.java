@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -61,6 +63,8 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
     private ComboViewer activityStatusComboViewer;
 
     private AliquotListInfoTable aliquotsWidget;
+
+    private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
 
     @Override
     protected void init() throws Exception {
@@ -214,10 +218,13 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         palletButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                new DispatchCreateScanDialog(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), shipment).open();
+                DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getShell(), shipment);
+                dialog.open();
                 setDirty(true); // FIXME need to do this better !
                 aliquotsWidget.reloadCollection(shipment.getAliquotCollection());
+                removedPallets.addAll(dialog.getRemovedPallets());
             }
         });
     }
@@ -271,10 +278,9 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         shipment.persist();
         DispatchShipmentAdministrationView.getCurrent().reload();
 
-        // FIXME aliquots need to be remove from their current position (should
-        // be done in the wrapper)
-        // FIXME pallet should be remove from the freezer
-
+        for (ContainerWrapper pallet : removedPallets) {
+            pallet.delete();
+        }
     }
 
     @Override

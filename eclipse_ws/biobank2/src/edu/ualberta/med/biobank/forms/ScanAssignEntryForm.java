@@ -517,7 +517,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                System.out.println(page.getSize());
                 cancelConfirmWidget.setFocus();
                 displayPalletPositions();
                 palletWidget.setCells(getCells());

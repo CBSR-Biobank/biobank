@@ -92,16 +92,16 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected void customDraw(PaintEvent e,
+    protected Color getDefaultBackgroundColor(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
         if (this.loadedProfile != null) {
             if (this.loadedProfile.get(indexCol + indexRow * 12)) {
-                e.gc.setBackground(new Color(e.display, 185, 211, 238));
-                e.gc.fillRectangle(rectangle);
+                return new Color(e.display, 185, 211, 238);
             }
         }
-
+        return super.getDefaultBackgroundColor(e, displayWidget, rectangle,
+            indexRow, indexCol);
     }
 
     @Override
@@ -147,8 +147,8 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     @Override
     protected void drawRectangle(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
-        int indexRow, int indexCol) {
-        Color backgroundColor = CellStatus.EMPTY.getColor();
+        int indexRow, int indexCol, Color defaultBackgroundColor) {
+        Color backgroundColor = defaultBackgroundColor;
         if (displayWidget.getCells() != null) {
             PalletCell cell = (PalletCell) displayWidget.getCells().get(
                 new RowColPos(indexRow, indexCol));

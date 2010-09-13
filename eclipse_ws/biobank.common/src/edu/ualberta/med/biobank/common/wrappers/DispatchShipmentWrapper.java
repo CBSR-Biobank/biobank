@@ -15,8 +15,6 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchShipmentWrapper extends
@@ -70,12 +68,8 @@ public class DispatchShipmentWrapper extends
     @Override
     protected void persistDependencies(DispatchShipment origObject)
         throws Exception {
-        List<SDKQuery> queries = new ArrayList<SDKQuery>();
         for (AliquotWrapper aliquot : modifiedAliquots) {
-            queries.add(new UpdateExampleQuery(aliquot.getWrappedObject()));
-        }
-        if (queries.size() > 0) {
-            appService.executeBatchQuery(queries);
+            aliquot.persist();
         }
     }
 
@@ -302,6 +296,7 @@ public class DispatchShipmentWrapper extends
             }
             allAliquotObjects.add(aliquot.getWrappedObject());
             aliquot.setActivityStatus(dispatchedStatus);
+            aliquot.setPosition(null);
             allAliquotWrappers.add(aliquot);
             modifiedAliquots.add(aliquot);
         }
