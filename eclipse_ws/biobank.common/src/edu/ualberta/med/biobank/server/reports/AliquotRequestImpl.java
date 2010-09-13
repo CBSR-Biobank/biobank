@@ -18,12 +18,14 @@ public class AliquotRequestImpl extends AbstractReport {
 
     private static final String QUERY = "select p.aliquot from "
         + AliquotPosition.class.getName()
-        + " p where p.aliquot.patientVisit.shipment.site " + SITE_OPERATOR
-        + SITE_ID + " and p.container.label not like '"
+        + " p where p.aliquot.patientVisit.shipment.site "
+        + SITE_OPERATOR
+        + SITE_ID
+        + " and p.container.label not like '"
         + SENT_SAMPLES_FREEZER_NAME
         + "' and p.aliquot.patientVisit.patient.pnumber like ? and"
         + " datediff(p.aliquot.patientVisit.dateDrawn, ?) = 0  and"
-        + " p.aliquot.sampleType.nameShort like ? ORDER BY RAND()";
+        + " p.aliquot.sampleType.nameShort like ? and p.aliquot.activityStatus.name != 'Closed' ORDER BY p.aliquot.activityStatus.name, RAND()";
 
     public AliquotRequestImpl(BiobankReport report) {
         super(QUERY, report);
@@ -65,7 +67,7 @@ public class AliquotRequestImpl extends AbstractReport {
         String typeName, Integer maxResults, Integer numResultsFound) {
         return new Object[] { pnumber, "",
             DateFormatter.formatAsDate(dateDrawn), typeName,
-            "NOT FOUND (" + (maxResults - numResultsFound) + ")" };
+            "NOT FOUND (" + (maxResults - numResultsFound) + ")", "" };
     }
 
     // Database calls are made so can't use RowPostProcess
@@ -85,8 +87,9 @@ public class AliquotRequestImpl extends AbstractReport {
                 String stName = aliquot.getSampleType().getNameShort();
                 String aliquotLabel = new AliquotWrapper(appService, aliquot)
                     .getPositionString(true, false);
+                String activityStatus = aliquot.getActivityStatus().getName();
                 modifiedResults.add(new Object[] { pnumber, inventoryId,
-                    dateDrawn, stName, aliquotLabel });
+                    dateDrawn, stName, aliquotLabel, activityStatus });
             }
         }
         return modifiedResults;

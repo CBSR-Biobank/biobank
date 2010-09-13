@@ -27,7 +27,7 @@ public class AliquotRequestEditor extends ReportsEditor {
 
     @Override
     protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100 };
+        return new int[] { 100, 100, 100, 100, 100, 100 };
     }
 
     @Override
@@ -83,7 +83,7 @@ public class AliquotRequestEditor extends ReportsEditor {
     @Override
     protected String[] getColumnNames() {
         return new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
-            "Location" };
+            "Location", "Activity Status" };
     }
 
     @Override
