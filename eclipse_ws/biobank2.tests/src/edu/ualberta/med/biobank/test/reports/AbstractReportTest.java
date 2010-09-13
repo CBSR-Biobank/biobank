@@ -100,8 +100,9 @@ public abstract class AbstractReportTest {
         final boolean isIn, final Integer siteId) {
         return new Predicate<PatientVisitWrapper>() {
             public boolean evaluate(PatientVisitWrapper patientVisit) {
-                return isIn == patientVisit.getShipment().getSite().getId()
-                    .equals(siteId);
+                return !isIn
+                    || patientVisit.getShipment().getSite().getId()
+                        .equals(siteId);
             }
         };
     }
