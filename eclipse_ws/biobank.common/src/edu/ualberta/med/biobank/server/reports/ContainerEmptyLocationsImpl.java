@@ -8,8 +8,8 @@ import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerEmptyLocationsImpl extends AbstractReport {
