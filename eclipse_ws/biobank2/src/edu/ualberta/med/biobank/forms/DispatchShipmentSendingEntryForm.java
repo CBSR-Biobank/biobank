@@ -212,7 +212,6 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         }
 
         // FIXME need to find a nice place for this button
-        // FIXME this should be enable only if others fields are filled
         Button palletButton = toolkit.createButton(page, "Scan pallet",
             SWT.PUSH);
         palletButton.addSelectionListener(new SelectionAdapter() {

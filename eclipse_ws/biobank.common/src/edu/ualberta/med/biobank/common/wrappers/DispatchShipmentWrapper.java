@@ -344,4 +344,8 @@ public class DispatchShipmentWrapper extends
             receivedAliquots.add(aliquot);
         }
     }
+
+    public boolean isClosed() {
+        return getActivityStatus().isClosed();
+    }
 }

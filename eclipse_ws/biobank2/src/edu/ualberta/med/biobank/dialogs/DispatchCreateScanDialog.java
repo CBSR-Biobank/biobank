@@ -192,12 +192,17 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 } else {
                     scanCell.setAliquot(foundAliquot);
                     if (expectedAliquot != null || currentPallet == null) {
-                        // aliquot scanned is already registered at this
-                        // position (everything is ok !)
-                        scanCell.setStatus(CellStatus.FILLED);
-                        scanCell.setTitle(foundAliquot.getPatientVisit()
-                            .getPatient().getPnumber());
-                        scanCell.setAliquot(foundAliquot);
+                        if (foundAliquot.isDispatched()) {
+                            scanCell.setStatus(CellStatus.ERROR);
+                            scanCell.setInformation("Already dispatched");
+                        } else {
+                            // aliquot scanned is already registered at this
+                            // position (everything is ok !)
+                            scanCell.setStatus(CellStatus.FILLED);
+                            scanCell.setTitle(foundAliquot.getPatientVisit()
+                                .getPatient().getPnumber());
+                            scanCell.setAliquot(foundAliquot);
+                        }
                     } else {
                         // should not be there
                         scanCell.setStatus(CellStatus.ERROR);
