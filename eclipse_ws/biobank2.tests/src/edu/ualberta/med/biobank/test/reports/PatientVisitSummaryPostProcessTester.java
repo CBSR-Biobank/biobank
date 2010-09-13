@@ -24,21 +24,21 @@ public class PatientVisitSummaryPostProcessTester implements PostProcessTester {
         List<Object> postProcessedResults = new ArrayList<Object>();
         String lastStudy = null;
         long[] sums = new long[NUM_SUMS];
+        Arrays.fill(sums, 0);
 
         for (Object row : results) {
             Object[] cells = (Object[]) row;
 
-            if ((lastStudy == null) || lastStudy.equals(cells[STUDY_INDEX])) {
-                for (int i = 0; i < sums.length; i++)
-                    if (cells[i + 2] instanceof Number)
-                        sums[i] += ((Number) cells[i + SUM_OFFSET]).longValue();
-            } else {
-                if (lastStudy != null) {
-                    postProcessedResults.add(getSumRow(lastStudy, sums));
-                    postProcessedResults.add(getBlankRow());
-                }
-
+            if ((lastStudy != null) && !lastStudy.equals(cells[STUDY_INDEX])) {
+                postProcessedResults.add(getSumRow(lastStudy, sums));
+                postProcessedResults.add(getBlankRow());
                 Arrays.fill(sums, 0); // reset sums
+            }
+
+            for (int i = 0; i < sums.length; i++) {
+                if (cells[i + 2] instanceof Number) {
+                    sums[i] += ((Number) cells[i + SUM_OFFSET]).longValue();
+                }
             }
 
             postProcessedResults.add(transformRow(cells)); // keep original
