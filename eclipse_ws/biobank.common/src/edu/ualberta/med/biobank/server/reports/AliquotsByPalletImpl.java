@@ -19,15 +19,12 @@ public class AliquotsByPalletImpl extends AbstractReport {
         + SITE_OPERATOR + SITE_ID + " and s.aliquotPosition.container.id "
         + "in (select path1.container.id from " + ContainerPath.class.getName()
         + " as path1, " + ContainerPath.class.getName()
-        + " as path2 where locate(path2.path, path1.path) > 0 "
-        + "and path2.container.containerType.nameShort like ?) "
+        + " as path2 where locate(path2.path, path1.path) > 0 and"
+        + " path2.container.id in (" + CONTAINER_LIST + ")) "
         + "and s.aliquotPosition.container.label = ?";
 
     public AliquotsByPalletImpl(BiobankReport report) {
         super(QUERY, report);
-        List<Object> params = report.getParams();
-        params.add(params.remove(0));
-        this.report.setParams(params);
     }
 
     // Use Collections.sort, so can't use RowPostProcess
