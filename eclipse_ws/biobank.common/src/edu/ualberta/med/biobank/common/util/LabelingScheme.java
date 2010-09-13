@@ -59,6 +59,9 @@ public class LabelingScheme {
      */
     public static RowColPos cbsrTwoCharToRowCol(String label, int rowCap,
         int colCap, String containerTypeName) throws Exception {
+        if (label.length() != 2)
+            throw new Exception("Label should be 2 characters");
+
         int pos = cbsrTwoCharToInt(label);
         if (pos >= rowCap * colCap) {
             throw new Exception("Address  " + label + " does not exist in "
@@ -81,7 +84,9 @@ public class LabelingScheme {
     public static RowColPos twoCharNumericToRowCol(String label, int totalRows)
         throws Exception {
         int len = label.length();
-        int pos = Integer.parseInt(label.substring(len - 2)) - 1;
+        if (len != 2)
+            throw new Exception("Label should be 2 characters");
+        int pos = Integer.parseInt(label) - 1;
         // has remove 1 because the two char numeric starts at 1
         RowColPos rowColPos = new RowColPos();
         rowColPos.row = pos % totalRows;
@@ -180,12 +185,20 @@ public class LabelingScheme {
      * Get the RowColPos in the given container corresponding to the given label
      * using the dewar labelling. Use the 2 last character in case we have a
      * full position string: for 01BB, will use only BB.
+     * 
+     * @throws Exception
      */
-    public static RowColPos dewarToRowCol(String label, int totalCol) {
+    public static RowColPos dewarToRowCol(String label, int totalCol)
+        throws Exception {
         int len = label.length();
-        String letter = label.substring(len - 2);
-        int letterPosition = SBS_ROW_LABELLING_PATTERN
-            .indexOf(letter.charAt(0)); // letters are double (BB). need only
+        if (len != 2)
+            throw new Exception("Label should be 2 characters");
+        int letterPosition = SBS_ROW_LABELLING_PATTERN.indexOf(label.charAt(0)); // letters
+                                                                                 // are
+                                                                                 // double
+                                                                                 // (BB).
+                                                                                 // need
+                                                                                 // only
         // one
         RowColPos rowColPos = new RowColPos();
         rowColPos.row = letterPosition / totalCol;

@@ -10,6 +10,7 @@ import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.security.SecurityHelper;
+import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -17,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrappe
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -748,16 +750,51 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * Get containers with a given label that can hold this type of container
      * (in this container site)
      */
-    public List<ContainerWrapper> getPossibleParents(String parentLabel)
+    public List<ContainerWrapper> getPossibleParents(String childLabel)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("select c from "
-            + Container.class.getName()
-            + " as c left join c.containerType.childContainerTypeCollection "
-            + "as ct where c.site = ? and c.label = ? and ct=?",
-            Arrays.asList(new Object[] { getSite().getWrappedObject(),
-                parentLabel, getContainerType().getWrappedObject() }));
-        List<Container> containers = appService.query(criteria);
-        return transformToWrapperList(appService, containers);
+        String query = "select min(minChars), max(maxChars) from "
+            + ContainerLabelingScheme.class.getName();
+        HQLCriteria rangeQuery = new HQLCriteria(query);
+        Object[] minMax = (Object[]) appService.query(rangeQuery).get(0);
+        List<Integer> validLengths = new ArrayList<Integer>();
+        for (int i = (Integer) minMax[0]; i < (Integer) minMax[1] + 1; i++) {
+            validLengths.add(i);
+        }
+        List<String> validParents = new ArrayList<String>();
+        for (Integer crop : validLengths)
+            if (crop < childLabel.length())
+                validParents.add(childLabel.substring(0, childLabel.length()
+                    - crop));
+        List<ContainerWrapper> filteredWrappers = new ArrayList<ContainerWrapper>();
+        if (validParents.size() > 0) {
+            String parentQuery = "select c from "
+                + Container.class.getName()
+                + " as c left join c.containerType.childContainerTypeCollection "
+                + "as ct where c.site = ? and c.label in ('";
+
+            for (String validParent : validParents) {
+                parentQuery = parentQuery + validParent + "','";
+            }
+            parentQuery = parentQuery.substring(0, parentQuery.length() - 2);
+            parentQuery = parentQuery + ") and ct=?";
+            HQLCriteria criteria = new HQLCriteria(parentQuery,
+                Arrays.asList(new Object[] { getSite().getWrappedObject(),
+                    getContainerType().getWrappedObject() }));
+            List<Container> containers = appService.query(criteria);
+            for (Container c : containers) {
+                ContainerType ct = c.getContainerType();
+                try {
+                    if (LabelingScheme.getRowColFromPositionString(childLabel
+                        .substring(c.getLabel().length()), ct
+                        .getChildLabelingScheme().getId(), ct.getCapacity()
+                        .getRowCapacity(), ct.getCapacity().getColCapacity()) != null)
+                        filteredWrappers
+                            .add(new ContainerWrapper(appService, c));
+                } catch (Exception e) {
+                }
+            }
+        }
+        return filteredWrappers;
     }
 
     /**

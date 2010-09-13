@@ -229,7 +229,8 @@ public class ContainerAdapter extends AdapterBase {
             return false;
         }
 
-        newParent.addChild(newLabel, container);
+        newParent.addChild(newLabel.substring(newParent.getLabel().length()),
+            container);
 
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());

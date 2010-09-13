@@ -658,20 +658,20 @@ public class TestContainer extends TestDatabase {
 
         top1 = ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r),
             null, site, containerTypeMap.get("TopCT"));
-        childL1 = ContainerHelper.addContainer(null, "0001", top1, site,
+        childL1 = ContainerHelper.addContainer("02AA", "0001", top1, site,
             containerTypeMap.get("ChildCtL1"), 0, 0);
         top1.reload();
 
-        List<ContainerWrapper> parents = childL1.getPossibleParents("02");
+        List<ContainerWrapper> parents = childL1.getPossibleParents("02AA");
         Assert.assertTrue(parents.contains(top1));
         Assert.assertFalse(parents.contains(top2));
 
         addContainerHierarchy(containerMap.get("Top"));
         childL1 = containerMap.get("ChildL1");
         childL2 = containerMap.get("ChildL2");
-        parents = childL2.getPossibleParents("01AA");
+        parents = childL2.getPossibleParents("01AA01");
         Assert.assertTrue((parents.size() == 1) && parents.contains(childL1));
-        parents = childL2.getPossibleParents("01");
+        parents = childL2.getPossibleParents("01AA");
         Assert.assertEquals(0, parents.size());
 
         parents = top1.getPossibleParents("");
@@ -1529,10 +1529,8 @@ public class TestContainer extends TestDatabase {
             containerTypeMap.get("TopCT"));
 
         String newLabel = "02AF";
-        String newParentContainerLabel = newLabel.substring(0,
-            newLabel.length() - 2);
         List<ContainerWrapper> newParentContainers = child
-            .getPossibleParents(newParentContainerLabel);
+            .getPossibleParents(newLabel);
         Assert.assertEquals(1, newParentContainers.size());
         ContainerWrapper newParent = newParentContainers.get(0);
         Assert.assertEquals(top2, newParent);
@@ -1558,10 +1556,8 @@ public class TestContainer extends TestDatabase {
             site, containerTypeMap.get("TopCT"));
 
         String newLabel = "01AF";
-        String newParentContainerLabel = newLabel.substring(0,
-            newLabel.length() - 2);
         List<ContainerWrapper> newParentContainers = child
-            .getPossibleParents(newParentContainerLabel);
+            .getPossibleParents(newLabel);
         Assert.assertEquals(1, newParentContainers.size());
         ContainerWrapper newParent = newParentContainers.get(0);
         Assert.assertEquals(top, newParent);

@@ -35,7 +35,8 @@ public class ContainerLabelingSchemeWrapper extends
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "maxRows", "maxCols", "maxCapacity" };
+        return new String[] { "name", "maxRows", "maxCols", "maxCapacity",
+            "minChars", "maxChars" };
     }
 
     public void setName(String name) {
@@ -58,6 +59,10 @@ public class ContainerLabelingSchemeWrapper extends
         return wrappedObject.getMaxRows();
     }
 
+    public Integer getMaxChars() {
+        return wrappedObject.getMaxChars();
+    }
+
     public void setMaxCols(Integer maxCols) {
         Integer oldMaxCols = wrappedObject.getMaxCols();
         wrappedObject.setMaxCols(maxCols);
@@ -66,6 +71,10 @@ public class ContainerLabelingSchemeWrapper extends
 
     public Integer getMaxCols() {
         return wrappedObject.getMaxCols();
+    }
+
+    public Integer getMinChars() {
+        return wrappedObject.getMinChars();
     }
 
     public void setMaxCapacity(Integer maxCapacity) {

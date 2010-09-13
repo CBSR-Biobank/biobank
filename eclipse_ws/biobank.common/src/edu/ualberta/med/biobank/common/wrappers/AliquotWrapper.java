@@ -450,7 +450,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Aliquot.class.getName()
-                + " a where a.patientVisit.shipment.site.id = ? and (activityStatus is null || activityStatus.name != ?",
+                + " a where a.patientVisit.shipment.site.id = ? and (activityStatus is null or activityStatus.name != ?",
             Arrays.asList(new Object[] { site.getId(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Aliquot> aliquots = appService.query(criteria);
