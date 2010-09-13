@@ -59,8 +59,10 @@ public class ServiceConnection {
 
     public static void logout(WritableApplicationService appService)
         throws Exception {
-        Log logMessage = new Log();
-        logMessage.action = "logout";
-        ((BiobankApplicationService) appService).logActivity(logMessage);
+        if (appService != null) {
+            Log logMessage = new Log();
+            logMessage.action = "logout";
+            ((BiobankApplicationService) appService).logActivity(logMessage);
+        }
     }
 }

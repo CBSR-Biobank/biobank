@@ -481,7 +481,9 @@ public class TestPatient extends TestDatabase {
                         patientSampleCount.get(patient) + 1);
                     ++sampleCount;
                     Assert.assertEquals(patientSampleCount.get(patient)
-                        .intValue(), patient.getAliquotsCount());
+                        .intValue(), patient.getAliquotsCount(true));
+                    Assert.assertEquals(patientSampleCount.get(patient)
+                        .intValue(), patient.getAliquotsCount(false));
                 }
             }
         }
@@ -500,9 +502,13 @@ public class TestPatient extends TestDatabase {
                     patientSampleCount.put(patient,
                         patientSampleCount.get(patient) - 1);
                     Assert.assertEquals(patientSampleCount.get(patient1)
-                        .intValue(), patient1.getAliquotsCount());
+                        .intValue(), patient1.getAliquotsCount(true));
+                    Assert.assertEquals(patientSampleCount.get(patient1)
+                        .intValue(), patient1.getAliquotsCount(false));
                     Assert.assertEquals(patientSampleCount.get(patient2)
-                        .intValue(), patient2.getAliquotsCount());
+                        .intValue(), patient2.getAliquotsCount(true));
+                    Assert.assertEquals(patientSampleCount.get(patient2)
+                        .intValue(), patient2.getAliquotsCount(false));
                 }
             }
         }

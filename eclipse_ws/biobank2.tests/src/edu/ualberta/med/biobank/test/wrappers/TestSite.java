@@ -854,7 +854,12 @@ public class TestSite extends TestDatabase {
             r.nextInt(5) + 1);
         List<StudyWrapper> studies = StudyHelper.addStudies(name,
             r.nextInt(5) + 1);
-        srcSite.reload();
+        srcSite.addStudies(studies);
+        srcSite.persist();
+        for (SiteWrapper site : destSites) {
+            site.addStudies(studies);
+            site.persist();
+        }
         for (StudyWrapper study : studies) {
             srcSite.addStudyDispatchSites(study, destSites);
         }
@@ -906,6 +911,17 @@ public class TestSite extends TestDatabase {
             r.nextInt(5) + 1);
 
         StudyWrapper study = StudyHelper.addStudy(name);
+        List<StudyWrapper> studies = Arrays.asList(study);
+        srcSite.addStudies(studies);
+        srcSite.persist();
+        for (SiteWrapper site : destSitesSet1) {
+            site.addStudies(studies);
+            site.persist();
+        }
+        for (SiteWrapper site : destSitesSet2) {
+            site.addStudies(studies);
+            site.persist();
+        }
 
         // add dest site set 1
         srcSite.addStudyDispatchSites(study, destSitesSet1);

@@ -60,25 +60,29 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                 .getModelObject();
 
             if ((wrapper instanceof ContainerWrapper)) {
-                ContainerWrapper container = (ContainerWrapper) wrapper;
-                if (container.getContainerType()
-                    .getChildContainerTypeCollection().size() != 0) {
+                try {
+                    ContainerWrapper container = (ContainerWrapper) wrapper;
                     if (container.getContainerType()
-                        .getChildContainerTypeCollection()
-                        .contains(srcContainer.getContainerType())) {
-                        if (!container.isContainerFull()) {
-                            event.feedback |= DND.FEEDBACK_SELECT;
+                        .getChildContainerTypeCollection().size() != 0) {
+                        if (container.getContainerType()
+                            .getChildContainerTypeCollection()
+                            .contains(srcContainer.getContainerType())) {
+                            if (!container.isContainerFull()) {
+                                event.feedback |= DND.FEEDBACK_SELECT;
+                                event.feedback |= DND.FEEDBACK_EXPAND;
+                            }
+                        } else {
+                            /*
+                             * TODO expand only when an ancestor can hold the
+                             * srcContainerType. It does not make sense to
+                             * expand a branch when none of the children of that
+                             * branch can hold the src container.
+                             */
                             event.feedback |= DND.FEEDBACK_EXPAND;
                         }
-                    } else {
-                        /*
-                         * TODO expand only when an ancestor can hold the
-                         * srcContainerType. It does not make sense to expand a
-                         * branch when none of the children of that branch can
-                         * hold the src container.
-                         */
-                        event.feedback |= DND.FEEDBACK_EXPAND;
                     }
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError("Error in drag", ex);
                 }
             }
         }
@@ -112,24 +116,28 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
         if (wrapper != null && (wrapper instanceof ContainerWrapper)) {
             ContainerWrapper dstContainer = (ContainerWrapper) wrapper;
             if (dstContainer != null) {
+                try {
+                    /* sanity checks */
+                    if (dstContainer.getContainerType()
+                        .getChildContainerTypeCollection()
+                        .contains(srcContainer.getContainerType())
+                        && !dstContainer.isContainerFull()) {
 
-                /* sanity checks */
-                if (dstContainer.getContainerType()
-                    .getChildContainerTypeCollection()
-                    .contains(srcContainer.getContainerType())
-                    && !dstContainer.isContainerFull()) {
+                        // TODO implement the moving of containers here.
+                        System.out.println("Valid Drag Detected:");
+                        System.out.println(srcContainer + " --> "
+                            + dstContainer);
+                        srcContainerAdapter.moveAction(dstContainer);
+                        return;
+                    } else {
+                        BioBankPlugin
+                            .openError(
+                                "Invalid state",
+                                "ERROR: an unexpected state occured in TreeDragDropListener. Please report this.");
 
-                    // TODO implement the moving of containers here.
-                    System.out.println("Valid Drag Detected:");
-                    System.out.println(srcContainer + " --> " + dstContainer);
-                    srcContainerAdapter.moveAction(dstContainer);
-                    return;
-                } else {
-                    BioBankPlugin
-                        .openError(
-                            "Invalid state",
-                            "ERROR: an unexpected state occured in TreeDragDropListener. Please report this.");
-
+                    }
+                } catch (Exception ex) {
+                    BioBankPlugin.openAsyncError("Drop error", ex);
                 }
             }
         }

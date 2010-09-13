@@ -123,17 +123,19 @@ public class ChangePasswordDialog extends TitleAreaDialog {
             return;
         }
         try {
-
             ((BiobankApplicationService) SessionManager.getAppService())
                 .modifyPassword(this.oldPassText.getText(),
                     this.newPass2Text.getText());
-            /*
-             * TODO instead of logging the user out, update all references to
-             * the old password
-             */
+
+            SessionManager.getInstance().getSession().resetAppService();
+            BioBankPlugin
+                .openInformation(
+                    "Password modified",
+                    "Your password has been successfully changed. You will need to reconnect again to see your data");
+
             LogoutHandler lh = new LogoutHandler();
             lh.execute(null);
-
+            // TODO find a way to reconnect the user automatically
             super.okPressed();
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error changing password", e);

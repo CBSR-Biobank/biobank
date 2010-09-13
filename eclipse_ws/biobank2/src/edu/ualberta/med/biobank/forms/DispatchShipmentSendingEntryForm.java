@@ -74,6 +74,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
         shipment = (DispatchShipmentWrapper) adapter.getModelObject();
         site = SessionManager.getInstance().getCurrentSite();
+        shipment.setSender(site);
         try {
             shipment.reload();
         } catch (Exception e) {
@@ -209,6 +210,8 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                     + "Please close the form.");
         }
 
+        // FIXME need to find a nice place for this button
+        // FIXME this should be enable only if others fields are filled
         Button palletButton = toolkit.createButton(page, "Scan pallet",
             SWT.PUSH);
         palletButton.addSelectionListener(new SelectionAdapter() {
@@ -230,8 +233,6 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        shipment.setSender(site);
-
         StudyWrapper study = null;
         IStructuredSelection studySelection = (IStructuredSelection) studyComboViewer
             .getSelection();
@@ -269,6 +270,11 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
         shipment.persist();
         DispatchShipmentAdministrationView.getCurrent().reload();
+
+        // FIXME aliquots need to be remove from their current position (should
+        // be done in the wrapper)
+        // FIXME pallet should be remove from the freezer
+
     }
 
     @Override

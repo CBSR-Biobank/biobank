@@ -5,6 +5,7 @@ import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -54,7 +55,11 @@ public class BiobankLabelProvider extends LabelProvider implements
             case 1:
                 return study.getNameShort();
             case 2:
-                return String.valueOf(study.getPatientCollection().size());
+                try {
+                    return String.valueOf(study.getPatientCount(true));
+                } catch (Exception e) {
+                    BioBankPlugin.openAsyncError("Error in count", e);
+                }
             }
         } else if (element instanceof AliquotWrapper) {
             final AliquotWrapper aliquot = (AliquotWrapper) element;

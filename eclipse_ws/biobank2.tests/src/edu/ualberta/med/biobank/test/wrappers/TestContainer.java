@@ -1675,7 +1675,8 @@ public class TestContainer extends TestDatabase {
         top.addChild(0, 1, child2);
         top.persist();
         top.reload();
-        Assert.assertEquals(2, top.getChildCount());
+        Assert.assertEquals(2, top.getChildCount(false));
+        Assert.assertEquals(2, top.getChildCount(true));
     }
 
     @Test

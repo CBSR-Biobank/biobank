@@ -2,13 +2,11 @@ package edu.ualberta.med.biobank.dialogs;
 
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -24,7 +22,6 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
@@ -33,7 +30,6 @@ import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
@@ -56,24 +52,23 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         super(parentShell);
         this.currentShipment = currentShipment;
         palletScanManagement = new PalletScanManagement() {
+
+            @Override
+            protected void beforeThreadStart() {
+                AbstractDispatchScanDialog.this.beforeScanThreadStart();
+            }
+
             @Override
             protected void processScanResult(IProgressMonitor monitor)
                 throws Exception {
+                setScanNotLaunched(true);
                 AbstractDispatchScanDialog.this.processScanResult(monitor);
             }
 
             @Override
             protected Map<RowColPos, PalletCell> getFakeScanCells()
                 throws Exception {
-                // return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                // SessionManager.getAppService(), currentShipment.getSender()
-                // .getId());
-                Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-                AliquotWrapper aliquot = currentShipment.getAliquotCollection()
-                    .get(0);
-                palletScanned.put(new RowColPos(0, 0), new PalletCell(
-                    new ScanCell(0, 0, aliquot.getInventoryId())));
-                return palletScanned;
+                return AbstractDispatchScanDialog.this.getFakeScanCells();
             }
 
             @Override
@@ -86,14 +81,14 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
                 });
             }
         };
-        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), scanOkValue,
-            "Error in scan result. Please keep only aliquots with no errors.",
-            IStatus.ERROR);
-        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), scanHasBeenLaunchedValue,
-            "Scan should be launched", IStatus.ERROR);
     }
+
+    protected void beforeScanThreadStart() {
+
+    }
+
+    protected abstract Map<RowColPos, PalletCell> getFakeScanCells()
+        throws Exception;
 
     protected abstract void processScanResult(IProgressMonitor monitor)
         throws Exception;
@@ -104,19 +99,13 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        ScannerBarcodeValidator validator = new ScannerBarcodeValidator(
-            Messages.getString("linkAssign.plateToScan.validationMsg")) {
-            @Override
-            public IStatus validate(Object value) {
-                IStatus status = super.validate(value);
-                scanButton.setEnabled(status == Status.OK_STATUS);
-                return status;
-            }
-        };
+        createCustomDialogContents(contents);
+
         plateToScanText = (BiobankText) createBoundWidgetWithLabel(contents,
             BiobankText.class, SWT.NONE,
             Messages.getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
-            new String[0], plateToScanValue, validator); //$NON-NLS-1$
+            new String[0], plateToScanValue, new ScannerBarcodeValidator(
+                Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -145,6 +134,18 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         gd.horizontalSpan = 3;
         spw.setLayoutData(gd);
 
+        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
+            Boolean.class), scanOkValue,
+            "Error in scan result. Please keep only aliquots with no errors.",
+            IStatus.ERROR);
+        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
+            Boolean.class), scanHasBeenLaunchedValue,
+            "Scan should be launched", IStatus.ERROR);
+
+    }
+
+    protected void createCustomDialogContents(
+        @SuppressWarnings("unused") Composite parent) {
     }
 
     protected abstract List<CellStatus> getPalletCellStatus();
@@ -169,7 +170,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         });
     }
 
-    protected void setScanNotLaunched(final boolean launched) {
+    private void setScanNotLaunched(final boolean launched) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -227,6 +228,23 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     protected boolean canActivateProceedButton() {
         return true;
     }
+
+    @Override
+    protected void handleStatusChanged(IStatus status) {
+        super.handleStatusChanged(status);
+        if (status.getSeverity() != IStatus.OK) {
+            scanButton.setEnabled(fieldsValid());
+        }
+    }
+
+    protected boolean fieldsValid() {
+        return isPlateValid();
+    }
+
+    private boolean isPlateValid() {
+        return BioBankPlugin.getDefault().isValidPlateBarcode(
+            plateToScanText.getText());
+    };
 
     @Override
     protected void buttonPressed(int buttonId) {

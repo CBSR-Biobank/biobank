@@ -716,14 +716,18 @@ public class TestStudy extends TestDatabase {
         for (StudyWrapper study : studyPatientsMap.keySet()) {
             List<PatientWrapper> patients = studyPatientsMap.get(study);
             while (patients.size() > 0) {
-                Assert.assertEquals(patients.size(), study.getPatientCount());
+                Assert.assertEquals(patients.size(),
+                    study.getPatientCount(false));
+                Assert.assertEquals(patients.size(),
+                    study.getPatientCount(true));
 
                 patient = patients.get(0);
                 patients.remove(patient);
                 patient.delete();
                 study.reload();
             }
-            Assert.assertEquals(0, study.getPatientCount());
+            Assert.assertEquals(0, study.getPatientCount(true));
+            Assert.assertEquals(0, study.getPatientCount(false));
         }
 
     }

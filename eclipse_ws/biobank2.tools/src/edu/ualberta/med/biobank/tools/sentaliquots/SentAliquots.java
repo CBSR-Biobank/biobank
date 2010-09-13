@@ -9,7 +9,12 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import java.io.FileReader;
 import java.util.List;
 
-import au.com.bytecode.opencsv.CSVReader;
+import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
+import org.supercsv.cellprocessor.constraint.Unique;
+import org.supercsv.cellprocessor.ift.CellProcessor;
+import org.supercsv.io.CsvBeanReader;
+import org.supercsv.io.ICsvBeanReader;
+import org.supercsv.prefs.CsvPreference;
 
 public class SentAliquots {
 
@@ -55,62 +60,56 @@ public class SentAliquots {
                 + appArgs.hostname);
         }
 
-        CSVReader reader = new CSVReader(new FileReader(appArgs.csvFileName));
+        ICsvBeanReader reader = new CsvBeanReader(new FileReader(
+            appArgs.csvFileName), CsvPreference.EXCEL_PREFERENCE);
 
-        int count = 0;
-        List<String[]> content = reader.readAll();
-
-        // first, parse entire file looking for errors
-        for (String[] cols : content) {
-            count++;
-
-            if (cols.length < 2) {
-                throw new Exception("missing columns in row " + count);
-            } else if (cols.length > 3) {
-                throw new Exception("too many columns in row " + count);
-            }
-        }
+        final CellProcessor[] processors = new CellProcessor[] { new Unique(),
+            new Unique(), new StrNotNullOrEmpty() };
 
         ActivityStatusWrapper closedStatus = ActivityStatusWrapper
             .getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING);
 
-        // now process the file contents
-        for (String[] cols : content) {
-            String patientNo = cols[0];
-            String inventoryId = cols[1];
-            String closeComment = cols[2];
+        try {
+            String[] header = new String[] { "patientNo", "inventoryId",
+                "closeComment" };
+            PatientInfo info;
+            while ((info = reader.read(PatientInfo.class, header, processors)) != null) {
+                List<AliquotWrapper> aliquots = AliquotWrapper
+                    .getAliquotsInSite(appService, info.getInventoryId(), site);
 
-            List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
-                appService, inventoryId, site);
+                System.out.print("patient " + info.getPatientNo()
+                    + " inventory ID " + info.getInventoryId());
 
-            System.out.print("patient " + patientNo + " inventory ID "
-                + inventoryId);
+                if (aliquots.size() == 0) {
+                    System.out.println(" not found");
+                    continue;
+                } else if (aliquots.size() > 1) {
+                    throw new Exception("multiple aliquots with inventory id"
+                        + info.getInventoryId());
+                }
 
-            if (aliquots.size() == 0) {
-                System.out.println(" not found");
-                continue;
-            } else if (aliquots.size() > 1) {
-                throw new Exception("multiple aliquots with inventory id"
-                    + inventoryId);
+                AliquotWrapper aliquot = aliquots.get(0);
+
+                String aliquotPnumber = aliquot.getPatientVisit().getPatient()
+                    .getPnumber();
+                if (!aliquotPnumber.equals(info.getPatientNo())) {
+                    System.out
+                        .println(" ERROR: does not match patient number for aliquot "
+                            + aliquotPnumber);
+                    continue;
+                }
+
+                System.out.println(" old position "
+                    + aliquot.getPositionString());
+                aliquot.setComment(info.getCloseComment());
+                aliquot.setPosition(null);
+                aliquot.setActivityStatus(closedStatus);
+                aliquot.persist();
             }
 
-            AliquotWrapper aliquot = aliquots.get(0);
-
-            String aliquotPnumber = aliquot.getPatientVisit().getPatient()
-                .getPnumber();
-            if (!aliquotPnumber.equals(patientNo)) {
-                System.out
-                    .println(" ERROR: does not match patient number for aliquot "
-                        + aliquotPnumber);
-                continue;
-            }
-
-            System.out.println(" old position " + aliquot.getPositionString());
-            aliquot.setComment(closeComment);
-            aliquot.setPosition(null);
-            aliquot.setActivityStatus(closedStatus);
-            aliquot.persist();
+        } finally {
+            reader.close();
         }
     }
 
