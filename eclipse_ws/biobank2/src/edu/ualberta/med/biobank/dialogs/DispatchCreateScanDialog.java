@@ -111,9 +111,8 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                     .getAppService(), SessionManager.getInstance()
                     .getCurrentSite(), currentProductBarcode);
             if (currentPallet != null) {
-                // FIXME check it is a pallet ? Do it when enter barcode ?
-                // FIXME can we choose with the label ? (for old pallets, might
-                // not have barcode
+                // FIXME check it is a pallet ? Should we do it when enter
+                // barcode ?
 
                 Map<RowColPos, AliquotWrapper> expectedAliquots = currentPallet
                     .getAliquots();

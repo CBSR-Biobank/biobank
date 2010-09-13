@@ -17,9 +17,9 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 
 public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
@@ -62,7 +62,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     private ComboViewer activityStatusComboViewer;
 
-    private AliquotListInfoTable aliquotsWidget;
+    private DispatchAliquotListInfoTable aliquotsWidget;
 
     private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
 
@@ -210,31 +210,29 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                 "The current site does not have any dispatch studies associated with it.\n"
                     + "Please close the form.");
         }
-
-        // FIXME need to find a nice place for this button
-        Button palletButton = toolkit.createButton(page, "Scan pallet",
-            SWT.PUSH);
-        palletButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), shipment);
-                dialog.open();
-                setDirty(true); // FIXME need to do this better !
-                aliquotsWidget.reloadCollection(shipment.getAliquotCollection());
-                removedPallets.addAll(dialog.getRemovedPallets());
-            }
-        });
     }
 
     private void createAliquotsSection() {
-        Composite parent = createSectionWithClient("Aliquots");
-        aliquotsWidget = new AliquotListInfoTable(parent,
-            shipment.getAliquotCollection(),
-            AliquotListInfoTable.ColumnsShown.PNUMBER);
+        Section section = createSection("Aliquots");
+        addSectionToolbar(section, "Add aliquots to this shipment",
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), shipment);
+                    dialog.open();
+                    setDirty(true); // FIXME need to do this better !
+                    aliquotsWidget.reloadCollection(shipment
+                        .getAliquotCollection());
+                    removedPallets.addAll(dialog.getRemovedPallets());
+                }
+            });
+        aliquotsWidget = new DispatchAliquotListInfoTable(section,
+            shipment.getAliquotCollection());
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
+        section.setClient(aliquotsWidget);
     }
 
     @Override
