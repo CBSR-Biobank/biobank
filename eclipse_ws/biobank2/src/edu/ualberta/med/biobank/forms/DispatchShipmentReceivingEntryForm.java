@@ -12,8 +12,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.dialogs.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
@@ -63,24 +61,6 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
 
         shipmentAdapter = (DispatchShipmentAdapter) adapter;
         shipment = (DispatchShipmentWrapper) adapter.getModelObject();
-        shipment.addWrapperListener(new WrapperListener() {
-            @Override
-            public void updated(WrapperEvent event) {
-                reloadAliquotsTables();
-            }
-
-            @Override
-            public void inserted(WrapperEvent event) {
-                // TODO Auto-generated method stub
-
-            }
-
-            @Override
-            public void deleted(WrapperEvent event) {
-                // TODO Auto-generated method stub
-
-            }
-        });
         retrieveShipment();
         setPartName("Dispatch Shipment sent on " + shipment.getDateShipped());
     }
@@ -114,6 +94,8 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
             public void widgetSelected(SelectionEvent e) {
                 new DispatchReceiveScanDialog(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), shipment).open();
+                setDirty(true); // FIXME need to do this better !
+                reloadAliquotsTables();
             }
         });
         setFirstControl(palletButton);
@@ -181,8 +163,7 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        // TODO Auto-generated method stub
-
+        shipment.persist();
     }
 
     @Override
@@ -196,12 +177,6 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
     }
 
     private void reloadAliquotsTables() {
-        try {
-            shipment.reload();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
         aliquotsToBeReceivedTable.reloadCollection(shipment
             .getNotReceivedAliquots());
         aliquotsReceivedTable.reloadCollection(shipment.getReceivedAliquots());

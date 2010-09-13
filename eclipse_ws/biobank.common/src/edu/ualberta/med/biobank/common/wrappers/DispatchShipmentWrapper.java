@@ -342,9 +342,11 @@ public class DispatchShipmentWrapper extends
         throws Exception {
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
+        List<AliquotWrapper> receivedAliquots = getReceivedAliquots();
         for (AliquotWrapper aliquot : aliquotsToReceive) {
             aliquot.setActivityStatus(activeStatus);
             modifiedAliquots.add(aliquot);
+            receivedAliquots.add(aliquot);
         }
     }
 }

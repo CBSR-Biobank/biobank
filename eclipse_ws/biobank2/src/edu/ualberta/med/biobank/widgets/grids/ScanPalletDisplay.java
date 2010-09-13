@@ -148,15 +148,16 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     protected void drawRectangle(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
+        Color backgroundColor = CellStatus.EMPTY.getColor();
         if (displayWidget.getCells() != null) {
             PalletCell cell = (PalletCell) displayWidget.getCells().get(
                 new RowColPos(indexRow, indexCol));
             if (cell != null && cell.getStatus() != null) {
-                Color color = cell.getStatus().getColor();
-                e.gc.setBackground(color);
-                e.gc.fillRectangle(rectangle);
+                backgroundColor = cell.getStatus().getColor();
             }
         }
+        e.gc.setBackground(backgroundColor);
+        e.gc.fillRectangle(rectangle);
         e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
         e.gc.drawRectangle(rectangle);
 

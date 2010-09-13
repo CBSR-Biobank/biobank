@@ -23,7 +23,6 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -60,8 +59,6 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
     private ComboViewer shippingMethodComboViewer;
 
     private ComboViewer activityStatusComboViewer;
-
-    private List<AliquotWrapper> aliquots;
 
     private AliquotListInfoTable aliquotsWidget;
 
@@ -219,13 +216,16 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             public void widgetSelected(SelectionEvent e) {
                 new DispatchCreateScanDialog(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), shipment).open();
+                setDirty(true); // FIXME need to do this better !
+                aliquotsWidget.reloadCollection(shipment.getAliquotCollection());
             }
         });
     }
 
     private void createAliquotsSection() {
         Composite parent = createSectionWithClient("Aliquots");
-        aliquotsWidget = new AliquotListInfoTable(parent, aliquots,
+        aliquotsWidget = new AliquotListInfoTable(parent,
+            shipment.getAliquotCollection(),
             AliquotListInfoTable.ColumnsShown.PNUMBER);
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
@@ -284,7 +284,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     @Override
     public String getNextOpenedFormID() {
-        return null;
+        return DispatchShipmentViewForm.ID;
     }
 
     @Override
