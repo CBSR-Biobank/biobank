@@ -4,8 +4,8 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -74,10 +74,10 @@ public class TestContainer extends SpeedTest {
     public void testWrapper() throws Exception {
         for (ContainerWrapper c : site.getTopContainerCollection()) {
             logger.info(c.getLabel() + ": number of children: "
-                + c.getChildCount());
+                + c.getChildCount(false));
             Map<RowColPos, ContainerWrapper> pos = c.getChildren();
             for (ContainerWrapper child : pos.values()) {
-                int count = child.getChildCount();
+                long count = child.getChildCount(false);
                 logger.debug(child.getLabel() + ": number of children: "
                     + count);
             }

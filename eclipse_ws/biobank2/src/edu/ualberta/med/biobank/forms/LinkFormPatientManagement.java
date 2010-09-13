@@ -10,8 +10,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -19,7 +17,6 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -91,17 +88,7 @@ public class LinkFormPatientManagement {
                 }
             }
         });
-        patientNumberText.addKeyListener(new KeyAdapter() {
-            @Override
-            public void keyReleased(KeyEvent e) {
-                if (e.character == SWT.CR && !aliquotAdminForm.afterKeyCancel
-                    && !aliquotAdminForm.afterInitialization) {
-                    ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
-                }
-                aliquotAdminForm.afterKeyCancel = false;
-                aliquotAdminForm.afterInitialization = false;
-            }
-        });
+        patientNumberText.addKeyListener(aliquotAdminForm.textFieldKeyListener);
         GridData gd = (GridData) patientNumberText.getLayoutData();
         gd.horizontalSpan = 2;
         setFirstControl();

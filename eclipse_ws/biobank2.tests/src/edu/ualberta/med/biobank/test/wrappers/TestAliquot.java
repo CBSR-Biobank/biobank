@@ -634,9 +634,23 @@ public class TestAliquot extends TestDatabase {
         destSite2.reload();
         destSite.addStudyDispatchSites(study, Arrays.asList(destSite2));
         destSite.persist();
+
         destSite.reload();
         DispatchShipmentWrapper dShipment2 = DispatchShipmentHelper
             .newShipment(destSite, destSite2, study, method);
+        try {
+            dShipment2.addAliquots(Arrays.asList(aliquot));
+            Assert
+                .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Actvive' status)");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        // dest site receive aliquot
+        dShipment.receiveAliquots(Arrays.asList(aliquot));
+        dShipment.persist();
+
+        // add to new shipment
         dShipment2.addAliquots(Arrays.asList(aliquot));
         dShipment2.persist();
 
@@ -646,10 +660,4 @@ public class TestAliquot extends TestDatabase {
         Assert.assertTrue(aliquotDispatchShipments.contains(dShipment));
         Assert.assertTrue(aliquotDispatchShipments.contains(dShipment2));
     }
-
-    @Override
-    public void tearDown() {
-
-    }
-
 }

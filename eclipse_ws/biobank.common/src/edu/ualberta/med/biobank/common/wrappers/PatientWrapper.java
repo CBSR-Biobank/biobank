@@ -282,7 +282,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
         checkNoMorePatientVisits();
-        if (hasAliquots())
+        if (getAliquotsCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
                 + " because patient has samples stored in database.");
@@ -307,17 +307,27 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
     }
 
-    public long getAliquotsCount() {
+    public long getAliquotsCount(boolean fast) throws BiobankCheckException,
+        ApplicationException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(
+                "select count(aliquots) from "
+                    + PatientVisit.class.getName()
+                    + " as pv join pv.aliquotCollection as aliquots where pv.patient.id = ? ",
+                Arrays.asList(new Object[] { getId() }));
+            List<Long> results = appService.query(criteria);
+            if (results.size() != 1) {
+                throw new BiobankCheckException(
+                    "Invalid size for HQL query result");
+            }
+            return results.get(0);
+        }
         long total = 0;
         List<PatientVisitWrapper> pvs = getPatientVisitCollection();
         if (pvs != null)
             for (PatientVisitWrapper pv : pvs)
-                total += pv.getAliquotsCount();
+                total += pv.getAliquotsCount(false);
         return total;
-    }
-
-    public boolean hasAliquots() {
-        return (getAliquotsCount() > 0);
     }
 
     @Override

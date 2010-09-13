@@ -407,6 +407,7 @@ public class TestClinic extends TestDatabase {
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
 
         Assert.assertEquals(0, clinic.getShipmentCount());
+        Assert.assertEquals(0, clinic.getShipmentCount(true));
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
@@ -416,6 +417,7 @@ public class TestClinic extends TestDatabase {
             site, clinic, method, patient2);
 
         Assert.assertEquals(2, clinic.getShipmentCount());
+        Assert.assertEquals(2, clinic.getShipmentCount(true));
 
         clinic.reload();
         shipment1.delete();
@@ -423,6 +425,7 @@ public class TestClinic extends TestDatabase {
         clinic.reload();
 
         Assert.assertEquals(0, clinic.getShipmentCount());
+        Assert.assertEquals(0, clinic.getShipmentCount(true));
     }
 
     @Test
@@ -604,7 +607,9 @@ public class TestClinic extends TestDatabase {
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
                 patient);
             Assert.assertEquals(patientMap.get(clinic).size(),
-                clinic.getPatientCount());
+                clinic.getPatientCount(true));
+            Assert.assertEquals(patientMap.get(clinic).size(),
+                clinic.getPatientCount(false));
         }
 
         // delete patients
@@ -623,7 +628,9 @@ public class TestClinic extends TestDatabase {
                 patientMap.get(clinic).remove(0);
                 clinic.reload();
                 Assert.assertEquals(patientMap.get(clinic).size(),
-                    clinic.getPatientCount());
+                    clinic.getPatientCount(true));
+                Assert.assertEquals(patientMap.get(clinic).size(),
+                    clinic.getPatientCount(false));
             }
         }
     }

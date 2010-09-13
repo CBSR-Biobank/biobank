@@ -279,8 +279,8 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    protected int getWrapperChildCount() {
-        return getContainer().getChildCount();
+    protected int getWrapperChildCount() throws Exception {
+        return (int) getContainer().getChildCount(true);
     }
 
     @Override

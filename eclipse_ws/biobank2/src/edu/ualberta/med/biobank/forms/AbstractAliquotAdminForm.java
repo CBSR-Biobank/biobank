@@ -13,6 +13,11 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -35,6 +40,20 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         "yyyy-MM-dd_HHmmss");
 
     protected boolean afterInitialization = true;
+
+    protected boolean afterKeyCancel = false;
+
+    protected KeyListener textFieldKeyListener = new KeyAdapter() {
+        @Override
+        public void keyReleased(KeyEvent e) {
+            if (e.character == SWT.CR && !afterKeyCancel
+                && !afterInitialization) {
+                ((Control) e.widget).traverse(SWT.TRAVERSE_TAB_NEXT);
+            }
+            afterKeyCancel = false;
+            afterInitialization = false;
+        }
+    };
 
     @Override
     protected void init() throws Exception {
@@ -145,6 +164,10 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         addResetAction();
         addConfirmAction();
         form.updateToolBar();
+    }
+
+    public void setAfterKeyCancel() {
+        afterKeyCancel = true;
     }
 
 }

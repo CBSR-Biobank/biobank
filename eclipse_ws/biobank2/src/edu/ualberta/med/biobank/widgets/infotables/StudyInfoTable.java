@@ -6,7 +6,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -17,7 +16,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         String name;
         String nameShort;
         String status;
-        Integer patientCount;
+        Long patientCount;
         Long visitCount;
 
         @Override
@@ -79,11 +78,9 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
         if (info.status == null) {
             info.status = new String();
         }
-        List<PatientWrapper> patients = study.getPatientCollection();
-        if (patients != null) {
-            info.patientCount = patients.size();
-        }
+        info.patientCount = study.getPatientCount(true);
         info.visitCount = study.getPatientVisitCount();
+        study.reload();
         return info;
     }
 
