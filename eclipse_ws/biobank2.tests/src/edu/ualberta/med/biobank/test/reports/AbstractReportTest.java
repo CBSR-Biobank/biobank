@@ -263,6 +263,17 @@ public abstract class AbstractReportTest {
     // use getReport() to get the parameters
     protected abstract Collection<Object> getExpectedResults() throws Exception;
 
+    /**
+     * Override this method to return an implementation of PostProcessTester if
+     * the postProcess() method should be compared with the results of another
+     * implementation.
+     * 
+     * @return
+     */
+    protected PostProcessTester getPostProcessTester() {
+        return null;
+    }
+
     protected void checkResults(EnumSet<CompareResult> cmpOptions)
         throws Exception {
         for (SiteWrapper site : getSites()) {
@@ -313,6 +324,18 @@ public abstract class AbstractReportTest {
         return dataSource.getPatients();
     }
 
+    private void testPostProcess(EnumSet<CompareResult> cmpOptions,
+        Collection<Object> rawResults, List<Object> expectedResults) {
+        PostProcessTester postProcessTester = getPostProcessTester();
+
+        if (postProcessTester != null) {
+            List<Object> postProcessedRawResults = postProcessTester
+                .postProcess(getAppService(), rawResults);
+
+            compareResults(cmpOptions, expectedResults, postProcessedRawResults);
+        }
+    }
+
     private Collection<Object> compareResults(EnumSet<CompareResult> cmpOptions)
         throws Exception {
         // TODO: logging?
@@ -339,10 +362,20 @@ public abstract class AbstractReportTest {
         List<Object> actualResults = getReport().generate(getAppService());
         List<Object> postProcessedExpectedResults = postProcessExpectedResults(expectedResults);
 
+        testPostProcess(cmpOptions, expectedResults,
+            postProcessedExpectedResults);
+
+        compareResults(cmpOptions, actualResults, postProcessedExpectedResults);
+
+        return postProcessedExpectedResults;
+    }
+
+    private static void compareResults(EnumSet<CompareResult> cmpOptions,
+        List<Object> actualResults, List<Object> expectedResults) {
         // we may only require the actual results to be a subset of
         // the expected results, so the actual results must be iterated in an
         // outer loop.
-        Iterator<Object> it = postProcessedExpectedResults.iterator();
+        Iterator<Object> it = expectedResults.iterator();
         int actualResultsSize = 0;
         for (Object actualRow : actualResults) {
             boolean isFound = false;
@@ -354,7 +387,7 @@ public abstract class AbstractReportTest {
                     }
                 }
             } else {
-                for (Object expectedRow : postProcessedExpectedResults) {
+                for (Object expectedRow : expectedResults) {
                     if (datewiseArraysEquals((Object[]) expectedRow,
                         (Object[]) actualRow)) {
                         isFound = true;
@@ -382,12 +415,10 @@ public abstract class AbstractReportTest {
         // size
 
         if (cmpOptions.contains(CompareResult.SIZE)
-            && (postProcessedExpectedResults.size() != actualResultsSize)) {
-            Assert.fail("expected " + postProcessedExpectedResults.size()
-                + " results, got " + actualResultsSize);
+            && (expectedResults.size() != actualResultsSize)) {
+            Assert.fail("expected " + expectedResults.size() + " results, got "
+                + actualResultsSize);
         }
-
-        return postProcessedExpectedResults;
     }
 
     /**
@@ -399,7 +430,7 @@ public abstract class AbstractReportTest {
      * @return true if the two arrays are the same length and the Object
      *         referenced at each corresponding index is equal.
      */
-    private boolean datewiseArraysEquals(Object[] a1, Object[] a2) {
+    private static boolean datewiseArraysEquals(Object[] a1, Object[] a2) {
         if (a1.length != a2.length) {
             return false;
         }

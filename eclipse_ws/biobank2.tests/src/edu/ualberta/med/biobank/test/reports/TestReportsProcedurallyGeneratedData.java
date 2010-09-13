@@ -68,8 +68,8 @@ public final class TestReportsProcedurallyGeneratedData implements
     ReportDataSource {
     private static TestReportsProcedurallyGeneratedData instance = null;
 
-    private static final int NUM_SITES = 2; // <-- PUT BACK TO 2
-    private static final int NUM_STUDIES_PER_SITE = 2; // <-- PUT BACK TO 11
+    private static final int NUM_SITES = 1; // <-- PUT BACK TO 2
+    private static final int NUM_STUDIES = 2; // <-- PUT BACK TO 11
     private static final int NUM_SAMPLE_TYPES = 2; // 5
     private static final int NUM_CLINICS = 2; // <-- PUT BACK TO 7
     private static final int NUM_CONTAINER_ROWS = 3; // 5
@@ -77,7 +77,8 @@ public final class TestReportsProcedurallyGeneratedData implements
     // the maximum ratio of "filled positions" / "total positions" for a
     // container; should be at least (int) 1 / (NUM_CONTAINER_ROWS *
     // NUM_CONTAINER_COLS)
-    private static final double MAX_CONTAINER_CAPACITY = 0.2d; // 0.1d
+    private static final double MAX_CONTAINER_CAPACITY = 0.01d; // 0.1d <-- PUT
+                                                                // BACK TO 0.2d
     private static final int CONTAINER_DEPTH = 3;
     private static final int[] NUM_CONTACTS_PER_CLINIC = { 1, 2, 3 };
     private static final int[] NUM_CONTACTS_PER_STUDY = { 2, 2, 3 };
@@ -87,7 +88,7 @@ public final class TestReportsProcedurallyGeneratedData implements
     private static final int[] NUM_PATIENTS_PER_SHIPMENT = { 1, 2, 3 };
     private static final int NUM_SHIPMENTS_WITHOUT_PVS = 3;
     // leave every xth Container position empty
-    private static final int SKIP_ALIQUOT = 2; // 10
+    private static final int SKIP_ALIQUOT = 7; // 10
 
     private final WritableApplicationService appService;
     private final Random random = new Random(1); // consistent randomness (;
@@ -717,7 +718,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         // contacts, studies, etc. are left unpopulated with other data?
 
         List<SiteWrapper> sites = generateSites(NUM_SITES);
-        List<StudyWrapper> studies = generateStudies(NUM_STUDIES_PER_SITE);
+        List<StudyWrapper> studies = generateStudies(NUM_STUDIES);
         List<SampleTypeWrapper> sampleTypes = generateSampleTypes(NUM_SAMPLE_TYPES);
         List<ClinicWrapper> clinics = generateClinics(NUM_CLINICS);
 

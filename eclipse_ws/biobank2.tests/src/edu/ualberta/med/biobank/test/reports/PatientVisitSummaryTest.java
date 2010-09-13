@@ -164,6 +164,11 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
         return expectedResults;
     }
 
+    @Override
+    protected PostProcessTester getPostProcessTester() {
+        return new PatientVisitSummaryPostProcessTester();
+    }
+
     private void checkResults(Date after, Date before) throws Exception {
         getReport().setParams(Arrays.asList((Object) after, (Object) before));
 
