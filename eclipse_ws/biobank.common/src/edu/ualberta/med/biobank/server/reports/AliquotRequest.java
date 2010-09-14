@@ -16,7 +16,7 @@ public class AliquotRequest implements Serializable {
     private String pnumber;
     private Date dateDrawn;
     private String sampleTypeNameShort;
-    private int maxAliquots;
+    private long maxAliquots;
 
     public String getPnumber() {
         return pnumber;
@@ -42,11 +42,11 @@ public class AliquotRequest implements Serializable {
         this.sampleTypeNameShort = sampleType;
     }
 
-    public int getMaxAliquots() {
+    public long getMaxAliquots() {
         return maxAliquots;
     }
 
-    public void setMaxAliquots(int maxAliquots) {
+    public void setMaxAliquots(long maxAliquots) {
         this.maxAliquots = maxAliquots;
     }
 }
