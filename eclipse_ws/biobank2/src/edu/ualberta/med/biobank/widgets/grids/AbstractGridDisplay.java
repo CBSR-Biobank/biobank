@@ -114,7 +114,9 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
         int indexRow, int indexCol, Color defaultBackgroundColor) {
         Color backgroundColor = defaultBackgroundColor;
         if (displayWidget.getSelection() != null
+            && displayWidget.getSelection().row != null
             && displayWidget.getSelection().row == indexRow
+            && displayWidget.getSelection().col != null
             && displayWidget.getSelection().col == indexCol) {
             backgroundColor = e.display.getSystemColor(SWT.COLOR_YELLOW);
         }
