@@ -149,6 +149,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalAlignment = SWT.CENTER;
         gd.grabExcessHorizontalSpace = true;
         client.setLayoutData(gd);
+        containersScroll.setContent(client);
 
         spw = new ScanPalletWidget(client,
             CellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);

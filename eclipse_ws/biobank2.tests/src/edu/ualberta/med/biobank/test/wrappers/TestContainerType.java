@@ -1080,7 +1080,7 @@ public class TestContainerType extends TestDatabase {
             .getAllLabelingSchemes(appService);
 
         // currently only 4 labeling schemes
-        Assert.assertEquals(4, map.size());
+        Assert.assertEquals(5, map.size());
     }
 
     @Test

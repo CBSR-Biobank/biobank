@@ -19,6 +19,7 @@ public class DispatchShipmentAddHandler extends AbstractHandler {
         Assert.isNotNull(sessionAdapter);
         DispatchShipmentWrapper shipment = new DispatchShipmentWrapper(
             SessionManager.getAppService());
+        shipment.setSender(SessionManager.getInstance().getCurrentSite());
         DispatchShipmentAdapter shipNode = new DispatchShipmentAdapter(
             sessionAdapter, shipment);
         shipNode.openEntryForm();

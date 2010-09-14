@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm;
@@ -48,11 +49,6 @@ public class DispatchShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    protected void executeDoubleClick() {
-        openViewForm();
-    }
-
-    @Override
     public String getTooltipText() {
         return getTooltipText("Dispatch Shipment");
     }
@@ -75,17 +71,7 @@ public class DispatchShipmentAdapter extends AdapterBase {
             }
             if (SessionManager.getInstance().getCurrentSite()
                 .equals(((DispatchShipmentWrapper) modelObject).getSender())) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Modify shipment");
-                // FIXME is there any way to know if the shipment has been sent
-                // already ?
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        System.out
-                            .println("should open entry form to edit the shipment as a sender");
-                    }
-                });
+                addEditMenu(menu, "Shipment");
             }
         }
     }
@@ -118,7 +104,11 @@ public class DispatchShipmentAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return DispatchShipmentSendingEntryForm.ID;
+        SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
+        if (currentSite.equals(((DispatchShipmentWrapper) modelObject)
+            .getSender()))
+            return DispatchShipmentSendingEntryForm.ID;
+        return DispatchShipmentReceivingEntryForm.ID;
     }
 
     @Override

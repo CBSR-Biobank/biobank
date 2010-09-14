@@ -11,7 +11,9 @@ public class LabelingScheme {
 
     public static final String CBSR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
-    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHJKLMNPQR";
+    public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
+
+    public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ";
 
     /**
      * Get the rowColPos corresponding to the given SBS standard 2 or 3 char
@@ -26,12 +28,25 @@ public class LabelingScheme {
         return new RowColPos(row, col);
     }
 
+    public static RowColPos box81ToRowCol(String pos) throws Exception {
+        if ((pos.length() != 2)) {
+            throw new Exception("binPos has an invalid length: " + pos);
+        }
+        int row = BOX81_LABELLING_PATTERN.indexOf(pos.charAt(0));
+        int col = Integer.parseInt(pos.substring(1)) - 1;
+        return new RowColPos(row, col);
+    }
+
     /**
      * Get the string corresponding to the given RowColPos and using the SBS
      * standard. 2:1 will return C2.
      */
     public static String rowColToSbs(RowColPos rcp) {
         return "" + SBS_ROW_LABELLING_PATTERN.charAt(rcp.row) + (rcp.col + 1);
+    }
+
+    private static String rowColtoBox81(RowColPos rcp) {
+        return "" + BOX81_LABELLING_PATTERN.charAt(rcp.row) + (rcp.col + 1);
     }
 
     /**
@@ -59,6 +74,9 @@ public class LabelingScheme {
      */
     public static RowColPos cbsrTwoCharToRowCol(String label, int rowCap,
         int colCap, String containerTypeName) throws Exception {
+        if (label.length() != 2)
+            throw new Exception("Label should be 2 characters");
+
         int pos = cbsrTwoCharToInt(label);
         if (pos >= rowCap * colCap) {
             throw new Exception("Address  " + label + " does not exist in "
@@ -81,7 +99,9 @@ public class LabelingScheme {
     public static RowColPos twoCharNumericToRowCol(String label, int totalRows)
         throws Exception {
         int len = label.length();
-        int pos = Integer.parseInt(label.substring(len - 2)) - 1;
+        if (len != 2)
+            throw new Exception("Label should be 2 characters");
+        int pos = Integer.parseInt(label) - 1;
         // has remove 1 because the two char numeric starts at 1
         RowColPos rowColPos = new RowColPos();
         rowColPos.row = pos % totalRows;
@@ -180,12 +200,20 @@ public class LabelingScheme {
      * Get the RowColPos in the given container corresponding to the given label
      * using the dewar labelling. Use the 2 last character in case we have a
      * full position string: for 01BB, will use only BB.
+     * 
+     * @throws Exception
      */
-    public static RowColPos dewarToRowCol(String label, int totalCol) {
+    public static RowColPos dewarToRowCol(String label, int totalCol)
+        throws Exception {
         int len = label.length();
-        String letter = label.substring(len - 2);
-        int letterPosition = SBS_ROW_LABELLING_PATTERN
-            .indexOf(letter.charAt(0)); // letters are double (BB). need only
+        if (len != 2)
+            throw new Exception("Label should be 2 characters");
+        int letterPosition = SBS_ROW_LABELLING_PATTERN.indexOf(label.charAt(0)); // letters
+                                                                                 // are
+                                                                                 // double
+                                                                                 // (BB).
+                                                                                 // need
+                                                                                 // only
         // one
         RowColPos rowColPos = new RowColPos();
         rowColPos.row = letterPosition / totalCol;
@@ -212,6 +240,9 @@ public class LabelingScheme {
         case 4:
             // dewar
             return rowColToDewar(rcp, colCapacity);
+        case 5:
+            // box81
+            return rowColtoBox81(rcp);
         }
         return null;
     }
@@ -233,6 +264,12 @@ public class LabelingScheme {
         case 3:
             // 2 char numeric
             return twoCharNumericToRowCol(position, rowCapacity);
+        case 4:
+            // Dewar
+            return dewarToRowCol(position, colCapacity);
+        case 5:
+            // Box81
+            return box81ToRowCol(position);
         }
         return null;
     }

@@ -75,4 +75,26 @@ public class DebugUtil {
         return list;
     }
 
+    public static List<AliquotWrapper> getRandomAliquotsDispatched(
+        WritableApplicationService appService, Integer siteId)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Aliquot.class.getName()
+                + " as s where s.patientVisit.shipment.site.id = ? and a.activityStatus.name='Dispatched'",
+            Arrays.asList(new Object[] { siteId }));
+        List<Aliquot> aliquots = appService.query(criteria);
+        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
+        int i = 0;
+        for (Aliquot aliquot : aliquots) {
+            // return a list of 10 maximum
+            if (i == 10) {
+                return list;
+            }
+            list.add(new AliquotWrapper(appService, aliquot));
+            i++;
+        }
+        return list;
+    }
+
 }

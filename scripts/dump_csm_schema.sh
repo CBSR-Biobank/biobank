@@ -64,7 +64,7 @@ fi
 
 for table in `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME -BNe "show tables"` ; do
   # echo "  table: \"$table\""
-    if [[ $table =~ ^csm_ ]]; then
+    if [[ "$table" != "^csm_" ]]; then
         in_array "${exclude[@]}" $table
         if [ $? -eq 0 ]; then
             CSM_TABLES="$CSM_TABLES $table"

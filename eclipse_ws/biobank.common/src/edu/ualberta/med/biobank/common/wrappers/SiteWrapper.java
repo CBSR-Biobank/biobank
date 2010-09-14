@@ -760,6 +760,46 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return shipCollection;
     }
 
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getPendingSentDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("pendingSentDispatchShipmentCollection");
+        if (shipCollection == null) {
+            List<DispatchShipmentWrapper> children = getSentDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipmentWrapper ship : children) {
+                    if (!ship.isClosed()) {
+                        shipCollection.add(ship);
+                    }
+                }
+                propertiesMap.put("pendingSentDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getPendingReceivedDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("pendingReceivedDispatchShipmentCollection");
+        if (shipCollection == null) {
+            List<DispatchShipmentWrapper> children = getReceivedDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipmentWrapper ship : children) {
+                    if (!ship.isClosed()) {
+                        shipCollection.add(ship);
+                    }
+                }
+                propertiesMap.put("pendingReceivedDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
     /**
      * For one study, this site has one source dispatch info associated.
      * 

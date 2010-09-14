@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -16,14 +17,14 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -34,7 +35,7 @@ import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 
 public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
@@ -61,9 +62,9 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     private ComboViewer activityStatusComboViewer;
 
-    private List<AliquotWrapper> aliquots;
+    private DispatchAliquotListInfoTable aliquotsWidget;
 
-    private AliquotListInfoTable aliquotsWidget;
+    private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
 
     @Override
     protected void init() throws Exception {
@@ -74,6 +75,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
         shipment = (DispatchShipmentWrapper) adapter.getModelObject();
         site = SessionManager.getInstance().getCurrentSite();
+        shipment.setSender(site);
         try {
             shipment.reload();
         } catch (Exception e) {
@@ -208,30 +210,33 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                 "The current site does not have any dispatch studies associated with it.\n"
                     + "Please close the form.");
         }
-
-        Button palletButton = toolkit.createButton(page, "Scan pallet",
-            SWT.PUSH);
-        palletButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                new DispatchCreateScanDialog(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), shipment).open();
-            }
-        });
     }
 
     private void createAliquotsSection() {
-        Composite parent = createSectionWithClient("Aliquots");
-        aliquotsWidget = new AliquotListInfoTable(parent, aliquots,
-            AliquotListInfoTable.ColumnsShown.PNUMBER);
+        Section section = createSection("Aliquots");
+        addSectionToolbar(section, "Add aliquots to this shipment",
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
+                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                            .getShell(), shipment);
+                    dialog.open();
+                    setDirty(true); // FIXME need to do this better !
+                    aliquotsWidget.reloadCollection(shipment
+                        .getAliquotCollection());
+                    removedPallets.addAll(dialog.getRemovedPallets());
+                }
+            });
+        aliquotsWidget = new DispatchAliquotListInfoTable(section,
+            shipment.getAliquotCollection());
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
+        section.setClient(aliquotsWidget);
     }
 
     @Override
     protected void saveForm() throws Exception {
-        shipment.setSender(site);
-
         StudyWrapper study = null;
         IStructuredSelection studySelection = (IStructuredSelection) studyComboViewer
             .getSelection();
@@ -269,6 +274,10 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
         shipment.persist();
         DispatchShipmentAdministrationView.getCurrent().reload();
+
+        for (ContainerWrapper pallet : removedPallets) {
+            pallet.delete();
+        }
     }
 
     @Override
@@ -278,7 +287,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     @Override
     public String getNextOpenedFormID() {
-        return null;
+        return DispatchShipmentViewForm.ID;
     }
 
     @Override

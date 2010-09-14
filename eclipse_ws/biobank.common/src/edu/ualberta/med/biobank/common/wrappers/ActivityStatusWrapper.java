@@ -220,4 +220,9 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return getName();
     }
 
+    public boolean isClosed() {
+        String name = getName();
+        return name != null && name.equals(CLOSED_STATUS_STRING);
+    }
+
 }
