@@ -37,7 +37,7 @@ public class GenericAppArgs {
 
         Boolean verbose = (Boolean) parser.getOptionValue(verboseOpt);
         if (verbose != null) {
-            verbose = verbose.booleanValue();
+            this.verbose = verbose.booleanValue();
         }
 
         String hostname = (String) parser.getOptionValue(hostnameOpt);
@@ -51,7 +51,7 @@ public class GenericAppArgs {
         }
 
         String password = (String) parser.getOptionValue(passwordOpt);
-        if (hostname != null) {
+        if (password != null) {
             this.password = password;
         }
 
@@ -61,6 +61,12 @@ public class GenericAppArgs {
         }
 
         remainingArgs = parser.getRemainingArgs();
+    }
+
+    public String toString() {
+        return "h: " + hostname + ", p: " + port + ", u: " + username + ", w: "
+            + password + ", rArgs: " + remainingArgs.toString() + ", errmsg"
+            + errorMsg;
     }
 
 }

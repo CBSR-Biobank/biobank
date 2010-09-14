@@ -45,6 +45,11 @@ public class SentAliquots {
         String serverUrl = prefix + appArgs.hostname + ":" + appArgs.port
             + "/biobank2";
 
+        if (appArgs.verbose) {
+            System.out.println("connection URL: " + serverUrl + " w="
+                + appArgs.username + " p=" + appArgs.password);
+        }
+
         appService = edu.ualberta.med.biobank.common.ServiceConnection
             .getAppService(serverUrl, appArgs.username, appArgs.password);
 
@@ -82,11 +87,9 @@ public class SentAliquots {
             List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
                 appService, inventoryId, site);
 
-            System.out.print("patient " + patientNo + " inventory ID "
-                + inventoryId);
-
             if (aliquots.size() == 0) {
-                System.out.println(" not found");
+                System.out.println(" ERROR: aliquot not found: inventoryId/"
+                    + inventoryId + " patientNo/" + patientNo);
                 continue;
             } else if (aliquots.size() > 1) {
                 throw new Exception("multiple aliquots with inventory id"
@@ -99,16 +102,32 @@ public class SentAliquots {
                 .getPnumber();
             if (!aliquotPnumber.equals(patientNo)) {
                 System.out
-                    .println(" ERROR: does not match patient number for aliquot "
-                        + aliquotPnumber);
+                    .println(" ERROR: patient number mismatch: inventoryId/"
+                        + inventoryId + " csvPatientNo/" + patientNo
+                        + " dbPatientNo/" + aliquotPnumber);
                 continue;
             }
 
-            System.out.println(" old position " + aliquot.getPositionString());
+            if (aliquot.getActivityStatus().equals(closedStatus)) {
+                System.out
+                    .println(" ERROR: aliquot already closed: inventoryId/"
+                        + inventoryId + " patientNo/" + patientNo
+                        + " comment/\"" + aliquot.getComment() + "\"");
+                continue;
+            }
+
+            String oldPosition = new String(aliquot.getPositionString());
+
             aliquot.setComment(closeComment);
             aliquot.setPosition(null);
             aliquot.setActivityStatus(closedStatus);
             aliquot.persist();
+
+            if (appArgs.verbose) {
+                System.out.println("patient/" + patientNo + " inventoryId/"
+                    + inventoryId + " oldPosition/" + oldPosition
+                    + " comment/\"" + closeComment + "\"");
+            }
         }
     }
 
