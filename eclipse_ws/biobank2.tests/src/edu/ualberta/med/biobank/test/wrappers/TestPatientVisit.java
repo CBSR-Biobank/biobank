@@ -34,7 +34,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -675,28 +674,40 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testAddNewSample() throws BiobankCheckException, Exception {
+    public void testAddAliquot() throws BiobankCheckException, Exception {
         PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
             appService, false);
-        SampleStorageWrapper ss1 = SampleStorageHelper.addSampleStorage(study,
+        SampleStorageHelper.addSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
-        SampleStorageWrapper ss2 = SampleStorageHelper.addSampleStorage(study,
+        SampleStorageHelper.addSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
         SampleTypeWrapper sampleType = DbHelper.chooseRandomlyInList(types);
         SampleStorageWrapper ss3 = SampleStorageHelper.newSampleStorage(study,
             sampleType);
         ss3.setVolume(3.0);
         ss3.persist();
-        AliquotWrapper newSample = visit.addNewAliquot("newid", sampleType,
-            Arrays.asList(ss1, ss2, ss3),
-            ActivityStatusWrapper.getActiveActivityStatus(appService));
-        Aliquot dbSample = ModelUtils.getObjectWithId(appService,
-            Aliquot.class, newSample.getId());
-        Assert.assertEquals(dbSample.getSampleType().getId(), newSample
+        visit.reload();
+
+        String inventoryId = "newid";
+        AliquotWrapper newAliquot = new AliquotWrapper(appService);
+        newAliquot.setInventoryId(inventoryId);
+        newAliquot.setLinkDate(new Date());
+        newAliquot.setSampleType(sampleType);
+        newAliquot.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
+        visit.addAliquots(Arrays.asList(newAliquot));
+        visit.persist();
+
+        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(appService,
+            inventoryId);
+        Assert.assertEquals(1, aliquots.size());
+        Assert.assertEquals(aliquots.get(0).getSampleType().getId(), newAliquot
             .getSampleType().getId());
-        Assert.assertTrue(dbSample.getQuantity().equals(3.0));
+        Assert.assertTrue(aliquots.get(0).getQuantity().equals(3.0));
+        Assert.assertEquals(aliquots.get(0).getPatientVisit().getId(),
+            visit.getId());
     }
 }

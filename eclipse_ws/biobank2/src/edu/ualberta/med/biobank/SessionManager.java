@@ -88,9 +88,7 @@ public class SessionManager {
         siteManager.getCurrentSite(serverName, sites);
         siteManager.updateSites(sites);
 
-        if (view != null) {
-            view.getTreeViewer().expandToLevel(2);
-        }
+        rebuildSession();
         updateMenus();
     }
 
