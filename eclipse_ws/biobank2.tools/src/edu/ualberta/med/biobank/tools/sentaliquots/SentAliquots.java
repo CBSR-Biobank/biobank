@@ -7,10 +7,11 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.io.FileReader;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
-import org.supercsv.cellprocessor.constraint.Unique;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.io.CsvBeanReader;
 import org.supercsv.io.ICsvBeanReader;
@@ -51,6 +52,11 @@ public class SentAliquots {
         String serverUrl = prefix + appArgs.hostname + ":" + appArgs.port
             + "/biobank2";
 
+        if (appArgs.verbose) {
+            System.out.println("connection URL: " + serverUrl + " w="
+                + appArgs.username + " p=" + appArgs.password);
+        }
+
         appService = ServiceConnection.getAppService(serverUrl,
             appArgs.username, appArgs.password);
 
@@ -63,12 +69,15 @@ public class SentAliquots {
         ICsvBeanReader reader = new CsvBeanReader(new FileReader(
             appArgs.csvFileName), CsvPreference.EXCEL_PREFERENCE);
 
-        final CellProcessor[] processors = new CellProcessor[] { new Unique(),
-            new Unique(), new StrNotNullOrEmpty() };
+        final CellProcessor[] processors = new CellProcessor[] {
+            new StrNotNullOrEmpty(), new StrNotNullOrEmpty(),
+            new StrNotNullOrEmpty() };
 
         ActivityStatusWrapper closedStatus = ActivityStatusWrapper
             .getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING);
+
+        Map<String, AliquotWrapper> aliquotsAffected = new HashMap<String, AliquotWrapper>();
 
         try {
             String[] header = new String[] { "patientNo", "inventoryId",
@@ -78,11 +87,11 @@ public class SentAliquots {
                 List<AliquotWrapper> aliquots = AliquotWrapper
                     .getAliquotsInSite(appService, info.getInventoryId(), site);
 
-                System.out.print("patient " + info.getPatientNo()
-                    + " inventory ID " + info.getInventoryId());
-
                 if (aliquots.size() == 0) {
-                    System.out.println(" not found");
+                    System.out
+                        .println(" ERROR: aliquot not found: inventoryId/"
+                            + info.getInventoryId() + " patientNo/"
+                            + info.getPatientNo());
                     continue;
                 } else if (aliquots.size() > 1) {
                     throw new Exception("multiple aliquots with inventory id"
@@ -90,24 +99,53 @@ public class SentAliquots {
                 }
 
                 AliquotWrapper aliquot = aliquots.get(0);
-
                 String aliquotPnumber = aliquot.getPatientVisit().getPatient()
                     .getPnumber();
+
                 if (!aliquotPnumber.equals(info.getPatientNo())) {
                     System.out
-                        .println(" ERROR: does not match patient number for aliquot "
+                        .println(" ERROR: patient number mismatch: inventoryId/"
+                            + info.getInventoryId()
+                            + " csvPatientNo/"
+                            + info.getPatientNo()
+                            + " dbPatientNo/"
                             + aliquotPnumber);
                     continue;
                 }
 
-                System.out.println(" old position "
-                    + aliquot.getPositionString());
+                if (aliquotsAffected.containsKey(info.getInventoryId())) {
+                    System.out
+                        .println(" ERROR: duplicate aliquot: inventoryId/"
+                            + info.getInventoryId() + " patientNo/"
+                            + aliquotPnumber);
+                    continue;
+                }
+
+                aliquotsAffected.put(info.getInventoryId(), aliquot);
+
+                if (aliquot.getActivityStatus().equals(closedStatus)) {
+                    System.out
+                        .println(" ERROR: aliquot already closed: inventoryId/"
+                            + info.getInventoryId() + " patientNo/"
+                            + info.getPatientNo() + " comment/\""
+                            + aliquot.getComment() + "\"");
+                    continue;
+                }
+
+                String oldPosition = new String(aliquot.getPositionString());
+
                 aliquot.setComment(info.getCloseComment());
                 aliquot.setPosition(null);
                 aliquot.setActivityStatus(closedStatus);
                 aliquot.persist();
-            }
 
+                if (appArgs.verbose) {
+                    System.out.println("patient/" + info.getPatientNo()
+                        + " inventoryId/" + info.getInventoryId()
+                        + " oldPosition/" + oldPosition + " comment/\""
+                        + info.getCloseComment() + "\"");
+                }
+            }
         } finally {
             reader.close();
         }
