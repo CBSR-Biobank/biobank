@@ -8,8 +8,8 @@ import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerEmptyLocationsImpl extends AbstractReport {
@@ -18,8 +18,10 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         + ContainerPath.class.getName()
         + " c, "
         + ContainerPath.class.getName()
-        + " top where locate(top.path || '/', c.path) !=0 and top.container.label = ? and top.container.containerType.nameShort = ? "
-        + "and c.container.containerType.sampleTypeCollection.size > 0 and (c.container.containerType.capacity.rowCapacity * c.container.containerType.capacity.colCapacity) > c.container.aliquotPositionCollection.size and c.container.site "
+        + " parent where locate(parent.path || '/', c.path) !=0 and parent.container.label = ? and substr(parent.path, 1, locate('/', parent.path)) in ("
+        + CONTAINER_LIST
+        + ") and c.container.containerType.sampleTypeCollection.size > 0 "
+        + "and (c.container.containerType.capacity.rowCapacity * c.container.containerType.capacity.colCapacity) > c.container.aliquotPositionCollection.size and c.container.site "
         + SITE_OPERATOR + SITE_ID;
 
     public ContainerEmptyLocationsImpl(BiobankReport report) {
