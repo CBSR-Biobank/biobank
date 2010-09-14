@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class SiteGroup extends AdapterBase {
 
     public SiteGroup(SessionAdapter parent, int id) {
-        super(parent, id, "Sites", true, true);
+        super(parent, id, "Sites", true, false);
     }
 
     @Override
@@ -57,8 +57,11 @@ public class SiteGroup extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof SiteWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
+        }
+        return searchChildren(searchedObject);
     }
 
     @Override

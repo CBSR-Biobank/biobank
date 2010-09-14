@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -126,7 +127,7 @@ public class ContainerAdapter extends AdapterBase {
                             IProgressMonitor.UNKNOWN);
                         try {
                             getContainer().moveAliquots(newContainer);
-                            newContainer.persist();
+                            // newContainer.persist();
                             newContainer.reload();
                         } catch (Exception e) {
                             BioBankPlugin.openAsyncError("Move problem", e);
@@ -254,8 +255,43 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof ContainerWrapper) {
+            ContainerWrapper containerWrapper = (ContainerWrapper) searchedObject;
+            List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
+            ContainerWrapper currentContainer = containerWrapper;
+            while (currentContainer.hasParent()) {
+                currentContainer = currentContainer.getParent();
+                parents.add(currentContainer);
+            }
+            return acceptChildContainers(searchedObject, this, parents);
+        }
+        return null;
+    }
+
+    private AdapterBase acceptChildContainers(Object searchedObject,
+        ContainerAdapter container, final List<ContainerWrapper> parents) {
+        if (parents.contains(container.getContainer())) {
+            AdapterBase child = container.getChild(
+                (ModelWrapper<?>) searchedObject, true);
+            if (child == null) {
+                for (AdapterBase childContainer : container.getChildren()) {
+                    AdapterBase foundChild;
+                    if (childContainer instanceof ContainerAdapter) {
+                        foundChild = acceptChildContainers(searchedObject,
+                            (ContainerAdapter) childContainer, parents);
+                    } else {
+                        foundChild = childContainer.search(searchedObject);
+                    }
+                    if (foundChild != null) {
+                        return foundChild;
+                    }
+                }
+            } else {
+                return child;
+            }
+        }
+        return null;
     }
 
     @Override

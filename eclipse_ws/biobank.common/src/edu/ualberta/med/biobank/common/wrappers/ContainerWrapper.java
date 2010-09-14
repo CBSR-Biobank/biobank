@@ -718,8 +718,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         for (RowColPos rcp : aliquots.keySet()) {
             AliquotWrapper aliquot = aliquots.get(rcp);
             destination.addAliquot(rcp.row, rcp.col, aliquot);
-            aliquot.persist();
         }
+        destination.persist();
     }
 
     @Override

@@ -1,10 +1,12 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.Date;
+
 import org.eclipse.core.runtime.Assert;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 
 public class ShipmentSearchedNode extends AbstractSearchedNode {
 
@@ -29,5 +31,16 @@ public class ShipmentSearchedNode extends AbstractSearchedNode {
             return parent.equals(((ClinicShipmentWrapper) child).getClinic());
         }
         return false;
+    }
+
+    @Override
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof Date) {
+            Date date = (Date) searchedObject;
+            return getChild((int) date.getTime());
+        } else if (searchedObject instanceof ClinicWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
+        }
+        return searchChildren(searchedObject);
     }
 }
