@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.forms.ClinicShipmentViewForm;
 
 public class ClinicShipmentAdapter extends AdapterBase {
 
-    public ClinicShipmentAdapter(AdapterBase parent, ClinicShipmentWrapper shipment) {
+    public ClinicShipmentAdapter(AdapterBase parent,
+        ClinicShipmentWrapper shipment) {
         super(parent, shipment);
         setHasChildren(true);
     }
@@ -56,8 +57,11 @@ public class ClinicShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof PatientVisitWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
+        }
+        return searchChildren(searchedObject);
     }
 
     @Override

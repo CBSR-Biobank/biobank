@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
 public class DateNode extends AdapterBase {
@@ -21,11 +22,11 @@ public class DateNode extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        if (visitor instanceof ShipmentViewNodeSearchVisitor) {
-            return ((ShipmentViewNodeSearchVisitor) visitor).visit(this);
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof ClinicWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
         }
-        return null;
+        return searchChildren(searchedObject);
     }
 
     @Override

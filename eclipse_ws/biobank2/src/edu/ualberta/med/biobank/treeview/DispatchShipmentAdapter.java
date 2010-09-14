@@ -111,9 +111,4 @@ public class DispatchShipmentAdapter extends AdapterBase {
         return DispatchShipmentReceivingEntryForm.ID;
     }
 
-    @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return null;
-    }
-
 }

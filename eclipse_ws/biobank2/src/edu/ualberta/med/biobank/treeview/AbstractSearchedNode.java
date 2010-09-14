@@ -133,11 +133,6 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         return null;
     }
 
-    @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
-    }
-
     public void addSearchObject(ModelWrapper<?> searchedObject) {
         searchedObjects.add(searchedObject);
     }

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -67,8 +68,62 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof ContainerWrapper) {
+            ContainerWrapper container = (ContainerWrapper) searchedObject;
+            if (container.getContainerType() != null) {
+                if (Boolean.TRUE.equals(container.getContainerType()
+                    .getTopLevel())) {
+                    return getChild((ModelWrapper<?>) searchedObject, true);
+                } else {
+                    List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
+                    ContainerWrapper currentContainer = container;
+                    while (currentContainer.hasParent()) {
+                        currentContainer = currentContainer.getParent();
+                        parents.add(currentContainer);
+                    }
+                    for (AdapterBase child : getChildren()) {
+                        if (child instanceof ContainerAdapter) {
+                            acceptChildContainers(searchedObject,
+                                (ContainerAdapter) child, parents);
+                        } else {
+                            AdapterBase foundChild = child
+                                .search(searchedObject);
+                            if (foundChild != null) {
+                                return foundChild;
+                            }
+                        }
+                    }
+                    return searchChildren(searchedObject);
+                }
+            }
+        }
+        return null;
+    }
+
+    private AdapterBase acceptChildContainers(Object searchedObject,
+        ContainerAdapter container, final List<ContainerWrapper> parents) {
+        if (parents.contains(container.getContainer())) {
+            AdapterBase child = container.getChild(
+                (ModelWrapper<?>) searchedObject, true);
+            if (child == null) {
+                for (AdapterBase childContainer : container.getChildren()) {
+                    AdapterBase foundChild;
+                    if (childContainer instanceof ContainerAdapter) {
+                        foundChild = acceptChildContainers(searchedObject,
+                            (ContainerAdapter) childContainer, parents);
+                    } else {
+                        foundChild = childContainer.search(searchedObject);
+                    }
+                    if (foundChild != null) {
+                        return foundChild;
+                    }
+                }
+            } else {
+                return child;
+            }
+        }
+        return null;
     }
 
     @Override

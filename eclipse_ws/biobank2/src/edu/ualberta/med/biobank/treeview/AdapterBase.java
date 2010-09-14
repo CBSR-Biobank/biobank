@@ -624,7 +624,21 @@ public abstract class AdapterBase {
 
     public abstract String getEntryFormId();
 
-    public abstract AdapterBase accept(NodeSearchVisitor visitor);
+    public AdapterBase search(Object searchedObject) {
+        if (modelObject.equals(searchedObject))
+            return this;
+        return null;
+    }
+
+    protected AdapterBase searchChildren(Object searchedObject) {
+        for (AdapterBase child : getChildren()) {
+            AdapterBase foundChild = child.search(searchedObject);
+            if (foundChild != null) {
+                return foundChild;
+            }
+        }
+        return null;
+    }
 
     public RootNode getRootNode() {
         return getParentFromClass(RootNode.class);

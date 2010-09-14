@@ -62,11 +62,6 @@ public class ContainerTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return null;
-    }
-
-    @Override
     protected AdapterBase createChildNode() {
         return null;
     }

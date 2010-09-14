@@ -4,7 +4,6 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 
@@ -30,7 +29,7 @@ public abstract class AbstractViewWithAdapterTree extends
 
     @Override
     public AdapterBase searchNode(ModelWrapper<?> wrapper) {
-        return rootNode.accept(new NodeSearchVisitor(wrapper));
+        return rootNode.search(wrapper);
     }
 
     public abstract void reload();
