@@ -5,6 +5,9 @@ import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -32,6 +35,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
     private ComboViewer activityStatusComboViewer;
 
     private ComboViewer sampleTypeComboViewer;
+
+    private BiobankText volume;
 
     @Override
     protected void init() throws Exception {
@@ -85,11 +90,22 @@ public class AliquotEntryForm extends BiobankEntryForm {
         sampleTypeComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Type", sampleTypes, aliquot.getSampleType(),
             "Aliquot must have a sample type");
+        sampleTypeComboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    aliquot
+                        .setSampleType((SampleTypeWrapper) ((IStructuredSelection) event
+                            .getSelection()).getFirstElement());
+                    aliquot.setQuantityFromType();
+                    volume.setText(aliquot.getQuantity().toString());
+                }
+            });
 
         createReadOnlyLabelledField(client, SWT.NONE, "Link Date",
             aliquot.getFormattedLinkDate());
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Volume (ml)",
+        volume = createReadOnlyLabelledField(client, SWT.NONE, "Volume (ml)",
             aliquot.getQuantity() == null ? null : aliquot.getQuantity()
                 .toString());
 

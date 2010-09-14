@@ -95,8 +95,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         patientVisitAdapter = (PatientVisitAdapter) adapter;
         patientVisit = patientVisitAdapter.getWrapper();
-        patient = ((PatientAdapter) patientVisitAdapter.getParent())
-            .getWrapper();
+        patient = patientVisit.getPatient();
         retrieve();
         try {
             patientVisit.logEdit(SessionManager.getInstance().getCurrentSite()
