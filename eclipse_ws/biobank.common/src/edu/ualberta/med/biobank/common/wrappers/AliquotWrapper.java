@@ -199,10 +199,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return patientVisit;
     }
 
+    /**
+     * Set the position in the given container using the positionString
+     */
     public void setAliquotPositionFromString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
         RowColPos rcp = parentContainer.getContainerType()
-            .getRowColFromPositionString(positionString);
+            .getRowColFromPositionString(
+                positionString.replaceFirst(parentContainer.getLabel(), ""));
         if ((rcp.row > -1) && (rcp.col > -1)) {
             setPosition(rcp);
         } else {
@@ -466,37 +470,18 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         WritableApplicationService appService, SiteWrapper site,
         String positionString) throws ApplicationException,
         BiobankCheckException {
-        // assume that the aliquot label position is 2 or 3 letters
-        // will search with both possible positions
-        String lastContainerLabel = positionString.substring(0,
-            positionString.length() - 2);
-        String aliquotPositionLabel = positionString.replace(
-            lastContainerLabel, "");
-        List<AliquotWrapper> aliquots = getAliquotsInSiteWithPositionLabel(
-            appService, site, lastContainerLabel, aliquotPositionLabel);
-        lastContainerLabel = positionString.substring(0,
-            positionString.length() - 3);
-        aliquotPositionLabel = positionString.replace(lastContainerLabel, "");
-        aliquots.addAll(getAliquotsInSiteWithPositionLabel(appService, site,
-            lastContainerLabel, aliquotPositionLabel));
-        return aliquots;
-    }
-
-    private static List<AliquotWrapper> getAliquotsInSiteWithPositionLabel(
-        WritableApplicationService appService, SiteWrapper site,
-        String containerString, String aliquotString)
-        throws ApplicationException, BiobankCheckException {
-        List<ContainerWrapper> containers = ContainerWrapper
-            .getContainersInSite(appService, site, containerString);
+        List<ContainerWrapper> possibleContainers = ContainerWrapper
+            .getPossibleParents(appService, positionString, site, null);
         List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
-        for (ContainerWrapper container : containers) {
+        for (ContainerWrapper container : possibleContainers) {
             RowColPos rcp = null;
             try {
                 rcp = container.getContainerType().getRowColFromPositionString(
-                    aliquotString);
+                    positionString.replaceFirst(container.getLabel(), ""));
             } catch (Exception e) {
-                // do nothing. The positionString doesn't fit the current
-                // container.
+                // Should never happen: it has been already tested in
+                // getPossibleParentsMethod
+                assert false;
             }
             if (rcp != null) {
                 if ((rcp.row > -1) && (rcp.col > -1)) {

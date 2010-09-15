@@ -209,4 +209,17 @@ public class ContainerLabelingSchemeWrapper extends
 
         return isInBounds;
     }
+
+    public static List<Integer> getPossibleLabelLength(
+        WritableApplicationService appService) throws ApplicationException {
+        String query = "select min(minChars), max(maxChars) from "
+            + ContainerLabelingScheme.class.getName();
+        HQLCriteria rangeQuery = new HQLCriteria(query);
+        Object[] minMax = (Object[]) appService.query(rangeQuery).get(0);
+        List<Integer> validLengths = new ArrayList<Integer>();
+        for (int i = (Integer) minMax[0]; i < (Integer) minMax[1] + 1; i++) {
+            validLengths.add(i);
+        }
+        return validLengths;
+    }
 }
