@@ -506,6 +506,14 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     @Override
+    protected void launchScanAndProcessResult() {
+        super.launchScanAndProcessResult();
+        page.layout(true, true);
+        book.reflow(true);
+        cancelConfirmWidget.setFocus();
+    }
+
+    @Override
     protected void beforeScanThreadStart() {
         showOnlyPallet(false, false);
         isFakeScanLinkedOnly = fakeScanLinkedOnlyButton != null
