@@ -98,8 +98,9 @@ public class BiobankListProxy implements List<Object>, Serializable {
         if (index - offset >= pageSize || index < offset) {
             if (index < loadedOffset + pageSize) {
                 // swap
-                if (loading && listener != null) {
-                    listener.showBusy();
+                if (loading) {
+                    if (listener != null)
+                        listener.showBusy();
                     while (loading) {
                         try {
                             Thread.sleep(1000);
@@ -107,8 +108,11 @@ public class BiobankListProxy implements List<Object>, Serializable {
                             break;
                         }
                     }
-                    listener.done();
+                    if (listener != null)
+                        listener.done();
                 }
+                System.out.println(loading);
+                System.out.println(listener);
                 if (nextListChunk != null) {
                     List<Object> temp = listChunk;
                     listChunk = nextListChunk;

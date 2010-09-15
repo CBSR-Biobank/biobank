@@ -21,7 +21,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         + "from (select s.name_short "
         + "as study_name, c.name_short as clinic_name, p.pnumber as patient_number, count(pv.id) as pvCount "
         + "from patient_visit pv join patient p on pv.patient_id=p.id join study s on s.id = p.study_id "
-        + "join shipment sh on sh.id=pv.shipment_id join clinic c on c.id=sh.clinic_id where pv.date_processed "
+        + "join abstract_shipment sh on sh.id=pv.clinic_shipment_id join clinic c on c.id=sh.clinic_id where pv.date_processed "
         + "between ? and ? and sh.site_id "
         + SITE_OPERATOR_SEARCH_STRING
         + SITE_ID_SEARCH_STRING
