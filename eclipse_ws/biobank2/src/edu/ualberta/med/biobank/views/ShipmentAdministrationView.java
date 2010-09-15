@@ -24,8 +24,8 @@ import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
@@ -158,10 +158,11 @@ public class ShipmentAdministrationView extends
                 }
                 topNode = dateNode;
             }
-            ClinicAdapter clinicAdapter = (ClinicAdapter) topNode
+            ClinicWithShipmentAdapter clinicAdapter = (ClinicWithShipmentAdapter) topNode
                 .search(shipment.getClinic());
             if (clinicAdapter == null) {
-                clinicAdapter = new ClinicAdapter(topNode, shipment.getClinic());
+                clinicAdapter = new ClinicWithShipmentAdapter(topNode,
+                    shipment.getClinic());
                 clinicAdapter.setEditable(false);
                 clinicAdapter.setLoadChildrenInBackground(false);
                 topNode.addChild(clinicAdapter);

@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
 import edu.ualberta.med.biobank.treeview.PatientTodayNode;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.StudyWithPatientAdapter;
 
 public class PatientAdministrationView extends
     AbstractTodaySearchAdministrationView {
@@ -45,10 +45,11 @@ public class PatientAdministrationView extends
     public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
         if (wrapper instanceof PatientWrapper) {
             PatientWrapper patient = (PatientWrapper) wrapper;
-            StudyAdapter studyAdapter = (StudyAdapter) parentNode
+            StudyWithPatientAdapter studyAdapter = (StudyWithPatientAdapter) parentNode
                 .search(patient.getStudy());
             if (studyAdapter == null) {
-                studyAdapter = new StudyAdapter(parentNode, patient.getStudy());
+                studyAdapter = new StudyWithPatientAdapter(parentNode,
+                    patient.getStudy());
                 studyAdapter.setEditable(false);
                 studyAdapter.setLoadChildrenInBackground(false);
                 parentNode.addChild(studyAdapter);
