@@ -83,7 +83,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             throw new BiobankCheckException("Labeling scheme should be set");
         } else {
             // should throw error if labeling scheme too small for container
-            if (!LabelingScheme.checkBounds(appService,
+            if (!ContainerLabelingSchemeWrapper.checkBounds(appService,
                 getChildLabelingScheme(), getCapacity().getRowCapacity(),
                 getCapacity().getColCapacity()))
                 throw new BiobankCheckException("Labeling scheme cannot label "
