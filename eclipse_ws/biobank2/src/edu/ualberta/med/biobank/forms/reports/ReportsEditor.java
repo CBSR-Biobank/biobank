@@ -316,8 +316,7 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                                 exportPDFButton.setToolTipText("Export PDF");
                             }
                             reportTable = new ReportTableWidget<Object>(page,
-                                reportData, getColumnNames(),
-                                getColumnWidths(), 24);
+                                reportData, getColumnNames(), getColumnWidths());
                             reportTable.adaptToToolkit(toolkit, true);
                             page.layout(true, true);
                             book.reflow(true);
@@ -336,8 +335,8 @@ public abstract class ReportsEditor extends BiobankFormBase implements
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new ReportTableWidget<Object>(page, null,
-            new String[] { " " }, new int[] { 500 });
+        reportTable = new ReportTableWidget<Object>(page,
+            new ArrayList<Object>(), new String[] { " " }, new int[] { 500 });
         reportTable.adaptToToolkit(toolkit, true);
         page.layout(true, true);
         book.reflow(true);
