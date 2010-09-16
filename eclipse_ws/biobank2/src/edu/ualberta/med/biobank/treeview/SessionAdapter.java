@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -33,22 +34,22 @@ public class SessionAdapter extends AdapterBase {
 
     private WritableApplicationService appService;
 
-    private String userName;
+    private User user;
     private String serverName;
 
     public SessionAdapter(AdapterBase parent,
         WritableApplicationService appService, int sessionId,
-        String serverName, String userName) {
+        String serverName, User user) {
         super(parent, null, false);
         this.appService = appService;
         setId(sessionId);
-        if (userName != null && userName.isEmpty()) {
+        if (user.getLogin().isEmpty()) {
             setName(serverName);
         } else {
-            setName(serverName + " [" + userName + "]");
+            setName(serverName + " [" + user.getLogin() + "]");
         }
         this.serverName = serverName;
-        this.userName = userName;
+        this.user = user;
 
         addGroupNodes();
     }
@@ -123,7 +124,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     public String getUserName() {
-        return userName;
+        return user.getLogin();
     }
 
     public String getServerName() {

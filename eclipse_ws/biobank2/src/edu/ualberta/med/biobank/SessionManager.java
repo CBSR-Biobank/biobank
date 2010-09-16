@@ -14,6 +14,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.SecurityHelper;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -75,11 +76,11 @@ public class SessionManager {
     }
 
     public void addSession(final WritableApplicationService appService,
-        String serverName, String userName, Collection<SiteWrapper> sites) {
-        logger.debug("addSession: " + serverName + ", user/" + userName
+        String serverName, User user, Collection<SiteWrapper> sites) {
+        logger.debug("addSession: " + serverName + ", user/" + user.getLogin()
             + " numSites/" + sites.size());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
-            serverName, userName);
+            serverName, user);
         rootNode.addChild(sessionAdapter);
 
         siteManager.init(appService, serverName);

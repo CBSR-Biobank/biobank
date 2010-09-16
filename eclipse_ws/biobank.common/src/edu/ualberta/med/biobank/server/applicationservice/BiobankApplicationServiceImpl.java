@@ -10,9 +10,14 @@ import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authorization.domainobjects.Group;
+import gov.nih.nci.security.authorization.domainobjects.Privilege;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
+import gov.nih.nci.security.authorization.domainobjects.ProtectionGroup;
+import gov.nih.nci.security.authorization.domainobjects.ProtectionGroupRoleContext;
+import gov.nih.nci.security.authorization.domainobjects.Role;
 import gov.nih.nci.security.authorization.domainobjects.User;
 import gov.nih.nci.security.dao.GroupSearchCriteria;
+import gov.nih.nci.security.exceptions.CSException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.query.SDKQuery;
@@ -23,8 +28,10 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.acegisecurity.Authentication;
@@ -62,6 +69,8 @@ public class BiobankApplicationServiceImpl extends
     private static final String UPDATE_PRIVILEGE = "UPDATE";
 
     private static final String READ_PRIVILEGE = "READ";
+
+    private Map<String, Map<String, Boolean>> cachedPrivilegesMap = new HashMap<String, Map<String, Boolean>>();
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
@@ -113,15 +122,33 @@ public class BiobankApplicationServiceImpl extends
                 .getAuthentication().getName();
             AuthorizationManager am = SecurityServiceProvider
                 .getAuthorizationManager(APPLICATION_CONTEXT_NAME);
+            String objectId = clazz.getName();
             if (id == null) {
-                return am.checkPermission(userLogin, clazz.getName(),
-                    privilegeName);
+                return checkPermission(am, userLogin, objectId, privilegeName);
             }
-            return am.checkPermission(userLogin, clazz.getName(), "id",
-                id.toString(), privilegeName);
+            return am.checkPermission(userLogin, objectId, "id", id.toString(),
+                privilegeName);
         } catch (Exception e) {
             throw new ApplicationException(e);
         }
+    }
+
+    private Boolean checkPermission(AuthorizationManager am, String userLogin,
+        String objectId, String privilegeName) throws CSException {
+        Map<String, Boolean> objectsMap = cachedPrivilegesMap
+            .get(privilegeName);
+        if (objectsMap == null) {
+            objectsMap = new HashMap<String, Boolean>();
+            cachedPrivilegesMap.put(privilegeName, objectsMap);
+        }
+        Boolean res = objectsMap.get(objectId);
+        if (res == null) {
+            System.out.println("call database for " + userLogin + "/"
+                + objectId + "/" + privilegeName);
+            res = am.checkPermission(userLogin, objectId, privilegeName);
+        }
+        objectsMap.put(objectId, res);
+        return res;
     }
 
     @Override
@@ -486,6 +513,34 @@ public class BiobankApplicationServiceImpl extends
             throw ae;
         } catch (Exception ex) {
             log.error("Error checking password status", ex);
+            throw new ApplicationException(ex);
+        }
+    }
+
+    @Override
+    public void testSecurity() throws ApplicationException {
+        try {
+            System.out.println("testSecurity");
+            UserProvisioningManager upm = SecurityServiceProvider
+                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+            Set<?> pgrcList = upm.getProtectionGroupRoleContextForGroup("7");
+            for (Object o : pgrcList) {
+                ProtectionGroupRoleContext pgrc = (ProtectionGroupRoleContext) o;
+                ProtectionGroup pg = pgrc.getProtectionGroup();
+                System.out.println(pg.getProtectionGroupName());
+                for (Object r : pgrc.getRoles()) {
+                    Role role = (Role) r;
+                    System.out.print("  " + role.getName() + ": ");
+
+                    for (Object p : role.getPrivileges()) {
+                        Privilege privilege = (Privilege) p;
+                        System.out.println(privilege.getName() + " ");
+                    }
+                    System.out.println();
+                }
+            }
+        } catch (Exception ex) {
+            log.error("Error testSecurity", ex);
             throw new ApplicationException(ex);
         }
     }

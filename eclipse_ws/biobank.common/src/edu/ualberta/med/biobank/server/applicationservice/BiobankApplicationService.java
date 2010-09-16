@@ -70,4 +70,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void deleteUser(String login) throws ApplicationException;
 
     public boolean needPasswordModification() throws ApplicationException;
+
+    public void testSecurity() throws ApplicationException;
 }
