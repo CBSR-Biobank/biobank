@@ -32,6 +32,7 @@ public class PvListViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Patient Visits");
         page.setLayout(new GridLayout(1, false));
+        // FIXME should we use this icon ?
         form.setImage(BioBankPlugin.getDefault().getImageRegistry()
             .get(BioBankPlugin.IMG_BOX));
 

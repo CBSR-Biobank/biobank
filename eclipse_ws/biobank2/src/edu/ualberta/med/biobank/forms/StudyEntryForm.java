@@ -17,7 +17,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.GlobalPvAttrWrapper;
@@ -99,8 +98,6 @@ public class StudyEntryForm extends BiobankEntryForm {
         form.setText("Study Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_STUDY));
 
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);

@@ -98,8 +98,6 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         form.setText("Shipment Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_CLINIC_SHIPMENT));
 
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -229,7 +227,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                 }
             });
         aliquotsWidget = new DispatchAliquotListInfoTable(section,
-            shipment.getAliquotCollection());
+            shipment.getAliquotCollection(), true);
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
         section.setClient(aliquotsWidget);

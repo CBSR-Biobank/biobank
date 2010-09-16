@@ -7,7 +7,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -54,8 +53,6 @@ public class PatientViewForm extends BiobankViewForm {
         form.setText("Patient: " + patient.getPnumber());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_PATIENT));
 
         createPatientSection();
         createPatientVisitSection();

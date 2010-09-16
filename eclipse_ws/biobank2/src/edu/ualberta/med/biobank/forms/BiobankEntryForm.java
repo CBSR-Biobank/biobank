@@ -204,6 +204,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         super.createPartControl(parent);
         addToolbarButtons();
         bindChangeListener();
+        setDirty(false);
     }
 
     abstract protected void saveForm() throws Exception;

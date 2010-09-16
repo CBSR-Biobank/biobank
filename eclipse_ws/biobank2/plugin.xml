@@ -1986,12 +1986,14 @@
       <editor
             class="edu.ualberta.med.biobank.forms.AliquotViewForm"
             default="false"
+            icon="icons/aliquot.png"
             id="edu.ualberta.med.biobank.forms.AliquotViewForm"
             name="Aliquot View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.AliquotEntryForm"
             default="false"
+            icon="icons/aliquot.png"
             id="edu.ualberta.med.biobank.forms.AliquotEntryForm"
             name="Aliquot Entry">
       </editor>
@@ -2065,12 +2067,14 @@
       <editor
             class="edu.ualberta.med.biobank.forms.AliquotListViewForm"
             default="false"
+            icon="icons/aliquot.png"
             id="edu.ualberta.med.biobank.forms.AliquotListViewForm"
             name="Aliquot List">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.PvListViewForm"
             default="false"
+            icon="icons/patientVisit.png"
             id="edu.ualberta.med.biobank.forms.PvListViewForm"
             name="Patient Visit List">
       </editor>

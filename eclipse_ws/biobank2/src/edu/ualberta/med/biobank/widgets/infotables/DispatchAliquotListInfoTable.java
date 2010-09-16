@@ -7,6 +7,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -34,9 +35,39 @@ public class DispatchAliquotListInfoTable extends
 
     private static final int[] BOUNDS = new int[] { 100, 100, 120, 120, -1 };
 
+    private boolean editMode = false;
+
     public DispatchAliquotListInfoTable(Composite parent,
-        List<AliquotWrapper> aliquotCollection) {
+        List<AliquotWrapper> aliquotCollection, boolean editMode) {
         super(parent, aliquotCollection, HEADINGS, BOUNDS, 20);
+        if (editMode) {
+            addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                @Override
+                public void deleteItem(InfoTableEvent event) {
+                    AliquotWrapper aliquot = getSelection();
+                    if (aliquot != null) {
+                        if (!BioBankPlugin.openConfirm("Remove Aliquot",
+                            "Are you sure you want to remove aliquot \""
+                                + aliquot.getInventoryId()
+                                + "\" from this shipment ?"))
+                            return;
+                        System.out.println("remove aliquot");
+                        // try {
+                        // site.removeStudies(Arrays.asList(study));
+                        // setCollection(site.getStudyCollection(true));
+                        // notifyListeners();
+                        // } catch (BiobankCheckException e) {
+                        // BioBankPlugin.openAsyncError("Delete failed", e);
+                        // }
+                    }
+                }
+            });
+        }
+    }
+
+    @Override
+    protected boolean isEditMode() {
+        return editMode;
     }
 
     @Override

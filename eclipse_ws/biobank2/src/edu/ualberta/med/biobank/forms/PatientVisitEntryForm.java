@@ -128,8 +128,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         form.setText("Patient Visit Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_PATIENT_VISIT));
         createMainSection();
         createSourcesSection();
         if (patientVisit.isNew()) {
