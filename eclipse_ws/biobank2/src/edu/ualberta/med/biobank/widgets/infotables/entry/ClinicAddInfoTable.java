@@ -9,6 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -40,8 +41,8 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
     public void createClinicContact() {
         SelectClinicContactDialog dlg;
         try {
-            List<ContactWrapper> availableContacts = study
-                .getContactsNotAssoc();
+            List<ContactWrapper> availableContacts = ContactWrapper
+                .getAllContacts(SessionManager.getAppService());
             availableContacts.removeAll(study.getContactCollection(true));
             dlg = new SelectClinicContactDialog(PlatformUI.getWorkbench()
                 .getActiveWorkbenchWindow().getShell(), availableContacts);
