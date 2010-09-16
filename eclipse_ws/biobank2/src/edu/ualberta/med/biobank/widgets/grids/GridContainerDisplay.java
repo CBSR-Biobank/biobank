@@ -4,6 +4,7 @@ import java.util.Map;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.PaintEvent;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 
@@ -36,7 +37,7 @@ public class GridContainerDisplay extends AbstractGridDisplay {
     }
 
     @Override
-    protected void drawRectangle(PaintEvent e,
+    protected Color getDefaultBackgroundColor(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
         if (displayWidget.getCells() != null) {
@@ -48,10 +49,10 @@ public class GridContainerDisplay extends AbstractGridDisplay {
             CellStatus status = cell.getStatus();
             if (status == null)
                 status = defaultStatus;
-            e.gc.setBackground(status.getColor());
-            e.gc.fillRectangle(rectangle);
+            return status.getColor();
         }
-        super.drawRectangle(e, displayWidget, rectangle, indexRow, indexCol);
+        return super.getDefaultBackgroundColor(e, displayWidget, rectangle,
+            indexRow, indexCol);
     }
 
     @Override

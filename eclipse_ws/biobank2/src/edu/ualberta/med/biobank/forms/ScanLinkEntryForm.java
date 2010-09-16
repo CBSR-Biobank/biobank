@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,6 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -149,6 +149,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalAlignment = SWT.CENTER;
         gd.grabExcessHorizontalSpace = true;
         client.setLayoutData(gd);
+        containersScroll.setContent(client);
 
         spw = new ScanPalletWidget(client,
             CellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
@@ -599,17 +600,22 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             .getCells();
         PatientVisitWrapper patientVisit = linkFormPatientManagement
             .getSelectedPatientVisit();
+
         StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:\n"); //$NON-NLS-1$
         int nber = 0;
-        StudyWrapper study = patientVisit.getPatient().getStudy();
-        List<SampleStorageWrapper> sampleStorages = study
-            .getSampleStorageCollection();
+        ActivityStatusWrapper activeStatus = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
+        List<AliquotWrapper> newAliquots = new ArrayList<AliquotWrapper>();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
                 && cell.getStatus() == CellStatus.TYPE) {
-                patientVisit.addNewAliquot(cell.getValue(), cell.getType(),
-                    sampleStorages,
-                    ActivityStatusWrapper.getActiveActivityStatus(appService));
+                AliquotWrapper aliquot = new AliquotWrapper(appService);
+                aliquot.setInventoryId(cell.getValue());
+                aliquot.setLinkDate(new Date());
+                aliquot.setSampleType(cell.getType());
+                aliquot.setActivityStatus(activeStatus);
+                newAliquots.add(aliquot);
+
                 sb.append(Messages.getFormattedString(
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),
@@ -619,6 +625,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 nber++;
             }
         }
+        patientVisit.addAliquots(newAliquots);
+        patientVisit.persist();
         appendLog(sb.toString());
         appendLogNLS(
             "ScanLink.activitylog.save.summary", nber, patientVisit.getFormattedDateProcessed()); //$NON-NLS-1$ 

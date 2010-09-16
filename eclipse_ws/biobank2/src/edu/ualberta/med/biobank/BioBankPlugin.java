@@ -22,8 +22,10 @@ import org.osgi.framework.BundleContext;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
+import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicMasterGroup;
 import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
@@ -40,11 +42,8 @@ import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.treeview.SiteClinicGroup;
 import edu.ualberta.med.biobank.treeview.SiteGroup;
-import edu.ualberta.med.biobank.treeview.SiteStudyGroup;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.treeview.StudyMasterGroup;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -124,13 +123,9 @@ public class BioBankPlugin extends AbstractUIPlugin {
         classToImageKey
             .put(SiteAdapter.class.getName(), BioBankPlugin.IMG_SITE);
         classToImageKey.put(SiteGroup.class.getName(), BioBankPlugin.IMG_SITES);
-        classToImageKey.put(ClinicMasterGroup.class.getName(),
+        classToImageKey.put(AbstractClinicGroup.class.getName(),
             BioBankPlugin.IMG_CLINICS);
-        classToImageKey.put(SiteClinicGroup.class.getName(),
-            BioBankPlugin.IMG_CLINICS);
-        classToImageKey.put(StudyMasterGroup.class.getName(),
-            BioBankPlugin.IMG_STUDIES);
-        classToImageKey.put(SiteStudyGroup.class.getName(),
+        classToImageKey.put(AbstractStudyGroup.class.getName(),
             BioBankPlugin.IMG_STUDIES);
         classToImageKey.put(ContainerTypeGroup.class.getName(),
             BioBankPlugin.IMG_CONTAINER_TYPES);
@@ -487,15 +482,20 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return true;
     }
 
-    public Image getImage(Object element) {
-        String imageKey = classToImageKey.get(element.getClass().getName());
+    public Image getImage(AdapterBase element) {
+        String imageKey = null;
+        Class<?> objectClass = element.getClass();
+        while (imageKey == null && !objectClass.equals(AdapterBase.class)) {
+            imageKey = classToImageKey.get(objectClass.getName());
+            objectClass = objectClass.getSuperclass();
+        }
         if ((imageKey == null)
             && ((element instanceof ContainerAdapter) || (element instanceof ContainerTypeAdapter))) {
             String ctName;
             if (element instanceof ContainerAdapter) {
                 ContainerWrapper container = ((ContainerAdapter) element)
                     .getContainer();
-                if (container == null)
+                if (container == null || container.getContainerType() == null)
                     return null;
                 ctName = container.getContainerType().getName();
             } else {
@@ -510,7 +510,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return BioBankPlugin.getDefault().getImageRegistry().getDescriptor(key);
     }
 
-    public Image getIconForTypeName(String typeName) {
+    private Image getIconForTypeName(String typeName) {
         if (typeName == null) {
             return null;
         }

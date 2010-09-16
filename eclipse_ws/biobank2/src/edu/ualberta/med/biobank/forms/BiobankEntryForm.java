@@ -434,7 +434,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             .closeEditor(this, saveOnClose);
         if (openView && getNextOpenedFormID() != null) {
             AdapterBase.openForm(new FormInput(getAdapter()),
-                getNextOpenedFormID(), false);
+                getNextOpenedFormID(), true);
 
             int previousFormIndex = entryIndex - 1;
             if (previousFormIndex >= 0

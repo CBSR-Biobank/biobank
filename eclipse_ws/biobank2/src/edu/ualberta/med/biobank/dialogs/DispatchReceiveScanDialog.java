@@ -115,7 +115,6 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         }
         try {
             currentShipment.receiveAliquots(aliquots);
-            currentShipment.persist();
             redrawPallet();
             pendingAliquotsNumber = 0;
             setOkButtonEnabled(true);
@@ -135,10 +134,18 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         if (currentShipment.getAliquotCollection().size() > 0) {
-            AliquotWrapper aliquot = currentShipment.getAliquotCollection()
-                .get(0);
-            palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
-                0, 0, aliquot.getInventoryId())));
+            AliquotWrapper aliquotNotReceived = null;
+            for (AliquotWrapper aliquot : currentShipment
+                .getAliquotCollection()) {
+                if (aliquot.isDispatched()) {
+                    aliquotNotReceived = aliquot;
+                    break;
+                }
+            }
+            if (aliquotNotReceived != null) {
+                palletScanned.put(new RowColPos(0, 0), new PalletCell(
+                    new ScanCell(0, 0, aliquotNotReceived.getInventoryId())));
+            }
         }
         return palletScanned;
     }

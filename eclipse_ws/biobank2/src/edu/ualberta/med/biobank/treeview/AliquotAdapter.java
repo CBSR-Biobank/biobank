@@ -51,11 +51,6 @@ public class AliquotAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return null;
-    }
-
-    @Override
     protected AdapterBase createChildNode() {
         return null;
     }

@@ -61,9 +61,8 @@ public abstract class AbstractDispatchShipmentGroup extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        // TODO Auto-generated method stub
-        return null;
+    public AdapterBase search(Object searchedObject) {
+        return searchChildren(searchedObject);
     }
 
     @Override

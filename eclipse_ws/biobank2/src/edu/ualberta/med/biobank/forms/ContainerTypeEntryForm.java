@@ -137,8 +137,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         form.setText("Container Type Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
-            containerType.getName()));
+        form.setImage(BioBankPlugin.getDefault().getImage(containerTypeAdapter));
 
         createContainerTypeSection();
         createContainsSection();

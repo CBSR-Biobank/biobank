@@ -24,13 +24,11 @@ import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.DateNode;
-import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
-import edu.ualberta.med.biobank.treeview.ShipmentViewNodeSearchVisitor;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class ShipmentAdministrationView extends
@@ -152,8 +150,7 @@ public class ShipmentAdministrationView extends
             AdapterBase topNode = parentNode;
             if (parentNode.equals(searchedNode) && !radioWaybill.getSelection()) {
                 Date date = dateReceivedWidget.getDate();
-                AdapterBase dateNode = parentNode
-                    .accept(new ShipmentViewNodeSearchVisitor(date));
+                AdapterBase dateNode = parentNode.search(date);
                 if (dateNode == null) {
                     dateNode = new DateNode(parentNode,
                         dateReceivedWidget.getDate());
@@ -161,16 +158,17 @@ public class ShipmentAdministrationView extends
                 }
                 topNode = dateNode;
             }
-            ClinicAdapter clinicAdapter = (ClinicAdapter) topNode
-                .accept(new ShipmentViewNodeSearchVisitor(shipment.getClinic()));
+            ClinicWithShipmentAdapter clinicAdapter = (ClinicWithShipmentAdapter) topNode
+                .search(shipment.getClinic());
             if (clinicAdapter == null) {
-                clinicAdapter = new ClinicAdapter(topNode, shipment.getClinic());
+                clinicAdapter = new ClinicWithShipmentAdapter(topNode,
+                    shipment.getClinic());
                 clinicAdapter.setEditable(false);
                 clinicAdapter.setLoadChildrenInBackground(false);
                 topNode.addChild(clinicAdapter);
             }
             ClinicShipmentAdapter shipmentAdapter = (ClinicShipmentAdapter) clinicAdapter
-                .accept(new ShipmentViewNodeSearchVisitor(shipment));
+                .search(shipment);
             if (shipmentAdapter == null) {
                 shipmentAdapter = new ClinicShipmentAdapter(clinicAdapter,
                     shipment);
@@ -179,11 +177,6 @@ public class ShipmentAdministrationView extends
             return shipmentAdapter;
         }
         return null;
-    }
-
-    @Override
-    protected NodeSearchVisitor getVisitor(ModelWrapper<?> searchedObject) {
-        return new ShipmentViewNodeSearchVisitor(searchedObject);
     }
 
     @Override
@@ -237,11 +230,6 @@ public class ShipmentAdministrationView extends
             return (ClinicShipmentAdapter) selectedNode;
         }
         return null;
-    }
-
-    @Override
-    public AdapterBase searchNode(ModelWrapper<?> wrapper) {
-        return rootNode.accept(new ShipmentViewNodeSearchVisitor(wrapper));
     }
 
 }

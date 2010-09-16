@@ -1,14 +1,14 @@
 package edu.ualberta.med.biobank.widgets;
 
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.KeyAdapter;
-import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.forms.AbstractAliquotAdminForm;
@@ -50,26 +50,23 @@ public class CancelConfirmWidget extends BiobankWidget {
         gd.widthHint = 100;
         confirmCancelText.setLayoutData(gd);
 
-        confirmCancelText.addKeyListener(new KeyAdapter() {
+        confirmCancelText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
-            public void keyPressed(KeyEvent e) {
-                if (e.character == SWT.CR) {
-                    String text = confirmCancelText.getText();
-                    if (BioBankPlugin.getDefault().isConfirmBarcode(text)
-                        && confirmButton.isEnabled()) {
-                        form.confirm();
-                        // form will be closed. Default following behaviours
-                        // will send a disposed error if we don't set this to
-                        // false
-                        e.doit = false;
-                    } else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
-                        try {
-                            form.reset();
-                            form.setAfterKeyCancel();
-                        } catch (Exception ex) {
-                            logger.error(
-                                "Error while reseting pallet values", ex); //$NON-NLS-1$
-                        }
+            public void handleEvent(Event e) {
+                String text = confirmCancelText.getText();
+                if (BioBankPlugin.getDefault().isConfirmBarcode(text)
+                    && confirmButton.isEnabled()) {
+                    form.confirm();
+                    // form will be closed. Default following behaviours
+                    // will send a disposed error if we don't set this to
+                    // false
+                    e.doit = false;
+                } else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
+                    try {
+                        form.reset();
+                        form.setAfterKeyCancel();
+                    } catch (Exception ex) {
+                        logger.error("Error while reseting pallet values", ex); //$NON-NLS-1$
                     }
                 }
             }

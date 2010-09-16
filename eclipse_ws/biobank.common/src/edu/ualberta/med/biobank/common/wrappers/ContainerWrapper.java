@@ -10,15 +10,14 @@ import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.security.SecurityHelper;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -360,6 +359,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      */
     public void setPositionAndParentFromLabel(String label,
         List<ContainerTypeWrapper> types) throws Exception {
+        // FIXME used only in ScanAssign, so its ok to use only last 2
+        // characters. But what if it is use in others places
         String parentContainerLabel = label.substring(0, label.length() - 2);
         List<ContainerWrapper> possibleParents = ContainerWrapper
             .getContainersHoldingContainerTypes(appService,
@@ -384,11 +385,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                     + " have been found. This is ambiguous: check containers definitions.");
         }
         // has the parent container. Can now find the position using the
-        // parent labeling scheme
+        // parent labelling scheme
         ContainerWrapper parent = possibleParents.get(0);
         setParent(parent);
-        // possibleParents.get(0).addChild(label.substring(label.length() - 2),
-        // this);
         RowColPos position = parent.getPositionFromLabelingScheme(label
             .substring(label.length() - 2));
         setPosition(position);
@@ -628,7 +627,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         if (label.startsWith(getLabel())) {
             label = label.substring(getLabel().length());
         }
-        RowColPos pos = containerType.getRowColFromPositionString(label);
+        RowColPos pos = getPositionFromLabelingScheme(label);
         return getChild(pos);
     }
 
@@ -691,6 +690,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * Add a child in this container
      * 
      * @param positionString position where the child should be added. e.g. AA
+     *            or B12 or 15
      * @param child
      * @throws Exception
      */
@@ -718,8 +718,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         for (RowColPos rcp : aliquots.keySet()) {
             AliquotWrapper aliquot = aliquots.get(rcp);
             destination.addAliquot(rcp.row, rcp.col, aliquot);
-            aliquot.persist();
         }
+        destination.persist();
     }
 
     @Override
@@ -764,14 +764,20 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      */
     public List<ContainerWrapper> getPossibleParents(String childLabel)
         throws ApplicationException {
-        String query = "select min(minChars), max(maxChars) from "
-            + ContainerLabelingScheme.class.getName();
-        HQLCriteria rangeQuery = new HQLCriteria(query);
-        Object[] minMax = (Object[]) appService.query(rangeQuery).get(0);
-        List<Integer> validLengths = new ArrayList<Integer>();
-        for (int i = (Integer) minMax[0]; i < (Integer) minMax[1] + 1; i++) {
-            validLengths.add(i);
-        }
+        return getPossibleParents(appService, childLabel, getSite(), this);
+    }
+
+    /**
+     * Get containers with a given label that can have a child (container or
+     * aliquot) with label 'childLabel'. If child is not null and is a
+     * container, then will check that the parent can contain this type of
+     * container
+     */
+    public static List<ContainerWrapper> getPossibleParents(
+        WritableApplicationService appService, String childLabel,
+        SiteWrapper site, ModelWrapper<?> child) throws ApplicationException {
+        List<Integer> validLengths = ContainerLabelingSchemeWrapper
+            .getPossibleLabelLength(appService);
         List<String> validParents = new ArrayList<String>();
         for (Integer crop : validLengths)
             if (crop < childLabel.length())
@@ -779,30 +785,35 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                     - crop));
         List<ContainerWrapper> filteredWrappers = new ArrayList<ContainerWrapper>();
         if (validParents.size() > 0) {
-            String parentQuery = "select c from "
+            List<Object> params = new ArrayList<Object>();
+            params.add(site.getWrappedObject());
+            String parentQuery = "select distinct(c) from "
                 + Container.class.getName()
                 + " as c left join c.containerType.childContainerTypeCollection "
                 + "as ct where c.site = ? and c.label in ('";
-
             for (String validParent : validParents) {
-                parentQuery = parentQuery + validParent + "','";
+                parentQuery += validParent + "','";
             }
             parentQuery = parentQuery.substring(0, parentQuery.length() - 2);
-            parentQuery = parentQuery + ") and ct=?";
-            HQLCriteria criteria = new HQLCriteria(parentQuery,
-                Arrays.asList(new Object[] { getSite().getWrappedObject(),
-                    getContainerType().getWrappedObject() }));
+            parentQuery += ")";
+            if (child != null && child instanceof ContainerWrapper) {
+                parentQuery += " and ct=?";
+                params.add(((ContainerWrapper) child).getContainerType()
+                    .getWrappedObject());
+            }
+            HQLCriteria criteria = new HQLCriteria(parentQuery, params);
             List<Container> containers = appService.query(criteria);
             for (Container c : containers) {
-                ContainerType ct = c.getContainerType();
+                ContainerTypeWrapper ct = new ContainerTypeWrapper(appService,
+                    c.getContainerType());
                 try {
-                    if (LabelingScheme.getRowColFromPositionString(childLabel
-                        .substring(c.getLabel().length()), ct
-                        .getChildLabelingScheme().getId(), ct.getCapacity()
-                        .getRowCapacity(), ct.getCapacity().getColCapacity()) != null)
+                    if (ct.getRowColFromPositionString(childLabel.substring(c
+                        .getLabel().length())) != null)
                         filteredWrappers
                             .add(new ContainerWrapper(appService, c));
                 } catch (Exception e) {
+                    // do nothing. The positionString doesn't fit the current
+                    // container.
                 }
             }
         }

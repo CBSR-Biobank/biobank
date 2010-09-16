@@ -48,6 +48,28 @@ public class TestLabelingScheme {
         CBSR_ALPHA = Collections.unmodifiableMap(aMap);
     };
 
+    private static final Map<Integer, String> SBS_ALPHA;
+    static {
+        Map<Integer, String> aMap = new HashMap<Integer, String>();
+        aMap.put(0, "A");
+        aMap.put(1, "B");
+        aMap.put(2, "C");
+        aMap.put(3, "D");
+        aMap.put(4, "E");
+        aMap.put(5, "F");
+        aMap.put(6, "G");
+        aMap.put(7, "H");
+        aMap.put(8, "I");
+        aMap.put(9, "J");
+        aMap.put(10, "K");
+        aMap.put(11, "L");
+        aMap.put(12, "M");
+        aMap.put(13, "N");
+        aMap.put(14, "O");
+        aMap.put(15, "P");
+        SBS_ALPHA = Collections.unmodifiableMap(aMap);
+    };
+
     @Before
     public void setUp() throws Exception {
         r = new Random();
@@ -163,7 +185,7 @@ public class TestLabelingScheme {
                     } else {
                         Assert.assertTrue(posString.length() == 2);
                     }
-                    Assert.assertEquals(CBSR_ALPHA.get(row).charAt(0),
+                    Assert.assertEquals(SBS_ALPHA.get(row).charAt(0),
                         posString.charAt(0));
                     Assert.assertEquals(col + 1,
                         Integer.valueOf(posString.substring(1)).intValue());
@@ -173,7 +195,7 @@ public class TestLabelingScheme {
             for (int col = 0; col < totalCols; ++col) {
                 for (int row = 0; row < totalRows; ++row) {
                     pos = LabelingScheme.sbsToRowCol(String.format("%s%02d",
-                        CBSR_ALPHA.get(row), col + 1));
+                        SBS_ALPHA.get(row), col + 1));
                     Assert.assertEquals(row, pos.row.intValue());
                     Assert.assertEquals(col, pos.col.intValue());
                 }

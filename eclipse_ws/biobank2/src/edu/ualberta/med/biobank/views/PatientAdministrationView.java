@@ -16,8 +16,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
 import edu.ualberta.med.biobank.treeview.PatientTodayNode;
-import edu.ualberta.med.biobank.treeview.PatientViewNodeSearchVisitor;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.StudyWithPatientAdapter;
 
 public class PatientAdministrationView extends
     AbstractTodaySearchAdministrationView {
@@ -46,16 +45,17 @@ public class PatientAdministrationView extends
     public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
         if (wrapper instanceof PatientWrapper) {
             PatientWrapper patient = (PatientWrapper) wrapper;
-            StudyAdapter studyAdapter = (StudyAdapter) parentNode
-                .accept(new PatientViewNodeSearchVisitor(patient.getStudy()));
+            StudyWithPatientAdapter studyAdapter = (StudyWithPatientAdapter) parentNode
+                .search(patient.getStudy());
             if (studyAdapter == null) {
-                studyAdapter = new StudyAdapter(parentNode, patient.getStudy());
+                studyAdapter = new StudyWithPatientAdapter(parentNode,
+                    patient.getStudy());
                 studyAdapter.setEditable(false);
                 studyAdapter.setLoadChildrenInBackground(false);
                 parentNode.addChild(studyAdapter);
             }
             PatientAdapter patientAdapter = (PatientAdapter) studyAdapter
-                .accept(new PatientViewNodeSearchVisitor(patient));
+                .search(patient);
             if (patientAdapter == null) {
                 patientAdapter = new PatientAdapter(studyAdapter, patient);
                 studyAdapter.addChild(patientAdapter);
@@ -63,12 +63,6 @@ public class PatientAdministrationView extends
             return patientAdapter;
         }
         return null;
-    }
-
-    @Override
-    protected PatientViewNodeSearchVisitor getVisitor(
-        ModelWrapper<?> searchedObject) {
-        return new PatientViewNodeSearchVisitor(searchedObject);
     }
 
     @Override
@@ -116,8 +110,4 @@ public class PatientAdministrationView extends
         return currentInstance;
     }
 
-    @Override
-    public AdapterBase searchNode(ModelWrapper<?> wrapper) {
-        return rootNode.accept(new PatientViewNodeSearchVisitor(wrapper));
-    }
 }

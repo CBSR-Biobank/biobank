@@ -55,4 +55,12 @@ public class PatientTodayNode extends AbstractTodayNode {
         return false;
     }
 
+    @Override
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof StudyWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
+        }
+        return searchChildren(searchedObject);
+    }
+
 }

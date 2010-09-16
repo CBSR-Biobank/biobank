@@ -75,8 +75,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Container Type: " + containerType.getName());
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
-            containerType.getName()));
+        form.setImage(BioBankPlugin.getDefault().getImage(containerTypeAdapter));
 
         createContainerTypeSection();
         boolean containsSamples = false;

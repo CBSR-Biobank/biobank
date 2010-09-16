@@ -5,9 +5,9 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentTodayNode extends AbstractTodayNode {
@@ -31,9 +31,8 @@ public class ShipmentTodayNode extends AbstractTodayNode {
     @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
-        return ClinicShipmentWrapper.getTodayShipments(
-            SessionManager.getAppService(), SessionManager.getInstance()
-                .getCurrentSite());
+        return ClinicShipmentWrapper.getTodayShipments(SessionManager
+            .getAppService(), SessionManager.getInstance().getCurrentSite());
 
     }
 
@@ -44,4 +43,5 @@ public class ShipmentTodayNode extends AbstractTodayNode {
         }
         return false;
     }
+
 }

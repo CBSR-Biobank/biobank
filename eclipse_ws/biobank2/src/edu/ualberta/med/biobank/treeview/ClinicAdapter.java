@@ -55,11 +55,6 @@ public class ClinicAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
-    }
-
-    @Override
     protected AdapterBase createChildNode() {
         return null;
     }

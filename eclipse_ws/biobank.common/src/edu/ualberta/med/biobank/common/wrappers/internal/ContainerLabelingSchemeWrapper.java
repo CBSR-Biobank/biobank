@@ -157,4 +157,69 @@ public class ContainerLabelingSchemeWrapper extends
         super.delete();
         allSchemes = null;
     }
+
+    /**
+     * Check labeling scheme limits for a given gridsize
+     **/
+    public static boolean checkBounds(WritableApplicationService appService,
+        Integer labelingScheme, int totalRows, int totalCols) {
+
+        if (totalRows <= 0 || totalCols <= 0) {
+            return false;
+        }
+
+        Map<Integer, ContainerLabelingSchemeWrapper> schemeWrappersMap;
+        try {
+            schemeWrappersMap = ContainerLabelingSchemeWrapper
+                .getAllLabelingSchemesMap(appService);
+        } catch (ApplicationException e) {
+            throw new RuntimeException(
+                "could not load container labeling schemes");
+        }
+
+        ContainerLabelingSchemeWrapper schemeWrapper = schemeWrappersMap
+            .get(labelingScheme);
+        if (schemeWrapper != null) {
+            return schemeWrapper.checkBounds(totalRows, totalCols);
+        }
+        return false;
+    }
+
+    /**
+     * Check labeling scheme limits for a given gridsize
+     **/
+    public boolean checkBounds(int totalRows, int totalCols) {
+        Integer maxRows = getMaxRows();
+        Integer maxCols = getMaxCols();
+        Integer maxCapacity = getMaxCapacity();
+
+        boolean isInBounds = true;
+
+        if (maxRows != null) {
+            isInBounds &= totalRows <= maxRows;
+        }
+
+        if (maxCols != null) {
+            isInBounds &= totalCols <= maxCols;
+        }
+
+        if (maxCapacity != null) {
+            isInBounds &= totalRows * totalCols <= maxCapacity;
+        }
+
+        return isInBounds;
+    }
+
+    public static List<Integer> getPossibleLabelLength(
+        WritableApplicationService appService) throws ApplicationException {
+        String query = "select min(minChars), max(maxChars) from "
+            + ContainerLabelingScheme.class.getName();
+        HQLCriteria rangeQuery = new HQLCriteria(query);
+        Object[] minMax = (Object[]) appService.query(rangeQuery).get(0);
+        List<Integer> validLengths = new ArrayList<Integer>();
+        for (int i = (Integer) minMax[0]; i < (Integer) minMax[1] + 1; i++) {
+            validLengths.add(i);
+        }
+        return validLengths;
+    }
 }

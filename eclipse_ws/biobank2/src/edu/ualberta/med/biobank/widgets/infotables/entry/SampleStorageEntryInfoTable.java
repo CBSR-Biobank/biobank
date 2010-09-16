@@ -81,16 +81,21 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
 
     public void addSampleStorage() {
         addOrEditSampleStorage(true,
-            new SampleStorageWrapper(SessionManager.getAppService()),
-            allSampleTypes);
+            new SampleStorageWrapper(SessionManager.getAppService()));
     }
 
     private void addOrEditSampleStorage(boolean add,
-        SampleStorageWrapper sampleStorage,
-        List<SampleTypeWrapper> availSampleTypes) {
+        SampleStorageWrapper sampleStorage) {
+        List<SampleTypeWrapper> availableSampleTypes = new ArrayList<SampleTypeWrapper>();
+        availableSampleTypes.addAll(allSampleTypes);
+        for (SampleStorageWrapper ssw : selectedSampleStorages) {
+            if (add || !ssw.equals(sampleStorage)) {
+                availableSampleTypes.remove(ssw.getSampleType());
+            }
+        }
         SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            sampleStorage, availSampleTypes);
+            sampleStorage, availableSampleTypes);
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
@@ -117,8 +122,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
                 public void editItem(InfoTableEvent event) {
                     SampleStorageWrapper sampleStorage = getSelection();
                     if (sampleStorage != null)
-                        addOrEditSampleStorage(false, sampleStorage,
-                            allSampleTypes);
+                        addOrEditSampleStorage(false, sampleStorage);
                 }
             });
         }

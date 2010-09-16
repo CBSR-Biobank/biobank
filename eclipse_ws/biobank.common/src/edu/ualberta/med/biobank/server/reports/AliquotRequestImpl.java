@@ -50,7 +50,7 @@ public class AliquotRequestImpl extends AbstractReport {
             // need to limit query size but not possible in hql
             List<Object> queried = appService.query(c);
 
-            Integer maxResults = request.getMaxAliquots();
+            long maxResults = request.getMaxAliquots();
             for (int j = 0; j < maxResults; j++) {
                 if (j < queried.size())
                     results.add(queried.get(j));
@@ -64,7 +64,7 @@ public class AliquotRequestImpl extends AbstractReport {
     }
 
     public static Object[] getNotFoundRow(String pnumber, Date dateDrawn,
-        String typeName, Integer maxResults, Integer numResultsFound) {
+        String typeName, long maxResults, Integer numResultsFound) {
         return new Object[] { pnumber, "",
             DateFormatter.formatAsDate(dateDrawn), typeName,
             "NOT FOUND (" + (maxResults - numResultsFound) + ")", "" };
