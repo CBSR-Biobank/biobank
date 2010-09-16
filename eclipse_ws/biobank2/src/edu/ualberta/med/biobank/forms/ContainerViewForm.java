@@ -16,8 +16,6 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
-import org.eclipse.swt.events.DragDetectEvent;
-import org.eclipse.swt.events.DragDetectListener;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -238,19 +236,6 @@ public class ContainerViewForm extends BiobankViewForm {
 
         // Set the minimum size
         sc.setMinSize(containerWidget.computeSize(SWT.DEFAULT, SWT.DEFAULT));
-
-        containerWidget.addDragDetectListener(new DragDetectListener() {
-
-            @Override
-            public void dragDetected(DragDetectEvent e) {
-                Cell cell = ((ContainerDisplayWidget) e.widget)
-                    .getObjectAtCoordinates(e.x, e.y);
-                containerWidget.setSelection(new RowColPos(cell.getRow(), cell
-                    .getCol()));
-
-            }
-
-        });
 
         containerWidget.addMouseListener(new MouseAdapter() {
             @Override
