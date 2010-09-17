@@ -17,13 +17,20 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 public class SampleTypeSUsageTest extends AbstractReportTest {
     private static final Comparator<SampleStorageWrapper> ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<SampleStorageWrapper>() {
         public int compare(SampleStorageWrapper lhs, SampleStorageWrapper rhs) {
-            return lhs.getSampleType().getNameShort()
-                .compareTo(rhs.getSampleType().getNameShort());
+            int cmp = compareStrings(lhs.getSampleType().getNameShort(), rhs
+                .getSampleType().getNameShort());
+
+            if (cmp != 0) {
+                return cmp;
+            }
+
+            return compareStrings(lhs.getStudy().getNameShort(), rhs.getStudy()
+                .getNameShort());
         }
     };
     private static final Comparator<SampleTypeWrapper> ORDER_ST_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<SampleTypeWrapper>() {
         public int compare(SampleTypeWrapper lhs, SampleTypeWrapper rhs) {
-            return lhs.getNameShort().compareTo(rhs.getNameShort());
+            return compareStrings(lhs.getNameShort(), rhs.getNameShort());
         }
     };
 

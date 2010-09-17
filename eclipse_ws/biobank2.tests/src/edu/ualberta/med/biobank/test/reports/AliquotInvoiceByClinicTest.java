@@ -30,14 +30,14 @@ public class AliquotInvoiceByClinicTest extends AbstractReportTest {
                 return cmp;
             }
 
-            cmp = lhs.getPatientVisit().getPatient().getPnumber()
-                .compareTo(rhs.getPatientVisit().getPatient().getPnumber());
+            cmp = compareStrings(lhs.getPatientVisit().getPatient()
+                .getPnumber(), rhs.getPatientVisit().getPatient().getPnumber());
 
             if (cmp != 0) {
                 return cmp;
             }
 
-            return lhs.getInventoryId().compareTo(rhs.getInventoryId());
+            return compareStrings(lhs.getInventoryId(), rhs.getInventoryId());
         }
 
     };

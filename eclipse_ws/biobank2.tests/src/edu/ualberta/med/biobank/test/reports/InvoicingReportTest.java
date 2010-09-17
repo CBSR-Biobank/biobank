@@ -49,7 +49,11 @@ public class InvoicingReportTest extends AbstractReportTest {
     };
     private static final Comparator<List<String>> ORDER_STUDY_CLINIC_SAMPLE = new Comparator<List<String>>() {
         public int compare(List<String> lhs, List<String> rhs) {
-            return CollectionsUtil.compareTo(lhs, rhs);
+            return CollectionsUtil.compare(lhs, rhs, new Comparator<String>() {
+                public int compare(String lhs, String rhs) {
+                    return compareStrings(lhs, rhs);
+                }
+            });
         }
     };
 
