@@ -92,7 +92,8 @@ public class ShipmentAdministrationView extends
         gd.exclude = true;
         dateComposite.setLayoutData(gd);
 
-        dateReceivedWidget = new DateTimeWidget(dateComposite, SWT.DATE, null);
+        dateReceivedWidget = new DateTimeWidget(dateComposite, SWT.DATE,
+            new Date());
         Button searchButton = new Button(dateComposite, SWT.PUSH);
         searchButton.setText("Go");
         searchButton.addSelectionListener(new SelectionAdapter() {

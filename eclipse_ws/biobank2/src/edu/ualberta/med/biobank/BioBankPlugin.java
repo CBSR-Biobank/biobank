@@ -23,8 +23,11 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
+import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
+import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
@@ -32,15 +35,12 @@ import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
-import edu.ualberta.med.biobank.treeview.PatientTodayNode;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.ReceivedDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.SentDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
-import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.SiteGroup;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
@@ -96,6 +96,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SCAN_LINK = "scanLink";
     public static final String IMG_SESSIONS = "sessions";
     public static final String IMG_CLINIC_SHIPMENT = "clinicShipment";
+    public static final String IMG_DISPATCH_SHIPMENT = "dispatchShipment";
     public static final String IMG_SITE = "site";
     public static final String IMG_SITES = "sites";
     public static final String IMG_STUDIES = "studies";
@@ -111,6 +112,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SCAN_CLOSE_EDIT = "scanCloseEdit";
     public static final String IMG_RECEIVED = "received";
     public static final String IMG_SENT = "sent";
+    public static final String IMG_ALIQUOT = "aliquot";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -141,13 +143,9 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_PATIENT_VISIT);
         classToImageKey.put(ClinicShipmentAdapter.class.getName(),
             BioBankPlugin.IMG_CLINIC_SHIPMENT);
-        classToImageKey.put(PatientSearchedNode.class.getName(),
+        classToImageKey.put(AbstractSearchedNode.class.getName(),
             BioBankPlugin.IMG_SEARCH);
-        classToImageKey.put(PatientTodayNode.class.getName(),
-            BioBankPlugin.IMG_TODAY);
-        classToImageKey.put(ShipmentSearchedNode.class.getName(),
-            BioBankPlugin.IMG_SEARCH);
-        classToImageKey.put(ShipmentTodayNode.class.getName(),
+        classToImageKey.put(AbstractTodayNode.class.getName(),
             BioBankPlugin.IMG_TODAY);
         classToImageKey.put(DateNode.class.getName(),
             BioBankPlugin.IMG_CALENDAR);
@@ -155,6 +153,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_SENT);
         classToImageKey.put(ReceivedDispatchShipmentGroup.class.getName(),
             BioBankPlugin.IMG_RECEIVED);
+        classToImageKey.put(DispatchShipmentAdapter.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT);
+        classToImageKey.put(AliquotAdapter.class.getName(),
+            BioBankPlugin.IMG_ALIQUOT);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
@@ -239,7 +241,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SCAN_EDIT, "scan_edit.png");
         registerImage(registry, IMG_SCAN_CLOSE_EDIT, "scan_close_edit.png");
         registerImage(registry, IMG_SESSIONS, "sessions.png");
-        registerImage(registry, IMG_CLINIC_SHIPMENT, "shipment.png");
+        registerImage(registry, IMG_CLINIC_SHIPMENT, "clinicShipment.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT, "dispatchShipment.png");
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_SITES, "sites.png");
         registerImage(registry, IMG_STUDIES, "studies.png");
@@ -250,6 +253,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_TODAY, "today.png");
         registerImage(registry, IMG_RECEIVED, "received.png");
         registerImage(registry, IMG_SENT, "sent.png");
+        registerImage(registry, IMG_ALIQUOT, "aliquot.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
@@ -482,26 +486,35 @@ public class BioBankPlugin extends AbstractUIPlugin {
         return true;
     }
 
-    public Image getImage(AdapterBase element) {
+    public Image getImage(Object object) {
         String imageKey = null;
-        Class<?> objectClass = element.getClass();
-        while (imageKey == null && !objectClass.equals(AdapterBase.class)) {
-            imageKey = classToImageKey.get(objectClass.getName());
-            objectClass = objectClass.getSuperclass();
-        }
-        if ((imageKey == null)
-            && ((element instanceof ContainerAdapter) || (element instanceof ContainerTypeAdapter))) {
-            String ctName;
-            if (element instanceof ContainerAdapter) {
-                ContainerWrapper container = ((ContainerAdapter) element)
-                    .getContainer();
-                if (container == null || container.getContainerType() == null)
-                    return null;
-                ctName = container.getContainerType().getName();
-            } else {
-                ctName = ((ContainerTypeAdapter) element).getLabel();
+        if (object == null)
+            return null;
+        if (object instanceof AdapterBase) {
+            Class<?> objectClass = object.getClass();
+            while (imageKey == null && !objectClass.equals(AdapterBase.class)) {
+                imageKey = classToImageKey.get(objectClass.getName());
+                objectClass = objectClass.getSuperclass();
             }
-            return getIconForTypeName(ctName);
+            if ((imageKey == null)
+                && ((object instanceof ContainerAdapter) || (object instanceof ContainerTypeAdapter))) {
+                String ctName;
+                if (object instanceof ContainerAdapter) {
+                    ContainerWrapper container = ((ContainerAdapter) object)
+                        .getContainer();
+                    if (container == null
+                        || container.getContainerType() == null)
+                        return null;
+                    ctName = container.getContainerType().getName();
+                } else {
+                    ctName = ((ContainerTypeAdapter) object).getLabel();
+                }
+                return getIconForTypeName(ctName);
+            }
+        } else {
+            if (object instanceof String) {
+                imageKey = (String) object;
+            }
         }
         return BioBankPlugin.getDefault().getImageRegistry().get(imageKey);
     }

@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -80,8 +79,6 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
             + " from " + shipment.getSender().getNameShort());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_CLINIC_SHIPMENT));
 
         createMainSection();
         createAliquotsNotReceivedSection();
@@ -106,7 +103,7 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
         Composite parent = createSectionWithClient("Aliquots not yet "
             + "received");
         aliquotsToBeReceivedTable = new DispatchAliquotListInfoTable(parent,
-            shipment.getNotReceivedAliquots());
+            shipment.getNotReceivedAliquots(), false);
         aliquotsToBeReceivedTable.adaptToToolkit(toolkit, true);
         aliquotsToBeReceivedTable
             .addDoubleClickListener(collectionDoubleClickListener);
@@ -115,7 +112,7 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
     private void createAliquotsReceivedSection() {
         Composite parent = createSectionWithClient("Aliquots received");
         aliquotsReceivedTable = new DispatchAliquotListInfoTable(parent,
-            shipment.getReceivedAliquots());
+            shipment.getReceivedAliquots(), false);
         aliquotsReceivedTable.adaptToToolkit(toolkit, true);
         aliquotsReceivedTable
             .addDoubleClickListener(collectionDoubleClickListener);

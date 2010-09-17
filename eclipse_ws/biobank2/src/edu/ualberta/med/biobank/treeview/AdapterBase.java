@@ -625,7 +625,7 @@ public abstract class AdapterBase {
     public abstract String getEntryFormId();
 
     public AdapterBase search(Object searchedObject) {
-        if (modelObject.equals(searchedObject))
+        if (modelObject != null && modelObject.equals(searchedObject))
             return this;
         return null;
     }

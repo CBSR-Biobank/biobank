@@ -11,7 +11,7 @@ public class NodeLabelProvider implements ILabelProvider {
     @Override
     public Image getImage(Object element) {
         if (element instanceof AdapterBase) {
-            return BioBankPlugin.getDefault().getImage((AdapterBase) element);
+            return BioBankPlugin.getDefault().getImage(element);
         }
         return null;
     }

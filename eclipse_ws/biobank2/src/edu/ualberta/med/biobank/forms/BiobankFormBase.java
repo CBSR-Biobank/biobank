@@ -218,6 +218,7 @@ public abstract class BiobankFormBase extends EditorPart {
             @Override
             public void run() {
                 try {
+                    form.setImage(BioBankPlugin.getDefault().getImage(adapter));
                     createFormContent();
                     form.reflow(true);
                 } catch (final RemoteConnectFailureException exp) {
