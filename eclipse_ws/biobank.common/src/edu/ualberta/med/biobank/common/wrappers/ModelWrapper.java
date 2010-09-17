@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.common.wrappers;
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
+import edu.ualberta.med.biobank.common.security.Role;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
@@ -28,8 +30,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected WritableApplicationService appService;
@@ -40,9 +40,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         this);
 
     protected HashMap<String, Object> propertiesMap = new HashMap<String, Object>();
-
-    private static Logger LOGGER = Logger.getLogger(ModelWrapper.class
-        .getName());
 
     private List<WrapperListener> listeners = new ArrayList<WrapperListener>();
 
@@ -478,29 +475,15 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canView() {
-        try {
-            return ((BiobankApplicationService) appService)
-                .canReadObjects(getWrappedClass());
-        } catch (ApplicationException e) {
-            LOGGER.error("Error testing security authorization on "
-                + getWrappedClass(), e);
-            return false;
-        }
+    public boolean canView(User user) {
+        return user.hasRoleOnObject(Role.READ, getWrappedClass().getName());
     }
 
     /**
      * return true if the user can edit this object
      */
-    public boolean canEdit() {
-        try {
-            return ((BiobankApplicationService) appService)
-                .canUpdateObjects(getWrappedClass());
-        } catch (ApplicationException e) {
-            LOGGER.error("Error testing security authorization on "
-                + getWrappedClass(), e);
-            return false;
-        }
+    public boolean canEdit(User user) {
+        return user.hasRoleOnObject(Role.UPDATE, getWrappedClass().getName());
     }
 
     public void addWrapperListener(WrapperListener listener) {

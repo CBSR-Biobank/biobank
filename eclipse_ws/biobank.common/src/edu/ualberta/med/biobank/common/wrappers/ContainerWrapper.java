@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.security.SecurityHelper;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -1058,9 +1058,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    public boolean canEdit() {
-        return super.canEdit()
-            && SecurityHelper.isContainerAdministrator(appService);
+    public boolean canEdit(User user) {
+        return super.canEdit(user) && user.isContainerAdministrator();
     }
 
     /**

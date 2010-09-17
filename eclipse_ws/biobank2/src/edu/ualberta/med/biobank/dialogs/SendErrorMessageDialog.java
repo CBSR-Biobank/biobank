@@ -262,7 +262,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     if (SessionManager.getInstance().isConnected()) {
                         text += "\n\n------\nCreated by user "
                             + SessionManager.getInstance().getSession()
-                                .getUserName();
+                                .getUser().getLogin();
                     }
                     mbp1.setText(text);
                     mp.addBodyPart(mbp1);

@@ -123,8 +123,8 @@ public class SessionAdapter extends AdapterBase {
         });
     }
 
-    public String getUserName() {
-        return user.getLogin();
+    public User getUser() {
+        return user;
     }
 
     public String getServerName() {

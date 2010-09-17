@@ -10,7 +10,6 @@ import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authorization.domainobjects.Group;
-import gov.nih.nci.security.authorization.domainobjects.Privilege;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionGroup;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionGroupRoleContext;
@@ -18,6 +17,7 @@ import gov.nih.nci.security.authorization.domainobjects.Role;
 import gov.nih.nci.security.authorization.domainobjects.User;
 import gov.nih.nci.security.dao.GroupSearchCriteria;
 import gov.nih.nci.security.exceptions.CSException;
+import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.query.SDKQuery;
@@ -25,9 +25,11 @@ import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.ExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,60 +60,12 @@ public class BiobankApplicationServiceImpl extends
 
     private static final String SITE_ADMIN_PG_ID = "11";
 
-    private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
-
     private static final String GROUP_WEBSITE_ADMINISTRATOR = "Website Administrator";
-
-    private static final String CREATE_PRIVILEGE = "CREATE";
-
-    private static final String DELETE_PRIVILEGE = "DELETE";
-
-    private static final String UPDATE_PRIVILEGE = "UPDATE";
-
-    private static final String READ_PRIVILEGE = "READ";
 
     private Map<String, Map<String, Boolean>> cachedPrivilegesMap = new HashMap<String, Map<String, Boolean>>();
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
-    }
-
-    @Override
-    public boolean canReadObjects(Class<?> clazz) throws ApplicationException {
-        return hasPrivilege(clazz, null, READ_PRIVILEGE);
-    }
-
-    @Override
-    public boolean canReadObject(Class<?> clazz, Integer id)
-        throws ApplicationException {
-        return hasPrivilege(clazz, id, READ_PRIVILEGE);
-    }
-
-    @Override
-    public boolean canCreateObjects(Class<?> clazz) throws ApplicationException {
-        return hasPrivilege(clazz, null, CREATE_PRIVILEGE);
-    }
-
-    @Override
-    public boolean canDeleteObjects(Class<?> clazz) throws ApplicationException {
-        return hasPrivilege(clazz, null, DELETE_PRIVILEGE);
-    }
-
-    @Override
-    public boolean canDeleteObject(Class<?> clazz, Integer id)
-        throws ApplicationException {
-        return hasPrivilege(clazz, id, DELETE_PRIVILEGE);
-    }
-
-    @Override
-    public boolean canUpdateObjects(Class<?> clazz) throws ApplicationException {
-        return hasPrivilege(clazz, null, UPDATE_PRIVILEGE);
-    }
-
-    @Override
-    public boolean canUpdateObject(Class<?> clazz, Integer id)
-        throws ApplicationException {
-        return hasPrivilege(clazz, id, UPDATE_PRIVILEGE);
     }
 
     @Override
@@ -143,26 +97,10 @@ public class BiobankApplicationServiceImpl extends
         }
         Boolean res = objectsMap.get(objectId);
         if (res == null) {
-            System.out.println("call database for " + userLogin + "/"
-                + objectId + "/" + privilegeName);
             res = am.checkPermission(userLogin, objectId, privilegeName);
         }
         objectsMap.put(objectId, res);
         return res;
-    }
-
-    @Override
-    public boolean isContainerAdministrator() throws ApplicationException {
-        try {
-            String userLogin = SecurityContextHolder.getContext()
-                .getAuthentication().getName();
-            AuthorizationManager am = SecurityServiceProvider
-                .getAuthorizationManager(APPLICATION_CONTEXT_NAME);
-            return am.checkPermission(userLogin,
-                CONTAINER_ADMINISTRATION_STRING, "CREATE");
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
     }
 
     @Override
@@ -336,11 +274,12 @@ public class BiobankApplicationServiceImpl extends
         throws ApplicationException {
         if (isWebsiteAdministrator()) {
             try {
+                UserProvisioningManager upm = SecurityServiceProvider
+                    .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
                 List<edu.ualberta.med.biobank.common.security.Group> list = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
-                for (Object object : getCSMGroups()) {
-                    Group group = (Group) object;
-                    list.add(new edu.ualberta.med.biobank.common.security.Group(
-                        group.getGroupId(), group.getGroupName()));
+                for (Object object : upm.getObjects(new GroupSearchCriteria(
+                    new Group()))) {
+                    list.add(createGroup(upm, (Group) object));
                 }
                 return list;
             } catch (Exception ex) {
@@ -353,13 +292,29 @@ public class BiobankApplicationServiceImpl extends
         }
     }
 
-    /**
-     * Retrieve only groups for application biobank2
-     */
-    private List<?> getCSMGroups() throws Exception {
-        UserProvisioningManager upm = SecurityServiceProvider
-            .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
-        return upm.getObjects(new GroupSearchCriteria(new Group()));
+    private edu.ualberta.med.biobank.common.security.Group createGroup(
+        UserProvisioningManager upm, Group group)
+        throws CSObjectNotFoundException, ApplicationException {
+        edu.ualberta.med.biobank.common.security.Group biobankGroup = new edu.ualberta.med.biobank.common.security.Group(
+            group.getGroupId(), group.getGroupName());
+        Set<?> pgrcList = upm.getProtectionGroupRoleContextForGroup(group
+            .getGroupId().toString());
+        for (Object o : pgrcList) {
+            ProtectionGroupRoleContext pgrc = (ProtectionGroupRoleContext) o;
+            ProtectionGroup pg = pgrc.getProtectionGroup();
+            Set<edu.ualberta.med.biobank.common.security.Role> roles = new HashSet<edu.ualberta.med.biobank.common.security.Role>();
+            for (Object r : pgrc.getRoles()) {
+                Role csmRole = (Role) r;
+                roles.addAll(edu.ualberta.med.biobank.common.security.Role
+                    .getRoles(csmRole.getName()));
+            }
+            List<ProtectionElement> peList = getAllProtectionElementForGroup(pg);
+            for (ProtectionElement pe : peList) {
+                biobankGroup.addProtectionElementRole(
+                    pe.getProtectionElementName(), roles, pe.getValue());
+            }
+        }
+        return biobankGroup;
     }
 
     @Override
@@ -371,37 +326,15 @@ public class BiobankApplicationServiceImpl extends
                     .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
 
                 List<edu.ualberta.med.biobank.common.security.User> list = new ArrayList<edu.ualberta.med.biobank.common.security.User>();
-                for (Object object : getCSMGroups()) {
+                for (Object object : upm.getObjects(new GroupSearchCriteria(
+                    new Group()))) {
                     Group serverGroup = (Group) object;
                     for (Object userObj : upm.getUsers(serverGroup.getGroupId()
                         .toString())) {
-                        User serverUser = (User) userObj;
-                        edu.ualberta.med.biobank.common.security.User userDTO = new edu.ualberta.med.biobank.common.security.User();
-                        userDTO.setLogin(serverUser.getLoginName());
-                        userDTO.setFirstName(serverUser.getFirstName());
-                        userDTO.setLastName(serverUser.getLastName());
-                        String password = serverUser.getPassword();
-                        if (password != null) {
-                            userDTO.setPassword("******");
-                        }
-                        userDTO.setEmail(serverUser.getEmailId());
-                        List<edu.ualberta.med.biobank.common.security.Group> groups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
-                        for (Object o : upm.getGroups(serverUser.getUserId()
-                            .toString())) {
-                            Group userGroup = (Group) o;
-                            groups
-                                .add(new edu.ualberta.med.biobank.common.security.Group(
-                                    userGroup.getGroupId(), userGroup
-                                        .getGroupName()));
-                        }
-                        userDTO.setGroups(groups);
-                        list.add(userDTO);
+                        list.add(createUser(upm, (User) userObj, true));
                     }
                 }
                 return list;
-            } catch (ApplicationException ae) {
-                log.error("Error retrieving security users", ae);
-                throw ae;
             } catch (Exception ex) {
                 log.error("Error retrieving security users", ex);
                 throw new ApplicationException(ex);
@@ -517,31 +450,61 @@ public class BiobankApplicationServiceImpl extends
         }
     }
 
+    private List<ProtectionElement> getAllProtectionElementForGroup(
+        ProtectionGroup pg) throws ApplicationException {
+        List<ProtectionElement> list = query(new HQLCriteria(
+            "select pe from "
+                + ProtectionElement.class.getName()
+                + " as pe inner join pe.protectionGroups as groups"
+                + " left join groups.parentProtectionGroup as parent"
+                + " where (groups.protectionGroupId = ? or parent.protectionGroupId = ?)",
+            Arrays.asList(pg.getProtectionGroupId(), pg.getProtectionGroupId())));
+        return list;
+    }
+
     @Override
-    public void testSecurity() throws ApplicationException {
+    public edu.ualberta.med.biobank.common.security.User getCurrentUser()
+        throws ApplicationException {
         try {
-            System.out.println("testSecurity");
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
-            Set<?> pgrcList = upm.getProtectionGroupRoleContextForGroup("7");
-            for (Object o : pgrcList) {
-                ProtectionGroupRoleContext pgrc = (ProtectionGroupRoleContext) o;
-                ProtectionGroup pg = pgrc.getProtectionGroup();
-                System.out.println(pg.getProtectionGroupName());
-                for (Object r : pgrc.getRoles()) {
-                    Role role = (Role) r;
-                    System.out.print("  " + role.getName() + ": ");
 
-                    for (Object p : role.getPrivileges()) {
-                        Privilege privilege = (Privilege) p;
-                        System.out.println(privilege.getName() + " ");
-                    }
-                    System.out.println();
-                }
-            }
+            Authentication authentication = SecurityContextHolder.getContext()
+                .getAuthentication();
+            String userLogin = authentication.getName();
+            User serverUser = upm.getUser(userLogin);
+            if (serverUser == null)
+                throw new ApplicationException("Problem with user retrieval");
+            return createUser(upm, serverUser, false);
+        } catch (ApplicationException ae) {
+            log.error("Error modifying password", ae);
+            throw ae;
         } catch (Exception ex) {
-            log.error("Error testSecurity", ex);
+            log.error("Error modifying password", ex);
             throw new ApplicationException(ex);
         }
     }
+
+    private edu.ualberta.med.biobank.common.security.User createUser(
+        UserProvisioningManager upm, User serverUser, boolean setPassword)
+        throws CSObjectNotFoundException, ApplicationException {
+        edu.ualberta.med.biobank.common.security.User userDTO = new edu.ualberta.med.biobank.common.security.User();
+        userDTO.setLogin(serverUser.getLoginName());
+        userDTO.setFirstName(serverUser.getFirstName());
+        userDTO.setLastName(serverUser.getLastName());
+        if (setPassword) {
+            String password = serverUser.getPassword();
+            if (password != null) {
+                userDTO.setPassword("******");
+            }
+        }
+        userDTO.setEmail(serverUser.getEmailId());
+        List<edu.ualberta.med.biobank.common.security.Group> groups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
+        for (Object o : upm.getGroups(serverUser.getUserId().toString())) {
+            groups.add(createGroup(upm, (Group) o));
+        }
+        userDTO.setGroups(groups);
+        return userDTO;
+    }
+
 }

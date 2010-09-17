@@ -1,12 +1,20 @@
 package edu.ualberta.med.biobank.common.security;
 
 import java.io.Serializable;
+import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.List;
 
-public class User implements Serializable {
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
+public class User implements Serializable, BiobankSecurity {
 
     private static final long serialVersionUID = 1L;
+
+    private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
+
+    private static final String GROUP_WEBSITE_ADMINISTRATOR = "Website Administrator";
 
     private String login;
     private String firstName;
@@ -78,6 +86,58 @@ public class User implements Serializable {
     public String toString() {
         return getLogin() + "/" + getFirstName() + "/" + getLastName() + "/"
             + getPassword() + "/" + getEmail();
+    }
+
+    public boolean hasRoleOnObject(Role role, Class<?> clazz) {
+        return hasRoleOnObject(role, clazz, null);
+    }
+
+    public boolean hasRoleOnObject(Role role, Class<?> clazz, String objectId) {
+        String objectName;
+        if (ModelWrapper.class.isAssignableFrom(clazz)) {
+            ModelWrapper<?> wrapper = null;
+            try {
+                Constructor<?> constructor = clazz
+                    .getConstructor(WritableApplicationService.class);
+                wrapper = (ModelWrapper<?>) constructor
+                    .newInstance((WritableApplicationService) null);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+                return false;
+            }
+            objectName = wrapper.getWrappedClass().getName();
+        } else {
+            objectName = clazz.getName();
+        }
+        return hasRoleOnObject(role, objectName, objectId);
+    }
+
+    public boolean hasRoleOnObject(Role role, String objectName) {
+        return hasRoleOnObject(role, objectName, null);
+    }
+
+    private boolean hasRoleOnObject(Role role, String objectName,
+        String objectId) {
+        for (Group group : groups) {
+            if (group.hasRoleOnObject(role, objectName, objectId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isContainerAdministrator() {
+        return hasRoleOnObject(Role.CREATE, CONTAINER_ADMINISTRATION_STRING);
+    }
+
+    public boolean isWebsiteAdministrator() {
+        for (Group group : groups) {
+            if (group.getName().equals(GROUP_WEBSITE_ADMINISTRATOR)) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }

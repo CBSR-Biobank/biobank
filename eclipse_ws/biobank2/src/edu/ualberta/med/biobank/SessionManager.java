@@ -13,7 +13,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.security.SecurityHelper;
+import edu.ualberta.med.biobank.common.security.Role;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -268,8 +268,8 @@ public class SessionManager {
         }
     }
 
-    public static String getUser() {
-        return getInstance().getSession().getUserName();
+    public static User getUser() {
+        return getInstance().getSession().getUser();
     }
 
     public static String getServer() {
@@ -277,19 +277,19 @@ public class SessionManager {
     }
 
     public static boolean canCreate(Class<?> clazz) {
-        return SecurityHelper.canCreate(getAppService(), clazz);
+        return getUser().hasRoleOnObject(Role.CREATE, clazz);
     }
 
     public static boolean canDelete(Class<?> clazz) {
-        return SecurityHelper.canCreate(getAppService(), clazz);
+        return getUser().hasRoleOnObject(Role.DELETE, clazz);
     }
 
     public static boolean canView(Class<?> clazz) {
-        return SecurityHelper.canView(getAppService(), clazz);
+        return getUser().hasRoleOnObject(Role.READ, clazz);
     }
 
     public static boolean canUpdate(Class<?> clazz) {
-        return SecurityHelper.canUpdate(getAppService(), clazz);
+        return getUser().hasRoleOnObject(Role.UPDATE, clazz);
     }
 
     public boolean isConnected() {

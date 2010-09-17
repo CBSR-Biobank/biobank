@@ -60,11 +60,10 @@ public class DebugUtil {
     public static List<AliquotWrapper> getRandomAliquotsNotAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Aliquot.class.getName()
-            + " as s where s not in (select sp.aliquot from "
-            + AliquotPosition.class.getName()
-            + " as sp) and s.patientVisit.shipment.site.id = ?",
+        HQLCriteria criteria = new HQLCriteria(
+            "select a from "
+                + Aliquot.class.getName()
+                + " as a left join a.aliquotPosition as ap where ap is null and a.patientVisit.shipment.site.id = ?",
             Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();

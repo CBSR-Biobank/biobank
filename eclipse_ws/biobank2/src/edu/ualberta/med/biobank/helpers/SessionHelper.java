@@ -63,8 +63,7 @@ public class SessionHelper implements Runnable {
                     userName, password);
             }
             siteWrappers = SiteWrapper.getSites(appService);
-            user = new User();
-            user.setLogin(userName);
+            user = appService.getCurrentUser();
         } catch (ApplicationException exp) {
             logger.error("Error while logging to application", exp);
             if (exp.getCause() != null

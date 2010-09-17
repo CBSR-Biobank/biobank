@@ -45,7 +45,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public ContainerTypeWrapper(WritableApplicationService appService) {
         super(appService);
-        if (labelingSchemeMap == null) {
+        if (labelingSchemeMap == null && appService != null) {
             getAllLabelingSchemesMap(appService);
         }
     }
