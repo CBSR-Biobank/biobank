@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -29,6 +31,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -75,6 +79,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
     protected boolean reloadData = false;
 
     private int size;
+
+    private boolean autoSizeColumns;
 
     public AbstractInfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage,
@@ -137,6 +143,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
+
+        autoSizeColumns = columnWidths == null ? true : false;
 
         addClipboardCopySupport();
     }
@@ -243,14 +251,69 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         } else if (paginationWidget != null)
             paginationWidget.setVisible(false);
 
+        final Display display = getTableViewer().getTable().getDisplay();
         backgroundThread = new Thread() {
             @Override
             public void run() {
                 tableLoader(collection, selection);
+                if (autoSizeColumns) {
+                    display.syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            autoSizeColumns();
+                        }
+                    });
+                }
             }
         };
         backgroundThread.start();
+
         layout(true, true);
+    }
+
+    private void autoSizeColumns() {
+        // TODO: auto-size table initially based on headers? Sort of already
+        // done with .pack().
+        Table table = tableViewer.getTable();
+        if (table.isDisposed()) {
+            return;
+        }
+
+        final int[] maxCellContentsWidths = new int[table.getColumnCount()];
+        Text textRenderer = new Text(menu.getShell(), SWT.NONE);
+        Arrays.fill(maxCellContentsWidths, 0);
+
+        for (TableItem row : table.getItems()) {
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                String rowText = row.getText(i);
+                Image rowImage = row.getImage(i);
+                int cellContentsWidth = 0;
+
+                if (rowText != null) {
+                    textRenderer.setText(rowText);
+                    cellContentsWidth = textRenderer.computeSize(SWT.DEFAULT,
+                        SWT.DEFAULT).x;
+                } else if (rowImage != null) {
+                    cellContentsWidth = rowImage.getImageData().width;
+                }
+
+                maxCellContentsWidths[i] = Math.max(cellContentsWidth,
+                    maxCellContentsWidths[i]);
+            }
+        }
+
+        int sumOfMaxTextWidths = 0;
+        for (int width : maxCellContentsWidths) {
+            sumOfMaxTextWidths += width;
+        }
+
+        int tableWidth = tableViewer.getTable().getSize().x;
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            int width = (int) ((double) maxCellContentsWidths[i]
+                / sumOfMaxTextWidths * tableWidth);
+            table.getColumn(i).setWidth(width);
+        }
     }
 
     protected abstract void init(List<T> collection);
