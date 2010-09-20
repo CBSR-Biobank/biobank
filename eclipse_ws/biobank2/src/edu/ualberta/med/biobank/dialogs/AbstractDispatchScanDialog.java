@@ -208,14 +208,15 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         Button nextButton = getButton(IDialogConstants.NEXT_ID);
         if (finishButton != null && !finishButton.isDisposed()) {
             finishButton.setEnabled(enabled);
-            if (canActivateProceedButton()) {
-                proceedButton.setEnabled(false);
-                nextButton.setEnabled(enabled);
-            }
-            if (canActivateNextButton()) {
+            if (canActivateProceedButton())
                 proceedButton.setEnabled(enabled);
+            else
+                proceedButton.setEnabled(false);
+            if (canActivateNextButton())
+                nextButton.setEnabled(enabled);
+            else
                 nextButton.setEnabled(false);
-            }
+
         } else {
             okButtonEnabled = enabled;
         }
@@ -251,7 +252,11 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         if (IDialogConstants.CANCEL_ID == buttonId)
             super.buttonPressed(buttonId);
         else if (IDialogConstants.PROCEED_ID == buttonId) {
-            doProceed();
+            try {
+                doProceed();
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Error", e);
+            }
         } else if (IDialogConstants.FINISH_ID == buttonId) {
             setReturnCode(OK);
             close();
@@ -260,5 +265,5 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         }
     }
 
-    protected abstract void doProceed();
+    protected abstract void doProceed() throws Exception;
 }

@@ -13,6 +13,8 @@ import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.Transfer;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -22,11 +24,13 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.dialogs.FilteredTree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterTreeDragDropListener;
+import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.TreeFilter;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
 
@@ -112,6 +116,15 @@ public class AdapterTreeWidget extends Composite {
                 // .getStatusLineManager().setMessage(node.getName());
                 // }
                 // }
+            }
+        });
+        treeViewer.getTree().addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDown(MouseEvent e) {
+                AbstractViewWithAdapterTree view = SessionManager
+                    .getCurrentAdapterViewWithTree();
+                view.setFocus();
+                treeViewer.getTree().setFocus();
             }
         });
 

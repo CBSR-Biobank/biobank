@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm;
@@ -45,11 +46,6 @@ public class DispatchShipmentAdapter extends AdapterBase {
         label += shipment.getFormattedDateShipped();
         return label;
 
-    }
-
-    @Override
-    protected void executeDoubleClick() {
-        openViewForm();
     }
 
     @Override
@@ -108,12 +104,11 @@ public class DispatchShipmentAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return DispatchShipmentSendingEntryForm.ID;
-    }
-
-    @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return null;
+        SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
+        if (currentSite.equals(((DispatchShipmentWrapper) modelObject)
+            .getSender()))
+            return DispatchShipmentSendingEntryForm.ID;
+        return DispatchShipmentReceivingEntryForm.ID;
     }
 
 }

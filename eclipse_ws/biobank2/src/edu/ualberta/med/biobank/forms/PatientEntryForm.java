@@ -75,8 +75,6 @@ public class PatientEntryForm extends BiobankEntryForm {
         form.setText("Patient Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_PATIENT));
 
         createPatientSection();
 

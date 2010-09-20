@@ -7,6 +7,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 
@@ -39,8 +40,11 @@ public class SampleTypeAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof AliquotWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
+        }
+        return searchChildren(searchedObject);
     }
 
     @Override

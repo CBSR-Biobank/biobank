@@ -4,13 +4,13 @@ import java.util.Date;
 
 import org.eclipse.core.runtime.Assert;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
-public class ShipmentSearchedNode extends AbstractSearchedNode {
+public class DispatchShipmentSearchedNode extends AbstractSearchedNode {
 
-    public ShipmentSearchedNode(AdapterBase parent, int id) {
+    public DispatchShipmentSearchedNode(AdapterBase parent, int id) {
         super(parent, id);
     }
 
@@ -27,8 +27,8 @@ public class ShipmentSearchedNode extends AbstractSearchedNode {
 
     @Override
     protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
-        if (child instanceof ClinicShipmentWrapper) {
-            return parent.equals(((ClinicShipmentWrapper) child).getClinic());
+        if (child instanceof DispatchShipmentWrapper) {
+            return parent.equals(((DispatchShipmentWrapper) child).getSender());
         }
         return false;
     }
@@ -38,9 +38,10 @@ public class ShipmentSearchedNode extends AbstractSearchedNode {
         if (searchedObject instanceof Date) {
             Date date = (Date) searchedObject;
             return getChild((int) date.getTime());
-        } else if (searchedObject instanceof ClinicWrapper) {
+        } else if (searchedObject instanceof DispatchShipmentWrapper) {
             return getChild((ModelWrapper<?>) searchedObject, true);
         }
         return searchChildren(searchedObject);
     }
+
 }

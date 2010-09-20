@@ -13,7 +13,6 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -111,8 +110,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_SITE));
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Name", null,
@@ -179,8 +176,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
-        System.out.println(site.getDispatchStudies() == null ? "0" : site
-            .getDispatchStudies().size());
         site.setActivityStatus((ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
             .getSelection()).getFirstElement());
         site.persist();

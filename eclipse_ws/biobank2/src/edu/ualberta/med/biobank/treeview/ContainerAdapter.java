@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -126,7 +127,7 @@ public class ContainerAdapter extends AdapterBase {
                             IProgressMonitor.UNKNOWN);
                         try {
                             getContainer().moveAliquots(newContainer);
-                            newContainer.persist();
+                            // newContainer.persist();
                             newContainer.reload();
                         } catch (Exception e) {
                             BioBankPlugin.openAsyncError("Move problem", e);
@@ -199,13 +200,11 @@ public class ContainerAdapter extends AdapterBase {
         throws Exception {
         final ContainerWrapper container = getContainer();
         final String oldLabel = container.getLabel();
-        String newParentContainerLabel = newLabel.substring(0,
-            newLabel.length() - 2);
         List<ContainerWrapper> newParentContainers = container
-            .getPossibleParents(newParentContainerLabel);
+            .getPossibleParents(newLabel);
         if (newParentContainers.size() == 0) {
             BioBankPlugin.openError("Move Error",
-                "A parent container with label \"" + newParentContainerLabel
+                "A parent container with child \"" + newLabel
                     + "\" does not exist.");
             return false;
         }
@@ -231,7 +230,8 @@ public class ContainerAdapter extends AdapterBase {
             return false;
         }
 
-        newParent.addChild(newLabel, container);
+        newParent.addChild(newLabel.substring(newParent.getLabel().length()),
+            container);
 
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
@@ -255,8 +255,43 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof ContainerWrapper) {
+            ContainerWrapper containerWrapper = (ContainerWrapper) searchedObject;
+            List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
+            ContainerWrapper currentContainer = containerWrapper;
+            while (currentContainer.hasParent()) {
+                currentContainer = currentContainer.getParent();
+                parents.add(currentContainer);
+            }
+            return acceptChildContainers(searchedObject, this, parents);
+        }
+        return null;
+    }
+
+    private AdapterBase acceptChildContainers(Object searchedObject,
+        ContainerAdapter container, final List<ContainerWrapper> parents) {
+        if (parents.contains(container.getContainer())) {
+            AdapterBase child = container.getChild(
+                (ModelWrapper<?>) searchedObject, true);
+            if (child == null) {
+                for (AdapterBase childContainer : container.getChildren()) {
+                    AdapterBase foundChild;
+                    if (childContainer instanceof ContainerAdapter) {
+                        foundChild = acceptChildContainers(searchedObject,
+                            (ContainerAdapter) childContainer, parents);
+                    } else {
+                        foundChild = childContainer.search(searchedObject);
+                    }
+                    if (foundChild != null) {
+                        return foundChild;
+                    }
+                }
+            } else {
+                return child;
+            }
+        }
+        return null;
     }
 
     @Override

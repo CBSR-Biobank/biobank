@@ -204,6 +204,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         super.createPartControl(parent);
         addToolbarButtons();
         bindChangeListener();
+        setDirty(false);
     }
 
     abstract protected void saveForm() throws Exception;
@@ -434,7 +435,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             .closeEditor(this, saveOnClose);
         if (openView && getNextOpenedFormID() != null) {
             AdapterBase.openForm(new FormInput(getAdapter()),
-                getNextOpenedFormID(), false);
+                getNextOpenedFormID(), true);
 
             int previousFormIndex = entryIndex - 1;
             if (previousFormIndex >= 0

@@ -40,8 +40,11 @@ public abstract class AbstractStudyGroup extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof StudyWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
+        }
+        return searchChildren(searchedObject);
     }
 
     @Override

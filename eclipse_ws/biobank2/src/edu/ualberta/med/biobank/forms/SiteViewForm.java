@@ -75,8 +75,6 @@ public class SiteViewForm extends AddressViewFormCommon {
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_SITE));
 
         createSiteSection();
         createAddressSection(site);

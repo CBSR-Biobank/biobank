@@ -121,6 +121,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     @Override
     protected Image getTitleAreaImage() {
+        // FIXME should use another icon
         return BioBankPlugin.getDefault().getImageRegistry()
             .get(BioBankPlugin.IMG_COMPUTER_KEY);
     }

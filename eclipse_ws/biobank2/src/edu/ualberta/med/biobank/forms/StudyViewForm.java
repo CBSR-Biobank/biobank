@@ -14,7 +14,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -73,8 +72,6 @@ public class StudyViewForm extends BiobankViewForm {
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_STUDY));
 
         Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));

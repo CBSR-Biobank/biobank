@@ -7,7 +7,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -64,8 +63,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_CLINIC));
         createClinicSection();
         createAddressSection(clinic);
         createContactsSection();

@@ -31,6 +31,7 @@ eclipse_ws/biobank2/lib/*.jar
 eclipse_ws/biobank2/log
 eclipse_ws/biobank2/scanlib.*
 eclipse_ws/biobank2/src/edu/ualberta/med/biobank/test
+eclipse_ws/biobank2.ws-client/bin
 eclipse_ws/biobank2.ws-client/lib/*.jar
 log/
 model/*.png

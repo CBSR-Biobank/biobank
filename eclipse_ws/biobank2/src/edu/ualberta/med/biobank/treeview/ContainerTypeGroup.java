@@ -55,8 +55,11 @@ public class ContainerTypeGroup extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof ContainerTypeWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
+        }
+        return searchChildren(searchedObject);
     }
 
     @Override
@@ -76,8 +79,8 @@ public class ContainerTypeGroup extends AdapterBase {
         SiteWrapper currentSite = ((SiteAdapter) getParent()).getWrapper();
         Assert.isNotNull(currentSite, "null site");
         currentSite.reload();
-        return new ArrayList<ContainerTypeWrapper>(currentSite
-            .getContainerTypeCollection());
+        return new ArrayList<ContainerTypeWrapper>(
+            currentSite.getContainerTypeCollection());
     }
 
     @Override
@@ -92,11 +95,11 @@ public class ContainerTypeGroup extends AdapterBase {
 
     public static void addContainerType(SiteAdapter siteAdapter,
         boolean hasPreviousForm) {
-        ContainerTypeWrapper ct = new ContainerTypeWrapper(siteAdapter
-            .getAppService());
+        ContainerTypeWrapper ct = new ContainerTypeWrapper(
+            siteAdapter.getAppService());
         ct.setSite(siteAdapter.getWrapper());
-        ContainerTypeAdapter adapter = new ContainerTypeAdapter(siteAdapter
-            .getContainerTypesGroupNode(), ct);
+        ContainerTypeAdapter adapter = new ContainerTypeAdapter(
+            siteAdapter.getContainerTypesGroupNode(), ct);
         adapter.openEntryForm(hasPreviousForm);
     }
 

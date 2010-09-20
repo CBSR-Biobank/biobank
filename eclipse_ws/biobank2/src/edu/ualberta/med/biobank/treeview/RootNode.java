@@ -1,14 +1,14 @@
 package edu.ualberta.med.biobank.treeview;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
+
 import java.util.Collection;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
-
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class RootNode extends AdapterBase {
 
@@ -48,8 +48,8 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        return searchChildren(searchedObject);
     }
 
     @Override

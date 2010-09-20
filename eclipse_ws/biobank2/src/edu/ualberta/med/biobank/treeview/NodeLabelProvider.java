@@ -10,7 +10,10 @@ public class NodeLabelProvider implements ILabelProvider {
 
     @Override
     public Image getImage(Object element) {
-        return BioBankPlugin.getDefault().getImage(element);
+        if (element instanceof AdapterBase) {
+            return BioBankPlugin.getDefault().getImage(element);
+        }
+        return null;
     }
 
     @Override
@@ -18,7 +21,7 @@ public class NodeLabelProvider implements ILabelProvider {
         if (element instanceof AdapterBase) {
             return ((AdapterBase) element).getLabel();
         }
-        return new String();
+        return "";
     }
 
     @Override

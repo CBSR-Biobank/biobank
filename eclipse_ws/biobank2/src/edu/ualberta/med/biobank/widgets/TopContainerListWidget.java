@@ -9,6 +9,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
@@ -20,9 +22,22 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 
 public class TopContainerListWidget {
 
-    ListViewer topContainers;
+    private class NameFilter extends ViewerFilter {
+        @Override
+        public boolean select(Viewer viewer, Object top, Object child) {
+            if (filterText.equals(""))
+                return true;
+            return filterText.startsWith(((ContainerWrapper) child).getLabel());
+        }
+    }
+
+    private ListViewer topContainers;
+    private String filterText;
+    private boolean enabled;
 
     public TopContainerListWidget(Composite parent, int style) {
+        filterText = "";
+        enabled = true;
         topContainers = new ListViewer(parent, SWT.MULTI | SWT.BORDER | style);
         topContainers.setLabelProvider(new LabelProvider() {
             @Override
@@ -65,5 +80,24 @@ public class TopContainerListWidget {
             }
         }
         return containerList;
+    }
+
+    public void filterBy(String text) {
+        filterText = text;
+        topContainers.addFilter(new NameFilter());
+        topContainers.setSelection(null);
+        if (topContainers.getList().getItemCount() != 0) {
+            topContainers.getList().select(0);
+            setEnabled(true);
+        } else
+            setEnabled(false);
+    }
+
+    public void setEnabled(boolean b) {
+        enabled = b;
+    }
+
+    public boolean getEnabled() {
+        return enabled;
     }
 }

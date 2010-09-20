@@ -14,6 +14,7 @@ import org.eclipse.swt.graphics.Rectangle;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.model.Cell;
+import edu.ualberta.med.biobank.model.CellStatus;
 
 /**
  * Draw a grid according to specific parameters : total number of rows, total
@@ -61,8 +62,10 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
                 Rectangle rectangle = new Rectangle(xPosition, yPosition,
                     cellWidth, cellHeight);
 
-                customDraw(e, displayWidget, rectangle, indexRow, indexCol);
-                drawRectangle(e, displayWidget, rectangle, indexRow, indexCol);
+                Color defaultColor = getDefaultBackgroundColor(e,
+                    displayWidget, rectangle, indexRow, indexCol);
+                drawRectangle(e, displayWidget, rectangle, indexRow, indexCol,
+                    defaultColor);
                 String topText = getTopTextForBox(displayWidget.getCells(),
                     indexRow, indexCol);
                 if (topText != null) {
@@ -108,14 +111,17 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
 
     protected void drawRectangle(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
-        int indexRow, int indexCol) {
+        int indexRow, int indexCol, Color defaultBackgroundColor) {
+        Color backgroundColor = defaultBackgroundColor;
         if (displayWidget.getSelection() != null
+            && displayWidget.getSelection().row != null
             && displayWidget.getSelection().row == indexRow
+            && displayWidget.getSelection().col != null
             && displayWidget.getSelection().col == indexCol) {
-            Color color = e.display.getSystemColor(SWT.COLOR_YELLOW);
-            e.gc.setBackground(color);
-            e.gc.fillRectangle(rectangle);
+            backgroundColor = e.display.getSystemColor(SWT.COLOR_YELLOW);
         }
+        e.gc.setBackground(backgroundColor);
+        e.gc.fillRectangle(rectangle);
         e.gc.setForeground(e.display.getSystemColor(SWT.COLOR_BLACK));
         e.gc.drawRectangle(rectangle);
         if (displayWidget.getCells() != null) {
@@ -137,9 +143,10 @@ public abstract class AbstractGridDisplay extends AbstractContainerDisplay {
     }
 
     @SuppressWarnings("unused")
-    protected void customDraw(PaintEvent e,
+    protected Color getDefaultBackgroundColor(PaintEvent e,
         ContainerDisplayWidget displayWidget, Rectangle rectangle,
         int indexRow, int indexCol) {
+        return CellStatus.EMPTY.getColor();
     }
 
     @SuppressWarnings("unused")

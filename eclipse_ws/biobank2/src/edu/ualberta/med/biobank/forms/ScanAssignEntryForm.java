@@ -506,6 +506,14 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     @Override
+    protected void launchScanAndProcessResult() {
+        super.launchScanAndProcessResult();
+        page.layout(true, true);
+        book.reflow(true);
+        cancelConfirmWidget.setFocus();
+    }
+
+    @Override
     protected void beforeScanThreadStart() {
         showOnlyPallet(false, false);
         isFakeScanLinkedOnly = fakeScanLinkedOnlyButton != null
@@ -517,7 +525,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                System.out.println(page.getSize());
                 cancelConfirmWidget.setFocus();
                 displayPalletPositions();
                 palletWidget.setCells(getCells());
@@ -668,11 +675,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                                 if (foundAliquot.isDispatched()) {
                                     updateCellAsDispatchedError(positionString,
                                         scanCell, foundAliquot);
+                                } else {
+                                    scanCell.setStatus(CellStatus.NEW);
+                                    scanCell.setTitle(foundAliquot
+                                        .getPatientVisit().getPatient()
+                                        .getPnumber());
                                 }
-                                scanCell.setStatus(CellStatus.NEW);
-                                scanCell.setTitle(foundAliquot
-                                    .getPatientVisit().getPatient()
-                                    .getPnumber());
                             }
                         } else {
                             // pallet can't hold this aliquot type
@@ -697,9 +705,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         scanCell.setInformation(Messages.getFormattedString(
             "ScanAssign.scanStatus.aliquot.dispatchedError",
             ActivityStatusWrapper.DISPATCHED_STATUS_STRING)); //$NON-NLS-1$
-        appendLogNLS(Messages.getFormattedString(
-            "ScanAssign.activitylog.aliquot.dispatchedError", positionString,
-            ActivityStatusWrapper.DISPATCHED_STATUS_STRING));
+        appendLogNLS("ScanAssign.activitylog.aliquot.dispatchedError",
+            positionString, ActivityStatusWrapper.DISPATCHED_STATUS_STRING);
 
     }
 

@@ -2,8 +2,10 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -15,8 +17,6 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchShipmentWrapper extends
@@ -70,12 +70,8 @@ public class DispatchShipmentWrapper extends
     @Override
     protected void persistDependencies(DispatchShipment origObject)
         throws Exception {
-        List<SDKQuery> queries = new ArrayList<SDKQuery>();
         for (AliquotWrapper aliquot : modifiedAliquots) {
-            queries.add(new UpdateExampleQuery(aliquot.getWrappedObject()));
-        }
-        if (queries.size() > 0) {
-            appService.executeBatchQuery(queries);
+            aliquot.persist();
         }
     }
 
@@ -302,6 +298,7 @@ public class DispatchShipmentWrapper extends
             }
             allAliquotObjects.add(aliquot.getWrappedObject());
             aliquot.setActivityStatus(dispatchedStatus);
+            aliquot.setPosition(null);
             allAliquotWrappers.add(aliquot);
             modifiedAliquots.add(aliquot);
         }
@@ -342,9 +339,67 @@ public class DispatchShipmentWrapper extends
         throws Exception {
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
+        List<AliquotWrapper> receivedAliquots = getReceivedAliquots();
         for (AliquotWrapper aliquot : aliquotsToReceive) {
             aliquot.setActivityStatus(activeStatus);
             modifiedAliquots.add(aliquot);
+            receivedAliquots.add(aliquot);
         }
     }
+
+    public boolean isClosed() {
+        return getActivityStatus().isClosed();
+    }
+
+    /**
+     * Search for shipments with the given waybill. Site can be the sender or
+     * the receiver.
+     */
+    public static List<DispatchShipmentWrapper> getShipmentsInSite(
+        WritableApplicationService appService, String waybill, SiteWrapper site)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + DispatchShipment.class.getName()
+            + " where (sender.id = ? or receiver.id = ?) and waybill = ?",
+            Arrays.asList(new Object[] { site.getId(), site.getId(), waybill }));
+        List<DispatchShipment> shipments = appService.query(criteria);
+        List<DispatchShipmentWrapper> wrappers = new ArrayList<DispatchShipmentWrapper>();
+        for (DispatchShipment s : shipments) {
+            wrappers.add(new DispatchShipmentWrapper(appService, s));
+        }
+        return wrappers;
+    }
+
+    /**
+     * Search for shipments with the given date sent. Don't use hour and minute.
+     * Site can be the sender or the receiver.
+     */
+    public static List<DispatchShipmentWrapper> getShipmentsInSite(
+        WritableApplicationService appService, Date dateReceived,
+        SiteWrapper site) throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // date at 0:0am
+        cal.setTime(dateReceived);
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date startDate = cal.getTime();
+        // date at 0:0pm
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + DispatchShipment.class.getName()
+                + " where (sender.id = ? or receiver.id = ?) and dateShipped >= ? and dateShipped <= ?",
+            Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
+                endDate }));
+        List<DispatchShipment> shipments = appService.query(criteria);
+        List<DispatchShipmentWrapper> wrappers = new ArrayList<DispatchShipmentWrapper>();
+        for (DispatchShipment s : shipments) {
+            wrappers.add(new DispatchShipmentWrapper(appService, s));
+        }
+        return wrappers;
+    }
+
 }

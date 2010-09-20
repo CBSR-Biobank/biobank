@@ -69,11 +69,6 @@ public abstract class AbstractTodayNode extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
-    }
-
-    @Override
     public void performExpand() {
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             try {

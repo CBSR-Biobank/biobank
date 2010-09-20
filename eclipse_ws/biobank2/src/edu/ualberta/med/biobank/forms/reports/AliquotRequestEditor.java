@@ -8,7 +8,7 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.supercsv.cellprocessor.ParseDate;
-import org.supercsv.cellprocessor.ParseInt;
+import org.supercsv.cellprocessor.constraint.LMinMax;
 import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
 import org.supercsv.cellprocessor.ift.CellProcessor;
 import org.supercsv.exception.SuperCSVException;
@@ -27,7 +27,7 @@ public class AliquotRequestEditor extends ReportsEditor {
 
     @Override
     protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100 };
+        return new int[] { 100, 100, 100, 100, 100, 100 };
     }
 
     @Override
@@ -59,7 +59,7 @@ public class AliquotRequestEditor extends ReportsEditor {
 
         final CellProcessor[] processors = new CellProcessor[] {
             new StrNotNullOrEmpty(), new ParseDate("yyyy-MM-dd"),
-            new StrNotNullOrEmpty(), new ParseInt() };
+            new StrNotNullOrEmpty(), new LMinMax(1, Long.MAX_VALUE) };
 
         List<Object> requests = new ArrayList<Object>();
 
@@ -83,7 +83,7 @@ public class AliquotRequestEditor extends ReportsEditor {
     @Override
     protected String[] getColumnNames() {
         return new String[] { "Patient", "Inventory ID", "Date Drawn", "Type",
-            "Location" };
+            "Location", "Activity Status" };
     }
 
     @Override

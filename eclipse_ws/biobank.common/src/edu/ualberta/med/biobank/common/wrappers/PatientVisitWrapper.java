@@ -110,6 +110,54 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         return aliquotCollection;
     }
 
+    /**
+     * will set the adequate volume to the added aliquots
+     * 
+     * @throws BiobankCheckException
+     */
+    public void addAliquots(List<AliquotWrapper> aliquots)
+        throws BiobankCheckException {
+        if (aliquots != null && aliquots.size() > 0) {
+            List<SampleStorageWrapper> sampleStorages = getPatient().getStudy()
+                .getSampleStorageCollection();
+            if (sampleStorages == null || sampleStorages.size() == 0) {
+                throw new BiobankCheckException(
+                    "Can only add aliquots in a visit which study has sample storages");
+            }
+
+            Collection<Aliquot> allAliquotObjects = new HashSet<Aliquot>();
+            List<AliquotWrapper> allAliquotWrappers = new ArrayList<AliquotWrapper>();
+            // already added
+            List<AliquotWrapper> currentList = getAliquotCollection();
+            if (currentList != null) {
+                for (AliquotWrapper aliquot : currentList) {
+                    allAliquotObjects.add(aliquot.getWrappedObject());
+                    allAliquotWrappers.add(aliquot);
+                }
+            }
+            // new added
+
+            // will set the adequate volume to the added aliquots
+            Map<Integer, Double> typesVolumes = new HashMap<Integer, Double>();
+            for (SampleStorageWrapper ss : sampleStorages) {
+                typesVolumes.put(ss.getSampleType().getId(), ss.getVolume());
+            }
+            for (AliquotWrapper aliquot : aliquots) {
+                aliquot.setQuantity(typesVolumes.get(aliquot.getSampleType()
+                    .getId()));
+                aliquot.setPatientVisit(this);
+                allAliquotObjects.add(aliquot.getWrappedObject());
+                allAliquotWrappers.add(aliquot);
+            }
+            Collection<Aliquot> oldCollection = wrappedObject
+                .getAliquotCollection();
+            wrappedObject.setAliquotCollection(allAliquotObjects);
+            propertyChangeSupport.firePropertyChange("aliquotCollection",
+                oldCollection, allAliquotObjects);
+            propertiesMap.put("aliquotCollection", allAliquotWrappers);
+        }
+    }
+
     @SuppressWarnings("unchecked")
     private List<PvAttrWrapper> getPvAttrCollection() {
         List<PvAttrWrapper> pvAttrCollection = (List<PvAttrWrapper>) propertiesMap
@@ -491,33 +539,6 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             }
             setPvSamplSources(allPvObjects, allPvWrappers);
         }
-    }
-
-    /**
-     * Create a new aliquot (and persist it)
-     * 
-     * @param inventoryId
-     * @param type
-     * @param studySampleStorages
-     */
-    public AliquotWrapper addNewAliquot(String inventoryId,
-        SampleTypeWrapper type, List<SampleStorageWrapper> studySampleStorages,
-        ActivityStatusWrapper activityStatus) throws Exception {
-        AliquotWrapper aliquot = new AliquotWrapper(appService);
-        aliquot.setInventoryId(inventoryId);
-        aliquot.setPatientVisit(this);
-        aliquot.setLinkDate(new Date());
-        aliquot.setSampleType(type);
-        aliquot.setActivityStatus(activityStatus);
-        Double volume = null;
-        for (SampleStorageWrapper ss : studySampleStorages) {
-            if (ss.getSampleType().getId().equals(type.getId())) {
-                volume = ss.getVolume();
-            }
-        }
-        aliquot.setQuantity(volume);
-        aliquot.persist();
-        return aliquot;
     }
 
     @Override

@@ -18,7 +18,7 @@ public enum CellStatus {
         SWT.COLOR_DARK_GRAY, "Type"), IN_SHIPMENT_PENDING(SWT.COLOR_DARK_GREEN,
         "In Shipment - Pending"), IN_SHIPMENT_ACCEPTED(SWT.COLOR_DARK_GRAY,
         "In Shipment - Accepted"), NOT_IN_SHIPMENT(SWT.COLOR_YELLOW,
-        "Not in Shipment");
+        "Not in Shipment"), SCAN_PROFILE(185, 211, 238, "Profiled cell");
 
     private Color color;
     private String legend;
@@ -30,7 +30,7 @@ public enum CellStatus {
         .asList(EMPTY, NEW, MOVED, FILLED, MISSING, ERROR);
 
     public static List<CellStatus> DEFAULT_PALLET_SCAN_LINK_STATUS_LIST = Arrays
-        .asList(EMPTY, NO_TYPE, TYPE, ERROR);
+        .asList(EMPTY, SCAN_PROFILE, NO_TYPE, TYPE, ERROR);
 
     public static List<CellStatus> DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST = Arrays
         .asList(EMPTY, IN_SHIPMENT_ACCEPTED, IN_SHIPMENT_PENDING,

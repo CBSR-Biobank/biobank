@@ -51,6 +51,9 @@ ALTER TABLE activity_status
 #  Possibly data modifications needed!
 #
 
+INSERT INTO `ACTIVITY_STATUS` (ID, NAME) VALUES
+( 5, "Dispatched");
+
 ALTER TABLE aliquot
     ADD INDEX FKF4502987C449A4 (ACTIVITY_STATUS_ID);
 
@@ -254,6 +257,22 @@ UPDATE abstract_position,container_position
 DROP TABLE aliquot_position;
 
 DROP TABLE container_position;
+
+/* delete assoc between second entry of HEART and Calgary-F */
+DELETE site_study FROM site_study INNER JOIN site ON site.id=site_study.site_id
+INNER JOIN study ON study.id=site_study.study_id
+WHERE site.name_short='Calgary-F' AND study.name_short='HEART';
+
+/* remove second entry of HEART */
+DELETE study FROM STUDY LEFT JOIN site_study on site_study.study_id=study.id
+WHERE name_short='HEART' and study_id is null;
+
+/* create link between Calgary-F site and original entry for HEART */
+INSERT INTO site_study (site_id, study_id)
+       SELECT site.id,study.id
+       FROM site JOIN study
+       WHERE site.name_short='Calgary-F' AND study.name_short='HEART';
+
 
 #
 # DDL END

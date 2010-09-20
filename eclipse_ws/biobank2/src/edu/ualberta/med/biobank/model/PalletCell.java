@@ -90,7 +90,6 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
-        // List<AliquotWrapper> randomAliquots =
         List<AliquotWrapper> randomAliquots = DebugUtil
             .getRandomAliquotsNotAssigned(appService, siteId);
         if (randomAliquots.size() > 1) {

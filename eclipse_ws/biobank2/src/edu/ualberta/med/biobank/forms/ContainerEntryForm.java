@@ -93,10 +93,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Container");
-        if (container.getContainerType() != null) {
-            form.setImage(BioBankPlugin.getDefault().getIconForTypeName(
-                container.getContainerType().getName()));
-        }
 
         currentContainerType = container.getContainerType();
         page.setLayout(new GridLayout(1, false));

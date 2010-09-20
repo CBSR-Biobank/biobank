@@ -10,7 +10,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.NodeSearchVisitor;
 
 public abstract class AbstractTodaySearchAdministrationView extends
     AbstractAdministrationView {
@@ -59,22 +58,18 @@ public abstract class AbstractTodaySearchAdministrationView extends
     protected abstract List<? extends ModelWrapper<?>> search(String text)
         throws Exception;
 
-    protected abstract NodeSearchVisitor getVisitor(
-        ModelWrapper<?> searchedObject);
-
     protected abstract void notFound(String text);
 
     protected void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            NodeSearchVisitor visitor = getVisitor(searchedObject);
-            AdapterBase node = todayNode.accept(visitor);
+            AdapterBase node = todayNode.search(searchedObject);
             if (node == null) {
-                node = searchedNode.accept(visitor);
+                node = searchedNode.search(searchedObject);
                 if (node == null) {
                     searchedNode.addSearchObject(searchedObject);
                     searchedNode.performExpand();
-                    node = searchedNode.accept(visitor);
+                    node = searchedNode.search(searchedObject);
                 }
             }
             if (node != null) {

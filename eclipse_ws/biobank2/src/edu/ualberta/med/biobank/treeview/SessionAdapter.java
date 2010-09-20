@@ -131,8 +131,8 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase accept(NodeSearchVisitor visitor) {
-        return visitor.visit(this);
+    public AdapterBase search(Object searchedObject) {
+        return searchChildren(searchedObject);
     }
 
     @Override
