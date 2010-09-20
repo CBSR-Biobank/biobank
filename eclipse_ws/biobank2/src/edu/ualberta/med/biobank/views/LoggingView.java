@@ -352,7 +352,7 @@ public class LoggingView extends ViewPart {
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         ISourceProvider siteSelectionStateSourceProvider = service
-            .getSourceProvider(SessionState.SESSION_STATE);
+            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         return siteSelectionStateSourceProvider;
     }
 

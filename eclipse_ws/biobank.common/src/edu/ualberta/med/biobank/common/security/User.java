@@ -2,12 +2,15 @@ package edu.ualberta.med.biobank.common.security;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 public class User implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    private Long id;
     private String login;
     private String firstName;
     private String lastName;
@@ -17,6 +20,14 @@ public class User implements Serializable {
     private boolean needToChangePassword;
 
     private List<Group> groups = new ArrayList<Group>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public void setLogin(String login) {
         this.login = login;
@@ -74,10 +85,35 @@ public class User implements Serializable {
         return groups;
     }
 
-    @Override
-    public String toString() {
-        return getLogin() + "/" + getFirstName() + "/" + getLastName() + "/"
-            + getPassword() + "/" + getEmail();
+    public void copy(User user) {
+        id = user.getId();
+        login = user.getLogin();
+        firstName = user.getFirstName();
+        lastName = user.getLastName();
+        password = user.getPassword();
+        email = user.getEmail();
+        needToChangePassword = user.isNeedToChangePassword();
+        groups = new ArrayList<Group>(user.getGroups());
     }
 
+    public boolean isWebsiteAdministrator() {
+        for (Group group : groups) {
+            if (group.isWebsiteAdministrator()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        Map<String, Object> properties = new LinkedHashMap<String, Object>();
+        properties.put("login", login);
+        properties.put("password", password);
+        properties.put("firstName", firstName);
+        properties.put("lastName", lastName);
+        properties.put("email", email);
+        properties.put("groups", groups);
+        return properties.toString();
+    }
 }

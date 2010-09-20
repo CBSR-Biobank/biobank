@@ -1,11 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -21,6 +15,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+
 public class SessionAdapter extends AdapterBase {
 
     private static final String LOGOUT_COMMAND_ID = "edu.ualberta.med.biobank.commands.logout";
@@ -31,14 +31,14 @@ public class SessionAdapter extends AdapterBase {
 
     public static final int STUDIES_NODE_ID = 2;
 
-    private WritableApplicationService appService;
+    private BiobankApplicationService appService;
 
     private String userName;
     private String serverName;
 
     public SessionAdapter(AdapterBase parent,
-        WritableApplicationService appService, int sessionId,
-        String serverName, String userName) {
+        BiobankApplicationService appService, int sessionId, String serverName,
+        String userName) {
         super(parent, null, false);
         this.appService = appService;
         setId(sessionId);
@@ -67,7 +67,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public WritableApplicationService getAppService() {
+    public BiobankApplicationService getAppService() {
         return appService;
     }
 

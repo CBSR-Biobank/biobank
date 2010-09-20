@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.SecurityHelper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
@@ -28,6 +29,7 @@ import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
@@ -73,7 +75,7 @@ public class SessionManager {
         updateMenus();
     }
 
-    public void addSession(final WritableApplicationService appService,
+    public void addSession(final BiobankApplicationService appService,
         String serverName, String userName, Collection<SiteWrapper> sites) {
         logger.debug("addSession: " + serverName + ", user/" + userName
             + " numSites/" + sites.size());
@@ -91,6 +93,15 @@ public class SessionManager {
             view.getTreeViewer().expandToLevel(2);
         }
         updateMenus();
+
+        try {
+            if (sessionAdapter.getAppService().needPasswordModification()) {
+                ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
+                    .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
+                dlg.open();
+            }
+        } catch (ApplicationException e) {
+        }
     }
 
     public void deleteSession() throws Exception {
@@ -115,8 +126,13 @@ public class SessionManager {
 
         // assign logged in state
         SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.SESSION_STATE);
+            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
+        try {
+            sessionSourceProvider.setWebAdmin(sessionAdapter != null
+                && sessionAdapter.getAppService().isWebsiteAdministrator());
+        } catch (ApplicationException e) {
+        }
 
         // assign debug state
         DebugState debugStateSourceProvider = (DebugState) service
@@ -138,7 +154,7 @@ public class SessionManager {
         return sessionAdapter;
     }
 
-    public static WritableApplicationService getAppService() {
+    public static BiobankApplicationService getAppService() {
         return getInstance().getSession().getAppService();
     }
 
