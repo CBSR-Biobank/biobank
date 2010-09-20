@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.security.Role;
+import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
@@ -622,10 +622,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
      */
     @Override
     public boolean canEdit(User user) {
-        // return user.hasRoleOnObject(Role.CREATE, getWrappedClass(), getId())
         try {
+            // Need to use the appService method as the filter added for site
+            // need to be used. (see CSM documentation and configuration)
             return ((BiobankApplicationService) appService).hasPrivilege(
-                getWrappedClass(), getId(), Role.CREATE.name());
+                getWrappedClass(), getId(), Privilege.CREATE.name());
         } catch (ApplicationException e) {
             return false;
         }

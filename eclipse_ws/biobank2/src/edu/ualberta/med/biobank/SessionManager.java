@@ -13,7 +13,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.security.Role;
+import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -277,19 +277,19 @@ public class SessionManager {
     }
 
     public static boolean canCreate(Class<?> clazz) {
-        return getUser().hasRoleOnObject(Role.CREATE, clazz);
+        return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
     }
 
     public static boolean canDelete(Class<?> clazz) {
-        return getUser().hasRoleOnObject(Role.DELETE, clazz);
+        return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
     }
 
     public static boolean canView(Class<?> clazz) {
-        return getUser().hasRoleOnObject(Role.READ, clazz);
+        return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
     }
 
     public static boolean canUpdate(Class<?> clazz) {
-        return getUser().hasRoleOnObject(Role.UPDATE, clazz);
+        return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
     }
 
     public boolean isConnected() {

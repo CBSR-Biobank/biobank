@@ -14,12 +14,12 @@ public class Group implements Serializable, BiobankSecurity {
 
     private String name;
 
-    private Map<String, ProtectionElementRole> peRolesMap;
+    private Map<String, ProtectionElementPrivilege> pePrivilegeMap;
 
     public Group(Long id, String name) {
         this.id = id;
         this.name = name;
-        peRolesMap = new HashMap<String, ProtectionElementRole>();
+        pePrivilegeMap = new HashMap<String, ProtectionElementPrivilege>();
     }
 
     public void setId(Long id) {
@@ -38,18 +38,18 @@ public class Group implements Serializable, BiobankSecurity {
         return name;
     }
 
-    public void addProtectionElementRole(String objectName, Set<Role> roles,
-        String objectId) {
-        ProtectionElementRole per = peRolesMap.get(objectName);
+    public void addProtectionElementPrivilege(String objectName,
+        Set<Privilege> privileges, String objectId) {
+        ProtectionElementPrivilege per = pePrivilegeMap.get(objectName);
         if (per == null) {
-            per = new ProtectionElementRole(objectName, objectId);
-            peRolesMap.put(objectName, per);
+            per = new ProtectionElementPrivilege(objectName, objectId);
+            pePrivilegeMap.put(objectName, per);
         }
-        per.addRoles(roles);
+        per.addPrivileges(privileges);
     }
 
-    public Collection<ProtectionElementRole> getProtectionElementRole() {
-        return peRolesMap.values();
+    public Collection<ProtectionElementPrivilege> getProtectionElementPrivileges() {
+        return pePrivilegeMap.values();
     }
 
     @Override
@@ -57,18 +57,12 @@ public class Group implements Serializable, BiobankSecurity {
         return getId() + "/" + getName();
     }
 
-    public boolean hasRoleOnObject(Role role, String objectName, String objectId) {
-        ProtectionElementRole per = peRolesMap.get(objectName);
+    public boolean hasPrivilegeOnObject(Privilege privilege, String objectName) {
+        ProtectionElementPrivilege per = pePrivilegeMap.get(objectName);
         if (per == null) {
             return false;
         }
-        if (per.getRoles().contains(role)) {
-            if (objectId == null) {
-                return true;
-            }
-            return objectId.equals(per.getObjectId());
-        }
-        return false;
+        return per.getPrivileges().contains(privilege);
     }
 
 }

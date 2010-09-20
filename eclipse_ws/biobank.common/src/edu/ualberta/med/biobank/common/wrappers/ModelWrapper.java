@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
-import edu.ualberta.med.biobank.common.security.Role;
+import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
@@ -476,14 +476,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can view this object
      */
     public boolean canView(User user) {
-        return user.hasRoleOnObject(Role.READ, getWrappedClass().getName());
+        return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass().getName());
     }
 
     /**
      * return true if the user can edit this object
      */
     public boolean canEdit(User user) {
-        return user.hasRoleOnObject(Role.UPDATE, getWrappedClass().getName());
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass().getName());
     }
 
     public void addWrapperListener(WrapperListener listener) {

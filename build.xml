@@ -500,8 +500,7 @@
         <include name="${clm.object.state.logger.config}" />
       </classes>
       <classes dir="${eclipse.proj.dir.common}/output" >
-        <include name="**/common/**"/>
-        <include name="**/server/**"/>
+        <exclude name="**/client/**"/>
       </classes>
       <webinf dir="${cacore.sdk.dir}\${output.src.dir}">
         <include name="server-config.wsdd" />

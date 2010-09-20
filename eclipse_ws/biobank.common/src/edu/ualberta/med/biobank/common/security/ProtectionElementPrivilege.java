@@ -4,17 +4,18 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ProtectionElementRole implements Serializable, BiobankSecurity {
+public class ProtectionElementPrivilege implements Serializable,
+    BiobankSecurity {
 
     private static final long serialVersionUID = 1L;
 
     private String objectName;
 
-    private Set<Role> roles;
+    private Set<Privilege> privileges;
 
     private String objectId;
 
-    public ProtectionElementRole(String objectName, String objectId) {
+    public ProtectionElementPrivilege(String objectName, String objectId) {
         this.objectName = objectName;
         this.objectId = objectId;
     }
@@ -27,15 +28,15 @@ public class ProtectionElementRole implements Serializable, BiobankSecurity {
         return objectId;
     }
 
-    public Set<Role> getRoles() {
-        return roles;
+    public Set<Privilege> getPrivileges() {
+        return privileges;
     }
 
-    public void addRoles(Set<Role> roles) {
-        if (this.roles == null) {
-            this.roles = new HashSet<Role>();
+    public void addPrivileges(Set<Privilege> privileges) {
+        if (this.privileges == null) {
+            this.privileges = new HashSet<Privilege>();
         }
-        this.roles.addAll(roles);
+        this.privileges.addAll(privileges);
     }
 
 }

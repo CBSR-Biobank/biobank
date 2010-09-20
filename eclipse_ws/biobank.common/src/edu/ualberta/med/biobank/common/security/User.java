@@ -88,11 +88,7 @@ public class User implements Serializable, BiobankSecurity {
             + getPassword() + "/" + getEmail();
     }
 
-    public boolean hasRoleOnObject(Role role, Class<?> clazz) {
-        return hasRoleOnObject(role, clazz, null);
-    }
-
-    public boolean hasRoleOnObject(Role role, Class<?> clazz, String objectId) {
+    public boolean hasPrivilegeOnObject(Privilege privilege, Class<?> clazz) {
         String objectName;
         if (ModelWrapper.class.isAssignableFrom(clazz)) {
             ModelWrapper<?> wrapper = null;
@@ -110,17 +106,12 @@ public class User implements Serializable, BiobankSecurity {
         } else {
             objectName = clazz.getName();
         }
-        return hasRoleOnObject(role, objectName, objectId);
+        return hasPrivilegeOnObject(privilege, objectName);
     }
 
-    public boolean hasRoleOnObject(Role role, String objectName) {
-        return hasRoleOnObject(role, objectName, null);
-    }
-
-    private boolean hasRoleOnObject(Role role, String objectName,
-        String objectId) {
+    public boolean hasPrivilegeOnObject(Privilege privilege, String objectName) {
         for (Group group : groups) {
-            if (group.hasRoleOnObject(role, objectName, objectId)) {
+            if (group.hasPrivilegeOnObject(privilege, objectName)) {
                 return true;
             }
         }
@@ -128,7 +119,7 @@ public class User implements Serializable, BiobankSecurity {
     }
 
     public boolean isContainerAdministrator() {
-        return hasRoleOnObject(Role.CREATE, CONTAINER_ADMINISTRATION_STRING);
+        return hasPrivilegeOnObject(Privilege.CREATE, CONTAINER_ADMINISTRATION_STRING);
     }
 
     public boolean isWebsiteAdministrator() {
