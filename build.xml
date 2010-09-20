@@ -350,6 +350,7 @@
          userid="${DB_USERNAME}" password="${DB_PASSWORD}">
       DROP DATABASE IF EXISTS ${PROJECT_NAME};
       CREATE DATABASE ${PROJECT_NAME};
+      ALTER DATABASE `${PROJECT_NAME}` DEFAULT CHARACTER SET latin1 COLLATE latin1_general_cs;
       <classpath>
         <fileset dir="${cacore.sdk.dir}/system/lib">
           <include name="*.jar" />
