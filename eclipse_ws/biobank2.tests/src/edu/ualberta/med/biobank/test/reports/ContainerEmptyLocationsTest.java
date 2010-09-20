@@ -73,6 +73,11 @@ public class ContainerEmptyLocationsTest extends AbstractReportTest {
         return expectedResults;
     }
 
+    @Override
+    protected PostProcessTester getPostProcessTester() {
+        return new ContainerEmptyLocationsPostProcessTester();
+    }
+
     private void checkReport(String containerLabel,
         String topContainerTypeShortName) throws Exception {
         getReport().setParams(
@@ -80,6 +85,4 @@ public class ContainerEmptyLocationsTest extends AbstractReportTest {
                 (Object) topContainerTypeShortName));
         checkResults(EnumSet.of(CompareResult.SIZE));
     }
-
-    // TODO: test postProcess()
 }

@@ -31,20 +31,18 @@ public class PatientVisitSummaryImpl extends AbstractReport {
     public PatientVisitSummaryImpl(BiobankReport report) {
         super(QUERY_STRING, report);
         List<Object> parameters = report.getParams();
-        this.queryString = queryString.replaceFirst("\\?",
-            "'" + DateFormatter.formatAsDateTime((Date) parameters.get(0))
-                + "'");
-        this.queryString = queryString.replaceFirst("\\?",
-            "'" + DateFormatter.formatAsDateTime((Date) parameters.get(1))
-                + "'");
+        this.queryString = queryString.replaceFirst("\\?", "'"
+            + DateFormatter.formatAsDateTime((Date) parameters.get(0)) + "'");
+        this.queryString = queryString.replaceFirst("\\?", "'"
+            + DateFormatter.formatAsDateTime((Date) parameters.get(1)) + "'");
         report.setParams(parameters);
     }
 
     @Override
     public List<Object> executeQuery(WritableApplicationService appService)
         throws ApplicationException {
-        queryString = queryString.replace(SITE_OPERATOR_SEARCH_STRING,
-            report.getOp());
+        queryString = queryString.replace(SITE_OPERATOR_SEARCH_STRING, report
+            .getOp());
         queryString = queryString.replace(SITE_ID_SEARCH_STRING, report
             .getSiteId().toString());
         return ((BiobankApplicationService) appService).query(

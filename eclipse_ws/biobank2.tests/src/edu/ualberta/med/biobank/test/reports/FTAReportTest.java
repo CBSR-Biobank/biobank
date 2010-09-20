@@ -131,12 +131,19 @@ public class FTAReportTest extends AbstractReportTest {
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
         final String studyNameShort = (String) getReport().getParams().get(0);
-        Date firstPvDateProcessed = (Date) getReport().getParams().get(1);
+        final Date firstPvDateProcessed = (Date) getReport().getParams().get(1);
 
         Predicate<PatientVisitWrapper> patientInStudy = new Predicate<PatientVisitWrapper>() {
             public boolean evaluate(PatientVisitWrapper patientVisit) {
                 return patientVisit.getPatient().getStudy().getNameShort()
                     .equals(studyNameShort);
+            }
+        };
+
+        Predicate<AliquotWrapper> pvProcessedAfter = new Predicate<AliquotWrapper>() {
+            public boolean evaluate(AliquotWrapper aliquot) {
+                return aliquot.getPatientVisit().getDateProcessed()
+                    .after(firstPvDateProcessed);
             }
         };
 
@@ -151,7 +158,8 @@ public class FTAReportTest extends AbstractReportTest {
 
         Collection<AliquotWrapper> allAliquots = getAliquots();
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
-            allAliquots, ALIQUOT_FTA_SAMPLE_TYPE);
+            allAliquots, PredicateUtil.andPredicate(ALIQUOT_FTA_SAMPLE_TYPE,
+                pvProcessedAfter));
         Map<String, AliquotWrapper> groupedAliquots = MapperUtil.map(
             filteredAliquots, GROUP_ALIQUOTS_BY_PNUMBER);
         List<AliquotWrapper> filteredAndGroupedAliquots = new ArrayList<AliquotWrapper>(
@@ -165,9 +173,7 @@ public class FTAReportTest extends AbstractReportTest {
             for (PatientVisitWrapper patientVisit : groupedPatientVisits
                 .values()) {
                 if (patientVisit.getId().equals(
-                    aliquot.getPatientVisit().getId())
-                    && aliquot.getPatientVisit().getDateProcessed()
-                        .after(firstPvDateProcessed)) {
+                    aliquot.getPatientVisit().getId())) {
                     expectedResults.add(aliquot.getWrappedObject());
                 }
             }

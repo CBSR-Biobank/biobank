@@ -119,8 +119,8 @@ public class ContactEntryInfoTable extends ContactInfoTable {
     }
 
     public void addContact() {
-        addOrEditContact(true, new ContactWrapper(SessionManager
-            .getAppService()));
+        addOrEditContact(true,
+            new ContactWrapper(SessionManager.getAppService()));
     }
 
     public List<ContactWrapper> getAddedOrModifedContacts() {

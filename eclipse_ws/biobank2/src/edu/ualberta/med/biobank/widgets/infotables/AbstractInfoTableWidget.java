@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -18,6 +19,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -29,6 +31,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
+import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -73,6 +77,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
     protected boolean reloadData = false;
 
     private int size;
+
+    private boolean autoSizeColumns;
 
     public AbstractInfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
@@ -134,6 +140,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         menu = new Menu(parent);
         tableViewer.getTable().setMenu(menu);
+
+        autoSizeColumns = columnWidths == null ? true : false;
 
         addClipboardCopySupport();
 
@@ -241,15 +249,69 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             paginationWidget.setVisible(false);
 
         resizeTable();
-
+        final Display display = getTableViewer().getTable().getDisplay();
         backgroundThread = new Thread() {
             @Override
             public void run() {
                 tableLoader(collection, selection);
+                if (autoSizeColumns) {
+                    display.syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            autoSizeColumns();
+                        }
+                    });
+                }
             }
         };
         backgroundThread.start();
+
         layout(true, true);
+    }
+
+    private void autoSizeColumns() {
+        // TODO: auto-size table initially based on headers? Sort of already
+        // done with .pack().
+        Table table = tableViewer.getTable();
+        if (table.isDisposed()) {
+            return;
+        }
+
+        final int[] maxCellContentsWidths = new int[table.getColumnCount()];
+        Text textRenderer = new Text(menu.getShell(), SWT.NONE);
+        Arrays.fill(maxCellContentsWidths, 0);
+
+        for (TableItem row : table.getItems()) {
+            for (int i = 0; i < table.getColumnCount(); i++) {
+                String rowText = row.getText(i);
+                Image rowImage = row.getImage(i);
+                int cellContentsWidth = 0;
+
+                if (rowText != null) {
+                    textRenderer.setText(rowText);
+                    cellContentsWidth = textRenderer.computeSize(SWT.DEFAULT,
+                        SWT.DEFAULT).x;
+                } else if (rowImage != null) {
+                    cellContentsWidth = rowImage.getImageData().width;
+                }
+
+                maxCellContentsWidths[i] = Math.max(cellContentsWidth,
+                    maxCellContentsWidths[i]);
+            }
+        }
+
+        int sumOfMaxTextWidths = 0;
+        for (int width : maxCellContentsWidths) {
+            sumOfMaxTextWidths += width;
+        }
+
+        int tableWidth = tableViewer.getTable().getSize().x;
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            int width = (int) ((double) maxCellContentsWidths[i]
+                / sumOfMaxTextWidths * tableWidth);
+            table.getColumn(i).setWidth(width);
+        }
     }
 
     protected abstract void init(List<T> collection);
@@ -276,8 +338,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         paginationWidget.setLayout(new GridLayout(5, false));
 
         firstButton = new Button(paginationWidget, SWT.NONE);
-        firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_RESULTSET_FIRST));
+        firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_RESULTSET_FIRST));
         firstButton.setToolTipText("First page");
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -287,8 +349,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         });
 
         prevButton = new Button(paginationWidget, SWT.NONE);
-        prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_RESULTSET_PREV));
+        prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_RESULTSET_PREV));
         prevButton.setToolTipText("Previous page");
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -300,8 +362,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         pageLabel = new Label(paginationWidget, SWT.NONE);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
-        nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_RESULTSET_NEXT));
+        nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_RESULTSET_NEXT));
         nextButton.setToolTipText("Next page");
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -311,8 +373,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         });
 
         lastButton = new Button(paginationWidget, SWT.NONE);
-        lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_RESULTSET_LAST));
+        lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
+            BioBankPlugin.IMG_RESULTSET_LAST));
         lastButton.setToolTipText("Last page");
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override

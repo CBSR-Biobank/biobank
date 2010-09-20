@@ -9,8 +9,8 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionHelper implements Runnable {
 
@@ -23,7 +23,7 @@ public class SessionHelper implements Runnable {
 
     private String password;
 
-    private WritableApplicationService appService;
+    private BiobankApplicationService appService;
 
     private Collection<SiteWrapper> siteWrappers;
 
@@ -76,7 +76,7 @@ public class SessionHelper implements Runnable {
         }
     }
 
-    public WritableApplicationService getAppService() {
+    public BiobankApplicationService getAppService() {
         return appService;
     }
 

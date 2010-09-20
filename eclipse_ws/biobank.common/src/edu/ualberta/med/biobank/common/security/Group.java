@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.common.security;
 import java.io.Serializable;
 
 public class Group implements Serializable {
-
+    public static final String GROUP_NAME_WEBSITE_ADMINISTRATOR = "Website Administrator";
     private static final long serialVersionUID = 1L;
 
     private Long id;
@@ -33,6 +33,10 @@ public class Group implements Serializable {
 
     public String getName() {
         return name;
+    }
+
+    public boolean isWebsiteAdministrator() {
+        return name != null && name.equals(GROUP_NAME_WEBSITE_ADMINISTRATOR);
     }
 
     @Override

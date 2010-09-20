@@ -23,6 +23,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,8 +53,6 @@ public class BiobankApplicationServiceImpl extends
     private static final String SITE_ADMIN_PG_ID = "11";
 
     private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
-
-    private static final String GROUP_WEBSITE_ADMINISTRATOR = "Website Administrator";
 
     private static final String CREATE_PRIVILEGE = "CREATE";
 
@@ -152,7 +151,10 @@ public class BiobankApplicationServiceImpl extends
             Set<?> groups = upm.getGroups(user.getUserId().toString());
             for (Object obj : groups) {
                 Group group = (Group) obj;
-                if (group.getGroupName().equals(GROUP_WEBSITE_ADMINISTRATOR)) {
+                if (group
+                    .getGroupName()
+                    .equals(
+                        edu.ualberta.med.biobank.common.security.Group.GROUP_NAME_WEBSITE_ADMINISTRATOR)) {
                     return true;
                 }
             }
@@ -350,13 +352,17 @@ public class BiobankApplicationServiceImpl extends
                         .toString())) {
                         User serverUser = (User) userObj;
                         edu.ualberta.med.biobank.common.security.User userDTO = new edu.ualberta.med.biobank.common.security.User();
+                        userDTO.setId(serverUser.getUserId());
                         userDTO.setLogin(serverUser.getLoginName());
                         userDTO.setFirstName(serverUser.getFirstName());
                         userDTO.setLastName(serverUser.getLastName());
-                        String password = serverUser.getPassword();
-                        if (password != null) {
-                            userDTO.setPassword("******");
-                        }
+                        userDTO.setNeedToChangePassword(serverUser
+                            .getStartDate() != null);
+
+                        // no need to send password back in the clear (note:
+                        // passwords seem to be encrypted, not hashed)
+                        userDTO.setPassword(null);
+
                         userDTO.setEmail(serverUser.getEmailId());
                         List<edu.ualberta.med.biobank.common.security.Group> groups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
                         for (Object o : upm.getGroups(serverUser.getUserId()
@@ -395,18 +401,29 @@ public class BiobankApplicationServiceImpl extends
                 if (user.getLogin() == null) {
                     throw new ApplicationException("Login should be set");
                 }
-                User serverUser = upm.getUser(user.getLogin());
+
+                User serverUser = null;
+                if (user.getId() != null) {
+                    serverUser = upm.getUserById(user.getId().toString());
+                }
                 if (serverUser == null) {
                     serverUser = new User();
-                    serverUser.setLoginName(user.getLogin());
                 }
+
+                serverUser.setLoginName(user.getLogin());
                 serverUser.setFirstName(user.getFirstName());
                 serverUser.setLastName(user.getLastName());
                 serverUser.setEmailId(user.getEmail());
+
                 String password = user.getPassword();
-                if (password != null && !password.equals("******")) {
+                if (password != null && !password.isEmpty()) {
                     serverUser.setPassword(password);
                 }
+
+                if (user.isNeedToChangePassword()) {
+                    serverUser.setStartDate(new Date());
+                }
+
                 Set<Group> groups = new HashSet<Group>();
                 for (edu.ualberta.med.biobank.common.security.Group groupDto : user
                     .getGroups()) {

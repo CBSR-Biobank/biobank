@@ -290,6 +290,14 @@
             name="Change Password">
       </command>
       <command
+            id="edu.ualberta.med.biobank.commands.editUsers"
+            name="Edit Users">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.addUser"
+            name="Add User">
+      </command>
+      <command
             id="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
             name="Dispatch Shipment Administration">
       </command>
@@ -962,6 +970,40 @@
          </activeWhen>
       </handler>
       <handler
+            class="edu.ualberta.med.biobank.handlers.EditUsersHandler"
+            commandId="edu.ualberta.med.biobank.commands.editUsers">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.isWebAdmin">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerspectiveSelected">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.AddUserHandler"
+            commandId="edu.ualberta.med.biobank.commands.addUser">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+               <reference
+                     definitionId="biobank2.isWebAdmin">
+               </reference>
+               <reference
+                     definitionId="biobank2.mainPerspectiveSelected">
+               </reference>
+            </and>
+         </activeWhen>
+      </handler>
+      <handler
             class="edu.ualberta.med.biobank.handlers.DispatchShipmentAdministrationHandler"
             commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin">
          <enabledWhen>
@@ -1100,6 +1142,18 @@
                       commandId="edu.ualberta.med.biobank.commands.changePassword"
                       id="edu.ualberta.med.biobank.menu.changePassword"
                       label="Change Password"
+                      style="push">
+                </command>
+                <command
+                      commandId="edu.ualberta.med.biobank.commands.editUsers"
+                      id="edu.ualberta.med.biobank.menu.editUsers"
+                      label="Edit Users"
+                      style="push">
+                </command>
+                <command
+                      commandId="edu.ualberta.med.biobank.commands.addUser"
+                      id="edu.ualberta.med.biobank.menu.addUser"
+                      label="Add User"
                       style="push">
                 </command>
          </menu>
@@ -2571,6 +2625,15 @@
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.aliquotsManagement">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.isWebAdmin">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.isWebAdmin">
+            <equals
+                  value="true">
             </equals>
          </with>
       </definition>
