@@ -326,12 +326,17 @@ public class BiobankApplicationServiceImpl extends
                     .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
 
                 List<edu.ualberta.med.biobank.common.security.User> list = new ArrayList<edu.ualberta.med.biobank.common.security.User>();
-                for (Object object : upm.getObjects(new GroupSearchCriteria(
+                Map<Long, User> users = new HashMap<Long, User>();
+
+                for (Object g : upm.getObjects(new GroupSearchCriteria(
                     new Group()))) {
-                    Group serverGroup = (Group) object;
-                    for (Object userObj : upm.getUsers(serverGroup.getGroupId()
-                        .toString())) {
-                        list.add(createUser(upm, (User) userObj));
+                    Group group = (Group) g;
+                    for (Object u : upm.getUsers(group.getGroupId().toString())) {
+                        User user = (User) u;
+                        if (!users.containsKey(user.getUserId())) {
+                            list.add(createUser(upm, user));
+                            users.put(user.getUserId(), user);
+                        }
                     }
                 }
                 return list;
