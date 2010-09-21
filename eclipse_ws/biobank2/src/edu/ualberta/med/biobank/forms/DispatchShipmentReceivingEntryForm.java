@@ -103,7 +103,7 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
         Composite parent = createSectionWithClient("Aliquots not yet "
             + "received");
         aliquotsToBeReceivedTable = new DispatchAliquotListInfoTable(parent,
-            shipment.getNotReceivedAliquots(), false);
+            shipment, shipment.getNotReceivedAliquots(), false);
         aliquotsToBeReceivedTable.adaptToToolkit(toolkit, true);
         aliquotsToBeReceivedTable
             .addDoubleClickListener(collectionDoubleClickListener);
@@ -112,7 +112,7 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
     private void createAliquotsReceivedSection() {
         Composite parent = createSectionWithClient("Aliquots received");
         aliquotsReceivedTable = new DispatchAliquotListInfoTable(parent,
-            shipment.getReceivedAliquots(), false);
+            shipment, shipment.getReceivedAliquots(), false);
         aliquotsReceivedTable.adaptToToolkit(toolkit, true);
         aliquotsReceivedTable
             .addDoubleClickListener(collectionDoubleClickListener);

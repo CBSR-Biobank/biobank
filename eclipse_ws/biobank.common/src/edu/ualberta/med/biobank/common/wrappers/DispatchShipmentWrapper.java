@@ -64,12 +64,32 @@ public class DispatchShipmentWrapper extends
                 + getWaybill() + " already exists for sending site "
                 + getSender().getNameShort());
         }
+        if (isSent() && getDateShipped() == null) {
+            throw new BiobankCheckException(
+                "Date shipped should be set when the status is set to 'Sent'.");
+        }
         checkSenderCanSendToReceiver();
     }
 
     @Override
     protected void persistDependencies(DispatchShipment origObject)
         throws Exception {
+        if (isSent()) {
+            // when is sent, need to set aliquots positions to null and to
+            // remove containers holding them
+            for (AliquotWrapper aliquot : getAliquotCollection()) {
+                if (aliquot.isDispatched() && aliquot.getPosition() != null) {
+                    ContainerWrapper parent = aliquot.getParent();
+                    aliquot.setPosition(null);
+                    aliquot.persist();
+                    modifiedAliquots.remove(aliquot);
+                    parent.reload();
+                    if (!parent.hasAliquots()) {
+                        parent.delete();
+                    }
+                }
+            }
+        }
         for (AliquotWrapper aliquot : modifiedAliquots) {
             aliquot.persist();
         }
@@ -285,20 +305,19 @@ public class DispatchShipmentWrapper extends
         for (AliquotWrapper aliquot : newAliquots) {
             if (aliquot.isNew()) {
                 throw new BiobankCheckException(
-                    "Cannot add aliquot that are not already saved");
+                    "Cannot add aliquots that are not already saved");
             }
             if (aliquot.getPosition() == null) {
                 throw new BiobankCheckException(
-                    "Cannot add aliquot with no position. A position should be first assigned");
+                    "Cannot add aliquots with no position. A position should be first assigned");
             }
             if (!aliquot.isActive()) {
                 throw new BiobankCheckException(
-                    "Cannot add aliquot with an activity status that is not 'Active'."
+                    "Cannot add aliquots with an activity status that is not 'Active'."
                         + " Check comments on this aliquot for more information.");
             }
             allAliquotObjects.add(aliquot.getWrappedObject());
             aliquot.setActivityStatus(dispatchedStatus);
-            aliquot.setPosition(null);
             allAliquotWrappers.add(aliquot);
             modifiedAliquots.add(aliquot);
         }
@@ -349,6 +368,13 @@ public class DispatchShipmentWrapper extends
 
     public boolean isClosed() {
         return getActivityStatus().isClosed();
+    }
+
+    public boolean isSent() {
+        ActivityStatusWrapper activity = getActivityStatus();
+        return activity != null
+            && activity.getName().equals(
+                ActivityStatusWrapper.SENT_STATUS_STRING);
     }
 
     /**

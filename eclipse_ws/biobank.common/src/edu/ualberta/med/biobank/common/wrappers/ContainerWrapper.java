@@ -741,7 +741,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ApplicationException {
         if (hasAliquots()) {
             throw new BiobankCheckException("Unable to delete container "
-                + getLabel() + ". All samples must be removed first.");
+                + getLabel() + ". All aliquots must be removed first.");
         }
         if (hasChildren()) {
             throw new BiobankCheckException("Unable to delete container "

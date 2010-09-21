@@ -55,7 +55,7 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         shipmentAdapter = (DispatchShipmentAdapter) adapter;
         shipment = (DispatchShipmentWrapper) adapter.getModelObject();
         retrieveShipment();
-        setPartName("Dispatch Shipment sent on " + shipment.getDateShipped());
+        setPartName("Dispatch Shipment");
     }
 
     private void retrieveShipment() {
@@ -76,8 +76,12 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipment sent on " + shipment.getFormattedDateShipped()
-            + " from " + shipment.getSender().getNameShort());
+        String dateString = "";
+        if (shipment.getDateShipped() != null) {
+            dateString = " on " + shipment.getFormattedDateShipped();
+        }
+        form.setText("Shipment sent" + dateString + " from "
+            + shipment.getSender().getNameShort());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -91,7 +95,7 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         Composite parent = createSectionWithClient("Aliquots not yet "
             + "received");
         aliquotsToBeReceivedTable = new DispatchAliquotListInfoTable(parent,
-            null, false);
+            shipment, null, false);
         aliquotsToBeReceivedTable.adaptToToolkit(toolkit, true);
         aliquotsToBeReceivedTable
             .addDoubleClickListener(collectionDoubleClickListener);
@@ -99,8 +103,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     private void createAliquotsReceivedSection() {
         Composite parent = createSectionWithClient("Aliquots received");
-        aliquotsReceivedTable = new DispatchAliquotListInfoTable(parent, null,
-            false);
+        aliquotsReceivedTable = new DispatchAliquotListInfoTable(parent,
+            shipment, null, false);
         aliquotsReceivedTable.adaptToToolkit(toolkit, true);
         aliquotsReceivedTable
             .addDoubleClickListener(collectionDoubleClickListener);

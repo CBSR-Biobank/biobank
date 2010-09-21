@@ -263,7 +263,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     }
 
     @Override
-    protected boolean canActivateNextButton() {
+    protected boolean canActivateNextAndFinishButton() {
         return aliquotsAdded;
     }
 

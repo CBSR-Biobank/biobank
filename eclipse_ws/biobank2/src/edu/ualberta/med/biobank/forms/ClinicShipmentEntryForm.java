@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
@@ -167,7 +168,7 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
         dateShippedWidget = createDateTimeWidget(client, "Date Shipped",
             shipment.getDateShipped(),
             BeansObservables.observeValue(shipment, "dateShipped"),
-            "Date shipped should be set");
+            new DateNotNulValidator("Date shipped should be set"));
         setFirstControl(dateShippedWidget);
 
         ShippingMethodWrapper selectedShippingMethod = shipment
@@ -187,7 +188,7 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
         dateReceivedWidget = createDateTimeWidget(client, "Date Received",
             shipment.getDateReceived(),
             BeansObservables.observeValue(shipment, "dateReceived"),
-            "Date received should be set");
+            new DateNotNulValidator("Date received should be set"));
         dateReceivedWidget.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {

@@ -2,13 +2,10 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.List;
 
-import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
-import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -20,15 +17,13 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.springframework.remoting.RemoteAccessException;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.treeview.CallRunnablePersistOnAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -238,72 +233,34 @@ public class ContainerEntryForm extends BiobankEntryForm {
         throws Exception {
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
-        context.run(true, false, new IRunnableWithProgress() {
+
+        context.run(true, false, new CallRunnablePersistOnAdapter(adapter) {
             @Override
-            public void run(final IProgressMonitor monitor) {
-                monitor.beginTask("Saving...", IProgressMonitor.UNKNOWN);
-                try {
-                    adapter.getModelObject().persist();
-                    if (newName) {
-                        container.reload();
-                        containerAdapter.rebuild();
-                        containerAdapter.performExpand();
-                    } else {
-                        Display.getDefault().asyncExec(new Runnable() {
-                            @Override
-                            public void run() {
-                                containerAdapter.getParent().addChild(
-                                    containerAdapter);
-                            }
-                        });
-                    }
-                    containerAdapter.getParent().performExpand();
-                } catch (final RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
-                    Display.getDefault().syncExec(new Runnable() {
+            public void doSetDirty(boolean b) {
+                setDirty(b);
+            }
+
+            @Override
+            public void afterPersist() throws Exception {
+                if (newName) {
+                    container.reload();
+                    Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            setDirty(true);
+                            containerAdapter.rebuild();
+                            containerAdapter.performExpand();
                         }
                     });
-                    monitor.setCanceled(true);
-                } catch (final RemoteAccessException exp) {
-                    BioBankPlugin.openRemoteAccessErrorMessage(exp);
-                    Display.getDefault().syncExec(new Runnable() {
+                } else {
+                    Display.getDefault().asyncExec(new Runnable() {
                         @Override
                         public void run() {
-                            setDirty(true);
+                            containerAdapter.getParent().addChild(
+                                containerAdapter);
                         }
                     });
-                    monitor.setCanceled(true);
-                } catch (final AccessDeniedException ade) {
-                    BioBankPlugin.openAccessDeniedErrorMessage(ade);
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            setDirty(true);
-                        }
-                    });
-                    monitor.setCanceled(true);
-                } catch (BiobankCheckException bce) {
-                    BioBankPlugin.openAsyncError("Save error", bce);
-                    monitor.setCanceled(true);
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            setDirty(true);
-                        }
-                    });
-                } catch (Exception e) {
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            setDirty(true);
-                        }
-                    });
-                    throw new RuntimeException(e);
                 }
-                monitor.done();
+                containerAdapter.getParent().performExpand();
             }
         });
     }

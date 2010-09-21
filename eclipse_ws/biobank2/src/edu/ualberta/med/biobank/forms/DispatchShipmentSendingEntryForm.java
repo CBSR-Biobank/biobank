@@ -5,8 +5,13 @@ import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -18,6 +23,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
@@ -31,11 +37,15 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.CallRunnablePersistOnAdapter;
 import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
+import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
@@ -112,25 +122,23 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
         List<StudyWrapper> possibleStudies = site.getDispatchStudies();
         StudyWrapper study = shipment.getStudy();
-
         if ((study == null) && (possibleStudies != null)
             && (possibleStudies.size() == 1)) {
             study = possibleStudies.get(0);
         }
-
         studyComboViewer = createComboViewerWithNoSelectionValidator(client,
             "Study", possibleStudies, study,
             "Shipment must have a receiving site");
-
+        shipment.setStudy(study);
         studyComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
                     IStructuredSelection studySelection = (IStructuredSelection) studyComboViewer
                         .getSelection();
+                    StudyWrapper study = null;
                     if ((studySelection != null) && (studySelection.size() > 0)) {
-                        StudyWrapper study = (StudyWrapper) studySelection
-                            .getFirstElement();
+                        study = (StudyWrapper) studySelection.getFirstElement();
                         try {
                             List<SiteWrapper> possibleDestSites = site
                                 .getStudyDispachSites(study);
@@ -150,26 +158,39 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                                     e);
                         }
                     }
-
+                    shipment.setStudy(study);
                 }
             });
 
         List<SiteWrapper> possibleDestSites = null;
         SiteWrapper destSite = null;
-
         if (study != null) {
             possibleDestSites = site.getStudyDispachSites(study);
             destSite = shipment.getReceiver();
         }
-
         if ((destSite == null) && (possibleDestSites != null)
             && (possibleDestSites.size() == 1)) {
             destSite = possibleDestSites.get(0);
         }
-
+        shipment.setReceiver(destSite);
         destSiteComboViewer = createComboViewerWithNoSelectionValidator(client,
             "Receiver Site", possibleDestSites, destSite,
             "Shipment must have an associated study");
+        destSiteComboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    SiteWrapper destSite = null;
+                    IStructuredSelection destSiteSelecion = (IStructuredSelection) destSiteComboViewer
+                        .getSelection();
+                    if ((destSiteSelecion != null)
+                        && (destSiteSelecion.size() > 0)) {
+                        destSite = (SiteWrapper) destSiteSelecion
+                            .getFirstElement();
+                    }
+                    shipment.setReceiver(destSite);
+                }
+            });
 
         ShippingMethodWrapper selectedShippingMethod = shipment
             .getShippingMethod();
@@ -177,21 +198,76 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             client, "Shipping Method",
             ShippingMethodWrapper.getShippingMethods(appService),
             selectedShippingMethod, null);
+        shippingMethodComboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    ShippingMethodWrapper shippingMethod = null;
+                    IStructuredSelection shippingMethodSelection = (IStructuredSelection) shippingMethodComboViewer
+                        .getSelection();
+                    if ((shippingMethodSelection != null)
+                        && (shippingMethodSelection.size() > 0)) {
+                        shippingMethod = (ShippingMethodWrapper) shippingMethodSelection
+                            .getFirstElement();
+                    }
+                    shipment.setShippingMethod(shippingMethod);
+                }
+            });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             "Waybill", null,
             BeansObservables.observeValue(shipment, "waybill"), null);
 
-        dateShippedWidget = createDateTimeWidget(client, "Date Shipped",
-            shipment.getDateShipped(),
-            BeansObservables.observeValue(shipment, "dateShipped"),
-            "Date shipped should be set");
+        final AbstractValidator dateNotNul = new AbstractValidator(
+            "Date shipped should be set") {
+            @Override
+            public IStatus validate(Object value) {
+                if (value == null && shipment.isSent()) {
+                    showDecoration();
+                    return ValidationStatus.error(errorMessage);
+                } else {
+                    hideDecoration();
+                    return Status.OK_STATUS;
+                }
+            }
+        };
+        dateShippedWidget = widgetCreator.createDateTimeWidget(client,
+            "Date Shipped", shipment.getDateShipped(),
+            BeansObservables.observeValue(shipment, "dateShipped"), dateNotNul);
 
         activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Activity Status",
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             shipment.getActivityStatus(),
             "Container must have an activity status");
+        activityStatusComboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
+                @Override
+                public void selectionChanged(SelectionChangedEvent event) {
+                    ActivityStatusWrapper activityStatus = null;
+                    IStructuredSelection asSelection = (IStructuredSelection) activityStatusComboViewer
+                        .getSelection();
+                    if ((asSelection != null) && (asSelection.size() > 0)) {
+                        activityStatus = (ActivityStatusWrapper) asSelection
+                            .getFirstElement();
+                    }
+                    shipment.setActivityStatus(activityStatus);
+
+                    // Do this to trigger the validator and value binding on
+                    // form
+                    Date date = dateShippedWidget.getDate();
+                    dateShippedWidget.setDate(new Date());
+                    dateShippedWidget.setDate(date);
+
+                    if (shipment.isSent()
+                        && shipment.getAliquotCollection().size() == 0) {
+                        BioBankPlugin
+                            .openAsyncInformation(
+                                "No aliquots",
+                                "There are no aliquots added to this shipment, are you sure it should be set to 'Sent' ?");
+                    }
+                }
+            });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null,
@@ -212,70 +288,68 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     private void createAliquotsSection() {
         Section section = createSection("Aliquots");
-        addSectionToolbar(section, "Add aliquots to this shipment",
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), shipment);
-                    dialog.open();
-                    setDirty(true); // FIXME need to do this better !
-                    aliquotsWidget.reloadCollection(shipment
-                        .getAliquotCollection());
-                    removedPallets.addAll(dialog.getRemovedPallets());
-                }
-            });
-        aliquotsWidget = new DispatchAliquotListInfoTable(section,
+        if (!shipment.isSent()) {
+            addSectionToolbar(section, "Add aliquots to this shipment",
+                new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent e) {
+                        DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
+                            PlatformUI.getWorkbench()
+                                .getActiveWorkbenchWindow().getShell(),
+                            shipment);
+                        dialog.open();
+                        setDirty(true); // FIXME need to do this better !
+                        aliquotsWidget.reloadCollection(shipment
+                            .getAliquotCollection());
+                        removedPallets.addAll(dialog.getRemovedPallets());
+                    }
+                });
+        }
+        aliquotsWidget = new DispatchAliquotListInfoTable(section, shipment,
             shipment.getAliquotCollection(), true);
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
+        aliquotsWidget
+            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    setDirty(true);
+                }
+            });
         section.setClient(aliquotsWidget);
     }
 
     @Override
     protected void saveForm() throws Exception {
-        StudyWrapper study = null;
-        IStructuredSelection studySelection = (IStructuredSelection) studyComboViewer
-            .getSelection();
-        if ((studySelection != null) && (studySelection.size() > 0)) {
-            study = (StudyWrapper) studySelection.getFirstElement();
+        if (shipment.isSent() && shipment.getAliquotCollection().size() == 0) {
+            boolean ok = BioBankPlugin.openConfirm("No aliquots",
+                "There are no aliquots added to this shipment, are you sure"
+                    + " it should be save with a 'Sent' status ?");
+            if (!ok) {
+                setDirty(true);
+                return;
+            }
         }
-        shipment.setStudy(study);
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
+        context.run(true, false, new CallRunnablePersistOnAdapter(adapter) {
+            @Override
+            public void afterPersist() throws Exception {
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        DispatchShipmentAdministrationView.getCurrent()
+                            .reload();
+                    }
+                });
+            }
 
-        SiteWrapper destSite = null;
-        IStructuredSelection destSiteSelecion = (IStructuredSelection) destSiteComboViewer
-            .getSelection();
-        if ((destSiteSelecion != null) && (destSiteSelecion.size() > 0)) {
-            destSite = (SiteWrapper) destSiteSelecion.getFirstElement();
-        }
-        shipment.setReceiver(destSite);
+            @Override
+            public void doSetDirty(boolean b) {
+                setDirty(b);
+            }
+        });
 
-        ActivityStatusWrapper activityStatus = null;
-        IStructuredSelection asSelection = (IStructuredSelection) activityStatusComboViewer
-            .getSelection();
-        if ((asSelection != null) && (asSelection.size() > 0)) {
-            activityStatus = (ActivityStatusWrapper) asSelection
-                .getFirstElement();
-        }
-        shipment.setActivityStatus(activityStatus);
-
-        ShippingMethodWrapper shippingMethod = null;
-        IStructuredSelection shippingMethodSelection = (IStructuredSelection) shippingMethodComboViewer
-            .getSelection();
-        if ((shippingMethodSelection != null)
-            && (shippingMethodSelection.size() > 0)) {
-            shippingMethod = (ShippingMethodWrapper) shippingMethodSelection
-                .getFirstElement();
-        }
-        shipment.setShippingMethod(shippingMethod);
-
-        shipment.persist();
-        DispatchShipmentAdministrationView.getCurrent().reload();
-
-        for (ContainerWrapper pallet : removedPallets) {
-            pallet.delete();
-        }
     }
 
     @Override

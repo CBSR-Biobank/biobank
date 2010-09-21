@@ -102,7 +102,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     }
 
     @Override
-    protected boolean canActivateNextButton() {
+    protected boolean canActivateNextAndFinishButton() {
         return pendingAliquotsNumber == 0;
     }
 

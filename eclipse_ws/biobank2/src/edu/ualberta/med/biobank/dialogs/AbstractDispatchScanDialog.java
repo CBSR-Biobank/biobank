@@ -207,22 +207,24 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         Button finishButton = getButton(IDialogConstants.FINISH_ID);
         Button nextButton = getButton(IDialogConstants.NEXT_ID);
         if (finishButton != null && !finishButton.isDisposed()) {
-            finishButton.setEnabled(enabled);
             if (canActivateProceedButton())
                 proceedButton.setEnabled(enabled);
             else
                 proceedButton.setEnabled(false);
-            if (canActivateNextButton())
+            if (canActivateNextAndFinishButton()) {
+                finishButton.setEnabled(enabled);
                 nextButton.setEnabled(enabled);
-            else
+            } else {
+                finishButton.setEnabled(false);
                 nextButton.setEnabled(false);
+            }
 
         } else {
             okButtonEnabled = enabled;
         }
     }
 
-    protected boolean canActivateNextButton() {
+    protected boolean canActivateNextAndFinishButton() {
         return true;
     }
 

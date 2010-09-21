@@ -189,9 +189,9 @@ public abstract class BiobankDialog extends TitleAreaDialog {
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, IObservableValue modelObservableValue,
-        final String emptyMessage) {
+        AbstractValidator validator) {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, emptyMessage);
+            modelObservableValue, validator);
     }
 
     protected WidgetCreator getWidgetCreator() {

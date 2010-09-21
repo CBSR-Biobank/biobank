@@ -45,7 +45,6 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.forms.FieldInfo;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
-import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -400,43 +399,43 @@ public class WidgetCreator {
 
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, IObservableValue modelObservableValue,
-        final String emptyMessage) {
+        AbstractValidator validator) {
         return createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, emptyMessage, null);
+            modelObservableValue, validator, null);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, IObservableValue modelObservableValue,
-        final String emptyMessage, String bindingKey) {
+        AbstractValidator validator, String bindingKey) {
         return createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, emptyMessage, SWT.DATE | SWT.TIME, bindingKey);
+            modelObservableValue, validator, SWT.DATE | SWT.TIME, bindingKey);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, IObservableValue modelObservableValue,
-        final String emptyMessage, int typeShown) {
+        AbstractValidator validator, int typeShown) {
         return createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, emptyMessage, typeShown, null);
+            modelObservableValue, validator, typeShown, null);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
         String nameLabel, Date date, IObservableValue modelObservableValue,
-        final String emptyMessage, int typeShown, String bindingKey) {
+        AbstractValidator validator, int typeShown, String bindingKey) {
         Label label = createLabel(client, nameLabel, SWT.NONE, true);
         return createDateTimeWidget(client, label, date, modelObservableValue,
-            emptyMessage, typeShown, bindingKey);
+            validator, typeShown, bindingKey);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
         Date date, IObservableValue modelObservableValue,
-        final String emptyMessage, int typeShown) {
+        AbstractValidator validator, int typeShown) {
         return createDateTimeWidget(client, label, date, modelObservableValue,
-            emptyMessage, typeShown, null);
+            validator, typeShown, null);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
         Date date, IObservableValue modelObservableValue,
-        final String emptyMessage, int typeShown, String bindingKey) {
+        AbstractValidator validator, int typeShown, String bindingKey) {
         final DateTimeWidget widget = new DateTimeWidget(client, typeShown,
             date);
         if (selectionListener != null) {
@@ -447,9 +446,7 @@ public class WidgetCreator {
         }
         if (modelObservableValue != null) {
             UpdateValueStrategy uvs = null;
-            if (emptyMessage != null && !emptyMessage.isEmpty()) {
-                DateNotNulValidator validator = new DateNotNulValidator(
-                    emptyMessage);
+            if (validator != null) {
                 validator.setControlDecoration(BiobankWidget.createDecorator(
                     label, validator.getErrorMessage()));
                 uvs = new UpdateValueStrategy();
