@@ -113,7 +113,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         try {
             Map<String, Object> map = new HashMap<String, Object>();
             map.put("username", SessionManager.getInstance().getSession()
-                .getUserName());
+                .getUser().getLogin());
             List<LogInfo> logsList = appender.getLogsList();
 
             JasperPrint jp = ReportingUtils.createStandardReport(

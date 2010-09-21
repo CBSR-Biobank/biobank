@@ -89,8 +89,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null
                         && sourceValue.equals(SessionState.LOGGED_IN)) {
-                        updatedTitle(SessionManager.getServer(),
-                            SessionManager.getUser());
+                        updatedTitle(SessionManager.getServer(), SessionManager
+                            .getUser().getLogin());
                     } else {
                         resetTitle();
                     }

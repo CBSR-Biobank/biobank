@@ -35,7 +35,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -197,8 +196,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 false, null);
         setFirstControl(shipmentsComboViewer.getControl());
 
-        if (((BiobankApplicationService) SessionManager.getAppService())
-            .isWebsiteAdministrator()) {
+        if (SessionManager.getUser().isWebsiteAdministrator()) {
             final Button shipmentsListCheck = toolkit.createButton(composite,
                 "Last 7 days", SWT.CHECK);
             shipmentsListCheck.setSelection(true);

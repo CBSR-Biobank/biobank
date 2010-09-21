@@ -262,7 +262,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     if (SessionManager.getInstance().isConnected()) {
                         text += "\nCreated by user "
                             + SessionManager.getInstance().getSession()
-                                .getUserName();
+                                .getUser().getLogin();
                     }
 
                     text += "\nSent from client version "

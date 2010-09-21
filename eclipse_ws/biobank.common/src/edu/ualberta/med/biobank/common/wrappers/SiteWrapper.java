@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.security.Privilege;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -619,12 +621,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * return true if the user can edit this object
      */
     @Override
-    public boolean canEdit() {
+    public boolean canEdit(User user) {
         try {
-            return ((BiobankApplicationService) appService).canUpdateObject(
-                getWrappedClass(), getId());
+            // Need to use the appService method as the filter added for site
+            // need to be used. (see CSM documentation and configuration)
+            return ((BiobankApplicationService) appService).hasPrivilege(
+                getWrappedClass(), getId(), Privilege.CREATE.name());
         } catch (ApplicationException e) {
-            e.printStackTrace();
             return false;
         }
     }

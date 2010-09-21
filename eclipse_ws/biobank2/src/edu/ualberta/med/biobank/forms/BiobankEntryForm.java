@@ -47,6 +47,7 @@ import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -183,7 +184,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected void checkEditAccess() {
         if (adapter != null && adapter.getModelObject() != null
-            && !adapter.getModelObject().canEdit()) {
+            && !adapter.getModelObject().canEdit(SessionManager.getUser())) {
             BioBankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException("Cannot edit. Access Denied.");
         }

@@ -699,7 +699,7 @@ public abstract class AdapterBase {
     }
 
     public boolean isEditable() {
-        return editable && modelObject.canEdit();
+        return editable && modelObject.canEdit(SessionManager.getUser());
     }
 
     public void setEditable(boolean editable) {

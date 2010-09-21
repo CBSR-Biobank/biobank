@@ -33,7 +33,6 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.security.SecurityHelper;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -111,11 +110,9 @@ public class ContainerViewForm extends BiobankViewForm {
             + container.getContainerType().getNameShort() + ")");
         initCells();
         canCreate = SessionManager.canCreate(ContainerWrapper.class)
-            && SecurityHelper.isContainerAdministrator(SessionManager
-                .getAppService());
+            && SessionManager.getUser().isContainerAdministrator();
         canDelete = SessionManager.canCreate(ContainerWrapper.class)
-            && SecurityHelper.isContainerAdministrator(SessionManager
-                .getAppService());
+            && SessionManager.getUser().isContainerAdministrator();
     }
 
     @Override

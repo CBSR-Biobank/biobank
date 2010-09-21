@@ -346,7 +346,7 @@ public class LoginDialog extends TitleAreaDialog {
 
             SessionManager.getInstance().addSession(
                 sessionHelper.getAppService(), serverWidget.getText(),
-                sessionHelper.getUserName(), sites);
+                sessionHelper.getUser(), sites);
         }
         super.okPressed();
     }

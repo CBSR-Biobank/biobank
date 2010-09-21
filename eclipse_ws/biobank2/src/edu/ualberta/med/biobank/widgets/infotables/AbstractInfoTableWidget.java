@@ -281,6 +281,12 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         final int[] maxCellContentsWidths = new int[table.getColumnCount()];
         Text textRenderer = new Text(menu.getShell(), SWT.NONE);
+        textRenderer.setVisible(false);
+
+        GridData gd = new GridData();
+        gd.exclude = true;
+        textRenderer.setLayoutData(gd);
+
         Arrays.fill(maxCellContentsWidths, 0);
 
         for (TableItem row : table.getItems()) {
@@ -302,6 +308,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             }
         }
 
+        textRenderer.dispose();
+
         int sumOfMaxTextWidths = 0;
         for (int width : maxCellContentsWidths) {
             sumOfMaxTextWidths += width;
@@ -312,7 +320,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         for (int i = 0; i < table.getColumnCount(); i++) {
             int width = (int) ((double) maxCellContentsWidths[i]
                 / sumOfMaxTextWidths * tableWidth);
-            table.getColumn(i).setWidth(width);
+            table.getColumn(i).setWidth(width - 1);
         }
     }
 
