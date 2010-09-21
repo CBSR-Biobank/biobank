@@ -74,7 +74,7 @@ public class AliquotRequestTest extends AbstractReportTest {
             final String pnumber = request.getPnumber();
             final String typeName = request.getSampleTypeNameShort();
             Date dateDrawn = request.getDateDrawn();
-            Integer maxResults = request.getMaxAliquots();
+            Integer maxResults = (int) request.getMaxAliquots();
 
             Predicate<AliquotWrapper> aliquotPnumber = new Predicate<AliquotWrapper>() {
                 public boolean evaluate(AliquotWrapper aliquot) {
