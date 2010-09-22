@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.client.util;
 
-import edu.ualberta.med.biobank.common.security.BiobankSecurity;
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 import gov.nih.nci.system.client.proxy.ListProxy;
 import gov.nih.nci.system.client.proxy.ProxyHelperImpl;
@@ -19,10 +19,19 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
         if (obj instanceof BiobankListProxy) {
             return convertListProxyToProxy(as, (BiobankListProxy) obj);
         }
-        if (obj instanceof Enum || obj instanceof BiobankSecurity) {
+        if (obj instanceof NotAProxy) {
             return obj;
         }
         return super.convertToProxy(as, obj);
+    }
+
+    @Override
+    public Object convertToObject(Object proxyObject) throws Throwable {
+        if (proxyObject instanceof NotAProxy) {
+            return proxyObject;
+        }
+
+        return super.convertToObject(proxyObject);
     }
 
     private Object convertListProxyToProxy(ApplicationService as,

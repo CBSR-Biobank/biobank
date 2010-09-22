@@ -81,7 +81,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.SESSION_STATE);
+            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
                 @Override

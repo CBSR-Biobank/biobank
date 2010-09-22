@@ -11,10 +11,10 @@ import junit.framework.Assert;
 
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.server.reports.AliquotRequest;
 import edu.ualberta.med.biobank.server.reports.AliquotRequestImpl;
 
 public class AliquotRequestTest extends AbstractReportTest {
@@ -26,10 +26,7 @@ public class AliquotRequestTest extends AbstractReportTest {
         for (AliquotWrapper aliquot : getAliquots()) {
             params.clear();
 
-            params.add(aliquot.getPatientVisit().getPatient().getPnumber());
-            params.add(aliquot.getPatientVisit().getDateDrawn());
-            params.add(aliquot.getSampleType().getNameShort());
-            params.add(ALIQUOT_LIMIT);
+            addParams(params, aliquot, ALIQUOT_LIMIT);
 
             checkResults(params);
         }
@@ -61,7 +58,8 @@ public class AliquotRequestTest extends AbstractReportTest {
         AliquotWrapper aliquot = getAliquots().get(0);
         List<Object> params = new ArrayList<Object>();
         addParams(params, aliquot, ALIQUOT_LIMIT);
-        params.set(1, calendar.getTime());
+
+        ((AliquotRequest) params.get(0)).setDateDrawn(calendar.getTime());
 
         checkResults(params);
     }
@@ -71,12 +69,12 @@ public class AliquotRequestTest extends AbstractReportTest {
         List<Object> expectedResults = new ArrayList<Object>();
         List<Object> params = getReport().getParams();
 
-        for (int i = 0, numParams = params.size(); i < numParams; i += 4) {
-            final String pnumber = (String) params.get(i);
-            Date dateDrawn = DateFormatter.parseToDate((String) params
-                .get(i + 1));
-            final String typeName = (String) params.get(i + 2);
-            Integer maxResults = Integer.parseInt((String) params.get(i + 3));
+        for (Object o : params) {
+            AliquotRequest request = (AliquotRequest) o;
+            final String pnumber = request.getPnumber();
+            final String typeName = request.getSampleTypeNameShort();
+            Date dateDrawn = request.getDateDrawn();
+            Integer maxResults = (int) request.getMaxAliquots();
 
             Predicate<AliquotWrapper> aliquotPnumber = new Predicate<AliquotWrapper>() {
                 public boolean evaluate(AliquotWrapper aliquot) {
@@ -115,17 +113,7 @@ public class AliquotRequestTest extends AbstractReportTest {
     }
 
     private void checkResults(List<Object> params) throws Exception {
-        // convert parameters to String objects for the report, as this is what
-        // the report expects
-        List<Object> stringParams = new ArrayList<Object>();
-        for (Object o : params) {
-            if (o instanceof Date) {
-                stringParams.add(DateFormatter.formatAsDate((Date) o));
-            } else {
-                stringParams.add(o.toString());
-            }
-        }
-        getReport().setParams(stringParams);
+        getReport().setParams(params);
 
         // because this report selects a random subset of the possibly results,
         // we cannot enforce a common order or size between the expected and
@@ -136,9 +124,13 @@ public class AliquotRequestTest extends AbstractReportTest {
 
     private static void addParams(List<Object> params, AliquotWrapper aliquot,
         Integer limit) {
-        params.add(aliquot.getPatientVisit().getPatient().getPnumber());
-        params.add(aliquot.getPatientVisit().getDateDrawn());
-        params.add(aliquot.getSampleType().getNameShort());
-        params.add(limit);
+
+        AliquotRequest request = new AliquotRequest();
+        request.setPnumber(aliquot.getPatientVisit().getPatient().getPnumber());
+        request.setDateDrawn(aliquot.getPatientVisit().getDateDrawn());
+        request.setSampleTypeNameShort(aliquot.getSampleType().getNameShort());
+        request.setMaxAliquots(limit);
+
+        params.add(request);
     }
 }

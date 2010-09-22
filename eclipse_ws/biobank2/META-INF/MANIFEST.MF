@@ -8,9 +8,12 @@ Bundle-ClassPath: .,
  lib/iText-2.1.0.jar,
  lib/DynamicJasper-3.0.14.jar,
  lib/jdt-compiler-3.1.1.jar,
- lib/mail.jar,
  lib/SuperCSV-1.52.jar,
- lib/spiffy-all-0.05.jar
+ lib/spiffy-all-0.05.jar,
+ lib/activation.jar,
+ lib/gnumail.jar,
+ lib/inetlib.jar,
+ lib/gnumail-providers.jar
 Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2

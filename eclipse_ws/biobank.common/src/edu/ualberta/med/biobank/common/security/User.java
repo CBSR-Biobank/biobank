@@ -3,18 +3,19 @@ package edu.ualberta.med.biobank.common.security;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class User implements Serializable, BiobankSecurity {
-
+public class User implements Serializable, NotAProxy {
+    private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
     private static final long serialVersionUID = 1L;
 
-    private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
-
-    private static final String GROUP_WEBSITE_ADMINISTRATOR = "Website Administrator";
+    private Long id;
 
     private String login;
     private String firstName;
@@ -25,6 +26,14 @@ public class User implements Serializable, BiobankSecurity {
     private boolean needToChangePassword;
 
     private List<Group> groups = new ArrayList<Group>();
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
 
     public void setLogin(String login) {
         this.login = login;
@@ -82,10 +91,24 @@ public class User implements Serializable, BiobankSecurity {
         return groups;
     }
 
-    @Override
-    public String toString() {
-        return getLogin() + "/" + getFirstName() + "/" + getLastName() + "/"
-            + getPassword() + "/" + getEmail();
+    public void copy(User user) {
+        id = user.getId();
+        login = user.getLogin();
+        firstName = user.getFirstName();
+        lastName = user.getLastName();
+        password = user.getPassword();
+        email = user.getEmail();
+        needToChangePassword = user.isNeedToChangePassword();
+        groups = new ArrayList<Group>(user.getGroups());
+    }
+
+    public boolean isWebsiteAdministrator() {
+        for (Group group : groups) {
+            if (group.isWebsiteAdministrator()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean hasPrivilegeOnObject(Privilege privilege, Class<?> clazz) {
@@ -119,16 +142,20 @@ public class User implements Serializable, BiobankSecurity {
     }
 
     public boolean isContainerAdministrator() {
-        return hasPrivilegeOnObject(Privilege.CREATE, CONTAINER_ADMINISTRATION_STRING);
+        return hasPrivilegeOnObject(Privilege.CREATE,
+            CONTAINER_ADMINISTRATION_STRING);
     }
 
-    public boolean isWebsiteAdministrator() {
-        for (Group group : groups) {
-            if (group.getName().equals(GROUP_WEBSITE_ADMINISTRATOR)) {
-                return true;
-            }
-        }
-        return false;
+    @Override
+    public String toString() {
+        Map<String, Object> properties = new LinkedHashMap<String, Object>();
+        properties.put("id", id);
+        properties.put("login", login);
+        properties.put("password", password);
+        properties.put("firstName", firstName);
+        properties.put("lastName", lastName);
+        properties.put("email", email);
+        properties.put("groups", groups);
+        return properties.toString();
     }
-
 }

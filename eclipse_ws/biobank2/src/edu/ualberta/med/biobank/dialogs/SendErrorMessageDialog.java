@@ -258,12 +258,16 @@ public class SendErrorMessageDialog extends BiobankDialog {
 
                     // create and fill the first message part
                     MimeBodyPart mbp1 = new MimeBodyPart();
-                    String text = email.getDescription();
+                    String text = email.getDescription() + "\n\n------";
                     if (SessionManager.getInstance().isConnected()) {
-                        text += "\n\n------\nCreated by user "
+                        text += "\nCreated by user "
                             + SessionManager.getInstance().getSession()
                                 .getUser().getLogin();
                     }
+
+                    text += "\nSent from client version "
+                        + BioBankPlugin.getDefault().getBundle().getVersion();
+
                     mbp1.setText(text);
                     mp.addBodyPart(mbp1);
 

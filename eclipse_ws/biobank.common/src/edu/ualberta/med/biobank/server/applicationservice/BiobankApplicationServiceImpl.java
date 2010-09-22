@@ -27,6 +27,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,7 +58,7 @@ public class BiobankApplicationServiceImpl extends
 
     private static final String SITE_ADMIN_PG_ID = "11";
 
-    private static final String GROUP_WEBSITE_ADMINISTRATOR = "Website Administrator";
+    private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
 
     private Map<String, Map<String, Boolean>> cachedPrivilegesMap = new HashMap<String, Map<String, Boolean>>();
 
@@ -113,7 +114,10 @@ public class BiobankApplicationServiceImpl extends
             Set<?> groups = upm.getGroups(user.getUserId().toString());
             for (Object obj : groups) {
                 Group group = (Group) obj;
-                if (group.getGroupName().equals(GROUP_WEBSITE_ADMINISTRATOR)) {
+                if (group
+                    .getGroupName()
+                    .equals(
+                        edu.ualberta.med.biobank.common.security.Group.GROUP_NAME_WEBSITE_ADMINISTRATOR)) {
                     return true;
                 }
             }
@@ -322,12 +326,17 @@ public class BiobankApplicationServiceImpl extends
                     .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
 
                 List<edu.ualberta.med.biobank.common.security.User> list = new ArrayList<edu.ualberta.med.biobank.common.security.User>();
-                for (Object object : upm.getObjects(new GroupSearchCriteria(
+                Map<Long, User> users = new HashMap<Long, User>();
+
+                for (Object g : upm.getObjects(new GroupSearchCriteria(
                     new Group()))) {
-                    Group serverGroup = (Group) object;
-                    for (Object userObj : upm.getUsers(serverGroup.getGroupId()
-                        .toString())) {
-                        list.add(createUser(upm, (User) userObj, true));
+                    Group group = (Group) g;
+                    for (Object u : upm.getUsers(group.getGroupId().toString())) {
+                        User user = (User) u;
+                        if (!users.containsKey(user.getUserId())) {
+                            list.add(createUser(upm, user));
+                            users.put(user.getUserId(), user);
+                        }
                     }
                 }
                 return list;
@@ -351,18 +360,29 @@ public class BiobankApplicationServiceImpl extends
                 if (user.getLogin() == null) {
                     throw new ApplicationException("Login should be set");
                 }
-                User serverUser = upm.getUser(user.getLogin());
+
+                User serverUser = null;
+                if (user.getId() != null) {
+                    serverUser = upm.getUserById(user.getId().toString());
+                }
                 if (serverUser == null) {
                     serverUser = new User();
-                    serverUser.setLoginName(user.getLogin());
                 }
+
+                serverUser.setLoginName(user.getLogin());
                 serverUser.setFirstName(user.getFirstName());
                 serverUser.setLastName(user.getLastName());
                 serverUser.setEmailId(user.getEmail());
+
                 String password = user.getPassword();
-                if (password != null && !password.equals("******")) {
+                if (password != null && !password.isEmpty()) {
                     serverUser.setPassword(password);
                 }
+
+                if (user.isNeedToChangePassword()) {
+                    serverUser.setStartDate(new Date());
+                }
+
                 Set<Group> groups = new HashSet<Group>();
                 for (edu.ualberta.med.biobank.common.security.Group groupDto : user
                     .getGroups()) {
@@ -426,27 +446,6 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public boolean needPasswordModification() throws ApplicationException {
-        try {
-            String userLogin = SecurityContextHolder.getContext()
-                .getAuthentication().getName();
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
-            User user = upm.getUser(userLogin);
-            if (user == null) {
-                throw new ApplicationException("Error retrieving security user");
-            }
-            return user.getStartDate() != null;
-        } catch (ApplicationException ae) {
-            log.error("Error checking password status", ae);
-            throw ae;
-        } catch (Exception ex) {
-            log.error("Error checking password status", ex);
-            throw new ApplicationException(ex);
-        }
-    }
-
-    @Override
     public edu.ualberta.med.biobank.common.security.User getCurrentUser()
         throws ApplicationException {
         try {
@@ -459,30 +458,30 @@ public class BiobankApplicationServiceImpl extends
             User serverUser = upm.getUser(userLogin);
             if (serverUser == null)
                 throw new ApplicationException("Problem with user retrieval");
-            return createUser(upm, serverUser, false);
+            return createUser(upm, serverUser);
         } catch (ApplicationException ae) {
-            log.error("Error modifying password", ae);
+            log.error("Error getting current user", ae);
             throw ae;
         } catch (Exception ex) {
-            log.error("Error modifying password", ex);
+            log.error("Error getting current user", ex);
             throw new ApplicationException(ex);
         }
     }
 
     private edu.ualberta.med.biobank.common.security.User createUser(
-        UserProvisioningManager upm, User serverUser, boolean setPassword)
+        UserProvisioningManager upm, User serverUser)
         throws CSObjectNotFoundException {
         edu.ualberta.med.biobank.common.security.User userDTO = new edu.ualberta.med.biobank.common.security.User();
+        userDTO.setId(serverUser.getUserId());
         userDTO.setLogin(serverUser.getLoginName());
         userDTO.setFirstName(serverUser.getFirstName());
         userDTO.setLastName(serverUser.getLastName());
-        if (setPassword) {
-            String password = serverUser.getPassword();
-            if (password != null) {
-                userDTO.setPassword("******");
-            }
-        }
         userDTO.setEmail(serverUser.getEmailId());
+
+        if (serverUser.getStartDate() != null) {
+            userDTO.setNeedToChangePassword(true);
+        }
+
         List<edu.ualberta.med.biobank.common.security.Group> groups = new ArrayList<edu.ualberta.med.biobank.common.security.Group>();
         for (Object o : upm.getGroups(serverUser.getUserId().toString())) {
             groups.add(createGroup(upm, (Group) o));

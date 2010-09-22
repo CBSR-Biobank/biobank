@@ -372,5 +372,4 @@ public abstract class BiobankFormBase extends EditorPart {
             linkedForms.remove(this);
         }
     }
-
 }

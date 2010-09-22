@@ -6,8 +6,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class Group implements Serializable, BiobankSecurity {
+import edu.ualberta.med.biobank.common.util.NotAProxy;
 
+public class Group implements Serializable, NotAProxy {
+    public static final String GROUP_NAME_WEBSITE_ADMINISTRATOR = "Website Administrator";
     private static final long serialVersionUID = 1L;
 
     private Long id;
@@ -38,6 +40,10 @@ public class Group implements Serializable, BiobankSecurity {
         return name;
     }
 
+    public boolean isWebsiteAdministrator() {
+        return name != null && name.equals(GROUP_NAME_WEBSITE_ADMINISTRATOR);
+    }
+
     public void addProtectionElementPrivilege(String objectName,
         Set<Privilege> privileges, String objectId) {
         ProtectionElementPrivilege per = pePrivilegeMap.get(objectName);
@@ -52,11 +58,6 @@ public class Group implements Serializable, BiobankSecurity {
         return pePrivilegeMap.values();
     }
 
-    @Override
-    public String toString() {
-        return getId() + "/" + getName();
-    }
-
     public boolean hasPrivilegeOnObject(Privilege privilege, String objectName) {
         ProtectionElementPrivilege per = pePrivilegeMap.get(objectName);
         if (per == null) {
@@ -65,4 +66,8 @@ public class Group implements Serializable, BiobankSecurity {
         return per.getPrivileges().contains(privilege);
     }
 
+    @Override
+    public String toString() {
+        return getId() + "/" + getName();
+    }
 }

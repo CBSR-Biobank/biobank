@@ -19,14 +19,14 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 public class AliquotInvoiceByPatientTest extends AbstractReportTest {
     private static final Comparator<AliquotWrapper> ORDER_BY_ALIQUOT_PNUMBER = new Comparator<AliquotWrapper>() {
         public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
-            int cmp = lhs.getPatientVisit().getPatient().getPnumber()
-                .compareTo(rhs.getPatientVisit().getPatient().getPnumber());
+            int cmp = compareStrings(lhs.getPatientVisit().getPatient()
+                .getPnumber(), rhs.getPatientVisit().getPatient().getPnumber());
 
             if (cmp != 0) {
                 return cmp;
             }
 
-            return lhs.getInventoryId().compareTo(rhs.getInventoryId());
+            return compareStrings(lhs.getInventoryId(), rhs.getInventoryId());
         }
     };
 

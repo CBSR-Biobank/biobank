@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
@@ -75,7 +76,7 @@ public class SessionManager {
         updateMenus();
     }
 
-    public void addSession(final WritableApplicationService appService,
+    public void addSession(final BiobankApplicationService appService,
         String serverName, User user, Collection<SiteWrapper> sites) {
         logger.debug("addSession: " + serverName + ", user/" + user.getLogin()
             + " numSites/" + sites.size());
@@ -91,6 +92,12 @@ public class SessionManager {
 
         rebuildSession();
         updateMenus();
+
+        if (sessionAdapter.getUser().isNeedToChangePassword()) {
+            ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
+                .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
+            dlg.open();
+        }
     }
 
     public void deleteSession() throws Exception {
@@ -115,8 +122,10 @@ public class SessionManager {
 
         // assign logged in state
         SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.SESSION_STATE);
+            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
+        sessionSourceProvider.setWebAdmin(sessionAdapter != null
+            && sessionAdapter.getUser().isWebsiteAdministrator());
 
         // assign debug state
         DebugState debugStateSourceProvider = (DebugState) service
@@ -138,7 +147,7 @@ public class SessionManager {
         return sessionAdapter;
     }
 
-    public static WritableApplicationService getAppService() {
+    public static BiobankApplicationService getAppService() {
         return getInstance().getSession().getAppService();
     }
 

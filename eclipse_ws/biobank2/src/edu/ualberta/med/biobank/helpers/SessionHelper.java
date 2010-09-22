@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionHelper implements Runnable {
 
@@ -81,7 +80,7 @@ public class SessionHelper implements Runnable {
         }
     }
 
-    public WritableApplicationService getAppService() {
+    public BiobankApplicationService getAppService() {
         return appService;
     }
 

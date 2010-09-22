@@ -4,8 +4,9 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ProtectionElementPrivilege implements Serializable,
-    BiobankSecurity {
+import edu.ualberta.med.biobank.common.util.NotAProxy;
+
+public class ProtectionElementPrivilege implements Serializable, NotAProxy {
 
     private static final long serialVersionUID = 1L;
 
