@@ -174,7 +174,7 @@ public class FTAReportTest extends AbstractReportTest {
                 .values()) {
                 if (patientVisit.getId().equals(
                     aliquot.getPatientVisit().getId())) {
-                    expectedResults.add(aliquot.getWrappedObject());
+                    expectedResults.add(aliquot.getId());
                 }
             }
         }

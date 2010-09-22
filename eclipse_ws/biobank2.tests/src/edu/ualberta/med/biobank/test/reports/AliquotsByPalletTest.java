@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.test.reports;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.Predicate;
@@ -17,37 +17,29 @@ public class AliquotsByPalletTest extends AbstractReportTest {
 
     @Test
     public void testResults() throws Exception {
-        List<AliquotWrapper> allAliquots = getAliquots();
-        ContainerWrapper container, topContainer;
+        List<ContainerWrapper> topContainers = new ArrayList<ContainerWrapper>(
+            getTopContainers(getContainers()));
 
-        for (AliquotWrapper aliquot : allAliquots) {
-            container = aliquot.getParent();
-            topContainer = getTopContainer(aliquot.getParent());
-
-            if ((container != null) && (topContainer != null)) {
-                checkResults(container.getLabel(), topContainer
-                    .getContainerType().getNameShort());
+        for (ContainerWrapper container : getContainers()) {
+            for (int i = 0, n = topContainers.size(); i < n; i++) {
+                checkResults(container.getLabel(),
+                    topContainers.subList(i, i + 1));
             }
+            checkResults(container.getLabel(), topContainers);
         }
-    }
-
-    @Test
-    public void testEmptyCriteria() throws Exception {
-        checkResults("", "");
     }
 
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
         final String containerLabel = (String) getReport().getParams().get(0);
-        final String topContainerTypeNameShort = (String) getReport()
-            .getParams().get(1);
+        final String topContainers = getReport().getContainerList();
 
         Collection<AliquotWrapper> allAliquots = getAliquots();
         @SuppressWarnings("unchecked")
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 aliquotInContainerLabelled(containerLabel),
-                aliquotInTopContainerType(topContainerTypeNameShort),
+                aliquotTopContainerIdIn(topContainers),
                 aliquotSite(isInSite(), getSiteId())));
 
         List<Object> expectedResults = new ArrayList<Object>();
@@ -60,11 +52,12 @@ public class AliquotsByPalletTest extends AbstractReportTest {
     }
 
     private void checkResults(String containerLabel,
-        String topContainerTypeNameShort) throws Exception {
-        getReport().setParams(
-            Arrays.asList((Object) containerLabel,
-                (Object) topContainerTypeNameShort));
-
+        List<ContainerWrapper> topContainerList) throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(containerLabel);
+        getReport().setParams(params);
+        getReport().setContainerList(
+            StringUtils.join(getTopContainerIds(topContainerList), ","));
         checkResults(EnumSet.of(CompareResult.SIZE));
     }
 
@@ -76,26 +69,5 @@ public class AliquotsByPalletTest extends AbstractReportTest {
                     && aliquot.getParent().getLabel().equals(containerLabel);
             }
         };
-    }
-
-    private static final Predicate<AliquotWrapper> aliquotInTopContainerType(
-        final String topContainerTypeNameShort) {
-        return new Predicate<AliquotWrapper>() {
-            public boolean evaluate(AliquotWrapper aliquot) {
-                ContainerWrapper topLevelContainer = getTopContainer(aliquot
-                    .getParent());
-                return topLevelContainer == null ? false : topLevelContainer
-                    .getContainerType().getNameShort()
-                    .equals(topContainerTypeNameShort);
-            }
-        };
-    }
-
-    private static final ContainerWrapper getTopContainer(
-        ContainerWrapper container) {
-        while ((container != null) && (container.getParent() != null)) {
-            container = container.getParent();
-        }
-        return container;
     }
 }

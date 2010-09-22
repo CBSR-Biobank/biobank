@@ -54,16 +54,21 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
-@SuiteClasses({ AliquotCountTest.class, AliquotInvoiceByClinicTest.class,
-    AliquotInvoiceByPatientTest.class, AliquotRequestTest.class,
-    AliquotsByPalletTest.class, AliquotSCountTest.class, CAliquotsTest.class,
-    ContainerCapacityTest.class, ContainerEmptyLocationsTest.class,
-    DAliquotsTest.class, FTAReportTest.class, FvLPatientVisitsTest.class,
-    InvoicingReportTest.class, NewPsByStudyClinicTest.class,
-    NewPVsByStudyClinicTest.class, PatientVisitSummaryTest.class,
-    PatientWBCTest.class, PsByStudyTest.class, PVsByStudyTest.class,
-    QAAliquotsTest.class, SAliquotsTest.class, SampleTypePvCountTest.class,
-    SampleTypeSUsageTest.class })
+@SuiteClasses({// AliquotCountTest.class, AliquotInvoiceByClinicTest.class,
+// AliquotInvoiceByPatientTest.class, AliquotRequestTest.class,
+// AliquotsByPalletTest.class, AliquotSCountTest.class, CAliquotsTest.class,
+// ContainerCapacityTest.class,
+ContainerEmptyLocationsTest.class,
+// DAliquotsTest.class,
+    FTAReportTest.class,
+    // FvLPatientVisitsTest.class,
+    // InvoicingReportTest.class,
+    NewPsByStudyClinicTest.class
+// NewPVsByStudyClinicTest.class, PatientVisitSummaryTest.class,
+// PsByStudyTest.class, PVsByStudyTest.class, QAAliquotsTest.class,
+// SAliquotsTest.class, SampleTypePvCountTest.class,
+// SampleTypeSUsageTest.class
+})
 public final class TestReportsProcedurallyGeneratedData implements
     ReportDataSource {
     private static TestReportsProcedurallyGeneratedData instance = null;

@@ -18,9 +18,9 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         + ContainerPath.class.getName()
         + " c, "
         + ContainerPath.class.getName()
-        + " parent where locate(parent.path || '/', c.path) !=0 and parent.container.label = ? and substr(parent.path, 1, locate('/', parent.path)) in ("
+        + " parent where parent.id in ("
         + CONTAINER_LIST
-        + ") and c.container.containerType.sampleTypeCollection.size > 0 "
+        + ") and (c.path LIKE parent.path || '/%' OR c.id=parent.id) and c.container.label LIKE ?||'%' and c.container.containerType.sampleTypeCollection.size > 0 "
         + "and (c.container.containerType.capacity.rowCapacity * c.container.containerType.capacity.colCapacity) > c.container.aliquotPositionCollection.size and c.container.site "
         + SITE_OPERATOR + SITE_ID;
 
