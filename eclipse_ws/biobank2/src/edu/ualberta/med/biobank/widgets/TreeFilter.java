@@ -1,10 +1,10 @@
-package edu.ualberta.med.biobank.views;
+package edu.ualberta.med.biobank.widgets;
 
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.ui.dialogs.PatternFilter;
 
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 
 public class TreeFilter extends PatternFilter {
 

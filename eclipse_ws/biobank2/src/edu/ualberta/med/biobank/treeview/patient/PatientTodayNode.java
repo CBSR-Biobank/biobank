@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.patient;
 
 import java.util.Collection;
 import java.util.List;
@@ -9,6 +9,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.StudyAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientTodayNode extends AbstractTodayNode {

@@ -29,21 +29,21 @@ import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.DateNode;
-import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.ReceivedDispatchShipmentGroup;
-import edu.ualberta.med.biobank.treeview.SentDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.SiteGroup;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivedDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.SentDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**

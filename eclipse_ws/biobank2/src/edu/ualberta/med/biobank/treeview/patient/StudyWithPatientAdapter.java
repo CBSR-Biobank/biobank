@@ -1,8 +1,10 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.patient;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.StudyAdapter;
 
 public class StudyWithPatientAdapter extends StudyAdapter {
 

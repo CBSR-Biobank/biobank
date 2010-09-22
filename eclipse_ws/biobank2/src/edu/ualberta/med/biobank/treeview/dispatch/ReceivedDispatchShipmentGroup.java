@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.dispatch;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -6,11 +6,13 @@ import java.util.Collection;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class SentDispatchShipmentGroup extends AbstractDispatchShipmentGroup {
+public class ReceivedDispatchShipmentGroup extends
+    AbstractDispatchShipmentGroup {
 
-    public SentDispatchShipmentGroup(AdapterBase parent, int id) {
-        super(parent, id, "Sent - Pending");
+    public ReceivedDispatchShipmentGroup(AdapterBase parent, int id) {
+        super(parent, id, "Received - Pending");
     }
 
     @Override
@@ -19,7 +21,7 @@ public class SentDispatchShipmentGroup extends AbstractDispatchShipmentGroup {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             site.reload();
-            return site.getPendingSentDispatchShipmentCollection();
+            return site.getPendingReceivedDispatchShipmentCollection();
         }
         return new ArrayList<ModelWrapper<?>>();
     }

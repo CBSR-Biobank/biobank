@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.util;
 
 public class DeltaEvent {
 	protected Object actedUpon;

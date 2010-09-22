@@ -1,9 +1,11 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.util;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class NodeContentProvider implements ITreeContentProvider,
     IDeltaListener {

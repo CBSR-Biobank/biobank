@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.widgets;
 
 import java.io.IOException;
 import java.util.ArrayList;

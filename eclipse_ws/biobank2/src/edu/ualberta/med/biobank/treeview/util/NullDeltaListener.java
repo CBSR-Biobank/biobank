@@ -1,4 +1,5 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.util;
+
 
 public class NullDeltaListener implements IDeltaListener {
     protected static NullDeltaListener soleInstance = new NullDeltaListener();

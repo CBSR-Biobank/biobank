@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 

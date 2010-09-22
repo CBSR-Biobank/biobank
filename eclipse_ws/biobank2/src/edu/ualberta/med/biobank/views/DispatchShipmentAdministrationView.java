@@ -18,9 +18,9 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.DispatchShipmentSearchedNode;
-import edu.ualberta.med.biobank.treeview.ReceivedDispatchShipmentGroup;
-import edu.ualberta.med.biobank.treeview.SentDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentSearchedNode;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivedDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.SentDispatchShipmentGroup;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class DispatchShipmentAdministrationView extends

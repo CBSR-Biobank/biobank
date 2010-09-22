@@ -24,11 +24,11 @@ import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.DateNode;
-import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
-import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ClinicWithShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ShipmentSearchedNode;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ShipmentTodayNode;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class ShipmentAdministrationView extends

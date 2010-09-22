@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.clinicShipment;
 
 import java.util.Collection;
 
@@ -13,6 +13,8 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.ClinicShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicShipmentViewForm;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 
 public class ClinicShipmentAdapter extends AdapterBase {
 

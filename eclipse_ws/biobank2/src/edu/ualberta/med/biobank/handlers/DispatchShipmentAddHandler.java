@@ -7,8 +7,8 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
-import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentAdapter;
 
 public class DispatchShipmentAddHandler extends AbstractHandler {
 

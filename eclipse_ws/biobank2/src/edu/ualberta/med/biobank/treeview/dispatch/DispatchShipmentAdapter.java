@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.dispatch;
 
 import java.util.Collection;
 
@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchShipmentViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class DispatchShipmentAdapter extends AdapterBase {
 

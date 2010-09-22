@@ -1,8 +1,9 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.util;
 
 import java.lang.reflect.Constructor;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class AdapterFactory {
 

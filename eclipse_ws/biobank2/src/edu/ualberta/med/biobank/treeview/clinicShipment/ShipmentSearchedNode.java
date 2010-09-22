@@ -1,20 +1,20 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.clinicShipment;
 
-import java.util.List;
+import java.util.Date;
 
 import org.eclipse.core.runtime.Assert;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
+import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 
-public class ShipmentTodayNode extends AbstractTodayNode {
+public class ShipmentSearchedNode extends AbstractSearchedNode {
 
-    public ShipmentTodayNode(AdapterBase parent, int id) {
+    public ShipmentSearchedNode(AdapterBase parent, int id) {
         super(parent, id);
-        setName("Today's shipments");
     }
 
     @Override
@@ -29,14 +29,6 @@ public class ShipmentTodayNode extends AbstractTodayNode {
     }
 
     @Override
-    protected List<? extends ModelWrapper<?>> getTodayElements()
-        throws ApplicationException {
-        return ClinicShipmentWrapper.getTodayShipments(SessionManager
-            .getAppService(), SessionManager.getInstance().getCurrentSite());
-
-    }
-
-    @Override
     protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
         if (child instanceof ClinicShipmentWrapper) {
             return parent.equals(((ClinicShipmentWrapper) child).getClinic());
@@ -44,4 +36,14 @@ public class ShipmentTodayNode extends AbstractTodayNode {
         return false;
     }
 
+    @Override
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof Date) {
+            Date date = (Date) searchedObject;
+            return getChild((int) date.getTime());
+        } else if (searchedObject instanceof ClinicWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
+        }
+        return searchChildren(searchedObject);
+    }
 }

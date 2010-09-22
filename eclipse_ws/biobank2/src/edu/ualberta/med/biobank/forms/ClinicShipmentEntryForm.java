@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;

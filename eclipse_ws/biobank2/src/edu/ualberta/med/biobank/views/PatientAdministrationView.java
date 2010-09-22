@@ -13,10 +13,10 @@ import edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
-import edu.ualberta.med.biobank.treeview.PatientTodayNode;
-import edu.ualberta.med.biobank.treeview.StudyWithPatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
+import edu.ualberta.med.biobank.treeview.patient.PatientTodayNode;
+import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 
 public class PatientAdministrationView extends
     AbstractTodaySearchAdministrationView {

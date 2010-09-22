@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.util;
 
 import java.lang.reflect.InvocationTargetException;
 
@@ -11,6 +11,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public abstract class CallRunnablePersistOnAdapter implements
     IRunnableWithProgress {

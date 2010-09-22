@@ -25,10 +25,10 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.AdapterFactory;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
