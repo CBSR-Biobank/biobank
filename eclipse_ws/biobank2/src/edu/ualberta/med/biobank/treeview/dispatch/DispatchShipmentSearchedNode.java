@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 public class DispatchShipmentSearchedNode extends AbstractSearchedNode {
 
     public DispatchShipmentSearchedNode(AdapterBase parent, int id) {
-        super(parent, id);
+        super(parent, id, true);
     }
 
     @Override
@@ -45,6 +45,14 @@ public class DispatchShipmentSearchedNode extends AbstractSearchedNode {
             return getChild((ModelWrapper<?>) searchedObject, true);
         }
         return searchChildren(searchedObject);
+    }
+
+    @Override
+    protected void addNode(ModelWrapper<?> wrapper) {
+        DispatchShipmentAdapter ship = new DispatchShipmentAdapter(this,
+            (DispatchShipmentWrapper) wrapper);
+        ship.setParent(this);
+        addChild(ship);
     }
 
 }

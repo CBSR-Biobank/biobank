@@ -64,9 +64,9 @@ public class DispatchShipmentWrapper extends
                 + getWaybill() + " already exists for sending site "
                 + getSender().getNameShort());
         }
-        if (isSent() && getDateShipped() == null) {
+        if (isInTransit() && getDateShipped() == null) {
             throw new BiobankCheckException(
-                "Date shipped should be set when the status is set to 'Sent'.");
+                "Date shipped should be set when this shipment is in transit.");
         }
         checkSenderCanSendToReceiver();
     }
@@ -74,7 +74,7 @@ public class DispatchShipmentWrapper extends
     @Override
     protected void persistDependencies(DispatchShipment origObject)
         throws Exception {
-        if (isSent()) {
+        if (isInTransit()) {
             // when is sent, need to set aliquots positions to null and to
             // remove containers holding them
             for (AliquotWrapper aliquot : getAliquotCollection()) {
@@ -366,15 +366,24 @@ public class DispatchShipmentWrapper extends
         }
     }
 
-    public boolean isClosed() {
-        return getActivityStatus().isClosed();
+    public boolean isInCreation() {
+        ActivityStatusWrapper activity = getActivityStatus();
+        return activity != null && activity.getName().equals("Creation");
     }
 
-    public boolean isSent() {
+    public boolean isInTransit() {
         ActivityStatusWrapper activity = getActivityStatus();
-        return activity != null
-            && activity.getName().equals(
-                ActivityStatusWrapper.SENT_STATUS_STRING);
+        return activity != null && activity.getName().equals("In Transit");
+    }
+
+    public boolean isReceived() {
+        ActivityStatusWrapper activity = getActivityStatus();
+        return activity != null && activity.getName().equals("Received");
+    }
+
+    public boolean isClosed() {
+        ActivityStatusWrapper activity = getActivityStatus();
+        return activity != null && activity.getName().equals("Closed");
     }
 
     /**
@@ -400,7 +409,37 @@ public class DispatchShipmentWrapper extends
      * Search for shipments with the given date sent. Don't use hour and minute.
      * Site can be the sender or the receiver.
      */
-    public static List<DispatchShipmentWrapper> getShipmentsInSite(
+    public static List<DispatchShipmentWrapper> getShipmentsInSiteByDateSent(
+        WritableApplicationService appService, Date dateReceived,
+        SiteWrapper site) throws ApplicationException {
+        Calendar cal = Calendar.getInstance();
+        // date at 0:0am
+        cal.setTime(dateReceived);
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date startDate = cal.getTime();
+        // date at 0:0pm
+        cal.add(Calendar.DATE, 1);
+        Date endDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria("from "
+            + DispatchShipment.class.getName()
+            + " where sender.id = ? and dateShipped >= ? and dateShipped <= ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+        List<DispatchShipment> shipments = appService.query(criteria);
+        List<DispatchShipmentWrapper> wrappers = new ArrayList<DispatchShipmentWrapper>();
+        for (DispatchShipment s : shipments) {
+            wrappers.add(new DispatchShipmentWrapper(appService, s));
+        }
+        return wrappers;
+    }
+
+    /**
+     * Search for shipments with the given date received. Don't use hour and
+     * minute. Site can be the sender or the receiver.
+     */
+    public static List<DispatchShipmentWrapper> getShipmentsInSiteByDateReceived(
         WritableApplicationService appService, Date dateReceived,
         SiteWrapper site) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
@@ -417,15 +456,25 @@ public class DispatchShipmentWrapper extends
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + DispatchShipment.class.getName()
-                + " where (sender.id = ? or receiver.id = ?) and dateShipped >= ? and dateShipped <= ?",
-            Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
-                endDate }));
+                + " where receiver.id = ? and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<DispatchShipment> shipments = appService.query(criteria);
         List<DispatchShipmentWrapper> wrappers = new ArrayList<DispatchShipmentWrapper>();
         for (DispatchShipment s : shipments) {
             wrappers.add(new DispatchShipmentWrapper(appService, s));
         }
         return wrappers;
+    }
+
+    @Override
+    public String toString() {
+        StringBuffer sb = new StringBuffer();
+        sb.append(getSender() == null ? "" : getSender().getNameShort() + "/");
+        sb.append(getReceiver() == null ? "" : getReceiver().getNameShort()
+            + "/");
+        sb.append(getFormattedDateShipped() + "/");
+        sb.append(getFormattedDateReceived());
+        return sb.toString();
     }
 
 }

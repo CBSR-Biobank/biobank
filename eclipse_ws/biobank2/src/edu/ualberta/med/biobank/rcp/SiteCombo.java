@@ -80,7 +80,7 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
                         if (o instanceof SiteWrapper) {
                             SiteWrapper site = (SiteWrapper) o;
                             int numPending = site
-                                .getPendingReceivedDispatchShipmentCollection()
+                                .getReceivingDispatchShipmentCollection()
                                 .size();
 
                             message = MessageFormat.format(

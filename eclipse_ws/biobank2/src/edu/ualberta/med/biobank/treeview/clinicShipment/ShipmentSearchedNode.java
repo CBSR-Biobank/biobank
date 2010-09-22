@@ -10,11 +10,12 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 
 public class ShipmentSearchedNode extends AbstractSearchedNode {
 
     public ShipmentSearchedNode(AdapterBase parent, int id) {
-        super(parent, id);
+        super(parent, id, false);
     }
 
     @Override
@@ -45,5 +46,10 @@ public class ShipmentSearchedNode extends AbstractSearchedNode {
             return getChild((ModelWrapper<?>) searchedObject, true);
         }
         return searchChildren(searchedObject);
+    }
+
+    @Override
+    protected void addNode(ModelWrapper<?> wrapper) {
+        ShipmentAdministrationView.getCurrent().addToNode(this, wrapper);
     }
 }

@@ -869,17 +869,6 @@
                <reference
                      definitionId="biobank2.siteSelected">
                </reference>
-               <or>
-               <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.patientsPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.shipmentsPerspectiveSelected">
-               </reference>
-			   </or>
              </and>
          </activeWhen>
       </handler>
@@ -1678,6 +1667,13 @@
                </visibleWhen>
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  style="push"
+                  tooltip="Search">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
@@ -1902,7 +1898,7 @@
                moveable="true"
                ratio="0.85"
                relationship="bottom"
-               relative="edu.ualberta.med.biobank.views.ShipmentAdminView"
+               relative="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView"
                showTitle="true"
                standalone="false"
                visible="false">

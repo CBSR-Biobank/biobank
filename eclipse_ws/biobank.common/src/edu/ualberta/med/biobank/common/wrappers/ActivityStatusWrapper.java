@@ -38,8 +38,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     public static final String FLAGGED_STATUS_STRING = "Flagged";
 
-    public static final String SENT_STATUS_STRING = "Sent";
-
     public ActivityStatusWrapper(WritableApplicationService appService,
         ActivityStatus wrappedObject) {
         super(appService, wrappedObject);

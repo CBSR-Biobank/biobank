@@ -764,19 +764,19 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getPendingSentDispatchShipmentCollection() {
+    public List<DispatchShipmentWrapper> getInTransitSentDispatchShipmentCollection() {
         List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("pendingSentDispatchShipmentCollection");
+            .get("inTransitSentDispatchShipmentCollection");
         if (shipCollection == null) {
             List<DispatchShipmentWrapper> children = getSentDispatchShipmentCollection();
             if (children != null) {
                 shipCollection = new ArrayList<DispatchShipmentWrapper>();
                 for (DispatchShipmentWrapper ship : children) {
-                    if (!ship.isClosed()) {
+                    if (ship.isInTransit()) {
                         shipCollection.add(ship);
                     }
                 }
-                propertiesMap.put("pendingSentDispatchShipmentCollection",
+                propertiesMap.put("inTransitSentDispatchShipmentCollection",
                     shipCollection);
             }
         }
@@ -784,19 +784,59 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getPendingReceivedDispatchShipmentCollection() {
+    public List<DispatchShipmentWrapper> getInTransitReceiveDispatchShipmentCollection() {
         List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("pendingReceivedDispatchShipmentCollection");
+            .get("inTransitReceiveDispatchShipmentCollection");
         if (shipCollection == null) {
             List<DispatchShipmentWrapper> children = getReceivedDispatchShipmentCollection();
             if (children != null) {
                 shipCollection = new ArrayList<DispatchShipmentWrapper>();
                 for (DispatchShipmentWrapper ship : children) {
-                    if (!ship.isClosed()) {
+                    if (ship.isInTransit()) {
                         shipCollection.add(ship);
                     }
                 }
-                propertiesMap.put("pendingReceivedDispatchShipmentCollection",
+                propertiesMap.put("inTransitReceiveDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getReceivingDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("receivingDispatchShipmentCollection");
+        if (shipCollection == null) {
+            List<DispatchShipmentWrapper> children = getReceivedDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipmentWrapper ship : children) {
+                    if (ship.isReceived()) {
+                        shipCollection.add(ship);
+                    }
+                }
+                propertiesMap.put("receivingDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getInCreationDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("inCreationDispatchShipmentCollection");
+        if (shipCollection == null) {
+            List<DispatchShipmentWrapper> children = getSentDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipmentWrapper ship : children) {
+                    if (ship.isInCreation()) {
+                        shipCollection.add(ship);
+                    }
+                }
+                propertiesMap.put("inCreationDispatchShipmentCollection",
                     shipCollection);
             }
         }

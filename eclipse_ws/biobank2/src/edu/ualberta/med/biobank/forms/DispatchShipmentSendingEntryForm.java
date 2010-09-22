@@ -222,7 +222,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             "Date shipped should be set") {
             @Override
             public IStatus validate(Object value) {
-                if (value == null && shipment.isSent()) {
+                if (value == null && shipment.isInTransit()) {
                     showDecoration();
                     return ValidationStatus.error(errorMessage);
                 } else {
@@ -259,12 +259,12 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                     dateShippedWidget.setDate(new Date());
                     dateShippedWidget.setDate(date);
 
-                    if (shipment.isSent()
+                    if (shipment.isInTransit()
                         && shipment.getAliquotCollection().size() == 0) {
                         BioBankPlugin
                             .openAsyncInformation(
                                 "No aliquots",
-                                "There are no aliquots added to this shipment, are you sure it should be set to 'Sent' ?");
+                                "There are no aliquots added to this shipment, are you sure it should be set to 'In Transit' status ?");
                     }
                 }
             });
@@ -288,7 +288,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     private void createAliquotsSection() {
         Section section = createSection("Aliquots");
-        if (!shipment.isSent()) {
+        if (shipment.isInCreation()) {
             addSectionToolbar(section, "Add aliquots to this shipment",
                 new SelectionAdapter() {
                     @Override
@@ -321,7 +321,8 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        if (shipment.isSent() && shipment.getAliquotCollection().size() == 0) {
+        if (shipment.isInTransit()
+            && shipment.getAliquotCollection().size() == 0) {
             boolean ok = BioBankPlugin.openConfirm("No aliquots",
                 "There are no aliquots added to this shipment, are you sure"
                     + " it should be save with a 'Sent' status ?");

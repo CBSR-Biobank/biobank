@@ -8,10 +8,11 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class SentDispatchShipmentGroup extends AbstractDispatchShipmentGroup {
+public class SentInTransitDispatchShipmentGroup extends
+    AbstractDispatchShipmentGroup {
 
-    public SentDispatchShipmentGroup(AdapterBase parent, int id) {
-        super(parent, id, "Sent - Pending");
+    public SentInTransitDispatchShipmentGroup(AdapterBase parent, int id) {
+        super(parent, id, "In transit");
     }
 
     @Override
@@ -20,7 +21,7 @@ public class SentDispatchShipmentGroup extends AbstractDispatchShipmentGroup {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             site.reload();
-            return site.getPendingSentDispatchShipmentCollection();
+            return site.getInTransitSentDispatchShipmentCollection();
         }
         return new ArrayList<ModelWrapper<?>>();
     }

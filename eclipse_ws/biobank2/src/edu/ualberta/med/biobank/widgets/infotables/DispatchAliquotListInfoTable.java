@@ -45,7 +45,7 @@ public class DispatchAliquotListInfoTable extends
         super(parent, aliquotCollection, HEADINGS, BOUNDS, 20);
         this.editMode = editMode;
         if (editMode) {
-            if (!shipment.isSent()) {
+            if (shipment.isInCreation()) {
                 addDeleteItemListener(new IInfoTableDeleteItemListener() {
                     @Override
                     public void deleteItem(InfoTableEvent event) {
