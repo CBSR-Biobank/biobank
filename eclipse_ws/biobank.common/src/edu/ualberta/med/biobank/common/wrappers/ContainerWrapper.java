@@ -1058,8 +1058,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    public boolean canEdit(User user) {
-        return super.canEdit(user) && user.isContainerAdministrator();
+    public boolean canUpdate(User user) {
+        return super.canUpdate(user) && user.isContainerAdministrator();
     }
 
     /**

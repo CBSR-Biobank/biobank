@@ -49,7 +49,7 @@ public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
 
     public void reload() {
         List<StudySiteDispatch> dispatchList = new ArrayList<StudySiteDispatch>();
-        List<StudyWrapper> dispatchStudies = srcSite.getDispatchStudies();
+        List<StudyWrapper> dispatchStudies = srcSite.getDispatchStudiesAsSender();
         if (dispatchStudies != null) {
             for (StudyWrapper study : dispatchStudies) {
                 try {

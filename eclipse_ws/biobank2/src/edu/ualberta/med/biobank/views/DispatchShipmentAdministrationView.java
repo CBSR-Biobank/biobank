@@ -47,7 +47,7 @@ public class DispatchShipmentAdministrationView extends
 
     private Composite dateComposite;
 
-    private DateTimeWidget dateSentWidget;
+    private DateTimeWidget dateWidget;
 
     private DispatchShipmentSearchedNode searchedNode;
 
@@ -73,15 +73,17 @@ public class DispatchShipmentAdministrationView extends
 
     private void createNodes() {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
-        if (site == null || site.getDispatchStudies().size() > 0) {
+        if (site == null || site.getDispatchStudiesAsSender().size() > 0) {
             outgoingNode = new OutgoingNode(rootNode, 0);
             outgoingNode.setParent(rootNode);
             rootNode.addChild(outgoingNode);
         }
 
-        incomingNode = new IncomingNode(rootNode, 1);
-        incomingNode.setParent(rootNode);
-        rootNode.addChild(incomingNode);
+        if (site == null || site.getDispatchStudiesAsReceiver().size() > 0) {
+            incomingNode = new IncomingNode(rootNode, 1);
+            incomingNode.setParent(rootNode);
+            rootNode.addChild(incomingNode);
+        }
 
         searchedNode = new DispatchShipmentSearchedNode(rootNode, 2);
         searchedNode.setParent(rootNode);
@@ -140,7 +142,13 @@ public class DispatchShipmentAdministrationView extends
         gd.exclude = true;
         dateComposite.setLayoutData(gd);
 
-        dateSentWidget = new DateTimeWidget(dateComposite, SWT.DATE, new Date());
+        dateWidget = new DateTimeWidget(dateComposite, SWT.DATE, new Date());
+        dateWidget.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                internalSearch();
+            }
+        });
         Button searchButton = new Button(dateComposite, SWT.PUSH);
         searchButton.setText("Go");
         searchButton.addSelectionListener(new SelectionAdapter() {
@@ -188,7 +196,7 @@ public class DispatchShipmentAdministrationView extends
                     msg += " for waybill " + treeText.getText();
                 } else {
                     msg += " for date "
-                        + DateFormatter.formatAsDate(dateSentWidget.getDate());
+                        + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
                 BioBankPlugin.openMessage("Shipment not found", msg);
             } else {
@@ -206,7 +214,7 @@ public class DispatchShipmentAdministrationView extends
                 SessionManager.getAppService(), treeText.getText().trim(),
                 SessionManager.getInstance().getCurrentSite());
         } else {
-            Date date = dateSentWidget.getDate();
+            Date date = dateWidget.getDate();
             if (date != null) {
                 if (radioDateSent.getSelection())
                     return DispatchShipmentWrapper
@@ -243,6 +251,10 @@ public class DispatchShipmentAdministrationView extends
 
     public static DispatchShipmentAdministrationView getCurrent() {
         return currentInstance;
+    }
+
+    public OutgoingNode getOutgoingNode() {
+        return outgoingNode;
     }
 
 }

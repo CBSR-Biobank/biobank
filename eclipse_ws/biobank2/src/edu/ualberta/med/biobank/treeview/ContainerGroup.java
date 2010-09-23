@@ -154,8 +154,7 @@ public class ContainerGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addContainer(SiteAdapter siteAdapter,
-        boolean hasPreviousForm) {
+    public void addContainer(SiteAdapter siteAdapter, boolean hasPreviousForm) {
         try {
             List<ContainerTypeWrapper> top = ContainerTypeWrapper
                 .getTopContainerTypesInSite(SessionManager.getAppService(),

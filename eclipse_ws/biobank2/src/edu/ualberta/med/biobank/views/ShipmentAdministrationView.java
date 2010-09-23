@@ -94,6 +94,12 @@ public class ShipmentAdministrationView extends
 
         dateReceivedWidget = new DateTimeWidget(dateComposite, SWT.DATE,
             new Date());
+        dateReceivedWidget.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                internalSearch();
+            }
+        });
         Button searchButton = new Button(dateComposite, SWT.PUSH);
         searchButton.setText("Go");
         searchButton.addSelectionListener(new SelectionAdapter() {

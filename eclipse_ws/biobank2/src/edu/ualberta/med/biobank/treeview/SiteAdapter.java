@@ -40,17 +40,17 @@ public class SiteAdapter extends AdapterBase {
         return (SiteWrapper) modelObject;
     }
 
-    public AdapterBase getContainerTypesGroupNode() {
+    public ContainerTypeGroup getContainerTypesGroupNode() {
         AdapterBase adapter = getChild(nodeIdOffset
             + CONTAINER_TYPES_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return adapter;
+        return (ContainerTypeGroup) adapter;
     }
 
-    public AdapterBase getContainersGroupNode() {
+    public ContainerGroup getContainersGroupNode() {
         AdapterBase adapter = getChild(nodeIdOffset + CONTAINERS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return adapter;
+        return (ContainerGroup) adapter;
     }
 
     @Override

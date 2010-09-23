@@ -184,7 +184,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected void checkEditAccess() {
         if (adapter != null && adapter.getModelObject() != null
-            && !adapter.getModelObject().canEdit(SessionManager.getUser())) {
+            && !adapter.getModelObject().canUpdate(SessionManager.getUser())) {
             BioBankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException("Cannot edit. Access Denied.");
         }

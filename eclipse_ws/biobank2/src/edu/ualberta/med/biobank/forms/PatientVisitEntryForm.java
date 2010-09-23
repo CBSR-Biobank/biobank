@@ -174,7 +174,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             BeansObservables.observeValue(patientVisit, "comment"), null);
     }
 
-    private void createShipmentsCombo(Composite client) throws Exception {
+    private void createShipmentsCombo(Composite client) {
         ClinicShipmentWrapper selectedShip = initShipmentsCollections();
 
         Label label = widgetCreator.createLabel(client, "Shipment");

@@ -621,7 +621,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * return true if the user can edit this object
      */
     @Override
-    public boolean canEdit(User user) {
+    public boolean canUpdate(User user) {
         try {
             // Need to use the appService method as the filter added for site
             // need to be used. (see CSM documentation and configuration)
@@ -638,7 +638,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         removedDispatchInfoWrapper.clear();
     }
 
-    public List<StudyWrapper> getDispatchStudies() {
+    public List<StudyWrapper> getDispatchStudiesAsSender() {
         Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
         if (srcMap == null)
             return null;
@@ -647,6 +647,24 @@ public class SiteWrapper extends ModelWrapper<Site> {
             wrappers.add(diw.getStudy());
         }
         return wrappers;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<StudyWrapper> getDispatchStudiesAsReceiver() {
+        List<StudyWrapper> studies = (List<StudyWrapper>) propertiesMap
+            .get("dispatchStudiesAsReceiver");
+        if (studies == null) {
+            Collection<DispatchInfo> children = wrappedObject
+                .getDestDispatchInfoCollection();
+            if (children != null) {
+                studies = new ArrayList<StudyWrapper>();
+                for (DispatchInfo di : children) {
+                    studies.add(new StudyWrapper(appService, di.getStudy()));
+                }
+                propertiesMap.put("dispatchStudiesAsReceiver", studies);
+            }
+        }
+        return studies;
     }
 
     public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
@@ -772,7 +790,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchShipmentWrapper>();
                 for (DispatchShipmentWrapper ship : children) {
-                    if (ship.isInTransit()) {
+                    if (ship.isInTransitState()) {
                         shipCollection.add(ship);
                     }
                 }
@@ -792,7 +810,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchShipmentWrapper>();
                 for (DispatchShipmentWrapper ship : children) {
-                    if (ship.isInTransit()) {
+                    if (ship.isInTransitState()) {
                         shipCollection.add(ship);
                     }
                 }
@@ -812,11 +830,32 @@ public class SiteWrapper extends ModelWrapper<Site> {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchShipmentWrapper>();
                 for (DispatchShipmentWrapper ship : children) {
-                    if (ship.isReceived()) {
+                    if (ship.isInReceivedState()) {
                         shipCollection.add(ship);
                     }
                 }
                 propertiesMap.put("receivingDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getReceivingWithErrorsDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("receivingWithErrorsDispatchShipmentCollection");
+        if (shipCollection == null) {
+            List<DispatchShipmentWrapper> children = getReceivedDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipmentWrapper ship : children) {
+                    if (ship.isInErrorAndOpenState()) {
+                        shipCollection.add(ship);
+                    }
+                }
+                propertiesMap.put(
+                    "receivingWithErrorsDispatchShipmentCollection",
                     shipCollection);
             }
         }
@@ -832,7 +871,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchShipmentWrapper>();
                 for (DispatchShipmentWrapper ship : children) {
-                    if (ship.isInCreation()) {
+                    if (ship.isInCreationState()) {
                         shipCollection.add(ship);
                     }
                 }

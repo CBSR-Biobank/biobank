@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
+import java.util.Date;
+
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -78,8 +80,9 @@ public class SendDispatchShipmentDialog extends BiobankDialog {
             "Waybill", null,
             BeansObservables.observeValue(shipment, "waybill"), null);
 
-        widgetCreator.createDateTimeWidget(contents, "Date Shipped",
-            shipment.getDateShipped(),
+        Date date = new Date();
+        shipment.setDateShipped(date);
+        widgetCreator.createDateTimeWidget(contents, "Date Shipped", date,
             BeansObservables.observeValue(shipment, "dateShipped"),
             new DateNotNulValidator("Date shipped should be set"));
     }

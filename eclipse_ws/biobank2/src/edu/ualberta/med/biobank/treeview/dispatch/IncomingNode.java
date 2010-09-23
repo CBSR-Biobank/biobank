@@ -13,6 +13,7 @@ public class IncomingNode extends AdapterBase {
 
     private ReceivingInTransitDispatchShipmentGroup receivedTransitNode;
     private ReceivingDispatchShipmentGroup receivingNode;
+    private ReceivingWithErrorsDispatchShipmentGroup receivingWithErrorsNode;
 
     public IncomingNode(AdapterBase parent, int id) {
         super(parent, id, "Incoming", true, false);
@@ -24,6 +25,11 @@ public class IncomingNode extends AdapterBase {
         receivingNode = new ReceivingDispatchShipmentGroup(this, 1);
         receivingNode.setParent(this);
         addChild(receivingNode);
+
+        receivingWithErrorsNode = new ReceivingWithErrorsDispatchShipmentGroup(
+            this, 2);
+        receivingWithErrorsNode.setParent(this);
+        addChild(receivingWithErrorsNode);
 
     }
 
@@ -78,6 +84,11 @@ public class IncomingNode extends AdapterBase {
         for (AdapterBase adaper : getChildren()) {
             adaper.rebuild();
         }
+    }
+
+    @Override
+    public AdapterBase search(Object searchedObject) {
+        return searchChildren(searchedObject);
     }
 
 }

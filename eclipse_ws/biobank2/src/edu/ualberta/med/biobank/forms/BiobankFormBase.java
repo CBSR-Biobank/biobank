@@ -272,6 +272,11 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected void addSectionToolbar(Section section, String tooltip,
         SelectionListener listener, Class<?> wrapperTypeToAdd) {
+        addSectionToolbar(section, tooltip, listener, wrapperTypeToAdd, null);
+    }
+
+    protected void addSectionToolbar(Section section, String tooltip,
+        SelectionListener listener, Class<?> wrapperTypeToAdd, String imageKey) {
         if (wrapperTypeToAdd == null
             || SessionManager.canCreate(wrapperTypeToAdd)) {
             ToolBar tbar = (ToolBar) section.getTextClient();
@@ -281,8 +286,11 @@ public abstract class BiobankFormBase extends EditorPart {
             }
 
             ToolItem titem = new ToolItem(tbar, SWT.NULL);
+            if (imageKey == null) {
+                imageKey = BioBankPlugin.IMG_ADD;
+            }
             titem.setImage(BioBankPlugin.getDefault().getImageRegistry()
-                .get(BioBankPlugin.IMG_ADD));
+                .get(imageKey));
             titem.setToolTipText(tooltip);
             titem.addSelectionListener(listener);
         }

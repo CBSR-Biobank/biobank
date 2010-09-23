@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.model.Site;
@@ -27,6 +28,7 @@ public class DispatchShipmentWrapper extends
     AbstractShipmentWrapper<DispatchShipment> {
 
     private Set<AliquotWrapper> modifiedAliquots = new HashSet<AliquotWrapper>();
+    private boolean stateModified;
 
     public DispatchShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -68,7 +70,7 @@ public class DispatchShipmentWrapper extends
                 + getWaybill() + " already exists for sending site "
                 + getSender().getNameShort());
         }
-        if (isInTransit() && getDateShipped() == null) {
+        if (isInTransitState() && getDateShipped() == null) {
             throw new BiobankCheckException(
                 "Date shipped should be set when this shipment is in transit.");
         }
@@ -78,7 +80,7 @@ public class DispatchShipmentWrapper extends
     @Override
     protected void persistDependencies(DispatchShipment origObject)
         throws Exception {
-        if (isInTransit()) {
+        if (stateModified && isInTransitState()) {
             // when is sent, need to set aliquots positions to null and to
             // remove containers holding them
             for (AliquotWrapper aliquot : getAliquotCollection()) {
@@ -370,37 +372,42 @@ public class DispatchShipmentWrapper extends
         }
     }
 
-    public boolean isInCreation() {
+    public boolean isInCreationState() {
         return wrappedObject.getState() == null
             || wrappedObject.getState() == 0;
     }
 
-    public boolean isInTransit() {
+    public boolean isInTransitState() {
         return wrappedObject.getState() != null
             && wrappedObject.getState() == 1;
     }
 
-    public boolean isReceived() {
+    public boolean isInReceivedState() {
         return wrappedObject.getState() != null
             && wrappedObject.getState() == 2;
     }
 
-    public boolean isClosed() {
+    public boolean hasBeenReceived() {
+        return wrappedObject.getState() != null
+            && wrappedObject.getState() >= 2;
+    }
+
+    public boolean isInClosedState() {
         return wrappedObject.getState() != null
             && wrappedObject.getState() == 3;
     }
 
-    public boolean isInError() {
+    public boolean isSetInError() {
         return wrappedObject.getState() != null
             && wrappedObject.getState() >= 4;
     }
 
-    public boolean isInErrorAndOpen() {
+    public boolean isInErrorAndOpenState() {
         return wrappedObject.getState() != null
             && wrappedObject.getState() == 4;
     }
 
-    public boolean isInErrorAndClosed() {
+    public boolean isInErrorAndClosedState() {
         return wrappedObject.getState() != null
             && wrappedObject.getState() == 5;
     }
@@ -442,10 +449,12 @@ public class DispatchShipmentWrapper extends
         // date at 0:0pm
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria("from "
-            + DispatchShipment.class.getName()
-            + " where sender.id = ? and dateShipped >= ? and dateShipped <= ?",
-            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + DispatchShipment.class.getName()
+                + " where (sender.id = ? or receiver.id = ?) and dateShipped >= ? and dateShipped <= ?",
+            Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
+                endDate }));
         List<DispatchShipment> shipments = appService.query(criteria);
         List<DispatchShipmentWrapper> wrappers = new ArrayList<DispatchShipmentWrapper>();
         for (DispatchShipment s : shipments) {
@@ -475,8 +484,9 @@ public class DispatchShipmentWrapper extends
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + DispatchShipment.class.getName()
-                + " where receiver.id = ? and dateReceived >= ? and dateReceived <= ?",
-            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+                + " where (sender.id = ? or receiver.id = ?) and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
+                endDate }));
         List<DispatchShipment> shipments = appService.query(criteria);
         List<DispatchShipmentWrapper> wrappers = new ArrayList<DispatchShipmentWrapper>();
         for (DispatchShipment s : shipments) {
@@ -496,21 +506,44 @@ public class DispatchShipmentWrapper extends
         return sb.toString();
     }
 
+    private void setState(Integer state) {
+        Integer oldState = wrappedObject.getState();
+        wrappedObject.setState(state);
+        stateModified = oldState == null || state == null
+            || !oldState.equals(state);
+    }
+
     public void setNextState() {
         Integer state = wrappedObject.getState();
         if (state == null) {
             state = 0;
         }
         state++;
-        wrappedObject.setState(state);
+        setState(state);
     }
 
     public void setInErrorState() {
-        wrappedObject.setState(4);
+        setState(4);
     }
 
-    public boolean canBeSentBy(SiteWrapper site) {
-        return getSender().equals(site) && isInCreation()
+    public boolean canBeSentBy(User user, SiteWrapper site) {
+        return canUpdate(user) && getSender().equals(site)
+            && isInCreationState() && hasAliquots();
+    }
+
+    public boolean hasAliquots() {
+        return getAliquotCollection() != null
             && getAliquotCollection().size() > 0;
+    }
+
+    public boolean canBeReceivedBy(User user, SiteWrapper site) {
+        return canUpdate(user) && getReceiver().equals(site)
+            && isInTransitState();
+    }
+
+    public boolean canBeClosedBy(User user, SiteWrapper site) {
+        return canUpdate(user) && getReceiver().equals(site)
+            && isInReceivedState() && getNotReceivedAliquots() != null
+            && getNotReceivedAliquots().size() == 0;
     }
 }
