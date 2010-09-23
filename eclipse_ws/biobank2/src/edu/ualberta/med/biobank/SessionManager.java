@@ -307,7 +307,7 @@ public class SessionManager {
 
     public static void log(String action, String details, String type)
         throws Exception {
-        ((BiobankApplicationService) getAppService()).logActivity(action,
+        getAppService().logActivity(action,
             getInstance().getCurrentSite().getNameShort(), null, null, null,
             details, type);
     }

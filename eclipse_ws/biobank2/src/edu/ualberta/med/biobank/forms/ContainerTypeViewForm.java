@@ -5,6 +5,8 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.ScrolledComposite;
+import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -191,10 +193,23 @@ public class ContainerTypeViewForm extends BiobankViewForm {
     }
 
     protected void createVisualizeContainer() {
-        Composite client = createSectionWithClient("Container Visual");
+        Composite containerSection = createSectionWithClient("Container Visual");
+        containerSection.setLayout(new FillLayout());
+        ScrolledComposite sc = new ScrolledComposite(containerSection,
+            SWT.H_SCROLL);
+        sc.setExpandHorizontal(true);
+        sc.setExpandVertical(true);
+        Composite client = new Composite(sc, SWT.NONE);
+        client.setLayout(new GridLayout(1, false));
         ContainerDisplayWidget containerDisplay = new ContainerDisplayWidget(
             client);
         containerDisplay.setContainerType(containerType);
+        toolkit.adapt(containerSection);
+        toolkit.adapt(sc);
+        toolkit.adapt(client);
+        toolkit.adapt(containerDisplay);
+        sc.setContent(client);
+        sc.setMinSize(client.computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
     private void setChildContainerTypesValues() {

@@ -80,6 +80,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
         widget.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
+                topContainers.setEnabled(false);
                 comboStatus.setValue(false);
             }
         });
