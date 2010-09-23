@@ -15,8 +15,12 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotsByPalletEditor extends ReportsEditor {
 
@@ -62,8 +66,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.keyCode == SWT.CR) {
-                    filterList(widget.getText());
-                    comboStatus.setValue(topContainers.getEnabled());
+                    validate(widget.getText());
                 }
             }
         });
@@ -71,8 +74,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
             @Override
             public void keyTraversed(TraverseEvent e) {
                 if (e.keyCode == SWT.TAB) {
-                    filterList(widget.getText());
-                    comboStatus.setValue(topContainers.getEnabled());
+                    validate(widget.getText());
                 }
             }
 
@@ -90,6 +92,26 @@ public class AliquotsByPalletEditor extends ReportsEditor {
     protected void filterList(String text) {
         topContainers.filterBy(text);
         page.layout(true, true);
+    }
+
+    protected void validate(String label) {
+        Boolean validContainer;
+        try {
+            if (ContainerWrapper.getContainersByLabel(
+                SessionManager.getAppService(), label).size() > 0)
+                validContainer = true;
+            else {
+                BioBankPlugin.openAsyncError("Invalid label",
+                    "No container labelled " + label);
+                validContainer = false;
+            }
+        } catch (ApplicationException e) {
+            BioBankPlugin.openAsyncError("Invalid label",
+                "No container labelled " + label);
+            validContainer = false;
+        }
+        filterList(label);
+        comboStatus.setValue(validContainer && topContainers.getEnabled());
     }
 
     @Override

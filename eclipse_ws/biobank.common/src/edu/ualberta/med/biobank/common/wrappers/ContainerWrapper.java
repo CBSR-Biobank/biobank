@@ -924,6 +924,19 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     /**
+     * Get all containers with a given label
+     */
+    public static List<ContainerWrapper> getContainersByLabel(
+        WritableApplicationService appService, String label)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName() + " where label = ?",
+            Arrays.asList(new Object[] { label }));
+        List<Container> containers = appService.query(criteria);
+        return transformToWrapperList(appService, containers);
+    }
+
+    /**
      * Get the container with the given productBarcode in a site
      */
     public static ContainerWrapper getContainerWithProductBarcodeInSite(
