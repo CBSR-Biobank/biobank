@@ -42,7 +42,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parameterSection) {
-        palletLabel = createCustomText("Pallet Label", parameterSection);
+        palletLabel = createCustomText("Container Label", parameterSection);
         widgetCreator.createLabel(parameterSection, "Top Containers");
         topContainers = new TopContainerListWidget(parameterSection, SWT.NONE);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
@@ -100,7 +100,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
     @Override
     protected List<String> getParamNames() {
         List<String> paramNames = new ArrayList<String>();
-        paramNames.add("Pallet Label");
+        paramNames.add("Container Label");
         paramNames.add("Top Containers");
         return paramNames;
     }
