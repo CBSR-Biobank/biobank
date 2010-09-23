@@ -13,6 +13,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.ClinicShipmentPatient;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -172,6 +173,29 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                     allPvWrappers.add(visit);
                 }
             }
+
+            // TODO: asdf
+
+            for (ClinicShipmentPatient csp : wrappedObject
+                .getClinicShipmentPatientCollection()) {
+                if (csp.getPatient() != null
+                    && csp.getPatient().getId() != null) {
+                    for (PatientVisitWrapper visit : newPatientVisits) {
+                        if (visit.getPatient() != null
+                            && csp.getPatient().getId()
+                                .equals(visit.getPatient().getId())) {
+
+                        }
+                    }
+                }
+            }
+
+            // make sure given pv.getShipment exists in csps.
+            // add the PV to that CSP
+            //
+            //
+            // Q: remove PV?
+
             // new
             for (PatientVisitWrapper visit : newPatientVisits) {
                 visit.setPatient(this);
@@ -418,7 +442,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return log;
     }
 
-    public void setPatientVisitCollection(List<PatientVisitWrapper> pvws) {
+    private void setPatientVisitCollection(List<PatientVisitWrapper> pvws) {
         List<PatientVisit> pvs = new ArrayList<PatientVisit>();
         for (PatientVisitWrapper pvw : pvws)
             pvs.add(pvw.getWrappedObject());

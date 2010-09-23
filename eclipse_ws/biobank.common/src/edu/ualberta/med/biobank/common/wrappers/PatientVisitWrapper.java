@@ -74,7 +74,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         PatientWrapper patient = (PatientWrapper) propertiesMap.get("patient");
         if (patient != null)
             return patient;
-        Patient patientRaw = wrappedObject.getPatient();
+        Patient patientRaw = wrappedObject.getClinicShipmentPatient()
+            .getPatient();
         if (patientRaw == null) {
             return null;
         }
@@ -85,9 +86,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public void setPatient(PatientWrapper patient) {
         propertiesMap.put("patient", patient);
-        Patient oldPatientRaw = wrappedObject.getPatient();
+        Patient oldPatientRaw = wrappedObject.getClinicShipmentPatient()
+            .getPatient();
         Patient newPatientRaw = patient.getWrappedObject();
-        wrappedObject.setPatient(newPatientRaw);
+        wrappedObject.getClinicShipmentPatient().setPatient(newPatientRaw);
         propertyChangeSupport.firePropertyChange("patient", oldPatientRaw,
             newPatientRaw);
     }
@@ -444,7 +446,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         ClinicShipmentWrapper shipment = (ClinicShipmentWrapper) propertiesMap
             .get("shipment");
         if (shipment == null) {
-            ClinicShipment s = wrappedObject.getShipment();
+            ClinicShipment s = wrappedObject.getClinicShipmentPatient()
+                .getClinicShipment();
             if (s == null)
                 return null;
             shipment = new ClinicShipmentWrapper(appService, s);
@@ -455,9 +458,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     public void setShipment(ClinicShipmentWrapper s) {
         propertiesMap.put("shipment", s);
-        ClinicShipment oldShipment = wrappedObject.getShipment();
+        ClinicShipment oldShipment = wrappedObject.getClinicShipmentPatient()
+            .getClinicShipment();
         ClinicShipment newShipment = s.getWrappedObject();
-        wrappedObject.setShipment(newShipment);
+        wrappedObject.getClinicShipmentPatient().setClinicShipment(newShipment);
         propertyChangeSupport.firePropertyChange("shipment", oldShipment,
             newShipment);
     }
