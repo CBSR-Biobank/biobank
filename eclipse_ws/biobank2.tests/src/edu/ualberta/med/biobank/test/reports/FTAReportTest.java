@@ -149,17 +149,15 @@ public class FTAReportTest extends AbstractReportTest {
 
         Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
         Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
-            .filter(
-                allPatientVisits,
-                PredicateUtil.andPredicate(patientInStudy,
-                    patientVisitSite(isInSite(), getSiteId())));
+            .filter(allPatientVisits, patientInStudy);
         Map<String, PatientVisitWrapper> groupedPatientVisits = MapperUtil.map(
             filteredPatientVisits, GROUP_PATIENT_VISITS_BY_PNUMBER);
 
         Collection<AliquotWrapper> allAliquots = getAliquots();
+        @SuppressWarnings("unchecked")
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(ALIQUOT_FTA_SAMPLE_TYPE,
-                pvProcessedAfter));
+                pvProcessedAfter, ALIQUOT_HAS_POSITION));
         Map<String, AliquotWrapper> groupedAliquots = MapperUtil.map(
             filteredAliquots, GROUP_ALIQUOTS_BY_PNUMBER);
         List<AliquotWrapper> filteredAndGroupedAliquots = new ArrayList<AliquotWrapper>(

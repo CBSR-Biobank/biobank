@@ -447,14 +447,16 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             if (positions != null) {
                 aliquots = new TreeMap<RowColPos, AliquotWrapper>();
                 for (AliquotPosition position : positions) {
-                    AliquotWrapper aliquot = new AliquotWrapper(appService,
-                        position.getAliquot());
+                    AliquotPositionWrapper pw = new AliquotPositionWrapper(
+                        appService, position);
                     try {
-                        aliquot.reload();
-                    } catch (Exception e) {
+                        pw.reload();
+                    } catch (Exception e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
                     }
-                    aliquots.put(
-                        new RowColPos(position.getRow(), position.getCol()),
+                    AliquotWrapper aliquot = pw.getAliquot();
+                    aliquots.put(new RowColPos(pw.getRow(), pw.getCol()),
                         aliquot);
                 }
                 propertiesMap.put("aliquots", aliquots);
