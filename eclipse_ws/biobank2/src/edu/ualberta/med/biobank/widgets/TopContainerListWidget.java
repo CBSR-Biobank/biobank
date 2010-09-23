@@ -49,8 +49,7 @@ public class TopContainerListWidget {
             }
         });
         topContainers.setContentProvider(new ArrayContentProvider());
-        BiobankApplicationService appService = (BiobankApplicationService) SessionManager
-            .getAppService();
+        BiobankApplicationService appService = SessionManager.getAppService();
         List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
         try {
             // FIXME: uses all sites by default

@@ -19,6 +19,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+/**
+ * State 0 = Creation; State 1 = In Transit; State 2 = Received; State 3 =
+ * Ok/Closed; State 4 = In Error/Open; State 5 = In Error/Closed
+ */
 public class DispatchShipmentWrapper extends
     AbstractShipmentWrapper<DispatchShipment> {
 
@@ -367,23 +371,38 @@ public class DispatchShipmentWrapper extends
     }
 
     public boolean isInCreation() {
-        ActivityStatusWrapper activity = getActivityStatus();
-        return activity != null && activity.getName().equals("Creation");
+        return wrappedObject.getState() == null
+            || wrappedObject.getState() == 0;
     }
 
     public boolean isInTransit() {
-        ActivityStatusWrapper activity = getActivityStatus();
-        return activity != null && activity.getName().equals("In Transit");
+        return wrappedObject.getState() != null
+            && wrappedObject.getState() == 1;
     }
 
     public boolean isReceived() {
-        ActivityStatusWrapper activity = getActivityStatus();
-        return activity != null && activity.getName().equals("Received");
+        return wrappedObject.getState() != null
+            && wrappedObject.getState() == 2;
     }
 
     public boolean isClosed() {
-        ActivityStatusWrapper activity = getActivityStatus();
-        return activity != null && activity.getName().equals("Closed");
+        return wrappedObject.getState() != null
+            && wrappedObject.getState() == 3;
+    }
+
+    public boolean isInError() {
+        return wrappedObject.getState() != null
+            && wrappedObject.getState() >= 4;
+    }
+
+    public boolean isInErrorAndOpen() {
+        return wrappedObject.getState() != null
+            && wrappedObject.getState() == 4;
+    }
+
+    public boolean isInErrorAndClosed() {
+        return wrappedObject.getState() != null
+            && wrappedObject.getState() == 5;
     }
 
     /**
@@ -477,4 +496,21 @@ public class DispatchShipmentWrapper extends
         return sb.toString();
     }
 
+    public void setNextState() {
+        Integer state = wrappedObject.getState();
+        if (state == null) {
+            state = 0;
+        }
+        state++;
+        wrappedObject.setState(state);
+    }
+
+    public void setInErrorState() {
+        wrappedObject.setState(4);
+    }
+
+    public boolean canBeSentBy(SiteWrapper site) {
+        return getSender().equals(site) && isInCreation()
+            && getAliquotCollection().size() > 0;
+    }
 }

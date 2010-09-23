@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
  * @see BiobankApplicationServiceImpl
  * 
  */
+@SuppressWarnings("rawtypes")
 public class ProtectionElementPrivilegeContext implements Comparable,
     Serializable {
 

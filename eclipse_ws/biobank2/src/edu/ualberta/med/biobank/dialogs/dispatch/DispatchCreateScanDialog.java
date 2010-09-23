@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.ArrayList;
 import java.util.HashMap;

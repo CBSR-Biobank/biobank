@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.MoveAliquotsToDialog;
 import edu.ualberta.med.biobank.dialogs.MoveContainerDialog;
-import edu.ualberta.med.biobank.dialogs.SelectParentContainerDialog;
+import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.ContainerEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerViewForm;
 

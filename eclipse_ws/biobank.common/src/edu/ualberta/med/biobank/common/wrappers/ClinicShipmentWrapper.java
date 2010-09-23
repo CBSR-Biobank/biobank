@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Log;
@@ -54,7 +55,7 @@ public class ClinicShipmentWrapper extends
         String[] properties = super.getPropertyChangeNames();
         List<String> list = new ArrayList<String>(Arrays.asList(properties));
         list.addAll(Arrays.asList("clinic", "patientVisitCollection",
-            "patientCollection"));
+            "patientCollection", "activityStatus"));
         return list.toArray(new String[list.size()]);
     }
 
@@ -202,6 +203,30 @@ public class ClinicShipmentWrapper extends
         Site newSite = siteWrapper.getWrappedObject();
         wrappedObject.setSite(newSite);
         propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
+    }
+
+    public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
+        if (activity == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            activity = new ActivityStatusWrapper(appService, a);
+        }
+        return activity;
+    }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        propertiesMap.put("activityStatus", activityStatus);
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
+        propertyChangeSupport.firePropertyChange("activityStatus",
+            oldActivityStatus, activityStatus);
     }
 
     @SuppressWarnings("unchecked")

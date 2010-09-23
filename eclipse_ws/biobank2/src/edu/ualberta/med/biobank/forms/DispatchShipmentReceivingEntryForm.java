@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
-import edu.ualberta.med.biobank.dialogs.DispatchReceiveScanDialog;
+import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -44,8 +44,6 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
     private BiobankText dateReceivedLabel;
 
     private BiobankText commentLabel;
-
-    private BiobankText statusLabel;
 
     private DispatchAliquotListInfoTable aliquotsToBeReceivedTable;
 
@@ -137,7 +135,6 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
         waybillLabel = createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date received");
-        statusLabel = createReadOnlyLabelledField(client, SWT.NONE, "Status");
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
             "Comments");
 
@@ -154,7 +151,6 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
                 .getShippingMethod().getName());
         setTextValue(waybillLabel, shipment.getWaybill());
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
-        setTextValue(statusLabel, shipment.getActivityStatus().getName());
         setTextValue(commentLabel, shipment.getComment());
     }
 

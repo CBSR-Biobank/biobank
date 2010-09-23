@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentSearchedNode;
@@ -67,9 +68,16 @@ public class DispatchShipmentAdministrationView extends
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
-        outgoingNode = new OutgoingNode(rootNode, 0);
-        outgoingNode.setParent(rootNode);
-        rootNode.addChild(outgoingNode);
+        createNodes();
+    }
+
+    private void createNodes() {
+        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+        if (site == null || site.getDispatchStudies().size() > 0) {
+            outgoingNode = new OutgoingNode(rootNode, 0);
+            outgoingNode.setParent(rootNode);
+            rootNode.addChild(outgoingNode);
+        }
 
         incomingNode = new IncomingNode(rootNode, 1);
         incomingNode.setParent(rootNode);
@@ -161,6 +169,8 @@ public class DispatchShipmentAdministrationView extends
 
     @Override
     public void reload() {
+        rootNode.removeAll();
+        createNodes();
         for (AdapterBase adaper : rootNode.getChildren()) {
             if (!adaper.equals(searchedNode))
                 adaper.rebuild();

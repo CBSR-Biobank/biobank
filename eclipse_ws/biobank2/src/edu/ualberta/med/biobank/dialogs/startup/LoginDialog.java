@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.startup;
 
 import java.net.MalformedURLException;
 import java.net.URL;

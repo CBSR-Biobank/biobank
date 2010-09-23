@@ -1,14 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
@@ -29,20 +25,16 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.dialogs.DispatchCreateScanDialog;
+import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.util.CallRunnablePersistOnAdapter;
-import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -66,12 +58,6 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     private ComboViewer destSiteComboViewer;
 
-    private DateTimeWidget dateShippedWidget;
-
-    private ComboViewer shippingMethodComboViewer;
-
-    private ComboViewer activityStatusComboViewer;
-
     private DispatchAliquotListInfoTable aliquotsWidget;
 
     private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
@@ -94,8 +80,6 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         String tabName;
         if (shipment.isNew()) {
             tabName = "New Dispatch Shipment";
-            shipment.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
         } else {
             tabName = "Dispatch Shipment "
                 + shipment.getFormattedDateReceived();
@@ -192,90 +176,11 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                 }
             });
 
-        ShippingMethodWrapper selectedShippingMethod = shipment
-            .getShippingMethod();
-        shippingMethodComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Shipping Method",
-            ShippingMethodWrapper.getShippingMethods(appService),
-            selectedShippingMethod, null);
-        shippingMethodComboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    ShippingMethodWrapper shippingMethod = null;
-                    IStructuredSelection shippingMethodSelection = (IStructuredSelection) shippingMethodComboViewer
-                        .getSelection();
-                    if ((shippingMethodSelection != null)
-                        && (shippingMethodSelection.size() > 0)) {
-                        shippingMethod = (ShippingMethodWrapper) shippingMethodSelection
-                            .getFirstElement();
-                    }
-                    shipment.setShippingMethod(shippingMethod);
-                }
-            });
-
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Waybill", null,
-            BeansObservables.observeValue(shipment, "waybill"), null);
-
-        final AbstractValidator dateNotNul = new AbstractValidator(
-            "Date shipped should be set") {
-            @Override
-            public IStatus validate(Object value) {
-                if (value == null && shipment.isInTransit()) {
-                    showDecoration();
-                    return ValidationStatus.error(errorMessage);
-                } else {
-                    hideDecoration();
-                    return Status.OK_STATUS;
-                }
-            }
-        };
-        dateShippedWidget = widgetCreator.createDateTimeWidget(client,
-            "Date Shipped", shipment.getDateShipped(),
-            BeansObservables.observeValue(shipment, "dateShipped"), dateNotNul);
-
-        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status",
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            shipment.getActivityStatus(),
-            "Container must have an activity status");
-        activityStatusComboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    ActivityStatusWrapper activityStatus = null;
-                    IStructuredSelection asSelection = (IStructuredSelection) activityStatusComboViewer
-                        .getSelection();
-                    if ((asSelection != null) && (asSelection.size() > 0)) {
-                        activityStatus = (ActivityStatusWrapper) asSelection
-                            .getFirstElement();
-                    }
-                    shipment.setActivityStatus(activityStatus);
-
-                    // Do this to trigger the validator and value binding on
-                    // form
-                    Date date = dateShippedWidget.getDate();
-                    dateShippedWidget.setDate(new Date());
-                    dateShippedWidget.setDate(date);
-
-                    if (shipment.isInTransit()
-                        && shipment.getAliquotCollection().size() == 0) {
-                        BioBankPlugin
-                            .openAsyncInformation(
-                                "No aliquots",
-                                "There are no aliquots added to this shipment, are you sure it should be set to 'In Transit' status ?");
-                    }
-                }
-            });
-
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null,
             BeansObservables.observeValue(shipment, "comment"), null);
 
         createAliquotsSection();
-
-        // ---
 
         setFirstControl(studyComboViewer.getControl());
 
@@ -377,20 +282,5 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         } else if (destSiteComboViewer.getCombo().getItemCount() > 1) {
             destSiteComboViewer.getCombo().deselectAll();
         }
-        ShippingMethodWrapper shipMethod = shipment.getShippingMethod();
-        if (shipMethod != null) {
-            shippingMethodComboViewer.setSelection(new StructuredSelection(
-                shipMethod));
-        } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
-            shippingMethodComboViewer.getCombo().deselectAll();
-        }
-        ActivityStatusWrapper activity = shipment.getActivityStatus();
-        if (activity != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                activity));
-        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
-            activityStatusComboViewer.getCombo().deselectAll();
-        }
-        dateShippedWidget.setDate(new Date());
     }
 }
