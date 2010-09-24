@@ -387,7 +387,8 @@ public abstract class AdapterBase {
         }
 
         try {
-            Collection<? extends ModelWrapper<?>> children = getWrapperChildren();
+            Collection<? extends ModelWrapper<?>> children =
+                getWrapperChildren();
             if (children != null) {
                 for (ModelWrapper<?> child : children) {
                     AdapterBase node = getChild(child);
@@ -439,7 +440,8 @@ public abstract class AdapterBase {
                 @Override
                 public void run() {
                     try {
-                        Collection<? extends ModelWrapper<?>> childObjects = getWrapperChildren();
+                        Collection<? extends ModelWrapper<?>> childObjects =
+                            getWrapperChildren();
                         if (childObjects != null) {
                             for (ModelWrapper<?> child : childObjects) {
                                 // first see if this object is among the
@@ -568,8 +570,9 @@ public abstract class AdapterBase {
     protected abstract int getWrapperChildCount() throws Exception;
 
     public static boolean closeEditor(FormInput input) {
-        IWorkbenchPage page = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getActivePage();
+        IWorkbenchPage page =
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                .getActivePage();
         IEditorPart part = page.findEditor(input);
         if (part != null) {
             return page.closeEditor(part, true);
@@ -585,9 +588,9 @@ public abstract class AdapterBase {
         boolean focusOnEditor) {
         closeEditor(input);
         try {
-            IEditorPart part = PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getActivePage()
-                .openEditor(input, id, focusOnEditor);
+            IEditorPart part =
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getActivePage().openEditor(input, id, focusOnEditor);
             return part;
         } catch (PartInitException e) {
             logger.error("Can't open form with id " + id, e);
@@ -634,6 +637,9 @@ public abstract class AdapterBase {
     }
 
     protected AdapterBase searchChildren(Object searchedObject) {
+        // FIXME children are loading in background most of the time:
+        // they are not loaded then the objects are not found
+        loadChildren(false);
         for (AdapterBase child : getChildren()) {
             AdapterBase foundChild = child.search(searchedObject);
             if (foundChild != null) {

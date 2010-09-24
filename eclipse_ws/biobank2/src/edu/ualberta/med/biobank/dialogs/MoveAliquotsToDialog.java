@@ -45,7 +45,9 @@ public class MoveAliquotsToDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select the new container that can hold the aliquots.";
+        return "Select the new container that can hold the aliquots.\n"
+            + "It should be initialized, empty, as big as the previous one,"
+            + " and should accept these aliquots.";
     }
 
     @Override
@@ -60,42 +62,44 @@ public class MoveAliquotsToDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        List<SampleTypeWrapper> typesFromOlContainer = oldContainer
-            .getContainerType().getSampleTypeCollection();
-        List<ContainerWrapper> conts = ContainerWrapper
-            .getEmptyContainersHoldingSampleType(
-                SessionManager.getAppService(), SessionManager.getInstance()
-                    .getCurrentSite(), typesFromOlContainer, oldContainer
-                    .getRowCapacity(), oldContainer.getColCapacity());
+        List<SampleTypeWrapper> typesFromOlContainer =
+            oldContainer.getContainerType().getSampleTypeCollection();
+        List<ContainerWrapper> conts =
+            ContainerWrapper.getEmptyContainersHoldingSampleType(SessionManager
+                .getAppService(),
+                SessionManager.getInstance().getCurrentSite(),
+                typesFromOlContainer, oldContainer.getRowCapacity(),
+                oldContainer.getColCapacity());
 
         map = new HashMap<String, ContainerWrapper>();
         for (ContainerWrapper cont : conts) {
             map.put(cont.getLabel(), cont);
         }
-        AbstractValidator validator = new AbstractValidator(
-            "Destination container must accepts these aliquots, must be empty and as big as the previous one.") {
+        AbstractValidator validator =
+            new AbstractValidator(
+                "Destination container should accept these aliquots, "
+                    + "must be initialized but empty, "
+                    + " and as big as the previous one.") {
 
-            @Override
-            public IStatus validate(Object value) {
-                if (!(value instanceof String)) {
-                    throw new RuntimeException(
-                        "Not supposed to be called for non-strings.");
+                @Override
+                public IStatus validate(Object value) {
+                    if (!(value instanceof String)) {
+                        throw new RuntimeException(
+                            "Not supposed to be called for non-strings.");
+                    }
+
+                    ContainerWrapper cont = map.get(value);
+                    if (cont == null) {
+                        showDecoration();
+                        return ValidationStatus.error(errorMessage);
+                    } else {
+                        hideDecoration();
+                        return Status.OK_STATUS;
+                    }
                 }
-
-                ContainerWrapper cont = map.get(value);
-                if (cont == null) {
-                    showDecoration();
-                    return ValidationStatus.error(errorMessage);
-                } else {
-                    hideDecoration();
-                    return Status.OK_STATUS;
-                }
-            }
-
-        };
+            };
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.FILL,
             "New Container Label", null, newLabel, validator);
-
     }
 
     public ContainerWrapper getNewContainer() {
