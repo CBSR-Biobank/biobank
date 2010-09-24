@@ -53,9 +53,11 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     private BiobankText commentLabel;
 
-    private DispatchAliquotListInfoTable aliquotsToBeReceivedTable;
+    private DispatchAliquotListInfoTable aliquotsExpectedTable;
 
-    private DispatchAliquotListInfoTable aliquotsReceivedTable;
+    private DispatchAliquotListInfoTable aliquotsAcceptedTable;
+
+    private DispatchAliquotListInfoTable aliquotsFlaggedTable;
 
     @Override
     protected void init() throws Exception {
@@ -98,7 +100,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
         createMainSection();
         createAliquotsNotReceivedSection();
-        createAliquotsReceivedSection();
+        createAliquotsAcceptedSection();
+        createAliquotsFlaggedSection();
         setShipmentValues();
 
         User user = SessionManager.getUser();
@@ -107,8 +110,22 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             createSendButton();
         else if (shipment.canBeReceivedBy(user, currentSite))
             createReceiveButton();
+        else if (shipment.hasFlaggedAliquots() && shipment.isInReceivedState())
+            createErrorButton();
         else if (shipment.canBeClosedBy(user, currentSite))
             createCloseButton();
+    }
+
+    private void createErrorButton() {
+        Button sendButton = toolkit.createButton(page, "Flag", SWT.PUSH);
+        sendButton.setToolTipText("This shipment contains flagged aliquot."
+            + " It should be flagged as shipment with errors.");
+        sendButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                shipmentAdapter.doFlag();
+            }
+        });
     }
 
     private void createCloseButton() {
@@ -181,20 +198,31 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             title = "Aliquots expected";
         }
         Composite parent = createSectionWithClient(title);
-        aliquotsToBeReceivedTable = new DispatchAliquotListInfoTable(parent,
+        aliquotsExpectedTable = new DispatchAliquotListInfoTable(parent,
             shipment, null, false);
-        aliquotsToBeReceivedTable.adaptToToolkit(toolkit, true);
-        aliquotsToBeReceivedTable
+        aliquotsExpectedTable.adaptToToolkit(toolkit, true);
+        aliquotsExpectedTable
             .addDoubleClickListener(collectionDoubleClickListener);
     }
 
-    private void createAliquotsReceivedSection() {
+    private void createAliquotsAcceptedSection() {
         if (shipment.hasBeenReceived()) {
             Composite parent = createSectionWithClient("Aliquots accepted");
-            aliquotsReceivedTable = new DispatchAliquotListInfoTable(parent,
+            aliquotsAcceptedTable = new DispatchAliquotListInfoTable(parent,
                 shipment, null, false);
-            aliquotsReceivedTable.adaptToToolkit(toolkit, true);
-            aliquotsReceivedTable
+            aliquotsAcceptedTable.adaptToToolkit(toolkit, true);
+            aliquotsAcceptedTable
+                .addDoubleClickListener(collectionDoubleClickListener);
+        }
+    }
+
+    private void createAliquotsFlaggedSection() {
+        if (shipment.hasBeenReceived()) {
+            Composite parent = createSectionWithClient("Aliquots flagged");
+            aliquotsFlaggedTable = new DispatchAliquotListInfoTable(parent,
+                shipment, null, false);
+            aliquotsFlaggedTable.adaptToToolkit(toolkit, true);
+            aliquotsFlaggedTable
                 .addDoubleClickListener(collectionDoubleClickListener);
         }
     }
@@ -242,12 +270,14 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         if (dateReceivedLabel != null)
             setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
         setTextValue(commentLabel, shipment.getComment());
-        aliquotsToBeReceivedTable.reloadCollection(shipment
-            .getNotReceivedAliquots());
-        if (aliquotsReceivedTable != null) {
-            aliquotsReceivedTable.reloadCollection(shipment
-                .getReceivedAliquots());
-        }
+        aliquotsExpectedTable
+            .reloadCollection(shipment.getDispatchedAliquots());
+        if (aliquotsAcceptedTable != null)
+            aliquotsAcceptedTable
+                .reloadCollection(shipment.getActiveAliquots());
+        if (aliquotsFlaggedTable != null)
+            aliquotsFlaggedTable
+                .reloadCollection(shipment.getFlaggedAliquots());
     }
 
 }

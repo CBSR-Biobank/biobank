@@ -251,7 +251,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
         List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
         for (PalletCell cell : getCells().values()) {
             aliquots.add(cell.getAliquot());
-            cell.setStatus(CellStatus.IN_SHIPMENT_PENDING);
+            cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
         }
         currentShipment.addAliquots(aliquots);
         if (currentPallet != null) {

@@ -547,6 +547,11 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return status != null && status.isActive();
     }
 
+    public boolean isFlagged() {
+        ActivityStatusWrapper status = getActivityStatus();
+        return status != null && status.isFlagged();
+    }
+
     public boolean isDispatched() {
         ActivityStatusWrapper status = getActivityStatus();
         return status != null && status.isDispatched();

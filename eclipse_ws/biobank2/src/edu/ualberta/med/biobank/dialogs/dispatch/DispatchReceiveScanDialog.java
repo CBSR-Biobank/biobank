@@ -8,14 +8,16 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm;
+import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -25,6 +27,12 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     private static final String TITLE = "Scanning received pallets";
 
     private int pendingAliquotsNumber = 0;
+
+    private int notInshipmentNumber = 0;
+
+    private boolean aliquotsAccepted = false;
+
+    private int errors;
 
     public DispatchReceiveScanDialog(Shell parentShell,
         final DispatchShipmentWrapper currentShipment) {
@@ -50,44 +58,83 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         pendingAliquotsNumber = 0;
+        errors = 0;
+        final List<AliquotWrapper> notInShipmentAliquots = new ArrayList<AliquotWrapper>();
+        final List<PalletCell> notInShipmentCells = new ArrayList<PalletCell>();
         if (cells != null) {
-            boolean resOk = true;
             for (RowColPos rcp : cells.keySet()) {
                 monitor.subTask("Processing position "
                     + LabelingScheme.rowColToSbs(rcp));
                 PalletCell cell = cells.get(rcp);
-                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
-                    SessionManager.getAppService(), cell.getValue());
-                if (aliquots == null || aliquots.size() == 0) {
-                    cell.setStatus(CellStatus.ERROR);
-                    cell.setInformation("Aliquot not found in database");
-                    resOk = false;
-                    continue;
+                AliquotInfo info = DispatchShipmentReceivingEntryForm
+                    .getInfoForInventoryId(currentShipment, cell.getValue());
+                if (info.aliquot != null) {
+                    cell.setAliquot(info.aliquot);
+                    cell.setTitle(info.aliquot.getPatientVisit().getPatient()
+                        .getPnumber());
                 }
-                if (aliquots.size() > 1) {
+                switch (info.type) {
+                case ACCEPTED:
+                    cell.setStatus(CellStatus.IN_SHIPMENT_ACCEPTED);
+                    break;
+                case DUPLICATE:
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation("Found more than one aliquot with inventoryId "
                         + cell.getValue());
-                    resOk = false;
-                    continue;
-                }
-                AliquotWrapper aliquot = aliquots.get(0);
-                cell.setAliquot(aliquot);
-                cell.setTitle(aliquot.getPatientVisit().getPatient()
-                    .getPnumber());
-                if (currentShipment.getAliquotCollection().contains(aliquot)) {
-                    if (aliquot.isActive()) {
-                        cell.setStatus(CellStatus.IN_SHIPMENT_ACCEPTED);
-                    } else {
-                        cell.setStatus(CellStatus.IN_SHIPMENT_PENDING);
-                        pendingAliquotsNumber++;
-                    }
-                } else {
+                    cell.setTitle("!");
+                    errors++;
+                    break;
+                case FLAGGED:
+                    cell.setStatus(CellStatus.FLAGGED);
+                    break;
+                case NOT_IN_DB:
+                    cell.setStatus(CellStatus.ERROR);
+                    cell.setInformation("Aliquot " + cell.getValue()
+                        + " not found in database");
+                    cell.setTitle("!");
+                    errors++;
+                    break;
+                case NOT_IN_SHIPMENT:
                     cell.setStatus(CellStatus.NOT_IN_SHIPMENT);
                     cell.setInformation("Aliquot should not be in shipment");
+                    notInShipmentAliquots.add(info.aliquot);
+                    notInShipmentCells.add(cell);
+                    errors++;
+                    break;
+                case OK:
+                    cell.setStatus(CellStatus.IN_SHIPMENT_EXPECTED);
+                    pendingAliquotsNumber++;
+                    break;
                 }
             }
-            setScanOkValue(resOk);
+            if (notInShipmentAliquots.size() > 0) {
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        boolean flag = BioBankPlugin
+                            .openConfirm(
+                                "Not in shipment aliquots",
+                                "Some of the aliquots in this pallet were not supposed"
+                                    + " to be in this shipment. Do you wish to flag them ?");
+                        if (flag) {
+                            try {
+                                currentShipment
+                                    .addNotInShipmentAliquots(notInShipmentAliquots);
+                            } catch (Exception e) {
+                                BioBankPlugin.openAsyncError(
+                                    "Error flagging aliquots", e);
+                            }
+                            for (PalletCell cell : notInShipmentCells) {
+                                cell.setStatus(CellStatus.FLAGGED);
+                            }
+                            errors -= notInShipmentAliquots.size();
+                            setScanOkValue(errors == 0);
+                            redrawPallet();
+                        }
+                    }
+                });
+            }
+            setScanOkValue(errors == 0);
         }
     }
 
@@ -98,7 +145,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected boolean canActivateProceedButton() {
-        return pendingAliquotsNumber != 0;
+        return pendingAliquotsNumber != 0 && notInshipmentNumber == 0;
     }
 
     @Override
@@ -118,6 +165,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             redrawPallet();
             pendingAliquotsNumber = 0;
             setOkButtonEnabled(true);
+            aliquotsAccepted = true;
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error receiving aliquots", e);
         }
@@ -135,18 +183,33 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         if (currentShipment.getAliquotCollection().size() > 0) {
             AliquotWrapper aliquotNotReceived = null;
+            AliquotWrapper aliquotFlagged = null;
             for (AliquotWrapper aliquot : currentShipment
                 .getAliquotCollection()) {
                 if (aliquot.isDispatched()) {
                     aliquotNotReceived = aliquot;
-                    break;
+                }
+                if (aliquot.isFlagged()) {
+                    aliquotFlagged = aliquot;
                 }
             }
             if (aliquotNotReceived != null) {
                 palletScanned.put(new RowColPos(0, 0), new PalletCell(
                     new ScanCell(0, 0, aliquotNotReceived.getInventoryId())));
             }
+            if (aliquotFlagged != null) {
+                palletScanned.put(new RowColPos(0, 3), new PalletCell(
+                    new ScanCell(0, 3, aliquotFlagged.getInventoryId())));
+            }
         }
+        palletScanned.put(new RowColPos(0, 1), new PalletCell(new ScanCell(0,
+            1, "dddz")));
+        palletScanned.put(new RowColPos(0, 2), new PalletCell(new ScanCell(0,
+            2, "NUBR019021")));
         return palletScanned;
+    }
+
+    public boolean hasAcceptedAliquots() {
+        return aliquotsAccepted;
     }
 }
