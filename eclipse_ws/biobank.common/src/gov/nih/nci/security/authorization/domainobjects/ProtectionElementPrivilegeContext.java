@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 
 /**
  * Copy of original class from CSM4.1 There are bugs in the hashCode, compareTo
- * and equals methods that are solves here. This class is suppose to be the one
+ * and equals methods that are solved here. This class is supposed to be the one
  * taken by the classloader of the war file.
  * 
  * The correction code has been copied from the CSM4.2 source class. TODO: can
@@ -42,6 +42,7 @@ public class ProtectionElementPrivilegeContext implements Comparable,
      * 
      * @exception Throwable
      */
+    @Override
     public void finalize() throws Throwable {
 
     }
@@ -80,6 +81,7 @@ public class ProtectionElementPrivilegeContext implements Comparable,
         protectionElement = newVal;
     }
 
+    @Override
     public boolean equals(Object obj) {
         ProtectionElementPrivilegeContext other = (ProtectionElementPrivilegeContext) obj;
         if (null == other || null == this) {
@@ -97,6 +99,7 @@ public class ProtectionElementPrivilegeContext implements Comparable,
         }
     }
 
+    @Override
     public int compareTo(Object object) {
         if (object instanceof ProtectionElementPrivilegeContext) {
             ProtectionElementPrivilegeContext a = (ProtectionElementPrivilegeContext) object;
@@ -109,6 +112,7 @@ public class ProtectionElementPrivilegeContext implements Comparable,
         return 0;
     }
 
+    @Override
     public int hashCode() {
         int intNumber = 57 * 5;
         intNumber = intNumber

@@ -79,12 +79,12 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths) {
-        super(parent, collection, headings, columnWidths, 5, true);
+        super(parent, collection, headings, columnWidths, 5);
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
-        super(parent, collection, headings, columnWidths, rowsPerPage, true);
+        super(parent, collection, headings, columnWidths, rowsPerPage);
     }
 
     @Override
@@ -115,7 +115,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
             paginationRequired = true;
             if (pageInfo.page == pageInfo.pageTotal)
                 pageInfo.page--;
-            addPaginationWidget();
             getTableViewer().refresh();
         } else
             paginationRequired = false;

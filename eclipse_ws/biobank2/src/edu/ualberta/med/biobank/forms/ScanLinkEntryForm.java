@@ -173,6 +173,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         spw.loadProfile(profilesCombo.getCombo().getText());
 
         createScanTubeAloneButton(client);
+
+        containersScroll.setMinSize(client
+            .computeSize(SWT.DEFAULT, SWT.DEFAULT));
     }
 
     /**
