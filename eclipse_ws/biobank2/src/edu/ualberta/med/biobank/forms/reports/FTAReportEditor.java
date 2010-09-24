@@ -25,7 +25,7 @@ public class FTAReportEditor extends ReportsEditor {
 
     @Override
     protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100 };
+        return new int[] { 100, 100, 100, 100, 100, 100 };
     }
 
     @Override
@@ -68,7 +68,7 @@ public class FTAReportEditor extends ReportsEditor {
     @Override
     protected String[] getColumnNames() {
         return new String[] { "Patient Number", "Date Processed",
-            "Inventory Id", "Sample Type", "Location" };
+            "Inventory Id", "Sample Type", "Site", "Location" };
     }
 
     @Override

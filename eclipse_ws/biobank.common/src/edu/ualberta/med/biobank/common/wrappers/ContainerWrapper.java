@@ -447,14 +447,16 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             if (positions != null) {
                 aliquots = new TreeMap<RowColPos, AliquotWrapper>();
                 for (AliquotPosition position : positions) {
-                    AliquotWrapper aliquot = new AliquotWrapper(appService,
-                        position.getAliquot());
+                    AliquotPositionWrapper pw = new AliquotPositionWrapper(
+                        appService, position);
                     try {
-                        aliquot.reload();
-                    } catch (Exception e) {
+                        pw.reload();
+                    } catch (Exception e1) {
+                        // TODO Auto-generated catch block
+                        e1.printStackTrace();
                     }
-                    aliquots.put(
-                        new RowColPos(position.getRow(), position.getCol()),
+                    AliquotWrapper aliquot = pw.getAliquot();
+                    aliquots.put(new RowColPos(pw.getRow(), pw.getCol()),
                         aliquot);
                 }
                 propertiesMap.put("aliquots", aliquots);
@@ -917,6 +919,19 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         HQLCriteria criteria = new HQLCriteria("from "
             + Container.class.getName() + " where site.id = ? and label = ?",
             Arrays.asList(new Object[] { siteWrapper.getId(), label }));
+        List<Container> containers = appService.query(criteria);
+        return transformToWrapperList(appService, containers);
+    }
+
+    /**
+     * Get all containers with a given label
+     */
+    public static List<ContainerWrapper> getContainersByLabel(
+        WritableApplicationService appService, String label)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Container.class.getName() + " where label = ?",
+            Arrays.asList(new Object[] { label }));
         List<Container> containers = appService.query(criteria);
         return transformToWrapperList(appService, containers);
     }

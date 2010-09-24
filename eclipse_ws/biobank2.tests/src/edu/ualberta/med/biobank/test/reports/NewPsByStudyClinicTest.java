@@ -111,9 +111,8 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
             allPatientVisits, GROUP_BY_PATIENT).values();
 
         Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
-            .filter(firstPatientVisits, PredicateUtil.andPredicate(
-                patientVisitProcessedBetween(after, before),
-                patientVisitSite(isInSite(), getSiteId())));
+            .filter(firstPatientVisits,
+                patientVisitProcessedBetween(after, before));
 
         Map<List<Object>, Long> groupedData = MapperUtil.map(
             filteredPatientVisits,
