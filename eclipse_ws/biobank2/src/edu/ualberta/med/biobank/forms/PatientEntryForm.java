@@ -28,13 +28,17 @@ public class PatientEntryForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientEntryForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
-    public static final String MSG_NEW_PATIENT_OK = "Creating a new patient record.";
+    public static final String MSG_NEW_PATIENT_OK =
+        "Creating a new patient record.";
 
-    public static final String MSG_PATIENT_OK = "Editing an existing patient record.";
+    public static final String MSG_PATIENT_OK =
+        "Editing an existing patient record.";
 
-    public static final String MSG_NO_PATIENT_NUMBER = "Patient must have a patient number";
+    public static final String MSG_NO_PATIENT_NUMBER =
+        "Patient must have a patient number";
 
     public static final String MSG_NO_STUDY = "Enter a valid study short name";
 
@@ -44,8 +48,8 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private ComboViewer studiesViewer;
 
-    private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
-        MSG_NO_PATIENT_NUMBER);
+    private NonEmptyStringValidator pnumberNonEmptyValidator =
+        new NonEmptyStringValidator(MSG_NO_PATIENT_NUMBER);
 
     @Override
     public void init() {
@@ -91,14 +95,14 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText labelSite = createReadOnlyLabelledField(client, SWT.NONE,
-            "Site");
+        BiobankText labelSite =
+            createReadOnlyLabelledField(client, SWT.NONE, "Site");
         siteWrapper = SessionManager.getInstance().getCurrentSite();
         labelSite.setText(siteWrapper.getName());
 
         siteWrapper.reload();
-        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
-            siteWrapper.getStudyCollection());
+        List<StudyWrapper> studies =
+            new ArrayList<StudyWrapper>(siteWrapper.getStudyCollection());
         StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {
@@ -108,8 +112,9 @@ public class PatientEntryForm extends BiobankEntryForm {
             selectedStudy = patientAdapter.getWrapper().getStudy();
         }
 
-        studiesViewer = createComboViewerWithNoSelectionValidator(client,
-            "Study", studies, selectedStudy, "A study should be selected");
+        studiesViewer =
+            createComboViewerWithNoSelectionValidator(client, "Study", studies,
+                selectedStudy, "A study should be selected");
         setFirstControl(studiesViewer.getControl());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
@@ -128,8 +133,9 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        StudyWrapper study = (StudyWrapper) ((IStructuredSelection) studiesViewer
-            .getSelection()).getFirstElement();
+        StudyWrapper study =
+            (StudyWrapper) ((IStructuredSelection) studiesViewer.getSelection())
+                .getFirstElement();
         patientAdapter.getWrapper().setStudy(study);
         patientAdapter.getWrapper().persist();
     }
