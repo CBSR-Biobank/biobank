@@ -23,7 +23,8 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AbstractSearchedNode.class.getName());
 
-    private List<ModelWrapper<?>> searchedObjects = new ArrayList<ModelWrapper<?>>();
+    private List<ModelWrapper<?>> searchedObjects =
+        new ArrayList<ModelWrapper<?>>();
 
     private boolean keepDirectLeafChild;
 
@@ -55,11 +56,11 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                     if (childWrapper != null) {
                         childWrapper.reload();
                     }
-                    List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
-                        child.getChildren());
+                    List<AdapterBase> subChildren =
+                        new ArrayList<AdapterBase>(child.getChildren());
                     for (AdapterBase subChild : subChildren) {
-                        ModelWrapper<?> subChildWrapper = subChild
-                            .getModelObject();
+                        ModelWrapper<?> subChildWrapper =
+                            subChild.getModelObject();
                         subChildWrapper.reload();
                         if (!searchedObjects.contains(subChildWrapper)
                             || !isParentTo(childWrapper, subChildWrapper)) {
@@ -75,8 +76,8 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
                 if (!keepDirectLeafChild) {
                     // remove sub children without any children
-                    List<AdapterBase> children = new ArrayList<AdapterBase>(
-                        getChildren());
+                    List<AdapterBase> children =
+                        new ArrayList<AdapterBase>(getChildren());
                     for (AdapterBase child : children) {
                         if (child.getChildren().size() == 0) {
                             removeChild(child);
@@ -136,4 +137,8 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     protected abstract boolean isParentTo(ModelWrapper<?> parent,
         ModelWrapper<?> child);
 
+    @Override
+    public AdapterBase search(Object searchedObject) {
+        return searchChildren(searchedObject);
+    }
 }

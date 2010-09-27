@@ -31,7 +31,8 @@ import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 public class DispatchShipmentAdministrationView extends
     AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView";
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView";
 
     public InCreationDispatchShipmentGroup creationNode;
 
@@ -73,13 +74,15 @@ public class DispatchShipmentAdministrationView extends
 
     private void createNodes() {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
-        if (site == null || site.getDispatchStudiesAsSender().size() > 0) {
+        if (SessionManager.getInstance().isAllSitesSelected()
+            || site.getDispatchStudiesAsSender().size() > 0) {
             outgoingNode = new OutgoingNode(rootNode, 0);
             outgoingNode.setParent(rootNode);
             rootNode.addChild(outgoingNode);
         }
 
-        if (site == null || site.getDispatchStudiesAsReceiver().size() > 0) {
+        if (SessionManager.getInstance().isAllSitesSelected()
+            || site.getDispatchStudiesAsReceiver().size() > 0) {
             incomingNode = new IncomingNode(rootNode, 1);
             incomingNode.setParent(rootNode);
             rootNode.addChild(incomingNode);
@@ -195,8 +198,9 @@ public class DispatchShipmentAdministrationView extends
                 if (radioWaybill.getSelection()) {
                     msg += " for waybill " + treeText.getText();
                 } else {
-                    msg += " for date "
-                        + DateFormatter.formatAsDate(dateWidget.getDate());
+                    msg +=
+                        " for date "
+                            + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
                 BioBankPlugin.openMessage("Shipment not found", msg);
             } else {

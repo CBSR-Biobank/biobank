@@ -596,7 +596,7 @@ public class TestAliquot extends TestDatabase {
 
         DebugUtil.getRandomAliquotsAlreadyLinked(appService, site.getId());
         DebugUtil.getRandomAliquotsAlreadyAssigned(appService, site.getId());
-        DebugUtil.getRandomAliquotsNotAssigned(appService, site.getId());
+        DebugUtil.getRandomAliquotsNotAssignedNoDispatch(appService, site.getId());
     }
 
     @Test
