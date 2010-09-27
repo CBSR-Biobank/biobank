@@ -58,7 +58,8 @@ public class BiobankApplicationServiceImpl extends
 
     private static final String SITE_ADMIN_PG_ID = "11";
 
-    private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
+    // private static final String CONTAINER_ADMINISTRATION_STRING =
+    // "biobank.cbsr.container.administration";
 
     private Map<String, Map<String, Boolean>> cachedPrivilegesMap = new HashMap<String, Map<String, Boolean>>();
 

@@ -208,16 +208,20 @@ public class ContainerViewForm extends BiobankViewForm {
 
     protected void createVisualizeContainer() {
         Section s = createSection("Container Visual");
-        s.setLayout(new FillLayout());
-        ScrolledComposite sc = new ScrolledComposite(s, SWT.H_SCROLL);
+        s.setLayout(new GridLayout(1, false));
+        Composite containerSection = new Composite(s, SWT.NONE);
+        containerSection.setLayout(new FillLayout(SWT.VERTICAL));
+        ScrolledComposite sc = new ScrolledComposite(containerSection,
+            SWT.H_SCROLL);
         sc.setExpandHorizontal(true);
         sc.setExpandVertical(true);
         Composite client = new Composite(sc, SWT.NONE);
         client.setLayout(new GridLayout(1, false));
+        toolkit.adapt(containerSection);
         toolkit.adapt(sc);
         toolkit.adapt(client);
         sc.setContent(client);
-        s.setClient(sc);
+        s.setClient(containerSection);
         if (!childrenOk) {
             Label label = toolkit
                 .createLabel(client,
@@ -232,6 +236,7 @@ public class ContainerViewForm extends BiobankViewForm {
         toolkit.adapt(containerWidget);
 
         // Set the minimum size
+
         sc.setMinSize(containerWidget.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
         containerWidget.addMouseListener(new MouseAdapter() {
@@ -263,7 +268,7 @@ public class ContainerViewForm extends BiobankViewForm {
             });
         containerWidget.displayFullInfoString(true);
 
-        createChildrenActionsSection(client);
+        createChildrenActionsSection(containerSection);
     }
 
     private void createChildrenActionsSection(Composite client) {
@@ -279,6 +284,8 @@ public class ContainerViewForm extends BiobankViewForm {
                 initSelectionCv = createComboViewer(childrenActionSection,
                     "Initialize selection to", containerTypes,
                     containerTypes.get(0));
+                initSelectionCv.getCombo()
+                    .setLayoutData(new GridData(SWT.LEFT));
                 Button initializeSelectionButton = toolkit.createButton(
                     childrenActionSection, "Initialize", SWT.PUSH);
                 initializeSelectionButton
@@ -290,6 +297,7 @@ public class ContainerViewForm extends BiobankViewForm {
                             initSelection(type);
                         }
                     });
+                initializeSelectionButton.setLayoutData(new GridData(SWT.LEFT));
             }
 
             if (canDelete) {
@@ -300,8 +308,10 @@ public class ContainerViewForm extends BiobankViewForm {
                 deleteCv = createComboViewer(childrenActionSection,
                     "Delete selected containers of type", deleteComboList,
                     "All");
+                deleteCv.getCombo().setLayoutData(new GridData(SWT.LEFT));
                 Button deleteButton = toolkit.createButton(
                     childrenActionSection, "Delete", SWT.PUSH);
+                deleteButton.setLayoutData(new GridData(SWT.LEFT));
                 deleteButton.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
@@ -322,7 +332,6 @@ public class ContainerViewForm extends BiobankViewForm {
                     }
                 });
             }
-            setChildrenActionSectionEnabled(false);
         }
     }
 

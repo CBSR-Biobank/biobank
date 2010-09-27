@@ -169,6 +169,16 @@ public abstract class AbstractReportTest {
         return topContainerIds;
     }
 
+    public static Collection<ContainerWrapper> getTopContainers(
+        Collection<ContainerWrapper> containers) {
+        Set<ContainerWrapper> topContainers = new HashSet<ContainerWrapper>();
+        for (ContainerWrapper container : PredicateUtil.filter(containers,
+            CONTAINER_IS_TOP_LEVEL)) {
+            topContainers.add(container);
+        }
+        return topContainers;
+    }
+
     public static Predicate<AliquotWrapper> aliquotTopContainerIdIn(String list) {
         if ((list == null) || list.isEmpty()) {
             return new Predicate<AliquotWrapper>() {
