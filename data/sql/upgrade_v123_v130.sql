@@ -259,21 +259,35 @@ DROP TABLE aliquot_position;
 
 DROP TABLE container_position;
 
-/* delete assoc between second entry of HEART and Calgary-F */
+/* rename the HEART study assoc with Calgary-F to "HEART2" */
+UPDATE study,site_study,site SET study.name_short="HEART2"
+WHERE study.id=site_study.study_id AND site.id=site_study.site_id
+AND site.name_short="Calgary-F";
+
+/* move contacts from HEART2 to HEART */
+UPDATE study_contact,contact,clinic,study SET study_contact.study_id=(SELECT id FROM study WHERE name_short="HEART")
+WHERE study_contact.study_id=study.id AND study_contact.contact_id=contact.id
+AND contact.clinic_id=clinic.id AND study.name_short="HEART2"
+AND clinic.name_short="CL1-Foothills TRW";
+
+/* move all patients from HEART2 to HEART */
+UPDATE patient,study SET patient.study_id=(SELECT id FROM study WHERE name_short="HEART")
+WHERE study.id=patient.study_id AND study.name_short="HEART2";
+
+/* delete assoc between HEART2 and Calgary-F */
 DELETE site_study FROM site_study INNER JOIN site ON site.id=site_study.site_id
 INNER JOIN study ON study.id=site_study.study_id
-WHERE site.name_short='Calgary-F' AND study.name_short='HEART';
+WHERE site.name_short='Calgary-F' AND study.name_short='HEART2';
 
-/* remove second entry of HEART */
+/* remove HEART2 */
 DELETE study FROM STUDY LEFT JOIN site_study on site_study.study_id=study.id
-WHERE name_short='HEART' and study_id is null;
+WHERE name_short='HEART2' and study_id is null;
 
 /* create link between Calgary-F site and original entry for HEART */
 INSERT INTO site_study (site_id, study_id)
        SELECT site.id,study.id
        FROM site JOIN study
        WHERE site.name_short='Calgary-F' AND study.name_short='HEART';
-
 
 #
 # DDL END
