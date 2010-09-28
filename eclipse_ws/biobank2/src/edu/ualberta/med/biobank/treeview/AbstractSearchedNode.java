@@ -16,6 +16,8 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
+import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 public abstract class AbstractSearchedNode extends AdapterBase {
@@ -70,7 +72,13 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                 }
 
                 // add searched objects is not yet there
-                for (ModelWrapper<?> wrapper : searchedObjects) {
+                for (final ModelWrapper<?> wrapper : searchedObjects) {
+                    wrapper.addWrapperListener(new WrapperListenerAdapter() {
+                        @Override
+                        public void deleted(WrapperEvent event) {
+                            searchedObjects.remove(wrapper);
+                        }
+                    });
                     addNode(wrapper);
                 }
 

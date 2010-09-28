@@ -59,6 +59,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private ComboViewer activityStatusComboViewer;
 
+    private boolean doSave;
+
+    private boolean newName;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerAdapter),
@@ -178,16 +182,18 @@ public class ContainerEntryForm extends BiobankEntryForm {
                         ContainerTypeWrapper ct =
                             (ContainerTypeWrapper) selectedObject;
                         container.setContainerType(ct);
-                        tempWidget.setText("");
-                        if (ct != null && Boolean.TRUE.equals(ct.getTopLevel())) {
-                            Double temp = ct.getDefaultTemperature();
-                            if (temp == null) {
-                                tempWidget.setText("");
-                            } else {
-                                tempWidget.setText(temp.toString());
+                        if (tempWidget != null) {
+                            tempWidget.setText("");
+                            if (ct != null
+                                && Boolean.TRUE.equals(ct.getTopLevel())) {
+                                Double temp = ct.getDefaultTemperature();
+                                if (temp == null) {
+                                    tempWidget.setText("");
+                                } else {
+                                    tempWidget.setText(temp.toString());
+                                }
                             }
                         }
-
                     }
                 });
 
@@ -223,10 +229,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
         return MSG_STORAGE_CONTAINER_OK;
     }
 
-    @Override
-    protected void saveForm() throws Exception {
-        boolean doSave = true;
-        boolean newName = false;
+    protected void doBeforeSave() throws Exception {
+        doSave = true;
+        newName = false;
         if (container.hasChildren() && oldContainerLabel != null
             && !oldContainerLabel.equals(container.getLabel())) {
             doSave =
@@ -236,6 +241,10 @@ public class ContainerEntryForm extends BiobankEntryForm {
                         "This container has been renamed. Its children will also be renamed. Are you sure you want to continue ?");
             newName = true;
         }
+    }
+
+    @Override
+    protected void saveForm() throws Exception {
         if (doSave) {
             container.persist();
             if (newName) {

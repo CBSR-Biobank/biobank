@@ -164,7 +164,6 @@ public class LinkFormPatientManagement {
     }
 
     protected PatientVisitWrapper getSelectedPatientVisit() {
-        System.out.println(currentVisitSelected);
         return currentVisitSelected;
     }
 
@@ -208,7 +207,8 @@ public class LinkFormPatientManagement {
             viewerVisits.setInput(collection);
             viewerVisits.getCombo().setFocus();
             if (collection != null && collection.size() == 1) {
-                viewerVisits.getCombo().select(0);
+                viewerVisits.setSelection(new StructuredSelection(collection
+                    .get(0)));
             } else {
                 viewerVisits.getCombo().deselectAll();
             }

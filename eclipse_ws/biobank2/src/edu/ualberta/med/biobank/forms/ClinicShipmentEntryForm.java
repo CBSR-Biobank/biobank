@@ -332,7 +332,6 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
                             ShipmentAdministrationView.showShipment(shipment);
                         }
                     }
-                    shipmentAdapter.getParent().performExpand();
                 }
             }
         });

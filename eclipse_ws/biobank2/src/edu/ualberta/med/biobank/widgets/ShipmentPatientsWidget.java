@@ -22,6 +22,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
@@ -30,8 +31,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -71,8 +72,8 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         toolkit.paintBordersFor(this);
 
         if (editable) {
-            Label label = toolkit.createLabel(this,
-                "Enter patient number to add:");
+            Label label =
+                toolkit.createLabel(this, "Enter patient number to add:");
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
@@ -126,19 +127,20 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         String patientNumber = newPatientText.getText().trim();
         if (!patientNumber.isEmpty()) {
             try {
-                PatientWrapper patient = PatientWrapper.getPatient(
-                    shipment.getAppService(), patientNumber);
+                PatientWrapper patient =
+                    PatientWrapper.getPatient(shipment.getAppService(),
+                        patientNumber);
                 if (patient == null) {
-                    boolean create = BioBankPlugin.openConfirm(
-                        "Patient not found",
-                        "Do you want to create this patient ?");
+                    boolean create =
+                        BioBankPlugin.openConfirm("Patient not found",
+                            "Do you want to create this patient ?");
                     if (create) {
-                        patient = new PatientWrapper(
-                            SessionManager.getAppService());
+                        patient =
+                            new PatientWrapper(SessionManager.getAppService());
                         patient.setPnumber(patientNumber);
                         addPatientListener(patient);
-                        PatientAdapter patientAdapter = new PatientAdapter(
-                            null, patient);
+                        PatientAdapter patientAdapter =
+                            new PatientAdapter(null, patient);
                         // won't be able to edit it once created :
                         patientAdapter.setEditable(false);
                         patientAdapter.openEntryForm(true);
@@ -250,14 +252,19 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         @Override
         public void inserted(WrapperEvent event) {
             if (!ShipmentPatientsWidget.this.isDisposed()) {
-                addPatient(patient);
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        addPatient(patient);
+                    }
+                });
             }
         }
     }
 
     public void addBinding(WidgetCreator dbc, final String message) {
-        final ControlDecoration controlDecoration = createDecorator(addButton,
-            message);
+        final ControlDecoration controlDecoration =
+            createDecorator(addButton, message);
         WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(new IValidator() {

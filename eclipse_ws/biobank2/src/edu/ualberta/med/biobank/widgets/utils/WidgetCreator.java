@@ -368,8 +368,6 @@ public class WidgetCreator {
         Label fieldLabel, Collection<T> input, T selection,
         String errorMessage, boolean useDefaultComparator, String bindingKey,
         final ComboSelectionUpdate csu) {
-        Assert.isNotNull(dbc);
-
         Combo combo = new Combo(parent, SWT.READ_ONLY | SWT.BORDER);
         final ComboViewer comboViewer = new ComboViewer(combo);
         comboViewer.setContentProvider(new ArrayContentProvider());
@@ -382,18 +380,21 @@ public class WidgetCreator {
         }
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-        NonEmptyStringValidator validator =
-            new NonEmptyStringValidator(errorMessage);
-        validator.setControlDecoration(BiobankWidget.createDecorator(
-            fieldLabel, errorMessage));
-        UpdateValueStrategy uvs = new UpdateValueStrategy();
-        uvs.setAfterGetValidator(validator);
-        IObservableValue selectedValue = new WritableValue("", String.class);
-        Binding binding =
-            dbc.bindValue(SWTObservables.observeSelection(combo),
-                selectedValue, uvs, null);
-        if (bindingKey != null) {
-            bindings.put(bindingKey, binding);
+        if (dbc != null) {
+            NonEmptyStringValidator validator =
+                new NonEmptyStringValidator(errorMessage);
+            validator.setControlDecoration(BiobankWidget.createDecorator(
+                fieldLabel, errorMessage));
+            UpdateValueStrategy uvs = new UpdateValueStrategy();
+            uvs.setAfterGetValidator(validator);
+            IObservableValue selectedValue =
+                new WritableValue("", String.class);
+            Binding binding =
+                dbc.bindValue(SWTObservables.observeSelection(combo),
+                    selectedValue, uvs, null);
+            if (bindingKey != null) {
+                bindings.put(bindingKey, binding);
+            }
         }
         if (csu != null) {
             comboViewer
