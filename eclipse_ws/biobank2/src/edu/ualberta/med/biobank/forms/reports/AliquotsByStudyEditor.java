@@ -3,11 +3,15 @@ package edu.ualberta.med.biobank.forms.reports;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class AliquotsByStudyEditor extends ReportsEditor {
 
@@ -15,6 +19,8 @@ public class AliquotsByStudyEditor extends ReportsEditor {
     protected DateTimeWidget start;
     protected DateTimeWidget end;
     protected TopContainerListWidget topContainers;
+    private IObservableValue listStatus = new WritableValue(Boolean.TRUE,
+        Boolean.class);
 
     @Override
     protected int[] getColumnWidths() {
@@ -23,8 +29,17 @@ public class AliquotsByStudyEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) {
-        widgetCreator.createLabel(parent, "Top Containers");
         topContainers = new TopContainerListWidget(parent, SWT.NONE);
+        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
+            Boolean.class), listStatus, "Top Container List Empty");
+        topContainers
+            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    listStatus.setValue(topContainers.getEnabled());
+                }
+            });
+        topContainers.adaptToToolkit(toolkit, true);
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",

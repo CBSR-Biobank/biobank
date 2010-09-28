@@ -14,9 +14,7 @@ public class CAliquotsImpl extends AbstractReport {
         + ContainerPath.class.getName()
         + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.id in ("
         + CONTAINER_LIST
-        + ")) and aliquot.linkDate between ? and ? and aliquot.patientVisit.shipment.site"
-        + SITE_OPERATOR
-        + SITE_ID
+        + ")) and aliquot.linkDate between ? and ? "
         + " group by aliquot.patientVisit.patient.study.nameShort, aliquot.patientVisit.shipment.clinic.nameShort";
 
     public CAliquotsImpl(BiobankReport report) {
