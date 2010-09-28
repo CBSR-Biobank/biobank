@@ -5,9 +5,6 @@ import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -23,10 +20,12 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class AliquotEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.AliquotEntryForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.AliquotEntryForm";
 
     public static final String OK_MESSAGE = "Edit aliquot";
 
@@ -64,8 +63,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
         StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
         study.reload();
 
-        List<SampleStorageWrapper> allowedSampleStorage = study
-            .getSampleStorageCollection();
+        List<SampleStorageWrapper> allowedSampleStorage =
+            study.getSampleStorageCollection();
 
         List<SampleTypeWrapper> containerSampleTypeList = null;
         if (aliquot.hasParent()) {
@@ -74,7 +73,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
             containerSampleTypeList = ct.getSampleTypeCollection();
         }
 
-        List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
+        List<SampleTypeWrapper> sampleTypes =
+            new ArrayList<SampleTypeWrapper>();
         for (SampleStorageWrapper ss : allowedSampleStorage) {
             SampleTypeWrapper sst = ss.getSampleType();
             if (containerSampleTypeList == null) {
@@ -87,27 +87,28 @@ public class AliquotEntryForm extends BiobankEntryForm {
             }
         }
 
-        sampleTypeComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Type", sampleTypes, aliquot.getSampleType(),
-            "Aliquot must have a sample type");
-        sampleTypeComboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    aliquot
-                        .setSampleType((SampleTypeWrapper) ((IStructuredSelection) event
-                            .getSelection()).getFirstElement());
-                    aliquot.setQuantityFromType();
-                    volume.setText(aliquot.getQuantity().toString());
-                }
-            });
+        sampleTypeComboViewer =
+            createComboViewer(client, "Type", sampleTypes,
+                aliquot.getSampleType(), "Aliquot must have a sample type",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        aliquot
+                            .setSampleType((SampleTypeWrapper) selectedObject);
+                        aliquot.setQuantityFromType();
+                        if (volume != null) {
+                            volume.setText(aliquot.getQuantity().toString());
+                        }
+                    }
+                });
 
         createReadOnlyLabelledField(client, SWT.NONE, "Link Date",
             aliquot.getFormattedLinkDate());
 
-        volume = createReadOnlyLabelledField(client, SWT.NONE, "Volume (ml)",
-            aliquot.getQuantity() == null ? null : aliquot.getQuantity()
-                .toString());
+        volume =
+            createReadOnlyLabelledField(client, SWT.NONE, "Volume (ml)",
+                aliquot.getQuantity() == null ? null : aliquot.getQuantity()
+                    .toString());
 
         createReadOnlyLabelledField(client, SWT.NONE, "Shipment Waybill",
             aliquot.getPatientVisit().getShipment().getWaybill());
@@ -127,10 +128,18 @@ public class AliquotEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Position",
             aliquot.getPositionString(true, false));
 
-        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status",
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            aliquot.getActivityStatus(), "Aliquot must have an activity status");
+        activityStatusComboViewer =
+            createComboViewer(client, "Activity Status",
+                ActivityStatusWrapper.getAllActivityStatuses(appService),
+                aliquot.getActivityStatus(),
+                "Aliquot must have an activity status",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        aliquot
+                            .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                    }
+                });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
             | SWT.MULTI, "Comments", null,
@@ -141,12 +150,6 @@ public class AliquotEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
-            .getSelection()).getFirstElement();
-        aliquot.setActivityStatus(activity);
-        SampleTypeWrapper st = (SampleTypeWrapper) ((StructuredSelection) sampleTypeComboViewer
-            .getSelection()).getFirstElement();
-        aliquot.setSampleType(st);
         aliquot.persist();
     }
 
@@ -163,8 +166,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        ActivityStatusWrapper currentActivityStatus = aliquot
-            .getActivityStatus();
+        ActivityStatusWrapper currentActivityStatus =
+            aliquot.getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 currentActivityStatus));

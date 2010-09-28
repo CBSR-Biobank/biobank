@@ -5,9 +5,6 @@ import java.util.Collection;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -25,6 +22,7 @@ import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class SampleStorageDialog extends BiobankDialog {
 
@@ -101,50 +99,41 @@ public class SampleStorageDialog extends BiobankDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        sampleTypeComboViewer = getWidgetCreator()
-            .createComboViewerWithNoSelectionValidator(contents, "Sample Type",
+        sampleTypeComboViewer =
+            getWidgetCreator().createComboViewer(contents, "Sample Type",
                 availableSampleTypes, sampleStorage.getSampleType(),
-                "A sample type should be selected");
+                "A sample type should be selected", new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        sampleStorage
+                            .setSampleType((SampleTypeWrapper) selectedObject);
+                    }
+                });
         sampleTypeComboViewer.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
                 return ((SampleTypeWrapper) element).getName();
             }
         });
-        sampleTypeComboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection stSelection = (IStructuredSelection) sampleTypeComboViewer
-                        .getSelection();
-                    sampleStorage.setSampleType((SampleTypeWrapper) stSelection
-                        .getFirstElement());
-                }
-            });
 
-        activityStatusComboViewer = getWidgetCreator()
-            .createComboViewerWithNoSelectionValidator(
+        activityStatusComboViewer =
+            getWidgetCreator().createComboViewer(
                 contents,
                 "Activity Status",
                 ActivityStatusWrapper.getAllActivityStatuses(SessionManager
                     .getAppService()), sampleStorage.getActivityStatus(),
-                "A sample type should be selected");
-        activityStatusComboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection asSelection = (IStructuredSelection) activityStatusComboViewer
-                        .getSelection();
-                    try {
-                        sampleStorage
-                            .setActivityStatus((ActivityStatusWrapper) asSelection
-                                .getFirstElement());
-                    } catch (Exception e) {
-                        BioBankPlugin.openAsyncError(
-                            "Error setting activity status", e);
+                "A sample type should be selected", new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        try {
+                            sampleStorage
+                                .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                        } catch (Exception e) {
+                            BioBankPlugin.openAsyncError(
+                                "Error setting activity status", e);
+                        }
                     }
-                }
-            });
+                });
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
             "Volume (ml)", new String[0],

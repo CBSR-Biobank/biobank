@@ -5,9 +5,6 @@ import java.util.List;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -19,6 +16,7 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class StudySourceVesselDialog extends BiobankDialog {
 
@@ -90,22 +88,17 @@ public class StudySourceVesselDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        sourceVesselComboViewer = getWidgetCreator()
-            .createComboViewerWithNoSelectionValidator(contents,
-                "Source Vessel", allSourceVesselsMap,
-                studySourceVessel.getSourceVessel(),
-                "A source vessel should be selected");
-        sourceVesselComboViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    IStructuredSelection stSelection = (IStructuredSelection) sourceVesselComboViewer
-                        .getSelection();
-                    studySourceVessel
-                        .setSourceVessel((SourceVesselWrapper) stSelection
-                            .getFirstElement());
-                }
-            });
+        sourceVesselComboViewer =
+            getWidgetCreator().createComboViewer(contents, "Source Vessel",
+                allSourceVesselsMap, studySourceVessel.getSourceVessel(),
+                "A source vessel should be selected",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        studySourceVessel
+                            .setSourceVessel((SourceVesselWrapper) selectedObject);
+                    }
+                });
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
             "Need Time Drawn", new String[0],

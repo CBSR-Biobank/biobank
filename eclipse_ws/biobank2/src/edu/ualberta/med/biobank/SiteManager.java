@@ -9,6 +9,7 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
@@ -103,8 +104,8 @@ public class SiteManager {
             Integer saveVal = -1;
             if ((site != null) && (site.getId() != null))
                 saveVal = site.getId();
-            Preferences prefs = new InstanceScope()
-                .getNode(Application.PLUGIN_ID);
+            Preferences prefs =
+                new InstanceScope().getNode(Application.PLUGIN_ID);
             Preferences prefNode = prefs.node(SITE_PREF_NODE);
             prefNode.put(LAST_SERVER_PREF, sessionName);
             prefNode.putInt(LAST_SITE_PREF, saveVal);
@@ -118,18 +119,19 @@ public class SiteManager {
     }
 
     private void setSiteSelectionState(SiteWrapper site) {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-        SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
-            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        IWorkbenchWindow window =
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        ISourceProviderService service =
+            (ISourceProviderService) window
+                .getService(ISourceProviderService.class);
+        SiteSelectionState siteSelectionStateSourceProvider =
+            (SiteSelectionState) service
+                .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
         siteSelectionStateSourceProvider.setSiteSelection(site);
     }
 
     public void updateSites(Collection<SiteWrapper> sites) {
         Assert.isNotNull(sites, "sites collection is null");
-
         if (currentSite == null)
             currentSite = allSitesWrapper;
         logger.debug("site selected: " + currentSite.getName());
@@ -143,12 +145,32 @@ public class SiteManager {
         siteCombo.setSelection(currentSite);
     }
 
-    public void updateSites() {
+    public void updateSites(boolean async) {
+        if (async) {
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    updateSites(getSites());
+                }
+            });
+
+        } else {
+            updateSites(getSites());
+        }
+    }
+
+    private List<SiteWrapper> getSites() {
+        List<SiteWrapper> sites = null;
         try {
-            updateSites(SiteWrapper.getSites(appService));
+            sites = SiteWrapper.getSites(appService);
         } catch (Exception e) {
             logger.error("Cannot update Sites", e);
         }
+        return sites;
+    }
+
+    public void updateSites() {
+        updateSites(false);
     }
 
     public SiteWrapper getCurrentSite() {
@@ -163,10 +185,10 @@ public class SiteManager {
                 .addSelectionChangedListener(new ISelectionChangedListener() {
                     @Override
                     public void selectionChanged(SelectionChangedEvent event) {
-                        IStructuredSelection selection = (IStructuredSelection) event
-                            .getSelection();
-                        SiteWrapper siteWrapper = (SiteWrapper) selection
-                            .getFirstElement();
+                        IStructuredSelection selection =
+                            (IStructuredSelection) event.getSelection();
+                        SiteWrapper siteWrapper =
+                            (SiteWrapper) selection.getFirstElement();
 
                         if (siteWrapper == null)
                             return;

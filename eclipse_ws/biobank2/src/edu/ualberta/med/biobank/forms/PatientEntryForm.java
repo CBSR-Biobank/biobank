@@ -7,7 +7,6 @@ import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -22,6 +21,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class PatientEntryForm extends BiobankEntryForm {
 
@@ -113,9 +113,18 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
 
         studiesViewer =
-            createComboViewerWithNoSelectionValidator(client, "Study", studies,
-                selectedStudy, "A study should be selected");
+            createComboViewer(client, "Study", studies, selectedStudy,
+                "A study should be selected", new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        patientAdapter.getWrapper().setStudy(
+                            (StudyWrapper) selectedObject);
+                    }
+                });
         setFirstControl(studiesViewer.getControl());
+        if (selectedStudy != null) {
+            studiesViewer.setSelection(new StructuredSelection(selectedStudy));
+        }
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             "Patient Number", null, BeansObservables.observeValue(
@@ -133,10 +142,6 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        StudyWrapper study =
-            (StudyWrapper) ((IStructuredSelection) studiesViewer.getSelection())
-                .getFirstElement();
-        patientAdapter.getWrapper().setStudy(study);
         patientAdapter.getWrapper().persist();
     }
 

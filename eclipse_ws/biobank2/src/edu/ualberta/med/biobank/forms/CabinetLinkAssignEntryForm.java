@@ -13,9 +13,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -57,6 +54,7 @@ import edu.ualberta.med.biobank.validators.StringLengthValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
@@ -129,6 +127,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     private AliquotMode aliquotMode;
 
     private ScrolledComposite containersScroll;
+
+    protected boolean newAliquotCreation = true;
 
     @Override
     protected void init() throws Exception {
@@ -238,6 +238,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         radioNew.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                newAliquotCreation = radioNew.getSelection();
                 if (radioNew.getSelection()) {
                     setAliquotMode(AliquotMode.NEW_ALIQUOT);
                 }
@@ -252,6 +253,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         radioMove.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
+                newAliquotCreation = radioNew.getSelection();
                 if (!radioNew.getSelection()) {
                     setAliquotMode(AliquotMode.MOVE_ALIQUOT);
                 }
@@ -603,27 +605,21 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             widgetCreator.createLabel(fieldsComposite,
                 Messages.getString("Cabinet.sampleType.label"));
         viewerSampleTypes =
-            widgetCreator
-                .createComboViewerWithNoSelectionValidator(
-                    fieldsComposite,
-                    sampleTypeComboLabel,
-                    null,
-                    null,
-                    Messages.getString("Cabinet.sampleType.validationMsg"), true, SAMPLE_TYPE_LIST_BINDING); //$NON-NLS-1$
+            widgetCreator.createComboViewer(fieldsComposite,
+                sampleTypeComboLabel, null, null,
+                Messages.getString("Cabinet.sampleType.validationMsg"), true,
+                SAMPLE_TYPE_LIST_BINDING, new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        if (aliquotMode == AliquotMode.MOVE_ALIQUOT)
+                            return;
+                        aliquot
+                            .setSampleType((SampleTypeWrapper) selectedObject);
+
+                    }
+                }); //$NON-NLS-1$
         GridData gd = (GridData) viewerSampleTypes.getCombo().getLayoutData();
         gd.horizontalSpan = 2;
-        viewerSampleTypes
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    if (aliquotMode == AliquotMode.MOVE_ALIQUOT)
-                        return;
-                    IStructuredSelection stSelection =
-                        (IStructuredSelection) viewerSampleTypes.getSelection();
-                    aliquot.setSampleType((SampleTypeWrapper) stSelection
-                        .getFirstElement());
-                }
-            });
 
         // for move mode
         sampleTypeTextLabel =
@@ -944,7 +940,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     @Override
     protected void saveForm() throws Exception {
-        if (radioNew.getSelection()) {
+        if (newAliquotCreation) {
             aliquot.setLinkDate(new Date());
             aliquot.setQuantityFromType();
             aliquot.setActivityStatus(ActivityStatusWrapper
@@ -956,7 +952,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             posStr = "none"; //$NON-NLS-1$
         }
         String msgString = "";
-        if (radioNew.getSelection()) {
+        if (newAliquotCreation) {
             msgString = "Cabinet.activitylog.aliquot.saveNew"; //$NON-NLS-1$
         } else {
             msgString = "Cabinet.activitylog.aliquot.saveMove"; //$NON-NLS-1$

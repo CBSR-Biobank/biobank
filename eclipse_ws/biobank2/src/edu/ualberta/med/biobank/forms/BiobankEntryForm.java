@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -15,6 +16,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
@@ -56,6 +60,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 /**
  * Base class for data entry forms.
@@ -144,34 +149,82 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         doSaveInternal(monitor);
     }
 
-    protected void doSaveInternal(final IProgressMonitor monitor) {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    saveForm();
-                } catch (final RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
-                    setDirty(true);
-                    monitor.setCanceled(true);
-                } catch (final RemoteAccessException exp) {
-                    BioBankPlugin.openRemoteAccessErrorMessage(exp);
-                    setDirty(true);
-                    monitor.setCanceled(true);
-                } catch (final AccessDeniedException ade) {
-                    BioBankPlugin.openAccessDeniedErrorMessage(ade);
-                    setDirty(true);
-                    monitor.setCanceled(true);
-                } catch (BiobankCheckException bce) {
-                    setDirty(true);
-                    monitor.setCanceled(true);
-                    BioBankPlugin.openAsyncError("Save error", bce);
-                } catch (Exception e) {
-                    setDirty(true);
-                    throw new RuntimeException(e);
+    protected void doSaveInternal(
+        @SuppressWarnings("unused") final IProgressMonitor monitor) {
+        IRunnableContext context =
+            new ProgressMonitorDialog(Display.getDefault().getActiveShell());
+        try {
+            doBeforeSave();
+            context.run(true, false, new IRunnableWithProgress() {
+                @Override
+                public void run(IProgressMonitor monitor)
+                    throws InvocationTargetException, InterruptedException {
+
+                    try {
+                        monitor
+                            .beginTask("Saving...", IProgressMonitor.UNKNOWN);
+                        saveForm();
+                        monitor.done();
+                    } catch (final RemoteConnectFailureException exp) {
+                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        monitor.setCanceled(true);
+                    } catch (final RemoteAccessException exp) {
+                        BioBankPlugin.openRemoteAccessErrorMessage(exp);
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        monitor.setCanceled(true);
+                    } catch (final AccessDeniedException ade) {
+                        BioBankPlugin.openAccessDeniedErrorMessage(ade);
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        monitor.setCanceled(true);
+                    } catch (BiobankCheckException bce) {
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        monitor.setCanceled(true);
+                        BioBankPlugin.openAsyncError("Save error", bce);
+                    } catch (Exception e) {
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            setDirty(true);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Called before the monitor start. Can be used to get values on the GUI
+     * objects.
+     */
+    @SuppressWarnings("unused")
+    protected void doBeforeSave() throws Exception {
+        // do nothing by default
     }
 
     @Override
@@ -260,11 +313,11 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             validator);
     }
 
-    protected <T> ComboViewer createComboViewerWithNoSelectionValidator(
-        Composite parent, String fieldLabel, Collection<T> input, T selection,
-        String errorMessage) {
-        return widgetCreator.createComboViewerWithNoSelectionValidator(parent,
-            fieldLabel, input, selection, errorMessage);
+    protected <T> ComboViewer createComboViewer(Composite parent,
+        String fieldLabel, Collection<T> input, T selection,
+        String errorMessage, ComboSelectionUpdate csu) {
+        return widgetCreator.createComboViewer(parent, fieldLabel, input,
+            selection, errorMessage, csu);
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,

@@ -63,10 +63,9 @@ public class SelectParentContainerDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        comboViewer = getWidgetCreator()
-            .createComboViewerWithNoSelectionValidator(contents,
-                "Select parent", containers, null,
-                "A source vessel should be selected");
+        comboViewer =
+            getWidgetCreator().createComboViewer(contents, "Select parent",
+                containers, null, "A source vessel should be selected", null);
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -85,8 +84,9 @@ public class SelectParentContainerDialog extends BiobankDialog {
     }
 
     private void saveSelectedContainer() {
-        selectedContainer = (ContainerWrapper) ((IStructuredSelection) comboViewer
-            .getSelection()).getFirstElement();
+        selectedContainer =
+            (ContainerWrapper) ((IStructuredSelection) comboViewer
+                .getSelection()).getFirstElement();
     }
 
     public ContainerWrapper getSelectedContainer() {
