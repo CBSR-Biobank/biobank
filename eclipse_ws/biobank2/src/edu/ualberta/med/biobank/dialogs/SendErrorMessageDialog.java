@@ -232,7 +232,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     Properties props = new Properties();
                     props.put("mail.smtp.host", email.getSmtpServer());
                     props.put("mail.smtp.auth", "true");
-                    props.put("mail.debug", "true");
+                    // props.put("mail.debug", "true");
                     props.put("mail.smtp.port", email.getServerPort());
                     props.put("mail.smtp.socketFactory.port",
                         email.getServerPort());
@@ -248,7 +248,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
                                         "biobank2", email.getServerPassword());
                                 }
                             });
-                    session.setDebug(true);
+                    // session.setDebug(true);
                     Transport.send(getEmailMessage(session));
                     monitor.done();
                 } catch (AuthenticationFailedException afe) {
@@ -265,23 +265,6 @@ public class SendErrorMessageDialog extends BiobankDialog {
                 }
             }
         });
-    }
-
-    private Message getEmailMessage1(Session session) throws Exception {
-        String[] recipients = new String[] { "biobank@cs.ualberta.ca" };
-
-        Message msg = new MimeMessage(session);
-        InternetAddress addressFrom = new InternetAddress("biobank2@gmail.com");
-        msg.setFrom(addressFrom);
-
-        InternetAddress[] addressTo = new InternetAddress[recipients.length];
-        for (int i = 0; i < recipients.length; i++) {
-            addressTo[i] = new InternetAddress(recipients[i]);
-        }
-        msg.setRecipients(Message.RecipientType.TO, addressTo);
-        msg.setSubject(email.getTitle());
-        msg.setContent("test from java client", "text/plain");
-        return msg;
     }
 
     private Message getEmailMessage(Session session) throws Exception {
