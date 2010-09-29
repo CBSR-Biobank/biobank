@@ -30,8 +30,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
@@ -179,7 +179,12 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             return;
         }
         if (canAdd) {
-            shipment.addPatients(Arrays.asList(patient));
+            try {
+                shipment.addPatients(Arrays.asList(patient));
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Cannot add patient", e);
+                return;
+            }
             patientTable.setCollection(shipment.getPatientCollection());
             notifyListeners();
             patientsAdded.setValue(true);
@@ -210,12 +215,12 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                     }
                     try {
                         shipment.checkCanRemovePatient(patient);
+                        shipment.removePatients(Arrays.asList(patient));
                     } catch (Exception e) {
                         BioBankPlugin
                             .openAsyncError("Cannot remove patient", e);
                         return;
                     }
-                    shipment.removePatients(Arrays.asList(patient));
                     updateList();
                     notifyListeners();
                 }

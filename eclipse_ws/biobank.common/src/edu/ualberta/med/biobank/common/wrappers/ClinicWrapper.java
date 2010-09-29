@@ -512,9 +512,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(
-                "select count(distinct patients) from "
+                "select count(distinct csps.patient) from "
                     + Clinic.class.getName()
-                    + " as clinic join clinic.shipmentCollection as shipments join shipments.patientCollection as patients where clinic.id = ?",
+                    + " as clinic join clinic.shipmentCollection as shipments join shipments.clinicShipmentPatientCollection as csps where clinic.id = ?",
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
@@ -541,9 +541,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
         if (pvCollection == null) {
             pvCollection = new ArrayList<PatientVisitWrapper>();
-            HQLCriteria c = new HQLCriteria("select distinct pv from "
-                + PatientVisit.class.getName()
-                + " as pv where shipment.clinic.id = ?",
+            HQLCriteria c = new HQLCriteria(
+                "select distinct pv from "
+                    + PatientVisit.class.getName()
+                    + " as pv where clinicShipmentPatient.clinicShipment.clinic.id = ?",
                 Arrays.asList(new Object[] { getId() }));
             List<PatientVisit> collection = appService.query(c);
             for (PatientVisit pv : collection) {

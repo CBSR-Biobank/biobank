@@ -256,6 +256,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     private void persistPath() throws Exception {
+        // TODO: why does persisting always just get the current path, ignoring
+        // the one we just set?
         ContainerPathWrapper containerPath = ContainerPathWrapper
             .getContainerPath(appService, this);
         if (containerPath == null) {

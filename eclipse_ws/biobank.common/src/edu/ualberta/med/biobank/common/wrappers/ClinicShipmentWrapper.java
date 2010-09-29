@@ -7,11 +7,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.internal.ClinicShipmentPatientWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.ClinicShipmentPatient;
@@ -25,6 +25,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ClinicShipmentWrapper extends
     AbstractShipmentWrapper<ClinicShipment> {
+    private static final String PROP_KEY_CSP_COLLECTION = "cspCollection";
 
     private Set<PatientWrapper> patientsAdded = new HashSet<PatientWrapper>();
     private Set<PatientWrapper> patientsRemoved = new HashSet<PatientWrapper>();
@@ -96,6 +97,22 @@ public class ClinicShipmentWrapper extends
         checkAlLeastOnePatient();
         checkPatientsStudy();
         checkRemovedPatients();
+    }
+
+    @Override
+    protected void persistDependencies(ClinicShipment origObject)
+        throws Exception {
+        if (!isNew()) {
+            for (PatientWrapper patient : patientsRemoved) {
+                for (ClinicShipmentPatientWrapper csp : patient
+                    .getClinicShipmentPatientCollection()) {
+                    if (csp.getShipment() != null
+                        && csp.getShipment().getId().equals(getId())) {
+                        csp.delete();
+                    }
+                }
+            }
+        }
     }
 
     private void checkRemovedPatients() throws BiobankCheckException {
@@ -206,69 +223,145 @@ public class ClinicShipmentWrapper extends
         propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
     }
 
-    @SuppressWarnings("unchecked")
     public List<PatientVisitWrapper> getPatientVisitCollection() {
-        List<PatientVisitWrapper> patientVisitCollection = (List<PatientVisitWrapper>) propertiesMap
-            .get("patientVisitCollection");
-        if (patientVisitCollection == null) {
-            patientVisitCollection = new ArrayList<PatientVisitWrapper>();
-            for (PatientVisit pv : getUnwrappedPatientVisitCollection()) {
-                patientVisitCollection.add(new PatientVisitWrapper(appService,
-                    pv));
+        List<PatientVisitWrapper> patientVisitCollection = new ArrayList<PatientVisitWrapper>();
+        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
+        if (csps != null) {
+            for (ClinicShipmentPatientWrapper csp : csps) {
+                for (PatientVisitWrapper visit : csp
+                    .getPatientVisitCollection()) {
+                    patientVisitCollection.add(visit);
+                }
             }
-            // TODO: why not cache empty collection?
-            propertiesMap.put("patientVisitCollection", patientVisitCollection);
         }
         return patientVisitCollection;
     }
 
-    private void setPatientVisitCollection(
-        Collection<PatientVisit> allVisitObjects,
-        List<PatientVisitWrapper> allVisitWrappers) {
-        Collection<PatientVisit> oldCollection = getUnwrappedPatientVisitCollection();
+    public void addPatientVisits(List<PatientVisitWrapper> newPatientVisits)
+        throws BiobankCheckException {
+        if (newPatientVisits != null && newPatientVisits.size() > 0) {
+            Collection<PatientVisit> allVisitObjects = new HashSet<PatientVisit>();
+            List<PatientVisitWrapper> allVisitWrappers = new ArrayList<PatientVisitWrapper>();
+            // already added visits
+            List<PatientVisitWrapper> currentList = getPatientVisitCollection();
+            Collection<PatientVisit> oldCollection = new ArrayList<PatientVisit>();
+            for (PatientVisitWrapper visit : currentList) {
+                oldCollection.add(visit.getWrappedObject());
+                allVisitObjects.add(visit.getWrappedObject());
+                allVisitWrappers.add(visit);
+            }
+            // new
+            Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
+            Collection<PatientVisitWrapper> pvs;
+            for (PatientVisitWrapper newVisit : newPatientVisits) {
+                boolean isFound = false;
+                if (csps != null) {
+                    for (ClinicShipmentPatientWrapper csp : csps) {
+                        if (csp.isSameShipmentAndPatient(newVisit
+                            .getClinicShipmentPatient())) {
+                            pvs = csp.getPatientVisitCollection();
+                            pvs.add(newVisit);
+                            csp.setPatientVisitCollection(pvs);
 
-        Collection<ClinicShipmentPatient> cspCollection = new ArrayList<ClinicShipmentPatient>();
-        for (PatientVisitWrapper visit : allVisitWrappers) {
-            ClinicShipmentPatient csp = new ClinicShipmentPatient();
-            csp.setPatient(visit.getPatient().getWrappedObject());
-            csp.setClinicShipment(getWrappedObject());
-            cspCollection.add(csp);
+                            allVisitObjects.add(newVisit.getWrappedObject());
+                            allVisitWrappers.add(newVisit);
+                            isFound = true;
+                        }
+                    }
+                }
+                if (!isFound) {
+                    throw new BiobankCheckException(
+                        "Cannot add this visit until patient "
+                            + newVisit.getPatient().getPnumber()
+                            + " has been linked to shipment "
+                            + newVisit.getShipment().getWaybill() + ".");
+                }
+            }
+            propertyChangeSupport.firePropertyChange("patientVisitCollection",
+                oldCollection, allVisitObjects);
         }
-
-        wrappedObject.setClinicShipmentPatientCollection(cspCollection);
-        propertyChangeSupport.firePropertyChange("patientVisitCollection",
-            oldCollection, allVisitObjects);
-        propertiesMap.put("patientVisitCollection", allVisitWrappers);
     }
 
-    @SuppressWarnings("unchecked")
     public List<PatientWrapper> getPatientCollection(boolean sort) {
-        List<PatientWrapper> patientCollection = (List<PatientWrapper>) propertiesMap
-            .get("patientCollection");
-        if (patientCollection == null) {
-            patientCollection = new ArrayList<PatientWrapper>();
-            for (Patient patient : getUnwrappedPatientCollection()) {
-                patientCollection.add(new PatientWrapper(appService, patient));
+        List<PatientWrapper> patientCollection = new ArrayList<PatientWrapper>();
+        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
+        if (csps != null) {
+            for (ClinicShipmentPatientWrapper csp : csps) {
+                patientCollection.add(csp.getPatient());
             }
-            propertiesMap.put("patientCollection", patientCollection);
         }
         if ((patientCollection != null) && sort)
             Collections.sort(patientCollection);
         return patientCollection;
     }
 
-    private Collection<Patient> getUnwrappedPatientCollection() {
-        Collection<Patient> results = new LinkedList<Patient>();
+    private Collection<ClinicShipmentPatientWrapper> getClinicShipmentPatientCollection() {
+        // TODO: this method is (almost) exactly the same as
+        // PatientWrapper.getClinicShipmentPatientCollection() - should share
+        // code
+        @SuppressWarnings("unchecked")
+        Collection<ClinicShipmentPatientWrapper> csps = (Collection<ClinicShipmentPatientWrapper>) propertiesMap
+            .get(PROP_KEY_CSP_COLLECTION);
+        if (csps == null && wrappedObject != null) {
+            Collection<ClinicShipmentPatient> rawCsps = wrappedObject
+                .getClinicShipmentPatientCollection();
+            if (rawCsps != null) {
+                csps = ClinicShipmentPatientWrapper
+                    .wrapClinicShipmentPatientCollection(appService, rawCsps);
+            }
+            propertiesMap.put(PROP_KEY_CSP_COLLECTION, csps);
+        }
+        return csps;
+    }
 
-        Collection<ClinicShipmentPatient> cspCollection = wrappedObject
-            .getClinicShipmentPatientCollection();
-        if (cspCollection != null) {
-            for (ClinicShipmentPatient csp : cspCollection) {
-                results.add(csp.getPatient());
+    private void setClinicShipmentPatientCollection(
+        Collection<ClinicShipmentPatientWrapper> newCsps)
+        throws ApplicationException {
+        Collection<ClinicShipmentPatient> oldRawCsps = new ArrayList<ClinicShipmentPatient>();
+        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
+        if (csps != null) {
+            for (ClinicShipmentPatientWrapper csp : csps) {
+                oldRawCsps.add(csp.getWrappedObject());
             }
         }
 
-        return results;
+        Collection<ClinicShipmentPatient> newRawCsps = new HashSet<ClinicShipmentPatient>();
+        for (ClinicShipmentPatientWrapper csp : newCsps) {
+            newRawCsps.add(csp.getWrappedObject());
+        }
+
+        newCsps = updateExistingClinicShipmentPatients(newCsps);
+
+        wrappedObject.setClinicShipmentPatientCollection(newRawCsps);
+        propertiesMap.put(PROP_KEY_CSP_COLLECTION, newCsps);
+        propertyChangeSupport.firePropertyChange(PROP_KEY_CSP_COLLECTION,
+            oldRawCsps, newRawCsps);
+    }
+
+    private Collection<ClinicShipmentPatientWrapper> updateExistingClinicShipmentPatients(
+        Collection<ClinicShipmentPatientWrapper> csps)
+        throws ApplicationException {
+
+        Collection<ClinicShipmentPatientWrapper> updatedCsps = new ArrayList<ClinicShipmentPatientWrapper>();
+
+        HQLCriteria criteria = new HQLCriteria("select c from "
+            + ClinicShipmentPatient.class.getName()
+            + " as c left join fetch c.patient p where c.clinicShipment.id = ?");
+        criteria.setParameters(Arrays.asList((Object) getId()));
+
+        List<ClinicShipmentPatient> rows = appService.query(criteria);
+        for (ClinicShipmentPatientWrapper csp : csps) {
+            ClinicShipmentPatient rawCsp = csp.getWrappedObject();
+            for (ClinicShipmentPatient dbCsp : rows) {
+                if (csp.getPatient().getId().equals(dbCsp.getPatient().getId())) {
+                    rawCsp = dbCsp;
+                }
+            }
+            updatedCsps
+                .add(new ClinicShipmentPatientWrapper(appService, rawCsp));
+        }
+
+        return updatedCsps;
     }
 
     public List<PatientWrapper> getPatientCollection() {
@@ -276,25 +369,76 @@ public class ClinicShipmentWrapper extends
     }
 
     private void setPatients(Collection<Patient> allPatientObjects,
-        List<PatientWrapper> allPatientWrappers) {
-        Collection<Patient> oldPatients = getUnwrappedPatientCollection();
+        List<PatientWrapper> allPatientWrappers) throws ApplicationException {
+        Collection<Patient> oldPatients = new ArrayList<Patient>();
+        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
+        if (csps != null) {
+            for (ClinicShipmentPatientWrapper csp : csps) {
+                oldPatients.add(csp.getPatient().getWrappedObject());
+            }
+        }
 
-        Collection<ClinicShipmentPatient> cspCollection = new ArrayList<ClinicShipmentPatient>();
-        for (PatientWrapper p : allPatientWrappers) {
-            ClinicShipmentPatient csp = new ClinicShipmentPatient();
-            csp.setClinicShipment(getWrappedObject());
-            csp.setPatient(p.getWrappedObject());
+        Collection<ClinicShipmentPatientWrapper> cspCollection = new ArrayList<ClinicShipmentPatientWrapper>();
+        for (PatientWrapper patient : allPatientWrappers) {
+            ClinicShipmentPatientWrapper csp = null;
+
+            if (getId() != null) {
+                if (csps != null && patient.getId() != null) {
+                    // first try to reuse our own CSPs
+                    csp = findCspIn(getId(), patient.getId(), csps);
+                }
+
+                if (csp == null) {
+                    // next try to reuse the patient CSPs
+                    csp = findCspIn(getId(), patient.getId(),
+                        patient.getClinicShipmentPatientCollection());
+                }
+            }
+
+            if (csp == null) {
+                csp = new ClinicShipmentPatientWrapper(appService,
+                    new ClinicShipmentPatient());
+                csp.setShipment(this);
+                csp.setPatient(patient);
+            }
+
             cspCollection.add(csp);
         }
-        
-        wrappedObject.setClinicShipmentPatientCollection(cspCollection);
+
+        setClinicShipmentPatientCollection(cspCollection);
 
         propertyChangeSupport.firePropertyChange("patientCollection",
             oldPatients, allPatientObjects);
-        propertiesMap.put("patientCollection", allPatientWrappers);
     }
 
-    public void addPatients(List<PatientWrapper> newPatients) {
+    /**
+     * Find a <code>ClinicShipmentPatientWrapper</code> in the given collection
+     * of <code>ClinicShipmentPatientWrapper</code>-s that has the supplied
+     * <code>ClinicShipment</code> id and <code>Patient</code> id.
+     * 
+     * @param shipmentId
+     * @param patientId
+     * @param haystack collection of <code>ClinicShipmentPatientWrapper</code>-s
+     *            to search
+     * @return
+     */
+    private static ClinicShipmentPatientWrapper findCspIn(Integer shipmentId,
+        Integer patientId, Collection<ClinicShipmentPatientWrapper> haystack) {
+        ClinicShipmentPatientWrapper match = null;
+        if (shipmentId != null && patientId != null && haystack != null) {
+            for (ClinicShipmentPatientWrapper csp : haystack) {
+                if (csp.getShipment() != null && csp.getPatient() != null
+                    && shipmentId.equals(csp.getShipment().getId())
+                    && patientId.equals(csp.getPatient().getId())) {
+                    match = csp;
+                }
+            }
+        }
+        return match;
+    }
+
+    public void addPatients(List<PatientWrapper> newPatients)
+        throws ApplicationException {
         if (newPatients != null && newPatients.size() > 0) {
             Collection<Patient> allPatientsObjects = new HashSet<Patient>();
             List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
@@ -308,8 +452,6 @@ public class ClinicShipmentWrapper extends
             }
             // new patients
             for (PatientWrapper patient : newPatients) {
-                // TODO: what if patients in newPatients are already in the
-                // allPatientsWrappers?
                 patientsAdded.add(patient);
                 patientsRemoved.remove(patient);
                 allPatientsObjects.add(patient.getWrappedObject());
@@ -319,7 +461,8 @@ public class ClinicShipmentWrapper extends
         }
     }
 
-    public void removePatients(List<PatientWrapper> patientsToRemove) {
+    public void removePatients(List<PatientWrapper> patientsToRemove)
+        throws ApplicationException {
         if (patientsToRemove != null && patientsToRemove.size() > 0) {
             patientsAdded.removeAll(patientsToRemove);
             patientsRemoved.addAll(patientsToRemove);

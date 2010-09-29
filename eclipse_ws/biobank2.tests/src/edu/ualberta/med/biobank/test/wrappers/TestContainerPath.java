@@ -100,13 +100,14 @@ public class TestContainerPath extends TestDatabase {
 
         c3.setPosition(new RowColPos(1, 1));
         c3.persist();
+        c3.reload();
         c4.reload();
         Assert.assertEquals(p4Before, c4.getPath());
 
         c3.setParent(c1);
-        c3.setPosition(new RowColPos(0, 0));
+        c3.setPosition(new RowColPos(0, 1));
         c3.persist();
-        c4.persist();
+        c3.reload();
         c4.reload();
         Assert.assertEquals(c1.getId() + "/" + c3.getId() + "/" + c4.getId(),
             c4.getPath());

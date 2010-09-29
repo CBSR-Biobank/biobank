@@ -80,8 +80,8 @@ public class AliquotRequestImpl extends AbstractReport {
                 modifiedResults.add(ob);
             } else {
                 Aliquot aliquot = (Aliquot) ob;
-                String pnumber = aliquot.getPatientVisit().getPatient()
-                    .getPnumber();
+                String pnumber = aliquot.getPatientVisit()
+                    .getClinicShipmentPatient().getPatient().getPnumber();
                 String inventoryId = aliquot.getInventoryId();
                 Date dateDrawn = aliquot.getPatientVisit().getDateDrawn();
                 String stName = aliquot.getSampleType().getNameShort();

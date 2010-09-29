@@ -433,9 +433,10 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     public static List<AliquotWrapper> getAliquotsInSite(
         WritableApplicationService appService, String inventoryId,
         SiteWrapper site) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Aliquot.class.getName()
-            + " where inventoryId = ? and patientVisit.shipment.site.id = ?",
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Aliquot.class.getName()
+                + " where inventoryId = ? and patientVisit.clinicShipmentPatient.clinicShipment.site.id = ?",
             Arrays.asList(new Object[] { inventoryId, site.getId() }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
@@ -454,7 +455,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Aliquot.class.getName()
-                + " a where a.patientVisit.shipment.site.id = ? and activityStatus.name != ?",
+                + " a where a.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ? and activityStatus.name != ?",
             Arrays.asList(new Object[] { site.getId(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Aliquot> aliquots = appService.query(criteria);

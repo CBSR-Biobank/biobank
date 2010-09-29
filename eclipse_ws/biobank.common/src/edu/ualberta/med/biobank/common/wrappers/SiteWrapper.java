@@ -542,10 +542,11 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public Long getPatientCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria(
-            "select count(distinct patients) from " + Site.class.getName()
+            "select count(distinct patient) from " + Site.class.getName()
                 + " as site " + "join site.shipmentCollection as shipments "
-                + "join shipments.patientCollection as patients "
-                + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+                + "join shipments.clinicShipmentPatientCollection as csps "
+                + "join csps.patient as patient " + "where site.id = ?",
+            Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -557,7 +558,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
         HQLCriteria criteria = new HQLCriteria("select count(visits) from "
             + Site.class.getName() + " as site "
             + "join site.shipmentCollection as shipments "
-            + "join shipments.patientVisitCollection as visits "
+            + "join shipments.clinicShipmentPatientCollection as csps "
+            + "join csps.patientVisitCollection as visits "
             + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -570,7 +572,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
         HQLCriteria criteria = new HQLCriteria("select count(aliquots) from "
             + Site.class.getName() + " as site "
             + "join site.shipmentCollection as shipments "
-            + "join shipments.patientVisitCollection as visits "
+            + "join shipments.clinicShipmentPatientCollection as csps "
+            + "join csps.patientVisitCollection as visits "
             + "join visits.aliquotCollection as aliquots where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
