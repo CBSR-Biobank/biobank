@@ -4,7 +4,8 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 
 public class LabelingScheme {
 
-    public static final String CBSR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
+    public static final String CBSR_LABELLING_PATTERN =
+        "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
     public static final String SBS_ROW_LABELLING_PATTERN = "ABCDEFGHIJKLMNOP";
 
@@ -88,15 +89,21 @@ public class LabelingScheme {
      */
     public static RowColPos twoCharNumericToRowCol(String label, int totalRows)
         throws Exception {
+        String errorMsg =
+            "Label " + label + " is incorrect: it should be 2 characters";
         int len = label.length();
         if (len != 2)
-            throw new Exception("Label should be 2 characters");
-        int pos = Integer.parseInt(label) - 1;
-        // has remove 1 because the two char numeric starts at 1
-        RowColPos rowColPos = new RowColPos();
-        rowColPos.row = pos % totalRows;
-        rowColPos.col = pos / totalRows;
-        return rowColPos;
+            throw new Exception(errorMsg);
+        try {
+            int pos = Integer.parseInt(label) - 1;
+            // has remove 1 because the two char numeric starts at 1
+            RowColPos rowColPos = new RowColPos();
+            rowColPos.row = pos % totalRows;
+            rowColPos.col = pos / totalRows;
+            return rowColPos;
+        } catch (NumberFormatException nfe) {
+            throw new Exception(errorMsg);
+        }
     }
 
     /**

@@ -9,7 +9,6 @@ import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
@@ -145,18 +144,8 @@ public class SiteManager {
         siteCombo.setSelection(currentSite);
     }
 
-    public void updateSites(boolean async) {
-        if (async) {
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    updateSites(getSites());
-                }
-            });
-
-        } else {
-            updateSites(getSites());
-        }
+    public void updateSites() {
+        updateSites(getSites());
     }
 
     private List<SiteWrapper> getSites() {
@@ -167,10 +156,6 @@ public class SiteManager {
             logger.error("Cannot update Sites", e);
         }
         return sites;
-    }
-
-    public void updateSites() {
-        updateSites(false);
     }
 
     public SiteWrapper getCurrentSite() {

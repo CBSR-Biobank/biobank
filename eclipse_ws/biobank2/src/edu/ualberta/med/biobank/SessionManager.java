@@ -252,12 +252,8 @@ public class SessionManager {
     }
 
     public void updateSites() {
-        updateSites(false);
-    }
-
-    public void updateSites(boolean async) {
         Assert.isNotNull(siteManager, "site manager is null");
-        siteManager.updateSites(async);
+        siteManager.updateSites();
     }
 
     public static void addView(String perspectiveId,

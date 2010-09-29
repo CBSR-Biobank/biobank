@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -181,16 +182,23 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void saveForm() throws Exception {
-        boolean newSite = site.isNew();
+        final boolean newSite = site.isNew();
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
         site.persist();
 
-        SessionManager.getInstance().updateSites(true);
-        if (newSite && !SessionManager.getInstance().isAllSitesSelected()) {
-            SessionManager.getInstance().getSiteCombo().setSelection(site);
-        }
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                SessionManager.getInstance().updateSites();
+                if (newSite
+                    && !SessionManager.getInstance().isAllSitesSelected()) {
+                    SessionManager.getInstance().getSiteCombo()
+                        .setSelection(site);
+                }
+            }
+        });
     }
 
     @Override
