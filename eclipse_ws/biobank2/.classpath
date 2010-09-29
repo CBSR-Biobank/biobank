@@ -5,6 +5,8 @@
 			<attribute name="org.eclipse.jdt.launching.CLASSPATH_ATTR_LIBRARY_PATH_ENTRY" value="biobank2/lib"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry exported="true" kind="lib" path="lib/mailapi.jar"/>
+	<classpathentry exported="true" kind="lib" path="lib/smtp.jar"/>
 	<classpathentry kind="lib" path="lib/jasperreports-3.7.0.jar"/>
 	<classpathentry kind="lib" path="lib/commons-digester-1.7.jar"/>
 	<classpathentry kind="lib" path="lib/iText-2.1.0.jar"/>
@@ -21,7 +23,5 @@
 	</classpathentry>
 	<classpathentry kind="lib" path="lib/SuperCSV-1.52.jar"/>
 	<classpathentry kind="lib" path="lib/spiffy-all-0.05.jar"/>
-	<classpathentry kind="lib" path="lib/mailapi.jar"/>
-	<classpathentry kind="lib" path="lib/smtp.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
