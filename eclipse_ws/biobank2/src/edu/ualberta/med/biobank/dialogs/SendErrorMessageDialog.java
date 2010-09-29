@@ -51,6 +51,8 @@ import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
 public class SendErrorMessageDialog extends BiobankDialog {
 
+    private static final String SSL_FACTORY = "javax.net.ssl.SSLSocketFactory";
+
     private static final String SEND_ERROR_TITLE = "Send Error EMail";
 
     private EMailDescriptor email;
@@ -97,11 +99,12 @@ public class SendErrorMessageDialog extends BiobankDialog {
             PojoObservables.observeValue(email, "title"),
             new NonEmptyStringValidator("Please enter a title"));
 
-        BiobankText descText = (BiobankText) createBoundWidgetWithLabel(
-            contents, BiobankText.class, SWT.MULTI, "Description",
-            new String[0], PojoObservables.observeValue(email, "description"),
-            new NonEmptyStringValidator(
-                "Please enter at least a very small comment"));
+        BiobankText descText =
+            (BiobankText) createBoundWidgetWithLabel(contents,
+                BiobankText.class, SWT.MULTI, "Description", new String[0],
+                PojoObservables.observeValue(email, "description"),
+                new NonEmptyStringValidator(
+                    "Please enter at least a very small comment"));
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 200;
         descText.setLayoutData(gd);
@@ -109,7 +112,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
         Label attLabel = widgetCreator.createLabel(contents, "Attachments");
         attLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
-        final Composite attachmentsComposite = new Composite(contents, SWT.NONE);
+        final Composite attachmentsComposite =
+            new Composite(contents, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
@@ -126,8 +130,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                AttachmentComposite attachmentComposite = new AttachmentComposite(
-                    attachmentsComposite, contents);
+                AttachmentComposite attachmentComposite =
+                    new AttachmentComposite(attachmentsComposite, contents);
                 contents.layout(true, true);
                 Point shellSize = getShell().getSize();
                 getShell().setSize(shellSize.x,
@@ -208,7 +212,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
         email.setSmtpServer(node
             .getString(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER));
         email.setServerPort(node
-            .getInt(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PORT));
+            .getString(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PORT));
         email.setReceiverEmail(node
             .getString(PreferenceConstants.ISSUE_TRACKER_EMAIL));
         email.setServerUsername(node
@@ -218,75 +222,34 @@ public class SendErrorMessageDialog extends BiobankDialog {
     }
 
     private void sendMail() throws Exception {
-        IRunnableContext context = new ProgressMonitorDialog(Display
-            .getDefault().getActiveShell());
+        IRunnableContext context =
+            new ProgressMonitorDialog(Display.getDefault().getActiveShell());
         context.run(true, false, new IRunnableWithProgress() {
             @Override
             public void run(final IProgressMonitor monitor) {
                 monitor.beginTask("Sending mail...", IProgressMonitor.UNKNOWN);
                 try {
                     Properties props = new Properties();
-                    props.setProperty("mail.transport.protocol", "smtp");
-                    props.setProperty("mail.host", email.getSmtpServer());
+                    props.put("mail.smtp.host", email.getSmtpServer());
                     props.put("mail.smtp.auth", "true");
+                    // props.put("mail.debug", "true");
                     props.put("mail.smtp.port", email.getServerPort());
                     props.put("mail.smtp.socketFactory.port",
                         email.getServerPort());
-                    props.put("mail.smtp.socketFactory.class",
-                        "javax.net.ssl.SSLSocketFactory");
+                    props.put("mail.smtp.socketFactory.class", SSL_FACTORY);
                     props.put("mail.smtp.socketFactory.fallback", "false");
 
-                    Session session = Session.getInstance(props,
-                        new javax.mail.Authenticator() {
-                            @Override
-                            protected PasswordAuthentication getPasswordAuthentication() {
-                                return new PasswordAuthentication(email
-                                    .getServerUsername(), email
-                                    .getServerPassword());
-                            }
-                        });
-                    session.setDebug(false);
-
-                    MimeMessage message = new MimeMessage(session);
-                    message.setSubject(email.getTitle());
-                    message.setContent(email.getDescription(), "text/plain");
-
-                    message.setRecipient(Message.RecipientType.TO,
-                        new InternetAddress(email.getReceiverEmail()));
-
-                    Multipart mp = new MimeMultipart();
-
-                    // create and fill the first message part
-                    MimeBodyPart mbp1 = new MimeBodyPart();
-                    String text = email.getDescription() + "\n\n------";
-                    if (SessionManager.getInstance().isConnected()) {
-                        text += "\nCreated by user "
-                            + SessionManager.getInstance().getSession()
-                                .getUser().getLogin();
-                    }
-
-                    text += "\nSent from client version "
-                        + BioBankPlugin.getDefault().getBundle().getVersion();
-
-                    mbp1.setText(text);
-                    mp.addBodyPart(mbp1);
-
-                    // add log file
-                    File logFile = Platform.getLogFileLocation().toFile();
-                    addAttachment(mp, logFile.getPath());
-
-                    // add user attachments
-                    for (AttachmentComposite attachment : attachments) {
-                        addAttachment(mp, attachment.getFile());
-                    }
-
-                    // add the Multipart to the message
-                    message.setContent(mp);
-
-                    // set the Date: header
-                    message.setSentDate(new Date());
-
-                    Transport.send(message);
+                    Session session =
+                        Session.getDefaultInstance(props,
+                            new javax.mail.Authenticator() {
+                                @Override
+                                protected PasswordAuthentication getPasswordAuthentication() {
+                                    return new PasswordAuthentication(
+                                        "biobank2", email.getServerPassword());
+                                }
+                            });
+                    // session.setDebug(true);
+                    Transport.send(getEmailMessage(session));
                     monitor.done();
                 } catch (AuthenticationFailedException afe) {
                     BioBankPlugin.openAsyncError(
@@ -301,18 +264,62 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     return;
                 }
             }
-
-            private void addAttachment(Multipart mp, String file)
-                throws IOException, MessagingException {
-                if (file != null && !file.isEmpty()) {
-                    // create the second message part
-                    MimeBodyPart mbp2 = new MimeBodyPart();
-                    // attach the file to the message
-                    mbp2.attachFile(file);
-                    mp.addBodyPart(mbp2);
-                }
-            }
         });
+    }
+
+    private Message getEmailMessage(Session session) throws Exception {
+        MimeMessage message = new MimeMessage(session);
+        message.setSubject(email.getTitle());
+        message.setContent(email.getDescription(), "text/plain");
+
+        message.setRecipient(Message.RecipientType.TO, new InternetAddress(
+            email.getReceiverEmail()));
+
+        Multipart mp = new MimeMultipart();
+
+        // create and fill the first message part
+        MimeBodyPart mbp1 = new MimeBodyPart();
+        String text = email.getDescription() + "\n\n------";
+        if (SessionManager.getInstance().isConnected()) {
+            text +=
+                "\nCreated by user "
+                    + SessionManager.getInstance().getSession().getUser()
+                        .getLogin();
+        }
+
+        text +=
+            "\nSent from BioBank2 Java Client, version "
+                + BioBankPlugin.getDefault().getBundle().getVersion();
+
+        mbp1.setText(text);
+        mp.addBodyPart(mbp1);
+
+        // add log file
+        File logFile = Platform.getLogFileLocation().toFile();
+        addAttachment(mp, logFile.getPath());
+
+        // add user attachments
+        for (AttachmentComposite attachment : attachments) {
+            addAttachment(mp, attachment.getFile());
+        }
+
+        // add the Multipart to the message
+        message.setContent(mp);
+
+        // set the Date: header
+        message.setSentDate(new Date());
+        return message;
+    }
+
+    private void addAttachment(Multipart mp, String file) throws IOException,
+        MessagingException {
+        if (file != null && !file.isEmpty()) {
+            // create the second message part
+            MimeBodyPart mbp2 = new MimeBodyPart();
+            // attach the file to the message
+            mbp2.attachFile(file);
+            mp.addBodyPart(mbp2);
+        }
     }
 
     private class AttachmentComposite extends BiobankWidget {
@@ -338,15 +345,16 @@ public class SendErrorMessageDialog extends BiobankDialog {
             gd.grabExcessHorizontalSpace = true;
             setLayoutData(gd);
 
-            attachmentText = (BiobankText) widgetCreator.createWidget(this,
-                BiobankText.class, SWT.READ_ONLY, null);
+            attachmentText =
+                (BiobankText) widgetCreator.createWidget(this,
+                    BiobankText.class, SWT.READ_ONLY, null);
             browseButton = new Button(this, SWT.PUSH);
             browseButton.setText("Browse");
             browseButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    FileDialog fd = new FileDialog(browseButton.getShell(),
-                        SWT.OPEN);
+                    FileDialog fd =
+                        new FileDialog(browseButton.getShell(), SWT.OPEN);
                     fd.setText("Select attachment");
                     file = fd.open();
                     if (file != null) {
@@ -361,12 +369,13 @@ public class SendErrorMessageDialog extends BiobankDialog {
             removeButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    int height = AttachmentComposite.this.computeSize(
-                        SWT.DEFAULT, SWT.DEFAULT).y;
+                    int height =
+                        AttachmentComposite.this.computeSize(SWT.DEFAULT,
+                            SWT.DEFAULT).y;
                     attachmentText.setText("");
                     AttachmentComposite.this.setVisible(false);
-                    GridData gd = (GridData) AttachmentComposite.this
-                        .getLayoutData();
+                    GridData gd =
+                        (GridData) AttachmentComposite.this.getLayoutData();
                     gd.exclude = true;
                     attachments.remove(AttachmentComposite.this);
                     globalComposite.layout(true, true);

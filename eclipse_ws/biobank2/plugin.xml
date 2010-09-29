@@ -1426,6 +1426,19 @@
          <toolbar
                id="edu.ualberta.med.biobank.views.SessionsView">
             <command
+                  commandId="edu.ualberta.med.biobank.commands.siteAdd"
+                  icon="icons/sites_add.png"
+                  id="edu.ualberta.med.biobank.menu.siteAdd"
+                  label="Add Repository Site"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.mainPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
                   icon="icons/studies_add.png"
                   label="Add Study"

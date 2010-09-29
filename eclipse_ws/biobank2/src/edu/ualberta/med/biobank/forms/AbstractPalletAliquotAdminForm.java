@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -36,7 +35,6 @@ import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -83,12 +81,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
     @Override
     protected void init() throws Exception {
         super.init();
-        IPreferenceStore store =
-            BioBankPlugin.getDefault().getPreferenceStore();
-        palletNameContains =
-            store
-                .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
-
         addScannerPreferencesPropertyListener();
 
         palletScanManagement = new PalletScanManagement() {

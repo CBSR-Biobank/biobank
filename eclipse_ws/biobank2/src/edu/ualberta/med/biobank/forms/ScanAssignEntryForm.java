@@ -325,14 +325,16 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private List<ContainerTypeWrapper> getPalletContainerTypes()
         throws ApplicationException {
         List<ContainerTypeWrapper> palletContainerTypes =
-            ContainerTypeWrapper.getContainerTypesInSite(appService,
-                currentPalletWrapper.getSite(), palletNameContains, false);
+            ContainerTypeWrapper.getContainerTypesPallet96(appService,
+                currentPalletWrapper.getSite());
         if (palletContainerTypes.size() == 0) {
-            BioBankPlugin.openAsyncError(Messages
-                .getString("ScanAssign.dialog.noPalletFoundError.title"), //$NON-NLS-1$
-                Messages.getFormattedString(
-                    "ScanAssign.dialog.noPalletFoundError.msg", //$NON-NLS-1$
-                    palletNameContains));
+            BioBankPlugin
+                .openAsyncError(
+                    Messages
+                        .getString("ScanAssign.dialog.noPalletFoundError.title"), //$NON-NLS-1$
+                    Messages
+                        .getFormattedString("ScanAssign.dialog.noPalletFoundError.msg" //$NON-NLS-1$
+                        ));
         }
         return palletContainerTypes;
     }

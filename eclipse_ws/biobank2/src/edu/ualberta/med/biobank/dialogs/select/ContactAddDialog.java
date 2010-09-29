@@ -44,19 +44,18 @@ public class ContactAddDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        if (contactWrapper.getName() == null)
+        if (contactWrapper.getName() == null) {
             return "Add a contact person to this clinic";
-        else
-            return "Edit contact person for this clinic";
+        }
+        return "Edit contact person for this clinic";
     }
 
     @Override
     protected String getTitleAreaTitle() {
         if (contactWrapper.getName() == null) {
             return "Add Contact";
-        } else {
-            return "Edit Contact";
         }
+        return "Edit Contact";
     }
 
     @Override
@@ -65,9 +64,10 @@ public class ContactAddDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Control c = createBoundWidgetWithLabel(contents, BiobankText.class,
-            SWT.BORDER, "Name", new String[0],
-            BeansObservables.observeValue(contactWrapper, "name"), null);
+        Control c =
+            createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
+                "Name", new String[0],
+                BeansObservables.observeValue(contactWrapper, "name"), null);
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);

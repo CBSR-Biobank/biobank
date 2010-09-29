@@ -23,33 +23,28 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 public class ActivityLogLocationDialog extends BiobankDialog {
 
     private Text activityLogDirText;
+
     private Button browseBtn;
+
     private Button activityLogDirBtn;
 
     public ActivityLogLocationDialog(Shell parentShell) {
         super(parentShell);
-
-        GridLayout gl = new GridLayout(3, true);
-
-        parentShell.setLayout(gl);
-
-        Label lbl = new Label(parentShell, SWT.NONE);
-        lbl.setText("Activity Logs File");
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return "Activity Log Location";
+        return "Activity Logs Location";
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Please select a file to save your activity log data into.";
+        return "Do you wish to save activity logs to files?";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Where to save activity logs?";
+        return "Activity Logs Location";
     }
 
     @Override
@@ -63,7 +58,7 @@ public class ActivityLogLocationDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         activityLogDirBtn = new Button(contents, SWT.CHECK);
-        activityLogDirBtn.setText("Save activity logs into a file");
+        activityLogDirBtn.setText("Save activity logs to files");
         activityLogDirBtn.setSelection(true);
         activityLogDirBtn.addSelectionListener(new SelectionListener() {
 
@@ -79,12 +74,13 @@ public class ActivityLogLocationDialog extends BiobankDialog {
             public void widgetDefaultSelected(SelectionEvent e) {
             }
         });
-        createFileLocationSelector(contents, "&Log path");
+        createFileLocationSelector(contents, "Folder");
     }
 
     private void createFileLocationSelector(final Composite parent,
         String labelText) {
-        final Composite fileSelectionComposite = new Composite(parent, SWT.NONE);
+        final Composite fileSelectionComposite =
+            new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(3, false);
         fileSelectionComposite.setLayout(layout);
         fileSelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
@@ -92,10 +88,11 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
         createLabel(fileSelectionComposite, labelText);
 
-        final String biobank2Dir = System.getProperty("user.home")
-            + System.getProperty("file.separator") + "biobank2";
-        activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
-            | SWT.FILL);
+        final String biobank2Dir =
+            System.getProperty("user.home")
+                + System.getProperty("file.separator") + "biobank2";
+        activityLogDirText =
+            new Text(fileSelectionComposite, SWT.BORDER | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,
             GridData.FILL, true, false));
         activityLogDirText.setText(biobank2Dir);
@@ -106,8 +103,9 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                DirectoryDialog fd = new DirectoryDialog(fileSelectionComposite
-                    .getShell(), SWT.SAVE);
+                DirectoryDialog fd =
+                    new DirectoryDialog(fileSelectionComposite.getShell(),
+                        SWT.SAVE);
                 fd.setText("Select Directory");
                 fd.setFilterPath(biobank2Dir);
                 String selected = fd.open();
@@ -134,8 +132,9 @@ public class ActivityLogLocationDialog extends BiobankDialog {
             File activityLogDirFile = new File(activityLogDir);
 
             if (!activityLogDirFile.exists()) {
-                boolean createPath = BioBankPlugin.openConfirm("Create path?",
-                    "Path: " + activityLogDir
+                boolean createPath =
+                    BioBankPlugin.openConfirm("Create path?", "Path: "
+                        + activityLogDir
                         + "\ndoes not exist, would you like to create it?");
 
                 if (!createPath) {

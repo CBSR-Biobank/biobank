@@ -425,9 +425,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
         for (Aliquot aliquot : aliquots) {
-            if (aliquot.getInventoryId().equals(inventoryId)) {
-                list.add(new AliquotWrapper(appService, aliquot));
-            }
+            list.add(new AliquotWrapper(appService, aliquot));
         }
         return list;
     }

@@ -698,6 +698,34 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return transformToWrapperList(appService, containerTypes);
     }
 
+    /**
+     * Get containers types with the given capacity in the given site. The
+     * container types returned are ones that can only hold aliquots.
+     */
+    public static List<ContainerTypeWrapper> getContainerTypesByCapacity(
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        int maxRows, int maxCols) throws ApplicationException {
+        String query =
+            "select ct from "
+                + ContainerType.class.getName()
+                + " as ct join ct.capacity as cap"
+                + " where ct.site = ? and cap.rowCapacity = ?"
+                + " and cap.colCapacity = ? and ct.sampleTypeCollection is not empty"
+                + " and ct.childContainerTypeCollection is empty";
+        HQLCriteria criteria =
+            new HQLCriteria(query, Arrays.asList(new Object[] {
+                siteWrapper.getWrappedObject(), maxRows, maxCols }));
+        List<ContainerType> containerTypes = appService.query(criteria);
+        return transformToWrapperList(appService, containerTypes);
+    }
+
+    public static List<ContainerTypeWrapper> getContainerTypesPallet96(
+        WritableApplicationService appService, SiteWrapper siteWrapper)
+        throws ApplicationException {
+        return getContainerTypesByCapacity(appService, siteWrapper,
+            RowColPos.PALLET_96_ROW_MAX, RowColPos.PALLET_96_COL_MAX);
+    }
+
     private static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
         WritableApplicationService appService) throws RuntimeException {
         try {

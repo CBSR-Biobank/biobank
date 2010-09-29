@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -25,10 +24,7 @@ public class PalletScanPreferencePage extends FieldEditorPreferencePage
     public void createFieldEditors() {
         addField(new BooleanFieldEditor(
             PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY,
-            "Select sample type row/row only", getFieldEditorParent()));
-        addField(new StringFieldEditor(
-            PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS,
-            "Scanned container type name contains:", getFieldEditorParent()));
+            "Select sample type for whole row only", getFieldEditorParent()));
     }
 
     @Override
