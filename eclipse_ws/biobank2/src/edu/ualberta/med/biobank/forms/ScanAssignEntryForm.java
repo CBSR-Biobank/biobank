@@ -36,10 +36,10 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -572,7 +572,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             for (int col = 0; col < currentPalletWrapper.getColCapacity(); col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 monitor.subTask("Processing position "
-                    + LabelingScheme.rowColToSbs(rcp));
+                    + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 PalletCell cell = getCells().get(rcp);
                 if (!isRescanMode() || cell == null || cell.getStatus() == null
                     || cell.getStatus() == CellStatus.EMPTY
@@ -656,8 +656,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         String value = scanCell.getValue();
         String positionString =
             currentPalletWrapper.getLabel()
-                + LabelingScheme.rowColToSbs(new RowColPos(scanCell.getRow(),
-                    scanCell.getCol()));
+                + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(
+                    scanCell.getRow(), scanCell.getCol()));
         if (value == null) { // no aliquot scanned
             updateCellAsMissing(positionString, scanCell, expectedAliquot);
         } else {

@@ -12,9 +12,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -54,10 +54,11 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             boolean resOk = true;
             for (RowColPos rcp : cells.keySet()) {
                 monitor.subTask("Processing position "
-                    + LabelingScheme.rowColToSbs(rcp));
+                    + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 PalletCell cell = cells.get(rcp);
-                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
-                    SessionManager.getAppService(), cell.getValue());
+                List<AliquotWrapper> aliquots =
+                    AliquotWrapper.getAliquots(SessionManager.getAppService(),
+                        cell.getValue());
                 if (aliquots == null || aliquots.size() == 0) {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation("Aliquot not found in database");
@@ -132,7 +133,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned =
+            new TreeMap<RowColPos, PalletCell>();
         if (currentShipment.getAliquotCollection().size() > 0) {
             AliquotWrapper aliquotNotReceived = null;
             for (AliquotWrapper aliquot : currentShipment

@@ -20,9 +20,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
@@ -45,7 +45,8 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     private boolean isNewPallet;
     private boolean aliquotsAdded = false;
     private ContainerWrapper currentPallet;
-    private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
+    private List<ContainerWrapper> removedPallets =
+        new ArrayList<ContainerWrapper>();
 
     public DispatchCreateScanDialog(Shell parentShell,
         DispatchShipmentWrapper currentShipment) {
@@ -54,12 +55,14 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected void createCustomDialogContents(Composite parent) {
-        productBarcodeValidator = new NonEmptyStringValidator(
-            Messages.getString("ScanAssign.productBarcode.validationMsg"));
-        palletproductBarcodeText = (BiobankText) createBoundWidgetWithLabel(
-            parent, BiobankText.class, SWT.NONE,
-            Messages.getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
-            null, productBarcodeValue, productBarcodeValidator); //$NON-NLS-1$
+        productBarcodeValidator =
+            new NonEmptyStringValidator(
+                Messages.getString("ScanAssign.productBarcode.validationMsg"));
+        palletproductBarcodeText =
+            (BiobankText) createBoundWidgetWithLabel(parent, BiobankText.class,
+                SWT.NONE,
+                Messages.getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
+                null, productBarcodeValue, productBarcodeValidator); //$NON-NLS-1$
         palletproductBarcodeText
             .addKeyListener(new EnterKeyToNextFieldListener());
 
@@ -106,23 +109,23 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 scanOk = scanOk && (cell.getStatus() == CellStatus.FILLED);
             }
         } else {
-            currentPallet = ContainerWrapper
-                .getContainerWithProductBarcodeInSite(SessionManager
-                    .getAppService(), SessionManager.getInstance()
-                    .getCurrentSite(), currentProductBarcode);
+            currentPallet =
+                ContainerWrapper.getContainerWithProductBarcodeInSite(
+                    SessionManager.getAppService(), SessionManager
+                        .getInstance().getCurrentSite(), currentProductBarcode);
             if (currentPallet != null) {
                 // FIXME check it is a pallet ? Should we do it when enter
                 // barcode ?
 
-                Map<RowColPos, AliquotWrapper> expectedAliquots = currentPallet
-                    .getAliquots();
+                Map<RowColPos, AliquotWrapper> expectedAliquots =
+                    currentPallet.getAliquots();
                 for (int row = 0; row < currentPallet.getRowCapacity(); row++) {
                     for (int col = 0; col < currentPallet.getColCapacity(); col++) {
                         RowColPos rcp = new RowColPos(row, col);
                         PalletCell cell = getCells().get(rcp);
                         processCell(monitor, rcp, cell, expectedAliquots);
-                        scanOk = scanOk
-                            && (cell.getStatus() == CellStatus.FILLED);
+                        scanOk =
+                            scanOk && (cell.getStatus() == CellStatus.FILLED);
                     }
                 }
 
@@ -139,7 +142,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
         PalletCell cell, Map<RowColPos, AliquotWrapper> expectedAliquots)
         throws Exception {
         monitor.subTask("Processing position "
-            + LabelingScheme.rowColToSbs(rcp));
+            + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
         AliquotWrapper expectedAliquot = null;
         if (expectedAliquots != null) {
             expectedAliquot = expectedAliquots.get(rcp);
@@ -170,9 +173,10 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                         "ScanAssign.scanStatus.aliquot.missing", expectedAliquot.getInventoryId())); //$NON-NLS-1$
             scanCell.setTitle("?"); //$NON-NLS-1$
         } else {
-            List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
-                SessionManager.getAppService(), value, SessionManager
-                    .getInstance().getCurrentSite());
+            List<AliquotWrapper> aliquots =
+                AliquotWrapper.getAliquotsInSite(
+                    SessionManager.getAppService(), value, SessionManager
+                        .getInstance().getCurrentSite());
             if (aliquots.size() == 0) {
                 // not in database
                 scanCell.setStatus(CellStatus.ERROR);
@@ -274,20 +278,19 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
-        ContainerWrapper currentPallet = ContainerWrapper
-            .getContainerWithProductBarcodeInSite(SessionManager
-                .getAppService(),
-                SessionManager.getInstance().getCurrentSite(),
-                currentProductBarcode);
+        ContainerWrapper currentPallet =
+            ContainerWrapper.getContainerWithProductBarcodeInSite(
+                SessionManager.getAppService(), SessionManager.getInstance()
+                    .getCurrentSite(), currentProductBarcode);
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
             return PalletCell.getRandomAliquotsAlreadyAssigned(SessionManager
                 .getAppService(), currentShipment.getSender().getId());
         } else {
             for (AliquotWrapper aliquot : currentPallet.getAliquots().values()) {
-                PalletCell cell = new PalletCell(new ScanCell(
-                    aliquot.getPosition().row, aliquot.getPosition().col,
-                    aliquot.getInventoryId()));
+                PalletCell cell =
+                    new PalletCell(new ScanCell(aliquot.getPosition().row,
+                        aliquot.getPosition().col, aliquot.getInventoryId()));
                 map.put(aliquot.getPosition(), cell);
             }
         }
