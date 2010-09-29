@@ -15,15 +15,16 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = BioBankPlugin.getDefault()
-            .getPreferenceStore();
+        IPreferenceStore store =
+            BioBankPlugin.getDefault().getPreferenceStore();
         store.setDefault(PreferenceConstants.GENERAL_CONFIRM, "CONFIRM");
         store.setDefault(PreferenceConstants.GENERAL_CANCEL, "CANCEL");
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, true);
 
-        String path = Platform.getInstallLocation().getURL().getPath()
-            + File.separator + "activityLogs";
+        String path =
+            Platform.getInstallLocation().getURL().getPath() + File.separator
+                + "activityLogs";
         File file = new File(path);
         if (!file.exists()) {
             file.mkdir();
@@ -33,8 +34,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT, true);
         store.setDefault(PreferenceConstants.SCANNER_DPI, 300);
         store.setDefault(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY, true);
-        store.setDefault(
-            PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS, "pallet");
         store.setDefault(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS,
             "cabinet");
 

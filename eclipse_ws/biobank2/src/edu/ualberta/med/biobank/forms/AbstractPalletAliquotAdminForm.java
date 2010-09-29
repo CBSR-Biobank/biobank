@@ -10,7 +10,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
-import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -36,7 +35,6 @@ import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
@@ -83,11 +81,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
     @Override
     protected void init() throws Exception {
         super.init();
-        IPreferenceStore store = BioBankPlugin.getDefault()
-            .getPreferenceStore();
-        palletNameContains = store
-            .getString(PreferenceConstants.PALLET_SCAN_CONTAINER_NAME_CONTAINS);
-
         addScannerPreferencesPropertyListener();
 
         palletScanManagement = new PalletScanManagement() {
@@ -262,9 +255,10 @@ public abstract class AbstractPalletAliquotAdminForm extends
     protected void createProfileComboBox(Composite fieldsComposite) {
 
         Label lbl = widgetCreator.createLabel(fieldsComposite, "Profile");
-        profilesCombo = widgetCreator
-            .createComboViewerWithNoSelectionValidator(fieldsComposite, lbl,
-                null, null, "Invalid profile selected", false, null); //$NON-NLS-1$
+        profilesCombo =
+            widgetCreator.createComboViewerWithNoSelectionValidator(
+                fieldsComposite, lbl, null, null,
+                "Invalid profile selected", false, null); //$NON-NLS-1$
 
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
@@ -290,11 +284,12 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected void createPlateToScanField(Composite fieldsComposite) {
-        plateToScanText = (BiobankText) createBoundWidgetWithLabel(
-            fieldsComposite, BiobankText.class, SWT.NONE,
-            Messages.getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
-            new String[0], plateToScanValue, new ScannerBarcodeValidator(
-                Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$
+        plateToScanText =
+            (BiobankText) createBoundWidgetWithLabel(fieldsComposite,
+                BiobankText.class, SWT.NONE,
+                Messages.getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
+                new String[0], plateToScanValue, new ScannerBarcodeValidator(
+                    Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
@@ -399,9 +394,10 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     private String scanTubeAloneDialog(RowColPos rcp) {
-        ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(),
-            palletScanManagement.getCells(), rcp);
+        ScanOneTubeDialog dlg =
+            new ScanOneTubeDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(),
+                palletScanManagement.getCells(), rcp);
         if (dlg.open() == Dialog.OK) {
             return dlg.getScannedValue();
         }
@@ -410,8 +406,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected void scanTubeAlone(MouseEvent e) {
         if (scanTubeAloneMode && isScanHasBeenLaunched()) {
-            RowColPos rcp = ((ScanPalletWidget) e.widget)
-                .getPositionAtCoordinates(e.x, e.y);
+            RowColPos rcp =
+                ((ScanPalletWidget) e.widget)
+                    .getPositionAtCoordinates(e.x, e.y);
             Map<RowColPos, PalletCell> cells = palletScanManagement.getCells();
             if (rcp != null) {
                 PalletCell cell = cells.get(rcp);
@@ -419,8 +416,9 @@ public abstract class AbstractPalletAliquotAdminForm extends
                     String value = scanTubeAloneDialog(rcp);
                     if (value != null && !value.isEmpty()) {
                         if (cell == null) {
-                            cell = new PalletCell(new ScanCell(rcp.row,
-                                rcp.col, value));
+                            cell =
+                                new PalletCell(new ScanCell(rcp.row, rcp.col,
+                                    value));
                             cells.put(rcp, cell);
                         } else {
                             cell.setValue(value);
