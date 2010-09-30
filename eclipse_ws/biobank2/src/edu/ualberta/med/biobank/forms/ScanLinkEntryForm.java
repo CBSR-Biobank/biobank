@@ -32,10 +32,10 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -348,8 +348,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             final SampleTypeSelectionWidget typeWidget =
                 new SampleTypeSelectionWidget(typesSelectionPerRowComposite,
-                    LabelingScheme.SBS_ROW_LABELLING_PATTERN.charAt(i),
-                    sampleTypes, toolkit);
+                    ContainerLabelingSchemeWrapper.SBS_ROW_LABELLING_PATTERN
+                        .charAt(i), sampleTypes, toolkit);
             final int indexRow = i;
             typeWidget
                 .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -498,7 +498,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 new HashMap<Integer, Integer>();
             for (RowColPos rcp : cells.keySet()) {
                 monitor.subTask("Processing position "
-                    + LabelingScheme.rowColToSbs(rcp));
+                    + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 Integer typesRowsCount = typesRows.get(rcp.row);
                 if (typesRowsCount == null) {
                     typesRowsCount = 0;
@@ -580,8 +580,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
                     AliquotWrapper aliquot = aliquots.get(0);
                     String palletPosition =
-                        LabelingScheme.rowColToSbs(new RowColPos(cell.getRow(),
-                            cell.getCol()));
+                        ContainerLabelingSchemeWrapper
+                            .rowColToSbs(new RowColPos(cell.getRow(), cell
+                                .getCol()));
                     appendLogNLS("ScanLink.activitylog.aliquot.existsError",
                         palletPosition, value, aliquot.getPatientVisit()
                             .getFormattedDateProcessed(), aliquot

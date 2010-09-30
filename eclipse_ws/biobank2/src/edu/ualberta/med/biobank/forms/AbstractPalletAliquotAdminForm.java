@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -423,7 +423,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
                             cell.setValue(value);
                         }
                         appendLogNLS("linkAssign.activitylog.scanTubeAlone",
-                            value, LabelingScheme.rowColToSbs(rcp));
+                            value,
+                            ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {

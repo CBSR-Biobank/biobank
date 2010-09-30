@@ -17,12 +17,12 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -728,22 +728,25 @@ public class TestContainer extends TestDatabase {
     private String getLabel(Integer labelingScheme, int maxRows, int maxCol,
         int row, int col) {
         String label = null;
-        int len = LabelingScheme.CBSR_LABELLING_PATTERN.length();
+        int len =
+            ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN.length();
 
         switch (labelingScheme) {
         case 1: {
             label =
                 String.format("%c%d",
-                    LabelingScheme.SBS_ROW_LABELLING_PATTERN.charAt(row),
-                    col + 1);
+                    ContainerLabelingSchemeWrapper.SBS_ROW_LABELLING_PATTERN
+                        .charAt(row), col + 1);
             break;
         }
         case 2: {
             int index = maxRows * col + row;
             label =
                 String.format("%c%c",
-                    LabelingScheme.CBSR_LABELLING_PATTERN.charAt(index / len),
-                    LabelingScheme.CBSR_LABELLING_PATTERN.charAt(index % len));
+                    ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                        .charAt(index / len),
+                    ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                        .charAt(index % len));
             break;
         }
         case 3: {

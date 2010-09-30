@@ -12,9 +12,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm.AliquotInfo;
@@ -59,15 +59,17 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         Map<RowColPos, PalletCell> cells = getCells();
         pendingAliquotsNumber = 0;
         errors = 0;
-        final List<AliquotWrapper> notInShipmentAliquots = new ArrayList<AliquotWrapper>();
+        final List<AliquotWrapper> notInShipmentAliquots =
+            new ArrayList<AliquotWrapper>();
         final List<PalletCell> notInShipmentCells = new ArrayList<PalletCell>();
         if (cells != null) {
             for (RowColPos rcp : cells.keySet()) {
                 monitor.subTask("Processing position "
-                    + LabelingScheme.rowColToSbs(rcp));
+                    + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 PalletCell cell = cells.get(rcp);
-                AliquotInfo info = DispatchShipmentReceivingEntryForm
-                    .getInfoForInventoryId(currentShipment, cell.getValue());
+                AliquotInfo info =
+                    DispatchShipmentReceivingEntryForm.getInfoForInventoryId(
+                        currentShipment, cell.getValue());
                 if (info.aliquot != null) {
                     cell.setAliquot(info.aliquot);
                     cell.setTitle(info.aliquot.getPatientVisit().getPatient()
@@ -111,11 +113,12 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                 Display.getDefault().asyncExec(new Runnable() {
                     @Override
                     public void run() {
-                        boolean flag = BioBankPlugin
-                            .openConfirm(
-                                "Not in shipment aliquots",
-                                "Some of the aliquots in this pallet were not supposed"
-                                    + " to be in this shipment. Do you wish to flag them ?");
+                        boolean flag =
+                            BioBankPlugin
+                                .openConfirm(
+                                    "Not in shipment aliquots",
+                                    "Some of the aliquots in this pallet were not supposed"
+                                        + " to be in this shipment. Do you wish to flag them ?");
                         if (flag) {
                             try {
                                 currentShipment
@@ -180,7 +183,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned =
+            new TreeMap<RowColPos, PalletCell>();
         if (currentShipment.getAliquotCollection().size() > 0) {
             AliquotWrapper aliquotNotReceived = null;
             AliquotWrapper aliquotFlagged = null;

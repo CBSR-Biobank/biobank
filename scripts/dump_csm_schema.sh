@@ -19,9 +19,6 @@ OPTIONS
   -h          Help text.
 "
 
-MYSQL=/usr/bin/mysql
-MYSQLDUMP=/usr/bin/mysqldump
-SED=/bin/sed
 DBHOST="localhost"
 DBNAME=biobank2
 
@@ -62,9 +59,10 @@ if [ -z "$DBPWD" ]; then
     exit
 fi
 
-for table in `$MYSQL -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME -BNe "show tables"` ; do
+for table in `mysql -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME -BNe "show tables"` ; do
   # echo "  table: \"$table\""
-    if [[ "$table" =~ ^csm_.* ]]; then
+    #if [[ "$table" =~ ^csm_.* ]]; then # this line does not work on bash less than 3.2
+	if echo $table | grep -q '^csm_.*'; then
         in_array "${exclude[@]}" $table
         if [ $? -eq 0 ]; then
             CSM_TABLES="$CSM_TABLES $table"
@@ -81,9 +79,9 @@ if [ -n "$OUTFILE" ]; then
 fi
 
 if [ -z "$OUTFILE" ]; then
-    $MYSQLDUMP --skip-extended-insert -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME $CSM_TABLES
+    mysqldump --skip-extended-insert -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME $CSM_TABLES
 else
-    $MYSQLDUMP --skip-extended-insert -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME $CSM_TABLES >> $OUTFILE
+    mysqldump --skip-extended-insert -h$DBHOST -u$DBUSER -p$DBPWD $DBNAME $CSM_TABLES >> $OUTFILE
 fi
 
 if [ -n "$OUTFILE" ]; then

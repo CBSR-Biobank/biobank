@@ -20,9 +20,9 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
@@ -143,7 +143,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
         PalletCell cell, Map<RowColPos, AliquotWrapper> expectedAliquots)
         throws Exception {
         monitor.subTask("Processing position "
-            + LabelingScheme.rowColToSbs(rcp));
+            + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
         AliquotWrapper expectedAliquot = null;
         if (expectedAliquots != null) {
             expectedAliquot = expectedAliquots.get(rcp);

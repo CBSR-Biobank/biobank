@@ -595,9 +595,6 @@
       <classpath refid="common.lib.class.path" />
       <classpath refid="test.class.path" />
       <formatter usefile="yes" type="brief" />
-      <!--test name="test.ualberta.med.biobank.AllTests" haltonfailure="no" outfile="result">
-      <formatter type="xml" />
-      </test-->
       <batchtest todir="testing/raw">
         <fileset dir="${eclipse.proj.dir.junit}/src">
           <include name="**/Test*.java" />

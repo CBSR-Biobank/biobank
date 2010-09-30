@@ -10,10 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -29,7 +27,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
-    private static Map<Integer, ContainerLabelingSchemeWrapper> labelingSchemeMap;
+    private static Map<String, ContainerLabelingSchemeWrapper> labelingSchemeMap;
 
     private Set<ContainerTypeWrapper> deletedChildTypes =
         new HashSet<ContainerTypeWrapper>();
@@ -726,7 +724,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             RowColPos.PALLET_96_ROW_MAX, RowColPos.PALLET_96_COL_MAX);
     }
 
-    private static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
+    private static Map<String, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
         WritableApplicationService appService) throws RuntimeException {
         try {
             if (labelingSchemeMap == null) {
@@ -791,14 +789,15 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public String getPositionString(RowColPos position) {
-        return LabelingScheme.getPositionString(position,
+        return ContainerLabelingSchemeWrapper.getPositionString(position,
             getChildLabelingScheme(), getRowCapacity(), getColCapacity());
     }
 
     public RowColPos getRowColFromPositionString(String position)
         throws Exception {
-        return LabelingScheme.getRowColFromPositionString(position,
-            getChildLabelingScheme(), getRowCapacity(), getColCapacity());
+        return ContainerLabelingSchemeWrapper.getRowColFromPositionString(
+            getAppService(), position, getChildLabelingScheme(),
+            getRowCapacity(), getColCapacity());
     }
 
 }

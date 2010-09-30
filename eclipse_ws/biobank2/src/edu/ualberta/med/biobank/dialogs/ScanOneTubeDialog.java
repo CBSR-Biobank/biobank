@@ -9,8 +9,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
@@ -44,7 +44,7 @@ public class ScanOneTubeDialog extends BiobankDialog {
     @Override
     protected String getTitleAreaMessage() {
         return "Scan the missing tube for position "
-            + LabelingScheme.rowColToSbs(position);
+            + ContainerLabelingSchemeWrapper.rowColToSbs(position);
     }
 
     @Override
@@ -66,8 +66,9 @@ public class ScanOneTubeDialog extends BiobankDialog {
                 BioBankPlugin.openAsyncError(
                     "Tube Scan Error",
                     "The value entered already exists in position "
-                        + LabelingScheme.rowColToSbs(new RowColPos(otherCell
-                            .getRow(), otherCell.getCol())));
+                        + ContainerLabelingSchemeWrapper
+                            .rowColToSbs(new RowColPos(otherCell.getRow(),
+                                otherCell.getCol())));
                 valueText.setFocus();
                 valueText.setSelection(0, scannedValue.length());
                 return;
