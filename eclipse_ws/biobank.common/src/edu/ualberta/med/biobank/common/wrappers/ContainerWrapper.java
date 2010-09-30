@@ -78,11 +78,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                     }
                     return null;
                 }
-
-                @Override
-                public SiteWrapper getSite() {
-                    return ContainerWrapper.this.getSite();
-                }
             };
     }
 
@@ -113,6 +108,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         checkContainerTypeSameSite();
         checkHasPosition();
         objectWithPositionManagement.persistChecks();
+        checkParentFromSameSite();
+    }
+
+    private void checkParentFromSameSite() throws BiobankCheckException {
+        if (getParent() != null && !getParent().getSite().equals(getSite())) {
+            throw new BiobankCheckException(
+                "Parent should be part of the same site");
+        }
     }
 
     private void checkContainerTypeNotNull() throws BiobankCheckException {

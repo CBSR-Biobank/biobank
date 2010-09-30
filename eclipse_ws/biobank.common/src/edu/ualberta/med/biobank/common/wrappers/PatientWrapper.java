@@ -130,11 +130,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         final boolean ascending) {
         // TODO: gee, I hope that when you modify this collection it isn't meant
         // to modify the internals of the PatientWrapper object. Ask Delphine.
-        List<PatientVisitWrapper> patientVisitCollection =
-            new ArrayList<PatientVisitWrapper>();
+        List<PatientVisitWrapper> patientVisitCollection = null;
         Collection<ClinicShipmentPatientWrapper> csps =
             getClinicShipmentPatientCollection();
         if (csps != null && csps.size() > 0) {
+            patientVisitCollection = new ArrayList<PatientVisitWrapper>();
             for (ClinicShipmentPatientWrapper csp : csps) {
                 patientVisitCollection.addAll(csp.getPatientVisitCollection());
             }

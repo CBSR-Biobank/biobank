@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.model.DispatchShipmentAliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -61,11 +60,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                         return posWrapper;
                     }
                     return null;
-                }
-
-                @Override
-                public SiteWrapper getSite() {
-                    return AliquotWrapper.this.getSite();
                 }
             };
     }
@@ -168,13 +162,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                         .getName()) + ".");
             }
         }
-    }
-
-    public SiteWrapper getSite() {
-        if (getParent() != null) {
-            return getParent().getSite();
-        }
-        return null;
     }
 
     public void setPatientVisit(PatientVisitWrapper patientVisit) {
@@ -498,20 +485,23 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return getInventoryId();
     }
 
-    public List<DispatchShipmentWrapper> getDispatchShipments()
-        throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria("select ship from "
-                + DispatchShipment.class.getName()
-                + " ship where ship.aliquotCollection.id = ?",
-                Arrays.asList(new Object[] { getId() }));
-        List<DispatchShipment> ships = appService.query(criteria);
-        List<DispatchShipmentWrapper> shipWrappers =
-            new ArrayList<DispatchShipmentWrapper>();
-        for (DispatchShipment ship : ships) {
-            shipWrappers.add(new DispatchShipmentWrapper(appService, ship));
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getDispatchShipments() {
+        List<DispatchShipmentWrapper> dispatchShipments =
+            (List<DispatchShipmentWrapper>) propertiesMap
+                .get("dispatchShipments");
+        if (dispatchShipments == null) {
+            List<DispatchShipmentAliquotWrapper> dsaList =
+                getDispatchShipmentAliquotCollection();
+            if (dsaList != null) {
+                dispatchShipments = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipmentAliquotWrapper dsa : dsaList) {
+                    dispatchShipments.add(dsa.getShipment());
+                }
+                propertiesMap.put("dispatchShipments", dispatchShipments);
+            }
         }
-        return shipWrappers;
+        return dispatchShipments;
     }
 
     @Override

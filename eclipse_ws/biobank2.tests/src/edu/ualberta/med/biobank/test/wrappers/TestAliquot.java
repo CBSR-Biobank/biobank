@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper.STATE;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -228,34 +229,6 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testCheckParentFromSameSite() throws BiobankCheckException,
-        Exception {
-        String name = "testCheckParentFromSameSite" + r.nextInt();
-        SiteWrapper newSite = SiteHelper.addSite(name);
-        StudyWrapper newStudy = StudyHelper.addStudy(name);
-        PatientWrapper newPatient = PatientHelper.addPatient(name, newStudy);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        newStudy.addContacts(Arrays.asList(contact));
-        newStudy.persist();
-        ClinicShipmentWrapper shipment =
-            ClinicShipmentHelper.addShipment(newSite, clinic,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                newPatient);
-        PatientVisitWrapper newVisit =
-            PatientVisitHelper.addPatientVisit(newPatient, shipment, null,
-                Utils.getRandomDate());
-
-        aliquot.setPatientVisit(newVisit);
-        try {
-            aliquot.persist();
-            Assert.fail("visit not from same site as parent");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
     public void testDelete() throws Exception {
         aliquot.persist();
         SampleTypeWrapper type1 = aliquot.getSampleType();
@@ -308,14 +281,6 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testGetSite() {
-        Assert.assertEquals(site.getId(), aliquot.getSite().getId());
-
-        AliquotWrapper sample1 = new AliquotWrapper(appService);
-        Assert.assertNull(sample1.getSite());
-    }
-
-    @Test
     public void testGetPositionString() throws Exception {
         aliquot.setAliquotPositionFromString("A1", aliquot.getParent());
         Assert.assertTrue(aliquot.getPositionString(false, false).equals("A1"));
@@ -357,13 +322,13 @@ public class TestAliquot extends TestDatabase {
         Assert.assertTrue(aliquot.hasParent());
         ContainerWrapper oldParent = aliquot.getParent();
         ContainerTypeWrapper type =
-            ContainerTypeHelper.addContainerType(aliquot.getSite(),
-                "newCtType", "ctNew", 1, 4, 5, true);
+            ContainerTypeHelper.addContainerType(site, "newCtType", "ctNew", 1,
+                4, 5, true);
         type.addSampleTypes(Arrays.asList(aliquot.getSampleType()));
         type.persist();
         ContainerWrapper parent =
             ContainerHelper.addContainer("newcontainerParent", "ccNew", null,
-                aliquot.getSite(), type);
+                site, type);
 
         aliquot.setParent(parent);
         aliquot.persist();
@@ -618,7 +583,7 @@ public class TestAliquot extends TestDatabase {
 
         // add an aliquot that has not been persisted
         try {
-            dShipment.addAliquots(Arrays.asList(aliquot));
+            dShipment.addAliquots(Arrays.asList(aliquot), STATE.NONE_STATE);
             Assert.fail("Should not be allowed to add aliquots not yet in DB");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -629,7 +594,7 @@ public class TestAliquot extends TestDatabase {
 
         dShipment =
             DispatchShipmentHelper.newShipment(site, destSite, study, method);
-        dShipment.addAliquots(Arrays.asList(aliquot));
+        dShipment.addAliquots(Arrays.asList(aliquot), STATE.NONE_STATE);
         dShipment.persist();
         aliquot.reload();
 
@@ -651,7 +616,7 @@ public class TestAliquot extends TestDatabase {
             DispatchShipmentHelper.newShipment(destSite, destSite2, study,
                 method);
         try {
-            dShipment2.addAliquots(Arrays.asList(aliquot));
+            dShipment2.addAliquots(Arrays.asList(aliquot), STATE.NONE_STATE);
             Assert
                 .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Actvive' status)");
         } catch (BiobankCheckException bce) {
@@ -683,7 +648,7 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
 
         // add to new shipment
-        dShipment2.addAliquots(Arrays.asList(aliquot));
+        dShipment2.addAliquots(Arrays.asList(aliquot), STATE.NONE_STATE);
         dShipment2.persist();
 
         aliquot.reload();

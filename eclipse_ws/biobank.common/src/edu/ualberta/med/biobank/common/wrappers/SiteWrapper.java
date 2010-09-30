@@ -708,10 +708,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
             return;
         Map<Integer, DispatchInfoWrapper> infos =
             getSrcDispatchInfoCollection();
-        if (infos == null) {
-            infos = new HashMap<Integer, DispatchInfoWrapper>();
+        DispatchInfoWrapper diw = null;
+        if (infos != null) {
+            diw = infos.get(study.getId());
         }
-        DispatchInfoWrapper diw = infos.get(study.getId());
         if (diw == null) {
             List<StudyWrapper> studies = getStudyCollection();
             if (studies == null || !studies.contains(study)) {
@@ -723,11 +723,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
             diw = new DispatchInfoWrapper(appService);
             diw.setStudy(study);
             diw.setSrcSite(this);
-            infos.put(study.getId(), diw);
+            if (infos != null) {
+                infos.put(study.getId(), diw);
+            }
             Collection<DispatchInfo> allsInfoObjects =
                 wrappedObject.getSrcDispatchInfoCollection();
             if (allsInfoObjects == null) {
                 allsInfoObjects = new HashSet<DispatchInfo>();
+            } else {
+                allsInfoObjects = new HashSet<DispatchInfo>(allsInfoObjects);
             }
             allsInfoObjects.add(diw.wrappedObject);
             wrappedObject.setSrcDispatchInfoCollection(allsInfoObjects);

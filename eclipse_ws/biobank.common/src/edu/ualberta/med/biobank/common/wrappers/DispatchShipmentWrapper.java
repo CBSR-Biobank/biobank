@@ -405,6 +405,30 @@ public class DispatchShipmentWrapper extends
         setDispathcShipmentAliquotCollection(allDsaObjects, allDsaWrappers);
     }
 
+    public void removeAliquots(List<AliquotWrapper> aliquotsToRemove) {
+        if ((aliquotsToRemove == null) || (aliquotsToRemove.size() == 0))
+            return;
+
+        Collection<DispatchShipmentAliquot> allDsaObjects =
+            new HashSet<DispatchShipmentAliquot>();
+        List<DispatchShipmentAliquotWrapper> allDsaWrappers =
+            new ArrayList<DispatchShipmentAliquotWrapper>();
+        // already added dsa
+        List<DispatchShipmentAliquotWrapper> currentList =
+            getDispatchShipmentAliquotCollection(false);
+        if (currentList != null) {
+            for (DispatchShipmentAliquotWrapper dsa : currentList) {
+                if (!aliquotsToRemove.contains(dsa.getAliquot())) {
+                    allDsaObjects.add(dsa.getWrappedObject());
+                    allDsaWrappers.add(dsa);
+                } else {
+                    deletedDispatchedShipmentAliquots.add(dsa);
+                }
+            }
+        }
+        setDispathcShipmentAliquotCollection(allDsaObjects, allDsaWrappers);
+    }
+
     @Override
     protected void deleteChecks() throws Exception {
 
