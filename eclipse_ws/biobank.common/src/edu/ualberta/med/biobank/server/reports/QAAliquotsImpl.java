@@ -12,23 +12,28 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class QAAliquotsImpl extends AbstractReport {
 
-    private static final String QUERY = "from " + Aliquot.class.getName()
-        + " as aliquot where aliquot.patientVisit.dateProcessed "
-        + "between ? and ? and aliquot.sampleType.nameShort LIKE ?"
-        + " and aliquot.aliquotPosition.container.id "
-        + "in (select path1.container.id from " + ContainerPath.class.getName()
-        + " as path1, " + ContainerPath.class.getName()
-        + " as path2 where locate(path2.path, path1.path) > 0 and"
-        + " path2.container.id in (" + CONTAINER_LIST
-        + ")) and aliquot.patientVisit.shipment.site " + SITE_OPERATOR
-        + SITE_ID + " ORDER BY RAND()";
+    private static final String QUERY =
+        "from "
+            + Aliquot.class.getName()
+            + " as aliquot where aliquot.patientVisit.dateProcessed "
+            + "between ? and ? and aliquot.sampleType.nameShort LIKE ?"
+            + " and aliquot.aliquotPosition.container.id "
+            + "in (select path1.container.id from "
+            + ContainerPath.class.getName()
+            + " as path1, "
+            + ContainerPath.class.getName()
+            + " as path2 where locate(path2.path, path1.path) > 0 and"
+            + " path2.container.id in ("
+            + CONTAINER_LIST
+            + ")) and aliquot.patientVisit.clinicShipmentPatient.clinicShipment.site "
+            + SITE_OPERATOR + SITE_ID + " ORDER BY RAND()";
 
     private int numResults;
 
     public QAAliquotsImpl(BiobankReport report) {
         super(QUERY, report);
-        numResults = (Integer) report.getParams().remove(
-            report.getParams().size() - 1);
+        numResults =
+            (Integer) report.getParams().remove(report.getParams().size() - 1);
     }
 
     @Override
@@ -42,12 +47,14 @@ public class QAAliquotsImpl extends AbstractReport {
         // get the info
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
-            String pnumber = a.getPatientVisit().getClinicShipmentPatient()
-                .getPatient().getPnumber();
+            String pnumber =
+                a.getPatientVisit().getClinicShipmentPatient().getPatient()
+                    .getPnumber();
             String inventoryId = a.getInventoryId();
             String stName = a.getSampleType().getNameShort();
-            String dateProcessed = DateFormatter.formatAsDate(a
-                .getPatientVisit().getDateProcessed());
+            String dateProcessed =
+                DateFormatter.formatAsDate(a.getPatientVisit()
+                    .getDateProcessed());
             AliquotWrapper aliquotWrapper = new AliquotWrapper(appService, a);
             String aliquotLabel = aliquotWrapper.getPositionString();
             modifiedResults.add(new Object[] { aliquotLabel, inventoryId,
