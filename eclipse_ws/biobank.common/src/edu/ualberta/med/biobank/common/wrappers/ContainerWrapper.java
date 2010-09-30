@@ -331,6 +331,10 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ContainerWrapper container = this;
 
         while (container != null) {
+            if (container.isNew()) {
+                return null;
+            }
+
             sb.insert(0, container.getId());
             sb.insert(0, "/");
             container = container.getParent();
