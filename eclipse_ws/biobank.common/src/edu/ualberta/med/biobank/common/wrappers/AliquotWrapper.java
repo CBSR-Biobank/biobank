@@ -169,8 +169,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public SiteWrapper getSite() {
-        if (getPatientVisit() != null) {
-            return getPatientVisit().getShipment().getSite();
+        if (getParent() != null) {
+            return getParent().getSite();
         }
         return null;
     }
@@ -438,7 +438,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             new HQLCriteria(
                 "from "
                     + Aliquot.class.getName()
-                    + " a where a.patientVisit.shipment.site.id = ? and activityStatus.name != ?",
+                    + " a where a.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ? and activityStatus.name != ?",
                 Arrays.asList(new Object[] { site.getId(),
                     ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Aliquot> aliquots = appService.query(criteria);

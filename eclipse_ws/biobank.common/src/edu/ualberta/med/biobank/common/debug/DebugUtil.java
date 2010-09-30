@@ -17,8 +17,10 @@ public class DebugUtil {
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria =
-            new HQLCriteria("from " + Aliquot.class.getName()
-                + " as s where s.patientVisit.shipment.site.id = ?",
+            new HQLCriteria(
+                "from "
+                    + Aliquot.class.getName()
+                    + " as s where s.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ?",
                 Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
@@ -38,10 +40,12 @@ public class DebugUtil {
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria =
-            new HQLCriteria("from " + Aliquot.class.getName()
-                + " as s where s in (select sp.aliquot from "
-                + AliquotPosition.class.getName()
-                + " as sp) and s.patientVisit.shipment.site.id = ?",
+            new HQLCriteria(
+                "from "
+                    + Aliquot.class.getName()
+                    + " as s where s in (select sp.aliquot from "
+                    + AliquotPosition.class.getName()
+                    + " as sp) and s.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ?",
                 Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
@@ -61,10 +65,12 @@ public class DebugUtil {
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria =
-            new HQLCriteria("select a from " + Aliquot.class.getName()
-                + " as a left join a.aliquotPosition as ap where ap is null"
-                + " and a.patientVisit.shipment.site.id = ?"
-                + " and a.activityStatus.name != 'Dispatched'",
+            new HQLCriteria(
+                "select a from "
+                    + Aliquot.class.getName()
+                    + " as a left join a.aliquotPosition as ap where ap is null"
+                    + " and a.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ?"
+                    + " and a.activityStatus.name != 'Dispatched'",
                 Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();

@@ -596,7 +596,8 @@ public class TestAliquot extends TestDatabase {
 
         DebugUtil.getRandomAliquotsAlreadyLinked(appService, site.getId());
         DebugUtil.getRandomAliquotsAlreadyAssigned(appService, site.getId());
-        DebugUtil.getRandomAliquotsNotAssignedNoDispatch(appService, site.getId());
+        DebugUtil.getRandomAliquotsNotAssignedNoDispatch(appService,
+            site.getId());
     }
 
     @Test
@@ -660,6 +661,26 @@ public class TestAliquot extends TestDatabase {
         // dest site receive aliquot
         dShipment.receiveAliquots(Arrays.asList(aliquot));
         dShipment.persist();
+
+        // assign a position to this aliquot
+        ContainerTypeWrapper topType =
+            ContainerTypeHelper.addContainerType(destSite, "ct11", "ct11", 1,
+                5, 6, true);
+        ContainerWrapper topCont =
+            ContainerHelper.addContainer("11", "11", null, destSite, topType);
+        ContainerTypeWrapper childType =
+            ContainerTypeHelper.addContainerType(destSite, "ct22", "ct22", 2,
+                4, 7, false);
+        topType.addChildContainerTypes(Arrays.asList(childType));
+        topType.persist();
+        ContainerWrapper cont =
+            ContainerHelper.addContainer("22", "22", topCont, destSite,
+                childType, 4, 5);
+        childType.addSampleTypes(Arrays.asList(aliquot.getSampleType()));
+        childType.persist();
+        cont.reload();
+        cont.addAliquot(2, 3, aliquot);
+        aliquot.persist();
 
         // add to new shipment
         dShipment2.addAliquots(Arrays.asList(aliquot));

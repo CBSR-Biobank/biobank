@@ -37,7 +37,8 @@ public class AliquotsByPalletImpl extends AbstractReport {
         ContainerWrapper parent = null;
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
-            String pnumber = a.getPatientVisit().getPatient().getPnumber();
+            String pnumber = a.getPatientVisit().getClinicShipmentPatient()
+                .getPatient().getPnumber();
             String inventoryId = a.getInventoryId();
             String stName = a.getSampleType().getNameShort();
             AliquotWrapper aliquotWrapper = new AliquotWrapper(appService, a);

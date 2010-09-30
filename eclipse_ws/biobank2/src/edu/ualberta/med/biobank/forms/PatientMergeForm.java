@@ -219,8 +219,9 @@ public class PatientMergeForm extends BiobankEntryForm {
         try {
             patient1Adapter.getWrapper().addPatientVisits(
                 patient2.getPatientVisitCollection());
-            patient2
-                .setPatientVisitCollection(new ArrayList<PatientVisitWrapper>());
+            // FIXME: need to make sure this can be removed
+            // patient2Wrapper
+            // .setPatientVisitCollection(new ArrayList<PatientVisitWrapper>());
             List<ClinicShipmentWrapper> shipments =
                 patient2.getShipmentCollection();
             for (ClinicShipmentWrapper shipment : shipments) {

@@ -13,10 +13,12 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.internal.ClinicShipmentPatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.ClinicShipmentPatient;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -27,6 +29,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
+    private static final String PROP_KEY_CSP = "clinicShipmentPatient";
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
@@ -72,25 +75,16 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public PatientWrapper getPatient() {
-        PatientWrapper patient = (PatientWrapper) propertiesMap.get("patient");
-        if (patient != null)
-            return patient;
-        Patient patientRaw = wrappedObject.getPatient();
-        if (patientRaw == null) {
-            return null;
-        }
-        patient = new PatientWrapper(appService, patientRaw);
-        propertiesMap.put("patient", patient);
-        return patient;
+        return getClinicShipmentPatient().getPatient();
     }
 
     public void setPatient(PatientWrapper patient) {
-        propertiesMap.put("patient", patient);
-        Patient oldPatientRaw = wrappedObject.getPatient();
-        Patient newPatientRaw = patient.getWrappedObject();
-        wrappedObject.setPatient(newPatientRaw);
-        propertyChangeSupport.firePropertyChange("patient", oldPatientRaw,
-            newPatientRaw);
+        Patient oldRawPatient =
+            getClinicShipmentPatient().getWrappedObject().getPatient();
+        Patient newRawPatient = patient.getWrappedObject();
+        getClinicShipmentPatient().setPatient(patient);
+        propertyChangeSupport.firePropertyChange("patient", oldRawPatient,
+            newRawPatient);
     }
 
     @SuppressWarnings("unchecked")
@@ -394,6 +388,32 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
+    public void setClinicShipmentPatient(ClinicShipmentPatientWrapper csp) {
+        propertiesMap.put(PROP_KEY_CSP, csp);
+        ClinicShipmentPatient newRawCsp = csp.getWrappedObject();
+        wrappedObject.setClinicShipmentPatient(newRawCsp);
+    }
+
+    public ClinicShipmentPatientWrapper getClinicShipmentPatient() {
+        ClinicShipmentPatientWrapper csp =
+            (ClinicShipmentPatientWrapper) propertiesMap.get(PROP_KEY_CSP);
+        if (csp == null) {
+            ClinicShipmentPatient rawCsp =
+                wrappedObject.getClinicShipmentPatient();
+
+            // TODO: is this okay? I'd like to make sure that this method never
+            // returns null.
+            if (rawCsp == null) {
+                rawCsp = new ClinicShipmentPatient();
+            }
+
+            csp = new ClinicShipmentPatientWrapper(appService, rawCsp);
+
+            propertiesMap.put(PROP_KEY_CSP, csp);
+        }
+        return csp;
+    }
+
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
@@ -401,6 +421,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         checkPatientInShipment();
         // patient to clinic relationship tested by shipment, so no need to
         // test it again here
+        checkClinicShipmentPatient();
     }
 
     private void checkHasShipment() throws BiobankCheckException {
@@ -425,6 +446,40 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
+    private void checkClinicShipmentPatient() throws BiobankCheckException,
+        ApplicationException {
+        ClinicShipmentPatientWrapper csp = getClinicShipmentPatient();
+
+        HQLCriteria criteria =
+            new HQLCriteria("from " + ClinicShipmentPatient.class.getName()
+                + " where clinicShipment.id = ?" + " and patient.id = ?");
+
+        List<Object> params = new ArrayList<Object>();
+        params.add(csp.getShipment().getId());
+        params.add(csp.getPatient().getId());
+        criteria.setParameters(params);
+
+        List<ClinicShipmentPatient> rawCsps = appService.query(criteria);
+
+        if (rawCsps.size() <= 0) {
+            throw new BiobankCheckException("ClinicShipment '"
+                + csp.getShipment() + "' and Patient '" + csp.getPatient()
+                + "' are not associated. They must be for this PatientVisit '"
+                + toString() + "' to be saved.");
+        } else if (rawCsps.size() > 1) {
+            throw new BiobankCheckException(
+                "Ambiguous ClinicShipment to Patient pairing: more than one pairing of ClinicShipment '"
+                    + csp.getShipment()
+                    + "' and Patient '"
+                    + csp.getPatient()
+                    + "' exist. Not sure which pairing to use.");
+        } else {
+            ClinicShipmentPatientWrapper tmp =
+                new ClinicShipmentPatientWrapper(appService, rawCsps.get(0));
+            setClinicShipmentPatient(tmp);
+        }
+    }
+
     @Override
     protected void persistDependencies(PatientVisit origObject)
         throws Exception {
@@ -443,28 +498,16 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public ClinicShipmentWrapper getShipment() {
-        ClinicShipmentWrapper shipment =
-            (ClinicShipmentWrapper) propertiesMap.get("shipment");
-        if (shipment == null) {
-            ClinicShipment s = wrappedObject.getShipment();
-            if (s == null)
-                return null;
-            shipment = new ClinicShipmentWrapper(appService, s);
-            propertiesMap.put("shipment", shipment);
-        }
-        return shipment;
+        return getClinicShipmentPatient().getShipment();
     }
 
-    public void setShipment(ClinicShipmentWrapper s) {
-        propertiesMap.put("shipment", s);
-        ClinicShipment oldShipment = wrappedObject.getShipment();
-        ClinicShipment newShipment = null;
-        if (s != null) {
-            newShipment = s.getWrappedObject();
-        }
-        wrappedObject.setShipment(newShipment);
-        propertyChangeSupport.firePropertyChange("shipment", oldShipment,
-            newShipment);
+    public void setShipment(ClinicShipmentWrapper shipment) {
+        ClinicShipment oldRawShipment =
+            getClinicShipmentPatient().getWrappedObject().getClinicShipment();
+        ClinicShipment newRawShipment = shipment.getWrappedObject();
+        getClinicShipmentPatient().setShipment(shipment);
+        propertyChangeSupport.firePropertyChange("shipment", oldRawShipment,
+            newRawShipment);
     }
 
     @SuppressWarnings("unchecked")

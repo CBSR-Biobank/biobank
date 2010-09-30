@@ -181,7 +181,12 @@ public class ShipmentPatientsWidget extends BiobankWidget {
             return;
         }
         if (canAdd) {
-            shipment.addPatients(Arrays.asList(patient));
+            try {
+                shipment.addPatients(Arrays.asList(patient));
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError("Cannot add patient", e);
+                return;
+            }
             patientTable.setCollection(shipment.getPatientCollection());
             notifyListeners();
             patientsAdded.setValue(true);
@@ -212,12 +217,12 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                     }
                     try {
                         shipment.checkCanRemovePatient(patient);
+                        shipment.removePatients(Arrays.asList(patient));
                     } catch (Exception e) {
                         BioBankPlugin
                             .openAsyncError("Cannot remove patient", e);
                         return;
                     }
-                    shipment.removePatients(Arrays.asList(patient));
                     updateList();
                     notifyListeners();
                 }

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 import java.util.Date;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -22,7 +21,6 @@ public class SendDispatchShipmentDialog extends BiobankDialog {
 
     private static final String TITLE = "Dispatching aliquots";
     private DispatchShipmentWrapper shipment;
-    private ComboViewer shippingMethodComboViewer;
 
     public SendDispatchShipmentDialog(Shell parentShell,
         DispatchShipmentWrapper shipment) {
@@ -53,17 +51,16 @@ public class SendDispatchShipmentDialog extends BiobankDialog {
 
         ShippingMethodWrapper selectedShippingMethod =
             shipment.getShippingMethod();
-        shippingMethodComboViewer =
-            widgetCreator.createComboViewer(contents, "Shipping Method",
-                ShippingMethodWrapper.getShippingMethods(SessionManager
-                    .getAppService()), selectedShippingMethod, null,
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        shipment
-                            .setShippingMethod((ShippingMethodWrapper) selectedObject);
-                    }
-                });
+        widgetCreator.createComboViewer(contents, "Shipping Method",
+            ShippingMethodWrapper.getShippingMethods(SessionManager
+                .getAppService()), selectedShippingMethod, null,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    shipment
+                        .setShippingMethod((ShippingMethodWrapper) selectedObject);
+                }
+            });
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
             "Waybill", null,

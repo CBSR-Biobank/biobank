@@ -229,6 +229,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         return MSG_STORAGE_CONTAINER_OK;
     }
 
+    @Override
     protected void doBeforeSave() throws Exception {
         doSave = true;
         newName = false;

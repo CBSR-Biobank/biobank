@@ -34,8 +34,6 @@ public class SampleStorageDialog extends BiobankDialog {
 
     private ComboViewer sampleTypeComboViewer;
 
-    private ComboViewer activityStatusComboViewer;
-
     private String currentTitle;
 
     private Collection<SampleTypeWrapper> availableSampleTypes;
@@ -116,24 +114,23 @@ public class SampleStorageDialog extends BiobankDialog {
             }
         });
 
-        activityStatusComboViewer =
-            getWidgetCreator().createComboViewer(
-                contents,
-                "Activity Status",
-                ActivityStatusWrapper.getAllActivityStatuses(SessionManager
-                    .getAppService()), sampleStorage.getActivityStatus(),
-                "A sample type should be selected", new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        try {
-                            sampleStorage
-                                .setActivityStatus((ActivityStatusWrapper) selectedObject);
-                        } catch (Exception e) {
-                            BioBankPlugin.openAsyncError(
-                                "Error setting activity status", e);
-                        }
+        getWidgetCreator().createComboViewer(
+            contents,
+            "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(SessionManager
+                .getAppService()), sampleStorage.getActivityStatus(),
+            "A sample type should be selected", new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    try {
+                        sampleStorage
+                            .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                    } catch (Exception e) {
+                        BioBankPlugin.openAsyncError(
+                            "Error setting activity status", e);
                     }
-                });
+                }
+            });
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
             "Volume (ml)", new String[0],
