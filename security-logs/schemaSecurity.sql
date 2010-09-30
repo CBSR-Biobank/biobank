@@ -271,6 +271,7 @@ INSERT INTO `csm_pg_pe` VALUES (707,1,3,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (708,1,25,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (709,1,62,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (710,1,145,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (711,1,146,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -378,6 +379,7 @@ INSERT INTO `csm_protection_element` VALUES (64,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (65,'edu.ualberta.med.biobank.model.DispatchShipment','edu.ualberta.med.biobank.model.DispatchShipment','edu.ualberta.med.biobank.model.DispatchShipment','','','',2,'2010-08-18');
 INSERT INTO `csm_protection_element` VALUES (144,'edu.ualberta.med.biobank.model.DispatchContainer','edu.ualberta.med.biobank.model.DispatchContainer','edu.ualberta.med.biobank.model.DispatchContainer','','','',2,'2010-08-19');
 INSERT INTO `csm_protection_element` VALUES (145,'edu.ualberta.med.biobank.model.DispatchPosition','edu.ualberta.med.biobank.model.DispatchPosition','edu.ualberta.med.biobank.model.DispatchPosition','','','',2,'2010-08-19');
+INSERT INTO `csm_protection_element` VALUES (146,'edu.ualberta.med.biobank.model.ClinicShipmentPatient','edu.ualberta.med.biobank.model.ClinicShipmentPatient','edu.ualberta.med.biobank.model.ClinicShipmentPatient','','','',2,'2010-09-30');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
