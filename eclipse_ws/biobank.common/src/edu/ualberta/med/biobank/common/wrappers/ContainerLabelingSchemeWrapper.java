@@ -141,31 +141,31 @@ public class ContainerLabelingSchemeWrapper extends
                     Integer id = scheme.getId();
                     switch (id.intValue()) {
                     case SCHEME_SBS:
-                        if (scheme.getName().equals("SBS Standard")) {
+                        if (!scheme.getName().equals("SBS Standard")) {
                             throw new ApplicationException("");
                         }
                         break;
 
                     case SCHEME_CBSR_2_CHAR_ALPHA:
-                        if (scheme.getName().equals("CBSR 2 cahr alpabetic")) {
+                        if (!scheme.getName().equals("CBSR 2 char alphabetic")) {
                             throw new ApplicationException("");
                         }
                         break;
 
                     case SCHEME_2_CHAR_NUMERIC:
-                        if (scheme.getName().equals("2 char numeric")) {
+                        if (!scheme.getName().equals("2 char numeric")) {
                             throw new ApplicationException("");
                         }
                         break;
 
                     case SCHEME_DEWAR:
-                        if (scheme.getName().equals("Dewar")) {
+                        if (!scheme.getName().equals("Dewar")) {
                             throw new ApplicationException("");
                         }
                         break;
 
                     case SCHEME_BOX_81:
-                        if (scheme.getName().equals("Box81")) {
+                        if (!scheme.getName().equals("Box81")) {
                             throw new ApplicationException("");
                         }
                         break;

@@ -249,7 +249,7 @@ public class TestAliquot extends TestDatabase {
         aliquot.setPatientVisit(newVisit);
         try {
             aliquot.persist();
-            Assert.fail("visit not from same site that parent");
+            Assert.fail("visit not from same site as parent");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
