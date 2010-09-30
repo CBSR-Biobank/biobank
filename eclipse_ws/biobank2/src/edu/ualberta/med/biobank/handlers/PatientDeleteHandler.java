@@ -5,7 +5,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientDeleteHandler extends AbstractHandler {

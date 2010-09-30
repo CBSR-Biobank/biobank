@@ -34,6 +34,8 @@ import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.SiteGroup;
@@ -47,8 +49,6 @@ import edu.ualberta.med.biobank.treeview.dispatch.ReceivingDispatchShipmentGroup
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchShipmentGroup;
-import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**

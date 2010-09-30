@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 
 import org.junit.Assert;
@@ -14,11 +12,8 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
-import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 
 public class TestContainerLabelingScheme extends TestDatabase {
-
-    private ContainerLabelingSchemeWrapper clsw;
 
     private static final Map<Integer, String> CBSR_ALPHA;
     static {
@@ -86,48 +81,13 @@ public class TestContainerLabelingScheme extends TestDatabase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        clsw = ContainerHelper.newContainerLabelingScheme();
     }
 
     @Test
     public void TestGetAllLabelingSchemes() throws BiobankCheckException,
         Exception {
-        // check after add
-        Collection<ContainerLabelingSchemeWrapper> beforeWraps =
-            ContainerLabelingSchemeWrapper.getAllLabelingSchemesMap(appService)
-                .values();
-        clsw.persist();
-        Collection<ContainerLabelingSchemeWrapper> afterWraps =
-            ContainerLabelingSchemeWrapper.getAllLabelingSchemesMap(appService)
-                .values();
-
-        Iterator<ContainerLabelingSchemeWrapper> b = beforeWraps.iterator();
-        Iterator<ContainerLabelingSchemeWrapper> a = afterWraps.iterator();
-        while (b.hasNext() && a.hasNext()) {
-            Assert.assertTrue(b.next().equals(a.next()));
-        }
-        Assert.assertTrue(!b.hasNext() && a.hasNext());
-        Assert.assertTrue(clsw.equals(a.next()));
-
-        // check after delete
-        clsw.delete();
-        afterWraps =
-            ContainerLabelingSchemeWrapper.getAllLabelingSchemesMap(appService)
-                .values();
-        b = beforeWraps.iterator();
-        a = afterWraps.iterator();
-        while (b.hasNext() && a.hasNext()) {
-            Assert.assertTrue(b.next().equals(a.next()));
-        }
-        Assert.assertTrue(!b.hasNext() && !a.hasNext());
-    }
-
-    @Test
-    public void TestBasicGettersAndSetters() throws BiobankCheckException,
-        Exception {
-        clsw.persist();
-        testGettersAndSetters(clsw);
-        clsw.delete();
+        ContainerLabelingSchemeWrapper.getAllLabelingSchemesMap(appService)
+            .values();
     }
 
     @Test
