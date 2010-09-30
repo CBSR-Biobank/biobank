@@ -21,7 +21,8 @@ public class ReceivingWithErrorsDispatchShipmentGroup extends
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             site.reload();
-            return site.getReceivingWithErrorsDispatchShipmentCollection();
+            // TODO
+            return null; // site.getReceivingWithErrorsDispatchShipmentCollection();
         }
         return new ArrayList<ModelWrapper<?>>();
     }

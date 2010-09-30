@@ -118,7 +118,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private void retrieve() {
         try {
-            patientVisit.reload();
+            if (!patientVisit.isNew()) {
+                patientVisit.reload();
+            }
             patient.reload();
         } catch (Exception e) {
             logger.error("Error while retrieving patient visit "

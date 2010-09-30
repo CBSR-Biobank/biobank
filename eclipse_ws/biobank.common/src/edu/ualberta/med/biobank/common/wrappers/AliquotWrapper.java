@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -15,6 +16,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.DispatchShipmentAliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -547,5 +549,42 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public ContainerWrapper getTop() {
         return objectWithPositionManagement.getTop();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection(
+        boolean sort) {
+        List<DispatchShipmentAliquotWrapper> dsaCollection =
+            (List<DispatchShipmentAliquotWrapper>) propertiesMap
+                .get("dispatchShipmentAliquotCollection");
+        if (dsaCollection == null) {
+            Collection<DispatchShipmentAliquot> children =
+                wrappedObject.getDispatchShipmentAliquotCollection();
+            if (children != null) {
+                dsaCollection = new ArrayList<DispatchShipmentAliquotWrapper>();
+                for (DispatchShipmentAliquot dsa : children) {
+                    dsaCollection.add(new DispatchShipmentAliquotWrapper(
+                        appService, dsa));
+                }
+                propertiesMap.put("dispatchShipmentAliquotCollection",
+                    dsaCollection);
+            }
+        }
+        if ((dsaCollection != null) && sort)
+            Collections.sort(dsaCollection);
+        return dsaCollection;
+    }
+
+    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection() {
+        return getDispatchShipmentAliquotCollection(true);
+    }
+
+    public boolean isInTransit() {
+        for (DispatchShipmentAliquotWrapper dsa : getDispatchShipmentAliquotCollection()) {
+            if (dsa.getShipment().isInTransitState()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

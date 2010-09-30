@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.List;
+
 import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.Dialog;
@@ -17,6 +19,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchShipmentDialog;
@@ -31,7 +34,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(DispatchShipmentViewForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchShipmentViewForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.DispatchShipmentViewForm";
 
     private DispatchShipmentAdapter shipmentAdapter;
 
@@ -57,7 +61,9 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     private DispatchAliquotListInfoTable aliquotsAcceptedTable;
 
-    private DispatchAliquotListInfoTable aliquotsFlaggedTable;
+    private DispatchAliquotListInfoTable aliquotsExtraTable;
+
+    private DispatchAliquotListInfoTable aliquotsMissingTable;
 
     @Override
     protected void init() throws Exception {
@@ -85,6 +91,11 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         retrieveShipment();
         setPartName("Dispatch Shipment sent on " + shipment.getDateShipped());
         setShipmentValues();
+        aliquotsExpectedTable.reloadCollection();
+        if (aliquotsAcceptedTable != null)
+            aliquotsAcceptedTable.reloadCollection();
+        if (aliquotsExtraTable != null)
+            aliquotsExtraTable.reloadCollection();
     }
 
     @Override
@@ -100,8 +111,9 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
         createMainSection();
         createAliquotsNotReceivedSection();
-        createAliquotsAcceptedSection();
-        createAliquotsFlaggedSection();
+        createAliquotsReceivedSection();
+        createAliquotsExtraSection();
+        createAliquotsMissingSection();
         setShipmentValues();
 
         User user = SessionManager.getUser();
@@ -110,39 +122,13 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             createSendButton();
         else if (shipment.canBeReceivedBy(user, currentSite))
             createReceiveButton();
-        else if (shipment.hasFlaggedAliquots() && shipment.isInReceivedState())
-            createErrorButton();
-        else if (shipment.canBeClosedBy(user, currentSite))
-            createCloseButton();
-    }
-
-    private void createErrorButton() {
-        Button sendButton = toolkit.createButton(page, "Flag", SWT.PUSH);
-        sendButton.setToolTipText("This shipment contains flagged aliquot."
-            + " It should be flagged as shipment with errors.");
-        sendButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                shipmentAdapter.doFlag();
-            }
-        });
-    }
-
-    private void createCloseButton() {
-        Button sendButton = toolkit.createButton(page, "Close", SWT.PUSH);
-        sendButton.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                shipmentAdapter.doClose();
-            }
-        });
     }
 
     private void createReceiveButton() {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(2, false));
-        Button sendButton = toolkit
-            .createButton(composite, "Receive", SWT.PUSH);
+        Button sendButton =
+            toolkit.createButton(composite, "Receive", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -150,8 +136,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             }
         });
 
-        Button sendProcessButton = toolkit.createButton(composite,
-            "Receive and Process", SWT.PUSH);
+        Button sendProcessButton =
+            toolkit.createButton(composite, "Receive and Process", SWT.PUSH);
         sendProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -195,34 +181,66 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         if (shipment.isInCreationState()) {
             title = "Aliquots added";
         } else {
-            title = "Aliquots expected";
+            title = "Non processed aliquots";
         }
         Composite parent = createSectionWithClient(title);
-        aliquotsExpectedTable = new DispatchAliquotListInfoTable(parent,
-            shipment, null, false);
+        aliquotsExpectedTable =
+            new DispatchAliquotListInfoTable(parent, shipment, false) {
+                @Override
+                public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
+                    return shipment
+                        .getNonProcessedDispatchShipmentAliquotCollection();
+                }
+            };
         aliquotsExpectedTable.adaptToToolkit(toolkit, true);
         aliquotsExpectedTable
             .addDoubleClickListener(collectionDoubleClickListener);
     }
 
-    private void createAliquotsAcceptedSection() {
+    private void createAliquotsReceivedSection() {
         if (shipment.hasBeenReceived()) {
-            Composite parent = createSectionWithClient("Aliquots accepted");
-            aliquotsAcceptedTable = new DispatchAliquotListInfoTable(parent,
-                shipment, null, false);
+            Composite parent = createSectionWithClient("Aliquots received");
+            aliquotsAcceptedTable =
+                new DispatchAliquotListInfoTable(parent, shipment, false) {
+                    @Override
+                    public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
+                        return shipment.getReceivedDispatchShipmentAliquots();
+                    }
+                };
             aliquotsAcceptedTable.adaptToToolkit(toolkit, true);
             aliquotsAcceptedTable
                 .addDoubleClickListener(collectionDoubleClickListener);
         }
     }
 
-    private void createAliquotsFlaggedSection() {
+    private void createAliquotsExtraSection() {
         if (shipment.hasBeenReceived()) {
-            Composite parent = createSectionWithClient("Aliquots flagged");
-            aliquotsFlaggedTable = new DispatchAliquotListInfoTable(parent,
-                shipment, null, false);
-            aliquotsFlaggedTable.adaptToToolkit(toolkit, true);
-            aliquotsFlaggedTable
+            Composite parent = createSectionWithClient("Extra aliquots");
+            aliquotsExtraTable =
+                new DispatchAliquotListInfoTable(parent, shipment, false) {
+                    @Override
+                    public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
+                        return shipment.getExtraDispatchShipmentAliquots();
+                    }
+                };
+            aliquotsExtraTable.adaptToToolkit(toolkit, true);
+            aliquotsExtraTable
+                .addDoubleClickListener(collectionDoubleClickListener);
+        }
+    }
+
+    private void createAliquotsMissingSection() {
+        if (shipment.hasBeenReceived()) {
+            Composite parent = createSectionWithClient("Missing aliquots");
+            aliquotsMissingTable =
+                new DispatchAliquotListInfoTable(parent, shipment, false) {
+                    @Override
+                    public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
+                        return shipment.getMissingDispatchShipmentAliquots();
+                    }
+                };
+            aliquotsMissingTable.adaptToToolkit(toolkit, true);
+            aliquotsMissingTable
                 .addDoubleClickListener(collectionDoubleClickListener);
         }
     }
@@ -237,22 +255,22 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
-        receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Receiver");
+        receiverLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Receiver");
         if (!shipment.isInCreationState()) {
-            dateShippedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Date Shipped");
-            shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Shipping Method");
-            waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Waybill");
+            dateShippedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE, "Date Shipped");
+            shippingMethodLabel =
+                createReadOnlyLabelledField(client, SWT.NONE, "Shipping Method");
+            waybillLabel =
+                createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
         }
         if (shipment.hasBeenReceived()) {
-            dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Date received");
+            dateReceivedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE, "Date received");
         }
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+        commentLabel =
+            createReadOnlyLabelledField(client, SWT.MULTI, "Comments");
     }
 
     private void setShipmentValues() {
@@ -270,14 +288,6 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         if (dateReceivedLabel != null)
             setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
         setTextValue(commentLabel, shipment.getComment());
-        aliquotsExpectedTable
-            .reloadCollection(shipment.getDispatchedAliquots());
-        if (aliquotsAcceptedTable != null)
-            aliquotsAcceptedTable
-                .reloadCollection(shipment.getActiveAliquots());
-        if (aliquotsFlaggedTable != null)
-            aliquotsFlaggedTable
-                .reloadCollection(shipment.getFlaggedAliquots());
     }
 
 }

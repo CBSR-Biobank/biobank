@@ -42,8 +42,8 @@ public class DispatchShipmentAdapter extends AdapterBase {
     public boolean isEditable() {
         boolean editable = super.isEditable();
         if (getWrapper() != null) {
-            SiteWrapper currentSite = SessionManager.getInstance()
-                .getCurrentSite();
+            SiteWrapper currentSite =
+                SessionManager.getInstance().getCurrentSite();
             return editable
                 && (getWrapper().isNew() || currentSite == null || !(currentSite
                     .equals(getWrapper().getReceiver()) && getWrapper()
@@ -124,42 +124,6 @@ public class DispatchShipmentAdapter extends AdapterBase {
             BioBankPlugin.openAsyncError("Save error", ex);
         }
         DispatchShipmentAdministrationView.getCurrent().reload();
-    }
-
-    public void doClose() {
-        // if was in error, will be in close/error state
-        // if was received, will be in close state
-        getWrapper().setNextState();
-        try {
-            getWrapper().persist();
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage(exp);
-        } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage(exp);
-        } catch (final AccessDeniedException ade) {
-            BioBankPlugin.openAccessDeniedErrorMessage(ade);
-        } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Save error", ex);
-        }
-        DispatchShipmentAdministrationView.getCurrent().reload();
-        openViewForm();
-    }
-
-    public void doFlag() {
-        getWrapper().setInErrorState();
-        try {
-            getWrapper().persist();
-        } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage(exp);
-        } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage(exp);
-        } catch (final AccessDeniedException ade) {
-            BioBankPlugin.openAccessDeniedErrorMessage(ade);
-        } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Save error", ex);
-        }
-        DispatchShipmentAdministrationView.getCurrent().reload();
-        openViewForm();
     }
 
     @Override
