@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -37,6 +38,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
     private ComboViewer sampleTypeComboViewer;
 
     private BiobankText volume;
+
+    private BiobankText siteLabel;
 
     @Override
     protected void init() throws Exception {
@@ -86,6 +89,13 @@ public class AliquotEntryForm extends BiobankEntryForm {
                 }
             }
         }
+
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
+        ContainerWrapper c = aliquot.getParent();
+        if (c == null)
+            setTextValue(siteLabel, "Unassigned");
+        else
+            setTextValue(siteLabel, c.getSite().getNameShort());
 
         sampleTypeComboViewer = createComboViewerWithNoSelectionValidator(
             client, "Type", sampleTypes, aliquot.getSampleType(),
