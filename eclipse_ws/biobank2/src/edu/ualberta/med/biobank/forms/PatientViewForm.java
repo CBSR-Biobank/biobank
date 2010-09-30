@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.PatientViewForm";
 
     private PatientAdapter patientAdapter;
 
@@ -68,17 +69,18 @@ public class PatientViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
-        visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Visits");
-        sampleCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Samples");
+        visitCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Total Visits");
+        sampleCountLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Total Samples");
     }
 
     private void createPatientVisitSection() {
         Section section = createSection("Patient Visits");
 
-        visitsTable = new PatientVisitInfoTable(section,
-            patient.getPatientVisitCollection());
+        visitsTable =
+            new PatientVisitInfoTable(section,
+                patient.getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
         visitsTable.addDoubleClickListener(collectionDoubleClickListener);
@@ -86,8 +88,9 @@ public class PatientViewForm extends BiobankViewForm {
 
     private void setValues() throws BiobankCheckException, ApplicationException {
         setTextValue(studyLabel, patient.getStudy().getName());
-        setTextValue(visitCountLabel, patient.getPatientVisitCollection()
-            .size());
+        setTextValue(visitCountLabel,
+            (patient.getPatientVisitCollection() == null) ? 0 : patient
+                .getPatientVisitCollection().size());
         setTextValue(sampleCountLabel, patient.getAliquotsCount(true));
     }
 

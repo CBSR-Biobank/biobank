@@ -43,7 +43,7 @@ public class TopContainerListWidget extends BiobankWidget {
     private Boolean enabled;
 
     public TopContainerListWidget(Composite parent, int style) {
-        super(parent, SWT.BORDER);
+        super(parent, style);
         setLayout(new GridLayout(2, false));
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
@@ -55,7 +55,7 @@ public class TopContainerListWidget extends BiobankWidget {
         Label l = new Label(this, SWT.NONE);
         l.setText("Site:");
         final BiobankApplicationService appService =
-            (BiobankApplicationService) SessionManager.getAppService();
+            SessionManager.getAppService();
         siteCombo = new ComboViewer(this, SWT.NONE);
         siteCombo.setLabelProvider(new BiobankLabelProvider() {
             @Override
