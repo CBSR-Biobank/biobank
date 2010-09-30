@@ -581,7 +581,7 @@ public abstract class AdapterBase {
     }
 
     public static IEditorPart openForm(FormInput input, String id) {
-        return openForm(input, id, false);
+        return openForm(input, id, true);
     }
 
     public static IEditorPart openForm(FormInput input, String id,
@@ -708,7 +708,7 @@ public abstract class AdapterBase {
     }
 
     public boolean isEditable() {
-        return editable && modelObject.canEdit(SessionManager.getUser());
+        return editable && modelObject.canUpdate(SessionManager.getUser());
     }
 
     public void setEditable(boolean editable) {

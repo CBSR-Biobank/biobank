@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.select;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -7,10 +7,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -21,9 +17,11 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
@@ -35,7 +33,8 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
     private List<SiteWrapper> currentAllSitesForStudy;
 
-    private Map<Integer, StudySites> studiesDispatchRelations = new HashMap<Integer, SelectStudyDispatchSitesDialog.StudySites>();
+    private Map<Integer, StudySites> studiesDispatchRelations =
+        new HashMap<Integer, SelectStudyDispatchSitesDialog.StudySites>();
 
     private StudyWrapper currentStudy;
 
@@ -56,21 +55,18 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        final ComboViewer studyCombo = getWidgetCreator()
-            .createComboViewerWithNoSelectionValidator(contents,
-                "Choose a study", srcSite.getStudyCollection(), null, null);
+        getWidgetCreator().createComboViewer(contents, "Choose a study",
+            srcSite.getStudyCollection(), null, null,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    setSitesSelection((StudyWrapper) selectedObject);
+                }
+            });
 
-        studyCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                StudyWrapper study = (StudyWrapper) ((IStructuredSelection) studyCombo
-                    .getSelection()).getFirstElement();
-                setSitesSelection(study);
-            }
-        });
-
-        siteMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
-            "Selected Destination Sites", "Available Sites", 100);
+        siteMultiSelect =
+            new MultiSelectWidget(parent, SWT.NONE,
+                "Selected Destination Sites", "Available Sites", 100);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         siteMultiSelect.setLayoutData(gd);
@@ -79,19 +75,20 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
                     List<SiteWrapper> addedSites = new ArrayList<SiteWrapper>();
-                    List<SiteWrapper> removedSites = new ArrayList<SiteWrapper>();
-                    List<Integer> addedSitesIds = siteMultiSelect
-                        .getAddedToSelection();
-                    List<Integer> removedSitesIds = siteMultiSelect
-                        .getRemovedToSelection();
+                    List<SiteWrapper> removedSites =
+                        new ArrayList<SiteWrapper>();
+                    List<Integer> addedSitesIds =
+                        siteMultiSelect.getAddedToSelection();
+                    List<Integer> removedSitesIds =
+                        siteMultiSelect.getRemovedToSelection();
                     for (SiteWrapper site : currentAllSitesForStudy) {
                         if (addedSitesIds.contains(site.getId()))
                             addedSites.add(site);
                         if (removedSitesIds.contains(site.getId()))
                             removedSites.add(site);
                     }
-                    StudySites ss = studiesDispatchRelations.get(currentStudy
-                        .getId());
+                    StudySites ss =
+                        studiesDispatchRelations.get(currentStudy.getId());
                     ss.addedSites.addAll(addedSites);
                     ss.removedSites.removeAll(removedSites);
                     ss.removedSites.addAll(removedSites);
@@ -110,9 +107,10 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
         }
 
         try {
-            Collection<SiteWrapper> currentDestSites = srcSite
-                .getStudyDispachSites(study);
-            LinkedHashMap<Integer, String> availableSites = new LinkedHashMap<Integer, String>();
+            Collection<SiteWrapper> currentDestSites =
+                srcSite.getStudyDispachSites(study);
+            LinkedHashMap<Integer, String> availableSites =
+                new LinkedHashMap<Integer, String>();
             List<Integer> selectedSites = new ArrayList<Integer>();
             if (currentDestSites != null) {
                 for (SiteWrapper site : currentDestSites) {
@@ -122,8 +120,8 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
             for (SiteWrapper site : ss.addedSites) {
                 selectedSites.add(site.getId());
             }
-            currentAllSitesForStudy = new ArrayList<SiteWrapper>(
-                study.getSiteCollection());
+            currentAllSitesForStudy =
+                new ArrayList<SiteWrapper>(study.getSiteCollection());
             currentAllSitesForStudy.remove(srcSite);
             for (SiteWrapper site : currentAllSitesForStudy) {
                 availableSites.put(site.getId(), site.getNameShort());

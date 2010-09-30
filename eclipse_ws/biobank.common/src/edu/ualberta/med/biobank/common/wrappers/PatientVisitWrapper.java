@@ -13,10 +13,12 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.internal.ClinicShipmentPatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.ClinicShipmentPatient;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -27,12 +29,14 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
+    private static final String PROP_KEY_CSP = "clinicShipmentPatient";
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
     private Map<String, PvAttrWrapper> pvAttrMap;
 
-    private Set<PvSourceVesselWrapper> deletedPvSourceVessels = new HashSet<PvSourceVesselWrapper>();
+    private Set<PvSourceVesselWrapper> deletedPvSourceVessels =
+        new HashSet<PvSourceVesselWrapper>();
 
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
@@ -71,31 +75,22 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public PatientWrapper getPatient() {
-        PatientWrapper patient = (PatientWrapper) propertiesMap.get("patient");
-        if (patient != null)
-            return patient;
-        Patient patientRaw = wrappedObject.getPatient();
-        if (patientRaw == null) {
-            return null;
-        }
-        patient = new PatientWrapper(appService, patientRaw);
-        propertiesMap.put("patient", patient);
-        return patient;
+        return getClinicShipmentPatient().getPatient();
     }
 
     public void setPatient(PatientWrapper patient) {
-        propertiesMap.put("patient", patient);
-        Patient oldPatientRaw = wrappedObject.getPatient();
-        Patient newPatientRaw = patient.getWrappedObject();
-        wrappedObject.setPatient(newPatientRaw);
-        propertyChangeSupport.firePropertyChange("patient", oldPatientRaw,
-            newPatientRaw);
+        Patient oldRawPatient =
+            getClinicShipmentPatient().getWrappedObject().getPatient();
+        Patient newRawPatient = patient.getWrappedObject();
+        getClinicShipmentPatient().setPatient(patient);
+        propertyChangeSupport.firePropertyChange("patient", oldRawPatient,
+            newRawPatient);
     }
 
     @SuppressWarnings("unchecked")
     public List<AliquotWrapper> getAliquotCollection() {
-        List<AliquotWrapper> aliquotCollection = (List<AliquotWrapper>) propertiesMap
-            .get("aliquotCollection");
+        List<AliquotWrapper> aliquotCollection =
+            (List<AliquotWrapper>) propertiesMap.get("aliquotCollection");
         if (aliquotCollection == null) {
             Collection<Aliquot> children = wrappedObject.getAliquotCollection();
             if (children != null) {
@@ -118,15 +113,16 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public void addAliquots(List<AliquotWrapper> aliquots)
         throws BiobankCheckException {
         if (aliquots != null && aliquots.size() > 0) {
-            List<SampleStorageWrapper> sampleStorages = getPatient().getStudy()
-                .getSampleStorageCollection();
+            List<SampleStorageWrapper> sampleStorages =
+                getPatient().getStudy().getSampleStorageCollection();
             if (sampleStorages == null || sampleStorages.size() == 0) {
                 throw new BiobankCheckException(
                     "Can only add aliquots in a visit which study has sample storages");
             }
 
             Collection<Aliquot> allAliquotObjects = new HashSet<Aliquot>();
-            List<AliquotWrapper> allAliquotWrappers = new ArrayList<AliquotWrapper>();
+            List<AliquotWrapper> allAliquotWrappers =
+                new ArrayList<AliquotWrapper>();
             // already added
             List<AliquotWrapper> currentList = getAliquotCollection();
             if (currentList != null) {
@@ -149,8 +145,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 allAliquotObjects.add(aliquot.getWrappedObject());
                 allAliquotWrappers.add(aliquot);
             }
-            Collection<Aliquot> oldCollection = wrappedObject
-                .getAliquotCollection();
+            Collection<Aliquot> oldCollection =
+                wrappedObject.getAliquotCollection();
             wrappedObject.setAliquotCollection(allAliquotObjects);
             propertyChangeSupport.firePropertyChange("aliquotCollection",
                 oldCollection, allAliquotObjects);
@@ -160,8 +156,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @SuppressWarnings("unchecked")
     private List<PvAttrWrapper> getPvAttrCollection() {
-        List<PvAttrWrapper> pvAttrCollection = (List<PvAttrWrapper>) propertiesMap
-            .get("pvAttrCollection");
+        List<PvAttrWrapper> pvAttrCollection =
+            (List<PvAttrWrapper>) propertiesMap.get("pvAttrCollection");
         if (pvAttrCollection == null) {
             Collection<PvAttr> children = wrappedObject.getPvAttrCollection();
             if (children != null) {
@@ -201,8 +197,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
         if (getPatient() != null && getPatient().getStudy() != null) {
-            Collection<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
-                .getStudy().getStudyPvAttrCollection();
+            Collection<StudyPvAttrWrapper> studyPvAttrCollection =
+                getPatient().getStudy().getStudyPvAttrCollection();
             if (studyPvAttrCollection != null) {
                 for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
                     studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
@@ -333,8 +329,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                     || type.equals("select_multiple")) {
                     String permissible = studyPvAttr.getPermissible();
                     if (permissible != null) {
-                        permissibleSplit = Arrays
-                            .asList(permissible.split(";"));
+                        permissibleSplit =
+                            Arrays.asList(permissible.split(";"));
                     }
                 }
 
@@ -392,6 +388,32 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             .firePropertyChange("comment", oldComment, comment);
     }
 
+    public void setClinicShipmentPatient(ClinicShipmentPatientWrapper csp) {
+        propertiesMap.put(PROP_KEY_CSP, csp);
+        ClinicShipmentPatient newRawCsp = csp.getWrappedObject();
+        wrappedObject.setClinicShipmentPatient(newRawCsp);
+    }
+
+    public ClinicShipmentPatientWrapper getClinicShipmentPatient() {
+        ClinicShipmentPatientWrapper csp =
+            (ClinicShipmentPatientWrapper) propertiesMap.get(PROP_KEY_CSP);
+        if (csp == null) {
+            ClinicShipmentPatient rawCsp =
+                wrappedObject.getClinicShipmentPatient();
+
+            // TODO: is this okay? I'd like to make sure that this method never
+            // returns null.
+            if (rawCsp == null) {
+                rawCsp = new ClinicShipmentPatient();
+            }
+
+            csp = new ClinicShipmentPatientWrapper(appService, rawCsp);
+
+            propertiesMap.put(PROP_KEY_CSP, csp);
+        }
+        return csp;
+    }
+
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
@@ -399,6 +421,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         checkPatientInShipment();
         // patient to clinic relationship tested by shipment, so no need to
         // test it again here
+        checkClinicShipmentPatient();
     }
 
     private void checkHasShipment() throws BiobankCheckException {
@@ -423,6 +446,40 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
+    private void checkClinicShipmentPatient() throws BiobankCheckException,
+        ApplicationException {
+        ClinicShipmentPatientWrapper csp = getClinicShipmentPatient();
+
+        HQLCriteria criteria =
+            new HQLCriteria("from " + ClinicShipmentPatient.class.getName()
+                + " where clinicShipment.id = ?" + " and patient.id = ?");
+
+        List<Object> params = new ArrayList<Object>();
+        params.add(csp.getShipment().getId());
+        params.add(csp.getPatient().getId());
+        criteria.setParameters(params);
+
+        List<ClinicShipmentPatient> rawCsps = appService.query(criteria);
+
+        if (rawCsps.size() <= 0) {
+            throw new BiobankCheckException("ClinicShipment '"
+                + csp.getShipment() + "' and Patient '" + csp.getPatient()
+                + "' are not associated. They must be for this PatientVisit '"
+                + toString() + "' to be saved.");
+        } else if (rawCsps.size() > 1) {
+            throw new BiobankCheckException(
+                "Ambiguous ClinicShipment to Patient pairing: more than one pairing of ClinicShipment '"
+                    + csp.getShipment()
+                    + "' and Patient '"
+                    + csp.getPatient()
+                    + "' exist. Not sure which pairing to use.");
+        } else {
+            ClinicShipmentPatientWrapper tmp =
+                new ClinicShipmentPatientWrapper(appService, rawCsps.get(0));
+            setClinicShipmentPatient(tmp);
+        }
+    }
+
     @Override
     protected void persistDependencies(PatientVisit origObject)
         throws Exception {
@@ -441,36 +498,29 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public ClinicShipmentWrapper getShipment() {
-        ClinicShipmentWrapper shipment = (ClinicShipmentWrapper) propertiesMap
-            .get("shipment");
-        if (shipment == null) {
-            ClinicShipment s = wrappedObject.getShipment();
-            if (s == null)
-                return null;
-            shipment = new ClinicShipmentWrapper(appService, s);
-            propertiesMap.put("shipment", shipment);
-        }
-        return shipment;
+        return getClinicShipmentPatient().getShipment();
     }
 
-    public void setShipment(ClinicShipmentWrapper s) {
-        propertiesMap.put("shipment", s);
-        ClinicShipment oldShipment = wrappedObject.getShipment();
-        ClinicShipment newShipment = s.getWrappedObject();
-        wrappedObject.setShipment(newShipment);
-        propertyChangeSupport.firePropertyChange("shipment", oldShipment,
-            newShipment);
+    public void setShipment(ClinicShipmentWrapper shipment) {
+        ClinicShipment oldRawShipment =
+            getClinicShipmentPatient().getWrappedObject().getClinicShipment();
+        ClinicShipment newRawShipment = shipment.getWrappedObject();
+        getClinicShipmentPatient().setShipment(shipment);
+        propertyChangeSupport.firePropertyChange("shipment", oldRawShipment,
+            newRawShipment);
     }
 
     @SuppressWarnings("unchecked")
     public List<PvSourceVesselWrapper> getPvSourceVesselCollection(boolean sort) {
-        List<PvSourceVesselWrapper> pvSourceVesselCollection = (List<PvSourceVesselWrapper>) propertiesMap
-            .get("pvSourceVesselCollection");
+        List<PvSourceVesselWrapper> pvSourceVesselCollection =
+            (List<PvSourceVesselWrapper>) propertiesMap
+                .get("pvSourceVesselCollection");
         if (pvSourceVesselCollection == null) {
-            Collection<PvSourceVessel> children = wrappedObject
-                .getPvSourceVesselCollection();
+            Collection<PvSourceVessel> children =
+                wrappedObject.getPvSourceVesselCollection();
             if (children != null) {
-                pvSourceVesselCollection = new ArrayList<PvSourceVesselWrapper>();
+                pvSourceVesselCollection =
+                    new ArrayList<PvSourceVesselWrapper>();
                 for (PvSourceVessel pvSourceVessel : children) {
                     pvSourceVesselCollection.add(new PvSourceVesselWrapper(
                         appService, pvSourceVessel));
@@ -491,10 +541,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public void addPvSourceVessels(
         Collection<PvSourceVesselWrapper> newPvSourceVessels) {
         if (newPvSourceVessels != null && newPvSourceVessels.size() > 0) {
-            Collection<PvSourceVessel> allPvObjects = new HashSet<PvSourceVessel>();
-            List<PvSourceVesselWrapper> allPvWrappers = new ArrayList<PvSourceVesselWrapper>();
+            Collection<PvSourceVessel> allPvObjects =
+                new HashSet<PvSourceVessel>();
+            List<PvSourceVesselWrapper> allPvWrappers =
+                new ArrayList<PvSourceVesselWrapper>();
             // already added
-            List<PvSourceVesselWrapper> currentList = getPvSourceVesselCollection();
+            List<PvSourceVesselWrapper> currentList =
+                getPvSourceVesselCollection();
             if (currentList != null) {
                 for (PvSourceVesselWrapper pvss : currentList) {
                     allPvObjects.add(pvss.getWrappedObject());
@@ -512,8 +565,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     private void setPvSamplSources(Collection<PvSourceVessel> allPvObjects,
         List<PvSourceVesselWrapper> allPvWrappers) {
-        Collection<PvSourceVessel> oldCollection = wrappedObject
-            .getPvSourceVesselCollection();
+        Collection<PvSourceVessel> oldCollection =
+            wrappedObject.getPvSourceVesselCollection();
         wrappedObject.setPvSourceVesselCollection(allPvObjects);
         propertyChangeSupport.firePropertyChange("pvSourceVesselCollection",
             oldCollection, allPvObjects);
@@ -525,10 +578,13 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         if (pvSourceVesselsToRemove != null
             && pvSourceVesselsToRemove.size() > 0) {
             deletedPvSourceVessels.addAll(pvSourceVesselsToRemove);
-            Collection<PvSourceVessel> allPvObjects = new HashSet<PvSourceVessel>();
-            List<PvSourceVesselWrapper> allPvWrappers = new ArrayList<PvSourceVesselWrapper>();
+            Collection<PvSourceVessel> allPvObjects =
+                new HashSet<PvSourceVessel>();
+            List<PvSourceVesselWrapper> allPvWrappers =
+                new ArrayList<PvSourceVesselWrapper>();
             // already added
-            List<PvSourceVesselWrapper> currentList = getPvSourceVesselCollection();
+            List<PvSourceVesselWrapper> currentList =
+                getPvSourceVesselCollection();
             if (currentList != null) {
                 for (PvSourceVesselWrapper pvss : currentList) {
                     if (!deletedPvSourceVessels.contains(pvss)) {
@@ -559,10 +615,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public long getAliquotsCount(boolean fast) throws BiobankCheckException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(
-                "select count(aliquot) from " + Aliquot.class.getName()
+            HQLCriteria criteria =
+                new HQLCriteria("select count(aliquot) from "
+                    + Aliquot.class.getName()
                     + " as aliquot where aliquot.patientVisit.id = ?",
-                Arrays.asList(new Object[] { getId() }));
+                    Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
                 throw new BiobankCheckException(
@@ -631,10 +688,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public static List<PatientVisitWrapper> getPatientVisitsWithWorksheet(
         WritableApplicationService appService, String searchString)
         throws Exception {
-        HQLCriteria c = new HQLCriteria("select pva.patientVisit from "
-            + PvAttr.class.getName()
-            + " pva where pva.studyPvAttr.label ='Worksheet' and pva.value ='"
-            + searchString + "'");
+        HQLCriteria c =
+            new HQLCriteria(
+                "select pva.patientVisit from "
+                    + PvAttr.class.getName()
+                    + " pva where pva.studyPvAttr.label ='Worksheet' and pva.value ='"
+                    + searchString + "'");
         List<PatientVisit> pvs = appService.query(c);
         List<PatientVisitWrapper> pvws = new ArrayList<PatientVisitWrapper>();
         for (PatientVisit pv : pvs)

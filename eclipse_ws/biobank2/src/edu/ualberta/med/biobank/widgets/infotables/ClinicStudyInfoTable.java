@@ -44,7 +44,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item =
+                    (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return "loading...";

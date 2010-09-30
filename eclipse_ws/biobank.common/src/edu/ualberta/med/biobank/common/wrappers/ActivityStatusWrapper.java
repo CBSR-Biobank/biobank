@@ -215,14 +215,19 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return name != null && name.equals(DISPATCHED_STATUS_STRING);
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
-
     public boolean isClosed() {
         String name = getName();
         return name != null && name.equals(CLOSED_STATUS_STRING);
+    }
+
+    public boolean isFlagged() {
+        String name = getName();
+        return name != null && name.equals(FLAGGED_STATUS_STRING);
+    }
+
+    @Override
+    public String toString() {
+        return getName();
     }
 
 }

@@ -866,7 +866,7 @@ public class TestSite extends TestDatabase {
         srcSite.persist();
         srcSite.reload();
 
-        List<StudyWrapper> siteDispatchStudies = srcSite.getDispatchStudies();
+        List<StudyWrapper> siteDispatchStudies = srcSite.getDispatchStudiesAsSender();
         Assert.assertNotNull(siteDispatchStudies);
         Assert.assertEquals(studies.size(), siteDispatchStudies.size());
         Assert.assertTrue(siteDispatchStudies.containsAll(studies));
@@ -877,7 +877,7 @@ public class TestSite extends TestDatabase {
         }
         srcSite.persist();
         srcSite.reload();
-        siteDispatchStudies = srcSite.getDispatchStudies();
+        siteDispatchStudies = srcSite.getDispatchStudiesAsSender();
         Assert.assertNotNull(siteDispatchStudies);
         Assert.assertEquals(0, siteDispatchStudies.size());
 
@@ -894,7 +894,7 @@ public class TestSite extends TestDatabase {
 
             srcSite.persist();
             srcSite.reload();
-            siteDispatchStudies = srcSite.getDispatchStudies();
+            siteDispatchStudies = srcSite.getDispatchStudiesAsSender();
             Assert.assertNotNull(siteDispatchStudies);
             Assert.assertEquals(studies.size() - count,
                 siteDispatchStudies.size());

@@ -33,6 +33,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
@@ -1647,6 +1648,30 @@ public class TestContainer extends TestDatabase {
         child.reload();
         Assert.assertEquals(top, child.getParent());
         Assert.assertEquals(newLabel, child.getLabel());
+    }
+
+    @Test
+    public void testMoveSameContainer2() throws Exception {
+        ContainerWrapper top = addContainerHierarchy(containerMap.get("Top"));
+        ContainerWrapper child = containerMap.get("ChildL1"); // 01AA
+
+        ContainerHelper.addContainer("02", TestCommon.getNewBarcode(r), null,
+            site, containerTypeMap.get("TopCT"));
+
+        top.addChild(2, 3, child);
+        child.persist();
+
+        // Use model object to be sure the DB is up-to-date
+        Container container = new Container();
+        container.setId(child.getId());
+        List<Container> containersDB =
+            appService.search(Container.class, container);
+        Assert.assertEquals(1, containersDB.size());
+        container = containersDB.get(0);
+        ContainerPosition pos = container.getPosition();
+        Assert.assertEquals(top.getId(), pos.getParentContainer().getId());
+        Assert.assertEquals(2, pos.getRow().intValue());
+        Assert.assertEquals(3, pos.getCol().intValue());
     }
 
     /**

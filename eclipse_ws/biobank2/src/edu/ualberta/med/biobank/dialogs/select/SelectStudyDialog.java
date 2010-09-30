@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.select;
 
 import java.util.List;
 
@@ -11,24 +11,25 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.widgets.infotables.StudyContactEntryInfoTable;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 
-public class SelectClinicContactDialog extends BiobankDialog {
+public class SelectStudyDialog extends BiobankDialog {
 
     public static final int ADD_BTN_ID = 100;
 
-    private static final String TITLE = "Clinic Contacts";
+    private static final String TITLE = "Associated Studies";
 
-    private StudyContactEntryInfoTable contactInfoTable;
+    private StudyInfoTable studyInfoTable;
 
-    private ContactWrapper selectedContact;
+    private StudyWrapper selectedStudy;
 
-    private List<ContactWrapper> contacts;
+    private List<StudyWrapper> studies;
 
-    public SelectClinicContactDialog(Shell parent, List<ContactWrapper> contacts) {
+    public SelectStudyDialog(Shell parent, List<StudyWrapper> studies) {
         super(parent);
-        this.contacts = contacts;
+        this.studies = studies;
     }
 
     @Override
@@ -38,12 +39,12 @@ public class SelectClinicContactDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select a contact to add to this study";
+        return "Select a study";
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return "Add a clinic contact to study";
+        return "Add a study to this site";
     }
 
     @Override
@@ -52,27 +53,27 @@ public class SelectClinicContactDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        contactInfoTable = new StudyContactEntryInfoTable(contents, null);
-        contactInfoTable.addSelectionListener(new SelectionAdapter() {
+        studyInfoTable = new StudyInfoTable(contents, null);
+        studyInfoTable.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (contactInfoTable.getSelection() != null)
-                    SelectClinicContactDialog.this.getButton(
-                        IDialogConstants.OK_ID).setEnabled(true);
+                if (studyInfoTable.getSelection() != null)
+                    SelectStudyDialog.this.getButton(IDialogConstants.OK_ID)
+                        .setEnabled(true);
             }
         });
-        contactInfoTable.setCollection(contacts);
-        contactInfoTable.setEnabled(true);
+        studyInfoTable.setCollection(studies);
+        studyInfoTable.setEnabled(true);
     }
 
     @Override
     protected void okPressed() {
-        selectedContact = contactInfoTable.getSelection();
+        selectedStudy = studyInfoTable.getSelection();
         super.okPressed();
     }
 
-    public ContactWrapper getSelection() {
-        return selectedContact;
+    public StudyWrapper getSelection() {
+        return selectedStudy;
     }
 
     @Override
@@ -80,5 +81,4 @@ public class SelectClinicContactDialog extends BiobankDialog {
         super.createButtonsForButtonBar(parent);
         getButton(IDialogConstants.OK_ID).setEnabled(false);
     }
-
 }

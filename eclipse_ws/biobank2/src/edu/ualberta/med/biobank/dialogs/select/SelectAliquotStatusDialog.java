@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.select;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,15 +12,16 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 
-public class AliquotStatusDialog extends BiobankDialog {
+public class SelectAliquotStatusDialog extends BiobankDialog {
 
     private AliquotWrapper aliquot;
     private ActivityStatusWrapper activityStatus;
 
     private Map<ActivityStatusWrapper, Button> buttons;
 
-    public AliquotStatusDialog(Shell parentShell, AliquotWrapper aliquot) {
+    public SelectAliquotStatusDialog(Shell parentShell, AliquotWrapper aliquot) {
         super(parentShell);
         this.aliquot = aliquot;
         activityStatus = aliquot.getActivityStatus();

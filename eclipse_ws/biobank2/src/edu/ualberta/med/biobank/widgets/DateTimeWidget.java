@@ -9,6 +9,7 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -115,5 +116,9 @@ public class DateTimeWidget extends BiobankWidget {
         if (dateEntry != null) {
             dateEntry.setEnabled(enabled);
         }
+    }
+
+    public void addSelectionListener(SelectionListener listener) {
+        dateEntry.addSelectionListener(listener);
     }
 }

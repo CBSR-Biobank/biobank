@@ -39,7 +39,7 @@ public abstract class BiobankDialog extends TitleAreaDialog {
 
     protected boolean setupFinished = false;
 
-    protected BiobankDialog(Shell parentShell) {
+    public BiobankDialog(Shell parentShell) {
         super(parentShell);
         widgetCreator = new WidgetCreator(null);
         widgetCreator.initDataBinding();

@@ -13,9 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -52,6 +50,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -293,33 +292,26 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private void createPalletTypesViewer(Composite parent) throws Exception {
         palletContainerTypes = getPalletContainerTypes();
         palletTypesViewer =
-            createComboViewerWithNoSelectionValidator(
+            createComboViewer(
                 parent,
                 Messages.getString("ScanAssign.palletType.label"), //$NON-NLS-1$
                 palletContainerTypes, null,
-                Messages.getString("ScanAssign.palletType.validationMsg")); //$NON-NLS-1$
-        palletTypesViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
-                @Override
-                public void selectionChanged(SelectionChangedEvent event) {
-                    if (!modificationMode) {
-                        ContainerTypeWrapper oldContainerType =
-                            currentPalletWrapper.getContainerType();
-                        IStructuredSelection selection =
-                            (IStructuredSelection) palletTypesViewer
-                                .getSelection();
-                        if (selection.size() > 0) {
+                Messages.getString("ScanAssign.palletType.validationMsg"),
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        if (!modificationMode) {
+                            ContainerTypeWrapper oldContainerType =
+                                currentPalletWrapper.getContainerType();
                             currentPalletWrapper
-                                .setContainerType((ContainerTypeWrapper) selection
-                                    .getFirstElement());
+                                .setContainerType((ContainerTypeWrapper) selectedObject);
                             if (oldContainerType != null) {
                                 validateValues();
                             }
                             palletTypesViewer.getCombo().setFocus();
                         }
                     }
-                }
-            });
+                }); //$NON-NLS-1$
         if (palletContainerTypes.size() == 1) {
             currentPalletWrapper.setContainerType(palletContainerTypes.get(0));
             palletTypesViewer.setSelection(new StructuredSelection(
@@ -662,8 +654,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             updateCellAsMissing(positionString, scanCell, expectedAliquot);
         } else {
             List<AliquotWrapper> aliquots =
-                AliquotWrapper.getAliquotsInSite(appService, value,
-                    SessionManager.getInstance().getCurrentSite());
+                AliquotWrapper.getAliquots(appService, value);
             if (aliquots.size() == 0) {
                 updateCellAsNotLinked(positionString, scanCell);
             } else if (aliquots.size() == 1) {

@@ -5,7 +5,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.dialogs.SelectStudyDispatchSitesDialog;
+import edu.ualberta.med.biobank.dialogs.select.SelectStudyDispatchSitesDialog;
 import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable;
 
 /**

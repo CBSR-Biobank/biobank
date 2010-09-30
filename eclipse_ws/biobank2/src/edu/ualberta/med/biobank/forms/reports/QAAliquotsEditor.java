@@ -22,7 +22,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class QAAliquotsEditor extends ReportsEditor {
 
-    public static String ID = "edu.ualberta.med.biobank.editors.QAAliquotsEditor";
+    public static String ID =
+        "edu.ualberta.med.biobank.editors.QAAliquotsEditor";
 
     DateTimeWidget start;
     DateTimeWidget end;
@@ -37,10 +38,12 @@ public class QAAliquotsEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
-        start = widgetCreator.createDateTimeWidget(parent,
-            "Start Date (Linked)", null, null, null, SWT.DATE);
-        end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
-            null, null, null, SWT.DATE);
+        start =
+            widgetCreator.createDateTimeWidget(parent, "Start Date (Linked)",
+                null, null, null, SWT.DATE);
+        end =
+            widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
+                null, null, null, SWT.DATE);
         widgetCreator.createLabel(parent, "Top Containers");
         topContainers = new TopContainerListWidget(parent, SWT.NONE);
         sampleType = createSampleTypeComboOption("Sample Type", parent);
@@ -70,11 +73,12 @@ public class QAAliquotsEditor extends ReportsEditor {
 
     protected ComboViewer createSampleTypeComboOption(String labelText,
         Composite parent) throws ApplicationException {
-        Collection<SampleTypeWrapper> sampleTypeWrappers = SampleTypeWrapper
-            .getAllSampleTypes(SessionManager.getAppService(), true);
-        ComboViewer widget = widgetCreator
-            .createComboViewerWithNoSelectionValidator(parent, labelText,
-                sampleTypeWrappers, null, "No selection");
+        Collection<SampleTypeWrapper> sampleTypeWrappers =
+            SampleTypeWrapper.getAllSampleTypes(SessionManager.getAppService(),
+                true);
+        ComboViewer widget =
+            widgetCreator.createComboViewer(parent, labelText,
+                sampleTypeWrappers, null, "No selection", null);
         widget.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
@@ -89,10 +93,11 @@ public class QAAliquotsEditor extends ReportsEditor {
     protected BiobankText createValidatedIntegerText(String labelText,
         Composite parent) {
         numAliquots = new WritableValue("", String.class);
-        BiobankText widget = (BiobankText) widgetCreator
-            .createBoundWidgetWithLabel(parent, BiobankText.class, SWT.BORDER,
-                labelText, new String[0], numAliquots,
-                new IntegerNumberValidator("Enter a valid integer.", false));
+        BiobankText widget =
+            (BiobankText) widgetCreator.createBoundWidgetWithLabel(parent,
+                BiobankText.class, SWT.BORDER, labelText, new String[0],
+                numAliquots, new IntegerNumberValidator(
+                    "Enter a valid integer.", false));
         return widget;
     }
 

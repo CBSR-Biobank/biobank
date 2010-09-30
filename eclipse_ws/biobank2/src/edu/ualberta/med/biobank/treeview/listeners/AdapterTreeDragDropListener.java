@@ -127,7 +127,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                         System.out.println("Valid Drag Detected:");
                         System.out.println(srcContainer + " --> "
                             + dstContainer);
-                        srcContainerAdapter.moveAction(dstContainer);
+                        srcContainerAdapter.moveContainer(dstContainer);
                         return;
                     } else {
                         BioBankPlugin

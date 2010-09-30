@@ -169,8 +169,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public SiteWrapper getSite() {
-        if (getPatientVisit() != null) {
-            return getPatientVisit().getShipment().getSite();
+        if (getParent() != null) {
+            return getParent().getSite();
         }
         return null;
     }
@@ -425,25 +425,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
         for (Aliquot aliquot : aliquots) {
-            if (aliquot.getInventoryId().equals(inventoryId)) {
-                list.add(new AliquotWrapper(appService, aliquot));
-            }
-        }
-        return list;
-    }
-
-    public static List<AliquotWrapper> getAliquotsInSite(
-        WritableApplicationService appService, String inventoryId,
-        SiteWrapper site) throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "from "
-                    + Aliquot.class.getName()
-                    + " where inventoryId = ? and patientVisit.shipment.site.id = ?",
-                Arrays.asList(new Object[] { inventoryId, site.getId() }));
-        List<Aliquot> aliquots = appService.query(criteria);
-        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        for (Aliquot aliquot : aliquots) {
             list.add(new AliquotWrapper(appService, aliquot));
         }
         return list;
@@ -457,7 +438,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             new HQLCriteria(
                 "from "
                     + Aliquot.class.getName()
-                    + " a where a.patientVisit.shipment.site.id = ? and activityStatus.name != ?",
+                    + " a where a.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ? and activityStatus.name != ?",
                 Arrays.asList(new Object[] { site.getId(),
                     ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Aliquot> aliquots = appService.query(criteria);
@@ -552,6 +533,11 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     public boolean isActive() {
         ActivityStatusWrapper status = getActivityStatus();
         return status != null && status.isActive();
+    }
+
+    public boolean isFlagged() {
+        ActivityStatusWrapper status = getActivityStatus();
+        return status != null && status.isFlagged();
     }
 
     public boolean isDispatched() {

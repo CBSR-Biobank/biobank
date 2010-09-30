@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.select;
 
 import java.util.Collection;
 
@@ -17,6 +17,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 
 /**
  * Allows the user to move a container and its contents to a new location
@@ -62,10 +63,9 @@ public class SelectParentContainerDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        comboViewer = getWidgetCreator()
-            .createComboViewerWithNoSelectionValidator(contents,
-                "Select parent", containers, null,
-                "A source vessel should be selected");
+        comboViewer =
+            getWidgetCreator().createComboViewer(contents, "Select parent",
+                containers, null, "A source vessel should be selected", null);
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -84,8 +84,9 @@ public class SelectParentContainerDialog extends BiobankDialog {
     }
 
     private void saveSelectedContainer() {
-        selectedContainer = (ContainerWrapper) ((IStructuredSelection) comboViewer
-            .getSelection()).getFirstElement();
+        selectedContainer =
+            (ContainerWrapper) ((IStructuredSelection) comboViewer
+                .getSelection()).getFirstElement();
     }
 
     public ContainerWrapper getSelectedContainer() {

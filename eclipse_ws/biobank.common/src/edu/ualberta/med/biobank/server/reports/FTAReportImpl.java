@@ -46,7 +46,8 @@ public class FTAReportImpl extends AbstractReport {
             } catch (ApplicationException e) {
                 e.printStackTrace();
             }
-            String pnumber = a.getPatientVisit().getPatient().getPnumber();
+            String pnumber = a.getPatientVisit().getClinicShipmentPatient()
+                .getPatient().getPnumber();
             String inventoryId = a.getInventoryId();
             String dateProcessed = DateFormatter.formatAsDate(a
                 .getPatientVisit().getDateProcessed());

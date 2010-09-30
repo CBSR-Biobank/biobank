@@ -573,8 +573,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             String value = cell.getValue();
             if (value != null) {
                 List<AliquotWrapper> aliquots =
-                    AliquotWrapper.getAliquotsInSite(appService, value,
-                        SessionManager.getInstance().getCurrentSite());
+                    AliquotWrapper.getAliquots(appService, value);
                 if (aliquots.size() > 0) {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages

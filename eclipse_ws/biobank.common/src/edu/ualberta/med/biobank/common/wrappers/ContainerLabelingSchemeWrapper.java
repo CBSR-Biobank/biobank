@@ -384,16 +384,21 @@ public class ContainerLabelingSchemeWrapper extends
             throw new BiobankCheckException(
                 "2 char numeric labeling scheme not found");
         }
+        String errorMsg =
+            "Label " + label + " is incorrect: it should be 2 characters";
         int len = label.length();
         if ((len != scheme.getMinChars()) && (len != scheme.getMaxChars()))
-            throw new Exception("Label should be " + scheme.getMinChars()
-                + " characters");
-        int pos = Integer.parseInt(label) - 1;
-        // has remove 1 because the two char numeric starts at 1
-        RowColPos rowColPos = new RowColPos();
-        rowColPos.row = pos % totalRows;
-        rowColPos.col = pos / totalRows;
-        return rowColPos;
+            throw new Exception(errorMsg);
+        try {
+            int pos = Integer.parseInt(label) - 1;
+            // has remove 1 because the two char numeric starts at 1
+            RowColPos rowColPos = new RowColPos();
+            rowColPos.row = pos % totalRows;
+            rowColPos.col = pos / totalRows;
+            return rowColPos;
+        } catch (NumberFormatException nbe) {
+            throw new Exception(errorMsg);
+        }
     }
 
     /**

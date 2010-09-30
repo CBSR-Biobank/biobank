@@ -672,15 +672,15 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String containerName, boolean useStrictName)
         throws ApplicationException {
-        String nameComparison = "=";
+        String nameComparison = "name =";
         String containerNameParameter = containerName;
         if (!useStrictName) {
-            nameComparison = "like";
-            containerNameParameter = "%" + containerName + "%";
+            nameComparison = "lower(name) like";
+            containerNameParameter = "%" + containerName.toLowerCase() + "%";
         }
         String query =
-            "from " + ContainerType.class.getName()
-                + " where site = ? and name " + nameComparison + " ?";
+            "from " + ContainerType.class.getName() + " where site = ? and "
+                + nameComparison + " ?";
         HQLCriteria criteria =
             new HQLCriteria(query, Arrays.asList(new Object[] {
                 siteWrapper.getWrappedObject(), containerNameParameter }));

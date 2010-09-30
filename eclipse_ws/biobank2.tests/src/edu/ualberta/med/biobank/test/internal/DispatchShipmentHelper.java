@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.Arrays;
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -23,8 +22,6 @@ public class DispatchShipmentHelper extends DbHelper {
         shipment.setSender(sender);
         shipment.setReceiver(receiver);
         shipment.setStudy(study);
-        shipment.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
         shipment.setShippingMethod(method);
         shipment.setWaybill(waybill);
         if (dateReceived != null) {

@@ -256,9 +256,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
         Label lbl = widgetCreator.createLabel(fieldsComposite, "Profile");
         profilesCombo =
-            widgetCreator.createComboViewerWithNoSelectionValidator(
-                fieldsComposite, lbl, null, null,
-                "Invalid profile selected", false, null); //$NON-NLS-1$
+            widgetCreator.createComboViewer(fieldsComposite, lbl, null, null,
+                "Invalid profile selected", false, null, null); //$NON-NLS-1$
 
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;

@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
@@ -104,6 +105,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_DISPATCH_SHIPMENT_CREATION = "dispatchShipmentCreation";
     public static final String IMG_DISPATCH_SHIPMENT_TRANSIT = "dispatchShipmentTransit";
     public static final String IMG_DISPATCH_SHIPMENT_RECEIVING = "dispatchShipmentReceiving";
+    public static final String IMG_DISPATCH_SHIPMENT_ERROR = "dispatchShipmentError";
+    public static final String IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT = "dispatchShipmentAddAliquot";
     public static final String IMG_SITE = "site";
     public static final String IMG_SITES = "sites";
     public static final String IMG_STUDIES = "studies";
@@ -169,6 +172,9 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
         classToImageKey.put(ReceivingDispatchShipmentGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
+        classToImageKey.put(
+            ReceivingWithErrorsDispatchShipmentGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
         classToImageKey.put(DispatchShipmentAdapter.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT);
         classToImageKey.put(AliquotAdapter.class.getName(),
@@ -265,6 +271,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
             "dispatchShipment_transit.png");
         registerImage(registry, IMG_DISPATCH_SHIPMENT_RECEIVING,
             "dispatchShipment_receiving.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_ERROR,
+            "dispatchShipment_error.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT,
+            "dispatchScanAdd.png");
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_SITES, "sites.png");
         registerImage(registry, IMG_STUDIES, "studies.png");

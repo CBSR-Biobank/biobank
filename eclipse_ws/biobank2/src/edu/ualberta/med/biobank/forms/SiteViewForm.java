@@ -13,8 +13,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.treeview.ContainerGroup;
-import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
@@ -144,7 +142,8 @@ public class SiteViewForm extends AddressViewFormCommon {
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    ContainerTypeGroup.addContainerType(siteAdapter, true);
+                    siteAdapter.getContainerTypesGroupNode().addContainerType(
+                        siteAdapter, true);
                 }
             }, ContainerTypeWrapper.class);
 
@@ -162,7 +161,8 @@ public class SiteViewForm extends AddressViewFormCommon {
         addSectionToolbar(section, "Add Container", new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                ContainerGroup.addContainer(siteAdapter, true);
+                siteAdapter.getContainersGroupNode().addContainer(siteAdapter,
+                    true);
             }
         }, ContainerWrapper.class);
 

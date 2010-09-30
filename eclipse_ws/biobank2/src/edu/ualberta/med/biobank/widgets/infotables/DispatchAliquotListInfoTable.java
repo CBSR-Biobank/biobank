@@ -45,7 +45,7 @@ public class DispatchAliquotListInfoTable extends
         super(parent, aliquotCollection, HEADINGS, BOUNDS, 20);
         this.editMode = editMode;
         if (editMode) {
-            if (shipment.isInCreation()) {
+            if (shipment.isInCreationState()) {
                 addDeleteItemListener(new IInfoTableDeleteItemListener() {
                     @Override
                     public void deleteItem(InfoTableEvent event) {
@@ -157,4 +157,5 @@ public class DispatchAliquotListInfoTable extends
     protected BiobankTableSorter getComparator() {
         return null;
     }
+
 }

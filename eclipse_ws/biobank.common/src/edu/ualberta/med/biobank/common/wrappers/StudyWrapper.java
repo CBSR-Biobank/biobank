@@ -815,11 +815,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
             new HQLCriteria("select count(distinct patients) from "
                 + Site.class.getName() + " as site"
                 + " join site.shipmentCollection as shipments"
-                + " join shipments.patientVisitCollection as visits"
-                + " join visits.patient as patients"
-                + " where site.id=? and visits.patient.study.id=?",
+                + " join shipments.clinicShipmentPatientCollection as csps"
+                + " join csps.patient as patients"
+                + " where site.id=? and patients.study.id=?",
                 Arrays.asList(new Object[] { site.getId(), getId() }));
-
         List<Long> result = appService.query(c);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -833,10 +832,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
             new HQLCriteria("select count(distinct visits) from "
                 + Site.class.getName() + " as site"
                 + " join site.shipmentCollection as shipments"
-                + " join shipments.patientVisitCollection as visits"
-                + " where site.id=? and visits.patient.study.id=?",
+                + " join shipments.clinicShipmentPatientCollection as csps"
+                + " join csps.patientVisitCollection as visits"
+                + " where site.id=? and csps.patient.study.id=?",
                 Arrays.asList(new Object[] { site.getId(), getId() }));
-
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -850,11 +849,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
             new HQLCriteria("select count(distinct patients) from "
                 + Study.class.getName() + " as study"
                 + " join study.patientCollection as patients"
-                + " join patients.shipmentCollection as shipments"
-                + " join shipments.clinic as clinic"
+                + " join patients.clinicShipmentPatientCollection as csps"
+                + " join csps.clinicShipment.clinic as clinic"
                 + " where study.id=? and clinic.id=?",
                 Arrays.asList(new Object[] { getId(), clinic.getId() }));
-
         List<Long> result = appService.query(c);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -868,13 +866,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
             new HQLCriteria("select count(distinct visits) from "
                 + Study.class.getName() + " as study"
                 + " join study.patientCollection as patients"
-                + " join patients.shipmentCollection as shipments"
-                + " join shipments.clinic as clinic"
-                + " join shipments.patientVisitCollection as visits"
+                + " join patients.clinicShipmentPatientCollection as csps"
+                + " join csps.clinicShipment.clinic as clinic"
+                + " join csps.patientVisitCollection as visits"
                 + " where study.id=? and clinic.id=?"
-                + " and visits.patient.study=study",
-                Arrays.asList(new Object[] { getId(), clinic.getId() }));
-
+                + " and csps.patient.study=study", Arrays.asList(new Object[] {
+                getId(), clinic.getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -885,12 +882,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public long getPatientVisitCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria c =
-            new HQLCriteria("select count(visits) from "
-                + Study.class.getName() + " as study"
-                + " inner join study.patientCollection as patients"
-                + " inner join patients.patientVisitCollection as visits"
-                + " where study.id=? ", Arrays.asList(new Object[] { getId() }));
-
+            new HQLCriteria(
+                "select count(visits) from "
+                    + Study.class.getName()
+                    + " as study"
+                    + " inner join study.patientCollection as patients"
+                    + " inner join patients.clinicShipmentPatientCollection as csps"
+                    + " inner join csps.patientVisitCollection as visits"
+                    + " where study.id=? ",
+                Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");

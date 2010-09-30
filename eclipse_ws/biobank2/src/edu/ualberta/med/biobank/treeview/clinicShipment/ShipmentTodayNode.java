@@ -47,4 +47,12 @@ public class ShipmentTodayNode extends AbstractTodayNode {
         return false;
     }
 
+    @Override
+    public AdapterBase search(Object searchedObject) {
+        if (searchedObject instanceof ClinicWrapper) {
+            return getChild((ModelWrapper<?>) searchedObject, true);
+        }
+        return searchChildren(searchedObject);
+    }
+
 }

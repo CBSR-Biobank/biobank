@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Map;
@@ -15,6 +16,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
@@ -56,6 +60,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 /**
  * Base class for data entry forms.
@@ -144,34 +149,82 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         doSaveInternal(monitor);
     }
 
-    protected void doSaveInternal(final IProgressMonitor monitor) {
-        BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    saveForm();
-                } catch (final RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
-                    setDirty(true);
-                    monitor.setCanceled(true);
-                } catch (final RemoteAccessException exp) {
-                    BioBankPlugin.openRemoteAccessErrorMessage(exp);
-                    setDirty(true);
-                    monitor.setCanceled(true);
-                } catch (final AccessDeniedException ade) {
-                    BioBankPlugin.openAccessDeniedErrorMessage(ade);
-                    setDirty(true);
-                    monitor.setCanceled(true);
-                } catch (BiobankCheckException bce) {
-                    setDirty(true);
-                    monitor.setCanceled(true);
-                    BioBankPlugin.openAsyncError("Save error", bce);
-                } catch (Exception e) {
-                    setDirty(true);
-                    throw new RuntimeException(e);
+    protected void doSaveInternal(
+        @SuppressWarnings("unused") final IProgressMonitor monitor) {
+        IRunnableContext context =
+            new ProgressMonitorDialog(Display.getDefault().getActiveShell());
+        try {
+            doBeforeSave();
+            context.run(true, false, new IRunnableWithProgress() {
+                @Override
+                public void run(IProgressMonitor monitor)
+                    throws InvocationTargetException, InterruptedException {
+
+                    try {
+                        monitor
+                            .beginTask("Saving...", IProgressMonitor.UNKNOWN);
+                        saveForm();
+                        monitor.done();
+                    } catch (final RemoteConnectFailureException exp) {
+                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        monitor.setCanceled(true);
+                    } catch (final RemoteAccessException exp) {
+                        BioBankPlugin.openRemoteAccessErrorMessage(exp);
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        monitor.setCanceled(true);
+                    } catch (final AccessDeniedException ade) {
+                        BioBankPlugin.openAccessDeniedErrorMessage(ade);
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        monitor.setCanceled(true);
+                    } catch (BiobankCheckException bce) {
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        monitor.setCanceled(true);
+                        BioBankPlugin.openAsyncError("Save error", bce);
+                    } catch (Exception e) {
+                        Display.getDefault().syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                setDirty(true);
+                            }
+                        });
+                        throw new RuntimeException(e);
+                    }
                 }
-            }
-        });
+            });
+        } catch (Exception e) {
+            setDirty(true);
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * Called before the monitor start. Can be used to get values on the GUI
+     * objects.
+     */
+    @SuppressWarnings("unused")
+    protected void doBeforeSave() throws Exception {
+        // do nothing by default
     }
 
     @Override
@@ -184,7 +237,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected void checkEditAccess() {
         if (adapter != null && adapter.getModelObject() != null
-            && !adapter.getModelObject().canEdit(SessionManager.getUser())) {
+            && !adapter.getModelObject().canUpdate(SessionManager.getUser())) {
             BioBankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException("Cannot edit. Access Denied.");
         }
@@ -205,7 +258,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         super.createPartControl(parent);
         addToolbarButtons();
         bindChangeListener();
-        setDirty(false);
     }
 
     abstract protected void saveForm() throws Exception;
@@ -261,11 +313,11 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             validator);
     }
 
-    protected <T> ComboViewer createComboViewerWithNoSelectionValidator(
-        Composite parent, String fieldLabel, Collection<T> input, T selection,
-        String errorMessage) {
-        return widgetCreator.createComboViewerWithNoSelectionValidator(parent,
-            fieldLabel, input, selection, errorMessage);
+    protected <T> ComboViewer createComboViewer(Composite parent,
+        String fieldLabel, Collection<T> input, T selection,
+        String errorMessage, ComboSelectionUpdate csu) {
+        return widgetCreator.createComboViewer(parent, fieldLabel, input,
+            selection, errorMessage, csu);
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
@@ -281,8 +333,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     protected BiobankText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
-        BiobankText widget = super.createReadOnlyLabelledField(parent,
-            widgetOptions, fieldLabel, value);
+        BiobankText widget =
+            super.createReadOnlyLabelledField(parent, widgetOptions,
+                fieldLabel, value);
         widget.setBackground(READ_ONLY_TEXT_BGR);
         return widget;
     }
@@ -292,8 +345,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         statusObservable.addChangeListener(new IChangeListener() {
             @Override
             public void handleChange(ChangeEvent event) {
-                IObservableValue validationStatus = (IObservableValue) event
-                    .getSource();
+                IObservableValue validationStatus =
+                    (IObservableValue) event.getSource();
                 handleStatusChanged((IStatus) validationStatus.getValue());
             }
         });
@@ -320,11 +373,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void setConfirmEnabled(boolean enabled) {
-        ISourceProviderService service = (ISourceProviderService) PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow()
-            .getService(ISourceProviderService.class);
-        ConfirmState confirmSourceProvider = (ConfirmState) service
-            .getSourceProvider(ConfirmState.SESSION_STATE);
+        ISourceProviderService service =
+            (ISourceProviderService) PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow()
+                .getService(ISourceProviderService.class);
+        ConfirmState confirmSourceProvider =
+            (ConfirmState) service
+                .getSourceProvider(ConfirmState.SESSION_STATE);
         confirmSourceProvider.setState(enabled);
         confirmAction.setEnabled(enabled);
         form.getToolBarManager().update(true);
@@ -374,9 +429,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void addCancelAction() {
-        CommandContributionItem cancel = new CommandContributionItem(
-            new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), "Cancel",
+        CommandContributionItem cancel =
+            new CommandContributionItem(new CommandContributionItemParameter(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow(), "Cancel",
                 "edu.ualberta.med.biobank.commands.cancel", null,
                 cancelActionImage, null, null, "Cancel", "Cancel", "Cancel",
                 SWT.NONE, "Cancel", true));
@@ -409,9 +464,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void addResetAction() {
-        CommandContributionItem reset = new CommandContributionItem(
-            new CommandContributionItemParameter(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow(), "Reset",
+        CommandContributionItem reset =
+            new CommandContributionItem(new CommandContributionItemParameter(
+                PlatformUI.getWorkbench().getActiveWorkbenchWindow(), "Reset",
                 "edu.ualberta.med.biobank.commands.reset", null,
                 resetActionImage, null, null, "Reset", "Reset", "Reset",
                 SWT.NONE, "Reset", true));
@@ -442,8 +497,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             if (previousFormIndex >= 0
                 && previousFormIndex < linkedForms.size()) {
                 BiobankFormBase form = linkedForms.get(previousFormIndex);
-                IWorkbenchPage page = PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getActivePage();
+                IWorkbenchPage page =
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getActivePage();
                 page.bringToTop(form);
             }
         }
@@ -451,8 +507,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     public void cancel() {
         try {
-            boolean openView = adapter.getModelObject() != null
-                && !adapter.getModelObject().isNew();
+            boolean openView =
+                adapter.getModelObject() != null
+                    && !adapter.getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
             logger.error("Can't cancel the form", e);
