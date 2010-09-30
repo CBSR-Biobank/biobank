@@ -6,7 +6,7 @@ import java.util.List;
 import junit.framework.Assert;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 
-public class TestPostProcessUtil {
+public class PostProcessUtil {
     protected static void checkExpected(AbstractRowPostProcess processor,
         List<Object[]> input, List<Object[]> expectedOutput) {
 

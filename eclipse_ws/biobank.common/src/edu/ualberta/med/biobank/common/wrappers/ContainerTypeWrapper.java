@@ -3,10 +3,8 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -27,8 +25,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
-    private static Map<String, ContainerLabelingSchemeWrapper> labelingSchemeMap;
-
     private Set<ContainerTypeWrapper> deletedChildTypes =
         new HashSet<ContainerTypeWrapper>();
 
@@ -38,16 +34,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
         super(appService, wrappedObject);
-        if (labelingSchemeMap == null) {
-            getAllLabelingSchemesMap(appService);
-        }
     }
 
     public ContainerTypeWrapper(WritableApplicationService appService) {
         super(appService);
-        if (labelingSchemeMap == null && appService != null) {
-            getAllLabelingSchemesMap(appService);
-        }
     }
 
     @Override
@@ -552,16 +542,18 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         propertyChangeSupport.firePropertyChange("colCapacity", old, maxCols);
     }
 
-    public void setChildLabelingScheme(Integer id) {
+    public void setChildLabelingScheme(Integer id) throws ApplicationException {
         if (id == null)
             return;
-        setChildLabelingScheme(labelingSchemeMap.get(id));
+        setChildLabelingScheme(ContainerLabelingSchemeWrapper
+            .getLabelingSchemeById(appService, id));
     }
 
     public void setChildLabelingSchemeName(String name) throws Exception {
         if (name == null)
             return;
-        for (ContainerLabelingSchemeWrapper scheme : labelingSchemeMap.values()) {
+        for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
+            .getAllLabelingSchemesMap(appService).values()) {
             if (scheme.getName().equals(name)) {
                 setChildLabelingScheme(scheme);
                 return;
@@ -722,32 +714,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         throws ApplicationException {
         return getContainerTypesByCapacity(appService, siteWrapper,
             RowColPos.PALLET_96_ROW_MAX, RowColPos.PALLET_96_COL_MAX);
-    }
-
-    private static Map<String, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
-        WritableApplicationService appService) throws RuntimeException {
-        try {
-            if (labelingSchemeMap == null) {
-                labelingSchemeMap =
-                    ContainerLabelingSchemeWrapper
-                        .getAllLabelingSchemesMap(appService);
-            }
-            return labelingSchemeMap;
-        } catch (ApplicationException e) {
-            throw new RuntimeException(
-                "could not load container labeling schemes");
-        }
-    }
-
-    public static Map<Integer, String> getAllLabelingSchemes(
-        WritableApplicationService appService) {
-        getAllLabelingSchemesMap(appService);
-        Map<Integer, String> map = new HashMap<Integer, String>();
-        for (ContainerLabelingSchemeWrapper labeling : labelingSchemeMap
-            .values()) {
-            map.put(labeling.getId(), labeling.getName());
-        }
-        return map;
     }
 
     /**

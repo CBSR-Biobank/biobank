@@ -6,11 +6,11 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.CapacityPostProcess;
 
-public class CapacityPostProcessTest {
+public class TestCapacityPostProcess {
     @SuppressWarnings("serial")
     @Test
     public void test() {
-        TestPostProcessUtil.checkExpected(new CapacityPostProcess(1, 0),
+        PostProcessUtil.checkExpected(new CapacityPostProcess(1, 0),
             new ArrayList<Object[]>() {
                 {
                     add(new Object[] { new Long(1), new Long(2) });
@@ -29,7 +29,7 @@ public class CapacityPostProcessTest {
     @SuppressWarnings("serial")
     @Test
     public void testSameColumn() {
-        TestPostProcessUtil.checkExpected(new CapacityPostProcess(0, 0),
+        PostProcessUtil.checkExpected(new CapacityPostProcess(0, 0),
             new ArrayList<Object[]>() {
                 {
                     add(new Object[] { new Long(1) });

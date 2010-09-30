@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,6 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -41,17 +43,23 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ContainerTypeEntryForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
 
-    private static final String MSG_NEW_STORAGE_TYPE_OK = "Creating a new storage type.";
+    private static final String MSG_NEW_STORAGE_TYPE_OK =
+        "Creating a new storage type.";
 
-    private static final String MSG_STORAGE_TYPE_OK = "Editing an existing storage type.";
+    private static final String MSG_STORAGE_TYPE_OK =
+        "Editing an existing storage type.";
 
-    private static final String MSG_NO_CONTAINER_TYPE_NAME = "Container type must have a name";
+    private static final String MSG_NO_CONTAINER_TYPE_NAME =
+        "Container type must have a name";
 
-    private static final String MSG_NO_CONTAINER_TYPE_NAME_SHORT = "Container type must have a short name";
+    private static final String MSG_NO_CONTAINER_TYPE_NAME_SHORT =
+        "Container type must have a short name";
 
-    public static final String MSG_CHILD_LABELING_SCHEME_EMPTY = "Select a child labeling scheme";
+    public static final String MSG_CHILD_LABELING_SCHEME_EMPTY =
+        "Select a child labeling scheme";
 
     private ContainerTypeAdapter containerTypeAdapter;
 
@@ -116,8 +124,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void retrieveSiteAndType() {
-        site = containerTypeAdapter.getParentFromClass(SiteAdapter.class)
-            .getWrapper();
+        site =
+            containerTypeAdapter.getParentFromClass(SiteAdapter.class)
+                .getWrapper();
         try {
             site.reload();
         } catch (Exception e) {
@@ -149,8 +158,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Repository Site");
+        BiobankText siteLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Repository Site");
         setTextValue(siteLabel, containerType.getSite().getName());
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Name", null,
@@ -187,17 +196,22 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 "Default temperature is not a valid number"));
 
         String currentScheme = containerType.getChildLabelingSchemeName();
-        labelingSchemeMap = ContainerTypeWrapper
-            .getAllLabelingSchemes(appService);
-        labelingSchemeComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Child Labeling Scheme", labelingSchemeMap.values(),
-            currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
+        labelingSchemeMap = new HashMap<Integer, String>();
+        for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
+            .getAllLabelingSchemesMap(appService).values()) {
+            labelingSchemeMap.put(scheme.getId(), scheme.getName());
+        }
+        labelingSchemeComboViewer =
+            createComboViewerWithNoSelectionValidator(client,
+                "Child Labeling Scheme", labelingSchemeMap.values(),
+                currentScheme, MSG_CHILD_LABELING_SCHEME_EMPTY);
 
-        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity status",
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            containerType.getActivityStatus(),
-            "Container type must have an activity status");
+        activityStatusComboViewer =
+            createComboViewerWithNoSelectionValidator(client,
+                "Activity status",
+                ActivityStatusWrapper.getAllActivityStatuses(appService),
+                containerType.getActivityStatus(),
+                "Container type must have an activity status");
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null,
@@ -206,10 +220,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private void createContainsSection() throws Exception {
         Composite client = createSectionWithClient("Contents");
-        hasContainers = toolkit.createButton(client, "Contains Containers",
-            SWT.RADIO);
-        hasSamples = toolkit.createButton(client, "Contains aliquots",
-            SWT.RADIO);
+        hasContainers =
+            toolkit.createButton(client, "Contains Containers", SWT.RADIO);
+        hasSamples =
+            toolkit.createButton(client, "Contains aliquots", SWT.RADIO);
         hasContainers.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -236,15 +250,17 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         samplesMultiSelect.setVisible(show);
         ((GridData) samplesMultiSelect.getLayoutData()).exclude = !show;
         childContainerTypesMultiSelect.setVisible(!show);
-        ((GridData) childContainerTypesMultiSelect.getLayoutData()).exclude = show;
+        ((GridData) childContainerTypesMultiSelect.getLayoutData()).exclude =
+            show;
         form.layout(true, true);
     }
 
     private void createSampleTypesSection(Composite parent) throws Exception {
         allSampleTypes = SampleTypeWrapper.getAllSampleTypes(appService, true);
 
-        samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
-            "Selected Sample Types", "Available Sample Types", 100);
+        samplesMultiSelect =
+            new MultiSelectWidget(parent, SWT.NONE, "Selected Sample Types",
+                "Available Sample Types", 100);
         samplesMultiSelect.adaptToToolkit(toolkit, true);
         samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -255,9 +271,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void setSampleTypesSelection() {
-        Collection<SampleTypeWrapper> stSamplesTypes = containerType
-            .getSampleTypeCollection();
-        LinkedHashMap<Integer, String> availSampleTypes = new LinkedHashMap<Integer, String>();
+        Collection<SampleTypeWrapper> stSamplesTypes =
+            containerType.getSampleTypeCollection();
+        LinkedHashMap<Integer, String> availSampleTypes =
+            new LinkedHashMap<Integer, String>();
         List<Integer> selSampleTypes = new ArrayList<Integer>();
 
         if (stSamplesTypes != null) {
@@ -273,9 +290,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createChildContainerTypesSection(Composite parent) {
-        childContainerTypesMultiSelect = new MultiSelectWidget(parent,
-            SWT.NONE, "Selected Sub-Container Types",
-            "Available Sub-Container Types", 100);
+        childContainerTypesMultiSelect =
+            new MultiSelectWidget(parent, SWT.NONE,
+                "Selected Sub-Container Types",
+                "Available Sub-Container Types", 100);
         childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
@@ -289,14 +307,15 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private void setChildContainerTypeSelection() {
         List<Integer> selChildContainerTypes = new ArrayList<Integer>();
-        Collection<ContainerTypeWrapper> childContainerTypes = containerType
-            .getChildContainerTypeCollection();
+        Collection<ContainerTypeWrapper> childContainerTypes =
+            containerType.getChildContainerTypeCollection();
         if (childContainerTypes != null) {
             for (ContainerTypeWrapper childContainerType : childContainerTypes) {
                 selChildContainerTypes.add(childContainerType.getId());
             }
         }
-        LinkedHashMap<Integer, String> availContainerTypes = new LinkedHashMap<Integer, String>();
+        LinkedHashMap<Integer, String> availContainerTypes =
+            new LinkedHashMap<Integer, String>();
         if (availSubContainerTypes != null) {
             for (ContainerTypeWrapper type : availSubContainerTypes) {
                 if (containerType.isNew() || !containerType.equals(type)) {
@@ -328,13 +347,15 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         // associate the storage type to it's site
         containerType.setSite(site);
 
-        ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
-            .getSelection()).getFirstElement();
+        ActivityStatusWrapper activity =
+            (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
+                .getSelection()).getFirstElement();
         containerType.setActivityStatus(activity);
 
         // set the labeling scheme
-        String currentScheme = (String) ((StructuredSelection) labelingSchemeComboViewer
-            .getSelection()).getFirstElement();
+        String currentScheme =
+            (String) ((StructuredSelection) labelingSchemeComboViewer
+                .getSelection()).getFirstElement();
         containerType.setChildLabelingSchemeName(currentScheme);
 
         containerType.persist();
@@ -347,8 +368,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         if (hasSamples.getSelection()) {
             addedIds = samplesMultiSelect.getAddedToSelection();
             removedIds = samplesMultiSelect.getRemovedToSelection();
-            List<SampleTypeWrapper> addedSampleTypes = new ArrayList<SampleTypeWrapper>();
-            List<SampleTypeWrapper> removedSampleTypes = new ArrayList<SampleTypeWrapper>();
+            List<SampleTypeWrapper> addedSampleTypes =
+                new ArrayList<SampleTypeWrapper>();
+            List<SampleTypeWrapper> removedSampleTypes =
+                new ArrayList<SampleTypeWrapper>();
             for (SampleTypeWrapper sampleType : allSampleTypes) {
                 if (addedIds.indexOf(sampleType.getId()) >= 0) {
                     addedSampleTypes.add(sampleType);
@@ -377,12 +400,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         List<Integer> addedTypesIds = new ArrayList<Integer>();
         List<Integer> removedTypesIds = new ArrayList<Integer>();
         if (hasContainers.getSelection()) {
-            addedTypesIds = childContainerTypesMultiSelect
-                .getAddedToSelection();
-            removedTypesIds = childContainerTypesMultiSelect
-                .getRemovedToSelection();
-            List<ContainerTypeWrapper> addedContainerTypes = new ArrayList<ContainerTypeWrapper>();
-            List<ContainerTypeWrapper> removedContainerTypes = new ArrayList<ContainerTypeWrapper>();
+            addedTypesIds =
+                childContainerTypesMultiSelect.getAddedToSelection();
+            removedTypesIds =
+                childContainerTypesMultiSelect.getRemovedToSelection();
+            List<ContainerTypeWrapper> addedContainerTypes =
+                new ArrayList<ContainerTypeWrapper>();
+            List<ContainerTypeWrapper> removedContainerTypes =
+                new ArrayList<ContainerTypeWrapper>();
             if (availSubContainerTypes != null) {
                 for (ContainerTypeWrapper containerType : availSubContainerTypes) {
                     if (addedTypesIds.indexOf(containerType.getId()) >= 0) {
@@ -426,8 +451,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void showContainersOrSamples() {
-        boolean containsSamples = containerType.getSampleTypeCollection() != null
-            && containerType.getSampleTypeCollection().size() > 0;
+        boolean containsSamples =
+            containerType.getSampleTypeCollection() != null
+                && containerType.getSampleTypeCollection().size() > 0;
         showSamples(containsSamples);
         hasSamples.setSelection(containsSamples);
         hasContainers.setSelection(!containsSamples);
