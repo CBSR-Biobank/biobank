@@ -15,6 +15,7 @@ import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -24,7 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicVisitInfoTable;
@@ -36,29 +37,33 @@ public class PatientMergeForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientMergeForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientMergeForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.PatientMergeForm";
 
-    public static final String MSG_PATIENT_NOT_VALID = "Select a second patient";
+    public static final String MSG_PATIENT_NOT_VALID =
+        "Select a second patient";
 
     private PatientAdapter patient1Adapter;
 
     private PatientWrapper patient1;
 
-    private PatientWrapper patient2Wrapper;
+    private PatientWrapper patient2;
 
-    BiobankText study2;
+    private BiobankText study2Text;
 
-    ClinicVisitInfoTable patient2Visits;
+    private ClinicVisitInfoTable patient2VisitsTable;
 
-    private BiobankText pnumber2;
+    private BiobankText pnumber2Text;
 
-    private BiobankText pnumber1;
+    private BiobankText pnumber1Text;
 
-    private BiobankText study1;
+    private BiobankText study1Text;
 
-    IObservableValue patientNotNull;
+    private IObservableValue patientNotNullValue;
 
-    private AbstractInfoTableWidget<PatientVisitWrapper> patient1Visits;
+    private AbstractInfoTableWidget<PatientVisitWrapper> patient1VisitsTable;
+
+    private boolean canMerge;
 
     @Override
     public void init() {
@@ -70,9 +75,9 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1 = patient1Adapter.getWrapper();
         String tabName = "Merging Patient " + patient1.getPnumber();
         setPartName(tabName);
-        patientNotNull = new WritableValue(Boolean.FALSE, Boolean.class);
+        patientNotNullValue = new WritableValue(Boolean.FALSE, Boolean.class);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), patientNotNull, MSG_PATIENT_NOT_VALID);
+            Boolean.class), patientNotNullValue, MSG_PATIENT_NOT_VALID);
     }
 
     @Override
@@ -121,100 +126,110 @@ public class PatientMergeForm extends BiobankEntryForm {
         patientArea2.setLayoutData(patient2Data);
         toolkit.paintBordersFor(client);
 
-        pnumber1 = createReadOnlyLabelledField(patientArea1, SWT.NONE,
-            "Patient Number");
-        pnumber1.setText(patient1Adapter.getWrapper().getPnumber());
+        pnumber1Text =
+            createReadOnlyLabelledField(patientArea1, SWT.NONE,
+                "Patient Number");
+        pnumber1Text.setText(patient1Adapter.getWrapper().getPnumber());
 
-        pnumber2 = (BiobankText) createLabelledWidget(patientArea2,
-            BiobankText.class, SWT.NONE, "Patient Number");
-        pnumber2.addKeyListener(new KeyListener() {
+        pnumber2Text =
+            (BiobankText) createLabelledWidget(patientArea2, BiobankText.class,
+                SWT.NONE, "Patient Number");
+        pnumber2Text.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
-                patientNotNull.setValue(Boolean.FALSE);
+                patientNotNullValue.setValue(Boolean.FALSE);
             }
 
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.keyCode == SWT.CR)
-                    populateFields(pnumber2.getText());
+                    populateFields(pnumber2Text.getText());
             }
         });
-        pnumber2.addTraverseListener(new TraverseListener() {
+        pnumber2Text.addTraverseListener(new TraverseListener() {
             @Override
             public void keyTraversed(TraverseEvent e) {
                 if (e.keyCode == SWT.TAB)
-                    populateFields(pnumber2.getText());
+                    populateFields(pnumber2Text.getText());
             }
 
         });
 
-        setFirstControl(pnumber2);
+        setFirstControl(pnumber2Text);
 
         StudyWrapper selectedStudy = patient1Adapter.getWrapper().getStudy();
-        study1 = createReadOnlyLabelledField(patientArea1, SWT.NONE, "Study");
-        study1.setText(selectedStudy.getNameShort());
+        study1Text =
+            createReadOnlyLabelledField(patientArea1, SWT.NONE, "Study");
+        study1Text.setText(selectedStudy.getNameShort());
 
-        study2 = createReadOnlyLabelledField(patientArea2, SWT.NONE, "Study");
+        study2Text =
+            createReadOnlyLabelledField(patientArea2, SWT.NONE, "Study");
 
-        patient1Visits = new ClinicVisitInfoTable(patientArea1, patient1Adapter
-            .getWrapper().getPatientVisitCollection(true, true));
+        patient1VisitsTable =
+            new ClinicVisitInfoTable(patientArea1, patient1Adapter.getWrapper()
+                .getPatientVisitCollection(true, true));
         GridData gd1 = new GridData();
         gd1.horizontalSpan = 2;
         gd1.grabExcessHorizontalSpace = true;
         gd1.horizontalAlignment = SWT.FILL;
-        patient1Visits.setLayoutData(gd1);
+        patient1VisitsTable.setLayoutData(gd1);
+        patient1VisitsTable.adaptToToolkit(toolkit, true);
 
-        patient2Visits = new ClinicVisitInfoTable(patientArea2,
-            new ArrayList<PatientVisitWrapper>());
+        patient2VisitsTable =
+            new ClinicVisitInfoTable(patientArea2,
+                new ArrayList<PatientVisitWrapper>());
         GridData gd2 = new GridData();
         gd2.horizontalSpan = 2;
         gd2.grabExcessHorizontalSpace = true;
         gd2.horizontalAlignment = SWT.FILL;
-        patient2Visits.setLayoutData(gd2);
+        patient2VisitsTable.setLayoutData(gd2);
+        patient2VisitsTable.adaptToToolkit(toolkit, true);
     }
 
     protected void populateFields(String pnumber) {
         try {
-            patient2Wrapper = PatientWrapper.getPatient(
-                SessionManager.getAppService(), pnumber);
+            patient2 =
+                PatientWrapper.getPatient(SessionManager.getAppService(),
+                    pnumber);
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError("Error retrieving patient", e);
             return;
         }
-        if (patient2Wrapper == null) {
+        if (patient2 == null) {
             BioBankPlugin.openAsyncError("Invalid Patient Number",
                 "Cannot find a patient with that pnumber");
             return;
         }
 
-        study2.setText(patient2Wrapper.getStudy().getNameShort());
+        study2Text.setText(patient2.getStudy().getNameShort());
 
-        if (!patient2Wrapper.getStudy().equals(
-            patient1Adapter.getWrapper().getStudy()))
+        if (!patient2.getStudy()
+            .equals(patient1Adapter.getWrapper().getStudy()))
             BioBankPlugin.openAsyncError("Invalid Patient Number",
                 "Patients from different studies cannot be merged");
         else {
-            patient2Visits.setCollection(patient2Wrapper
+            patient2VisitsTable.setCollection(patient2
                 .getPatientVisitCollection());
-            patient2Visits.layout();
-            patientNotNull.setValue(Boolean.TRUE);
+            patient2VisitsTable.layout();
+            patientNotNullValue.setValue(Boolean.TRUE);
         }
     }
 
     private void merge() {
         try {
             patient1Adapter.getWrapper().addPatientVisits(
-                patient2Wrapper.getPatientVisitCollection());
-            patient2Wrapper
-                .setPatientVisitCollection(new ArrayList<PatientVisitWrapper>());
-            List<ClinicShipmentWrapper> shipments = patient2Wrapper
-                .getShipmentCollection();
+                patient2.getPatientVisitCollection());
+            // FIXME: need to make sure this can be removed
+            // patient2Wrapper
+            // .setPatientVisitCollection(new ArrayList<PatientVisitWrapper>());
+            List<ClinicShipmentWrapper> shipments =
+                patient2.getShipmentCollection();
             for (ClinicShipmentWrapper shipment : shipments) {
                 List<PatientWrapper> patients = shipment.getPatientCollection();
                 for (PatientWrapper p : patients)
-                    if (p.equals(patient2Wrapper)) {
+                    if (p.equals(patient2)) {
                         shipment.removePatients(Arrays
-                            .asList(new PatientWrapper[] { patient2Wrapper }));
+                            .asList(new PatientWrapper[] { patient2 }));
                         shipment.addPatients(Arrays
                             .asList(new PatientWrapper[] { patient1Adapter
                                 .getWrapper() }));
@@ -223,52 +238,66 @@ public class PatientMergeForm extends BiobankEntryForm {
                 shipment.persist();
             }
             patient1Adapter.getWrapper().persist();
-            patient2Wrapper.reload();
+            patient2.reload();
+            patient2.delete();
 
-            PatientAdapter p = (PatientAdapter) SessionManager
-                .searchNode(patient2Wrapper);
-            p.getParent().removeChild(p);
-            SessionManager.getCurrentAdapterViewWithTree().getTreeViewer()
-                .refresh();
-
-            patient2Wrapper.delete();
-            this.closeEntryOpenView(false, true);
+            Display.getDefault().syncExec(new Runnable() {
+                @Override
+                public void run() {
+                    PatientAdapter p =
+                        (PatientAdapter) SessionManager.searchNode(patient2);
+                    if (p != null) {
+                        p.getParent().removeChild(p);
+                    }
+                    SessionManager.getCurrentAdapterViewWithTree()
+                        .getTreeViewer().refresh();
+                    closeEntryOpenView(false, true);
+                }
+            });
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Merge failed.", e);
         }
+    }
 
+    @Override
+    protected void doBeforeSave() throws Exception {
+        canMerge = false;
+        if (patient2 != null) {
+            if (BioBankPlugin.openConfirm(
+                "Confirm Merge",
+                "Are you sure you want to merge patient "
+                    + patient2.getPnumber() + " into patient "
+                    + patient1Adapter.getWrapper().getPnumber()
+                    + "? All patient visits will be transferred.")) {
+                canMerge = true;
+            }
+        }
     }
 
     @Override
     protected void saveForm() throws Exception {
-        if (patient2Wrapper != null) {
-            if (BioBankPlugin.openConfirm(
-                "Confirm Merge",
-                "Are you sure you want to merge patient "
-                    + patient2Wrapper.getPnumber() + " into patient "
-                    + patient1Adapter.getWrapper().getPnumber()
-                    + "? All patient visits will be transferred.")) {
-                merge();
-            }
+        if (canMerge) {
+            merge();
         }
     }
 
     @Override
     public void reset() throws Exception {
         super.reset();
-        pnumber1.setText(patient1Adapter.getWrapper().getPnumber());
-        study1.setText(patient1Adapter.getWrapper().getStudy().getNameShort());
-        patient1Visits.setCollection(patient1Adapter.getWrapper()
+        pnumber1Text.setText(patient1Adapter.getWrapper().getPnumber());
+        study1Text.setText(patient1Adapter.getWrapper().getStudy()
+            .getNameShort());
+        patient1VisitsTable.setCollection(patient1Adapter.getWrapper()
             .getPatientVisitCollection(true, true));
-        pnumber2.setText("");
-        study2.setText("");
-        patient2Visits.setCollection(new ArrayList<PatientVisitWrapper>());
-        patient2Wrapper = null;
+        pnumber2Text.setText("");
+        study2Text.setText("");
+        patient2VisitsTable.setCollection(new ArrayList<PatientVisitWrapper>());
+        patient2 = null;
     }
 
     @Override
     protected String getOkMessage() {
-        return "Patient " + patient2Wrapper.getPnumber()
+        return "Patient " + patient2.getPnumber()
             + " will be merged into patient "
             + patient1Adapter.getWrapper().getPnumber();
     }

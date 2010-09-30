@@ -154,13 +154,14 @@ CREATE TABLE abstract_shipment (
     WAYBILL varchar(255) NULL DEFAULT NULL COMMENT '' COLLATE latin1_swedish_ci,
     DATE_SHIPPED datetime NULL DEFAULT NULL COMMENT '',
     BOX_NUMBER varchar(255) NULL DEFAULT NULL COMMENT '' COLLATE latin1_swedish_ci,
-    SHIPPING_METHOD_ID int(11) NOT NULL,
-    ACTIVITY_STATUS_ID INT(11) NOT NULL,
+    SHIPPING_METHOD_ID int(11) NULL DEFAULT NULL,
+    ACTIVITY_STATUS_ID INT(11) NULL DEFAULT NULL,
     SITE_ID int(11) NULL DEFAULT NULL COMMENT '',
     STUDY_ID INT(11) NULL DEFAULT NULL COMMENT '',
     CLINIC_ID int(11) NULL DEFAULT NULL COMMENT '',
     DISPATCH_RECEIVER_ID int(11) NULL DEFAULT NULL COMMENT '',
     DISPATCH_SENDER_ID int(11) NULL DEFAULT NULL COMMENT '',
+    STATE int(11) NULL DEFAULT NULL COMMENT '',
     PRIMARY KEY (ID),
     INDEX FK70F1B917FB659898 (DISPATCH_RECEIVER_ID),
     INDEX FK70F1B917DCA49682 (SHIPPING_METHOD_ID),
@@ -258,14 +259,29 @@ DROP TABLE aliquot_position;
 
 DROP TABLE container_position;
 
-/* delete assoc between second entry of HEART and Calgary-F */
+/* rename the HEART study assoc with Calgary-F to "HEART2" */
+UPDATE study,site_study,site SET study.name_short="HEART2"
+WHERE study.id=site_study.study_id AND site.id=site_study.site_id
+AND site.name_short="Calgary-F";
+
+/* move contacts from HEART2 to HEART */
+UPDATE study_contact,contact,clinic,study SET study_contact.study_id=(SELECT id FROM study WHERE name_short="HEART")
+WHERE study_contact.study_id=study.id AND study_contact.contact_id=contact.id
+AND contact.clinic_id=clinic.id AND study.name_short="HEART2"
+AND clinic.name_short="CL1-Foothills TRW";
+
+/* move all patients from HEART2 to HEART */
+UPDATE patient,study SET patient.study_id=(SELECT id FROM study WHERE name_short="HEART")
+WHERE study.id=patient.study_id AND study.name_short="HEART2";
+
+/* delete assoc between HEART2 and Calgary-F */
 DELETE site_study FROM site_study INNER JOIN site ON site.id=site_study.site_id
 INNER JOIN study ON study.id=site_study.study_id
-WHERE site.name_short='Calgary-F' AND study.name_short='HEART';
+WHERE site.name_short='Calgary-F' AND study.name_short='HEART2';
 
-/* remove second entry of HEART */
+/* remove HEART2 */
 DELETE study FROM STUDY LEFT JOIN site_study on site_study.study_id=study.id
-WHERE name_short='HEART' and study_id is null;
+WHERE name_short='HEART2' and study_id is null;
 
 /* create link between Calgary-F site and original entry for HEART */
 INSERT INTO site_study (site_id, study_id)
@@ -273,6 +289,69 @@ INSERT INTO site_study (site_id, study_id)
        FROM site JOIN study
        WHERE site.name_short='Calgary-F' AND study.name_short='HEART';
 
+/* fix upper case - lower case problems */
+ALTER TABLE abstract_position
+      MODIFY COLUMN DISCRIMINATOR VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE abstract_shipment
+      MODIFY COLUMN DISCRIMINATOR VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+      MODIFY COLUMN COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN WAYBILL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN BOX_NUMBER VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN SHIPPING_METHOD_ID INT(11) NOT NULL,
+      MODIFY COLUMN ACTIVITY_STATUS_ID INT(11) NOT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE activity_status MODIFY COLUMN NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE address MODIFY COLUMN STREET1 VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN STREET2 VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN CITY VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN PROVINCE VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN POSTAL_CODE VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE aliquot MODIFY COLUMN INVENTORY_ID VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE capacity COLLATE=latin1_general_cs;
+ALTER TABLE clinic MODIFY COLUMN NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN NAME_SHORT VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE clinic_shipment_patient COLLATE=latin1_general_cs;
+ALTER TABLE contact MODIFY COLUMN NAME VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN TITLE VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN MOBILE_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN OFFICE_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN FAX_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN EMAIL_ADDRESS VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN PAGER_NUMBER VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE container MODIFY COLUMN LABEL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN PRODUCT_BARCODE VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE container_labeling_scheme MODIFY COLUMN NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE container_path MODIFY COLUMN PATH VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE container_type MODIFY COLUMN NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN NAME_SHORT VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE container_type_container_type COLLATE=latin1_general_cs;
+ALTER TABLE container_type_sample_type COLLATE=latin1_general_cs;
+ALTER TABLE dispatch_info COLLATE=latin1_general_cs;
+ALTER TABLE dispatch_info_site COLLATE=latin1_general_cs;
+ALTER TABLE global_pv_attr MODIFY COLUMN LABEL VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE patient MODIFY COLUMN PNUMBER VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE patient_visit MODIFY COLUMN COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE pv_attr MODIFY COLUMN VALUE VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE pv_attr_type MODIFY COLUMN NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE pv_source_vessel MODIFY COLUMN VOLUME VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE sample_storage COLLATE=latin1_general_cs;
+ALTER TABLE sample_type MODIFY COLUMN NAME VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN NAME_SHORT VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE shipping_method MODIFY COLUMN NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE site MODIFY COLUMN NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN NAME_SHORT VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE source_vessel MODIFY COLUMN NAME VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE study MODIFY COLUMN NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN NAME_SHORT VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE study_contact COLLATE=latin1_general_cs;
+ALTER TABLE study_pv_attr MODIFY COLUMN LABEL VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+      MODIFY COLUMN PERMISSIBLE TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
+ALTER TABLE study_source_vessel COLLATE=latin1_general_cs;
 
 #
 # DDL END

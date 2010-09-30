@@ -647,7 +647,7 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                         }
                     });
                 } catch (Exception e) {
-                    System.out.println("Loading Error");
+                    BioBankPlugin.openAsyncError("Loading Error", e);
                 }
             }
         });

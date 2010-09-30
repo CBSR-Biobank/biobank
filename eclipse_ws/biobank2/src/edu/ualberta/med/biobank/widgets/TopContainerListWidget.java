@@ -54,8 +54,8 @@ public class TopContainerListWidget extends BiobankWidget {
         enabled = true;
         Label l = new Label(this, SWT.NONE);
         l.setText("Site:");
-        final BiobankApplicationService appService = (BiobankApplicationService) SessionManager
-            .getAppService();
+        final BiobankApplicationService appService =
+            (BiobankApplicationService) SessionManager.getAppService();
         siteCombo = new ComboViewer(this, SWT.NONE);
         siteCombo.setLabelProvider(new BiobankLabelProvider() {
             @Override
@@ -74,13 +74,15 @@ public class TopContainerListWidget extends BiobankWidget {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 if (siteCombo.getSelection() != null) {
-                    List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
+                    List<ContainerWrapper> containers =
+                        new ArrayList<ContainerWrapper>();
                     try {
-                        SiteWrapper s = (SiteWrapper) ((IStructuredSelection) siteCombo
-                            .getSelection()).getFirstElement();
+                        SiteWrapper s =
+                            (SiteWrapper) ((IStructuredSelection) siteCombo
+                                .getSelection()).getFirstElement();
                         if (s.getId() == -9999) {
-                            List<SiteWrapper> sites = SiteWrapper
-                                .getSites(appService);
+                            List<SiteWrapper> sites =
+                                SiteWrapper.getSites(appService);
                             for (SiteWrapper site : sites) {
                                 containers.addAll(site
                                     .getTopContainerCollection());
@@ -119,8 +121,8 @@ public class TopContainerListWidget extends BiobankWidget {
 
     public List<Integer> getSelectedContainers() {
         List<Integer> containerList = new ArrayList<Integer>();
-        IStructuredSelection selections = (IStructuredSelection) topContainers
-            .getSelection();
+        IStructuredSelection selections =
+            (IStructuredSelection) topContainers.getSelection();
         Iterator<?> it = selections.iterator();
         while (it.hasNext()) {
             containerList.add(((ContainerWrapper) it.next()).getId());

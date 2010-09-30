@@ -13,9 +13,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.security.SecurityHelper;
+import edu.ualberta.med.biobank.common.security.Privilege;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.MainPerspective;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
@@ -23,10 +25,10 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.AdapterFactory;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -74,12 +76,12 @@ public class SessionManager {
         updateMenus();
     }
 
-    public void addSession(final WritableApplicationService appService,
-        String serverName, String userName, Collection<SiteWrapper> sites) {
-        logger.debug("addSession: " + serverName + ", user/" + userName
+    public void addSession(final BiobankApplicationService appService,
+        String serverName, User user, Collection<SiteWrapper> sites) {
+        logger.debug("addSession: " + serverName + ", user/" + user.getLogin()
             + " numSites/" + sites.size());
-        sessionAdapter = new SessionAdapter(rootNode, appService, 0,
-            serverName, userName);
+        sessionAdapter =
+            new SessionAdapter(rootNode, appService, 0, serverName, user);
         rootNode.addChild(sessionAdapter);
 
         siteManager.init(appService, serverName);
@@ -90,6 +92,13 @@ public class SessionManager {
 
         rebuildSession();
         updateMenus();
+
+        if (sessionAdapter.getUser().isNeedToChangePassword()) {
+            ChangePasswordDialog dlg =
+                new ChangePasswordDialog(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), true);
+            dlg.open();
+        }
     }
 
     public void deleteSession() throws Exception {
@@ -107,19 +116,23 @@ public class SessionManager {
     }
 
     private void updateMenus() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
+        IWorkbenchWindow window =
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        ISourceProviderService service =
+            (ISourceProviderService) window
+                .getService(ISourceProviderService.class);
 
         // assign logged in state
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.SESSION_STATE);
+        SessionState sessionSourceProvider =
+            (SessionState) service
+                .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
+        sessionSourceProvider.setWebAdmin(sessionAdapter != null
+            && sessionAdapter.getUser().isWebsiteAdministrator());
 
         // assign debug state
-        DebugState debugStateSourceProvider = (DebugState) service
-            .getSourceProvider(DebugState.SESSION_STATE);
+        DebugState debugStateSourceProvider =
+            (DebugState) service.getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BioBankPlugin.getDefault()
             .isDebugging());
 
@@ -137,7 +150,7 @@ public class SessionManager {
         return sessionAdapter;
     }
 
-    public static WritableApplicationService getAppService() {
+    public static BiobankApplicationService getAppService() {
         return getInstance().getSession().getAppService();
     }
 
@@ -188,8 +201,8 @@ public class SessionManager {
 
     public static AbstractViewWithAdapterTree getCurrentAdapterViewWithTree() {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
-        IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()
-            .getActivePage();
+        IWorkbenchPage activePage =
+            workbench.getActiveWorkbenchWindow().getActivePage();
         return getInstance().possibleViewMap.get(activePage.getPerspective()
             .getId());
     }
@@ -255,8 +268,9 @@ public class SessionManager {
         }
         if (view != null) {
             if (!isAllSitesSelected()) {
-                SiteAdapter site = (SiteAdapter) getSession()
-                    .getSitesGroupNode().search(getCurrentSite());
+                SiteAdapter site =
+                    (SiteAdapter) getSession().getSitesGroupNode().search(
+                        getCurrentSite());
                 if (site != null) {
                     site.performExpand();
                     return;
@@ -267,8 +281,8 @@ public class SessionManager {
         }
     }
 
-    public static String getUser() {
-        return getInstance().getSession().getUserName();
+    public static User getUser() {
+        return getInstance().getSession().getUser();
     }
 
     public static String getServer() {
@@ -276,19 +290,19 @@ public class SessionManager {
     }
 
     public static boolean canCreate(Class<?> clazz) {
-        return SecurityHelper.canCreate(getAppService(), clazz);
+        return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
     }
 
     public static boolean canDelete(Class<?> clazz) {
-        return SecurityHelper.canCreate(getAppService(), clazz);
+        return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
     }
 
     public static boolean canView(Class<?> clazz) {
-        return SecurityHelper.canView(getAppService(), clazz);
+        return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
     }
 
     public static boolean canUpdate(Class<?> clazz) {
-        return SecurityHelper.canUpdate(getAppService(), clazz);
+        return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
     }
 
     public boolean isConnected() {
@@ -297,7 +311,7 @@ public class SessionManager {
 
     public static void log(String action, String details, String type)
         throws Exception {
-        ((BiobankApplicationService) getAppService()).logActivity(action,
+        getAppService().logActivity(action,
             getInstance().getCurrentSite().getNameShort(), null, null, null,
             details, type);
     }

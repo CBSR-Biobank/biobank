@@ -27,11 +27,10 @@ import org.eclipse.ui.dialogs.FilteredTree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.NodeContentProvider;
-import edu.ualberta.med.biobank.treeview.NodeLabelProvider;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterTreeDragDropListener;
+import edu.ualberta.med.biobank.treeview.util.NodeContentProvider;
+import edu.ualberta.med.biobank.treeview.util.NodeLabelProvider;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
-import edu.ualberta.med.biobank.views.TreeFilter;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
 
 public class AdapterTreeWidget extends Composite {

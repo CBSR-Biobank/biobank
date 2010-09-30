@@ -5,8 +5,8 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 
-import edu.ualberta.med.biobank.treeview.DeltaEvent;
-import edu.ualberta.med.biobank.treeview.IDeltaListener;
+import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
+import edu.ualberta.med.biobank.treeview.util.IDeltaListener;
 
 public class MultiSelectNodeContentProvider implements ITreeContentProvider, IDeltaListener {
 	protected TreeViewer viewer;

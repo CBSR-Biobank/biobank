@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -16,13 +17,13 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public class ChangePasswordDialog extends TitleAreaDialog {
 
-    Text oldPassText;
-    Text newPass1Text;
-    Text newPass2Text;
+    private boolean forceChange;
+    private Text oldPassText;
+    private Text newPass1Text;
+    private Text newPass2Text;
 
     public ChangePasswordDialog(Shell parentShell) {
         super(parentShell);
@@ -33,6 +34,12 @@ public class ChangePasswordDialog extends TitleAreaDialog {
 
         Label lbl = new Label(parentShell, SWT.NONE);
         lbl.setText("Change Password");
+    }
+
+    public ChangePasswordDialog(Shell parentShell, boolean forceChange) {
+        this(parentShell);
+
+        this.forceChange = forceChange;
     }
 
     @Override
@@ -113,6 +120,15 @@ public class ChangePasswordDialog extends TitleAreaDialog {
     }
 
     @Override
+    protected void cancelPressed() {
+        if (forceChange) {
+            return;
+        }
+
+        super.cancelPressed();
+    }
+
+    @Override
     protected void okPressed() {
         if ((this.newPass1Text.getText().length() < 1)) {
             newPass1Text.notifyListeners(SWT.Modify, new Event());
@@ -123,15 +139,18 @@ public class ChangePasswordDialog extends TitleAreaDialog {
             return;
         }
         try {
-            ((BiobankApplicationService) SessionManager.getAppService())
-                .modifyPassword(this.oldPassText.getText(),
-                    this.newPass2Text.getText());
+            SessionManager.getAppService().modifyPassword(
+                this.oldPassText.getText(), this.newPass2Text.getText());
 
             SessionManager.getInstance().getSession().resetAppService();
             BioBankPlugin
                 .openInformation(
                     "Password modified",
                     "Your password has been successfully changed. You will need to reconnect again to see your data");
+
+            if (forceChange && newPass1Text.getText().isEmpty()) {
+                return;
+            }
 
             LogoutHandler lh = new LogoutHandler();
             lh.execute(null);
@@ -154,6 +173,11 @@ public class ChangePasswordDialog extends TitleAreaDialog {
     @Override
     protected Control createButtonBar(Composite parent) {
         Control contents = super.createButtonBar(parent);
+
+        if (forceChange) {
+            getButton(IDialogConstants.CANCEL_ID).setEnabled(false);
+        }
+
         return contents;
     }
 }

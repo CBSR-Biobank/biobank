@@ -28,7 +28,7 @@ public class StudyMasterGroup extends AbstractStudyGroup {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addStudy(SessionManager.getInstance().getSession(), false);
+                    addStudy();
                 }
             });
         }
@@ -40,12 +40,10 @@ public class StudyMasterGroup extends AbstractStudyGroup {
         return StudyWrapper.getAllStudies(getAppService());
     }
 
-    public static void addStudy(SessionAdapter sessionAdapter,
-        boolean hasPreviousForm) {
-        StudyWrapper study = new StudyWrapper(sessionAdapter.getAppService());
-        StudyAdapter adapter = new StudyAdapter(
-            sessionAdapter.getStudiesGroupNode(), study);
-        adapter.openEntryForm(hasPreviousForm);
+    public void addStudy() {
+        StudyWrapper study = new StudyWrapper(SessionManager.getAppService());
+        StudyAdapter adapter = new StudyAdapter(this, study);
+        adapter.openEntryForm();
     }
 
 }

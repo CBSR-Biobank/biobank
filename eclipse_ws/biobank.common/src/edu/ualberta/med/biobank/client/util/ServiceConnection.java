@@ -52,7 +52,7 @@ public class ServiceConnection {
         System.setProperty(TRUST_STORE_PROPERTY_NAME, tf.getAbsolutePath());
     }
 
-    public static WritableApplicationService getAppService(String serverUrl)
+    public static BiobankApplicationService getAppService(String serverUrl)
         throws Exception {
         return getAppService(serverUrl, null, null);
     }

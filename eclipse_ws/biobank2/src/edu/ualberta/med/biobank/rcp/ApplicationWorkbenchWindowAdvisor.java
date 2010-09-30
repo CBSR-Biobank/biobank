@@ -81,7 +81,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.SESSION_STATE);
+            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider
             .addSourceProviderListener(new ISourceProviderListener() {
                 @Override
@@ -89,8 +89,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null
                         && sourceValue.equals(SessionState.LOGGED_IN)) {
-                        updatedTitle(SessionManager.getServer(),
-                            SessionManager.getUser());
+                        updatedTitle(SessionManager.getServer(), SessionManager
+                            .getUser().getLogin());
                     } else {
                         resetTitle();
                     }

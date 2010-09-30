@@ -7,10 +7,11 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionHelper implements Runnable {
 
@@ -23,9 +24,11 @@ public class SessionHelper implements Runnable {
 
     private String password;
 
-    private WritableApplicationService appService;
+    private BiobankApplicationService appService;
 
     private Collection<SiteWrapper> siteWrappers;
+
+    private User user;
 
     public SessionHelper(String server, boolean secureConnection,
         String userName, String password) {
@@ -49,16 +52,19 @@ public class SessionHelper implements Runnable {
             if (userName.length() == 0) {
                 if (BioBankPlugin.getDefault().isDebugging()) {
                     userName = "testuser";
-                    appService = ServiceConnection.getAppService(serverUrl,
-                        userName, "test");
+                    appService =
+                        ServiceConnection.getAppService(serverUrl, userName,
+                            "test");
                 } else {
                     appService = ServiceConnection.getAppService(serverUrl);
                 }
             } else {
-                appService = ServiceConnection.getAppService(serverUrl,
-                    userName, password);
+                appService =
+                    ServiceConnection.getAppService(serverUrl, userName,
+                        password);
             }
             siteWrappers = SiteWrapper.getSites(appService);
+            user = appService.getCurrentUser();
         } catch (ApplicationException exp) {
             logger.error("Error while logging to application", exp);
             if (exp.getCause() != null
@@ -76,7 +82,7 @@ public class SessionHelper implements Runnable {
         }
     }
 
-    public WritableApplicationService getAppService() {
+    public BiobankApplicationService getAppService() {
         return appService;
     }
 
@@ -84,7 +90,7 @@ public class SessionHelper implements Runnable {
         return siteWrappers;
     }
 
-    public String getUserName() {
-        return userName;
+    public User getUser() {
+        return user;
     }
 }

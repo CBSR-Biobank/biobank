@@ -44,7 +44,8 @@ public class QAAliquotsImpl extends AbstractReport {
         // get the info
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
-            String pnumber = a.getPatientVisit().getPatient().getPnumber();
+            String pnumber = a.getPatientVisit().getClinicShipmentPatient()
+                .getPatient().getPnumber();
             String inventoryId = a.getInventoryId();
             String stName = a.getSampleType().getNameShort();
             String dateProcessed = DateFormatter.formatAsDate(a

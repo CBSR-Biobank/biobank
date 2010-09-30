@@ -54,9 +54,9 @@ import edu.ualberta.med.biobank.common.reports.AdvancedReportTreeNode;
 import edu.ualberta.med.biobank.dialogs.SaveReportDialog;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
-import edu.ualberta.med.biobank.treeview.QueryTree;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.QueryTree;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
 public class AdvancedReportsEditor extends BiobankFormBase {

@@ -6,7 +6,6 @@ import java.util.Date;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.AbstractShipment;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
@@ -155,30 +154,6 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
         }
         wrappedObject.setShippingMethod(newSh);
         propertyChangeSupport.firePropertyChange("shippingMethod", old, newSh);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
-            .get("activityStatus");
-        if (activity == null) {
-            ActivityStatus a = wrappedObject.getActivityStatus();
-            if (a == null)
-                return null;
-            activity = new ActivityStatusWrapper(appService, a);
-        }
-        return activity;
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        propertiesMap.put("activityStatus", activityStatus);
-        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        ActivityStatus rawObject = null;
-        if (activityStatus != null) {
-            rawObject = activityStatus.getWrappedObject();
-        }
-        wrappedObject.setActivityStatus(rawObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
     }
 
     public static AbstractShipmentWrapper<?> createInstance(

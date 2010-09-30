@@ -3,9 +3,9 @@ package edu.ualberta.med.biobank.widgets.multiselect;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.treeview.DeltaEvent;
-import edu.ualberta.med.biobank.treeview.IDeltaListener;
-import edu.ualberta.med.biobank.treeview.NullDeltaListener;
+import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
+import edu.ualberta.med.biobank.treeview.util.IDeltaListener;
+import edu.ualberta.med.biobank.treeview.util.NullDeltaListener;
 
 public class MultiSelectNode {
     private int id;

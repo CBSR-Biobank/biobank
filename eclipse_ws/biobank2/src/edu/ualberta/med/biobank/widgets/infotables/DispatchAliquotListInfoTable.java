@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -9,6 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -38,30 +40,36 @@ public class DispatchAliquotListInfoTable extends
     private boolean editMode = false;
 
     public DispatchAliquotListInfoTable(Composite parent,
+        final DispatchShipmentWrapper shipment,
         List<AliquotWrapper> aliquotCollection, boolean editMode) {
         super(parent, aliquotCollection, HEADINGS, BOUNDS, 20);
+        this.editMode = editMode;
         if (editMode) {
-            addDeleteItemListener(new IInfoTableDeleteItemListener() {
-                @Override
-                public void deleteItem(InfoTableEvent event) {
-                    AliquotWrapper aliquot = getSelection();
-                    if (aliquot != null) {
-                        if (!BioBankPlugin.openConfirm("Remove Aliquot",
-                            "Are you sure you want to remove aliquot \""
-                                + aliquot.getInventoryId()
-                                + "\" from this shipment ?"))
-                            return;
-                        System.out.println("remove aliquot");
-                        // try {
-                        // site.removeStudies(Arrays.asList(study));
-                        // setCollection(site.getStudyCollection(true));
-                        // notifyListeners();
-                        // } catch (BiobankCheckException e) {
-                        // BioBankPlugin.openAsyncError("Delete failed", e);
-                        // }
+            if (shipment.isInCreationState()) {
+                addDeleteItemListener(new IInfoTableDeleteItemListener() {
+                    @Override
+                    public void deleteItem(InfoTableEvent event) {
+                        AliquotWrapper aliquot = getSelection();
+                        if (aliquot != null) {
+                            if (!BioBankPlugin.openConfirm("Remove Aliquot",
+                                "Are you sure you want to remove aliquot \""
+                                    + aliquot.getInventoryId()
+                                    + "\" from this shipment ?"))
+                                return;
+                            try {
+                                shipment.removeAliquots(Arrays
+                                    .asList(getSelection()));
+                                reloadCollection(shipment
+                                    .getAliquotCollection());
+                                notifyListeners();
+                            } catch (Exception e) {
+                                BioBankPlugin
+                                    .openAsyncError("Delete failed", e);
+                            }
+                        }
                     }
-                }
-            });
+                });
+            }
         }
     }
 
@@ -149,4 +157,5 @@ public class DispatchAliquotListInfoTable extends
     protected BiobankTableSorter getComparator() {
         return null;
     }
+
 }

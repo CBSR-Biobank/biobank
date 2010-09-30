@@ -16,21 +16,31 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.DispatchShipmentSearchedNode;
-import edu.ualberta.med.biobank.treeview.ReceivedDispatchShipmentGroup;
-import edu.ualberta.med.biobank.treeview.SentDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentSearchedNode;
+import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
+import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchShipmentGroup;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class DispatchShipmentAdministrationView extends
     AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView";
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView";
 
-    public SentDispatchShipmentGroup sentNode;
+    public InCreationDispatchShipmentGroup creationNode;
 
-    public ReceivedDispatchShipmentGroup receivedNode;
+    public SentInTransitDispatchShipmentGroup sentTransitNode;
+
+    public ReceivingInTransitDispatchShipmentGroup receivedTransitNode;
+
+    public ReceivingDispatchShipmentGroup receivingNode;
 
     private Button radioWaybill;
 
@@ -38,9 +48,15 @@ public class DispatchShipmentAdministrationView extends
 
     private Composite dateComposite;
 
-    private DateTimeWidget dateSentWidget;
+    private DateTimeWidget dateWidget;
 
     private DispatchShipmentSearchedNode searchedNode;
+
+    private IncomingNode incomingNode;
+
+    private OutgoingNode outgoingNode;
+
+    private Button radioDateReceived;
 
     private static DispatchShipmentAdministrationView currentInstance;
 
@@ -53,13 +69,24 @@ public class DispatchShipmentAdministrationView extends
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
-        sentNode = new SentDispatchShipmentGroup(rootNode, 0);
-        sentNode.setParent(rootNode);
-        rootNode.addChild(sentNode);
+        createNodes();
+    }
 
-        receivedNode = new ReceivedDispatchShipmentGroup(rootNode, 1);
-        receivedNode.setParent(rootNode);
-        rootNode.addChild(receivedNode);
+    private void createNodes() {
+        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+        if (SessionManager.getInstance().isAllSitesSelected()
+            || site.getDispatchStudiesAsSender().size() > 0) {
+            outgoingNode = new OutgoingNode(rootNode, 0);
+            outgoingNode.setParent(rootNode);
+            rootNode.addChild(outgoingNode);
+        }
+
+        if (SessionManager.getInstance().isAllSitesSelected()
+            || site.getDispatchStudiesAsReceiver().size() > 0) {
+            incomingNode = new IncomingNode(rootNode, 1);
+            incomingNode.setParent(rootNode);
+            rootNode.addChild(incomingNode);
+        }
 
         searchedNode = new DispatchShipmentSearchedNode(rootNode, 2);
         searchedNode.setParent(rootNode);
@@ -69,7 +96,7 @@ public class DispatchShipmentAdministrationView extends
     @Override
     protected void createTreeTextOptions(Composite parent) {
         Composite composite = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout(2, false);
+        GridLayout layout = new GridLayout(3, false);
         layout.horizontalSpacing = 0;
         layout.marginHeight = 0;
         layout.verticalSpacing = 0;
@@ -97,6 +124,17 @@ public class DispatchShipmentAdministrationView extends
             }
         });
 
+        radioDateReceived = new Button(composite, SWT.RADIO);
+        radioDateReceived.setText("Date Received");
+        radioDateReceived.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioDateReceived.getSelection()) {
+                    showTextOnly(false);
+                }
+            }
+        });
+
         dateComposite = new Composite(parent, SWT.NONE);
         layout = new GridLayout(2, false);
         layout.horizontalSpacing = 0;
@@ -107,7 +145,13 @@ public class DispatchShipmentAdministrationView extends
         gd.exclude = true;
         dateComposite.setLayoutData(gd);
 
-        dateSentWidget = new DateTimeWidget(dateComposite, SWT.DATE, new Date());
+        dateWidget = new DateTimeWidget(dateComposite, SWT.DATE, new Date());
+        dateWidget.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                internalSearch();
+            }
+        });
         Button searchButton = new Button(dateComposite, SWT.PUSH);
         searchButton.setText("Go");
         searchButton.addSelectionListener(new SelectionAdapter() {
@@ -136,8 +180,12 @@ public class DispatchShipmentAdministrationView extends
 
     @Override
     public void reload() {
-        sentNode.rebuild();
-        receivedNode.rebuild();
+        rootNode.removeAll();
+        createNodes();
+        for (AdapterBase adaper : rootNode.getChildren()) {
+            if (!adaper.equals(searchedNode))
+                adaper.rebuild();
+        }
         super.reload();
     }
 
@@ -150,8 +198,9 @@ public class DispatchShipmentAdministrationView extends
                 if (radioWaybill.getSelection()) {
                     msg += " for waybill " + treeText.getText();
                 } else {
-                    msg += " for date "
-                        + DateFormatter.formatAsDate(dateSentWidget.getDate());
+                    msg +=
+                        " for date "
+                            + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
                 BioBankPlugin.openMessage("Shipment not found", msg);
             } else {
@@ -169,11 +218,18 @@ public class DispatchShipmentAdministrationView extends
                 SessionManager.getAppService(), treeText.getText().trim(),
                 SessionManager.getInstance().getCurrentSite());
         } else {
-            Date date = dateSentWidget.getDate();
+            Date date = dateWidget.getDate();
             if (date != null) {
-                return DispatchShipmentWrapper.getShipmentsInSite(
-                    SessionManager.getAppService(), date, SessionManager
-                        .getInstance().getCurrentSite());
+                if (radioDateSent.getSelection())
+                    return DispatchShipmentWrapper
+                        .getShipmentsInSiteByDateSent(
+                            SessionManager.getAppService(), date,
+                            SessionManager.getInstance().getCurrentSite());
+                else
+                    return DispatchShipmentWrapper
+                        .getShipmentsInSiteByDateReceived(
+                            SessionManager.getAppService(), date,
+                            SessionManager.getInstance().getCurrentSite());
             }
         }
         return null;
@@ -199,6 +255,10 @@ public class DispatchShipmentAdministrationView extends
 
     public static DispatchShipmentAdministrationView getCurrent() {
         return currentInstance;
+    }
+
+    public OutgoingNode getOutgoingNode() {
+        return outgoingNode;
     }
 
 }

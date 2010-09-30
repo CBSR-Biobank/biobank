@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.importer;
 
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -52,9 +52,13 @@ public class Freezer02Importer extends FreezerImporter {
         ContainerWrapper newHotel;
         int visitId;
 
-        for (int h = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('A'); h <= LabelingScheme.CBSR_LABELLING_PATTERN
+        for (int h =
+            ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN.indexOf('A'); h <= ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
             .indexOf('J'); h++) {
-            hotelLabel = "C" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
+            hotelLabel =
+                "C"
+                    + ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                        .charAt(h);
 
             if (!configuration.importFreezerHotel("02" + hotelLabel)) {
                 logger.info("not configured for importing hotel " + hotelLabel);
@@ -94,8 +98,8 @@ public class Freezer02Importer extends FreezerImporter {
                     return;
                 }
 
-                newPalletNr = Integer.valueOf(newLabel.substring(newLabel
-                    .length() - 2));
+                newPalletNr =
+                    Integer.valueOf(newLabel.substring(newLabel.length() - 2));
 
                 Importer.importSample(site, studyNameShort, patientNr, visitId,
                     dateProcessedStr, dateTakenStr, newHotel, newPalletNr,
@@ -104,9 +108,13 @@ public class Freezer02Importer extends FreezerImporter {
             }
         }
 
-        for (int h = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('A'); h <= LabelingScheme.CBSR_LABELLING_PATTERN
+        for (int h =
+            ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN.indexOf('A'); h <= ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
             .indexOf('T'); h++) {
-            hotelLabel = "A" + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(h);
+            hotelLabel =
+                "A"
+                    + ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                        .charAt(h);
 
             if (!configuration.importFreezerHotel("02" + hotelLabel)) {
                 logger.info("not configured for importing hotel " + hotelLabel);
@@ -146,8 +154,8 @@ public class Freezer02Importer extends FreezerImporter {
                     return;
                 }
 
-                newPalletNr = Integer.valueOf(newLabel.substring(newLabel
-                    .length() - 2));
+                newPalletNr =
+                    Integer.valueOf(newLabel.substring(newLabel.length() - 2));
 
                 Importer.importSample(site, studyNameShort, patientNr, visitId,
                     dateProcessedStr, dateTakenStr, newHotel, newPalletNr,
@@ -196,20 +204,24 @@ public class Freezer02Importer extends FreezerImporter {
         }
 
         if ((hotelLabel.charAt(1) >= 'A') && (hotelLabel.charAt(1) <= 'E')) {
-            hotelLabel = "A"
-                + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(2
-                    * LabelingScheme.CBSR_LABELLING_PATTERN.indexOf(hotelLabel
-                        .charAt(1)) + hotelOffset);
+            hotelLabel =
+                "A"
+                    + ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                        .charAt(2
+                            * ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                                .indexOf(hotelLabel.charAt(1)) + hotelOffset);
 
         } else if ((hotelLabel.charAt(1) >= 'F')
             && (hotelLabel.charAt(1) <= 'J')) {
-            hotelLabel = "B"
-                + LabelingScheme.CBSR_LABELLING_PATTERN
-                    .charAt(LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('S')
-                        + 2
-                        * (LabelingScheme.CBSR_LABELLING_PATTERN
-                            .indexOf(hotelLabel.charAt(1)) - LabelingScheme.CBSR_LABELLING_PATTERN
-                            .indexOf('F')) + hotelOffset);
+            hotelLabel =
+                "B"
+                    + ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                        .charAt(ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                            .indexOf('S')
+                            + 2
+                            * (ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                                .indexOf(hotelLabel.charAt(1)) - ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                                .indexOf('F')) + hotelOffset);
 
         } else {
             throw new Exception("invalid hotel in label: " + oldLabel);
@@ -241,8 +253,9 @@ public class Freezer02Importer extends FreezerImporter {
         }
 
         // there are 6 groups of 3
-        int hotelIndex = LabelingScheme.CBSR_LABELLING_PATTERN
-            .indexOf(hotelLabel.charAt(1));
+        int hotelIndex =
+            ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                .indexOf(hotelLabel.charAt(1));
 
         if (hotelIndex > 18) {
             throw new Exception("invalid hotel in label: " + oldLabel);
@@ -282,15 +295,20 @@ public class Freezer02Importer extends FreezerImporter {
             break;
         }
 
-        hotelIndex = LabelingScheme.CBSR_LABELLING_PATTERN.indexOf('L') + 5
-            * group + hotelOffset;
+        hotelIndex =
+            ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN.indexOf('L')
+                + 5 * group + hotelOffset;
 
         if (hotelIndex < 24) {
-            hotelLabel = "A"
-                + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(hotelIndex);
+            hotelLabel =
+                "A"
+                    + ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                        .charAt(hotelIndex);
         } else {
-            hotelLabel = "B"
-                + LabelingScheme.CBSR_LABELLING_PATTERN.charAt(hotelIndex - 24);
+            hotelLabel =
+                "B"
+                    + ContainerLabelingSchemeWrapper.CBSR_LABELLING_PATTERN
+                        .charAt(hotelIndex - 24);
         }
 
         if ((newPalletNum < 13) || (newPalletNum > 18)) {

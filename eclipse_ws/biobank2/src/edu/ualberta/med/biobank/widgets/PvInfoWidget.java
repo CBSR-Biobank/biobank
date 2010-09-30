@@ -12,7 +12,6 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -32,6 +31,7 @@ public class PvInfoWidget extends BiobankWidget {
     private Button removeButton;
     private List itemList;
     boolean hasListValues;
+    private LabelDialogInfo labelDlgInfo;
 
     private static class LabelDialogInfo {
         public String title;
@@ -45,21 +45,20 @@ public class PvInfoWidget extends BiobankWidget {
         }
     };
 
-    private static Map<String, LabelDialogInfo> LABEL_DLG_INFO = new HashMap<String, LabelDialogInfo>() {
-        private static final long serialVersionUID = 1L;
-        {
-            put(
-                "Visit Type",
-                new LabelDialogInfo("Visit Type Values",
-                    "Please enter a visit type:",
-                    "To enter multiple visit type values, separate with semicolon."));
-            put("Consent", new LabelDialogInfo("Consent Types",
-                "Please enter a consent type:",
-                "To enter multiple consent values, separate with semicolon."));
-        }
-    };
-
-    private LabelDialogInfo labelDlgInfo;
+    private static Map<String, LabelDialogInfo> LABEL_DLG_INFO =
+        new HashMap<String, LabelDialogInfo>() {
+            private static final long serialVersionUID = 1L;
+            {
+                put("Visit Type",
+                    new LabelDialogInfo("Visit Type Values",
+                        "Please enter a visit type:",
+                        "To enter multiple visit type values, separate with semicolon."));
+                put("Consent",
+                    new LabelDialogInfo("Consent Types",
+                        "Please enter a consent type:",
+                        "To enter multiple consent values, separate with semicolon."));
+            }
+        };
 
     public PvInfoWidget(Composite parent, int style,
         final PvAttrCustom pvCustomInfo, boolean selected) {
@@ -67,8 +66,9 @@ public class PvInfoWidget extends BiobankWidget {
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        hasListValues = (pvCustomInfo.getType().equals("select_single") || pvCustomInfo
-            .getType().equals("select_multiple"));
+        hasListValues =
+            (pvCustomInfo.getType().equals("select_single") || pvCustomInfo
+                .getType().equals("select_multiple"));
         selected |= (pvCustomInfo.getAllowedValues() != null);
 
         if (hasListValues) {
@@ -76,26 +76,7 @@ public class PvInfoWidget extends BiobankWidget {
             Assert.isNotNull(labelDlgInfo, "no dialog info for label "
                 + pvCustomInfo.getLabel());
 
-            checkButton = new Button(this, SWT.CHECK);
-            checkButton.setText(pvCustomInfo.getLabel());
-            checkButton.addSelectionListener(new SelectionListener() {
-                @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                    notifyListeners();
-                }
-
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    notifyListeners();
-                }
-            });
-
-            if (pvCustomInfo.getIsDefault()) {
-                checkButton.setEnabled(false);
-                checkButton.setSelection(true);
-            } else {
-                checkButton.setSelection(selected);
-            }
+            createCheckButton(pvCustomInfo, selected);
 
             // this composite holds the list and the "Add" and "Remove" buttons
             Composite comp = new Composite(this, SWT.NONE);
@@ -120,15 +101,17 @@ public class PvInfoWidget extends BiobankWidget {
                     Assert.isNotNull(labelDlgInfo, "no dialog info for label "
                         + pvCustomInfo.getLabel());
 
-                    ListAddDialog dlg = new ListAddDialog(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        labelDlgInfo.title, labelDlgInfo.prompt,
-                        labelDlgInfo.helpText);
+                    ListAddDialog dlg =
+                        new ListAddDialog(PlatformUI.getWorkbench()
+                            .getActiveWorkbenchWindow().getShell(),
+                            labelDlgInfo.title, labelDlgInfo.prompt,
+                            labelDlgInfo.helpText);
                     if (dlg.open() == Dialog.OK) {
-                        java.util.List<String> currentItems = new ArrayList<String>(
-                            Arrays.asList(itemList.getItems()));
-                        java.util.List<String> newItems = Arrays.asList(dlg
-                            .getResult());
+                        java.util.List<String> currentItems =
+                            new ArrayList<String>(Arrays.asList(itemList
+                                .getItems()));
+                        java.util.List<String> newItems =
+                            Arrays.asList(dlg.getResult());
 
                         if (currentItems.size() == 0) {
                             currentItems.addAll(newItems);
@@ -175,8 +158,9 @@ public class PvInfoWidget extends BiobankWidget {
                     itemList.add(item);
                 }
             }
-            Menu m = new Menu(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), SWT.POP_UP);
+            Menu m =
+                new Menu(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getShell(), SWT.POP_UP);
 
             MenuItem mi = new MenuItem(m, SWT.CASCADE);
             mi.setText("Move to Top");
@@ -270,31 +254,26 @@ public class PvInfoWidget extends BiobankWidget {
 
             itemList.setMenu(m);
         } else {
-            checkButton = new Button(this, SWT.CHECK);
-            checkButton.setText(pvCustomInfo.getLabel());
-            GridData gd = new GridData(GridData.VERTICAL_ALIGN_BEGINNING
-                | GridData.GRAB_HORIZONTAL);
-            checkButton.setLayoutData(gd);
-            checkButton.addSelectionListener(new SelectionListener() {
+            createCheckButton(pvCustomInfo, selected);
+        }
+    }
 
-                @Override
-                public void widgetDefaultSelected(SelectionEvent e) {
-                    notifyListeners();
-                }
-
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    notifyListeners();
-                }
-
-            });
-
-            if (pvCustomInfo.getIsDefault()) {
-                checkButton.setEnabled(false);
-                checkButton.setSelection(true);
-            } else {
-                checkButton.setSelection(selected);
+    private void createCheckButton(final PvAttrCustom pvCustomInfo,
+        boolean selected) {
+        checkButton = new Button(this, SWT.CHECK);
+        checkButton.setText(pvCustomInfo.getLabel());
+        checkButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                notifyListeners();
             }
+        });
+
+        if (pvCustomInfo.getIsDefault()) {
+            checkButton.setEnabled(false);
+            checkButton.setSelection(true);
+        } else {
+            checkButton.setSelection(selected);
         }
     }
 

@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.common.wrappers;
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
+import edu.ualberta.med.biobank.common.security.Privilege;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
@@ -28,21 +30,17 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 
-import org.apache.log4j.Logger;
-
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected WritableApplicationService appService;
 
     protected E wrappedObject;
 
-    protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
-        this);
+    protected PropertyChangeSupport propertyChangeSupport =
+        new PropertyChangeSupport(this);
 
-    protected HashMap<String, Object> propertiesMap = new HashMap<String, Object>();
-
-    private static Logger LOGGER = Logger.getLogger(ModelWrapper.class
-        .getName());
+    protected HashMap<String, Object> propertiesMap =
+        new HashMap<String, Object>();
 
     private List<WrapperListener> listeners = new ArrayList<WrapperListener>();
 
@@ -196,12 +194,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             eventType = WrapperEventType.UPDATE;
         }
         persistDependencies(origObject);
-        SDKQueryResult result = ((BiobankApplicationService) appService)
-            .executeQuery(query);
+        SDKQueryResult result =
+            ((BiobankApplicationService) appService).executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
         Log logMessage = null;
         try {
-            logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
+            logMessage =
+                getLogMessage(eventType.name().toLowerCase(), null, "");
         } catch (Exception ex) {
             // Don't want the logs to affect persist
             // FIXME save somewhere this information
@@ -232,16 +231,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         String fieldValue = "";
         String[] fields = getPropertyChangeNames();
         for (int i = 0; i < fields.length; i++) {
-            Integer maxLen = VarCharLengths.getMaxSize(
-                wrappedObject.getClass(), fields[i]);
+            Integer maxLen =
+                VarCharLengths.getMaxSize(wrappedObject.getClass(), fields[i]);
             if (maxLen == null)
                 continue;
 
             Method method;
             try {
-                method = this.getClass().getMethod(
-                    "get" + Character.toUpperCase(fields[i].charAt(0))
-                        + fields[i].substring(1));
+                method =
+                    this.getClass().getMethod(
+                        "get" + Character.toUpperCase(fields[i].charAt(0))
+                            + fields[i].substring(1));
                 if (method.getReturnType().equals(String.class)) {
                     fieldValue = (String) method.invoke(this);
                     if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
@@ -351,12 +351,15 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         BiobankCheckException {
         HQLCriteria c;
         if (isNew()) {
-            c = new HQLCriteria("from " + objectClass.getName() + " where "
-                + propertyName + "= ?", Arrays.asList(new Object[] { value }));
+            c =
+                new HQLCriteria("from " + objectClass.getName() + " where "
+                    + propertyName + "= ?",
+                    Arrays.asList(new Object[] { value }));
         } else {
-            c = new HQLCriteria("from " + objectClass.getName()
-                + " where id <> ? and " + propertyName + "= ?",
-                Arrays.asList(new Object[] { getId(), value }));
+            c =
+                new HQLCriteria("from " + objectClass.getName()
+                    + " where id <> ? and " + propertyName + "= ?",
+                    Arrays.asList(new Object[] { getId(), value }));
         }
 
         List<Object> results = appService.query(c);
@@ -369,8 +372,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected void checkNoDuplicatesInSite(Class<?> objectClass,
         String propertyName, String value, Integer siteId, String errorMessage)
         throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(
-            Arrays.asList(new Object[] { value }));
+        List<Object> parameters =
+            new ArrayList<Object>(Arrays.asList(new Object[] { value }));
         String siteIdTest = "site.id=?";
         if (siteId == null) {
             siteIdTest = "site.id is null";
@@ -382,9 +385,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             notSameObject = " and id <> ?";
             parameters.add(getId());
         }
-        HQLCriteria criteria = new HQLCriteria(
-            "from " + objectClass.getName() + " where " + propertyName
-                + "=? and " + siteIdTest + notSameObject, parameters);
+        HQLCriteria criteria =
+            new HQLCriteria("from " + objectClass.getName() + " where "
+                + propertyName + "=? and " + siteIdTest + notSameObject,
+                parameters);
         List<Object> results = appService.query(criteria);
         if (results.size() > 0) {
             throw new BiobankCheckException(errorMessage);
@@ -458,8 +462,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                     && (String.class.isAssignableFrom(returnType) || Number.class
                         .isAssignableFrom(returnType))) {
                     try {
-                        Object res = method.invoke(wrappedObject,
-                            (Object[]) null);
+                        Object res =
+                            method.invoke(wrappedObject, (Object[]) null);
                         if (res != null) {
                             sb.append(name).append(":").append(res.toString())
                                 .append("/");
@@ -478,29 +482,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canView() {
-        try {
-            return ((BiobankApplicationService) appService)
-                .canReadObjects(getWrappedClass());
-        } catch (ApplicationException e) {
-            LOGGER.error("Error testing security authorization on "
-                + getWrappedClass(), e);
-            return false;
-        }
+    public boolean canRead(User user) {
+        return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass()
+            .getName());
     }
 
     /**
      * return true if the user can edit this object
      */
-    public boolean canEdit() {
-        try {
-            return ((BiobankApplicationService) appService)
-                .canUpdateObjects(getWrappedClass());
-        } catch (ApplicationException e) {
-            LOGGER.error("Error testing security authorization on "
-                + getWrappedClass(), e);
-            return false;
-        }
+    public boolean canUpdate(User user) {
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass()
+            .getName());
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -512,7 +504,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     private void notifyListeners(WrapperEvent event) {
-        for (WrapperListener listener : listeners) {
+        // create a new list to avoid concurrent modification
+        for (WrapperListener listener : new ArrayList<WrapperListener>(
+            listeners)) {
             switch (event.getType()) {
             case UPDATE:
                 listener.updated(event);
@@ -554,4 +548,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return null;
     }
 
+    @Override
+    public int compareTo(ModelWrapper<E> arg0) {
+        return this.getId().compareTo(arg0.getId());
+    }
 }
