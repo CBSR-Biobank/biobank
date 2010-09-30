@@ -13,10 +13,6 @@ public class PostProcessUtil {
         int rowIndex = 0;
         for (Object[] before : input) {
             Object[] after = (Object[]) processor.rowPostProcess(before);
-
-            System.out.println(Arrays.toString(before));
-            System.out.println(Arrays.toString(after));
-
             Assert.assertTrue(Arrays.equals(after,
                 expectedOutput.get(rowIndex++)));
         }

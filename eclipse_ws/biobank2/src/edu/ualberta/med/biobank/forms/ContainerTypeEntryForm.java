@@ -367,21 +367,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setChildContainerTypes();
         // associate the storage type to it's site
         containerType.setSite(site);
-<<<<<<< HEAD
-
-        ActivityStatusWrapper activity =
-            (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
-                .getSelection()).getFirstElement();
-        containerType.setActivityStatus(activity);
-
-        // set the labeling scheme
-        String currentScheme =
-            (String) ((StructuredSelection) labelingSchemeComboViewer
-                .getSelection()).getFirstElement();
-        containerType.setChildLabelingSchemeName(currentScheme);
-
-=======
->>>>>>> dev-degrisda
         containerType.persist();
         containerTypeAdapter.getParent().performExpand();
     }
@@ -423,11 +408,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private void setChildContainerTypes() throws BiobankCheckException {
         List<Integer> addedTypesIds = new ArrayList<Integer>();
         List<Integer> removedTypesIds = new ArrayList<Integer>();
-<<<<<<< HEAD
-        if (hasContainers.getSelection()) {
-=======
         if (!hasSamples) {
->>>>>>> dev-degrisda
             addedTypesIds =
                 childContainerTypesMultiSelect.getAddedToSelection();
             removedTypesIds =
