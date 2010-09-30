@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrappe
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -258,12 +259,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     private void persistPath() throws Exception {
         // TODO: why does persisting always just get the current path, ignoring
         // the one we just set?
-        ContainerPathWrapper containerPath = ContainerPathWrapper
-            .getContainerPath(appService, this);
-        if (containerPath == null) {
-            containerPath = new ContainerPathWrapper(appService);
-            containerPath.setContainer(this);
-        }
+        ContainerPathWrapper containerPath = getContainerPath();
         containerPath.persist();
     }
 
@@ -317,15 +313,31 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     private ContainerPathWrapper getContainerPath() throws Exception {
-        return ContainerPathWrapper.getContainerPath(appService, this);
+        ContainerPathWrapper cp = ContainerPathWrapper.getContainerPath(
+            appService, this);
+
+        if (cp == null) {
+            cp = new ContainerPathWrapper(appService, new ContainerPath());
+        }
+
+        cp.setContainer(this);
+        cp.getWrappedObject().setPath(getPath());
+
+        return cp;
     }
 
-    public String getPath() throws Exception {
-        ContainerPathWrapper containerPath = getContainerPath();
-        if (containerPath == null) {
-            return null;
+    public String getPath() {
+        StringBuilder sb = new StringBuilder();
+        ContainerWrapper container = this;
+
+        while (container != null) {
+            sb.insert(0, container.getId());
+            sb.insert(0, "/");
+            container = container.getParent();
         }
-        return containerPath.getPath();
+        sb.deleteCharAt(0);
+
+        return sb.toString();
     }
 
     /**
