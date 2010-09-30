@@ -17,6 +17,16 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class ContainerLabelingSchemeWrapper extends
     ModelWrapper<ContainerLabelingScheme> {
 
+    public static final int SCHEME_SBS = 1;
+
+    public static final int SCHEME_CBSR_2_CHAR_ALPHA = 2;
+
+    public static final int SCHEME_2_CHAR_NUMERIC = 3;
+
+    public static final int SCHEME_DEWAR = 4;
+
+    public static final int SCHEME_BOX_81 = 5;
+
     public static final String CBSR_LABELLING_PATTERN =
         "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
@@ -24,7 +34,7 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ";
 
-    private static Map<String, ContainerLabelingSchemeWrapper> allSchemes;
+    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes;
 
     public ContainerLabelingSchemeWrapper(
         WritableApplicationService appService,
@@ -119,28 +129,70 @@ public class ContainerLabelingSchemeWrapper extends
         return types.size() > 0;
     }
 
-    public static Map<String, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
+    public static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
         WritableApplicationService appService) throws ApplicationException {
         if (allSchemes == null) {
-            allSchemes = new HashMap<String, ContainerLabelingSchemeWrapper>();
+            allSchemes = new HashMap<Integer, ContainerLabelingSchemeWrapper>();
             List<ContainerLabelingScheme> list =
                 appService.search(ContainerLabelingScheme.class,
                     new ContainerLabelingScheme());
             if (list != null) {
                 for (ContainerLabelingScheme scheme : list) {
-                    allSchemes.put(scheme.getName(),
-                        new ContainerLabelingSchemeWrapper(appService, scheme));
+                    Integer id = scheme.getId();
+                    switch (id.intValue()) {
+                    case SCHEME_SBS:
+                        if (scheme.getName().equals("SBS Standard")) {
+                            throw new ApplicationException("");
+                        }
+                        break;
+
+                    case SCHEME_CBSR_2_CHAR_ALPHA:
+                        if (scheme.getName().equals("CBSR 2 cahr alpabetic")) {
+                            throw new ApplicationException("");
+                        }
+                        break;
+
+                    case SCHEME_2_CHAR_NUMERIC:
+                        if (scheme.getName().equals("2 char numeric")) {
+                            throw new ApplicationException("");
+                        }
+                        break;
+
+                    case SCHEME_DEWAR:
+                        if (scheme.getName().equals("Dewar")) {
+                            throw new ApplicationException("");
+                        }
+                        break;
+
+                    case SCHEME_BOX_81:
+                        if (scheme.getName().equals("Box81")) {
+                            throw new ApplicationException("");
+                        }
+                        break;
+
+                    default:
+                        throw new ApplicationException(
+                            "labeling scheme with id " + id
+                                + " is not mapped correctly");
+                    }
+                    allSchemes.put(id, new ContainerLabelingSchemeWrapper(
+                        appService, scheme));
                 }
             }
         }
         return allSchemes;
     }
 
-    public static ContainerLabelingSchemeWrapper getLabelingSchemeByName(
-        WritableApplicationService appService, String name)
+    public static ContainerLabelingSchemeWrapper getLabelingSchemeById(
+        WritableApplicationService appService, Integer id)
         throws ApplicationException {
         getAllLabelingSchemesMap(appService);
-        return allSchemes.get(name);
+        ContainerLabelingSchemeWrapper scheme = allSchemes.get(id);
+        if (scheme == null) {
+            throw new ApplicationException("labeling scheme with id" + id
+                + "does not exist");
+        }
+        return scheme;
     }
 
     @Override
@@ -231,7 +283,7 @@ public class ContainerLabelingSchemeWrapper extends
     public static RowColPos sbsToRowCol(WritableApplicationService appService,
         String pos) throws Exception {
         ContainerLabelingSchemeWrapper scheme =
-            getLabelingSchemeByName(appService, "SBS Standard");
+            getLabelingSchemeById(appService, SCHEME_SBS);
         if (scheme == null) {
             throw new BiobankCheckException(
                 "SBS Standard labeling scheme not found");
@@ -252,7 +304,7 @@ public class ContainerLabelingSchemeWrapper extends
     public static RowColPos box81ToRowCol(
         WritableApplicationService appService, String pos) throws Exception {
         ContainerLabelingSchemeWrapper scheme =
-            getLabelingSchemeByName(appService, "Box81");
+            getLabelingSchemeById(appService, SCHEME_BOX_81);
         if (scheme == null) {
             throw new BiobankCheckException("Box81 labeling scheme not found");
         }
@@ -289,7 +341,7 @@ public class ContainerLabelingSchemeWrapper extends
         WritableApplicationService appService, String label, int rowCap,
         int colCap, String containerTypeName) throws Exception {
         ContainerLabelingSchemeWrapper scheme =
-            getLabelingSchemeByName(appService, "CBSR 2 char alphabetic");
+            getLabelingSchemeById(appService, SCHEME_CBSR_2_CHAR_ALPHA);
         if (scheme == null) {
             throw new BiobankCheckException(
                 "CBSR 2 char alphabetic labeling scheme not found");
@@ -327,7 +379,7 @@ public class ContainerLabelingSchemeWrapper extends
         WritableApplicationService appService, String label, int totalRows)
         throws Exception {
         ContainerLabelingSchemeWrapper scheme =
-            getLabelingSchemeByName(appService, "2 char numeric");
+            getLabelingSchemeById(appService, SCHEME_2_CHAR_NUMERIC);
         if (scheme == null) {
             throw new BiobankCheckException(
                 "2 char numeric labeling scheme not found");
@@ -404,7 +456,7 @@ public class ContainerLabelingSchemeWrapper extends
         WritableApplicationService appService, String label, int totalCol)
         throws Exception {
         ContainerLabelingSchemeWrapper scheme =
-            getLabelingSchemeByName(appService, "Dewar");
+            getLabelingSchemeById(appService, SCHEME_DEWAR);
         if (scheme == null) {
             throw new BiobankCheckException(
                 "CBSR 2 char alphabetic labeling scheme not found");

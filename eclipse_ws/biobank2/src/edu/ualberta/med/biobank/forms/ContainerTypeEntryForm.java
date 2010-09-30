@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -198,8 +200,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 "Default temperature is not a valid number"));
 
         String currentScheme = containerType.getChildLabelingSchemeName();
-        labelingSchemeMap =
-            ContainerTypeWrapper.getAllLabelingSchemes(appService);
+        labelingSchemeMap = new HashMap<Integer, String>();
+        for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
+            .getAllLabelingSchemesMap(appService).values()) {
+            labelingSchemeMap.put(scheme.getId(), scheme.getName());
+        }
         labelingSchemeComboViewer =
             createComboViewer(client, "Child Labeling Scheme",
                 labelingSchemeMap.values(), currentScheme,
@@ -362,6 +367,21 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setChildContainerTypes();
         // associate the storage type to it's site
         containerType.setSite(site);
+<<<<<<< HEAD
+
+        ActivityStatusWrapper activity =
+            (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
+                .getSelection()).getFirstElement();
+        containerType.setActivityStatus(activity);
+
+        // set the labeling scheme
+        String currentScheme =
+            (String) ((StructuredSelection) labelingSchemeComboViewer
+                .getSelection()).getFirstElement();
+        containerType.setChildLabelingSchemeName(currentScheme);
+
+=======
+>>>>>>> dev-degrisda
         containerType.persist();
         containerTypeAdapter.getParent().performExpand();
     }
@@ -403,7 +423,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private void setChildContainerTypes() throws BiobankCheckException {
         List<Integer> addedTypesIds = new ArrayList<Integer>();
         List<Integer> removedTypesIds = new ArrayList<Integer>();
+<<<<<<< HEAD
+        if (hasContainers.getSelection()) {
+=======
         if (!hasSamples) {
+>>>>>>> dev-degrisda
             addedTypesIds =
                 childContainerTypesMultiSelect.getAddedToSelection();
             removedTypesIds =

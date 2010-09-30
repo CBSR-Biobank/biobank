@@ -6,11 +6,11 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
 
-public class DateRangeRowPostProcessTest {
+public class TestDateRangeRowPostProcess {
     @SuppressWarnings("serial")
     @Test
     public void testNotGroupByYear() {
-        TestPostProcessUtil.checkExpected(
+        PostProcessUtil.checkExpected(
             new DateRangeRowPostProcess(false, 1), new ArrayList<Object[]>() {
                 {
                     add(new Object[] { null, 1970, 0, null });
@@ -27,7 +27,7 @@ public class DateRangeRowPostProcessTest {
     @SuppressWarnings("serial")
     @Test
     public void testGroupByYear() {
-        TestPostProcessUtil.checkExpected(new DateRangeRowPostProcess(true, 1),
+        PostProcessUtil.checkExpected(new DateRangeRowPostProcess(true, 1),
             new ArrayList<Object[]>() {
                 {
                     add(new Object[] { null, 1970, 0, null });
