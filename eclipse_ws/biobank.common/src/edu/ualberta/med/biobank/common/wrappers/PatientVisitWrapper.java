@@ -502,12 +502,15 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     public void setShipment(ClinicShipmentWrapper shipment) {
-        ClinicShipment oldRawShipment =
-            getClinicShipmentPatient().getWrappedObject().getClinicShipment();
-        ClinicShipment newRawShipment = shipment.getWrappedObject();
-        getClinicShipmentPatient().setShipment(shipment);
-        propertyChangeSupport.firePropertyChange("shipment", oldRawShipment,
-            newRawShipment);
+        if (shipment != null) {
+            ClinicShipment oldRawShipment =
+                getClinicShipmentPatient().getWrappedObject()
+                    .getClinicShipment();
+            ClinicShipment newRawShipment = shipment.getWrappedObject();
+            getClinicShipmentPatient().setShipment(shipment);
+            propertyChangeSupport.firePropertyChange("shipment",
+                oldRawShipment, newRawShipment);
+        }
     }
 
     @SuppressWarnings("unchecked")
