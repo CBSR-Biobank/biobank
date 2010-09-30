@@ -29,21 +29,26 @@ import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.DateNode;
-import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.ReceivedDispatchShipmentGroup;
-import edu.ualberta.med.biobank.treeview.SentDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.SiteGroup;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
+import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -97,6 +102,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SESSIONS = "sessions";
     public static final String IMG_CLINIC_SHIPMENT = "clinicShipment";
     public static final String IMG_DISPATCH_SHIPMENT = "dispatchShipment";
+    public static final String IMG_DISPATCH_SHIPMENT_CREATION = "dispatchShipmentCreation";
+    public static final String IMG_DISPATCH_SHIPMENT_TRANSIT = "dispatchShipmentTransit";
+    public static final String IMG_DISPATCH_SHIPMENT_RECEIVING = "dispatchShipmentReceiving";
+    public static final String IMG_DISPATCH_SHIPMENT_ERROR = "dispatchShipmentError";
+    public static final String IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT = "dispatchShipmentAddAliquot";
     public static final String IMG_SITE = "site";
     public static final String IMG_SITES = "sites";
     public static final String IMG_STUDIES = "studies";
@@ -149,10 +159,22 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_TODAY);
         classToImageKey.put(DateNode.class.getName(),
             BioBankPlugin.IMG_CALENDAR);
-        classToImageKey.put(SentDispatchShipmentGroup.class.getName(),
+        classToImageKey.put(OutgoingNode.class.getName(),
             BioBankPlugin.IMG_SENT);
-        classToImageKey.put(ReceivedDispatchShipmentGroup.class.getName(),
+        classToImageKey.put(IncomingNode.class.getName(),
             BioBankPlugin.IMG_RECEIVED);
+        classToImageKey.put(InCreationDispatchShipmentGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_CREATION);
+        classToImageKey.put(
+            ReceivingInTransitDispatchShipmentGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
+        classToImageKey.put(SentInTransitDispatchShipmentGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
+        classToImageKey.put(ReceivingDispatchShipmentGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
+        classToImageKey.put(
+            ReceivingWithErrorsDispatchShipmentGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
         classToImageKey.put(DispatchShipmentAdapter.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT);
         classToImageKey.put(AliquotAdapter.class.getName(),
@@ -243,6 +265,16 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SESSIONS, "sessions.png");
         registerImage(registry, IMG_CLINIC_SHIPMENT, "clinicShipment.png");
         registerImage(registry, IMG_DISPATCH_SHIPMENT, "dispatchShipment.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_CREATION,
+            "dispatchShipment_creation.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_TRANSIT,
+            "dispatchShipment_transit.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_RECEIVING,
+            "dispatchShipment_receiving.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_ERROR,
+            "dispatchShipment_error.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT,
+            "dispatchScanAdd.png");
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_SITES, "sites.png");
         registerImage(registry, IMG_STUDIES, "studies.png");

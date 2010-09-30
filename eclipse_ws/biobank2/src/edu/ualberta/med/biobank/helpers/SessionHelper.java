@@ -52,14 +52,16 @@ public class SessionHelper implements Runnable {
             if (userName.length() == 0) {
                 if (BioBankPlugin.getDefault().isDebugging()) {
                     userName = "testuser";
-                    appService = ServiceConnection.getAppService(serverUrl,
-                        userName, "test");
+                    appService =
+                        ServiceConnection.getAppService(serverUrl, userName,
+                            "test");
                 } else {
                     appService = ServiceConnection.getAppService(serverUrl);
                 }
             } else {
-                appService = ServiceConnection.getAppService(serverUrl,
-                    userName, password);
+                appService =
+                    ServiceConnection.getAppService(serverUrl, userName,
+                        password);
             }
             siteWrappers = SiteWrapper.getSites(appService);
             user = appService.getCurrentUser();

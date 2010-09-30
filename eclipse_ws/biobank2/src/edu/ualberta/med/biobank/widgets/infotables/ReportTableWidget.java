@@ -23,12 +23,12 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     public ReportTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths) {
-        super(parent, collection, headings, columnWidths, 40, false);
+        super(parent, collection, headings, columnWidths, 24);
     }
 
     public ReportTableWidget(Composite parent, List<T> collection,
         String[] headings, int[] columnWidths, int rowsPerPage) {
-        super(parent, collection, headings, columnWidths, rowsPerPage, false);
+        super(parent, collection, headings, columnWidths, rowsPerPage);
     }
 
     @Override
@@ -43,7 +43,6 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
             if (collection.get(pageInfo.rowsPerPage) != null) {
                 paginationRequired = true;
                 init(collection);
-                addPaginationWidget();
             }
         } else
             paginationRequired = false;

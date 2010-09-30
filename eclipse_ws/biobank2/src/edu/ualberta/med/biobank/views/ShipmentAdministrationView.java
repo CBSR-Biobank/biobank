@@ -19,16 +19,16 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.dialogs.SelectShipmentClinicDialog;
+import edu.ualberta.med.biobank.dialogs.select.SelectShipmentClinicDialog;
 import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.DateNode;
-import edu.ualberta.med.biobank.treeview.ShipmentSearchedNode;
-import edu.ualberta.med.biobank.treeview.ShipmentTodayNode;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ClinicWithShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ShipmentSearchedNode;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ShipmentTodayNode;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class ShipmentAdministrationView extends
@@ -94,6 +94,12 @@ public class ShipmentAdministrationView extends
 
         dateReceivedWidget = new DateTimeWidget(dateComposite, SWT.DATE,
             new Date());
+        dateReceivedWidget.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                internalSearch();
+            }
+        });
         Button searchButton = new Button(dateComposite, SWT.PUSH);
         searchButton.setText("Go");
         searchButton.addSelectionListener(new SelectionAdapter() {

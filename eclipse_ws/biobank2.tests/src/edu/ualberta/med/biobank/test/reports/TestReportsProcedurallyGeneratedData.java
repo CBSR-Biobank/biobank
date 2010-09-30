@@ -61,8 +61,8 @@ import org.junit.runners.Suite.SuiteClasses;
     DAliquotsTest.class, FTAReportTest.class, FvLPatientVisitsTest.class,
     InvoicingReportTest.class, NewPsByStudyClinicTest.class,
     NewPVsByStudyClinicTest.class, PatientVisitSummaryTest.class,
-    PatientWBCTest.class, PsByStudyTest.class, PVsByStudyTest.class,
-    QAAliquotsTest.class, SAliquotsTest.class, SampleTypePvCountTest.class,
+    PsByStudyTest.class, PVsByStudyTest.class, QAAliquotsTest.class,
+    SAliquotsTest.class, SampleTypePvCountTest.class,
     SampleTypeSUsageTest.class })
 public final class TestReportsProcedurallyGeneratedData implements
     ReportDataSource {
@@ -754,6 +754,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         getInstance().sites.addAll(sites);
         getInstance().sampleTypes.addAll(sampleTypes);
         getInstance().studies.addAll(studies);
+
     }
 
     @AfterClass

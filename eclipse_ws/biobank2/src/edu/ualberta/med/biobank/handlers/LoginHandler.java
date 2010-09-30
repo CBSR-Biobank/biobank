@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.dialogs.LoginDialog;
+import edu.ualberta.med.biobank.dialogs.startup.LoginDialog;
 
 public class LoginHandler extends AbstractHandler implements IHandler {
 

@@ -45,7 +45,7 @@ public class SiteGroup extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addSite(SessionManager.getInstance().getSession(), false);
+                    addSite();
                 }
             });
         }
@@ -91,12 +91,10 @@ public class SiteGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addSite(SessionAdapter sessionAdapter,
-        boolean hasPreviousForm) {
-        SiteWrapper site = new SiteWrapper(sessionAdapter.getAppService());
-        SiteAdapter adapter = new SiteAdapter(
-            sessionAdapter.getStudiesGroupNode(), site);
-        adapter.openEntryForm(hasPreviousForm);
+    public void addSite() {
+        SiteWrapper site = new SiteWrapper(getAppService());
+        SiteAdapter adapter = new SiteAdapter(this, site);
+        adapter.openEntryForm();
     }
 
     @Override

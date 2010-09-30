@@ -25,10 +25,10 @@ import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationServ
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.AdapterFactory;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -80,8 +80,8 @@ public class SessionManager {
         String serverName, User user, Collection<SiteWrapper> sites) {
         logger.debug("addSession: " + serverName + ", user/" + user.getLogin()
             + " numSites/" + sites.size());
-        sessionAdapter = new SessionAdapter(rootNode, appService, 0,
-            serverName, user);
+        sessionAdapter =
+            new SessionAdapter(rootNode, appService, 0, serverName, user);
         rootNode.addChild(sessionAdapter);
 
         siteManager.init(appService, serverName);
@@ -94,8 +94,9 @@ public class SessionManager {
         updateMenus();
 
         if (sessionAdapter.getUser().isNeedToChangePassword()) {
-            ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
-                .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
+            ChangePasswordDialog dlg =
+                new ChangePasswordDialog(PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getShell(), true);
             dlg.open();
         }
     }
@@ -115,21 +116,23 @@ public class SessionManager {
     }
 
     private void updateMenus() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
+        IWorkbenchWindow window =
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+        ISourceProviderService service =
+            (ISourceProviderService) window
+                .getService(ISourceProviderService.class);
 
         // assign logged in state
-        SessionState sessionSourceProvider = (SessionState) service
-            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
+        SessionState sessionSourceProvider =
+            (SessionState) service
+                .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
         sessionSourceProvider.setWebAdmin(sessionAdapter != null
             && sessionAdapter.getUser().isWebsiteAdministrator());
 
         // assign debug state
-        DebugState debugStateSourceProvider = (DebugState) service
-            .getSourceProvider(DebugState.SESSION_STATE);
+        DebugState debugStateSourceProvider =
+            (DebugState) service.getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BioBankPlugin.getDefault()
             .isDebugging());
 
@@ -198,8 +201,8 @@ public class SessionManager {
 
     public static AbstractViewWithAdapterTree getCurrentAdapterViewWithTree() {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
-        IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()
-            .getActivePage();
+        IWorkbenchPage activePage =
+            workbench.getActiveWorkbenchWindow().getActivePage();
         return getInstance().possibleViewMap.get(activePage.getPerspective()
             .getId());
     }
@@ -265,8 +268,9 @@ public class SessionManager {
         }
         if (view != null) {
             if (!isAllSitesSelected()) {
-                SiteAdapter site = (SiteAdapter) getSession()
-                    .getSitesGroupNode().search(getCurrentSite());
+                SiteAdapter site =
+                    (SiteAdapter) getSession().getSitesGroupNode().search(
+                        getCurrentSite());
                 if (site != null) {
                     site.performExpand();
                     return;
@@ -307,7 +311,7 @@ public class SessionManager {
 
     public static void log(String action, String details, String type)
         throws Exception {
-        ((BiobankApplicationService) getAppService()).logActivity(action,
+        getAppService().logActivity(action,
             getInstance().getCurrentSite().getNameShort(), null, null, null,
             details, type);
     }

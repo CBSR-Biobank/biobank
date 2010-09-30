@@ -21,13 +21,12 @@ public class FTAReportImpl extends AbstractReport {
         + " (select min(pv.dateProcessed) from "
         + PatientVisit.class.getName()
         + " pv where pv.patient.id = a2.patientVisit.patient "
-        + " and pv.patient.study.nameShort = ? and pv.shipment.site "
-        + SITE_OPERATOR
-        + SITE_ID
-        + ")"
+        + " and pv.patient.study.nameShort = ?)"
         + " and a2.sampleType.nameShort = '"
         + FTA_CARD_SAMPLE_TYPE_NAME
-        + "' and a2.patientVisit.dateProcessed > ? group by a2.patientVisit.patient.pnumber"
+        + "' and a2.patientVisit.dateProcessed > ? and a2.aliquotPosition.container.label not like '"
+        + SENT_SAMPLES_FREEZER_NAME
+        + "' group by a2.patientVisit.patient.pnumber"
         + " order by a2.patientVisit.patient.pnumber";
 
     public FTAReportImpl(BiobankReport report) {
@@ -56,7 +55,9 @@ public class FTAReportImpl extends AbstractReport {
             AliquotWrapper aliquotWrapper = new AliquotWrapper(appService, a);
             String aliquotLabel = aliquotWrapper.getPositionString(true, true);
             modifiedResults.add(new Object[] { pnumber, dateProcessed,
-                inventoryId, stName, aliquotLabel });
+                inventoryId, stName,
+                aliquotWrapper.getParent().getSite().getNameShort(),
+                aliquotLabel });
         }
         return modifiedResults;
     }

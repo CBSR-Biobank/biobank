@@ -10,10 +10,8 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -29,11 +27,13 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
-    private static Map<Integer, ContainerLabelingSchemeWrapper> labelingSchemeMap;
+    private static Map<String, ContainerLabelingSchemeWrapper> labelingSchemeMap;
 
-    private Set<ContainerTypeWrapper> deletedChildTypes = new HashSet<ContainerTypeWrapper>();
+    private Set<ContainerTypeWrapper> deletedChildTypes =
+        new HashSet<ContainerTypeWrapper>();
 
-    private Set<SampleTypeWrapper> deletedSampleTypes = new HashSet<SampleTypeWrapper>();
+    private Set<SampleTypeWrapper> deletedSampleTypes =
+        new HashSet<SampleTypeWrapper>();
 
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
@@ -104,11 +104,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     private void checkDeletedSampleTypes() throws ApplicationException,
         BiobankCheckException {
         if (deletedSampleTypes.size() > 0) {
-            String queryString = "from " + AliquotPosition.class.getName()
-                + " as sp inner join sp.container as sparent"
-                + " where sparent.containerType.id=? and "
-                + "sp.aliquot.sampleType.id in (select id from "
-                + SampleType.class.getName() + " as st where";
+            String queryString =
+                "from " + AliquotPosition.class.getName()
+                    + " as sp inner join sp.container as sparent"
+                    + " where sparent.containerType.id=? and "
+                    + "sp.aliquot.sampleType.id in (select id from "
+                    + SampleType.class.getName() + " as st where";
             List<Object> params = new ArrayList<Object>();
             params.add(getId());
             int i = 0;
@@ -121,8 +122,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
                 i++;
             }
             queryString += ")";
-            List<Object> results = appService.query(new HQLCriteria(
-                queryString, params));
+            List<Object> results =
+                appService.query(new HQLCriteria(queryString, params));
             if (results.size() != 0) {
                 throw new BiobankCheckException(
                     "Unable to remove sample type. This parent/child relationship "
@@ -135,11 +136,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     private void checkDeletedChildContainerTypes()
         throws BiobankCheckException, ApplicationException {
         if (deletedChildTypes.size() > 0) {
-            String queryString = "from " + ContainerPosition.class.getName()
-                + " as cp inner join cp.parentContainer as cparent"
-                + " where cparent.containerType.id=? and "
-                + "cp.container.containerType.id in (select id from "
-                + ContainerType.class.getName() + " as ct where";
+            String queryString =
+                "from " + ContainerPosition.class.getName()
+                    + " as cp inner join cp.parentContainer as cparent"
+                    + " where cparent.containerType.id=? and "
+                    + "cp.container.containerType.id in (select id from "
+                    + ContainerType.class.getName() + " as ct where";
             List<Object> params = new ArrayList<Object>();
             params.add(getId());
             int i = 0;
@@ -152,8 +154,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
                 i++;
             }
             queryString += ")";
-            List<Object> results = appService.query(new HQLCriteria(
-                queryString, params));
+            List<Object> results =
+                appService.query(new HQLCriteria(queryString, params));
             if (results.size() != 0) {
                 throw new BiobankCheckException(
                     "Unable to remove child type. This parent/child relationship "
@@ -177,7 +179,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public Collection<ContainerTypeWrapper> getChildrenRecursively()
         throws ApplicationException {
-        List<ContainerTypeWrapper> allChildren = new ArrayList<ContainerTypeWrapper>();
+        List<ContainerTypeWrapper> allChildren =
+            new ArrayList<ContainerTypeWrapper>();
         List<ContainerTypeWrapper> children = getChildContainerTypeCollection();
         if (children != null) {
             for (ContainerTypeWrapper type : children) {
@@ -209,10 +212,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public boolean isUsedByContainers() throws ApplicationException,
         BiobankCheckException {
-        String queryString = "select count(c) from "
-            + Container.class.getName() + " as c where c.containerType=?)";
-        HQLCriteria c = new HQLCriteria(queryString,
-            Arrays.asList(new Object[] { wrappedObject }));
+        String queryString =
+            "select count(c) from " + Container.class.getName()
+                + " as c where c.containerType=?)";
+        HQLCriteria c =
+            new HQLCriteria(queryString,
+                Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -222,11 +227,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public List<ContainerTypeWrapper> getParentContainerTypes()
         throws ApplicationException {
-        String queryString = "select ct from "
-            + ContainerType.class.getName()
-            + " as ct inner join ct.childContainerTypeCollection as child where child.id = ?)";
-        HQLCriteria c = new HQLCriteria(queryString,
-            Arrays.asList(new Object[] { wrappedObject.getId() }));
+        String queryString =
+            "select ct from "
+                + ContainerType.class.getName()
+                + " as ct inner join ct.childContainerTypeCollection as child where child.id = ?)";
+        HQLCriteria c =
+            new HQLCriteria(queryString,
+                Arrays.asList(new Object[] { wrappedObject.getId() }));
         List<ContainerType> results = appService.query(c);
         return transformToWrapperList(appService, results);
     }
@@ -286,8 +293,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
-            .get("activityStatus");
+        ActivityStatusWrapper activityStatus =
+            (ActivityStatusWrapper) propertiesMap.get("activityStatus");
         if (activityStatus == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
@@ -312,8 +319,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     private void setSampleTypeCollection(Collection<SampleType> allTypeObjects,
         List<SampleTypeWrapper> allTypeWrappers) {
-        Collection<SampleType> oldTypes = wrappedObject
-            .getSampleTypeCollection();
+        Collection<SampleType> oldTypes =
+            wrappedObject.getSampleTypeCollection();
         wrappedObject.setSampleTypeCollection(allTypeObjects);
         propertyChangeSupport.firePropertyChange("sampleTypeCollection",
             oldTypes, allTypeObjects);
@@ -323,7 +330,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public void addSampleTypes(List<SampleTypeWrapper> newSampleTypes) {
         if (newSampleTypes != null && newSampleTypes.size() > 0) {
             Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
-            List<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
+            List<SampleTypeWrapper> allTypeWrappers =
+                new ArrayList<SampleTypeWrapper>();
             // already added types
             List<SampleTypeWrapper> currentList = getSampleTypeCollection();
             if (currentList != null) {
@@ -346,7 +354,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         if (typesToRemove != null && typesToRemove.size() > 0) {
             deletedSampleTypes.addAll(typesToRemove);
             Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
-            List<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
+            List<SampleTypeWrapper> allTypeWrappers =
+                new ArrayList<SampleTypeWrapper>();
             // already added types
             List<SampleTypeWrapper> currentList = getSampleTypeCollection();
             if (currentList != null) {
@@ -363,11 +372,11 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     @SuppressWarnings("unchecked")
     public List<SampleTypeWrapper> getSampleTypeCollection() {
-        List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
-            .get("sampleTypeCollection");
+        List<SampleTypeWrapper> sampleTypeCollection =
+            (List<SampleTypeWrapper>) propertiesMap.get("sampleTypeCollection");
         if (sampleTypeCollection == null) {
-            Collection<SampleType> children = wrappedObject
-                .getSampleTypeCollection();
+            Collection<SampleType> children =
+                wrappedObject.getSampleTypeCollection();
             if (children != null) {
                 sampleTypeCollection = new ArrayList<SampleTypeWrapper>();
                 for (SampleType type : children) {
@@ -395,8 +404,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     private void setChildContainerTypes(
         Collection<ContainerType> allTypeObjects,
         List<ContainerTypeWrapper> allTypeWrappers) {
-        Collection<ContainerType> oldContainerTypes = wrappedObject
-            .getChildContainerTypeCollection();
+        Collection<ContainerType> oldContainerTypes =
+            wrappedObject.getChildContainerTypeCollection();
         wrappedObject.setChildContainerTypeCollection(allTypeObjects);
         propertyChangeSupport.firePropertyChange(
             "childContainerTypeCollection", oldContainerTypes, allTypeObjects);
@@ -406,10 +415,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public void addChildContainerTypes(
         List<ContainerTypeWrapper> newContainerTypes) {
         if (newContainerTypes != null && newContainerTypes.size() > 0) {
-            Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
-            List<ContainerTypeWrapper> allTypesWrappers = new ArrayList<ContainerTypeWrapper>();
+            Collection<ContainerType> allTypeObjects =
+                new HashSet<ContainerType>();
+            List<ContainerTypeWrapper> allTypesWrappers =
+                new ArrayList<ContainerTypeWrapper>();
             // already added types
-            List<ContainerTypeWrapper> currentList = getChildContainerTypeCollection();
+            List<ContainerTypeWrapper> currentList =
+                getChildContainerTypeCollection();
             if (currentList != null) {
                 for (ContainerTypeWrapper type : currentList) {
                     allTypeObjects.add(type.getWrappedObject());
@@ -429,10 +441,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public void removeChildContainers(List<ContainerTypeWrapper> typesToRemove) {
         if (typesToRemove != null && typesToRemove.size() > 0) {
             deletedChildTypes.addAll(typesToRemove);
-            Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
-            List<ContainerTypeWrapper> allTypesWrappers = new ArrayList<ContainerTypeWrapper>();
+            Collection<ContainerType> allTypeObjects =
+                new HashSet<ContainerType>();
+            List<ContainerTypeWrapper> allTypesWrappers =
+                new ArrayList<ContainerTypeWrapper>();
             // already added types
-            List<ContainerTypeWrapper> currentList = getChildContainerTypeCollection();
+            List<ContainerTypeWrapper> currentList =
+                getChildContainerTypeCollection();
             if (currentList != null) {
                 for (ContainerTypeWrapper type : currentList) {
                     if (!deletedChildTypes.contains(type)) {
@@ -447,14 +462,15 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     @SuppressWarnings("unchecked")
     public List<ContainerTypeWrapper> getChildContainerTypeCollection() {
-        List<ContainerTypeWrapper> childContainerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
-            .get("childContainerTypeCollection");
+        List<ContainerTypeWrapper> childContainerTypeCollection =
+            (List<ContainerTypeWrapper>) propertiesMap
+                .get("childContainerTypeCollection");
         if (childContainerTypeCollection == null) {
-            Collection<ContainerType> children = wrappedObject
-                .getChildContainerTypeCollection();
+            Collection<ContainerType> children =
+                wrappedObject.getChildContainerTypeCollection();
             if (children != null) {
-                childContainerTypeCollection = transformToWrapperList(
-                    appService, children);
+                childContainerTypeCollection =
+                    transformToWrapperList(appService, children);
                 propertiesMap.put("childContainerTypeCollection",
                     childContainerTypeCollection);
             }
@@ -615,8 +631,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     private void checkLabelingScheme(ContainerType oldObject,
         boolean existsContainersWithType) throws BiobankCheckException {
-        ContainerTypeWrapper oldWrapper = new ContainerTypeWrapper(appService,
-            oldObject);
+        ContainerTypeWrapper oldWrapper =
+            new ContainerTypeWrapper(appService, oldObject);
         if (getChildLabelingScheme() == null
             && oldWrapper.getChildLabelingScheme() == null) {
             return;
@@ -637,10 +653,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public static List<ContainerTypeWrapper> getTopContainerTypesInSite(
         WritableApplicationService appService, SiteWrapper site)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + ContainerType.class.getName()
-            + " where site.id = ? and topLevel=true",
-            Arrays.asList(new Object[] { site.getId() }));
+        HQLCriteria criteria =
+            new HQLCriteria("from " + ContainerType.class.getName()
+                + " where site.id = ? and topLevel=true",
+                Arrays.asList(new Object[] { site.getId() }));
         List<ContainerType> types = appService.query(criteria);
         return transformToWrapperList(appService, types);
     }
@@ -664,27 +680,57 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String containerName, boolean useStrictName)
         throws ApplicationException {
-        String nameComparison = "=";
+        String nameComparison = "name =";
         String containerNameParameter = containerName;
         if (!useStrictName) {
-            nameComparison = "like";
-            containerNameParameter = "%" + containerName + "%";
+            nameComparison = "lower(name) like";
+            containerNameParameter = "%" + containerName.toLowerCase() + "%";
         }
-        String query = "from " + ContainerType.class.getName()
-            + " where site = ? and name " + nameComparison + " ?";
-        HQLCriteria criteria = new HQLCriteria(query,
-            Arrays.asList(new Object[] { siteWrapper.getWrappedObject(),
-                containerNameParameter }));
+        String query =
+            "from " + ContainerType.class.getName() + " where site = ? and "
+                + nameComparison + " ?";
+        HQLCriteria criteria =
+            new HQLCriteria(query, Arrays.asList(new Object[] {
+                siteWrapper.getWrappedObject(), containerNameParameter }));
         List<ContainerType> containerTypes = appService.query(criteria);
         return transformToWrapperList(appService, containerTypes);
     }
 
-    private static Map<Integer, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
+    /**
+     * Get containers types with the given capacity in the given site. The
+     * container types returned are ones that can only hold aliquots.
+     */
+    public static List<ContainerTypeWrapper> getContainerTypesByCapacity(
+        WritableApplicationService appService, SiteWrapper siteWrapper,
+        int maxRows, int maxCols) throws ApplicationException {
+        String query =
+            "select ct from "
+                + ContainerType.class.getName()
+                + " as ct join ct.capacity as cap"
+                + " where ct.site = ? and cap.rowCapacity = ?"
+                + " and cap.colCapacity = ? and ct.sampleTypeCollection is not empty"
+                + " and ct.childContainerTypeCollection is empty";
+        HQLCriteria criteria =
+            new HQLCriteria(query, Arrays.asList(new Object[] {
+                siteWrapper.getWrappedObject(), maxRows, maxCols }));
+        List<ContainerType> containerTypes = appService.query(criteria);
+        return transformToWrapperList(appService, containerTypes);
+    }
+
+    public static List<ContainerTypeWrapper> getContainerTypesPallet96(
+        WritableApplicationService appService, SiteWrapper siteWrapper)
+        throws ApplicationException {
+        return getContainerTypesByCapacity(appService, siteWrapper,
+            RowColPos.PALLET_96_ROW_MAX, RowColPos.PALLET_96_COL_MAX);
+    }
+
+    private static Map<String, ContainerLabelingSchemeWrapper> getAllLabelingSchemesMap(
         WritableApplicationService appService) throws RuntimeException {
         try {
             if (labelingSchemeMap == null) {
-                labelingSchemeMap = ContainerLabelingSchemeWrapper
-                    .getAllLabelingSchemesMap(appService);
+                labelingSchemeMap =
+                    ContainerLabelingSchemeWrapper
+                        .getAllLabelingSchemesMap(appService);
             }
             return labelingSchemeMap;
         } catch (ApplicationException e) {
@@ -709,9 +755,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
      */
     public long getContainersCount() throws ApplicationException,
         BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(*) from "
-            + Container.class.getName() + " where containerType.id=?",
-            Arrays.asList(new Object[] { getId() }));
+        HQLCriteria c =
+            new HQLCriteria("select count(*) from " + Container.class.getName()
+                + " where containerType.id=?",
+                Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -742,14 +789,15 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public String getPositionString(RowColPos position) {
-        return LabelingScheme.getPositionString(position,
+        return ContainerLabelingSchemeWrapper.getPositionString(position,
             getChildLabelingScheme(), getRowCapacity(), getColCapacity());
     }
 
     public RowColPos getRowColFromPositionString(String position)
         throws Exception {
-        return LabelingScheme.getRowColFromPositionString(position,
-            getChildLabelingScheme(), getRowCapacity(), getColCapacity());
+        return ContainerLabelingSchemeWrapper.getRowColFromPositionString(
+            getAppService(), position, getChildLabelingScheme(),
+            getRowCapacity(), getColCapacity());
     }
 
 }

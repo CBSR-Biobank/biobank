@@ -15,10 +15,12 @@ public enum CellStatus {
         SWT.COLOR_DARK_GRAY, "Filled"), NEW(SWT.COLOR_DARK_GREEN, "New"), MOVED(
         217, 161, 65, "Moved"), MISSING(SWT.COLOR_CYAN, "Missing"), ERROR(
         SWT.COLOR_RED, "Error"), NO_TYPE(SWT.COLOR_DARK_GREEN, "No type"), TYPE(
-        SWT.COLOR_DARK_GRAY, "Type"), IN_SHIPMENT_PENDING(SWT.COLOR_DARK_GREEN,
-        "In Shipment - Pending"), IN_SHIPMENT_ACCEPTED(SWT.COLOR_DARK_GRAY,
-        "In Shipment - Accepted"), NOT_IN_SHIPMENT(SWT.COLOR_YELLOW,
-        "Not in Shipment"), SCAN_PROFILE(185, 211, 238, "Profiled cell");
+        SWT.COLOR_DARK_GRAY, "Type"), IN_SHIPMENT_EXPECTED(
+        SWT.COLOR_DARK_GREEN, "Expected"), IN_SHIPMENT_ADDED(
+        SWT.COLOR_DARK_GREEN, "Added"), IN_SHIPMENT_ACCEPTED(
+        SWT.COLOR_DARK_GRAY, "Accepted"), NOT_IN_SHIPMENT(SWT.COLOR_YELLOW,
+        "Not in Shipment"), FLAGGED(217, 161, 65, "Flagged"), SCAN_PROFILE(185,
+        211, 238, "Profiled cell");
 
     private Color color;
     private String legend;
@@ -33,11 +35,11 @@ public enum CellStatus {
         .asList(EMPTY, SCAN_PROFILE, NO_TYPE, TYPE, ERROR);
 
     public static List<CellStatus> DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST = Arrays
-        .asList(EMPTY, IN_SHIPMENT_ACCEPTED, IN_SHIPMENT_PENDING,
+        .asList(EMPTY, IN_SHIPMENT_ACCEPTED, IN_SHIPMENT_EXPECTED, FLAGGED,
             NOT_IN_SHIPMENT, ERROR);
 
     public static List<CellStatus> DEFAULT_PALLET_DISPATCH_CREATE_STATUS_LIST = Arrays
-        .asList(EMPTY, FILLED, IN_SHIPMENT_PENDING, MISSING, ERROR);
+        .asList(EMPTY, FILLED, IN_SHIPMENT_ADDED, MISSING, ERROR);
 
     private CellStatus(int color, String legend) {
         this.color = BioBankPlugin.getDefault().getWorkbench().getDisplay()

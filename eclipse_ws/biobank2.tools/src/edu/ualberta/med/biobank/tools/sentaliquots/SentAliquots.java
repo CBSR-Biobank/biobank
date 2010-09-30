@@ -84,8 +84,8 @@ public class SentAliquots {
                 "closeComment" };
             PatientInfo info;
             while ((info = reader.read(PatientInfo.class, header, processors)) != null) {
-                List<AliquotWrapper> aliquots = AliquotWrapper
-                    .getAliquotsInSite(appService, info.getInventoryId(), site);
+                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
+                    appService, info.getInventoryId());
 
                 if (aliquots.size() == 0) {
                     System.out

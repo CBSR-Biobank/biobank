@@ -8,7 +8,6 @@ import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.ListViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
@@ -49,8 +48,7 @@ public class TopContainerListWidget {
             }
         });
         topContainers.setContentProvider(new ArrayContentProvider());
-        BiobankApplicationService appService = (BiobankApplicationService) SessionManager
-            .getAppService();
+        BiobankApplicationService appService = SessionManager.getAppService();
         List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
         try {
             // FIXME: uses all sites by default
@@ -62,7 +60,6 @@ public class TopContainerListWidget {
             BioBankPlugin.openAsyncError("Error retrieving containers", e);
         }
         topContainers.setInput(containers);
-        topContainers.setSelection(new StructuredSelection(containers.get(0)));
     }
 
     public List<Integer> getSelectedContainers() {
@@ -87,7 +84,6 @@ public class TopContainerListWidget {
         topContainers.addFilter(new NameFilter());
         topContainers.setSelection(null);
         if (topContainers.getList().getItemCount() != 0) {
-            topContainers.getList().select(0);
             setEnabled(true);
         } else
             setEnabled(false);
@@ -95,6 +91,9 @@ public class TopContainerListWidget {
 
     public void setEnabled(boolean b) {
         enabled = b;
+        topContainers.getList().setEnabled(b);
+        if (!b)
+            topContainers.setSelection(null);
     }
 
     public boolean getEnabled() {

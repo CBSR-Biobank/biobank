@@ -81,28 +81,30 @@ public abstract class BiobankFormBase extends EditorPart {
 
     public List<BiobankFormBase> linkedForms;
 
-    protected IDoubleClickListener collectionDoubleClickListener = new IDoubleClickListener() {
-        @Override
-        public void doubleClick(DoubleClickEvent event) {
-            Object selection = event.getSelection();
-            if (selection instanceof StructuredSelection) {
-                Object element = ((StructuredSelection) selection)
-                    .getFirstElement();
-                if (element instanceof AdapterBase) {
-                    ((AdapterBase) element).performDoubleClick();
-                } else if (element instanceof ModelWrapper<?>) {
-                    SessionManager.openViewForm((ModelWrapper<?>) element);
-                }
-            } else if (selection instanceof InfoTableSelection) {
-                InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                if (tableSelection.getObject() instanceof ModelWrapper<?>) {
-                    SessionManager
-                        .openViewForm((ModelWrapper<?>) tableSelection
-                            .getObject());
+    protected IDoubleClickListener collectionDoubleClickListener =
+        new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                Object selection = event.getSelection();
+                if (selection instanceof StructuredSelection) {
+                    Object element =
+                        ((StructuredSelection) selection).getFirstElement();
+                    if (element instanceof AdapterBase) {
+                        ((AdapterBase) element).performDoubleClick();
+                    } else if (element instanceof ModelWrapper<?>) {
+                        SessionManager.openViewForm((ModelWrapper<?>) element);
+                    }
+                } else if (selection instanceof InfoTableSelection) {
+                    InfoTableSelection tableSelection =
+                        (InfoTableSelection) selection;
+                    if (tableSelection.getObject() instanceof ModelWrapper<?>) {
+                        SessionManager
+                            .openViewForm((ModelWrapper<?>) tableSelection
+                                .getObject());
+                    }
                 }
             }
-        }
-    };
+        };
 
     public BiobankFormBase() {
         widgets = new HashMap<String, Control>();
@@ -124,8 +126,8 @@ public abstract class BiobankFormBase extends EditorPart {
             // if selection fails, then the adapter needs to be matched at the
             // id level
             if (SessionManager.getSelectedNode() == null) {
-                AdapterBase node = SessionManager.searchNode(adapter
-                    .getModelObject());
+                AdapterBase node =
+                    SessionManager.searchNode(adapter.getModelObject());
                 SessionManager.setSelectedNode(node);
             }
         }
@@ -237,8 +239,9 @@ public abstract class BiobankFormBase extends EditorPart {
     protected abstract void createFormContent() throws Exception;
 
     protected Section createSection(String title) {
-        Section section = toolkit.createSection(page, Section.TWISTIE
-            | Section.TITLE_BAR | Section.EXPANDED);
+        Section section =
+            toolkit.createSection(page, Section.TWISTIE | Section.TITLE_BAR
+                | Section.EXPANDED);
         if (title != null) {
             section.setText(title);
         }
@@ -272,6 +275,11 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected void addSectionToolbar(Section section, String tooltip,
         SelectionListener listener, Class<?> wrapperTypeToAdd) {
+        addSectionToolbar(section, tooltip, listener, wrapperTypeToAdd, null);
+    }
+
+    protected void addSectionToolbar(Section section, String tooltip,
+        SelectionListener listener, Class<?> wrapperTypeToAdd, String imageKey) {
         if (wrapperTypeToAdd == null
             || SessionManager.canCreate(wrapperTypeToAdd)) {
             ToolBar tbar = (ToolBar) section.getTextClient();
@@ -281,8 +289,11 @@ public abstract class BiobankFormBase extends EditorPart {
             }
 
             ToolItem titem = new ToolItem(tbar, SWT.NULL);
+            if (imageKey == null) {
+                imageKey = BioBankPlugin.IMG_ADD;
+            }
             titem.setImage(BioBankPlugin.getDefault().getImageRegistry()
-                .get(BioBankPlugin.IMG_ADD));
+                .get(imageKey));
             titem.setToolTipText(tooltip);
             titem.addSelectionListener(listener);
         }
@@ -297,7 +308,7 @@ public abstract class BiobankFormBase extends EditorPart {
     }
 
     protected <T> ComboViewer createComboViewer(Composite parent,
-        String fieldLabel, Collection<?> input, T selection) {
+        String fieldLabel, Collection<T> input, T selection) {
         return widgetCreator.createComboViewer(parent, fieldLabel, input,
             selection);
     }
@@ -327,8 +338,9 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected BiobankText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
-        BiobankText result = (BiobankText) createLabelledWidget(parent,
-            BiobankText.class, SWT.READ_ONLY | widgetOptions, fieldLabel, value);
+        BiobankText result =
+            (BiobankText) createLabelledWidget(parent, BiobankText.class,
+                SWT.READ_ONLY | widgetOptions, fieldLabel, value);
         return result;
     }
 
@@ -346,8 +358,9 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected BiobankText createReadOnlyWidget(Composite parent,
         int widgetOptions, String value) {
-        BiobankText result = (BiobankText) createWidget(parent,
-            BiobankText.class, SWT.READ_ONLY | widgetOptions, value);
+        BiobankText result =
+            (BiobankText) createWidget(parent, BiobankText.class, SWT.READ_ONLY
+                | widgetOptions, value);
         return result;
     }
 

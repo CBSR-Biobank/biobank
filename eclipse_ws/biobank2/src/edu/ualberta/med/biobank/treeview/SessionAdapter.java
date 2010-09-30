@@ -86,22 +86,22 @@ public class SessionAdapter extends AdapterBase {
         return "";
     }
 
-    public AdapterBase getSitesGroupNode() {
+    public SiteGroup getSitesGroupNode() {
         AdapterBase adapter = getChild(SITES_NODE_ID);
         Assert.isNotNull(adapter);
-        return adapter;
+        return (SiteGroup) adapter;
     }
 
-    public AdapterBase getStudiesGroupNode() {
+    public StudyMasterGroup getStudiesGroupNode() {
         AdapterBase adapter = getChild(STUDIES_NODE_ID);
         Assert.isNotNull(adapter);
-        return adapter;
+        return (StudyMasterGroup) adapter;
     }
 
-    public AdapterBase getClinicGroupNode() {
+    public ClinicMasterGroup getClinicGroupNode() {
         AdapterBase adapter = getChild(CLINICS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return adapter;
+        return (ClinicMasterGroup) adapter;
     }
 
     @Override

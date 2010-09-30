@@ -1,11 +1,11 @@
 package edu.ualberta.med.biobank.test.reports;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.Predicate;
@@ -16,52 +16,53 @@ public class ContainerEmptyLocationsTest extends AbstractReportTest {
 
     @Test
     public void testResults() throws Exception {
+        List<ContainerWrapper> topContainers = new ArrayList<ContainerWrapper>(
+            getTopContainers(getContainers()));
         for (ContainerWrapper container : getContainers()) {
-            checkReport(container.getLabel(), container.getContainerType()
-                .getNameShort());
-            checkReport(container.getLabel(), "");
+            for (int i = 0, n = topContainers.size(); i < n; i++) {
+                checkReport(container.getLabel(),
+                    topContainers.subList(i, i + 1));
+            }
+            checkReport(container.getLabel(), topContainers);
         }
-    }
-
-    @Test
-    public void testEmpty() throws Exception {
-        checkReport("", "");
     }
 
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
         final String containerLabel = (String) getReport().getParams().get(0);
-        final String topContainerTypeNameShort = (String) getReport()
-            .getParams().get(1);
+        final String topContainerList = getReport().getContainerList();
 
         Predicate<ContainerWrapper> specificContainerLabel = new Predicate<ContainerWrapper>() {
             public boolean evaluate(ContainerWrapper container) {
-                return container.getLabel().equals(containerLabel);
+                return container.getLabel().startsWith(containerLabel);
             }
         };
-        Predicate<ContainerWrapper> specificContainerType = new Predicate<ContainerWrapper>() {
+        Predicate<ContainerWrapper> specificTopContainer = new Predicate<ContainerWrapper>() {
             public boolean evaluate(ContainerWrapper container) {
-                return container.getContainerType().getNameShort()
-                    .equals(topContainerTypeNameShort);
+                final List<Integer> topContainerIds = new ArrayList<Integer>();
+                for (String id : topContainerList.split(",")) {
+                    topContainerIds.add(Integer.valueOf(id));
+                }
+                return topContainerIds.contains(container.getId());
             }
         };
 
         List<ContainerWrapper> allContainers = getContainers();
         Collection<ContainerWrapper> topContainers = PredicateUtil.filter(
-            allContainers, PredicateUtil.andPredicate(specificContainerLabel,
-                specificContainerType));
+            allContainers, specificTopContainer);
 
         Collection<ContainerWrapper> otherContainers = PredicateUtil.filter(
-            allContainers, PredicateUtil.andPredicate(
-                CONTAINER_CAN_STORE_SAMPLES_PREDICATE,
-                containerSite(isInSite(), getSiteId())));
+            allContainers, PredicateUtil.andPredicate(specificContainerLabel,
+                PredicateUtil.andPredicate(
+                    CONTAINER_CAN_STORE_SAMPLES_PREDICATE,
+                    containerSite(isInSite(), getSiteId()))));
 
         List<Object> expectedResults = new ArrayList<Object>();
 
         for (ContainerWrapper topContainer : topContainers) {
             for (ContainerWrapper container : otherContainers) {
                 try {
-                    if (container.getPath().contains(
+                    if (container.getPath().startsWith(
                         topContainer.getPath() + "/")) {
                         expectedResults.add(container.getWrappedObject());
                     }
@@ -79,10 +80,12 @@ public class ContainerEmptyLocationsTest extends AbstractReportTest {
     }
 
     private void checkReport(String containerLabel,
-        String topContainerTypeShortName) throws Exception {
-        getReport().setParams(
-            Arrays.asList((Object) containerLabel,
-                (Object) topContainerTypeShortName));
+        List<ContainerWrapper> topContainers) throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(containerLabel);
+        getReport().setParams(params);
+        getReport().setContainerList(
+            StringUtils.join(getTopContainerIds(topContainers), ","));
         checkResults(EnumSet.of(CompareResult.SIZE));
     }
 }

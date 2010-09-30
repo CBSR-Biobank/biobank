@@ -34,7 +34,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
     TestClinic.class, TestSampleStorage.class, TestSourceVessel.class,
     TestSampleType.class, TestContainer.class, TestContainerType.class,
     TestClinicShipment.class, TestContact.class, TestShippingMethod.class,
-    TestLabelingScheme.class })
+    TestContainerLabelingScheme.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 

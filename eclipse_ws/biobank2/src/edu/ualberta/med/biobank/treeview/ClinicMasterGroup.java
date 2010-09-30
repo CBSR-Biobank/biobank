@@ -28,7 +28,7 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addClinic(SessionManager.getInstance().getSession(), false);
+                    addClinic();
                 }
             });
         }
@@ -40,12 +40,10 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
         return ClinicWrapper.getAllClinics(SessionManager.getAppService());
     }
 
-    public static void addClinic(SessionAdapter sessAdapter,
-        boolean hasPreviousForm) {
-        ClinicWrapper clinic = new ClinicWrapper(sessAdapter.getAppService());
-        ClinicAdapter adapter = new ClinicAdapter(
-            sessAdapter.getClinicGroupNode(), clinic);
-        adapter.openEntryForm(hasPreviousForm);
+    public void addClinic() {
+        ClinicWrapper clinic = new ClinicWrapper(getAppService());
+        ClinicAdapter adapter = new ClinicAdapter(this, clinic);
+        adapter.openEntryForm();
     }
 
 }

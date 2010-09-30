@@ -5,7 +5,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.clinicShipment.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 
 public class ShipmentDeleteHandler extends AbstractHandler {

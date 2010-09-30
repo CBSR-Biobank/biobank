@@ -72,17 +72,18 @@ public abstract class AbstractTodayNode extends AdapterBase {
     public void performExpand() {
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             try {
-                List<? extends ModelWrapper<?>> todayElements = getTodayElements();
+                List<? extends ModelWrapper<?>> todayElements =
+                    getTodayElements();
 
                 // remove elements that are not in today list
                 for (AdapterBase child : getChildren()) {
                     ModelWrapper<?> childWrapper = child.getModelObject();
                     childWrapper.reload();
-                    List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
-                        child.getChildren());
+                    List<AdapterBase> subChildren =
+                        new ArrayList<AdapterBase>(child.getChildren());
                     for (AdapterBase subChild : subChildren) {
-                        ModelWrapper<?> subChildWrapper = subChild
-                            .getModelObject();
+                        ModelWrapper<?> subChildWrapper =
+                            subChild.getModelObject();
                         subChildWrapper.reload();
                         if (!todayElements.contains(subChildWrapper)
                             || !isParentTo(childWrapper, subChildWrapper)) {
@@ -105,8 +106,8 @@ public abstract class AbstractTodayNode extends AdapterBase {
                 }
 
                 // remove sub children without any children
-                List<AdapterBase> children = new ArrayList<AdapterBase>(
-                    getChildren());
+                List<AdapterBase> children =
+                    new ArrayList<AdapterBase>(getChildren());
                 for (AdapterBase child : children) {
                     if (child.getChildren().size() == 0) {
                         removeChild(child);
@@ -126,4 +127,8 @@ public abstract class AbstractTodayNode extends AdapterBase {
     protected abstract List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException;
 
+    @Override
+    public AdapterBase search(Object searchedObject) {
+        return searchChildren(searchedObject);
+    }
 }

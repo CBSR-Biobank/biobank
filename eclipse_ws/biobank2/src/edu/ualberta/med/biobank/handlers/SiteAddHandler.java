@@ -8,7 +8,6 @@ import org.eclipse.core.runtime.Assert;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
 
 public class SiteAddHandler extends AbstractHandler {
 
@@ -17,10 +16,9 @@ public class SiteAddHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        SiteWrapper site = new SiteWrapper(SessionManager.getAppService());
-        SiteAdapter siteNode = new SiteAdapter(sessionAdapter, site);
-        siteNode.openEntryForm();
+        sessionAdapter.getSitesGroupNode().addSite();
         return null;
+
     }
 
     @Override

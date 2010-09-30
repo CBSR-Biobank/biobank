@@ -107,7 +107,7 @@ public class BiobankText extends BiobankWidget {
     }
 
     public String getText() {
-        return text.getText();
+        return text.getText().trim();
     }
 
     public Text getTextBox() {

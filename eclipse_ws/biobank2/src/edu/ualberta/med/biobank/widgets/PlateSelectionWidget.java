@@ -37,8 +37,8 @@ public class PlateSelectionWidget extends BiobankWidget {
 
                 int plateId = i + 1;
                 Button b = plateButtons.get(plateId);
-                boolean visible = ScannerConfigPlugin.getDefault()
-                    .getPlateEnabled(plateId);
+                boolean visible =
+                    ScannerConfigPlugin.getDefault().getPlateEnabled(plateId);
                 b.setVisible(visible);
                 GridData gd = (GridData) b.getLayoutData();
                 gd.exclude = !visible;
@@ -54,8 +54,8 @@ public class PlateSelectionWidget extends BiobankWidget {
     public PlateSelectionWidget(Composite parent, int style) {
         super(parent, style);
 
-        GridLayout layout = new GridLayout(
-            ScannerConfigPlugin.getPlatesMax() + 1, false);
+        GridLayout layout =
+            new GridLayout(ScannerConfigPlugin.getPlatesMax() + 1, false);
         setLayout(layout);
         GridData gd = new GridData(SWT.LEFT, SWT.TOP, true, false);
         setLayoutData(gd);
@@ -68,9 +68,9 @@ public class PlateSelectionWidget extends BiobankWidget {
 
         for (int i = 1, n = ScannerConfigPlugin.getPlatesMax(); i <= n; ++i) {
             Button b = new Button(this, SWT.RADIO);
-            b.setText("Plate" + i);
-            boolean visible = ScannerConfigPlugin.getDefault().getPlateEnabled(
-                i);
+            b.setText("PLATE " + i);
+            boolean visible =
+                ScannerConfigPlugin.getDefault().getPlateEnabled(i);
             b.setVisible(visible);
             gd = new GridData();
             gd.exclude = !visible;

@@ -15,8 +15,8 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.dialogs.ActivityLogLocationDialog;
-import edu.ualberta.med.biobank.dialogs.LoginDialog;
+import edu.ualberta.med.biobank.dialogs.startup.ActivityLogLocationDialog;
+import edu.ualberta.med.biobank.dialogs.startup.LoginDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
