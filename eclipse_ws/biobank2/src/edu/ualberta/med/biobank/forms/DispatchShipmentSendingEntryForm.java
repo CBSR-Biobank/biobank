@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper.STATE;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
@@ -123,6 +124,25 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         setTextValue(siteLabel, site.getName());
 
         createStudyAndReceiverCombos(client);
+
+        if (!shipment.isNew() && !shipment.isInCreationState()) {
+            ShippingMethodWrapper selectedShippingMethod =
+                shipment.getShippingMethod();
+            widgetCreator.createComboViewer(client, "Shipping Method",
+                ShippingMethodWrapper.getShippingMethods(SessionManager
+                    .getAppService()), selectedShippingMethod, null,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        shipment
+                            .setShippingMethod((ShippingMethodWrapper) selectedObject);
+                    }
+                });
+
+            createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+                "Waybill", null,
+                BeansObservables.observeValue(shipment, "waybill"), null);
+        }
 
         BiobankText commentText =
             (BiobankText) createBoundWidgetWithLabel(client, BiobankText.class,
