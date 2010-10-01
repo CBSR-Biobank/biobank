@@ -172,7 +172,7 @@ CREATE TABLE abstract_shipment (
     INDEX FK70F1B9173F52C885 (SITE_ID),
     INDEX DATE_RECV_IDX (DATE_RECEIVED),
     INDEX WAYBILL_IDX (WAYBILL)
-) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 INSERT INTO abstract_shipment (ID, DISCRIMINATOR, DATE_RECEIVED, COMMENT, WAYBILL, DATE_SHIPPED,
 BOX_NUMBER, SHIPPING_METHOD_ID, CLINIC_ID, SITE_ID, ACTIVITY_STATUS_ID)
@@ -192,7 +192,7 @@ CREATE TABLE clinic_shipment_patient (
     PRIMARY KEY (ID),
     INDEX FKF4B18BB7E5B2B216 (CLINIC_SHIPMENT_ID),
     INDEX FKF4B18BB7B563F38F (PATIENT_ID)
-) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 INSERT INTO clinic_shipment_patient (PATIENT_ID, CLINIC_SHIPMENT_ID)
 SELECT PATIENT_ID, SHIPMENT_ID FROM shipment_patient;
@@ -226,7 +226,7 @@ CREATE TABLE dispatch_info (
     PRIMARY KEY (ID),
     INDEX FK3D4D9D53CDCA092A (SRC_SITE_ID),
     INDEX FK3D4D9D53F2A2464F (STUDY_ID)
-) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 DROP TABLE IF EXISTS  dispatch_info_site;
 
@@ -236,22 +236,18 @@ CREATE TABLE dispatch_info_site (
     PRIMARY KEY (DISPATCH_INFO_ID, SITE_ID),
     INDEX FK86B04EB33F52C885 (SITE_ID),
     INDEX FK86B04EB3A927DCFA (DISPATCH_INFO_ID)
-) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
-
-DROP TABLE IF EXISTS  dispatch_position;
-
-
-create table DISPATCH_SHIPMENT_ALIQUOT (
-	ID integer not null, 
-	STATE integer, 
-	COMMENT text, 
-	ALIQUOT_ID integer not null, 
-	DISPATCH_SHIPMENT_ID integer not null, 
-	primary key (ID)
 ) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-alter table DISPATCH_SHIPMENT_ALIQUOT add index FKB1B76907D8CEA57A (DISPATCH_SHIPMENT_ID), add constraint FKB1B76907D8CEA57A foreign key (DISPATCH_SHIPMENT_ID) references ABSTRACT_SHIPMENT (ID);
-alter table DISPATCH_SHIPMENT_ALIQUOT add index FKB1B76907898584F (ALIQUOT_ID), add constraint FKB1B76907898584F foreign key (ALIQUOT_ID) references ALIQUOT (ID);
 
+DROP TABLE IF EXISTS dispatch_shipment_aliquot;
+
+CREATE TABLE dispatch_shipment_aliquot (
+	ID integer not null,
+	STATE integer,
+	COMMENT text,
+	ALIQUOT_ID integer not null,
+	DISPATCH_SHIPMENT_ID integer not null,
+	PRIMARY KEY (ID)
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 ALTER TABLE clinic
     DROP COLUMN SITE_ID,

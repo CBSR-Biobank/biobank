@@ -7,8 +7,8 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
-import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileManager;
-import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileSettings;
+import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
+import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileSettings;
 
 public class ScanPalletWidget extends ContainerDisplayWidget {
 
@@ -35,8 +35,8 @@ public class ScanPalletWidget extends ContainerDisplayWidget {
     }
 
     public void loadProfile(String profileName) {
-        ProfileSettings profile = ProfileManager.instance().getProfile(
-            profileName);
+        ProfileSettings profile =
+            ProfileManager.instance().getProfile(profileName);
         ((ScanPalletDisplay) getContainerDisplay()).setProfile(profile);
         this.redraw();
     }
