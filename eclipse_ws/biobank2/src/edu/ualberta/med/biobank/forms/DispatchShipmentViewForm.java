@@ -4,7 +4,11 @@ import java.util.List;
 
 import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -12,7 +16,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -151,23 +155,42 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (new SendDispatchShipmentDialog(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), shipment).open() == Dialog.OK) {
-                    shipment.setNextState();
+                if (new SendDispatchShipmentDialog(Display.getDefault()
+                    .getActiveShell(), shipment).open() == Dialog.OK) {
+                    IRunnableContext context =
+                        new ProgressMonitorDialog(Display.getDefault()
+                            .getActiveShell());
                     try {
-                        shipment.persist();
-                    } catch (final RemoteConnectFailureException exp) {
-                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
-                        return;
-                    } catch (final RemoteAccessException exp) {
-                        BioBankPlugin.openRemoteAccessErrorMessage(exp);
-                        return;
-                    } catch (final AccessDeniedException ade) {
-                        BioBankPlugin.openAccessDeniedErrorMessage(ade);
-                        return;
-                    } catch (Exception ex) {
-                        BioBankPlugin.openAsyncError("Save error", ex);
-                        return;
+                        context.run(true, true, new IRunnableWithProgress() {
+                            @Override
+                            public void run(final IProgressMonitor monitor) {
+                                monitor.beginTask("Saving...",
+                                    IProgressMonitor.UNKNOWN);
+                                shipment.setNextState();
+                                try {
+                                    shipment.persist();
+                                } catch (final RemoteConnectFailureException exp) {
+                                    BioBankPlugin
+                                        .openRemoteConnectErrorMessage(exp);
+                                    return;
+                                } catch (final RemoteAccessException exp) {
+                                    BioBankPlugin
+                                        .openRemoteAccessErrorMessage(exp);
+                                    return;
+                                } catch (final AccessDeniedException ade) {
+                                    BioBankPlugin
+                                        .openAccessDeniedErrorMessage(ade);
+                                    return;
+                                } catch (Exception ex) {
+                                    BioBankPlugin.openAsyncError("Save error",
+                                        ex);
+                                    return;
+                                }
+                                monitor.done();
+                            }
+                        });
+                    } catch (Exception e1) {
+                        BioBankPlugin.openAsyncError("Save error", e1);
                     }
                     DispatchShipmentAdministrationView.getCurrent().reload();
                     shipmentAdapter.openViewForm();

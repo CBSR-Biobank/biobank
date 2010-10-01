@@ -15,11 +15,11 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class AliquotsByPalletImpl extends AbstractReport {
 
     private static final String QUERY = "select s from "
-        + Aliquot.class.getName() + " s where s.patientVisit.shipment.site "
-        + SITE_OPERATOR + SITE_ID + " and s.aliquotPosition.container.id "
+        + Aliquot.class.getName()
+        + " s where s.aliquotPosition.container.id "
         + "in (select path1.container.id from " + ContainerPath.class.getName()
         + " as path1, " + ContainerPath.class.getName()
-        + " as path2 where locate(path2.path, path1.path) > 0 and"
+        + " as path2 where path1.path like path2.path || '/%' and"
         + " path2.container.id in (" + CONTAINER_LIST + ")) "
         + "and s.aliquotPosition.container.label = ?";
 
@@ -37,13 +37,14 @@ public class AliquotsByPalletImpl extends AbstractReport {
         ContainerWrapper parent = null;
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
-            String pnumber = a.getPatientVisit().getClinicShipmentPatient()
-                .getPatient().getPnumber();
+            String pnumber =
+                a.getPatientVisit().getClinicShipmentPatient().getPatient()
+                    .getPnumber();
             String inventoryId = a.getInventoryId();
             String stName = a.getSampleType().getNameShort();
             AliquotWrapper aliquotWrapper = new AliquotWrapper(appService, a);
-            String aliquotLabel = aliquotWrapper
-                .getPositionString(false, false);
+            String aliquotLabel =
+                aliquotWrapper.getPositionString(false, false);
             parent = aliquotWrapper.getParent();
             String containerLabel = aliquotWrapper.getParent().getLabel();
             modifiedResults.add(new Object[] { aliquotLabel, containerLabel,
@@ -61,11 +62,12 @@ public class AliquotsByPalletImpl extends AbstractReport {
                     Object[] castOb2 = ((Object[]) o2);
                     String s1 = (String) castOb1[0];
                     String s2 = (String) castOb2[0];
-                    int compare = s1.substring(0, 1).compareTo(
-                        s2.substring(0, 1));
+                    int compare =
+                        s1.substring(0, 1).compareTo(s2.substring(0, 1));
                     if (compare == 0)
-                        compare = ((Integer) Integer.parseInt(s1.substring(1)))
-                            .compareTo(Integer.parseInt(s2.substring(1)));
+                        compare =
+                            ((Integer) Integer.parseInt(s1.substring(1)))
+                                .compareTo(Integer.parseInt(s2.substring(1)));
                     return compare;
                 }
             });

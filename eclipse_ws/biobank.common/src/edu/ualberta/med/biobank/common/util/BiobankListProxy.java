@@ -227,8 +227,8 @@ public class BiobankListProxy implements List<Object>, Serializable {
 
     @Override
     public List<Object> subList(int fromIndex, int toIndex) {
-        Assert.isTrue(fromIndex >= 0 && toIndex >= 0);
-        Assert.isTrue(fromIndex <= toIndex);
+        assert (fromIndex >= 0 && toIndex >= 0);
+        assert (fromIndex <= toIndex);
         updateListChunk(fromIndex);
         List<Object> subList = new ArrayList<Object>();
         for (Object o : listChunk.subList(fromIndex - offset,

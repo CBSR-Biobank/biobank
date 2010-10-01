@@ -41,7 +41,7 @@ import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
-import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileManager;
+import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractPalletAliquotAdminForm extends
     AbstractAliquotAdminForm {

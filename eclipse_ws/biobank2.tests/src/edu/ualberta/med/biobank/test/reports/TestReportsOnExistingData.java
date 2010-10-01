@@ -19,8 +19,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
     DAliquotsTest.class, FTAReportTest.class, FvLPatientVisitsTest.class,
     InvoicingReportTest.class, NewPsByStudyClinicTest.class,
     NewPVsByStudyClinicTest.class, PatientVisitSummaryTest.class,
-    PatientWBCTest.class, PsByStudyTest.class, PVsByStudyTest.class,
-    QAAliquotsTest.class, SAliquotsTest.class, SampleTypePvCountTest.class,
+    PsByStudyTest.class, PVsByStudyTest.class, QAAliquotsTest.class,
+    SAliquotsTest.class, SampleTypePvCountTest.class,
     SampleTypeSUsageTest.class })
 public final class TestReportsOnExistingData {
     @BeforeClass

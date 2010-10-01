@@ -17,7 +17,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
@@ -32,14 +34,11 @@ public class DispatchShipmentSendingEntryForm extends
     private static BiobankLogger logger = BiobankLogger
         .getLogger(DispatchShipmentSendingEntryForm.class.getName());
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm";
 
-    public static final String MSG_NEW_SHIPMENT_OK =
-        "Creating a new dispatch shipment record.";
+    public static final String MSG_NEW_SHIPMENT_OK = "Creating a new dispatch shipment record.";
 
-    public static final String MSG_SHIPMENT_OK =
-        "Editing an existing dispatch shipment record.";
+    public static final String MSG_SHIPMENT_OK = "Editing an existing dispatch shipment record.";
 
     private ComboViewer studyComboViewer;
 
@@ -69,16 +68,34 @@ public class DispatchShipmentSendingEntryForm extends
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText siteLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Sender Site");
+        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Sender Site");
         setTextValue(siteLabel, site.getName());
 
         createStudyAndReceiverCombos(client);
 
-        BiobankText commentText =
-            (BiobankText) createBoundWidgetWithLabel(client, BiobankText.class,
-                SWT.MULTI, "Comments", null,
-                BeansObservables.observeValue(shipment, "comment"), null);
+        if (!shipment.isNew() && !shipment.isInCreationState()) {
+            ShippingMethodWrapper selectedShippingMethod = shipment
+                .getShippingMethod();
+            widgetCreator.createComboViewer(client, "Shipping Method",
+                ShippingMethodWrapper.getShippingMethods(SessionManager
+                    .getAppService()), selectedShippingMethod, null,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        shipment
+                            .setShippingMethod((ShippingMethodWrapper) selectedObject);
+                    }
+                });
+
+            createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+                "Waybill", null,
+                BeansObservables.observeValue(shipment, "waybill"), null);
+        }
+
+        BiobankText commentText = (BiobankText) createBoundWidgetWithLabel(
+            client, BiobankText.class, SWT.MULTI, "Comments", null,
+            BeansObservables.observeValue(shipment, "comment"), null);
 
         createAliquotsSelectionSection();
         createAliquotsReceivedSection(false);
@@ -94,62 +111,59 @@ public class DispatchShipmentSendingEntryForm extends
     private void createStudyAndReceiverCombos(Composite client) {
         StudyWrapper study = shipment.getStudy();
         if (shipment.isInTransitState()) {
-            BiobankText studyLabel =
-                createReadOnlyLabelledField(client, SWT.NONE, "Study");
+            BiobankText studyLabel = createReadOnlyLabelledField(client,
+                SWT.NONE, "Study");
             setTextValue(studyLabel, shipment.getStudy().getNameShort());
-            BiobankText receiverLabel =
-                createReadOnlyLabelledField(client, SWT.NONE, "Receiver Site");
+            BiobankText receiverLabel = createReadOnlyLabelledField(client,
+                SWT.NONE, "Receiver Site");
             setTextValue(receiverLabel, shipment.getReceiver().getNameShort());
         } else {
-            List<StudyWrapper> possibleStudies =
-                site.getDispatchStudiesAsSender();
+            List<StudyWrapper> possibleStudies = site
+                .getDispatchStudiesAsSender();
             if ((study == null) && (possibleStudies != null)
                 && (possibleStudies.size() == 1)) {
                 study = possibleStudies.get(0);
             }
-            studyComboViewer =
-                createComboViewer(client, "Study", possibleStudies, study,
-                    "Shipment must have a receiving site",
-                    new ComboSelectionUpdate() {
-                        @Override
-                        public void doSelection(Object selectedObject) {
-                            StudyWrapper study = (StudyWrapper) selectedObject;
-                            if (destSiteComboViewer != null) {
-                                try {
-                                    List<SiteWrapper> possibleDestSites =
-                                        site.getStudyDispachSites(study);
+            studyComboViewer = createComboViewer(client, "Study",
+                possibleStudies, study, "Shipment must have a receiving site",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        StudyWrapper study = (StudyWrapper) selectedObject;
+                        if (destSiteComboViewer != null) {
+                            try {
+                                List<SiteWrapper> possibleDestSites = site
+                                    .getStudyDispachSites(study);
+                                destSiteComboViewer.setInput(possibleDestSites);
+
+                                if (possibleDestSites.size() == 1) {
                                     destSiteComboViewer
-                                        .setInput(possibleDestSites);
-
-                                    if (possibleDestSites.size() == 1) {
-                                        destSiteComboViewer
-                                            .setSelection(new StructuredSelection(
-                                                possibleDestSites.get(0)));
-                                    } else {
-                                        destSiteComboViewer.setSelection(null);
-                                    }
-                                } catch (Exception e) {
-                                    logger
-                                        .error(
-                                            "Error while retrieving dispatch shipment destination sites",
-                                            e);
+                                        .setSelection(new StructuredSelection(
+                                            possibleDestSites.get(0)));
+                                } else {
+                                    destSiteComboViewer.setSelection(null);
                                 }
+                            } catch (Exception e) {
+                                logger
+                                    .error(
+                                        "Error while retrieving dispatch shipment destination sites",
+                                        e);
                             }
-                            shipment.setStudy(study);
-                            setDirty(true);
                         }
-                    });
+                        shipment.setStudy(study);
+                        setDirty(true);
+                    }
+                });
 
-            destSiteComboViewer =
-                createComboViewer(client, "Receiver Site", null, null,
-                    "Shipment must have an associated study",
-                    new ComboSelectionUpdate() {
-                        @Override
-                        public void doSelection(Object selectedObject) {
-                            shipment.setReceiver((SiteWrapper) selectedObject);
-                            setDirty(true);
-                        }
-                    });
+            destSiteComboViewer = createComboViewer(client, "Receiver Site",
+                null, null, "Shipment must have an associated study",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        shipment.setReceiver((SiteWrapper) selectedObject);
+                        setDirty(true);
+                    }
+                });
 
             if ((possibleStudies == null) || (possibleStudies.size() == 0)) {
                 BioBankPlugin.openAsyncError("Sender Site Error",
@@ -184,9 +198,9 @@ public class DispatchShipmentSendingEntryForm extends
 
     @Override
     protected void openScanDialog() {
-        DispatchCreateScanDialog dialog =
-            new DispatchCreateScanDialog(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), shipment);
+        DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            shipment);
         dialog.open();
         setDirty(true); // FIXME need to do this better !
         reloadAliquotsTables();
@@ -200,9 +214,8 @@ public class DispatchShipmentSendingEntryForm extends
     protected void addAliquot(String inventoryId) {
         if (!inventoryId.isEmpty()) {
             try {
-                List<AliquotWrapper> aliquots =
-                    AliquotWrapper.getAliquots(shipment.getAppService(),
-                        inventoryId);
+                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
+                    shipment.getAppService(), inventoryId);
                 if (aliquots.size() == 0)
                     BioBankPlugin.openError("Aliquot not found",
                         "Aliquot with inventory id " + inventoryId
