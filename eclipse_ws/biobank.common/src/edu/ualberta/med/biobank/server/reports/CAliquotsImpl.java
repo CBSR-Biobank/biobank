@@ -13,7 +13,7 @@ public class CAliquotsImpl extends AbstractReport {
             + ContainerPath.class.getName()
             + " as path1, "
             + ContainerPath.class.getName()
-            + " as path2 where locate(path2.path, path1.path) > 0 and path2.container.id in ("
+            + " as path2 where path1.path like path2.path || '/%' and path2.container.id in ("
             + CONTAINER_LIST
             + ")) and aliquot.linkDate between ? and ? and aliquot.patientVisit.clinicShipmentPatient.clinicShipment.site"
             + SITE_OPERATOR
