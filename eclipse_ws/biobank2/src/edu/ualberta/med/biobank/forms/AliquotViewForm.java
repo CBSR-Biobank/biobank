@@ -30,6 +30,8 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private AliquotWrapper aliquot;
 
+    private BiobankText siteLabel;
+
     private BiobankText sampleTypeLabel;
 
     private BiobankText linkDateLabel;
@@ -96,7 +98,7 @@ public class AliquotViewForm extends BiobankViewForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-
+        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         sampleTypeLabel = createReadOnlyLabelledField(client, SWT.NONE, "Type");
         linkDateLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Link Date");
@@ -162,6 +164,11 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
+        ContainerWrapper c = aliquot.getParent();
+        if (c == null)
+            setTextValue(siteLabel, "Unassigned");
+        else
+            setTextValue(siteLabel, c.getSite().getNameShort());
         setTextValue(sampleTypeLabel, aliquot.getSampleType().getName());
         setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
         setTextValue(volumeLabel, aliquot.getQuantity() == null ? null

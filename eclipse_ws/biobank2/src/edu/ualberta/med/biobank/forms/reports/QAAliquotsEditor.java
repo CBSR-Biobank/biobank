@@ -18,6 +18,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class QAAliquotsEditor extends ReportsEditor {
@@ -29,6 +31,8 @@ public class QAAliquotsEditor extends ReportsEditor {
     DateTimeWidget end;
     ComboViewer sampleType;
     IObservableValue numAliquots;
+    private IObservableValue listStatus = new WritableValue(Boolean.TRUE,
+        Boolean.class);
     TopContainerListWidget topContainers;
 
     @Override
@@ -44,8 +48,17 @@ public class QAAliquotsEditor extends ReportsEditor {
         end =
             widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
                 null, null, null, SWT.DATE);
-        widgetCreator.createLabel(parent, "Top Containers");
         topContainers = new TopContainerListWidget(parent, SWT.NONE);
+        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
+            Boolean.class), listStatus, "Top Container List Empty");
+        topContainers
+            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    listStatus.setValue(topContainers.getEnabled());
+                }
+            });
+        topContainers.adaptToToolkit(toolkit, true);
         sampleType = createSampleTypeComboOption("Sample Type", parent);
         createValidatedIntegerText("# Aliquots", parent);
     }

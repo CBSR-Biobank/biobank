@@ -22,10 +22,7 @@ public class DAliquotsImpl extends AbstractReport {
             + " as path2 where path1.path like path2.path || '/%' and"
             + " path2.container.id in ("
             + CONTAINER_LIST
-            + ")) and aliquot.linkDate between ? and ? and aliquot.patientVisit.clinicShipmentPatient.clinicShipment.site "
-            + SITE_OPERATOR
-            + SITE_ID
-            + " group by aliquot.patientVisit.clinicShipmentPatient.patient.study.nameShort,"
+            + ")) and aliquot.linkDate between ? and ? group by aliquot.patientVisit.clinicShipmentPatient.patient.study.nameShort,"
             + " aliquot.patientVisit.clinicShipmentPatient.clinicShipment.clinic.nameShort, year(aliquot.linkDate), "
             + GROUPBY_DATE + "(aliquot.linkDate)";
 

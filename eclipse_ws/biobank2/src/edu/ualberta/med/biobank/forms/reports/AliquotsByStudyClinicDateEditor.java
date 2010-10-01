@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
@@ -12,6 +14,8 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.util.DateGroup;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
 
@@ -20,6 +24,8 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
     protected DateTimeWidget start;
     protected DateTimeWidget end;
     protected TopContainerListWidget topContainers;
+    private IObservableValue listStatus = new WritableValue(Boolean.TRUE,
+        Boolean.class);
 
     @Override
     protected int[] getColumnWidths() {
@@ -40,8 +46,17 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
         dateRangeCombo = widgetCreator.createComboViewer(parent, "Group By",
             Arrays.asList(DateGroup.values()), null);
         dateRangeCombo.getCombo().select(0);
-        widgetCreator.createLabel(parent, "Top Containers");
         topContainers = new TopContainerListWidget(parent, SWT.NONE);
+        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
+            Boolean.class), listStatus, "Top Container List Empty");
+        topContainers
+            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                @Override
+                public void selectionChanged(MultiSelectEvent event) {
+                    listStatus.setValue(topContainers.getEnabled());
+                }
+            });
+        topContainers.adaptToToolkit(toolkit, true);
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",

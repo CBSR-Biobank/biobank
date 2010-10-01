@@ -94,7 +94,8 @@ public class PalletCell extends Cell {
         Map<RowColPos, PalletCell> palletScanned =
             new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots =
-            DebugUtil.getRandomAliquotsNotAssignedNoDispatch(appService, siteId);
+            DebugUtil
+                .getRandomAliquotsNotAssignedNoDispatch(appService, siteId);
         int i = 0;
         while (i < randomAliquots.size() && i < 30) {
             int row = i / 12;

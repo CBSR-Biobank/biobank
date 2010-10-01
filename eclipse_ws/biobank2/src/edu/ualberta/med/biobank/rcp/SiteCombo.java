@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
@@ -108,6 +109,14 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
 
     public void setSelection(SiteWrapper siteWrapper) {
         comboViewer.setSelection(new StructuredSelection(siteWrapper));
+    }
+
+    public ISelection getSelection() {
+        return comboViewer.getSelection();
+    }
+
+    public Object getInput() {
+        return comboViewer.getInput();
     }
 
 }

@@ -25,8 +25,7 @@ public class QAAliquotsImpl extends AbstractReport {
             + " as path2 where path1.path like path2.path || '/%' and"
             + " path2.container.id in ("
             + CONTAINER_LIST
-            + ")) and aliquot.patientVisit.clinicShipmentPatient.clinicShipment.site "
-            + SITE_OPERATOR + SITE_ID + " ORDER BY RAND()";
+            + ")) ORDER BY RAND()";
 
     private int numResults;
 
@@ -39,7 +38,11 @@ public class QAAliquotsImpl extends AbstractReport {
     @Override
     public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
-        int lastIndex = Math.min(numResults, results.size());
+        int lastIndex;
+        if (results.size() != -1)
+            lastIndex = Math.min(numResults, results.size());
+        else
+            lastIndex = numResults;
         if (lastIndex > 0) {
             results = results.subList(0, lastIndex);
         }
