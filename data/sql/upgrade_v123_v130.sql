@@ -140,7 +140,7 @@ UPDATE container_labeling_scheme set min_chars=2,max_chars=3,max_rows=16,max_col
 UPDATE container_labeling_scheme set min_chars=2,max_chars=2,max_capacity=576 where id=2;
 UPDATE container_labeling_scheme set min_chars=2,max_chars=2,max_capacity=99 where id=3;
 UPDATE container_labeling_scheme set min_chars=2,max_chars=2,max_rows=2,max_cols=2,max_capacity=4 where id=4;
-INSERT INTO container_labeling_scheme values (5,"Box81",2,2,9,9,81);
+INSERT INTO container_labeling_scheme values (5,"CBSR SBS",2,2,9,9,81);
 
 UPDATE container_type set child_labeling_scheme_id=5 where name="Box 81";
 
@@ -246,7 +246,9 @@ CREATE TABLE dispatch_shipment_aliquot (
 	COMMENT text,
 	ALIQUOT_ID integer not null,
 	DISPATCH_SHIPMENT_ID integer not null,
-	PRIMARY KEY (ID)
+	PRIMARY KEY (ID),
+        INDEX FKB1B76907D8CEA57A (DISPATCH_SHIPMENT_ID),
+        INDEX FKB1B76907898584F (ALIQUOT_ID)
 ) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 ALTER TABLE clinic
