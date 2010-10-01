@@ -10,15 +10,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class DispatchShipmentAliquotWrapper extends
     ModelWrapper<DispatchShipmentAliquot> {
 
-    public enum STATE {
-        NONE_STATE, RECEIVED_STATE, MISSING_PENDING_STATE, MISSING,
-        EXTRA_PENDING_STATE, EXTRA;
-
-        public static STATE getState(Integer state) {
-            return values()[state];
-        }
-    }
-
     public DispatchShipmentAliquotWrapper(WritableApplicationService appService) {
         super(appService);
     }

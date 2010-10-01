@@ -3,12 +3,12 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -532,18 +532,12 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return status != null && status.isFlagged();
     }
 
-    public boolean isDispatched() {
-        ActivityStatusWrapper status = getActivityStatus();
-        return status != null && status.isDispatched();
-    }
-
     public ContainerWrapper getTop() {
         return objectWithPositionManagement.getTop();
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection(
-        boolean sort) {
+    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection() {
         List<DispatchShipmentAliquotWrapper> dsaCollection =
             (List<DispatchShipmentAliquotWrapper>) propertiesMap
                 .get("dispatchShipmentAliquotCollection");
@@ -560,18 +554,16 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                     dsaCollection);
             }
         }
-        if ((dsaCollection != null) && sort)
-            Collections.sort(dsaCollection);
         return dsaCollection;
     }
 
-    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection() {
-        return getDispatchShipmentAliquotCollection(true);
-    }
-
-    public boolean isInTransit() {
+    public boolean isUsedInDispatchShipment() {
         for (DispatchShipmentAliquotWrapper dsa : getDispatchShipmentAliquotCollection()) {
-            if (dsa.getShipment().isInTransitState()) {
+            DispatchShipmentWrapper ship = dsa.getShipment();
+            if (ship.isInTransitState() || ship.isInCreationState()) {
+                if (dsa.getState() == DispatchAliquotState.MISSING.ordinal()) {
+                    return false;
+                }
                 return true;
             }
         }

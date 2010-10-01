@@ -677,8 +677,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                             if (foundAliquot.hasParent()) { // moved
                                 processCellWithPreviousPosition(scanCell,
                                     positionString, foundAliquot);
-                            } else { // new
-                                if (foundAliquot.isDispatched()) {
+                            } else { // new in pallet
+                                if (foundAliquot.isUsedInDispatchShipment()) {
                                     updateCellAsDispatchedError(positionString,
                                         scanCell, foundAliquot);
                                 } else {
@@ -708,11 +708,11 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setInformation(Messages.getFormattedString(
-            "ScanAssign.scanStatus.aliquot.dispatchedError",
-            ActivityStatusWrapper.DISPATCHED_STATUS_STRING)); //$NON-NLS-1$
+        scanCell
+            .setInformation(Messages
+                .getFormattedString("ScanAssign.scanStatus.aliquot.dispatchedError")); //$NON-NLS-1$
         appendLogNLS("ScanAssign.activitylog.aliquot.dispatchedError",
-            positionString, ActivityStatusWrapper.DISPATCHED_STATUS_STRING);
+            positionString);
 
     }
 
@@ -721,30 +721,39 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private void processCellWithPreviousPosition(PalletCell scanCell,
         String positionString, AliquotWrapper foundAliquot) {
-        if (foundAliquot.getParent().equals(currentPalletWrapper)) {
-            // same pallet
-            RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
-            if (!foundAliquot.getPosition().equals(rcp)) {
-                // moved inside the same pallet
-                updateCellAsMoved(positionString, scanCell, foundAliquot);
-                RowColPos movedFromPosition = foundAliquot.getPosition();
-                PalletCell missingAliquot =
-                    movedAndMissingAliquotsFromPallet.get(movedFromPosition);
-                if (missingAliquot == null) {
-                    // missing position has not yet been processed
-                    movedAndMissingAliquotsFromPallet.put(movedFromPosition,
-                        scanCell);
-                } else {
-                    // missing position has already been processed: remove the
-                    // MISSING flag
-                    missingAliquot.setStatus(CellStatus.EMPTY);
-                    missingAliquot.setTitle("");
-                    movedAndMissingAliquotsFromPallet.remove(movedFromPosition);
+        if (foundAliquot.getParent().getSite()
+            .equals(SessionManager.getInstance().getCurrentSite())) {
+            if (foundAliquot.getParent().equals(currentPalletWrapper)) {
+                // same pallet
+                RowColPos rcp =
+                    new RowColPos(scanCell.getRow(), scanCell.getCol());
+                if (!foundAliquot.getPosition().equals(rcp)) {
+                    // moved inside the same pallet
+                    updateCellAsMoved(positionString, scanCell, foundAliquot);
+                    RowColPos movedFromPosition = foundAliquot.getPosition();
+                    PalletCell missingAliquot =
+                        movedAndMissingAliquotsFromPallet
+                            .get(movedFromPosition);
+                    if (missingAliquot == null) {
+                        // missing position has not yet been processed
+                        movedAndMissingAliquotsFromPallet.put(
+                            movedFromPosition, scanCell);
+                    } else {
+                        // missing position has already been processed: remove
+                        // the
+                        // MISSING flag
+                        missingAliquot.setStatus(CellStatus.EMPTY);
+                        missingAliquot.setTitle("");
+                        movedAndMissingAliquotsFromPallet
+                            .remove(movedFromPosition);
+                    }
                 }
+            } else {
+                // old position was on another pallet
+                updateCellAsMoved(positionString, scanCell, foundAliquot);
             }
         } else {
-            // old position was on another pallet
-            updateCellAsMoved(positionString, scanCell, foundAliquot);
+            updateCellAsInOtherSite(positionString, scanCell, foundAliquot);
         }
     }
 
@@ -791,6 +800,24 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         appendLogNLS(
             "ScanAssign.activitylog.aliquot.moved", position, scanCell.getValue(), //$NON-NLS-1$
             expectedPosition);
+    }
+
+    private void updateCellAsInOtherSite(String position, PalletCell scanCell,
+        AliquotWrapper foundAliquot) {
+        String currentPosition = foundAliquot.getPositionString(true, false);
+        if (currentPosition == null) {
+            currentPosition = "none"; //$NON-NLS-1$
+        }
+        String siteName = foundAliquot.getParent().getSite().getNameShort();
+        scanCell.setStatus(CellStatus.ERROR);
+        scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+            .getPnumber());
+        scanCell.setInformation(Messages.getFormattedString(
+            "ScanAssign.scanStatus.aliquot.otherSite", siteName)); //$NON-NLS-1$
+
+        appendLogNLS(
+            "ScanAssign.activitylog.aliquot.otherSite", position, scanCell.getValue(), //$NON-NLS-1$
+            siteName, currentPosition);
     }
 
     /**
