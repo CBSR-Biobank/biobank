@@ -42,8 +42,8 @@ public class DispatchShipmentAdapter extends AdapterBase {
     public boolean isEditable() {
         boolean editable = super.isEditable();
         if (getWrapper() != null) {
-            SiteWrapper currentSite = SessionManager.getInstance()
-                .getCurrentSite();
+            SiteWrapper currentSite =
+                SessionManager.getInstance().getCurrentSite();
             return editable
                 && (getWrapper().isNew() || currentSite == null || !(currentSite
                     .equals(getWrapper().getReceiver()) && getWrapper()
@@ -76,6 +76,19 @@ public class DispatchShipmentAdapter extends AdapterBase {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addViewMenu(menu, "Dispatch Shipment");
+        SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
+        if (currentSite.equals(getWrapper().getSender())
+            && SessionManager.canDelete(DispatchShipmentWrapper.class)
+            && getWrapper().isInCreationState()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Delete");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    delete();
+                }
+            });
+        }
         if (getWrapper().canBeReceivedBy(SessionManager.getUser(),
             SessionManager.getInstance().getCurrentSite())) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
