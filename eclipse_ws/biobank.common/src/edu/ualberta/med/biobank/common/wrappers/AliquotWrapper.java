@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.DispatchShipmentAliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -59,11 +60,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                         return posWrapper;
                     }
                     return null;
-                }
-
-                @Override
-                public SiteWrapper getSite() {
-                    return AliquotWrapper.this.getSite();
                 }
             };
     }
@@ -166,13 +162,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                         .getName()) + ".");
             }
         }
-    }
-
-    public SiteWrapper getSite() {
-        if (getParent() != null) {
-            return getParent().getSite();
-        }
-        return null;
     }
 
     public void setPatientVisit(PatientVisitWrapper patientVisit) {
@@ -496,20 +485,23 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return getInventoryId();
     }
 
-    public List<DispatchShipmentWrapper> getDispatchShipments()
-        throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria("select ship from "
-                + DispatchShipment.class.getName()
-                + " ship where ship.aliquotCollection.id = ?",
-                Arrays.asList(new Object[] { getId() }));
-        List<DispatchShipment> ships = appService.query(criteria);
-        List<DispatchShipmentWrapper> shipWrappers =
-            new ArrayList<DispatchShipmentWrapper>();
-        for (DispatchShipment ship : ships) {
-            shipWrappers.add(new DispatchShipmentWrapper(appService, ship));
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getDispatchShipments() {
+        List<DispatchShipmentWrapper> dispatchShipments =
+            (List<DispatchShipmentWrapper>) propertiesMap
+                .get("dispatchShipments");
+        if (dispatchShipments == null) {
+            List<DispatchShipmentAliquotWrapper> dsaList =
+                getDispatchShipmentAliquotCollection();
+            if (dsaList != null) {
+                dispatchShipments = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipmentAliquotWrapper dsa : dsaList) {
+                    dispatchShipments.add(dsa.getShipment());
+                }
+                propertiesMap.put("dispatchShipments", dispatchShipments);
+            }
         }
-        return shipWrappers;
+        return dispatchShipments;
     }
 
     @Override
@@ -547,5 +539,42 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public ContainerWrapper getTop() {
         return objectWithPositionManagement.getTop();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection(
+        boolean sort) {
+        List<DispatchShipmentAliquotWrapper> dsaCollection =
+            (List<DispatchShipmentAliquotWrapper>) propertiesMap
+                .get("dispatchShipmentAliquotCollection");
+        if (dsaCollection == null) {
+            Collection<DispatchShipmentAliquot> children =
+                wrappedObject.getDispatchShipmentAliquotCollection();
+            if (children != null) {
+                dsaCollection = new ArrayList<DispatchShipmentAliquotWrapper>();
+                for (DispatchShipmentAliquot dsa : children) {
+                    dsaCollection.add(new DispatchShipmentAliquotWrapper(
+                        appService, dsa));
+                }
+                propertiesMap.put("dispatchShipmentAliquotCollection",
+                    dsaCollection);
+            }
+        }
+        if ((dsaCollection != null) && sort)
+            Collections.sort(dsaCollection);
+        return dsaCollection;
+    }
+
+    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection() {
+        return getDispatchShipmentAliquotCollection(true);
+    }
+
+    public boolean isInTransit() {
+        for (DispatchShipmentAliquotWrapper dsa : getDispatchShipmentAliquotCollection()) {
+            if (dsa.getShipment().isInTransitState()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

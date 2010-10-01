@@ -240,6 +240,19 @@ CREATE TABLE dispatch_info_site (
 
 DROP TABLE IF EXISTS  dispatch_position;
 
+
+create table DISPATCH_SHIPMENT_ALIQUOT (
+	ID integer not null, 
+	STATE integer, 
+	COMMENT text, 
+	ALIQUOT_ID integer not null, 
+	DISPATCH_SHIPMENT_ID integer not null, 
+	primary key (ID)
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+alter table DISPATCH_SHIPMENT_ALIQUOT add index FKB1B76907D8CEA57A (DISPATCH_SHIPMENT_ID), add constraint FKB1B76907D8CEA57A foreign key (DISPATCH_SHIPMENT_ID) references ABSTRACT_SHIPMENT (ID);
+alter table DISPATCH_SHIPMENT_ALIQUOT add index FKB1B76907898584F (ALIQUOT_ID), add constraint FKB1B76907898584F foreign key (ALIQUOT_ID) references ALIQUOT (ID);
+
+
 ALTER TABLE clinic
     DROP COLUMN SITE_ID,
     DROP INDEX FK76A608E83F52C885;

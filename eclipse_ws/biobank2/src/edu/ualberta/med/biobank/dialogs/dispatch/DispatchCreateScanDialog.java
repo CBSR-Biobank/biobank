@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper.STATE;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -257,7 +258,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
             aliquots.add(cell.getAliquot());
             cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
         }
-        currentShipment.addAliquots(aliquots);
+        currentShipment.addAliquots(aliquots, STATE.NONE_STATE);
         if (currentPallet != null) {
             removedPallets.add(currentPallet);
         }

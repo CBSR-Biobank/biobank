@@ -65,9 +65,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     private PalletScanManagement palletScanManagement;
 
-    // the pallet container type name contains this text
-    protected String palletNameContains = ""; //$NON-NLS-1$
-
     private boolean scanTubeAloneMode = false;
 
     private Label scanTubeAloneSwitch;

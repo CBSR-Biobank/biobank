@@ -43,7 +43,7 @@ public abstract class AbstractDispatchShipmentGroup extends AdapterBase {
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+        return getWrapperChildren() == null ? 0 : getWrapperChildren().size();
     }
 
     @Override
