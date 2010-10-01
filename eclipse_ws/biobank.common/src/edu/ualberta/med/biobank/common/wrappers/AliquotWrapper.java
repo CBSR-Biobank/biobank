@@ -169,10 +169,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public SiteWrapper getSite() {
+        List<DispatchShipmentAliquotWrapper> dsaw = get
         if (getParent() != null) {
             return getParent().getSite();
+        } else if (getActivityStatus().isDispatched()) {
+//
+        } else {
+            return getPatientVisit().getShipment().getSite();
         }
-        return null;
     }
 
     public void setPatientVisit(PatientVisitWrapper patientVisit) {

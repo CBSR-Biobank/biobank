@@ -24,7 +24,8 @@ public class AliquotViewForm extends BiobankViewForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AliquotViewForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.AliquotViewForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.AliquotViewForm";
 
     private AliquotAdapter aliquotAdapter;
 
@@ -100,24 +101,24 @@ public class AliquotViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         sampleTypeLabel = createReadOnlyLabelledField(client, SWT.NONE, "Type");
-        linkDateLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Link Date");
-        volumeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Volume (ml)");
-        shipmentWaybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Shipment Waybill");
+        linkDateLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Link Date");
+        volumeLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Volume (ml)");
+        shipmentWaybillLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Shipment Waybill");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
-        dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date Processed");
-        dateDrawnLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date Drawn");
-        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity Status");
-        commentLabel = createReadOnlyLabelledField(client,
-            SWT.WRAP | SWT.MULTI, "Comment");
-        positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Position");
+        dateProcessedLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Date Processed");
+        dateDrawnLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Date Drawn");
+        activityStatusLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Activity Status");
+        commentLabel =
+            createReadOnlyLabelledField(client, SWT.WRAP | SWT.MULTI, "Comment");
+        positionLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Position");
     }
 
     private void createContainersSection() {
@@ -143,8 +144,8 @@ public class AliquotViewForm extends BiobankViewForm {
                 } else {
                     position = parents.peek().getPosition();
                 }
-                Composite containerComposite = toolkit
-                    .createComposite(containersComposite);
+                Composite containerComposite =
+                    toolkit.createComposite(containersComposite);
                 GridLayout layout = new GridLayout(1, false);
                 layout.horizontalSpacing = 0;
                 layout.marginWidth = 0;
@@ -154,8 +155,8 @@ public class AliquotViewForm extends BiobankViewForm {
                     .createLabel(containerComposite, container.getLabel()
                         + " (" + container.getContainerType().getNameShort()
                         + ") ");
-                ContainerDisplayWidget containerWidget = new ContainerDisplayWidget(
-                    containerComposite);
+                ContainerDisplayWidget containerWidget =
+                    new ContainerDisplayWidget(containerComposite);
                 containerWidget.setContainer(container);
                 containerWidget.setSelection(position);
                 toolkit.adapt(containerWidget);
@@ -164,11 +165,7 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        ContainerWrapper c = aliquot.getParent();
-        if (c == null)
-            setTextValue(siteLabel, "Unassigned");
-        else
-            setTextValue(siteLabel, c.getSite().getNameShort());
+        setTextValue(siteLabel, aliquot.getSite().getNameShort());
         setTextValue(sampleTypeLabel, aliquot.getSampleType().getName());
         setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
         setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
