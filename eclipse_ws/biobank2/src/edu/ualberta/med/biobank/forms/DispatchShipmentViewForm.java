@@ -2,7 +2,11 @@ package edu.ualberta.med.biobank.forms;
 
 import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -10,7 +14,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.swt.widgets.Display;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -31,7 +35,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(DispatchShipmentViewForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchShipmentViewForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.DispatchShipmentViewForm";
 
     private DispatchShipmentAdapter shipmentAdapter;
 
@@ -141,8 +146,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
     private void createReceiveButton() {
         Composite composite = toolkit.createComposite(page);
         composite.setLayout(new GridLayout(2, false));
-        Button sendButton = toolkit
-            .createButton(composite, "Receive", SWT.PUSH);
+        Button sendButton =
+            toolkit.createButton(composite, "Receive", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -150,8 +155,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             }
         });
 
-        Button sendProcessButton = toolkit.createButton(composite,
-            "Receive and Process", SWT.PUSH);
+        Button sendProcessButton =
+            toolkit.createButton(composite, "Receive and Process", SWT.PUSH);
         sendProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -165,23 +170,42 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (new SendDispatchShipmentDialog(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), shipment).open() == Dialog.OK) {
-                    shipment.setNextState();
+                if (new SendDispatchShipmentDialog(Display.getDefault()
+                    .getActiveShell(), shipment).open() == Dialog.OK) {
+                    IRunnableContext context =
+                        new ProgressMonitorDialog(Display.getDefault()
+                            .getActiveShell());
                     try {
-                        shipment.persist();
-                    } catch (final RemoteConnectFailureException exp) {
-                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
-                        return;
-                    } catch (final RemoteAccessException exp) {
-                        BioBankPlugin.openRemoteAccessErrorMessage(exp);
-                        return;
-                    } catch (final AccessDeniedException ade) {
-                        BioBankPlugin.openAccessDeniedErrorMessage(ade);
-                        return;
-                    } catch (Exception ex) {
-                        BioBankPlugin.openAsyncError("Save error", ex);
-                        return;
+                        context.run(true, true, new IRunnableWithProgress() {
+                            @Override
+                            public void run(final IProgressMonitor monitor) {
+                                monitor.beginTask("Saving...",
+                                    IProgressMonitor.UNKNOWN);
+                                shipment.setNextState();
+                                try {
+                                    shipment.persist();
+                                } catch (final RemoteConnectFailureException exp) {
+                                    BioBankPlugin
+                                        .openRemoteConnectErrorMessage(exp);
+                                    return;
+                                } catch (final RemoteAccessException exp) {
+                                    BioBankPlugin
+                                        .openRemoteAccessErrorMessage(exp);
+                                    return;
+                                } catch (final AccessDeniedException ade) {
+                                    BioBankPlugin
+                                        .openAccessDeniedErrorMessage(ade);
+                                    return;
+                                } catch (Exception ex) {
+                                    BioBankPlugin.openAsyncError("Save error",
+                                        ex);
+                                    return;
+                                }
+                                monitor.done();
+                            }
+                        });
+                    } catch (Exception e1) {
+                        BioBankPlugin.openAsyncError("Save error", e1);
                     }
                     DispatchShipmentAdministrationView.getCurrent().reload();
                     shipmentAdapter.openViewForm();
@@ -198,8 +222,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             title = "Aliquots expected";
         }
         Composite parent = createSectionWithClient(title);
-        aliquotsExpectedTable = new DispatchAliquotListInfoTable(parent,
-            shipment, null, false);
+        aliquotsExpectedTable =
+            new DispatchAliquotListInfoTable(parent, shipment, null, false);
         aliquotsExpectedTable.adaptToToolkit(toolkit, true);
         aliquotsExpectedTable
             .addDoubleClickListener(collectionDoubleClickListener);
@@ -208,8 +232,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
     private void createAliquotsAcceptedSection() {
         if (shipment.hasBeenReceived()) {
             Composite parent = createSectionWithClient("Aliquots accepted");
-            aliquotsAcceptedTable = new DispatchAliquotListInfoTable(parent,
-                shipment, null, false);
+            aliquotsAcceptedTable =
+                new DispatchAliquotListInfoTable(parent, shipment, null, false);
             aliquotsAcceptedTable.adaptToToolkit(toolkit, true);
             aliquotsAcceptedTable
                 .addDoubleClickListener(collectionDoubleClickListener);
@@ -219,8 +243,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
     private void createAliquotsFlaggedSection() {
         if (shipment.hasBeenReceived()) {
             Composite parent = createSectionWithClient("Aliquots flagged");
-            aliquotsFlaggedTable = new DispatchAliquotListInfoTable(parent,
-                shipment, null, false);
+            aliquotsFlaggedTable =
+                new DispatchAliquotListInfoTable(parent, shipment, null, false);
             aliquotsFlaggedTable.adaptToToolkit(toolkit, true);
             aliquotsFlaggedTable
                 .addDoubleClickListener(collectionDoubleClickListener);
@@ -237,22 +261,22 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
-        receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Receiver");
+        receiverLabel =
+            createReadOnlyLabelledField(client, SWT.NONE, "Receiver");
         if (!shipment.isInCreationState()) {
-            dateShippedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Date Shipped");
-            shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Shipping Method");
-            waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Waybill");
+            dateShippedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE, "Date Shipped");
+            shippingMethodLabel =
+                createReadOnlyLabelledField(client, SWT.NONE, "Shipping Method");
+            waybillLabel =
+                createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
         }
         if (shipment.hasBeenReceived()) {
-            dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-                "Date received");
+            dateReceivedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE, "Date received");
         }
-        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+        commentLabel =
+            createReadOnlyLabelledField(client, SWT.MULTI, "Comments");
     }
 
     private void setShipmentValues() {
