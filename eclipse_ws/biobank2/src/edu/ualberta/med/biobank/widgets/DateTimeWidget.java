@@ -24,7 +24,8 @@ public class DateTimeWidget extends BiobankWidget {
 
     private CDateTime dateEntry;
 
-    private List<ModifyListener> modifyListeners = new ArrayList<ModifyListener>();
+    private List<ModifyListener> modifyListeners =
+        new ArrayList<ModifyListener>();
 
     private Listener dataEntryModifyListener = new Listener() {
         @Override
@@ -49,8 +50,9 @@ public class DateTimeWidget extends BiobankWidget {
             style |= CDT.DROP_DOWN | CDT.DATE_SHORT;
         }
 
-        dateEntry = new CDateTime(this, CDT.BORDER | CDT.COMPACT
-            | CDT.TIME_SHORT | CDT.CLOCK_24_HOUR | CDT.BORDER | style);
+        dateEntry =
+            new CDateTime(this, CDT.BORDER | CDT.COMPACT | CDT.TIME_SHORT
+                | CDT.CLOCK_24_HOUR | CDT.BORDER | style);
         if ((style & SWT.TIME) != 0 && (style & SWT.DATE) != 0)
             dateEntry.setPattern(DateFormatter.DATE_TIME_FORMAT);
         else if ((style & SWT.TIME) != 0)
@@ -62,10 +64,7 @@ public class DateTimeWidget extends BiobankWidget {
 
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
-        if ((style & SWT.TIME) != 0 && (style & SWT.DATE) != 0)
-            gd.widthHint = 130;
-        else
-            gd.widthHint = 110;
+        gd.widthHint = SWT.DEFAULT;
         gd.heightHint = SWT.DEFAULT;
         dateEntry.setLayoutData(gd);
 
