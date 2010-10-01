@@ -275,15 +275,15 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void initAuthorizedSampleTypeList() throws ApplicationException {
         authorizedSampleTypes =
-            SampleTypeWrapper.getSampleTypeForContainerTypes(appService,
-                SessionManager.getInstance().getCurrentSite(),
-                palletNameContains);
+            SampleTypeWrapper.getSampleTypeForPallet96(appService,
+                SessionManager.getInstance().getCurrentSite());
         if (authorizedSampleTypes.size() == 0) {
-            BioBankPlugin.openAsyncError(Messages
-                .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
-                Messages.getFormattedString(
-                    "ScanLink.dialog.sampleTypesError.msg", //$NON-NLS-1$
-                    palletNameContains));
+            BioBankPlugin
+                .openAsyncError(
+                    Messages
+                        .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
+                    Messages
+                        .getFormattedString("ScanLink.dialog.sampleTypesError.msg")); //$NON-NLS-1$
         }
     }
 

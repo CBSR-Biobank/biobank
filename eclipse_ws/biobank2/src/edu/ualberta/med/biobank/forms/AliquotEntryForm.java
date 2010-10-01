@@ -24,8 +24,7 @@ import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class AliquotEntryForm extends BiobankEntryForm {
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.AliquotEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.AliquotEntryForm";
 
     public static final String OK_MESSAGE = "Edit aliquot";
 
@@ -35,7 +34,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
 
     private ComboViewer sampleTypeComboViewer;
 
-    private BiobankText volume;
+    private BiobankText volumeField;
 
     private BiobankText siteLabel;
 
@@ -65,8 +64,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
         StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
         study.reload();
 
-        List<SampleStorageWrapper> allowedSampleStorage =
-            study.getSampleStorageCollection();
+        List<SampleStorageWrapper> allowedSampleStorage = study
+            .getSampleStorageCollection();
 
         List<SampleTypeWrapper> containerSampleTypeList = null;
         if (aliquot.hasParent()) {
@@ -75,8 +74,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
             containerSampleTypeList = ct.getSampleTypeCollection();
         }
 
-        List<SampleTypeWrapper> sampleTypes =
-            new ArrayList<SampleTypeWrapper>();
+        List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
         for (SampleStorageWrapper ss : allowedSampleStorage) {
             SampleTypeWrapper sst = ss.getSampleType();
             if (containerSampleTypeList == null) {
@@ -92,28 +90,30 @@ public class AliquotEntryForm extends BiobankEntryForm {
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, aliquot.getSite().getNameShort());
 
-        sampleTypeComboViewer =
-            createComboViewer(client, "Type", sampleTypes,
-                aliquot.getSampleType(), "Aliquot must have a sample type",
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        aliquot
-                            .setSampleType((SampleTypeWrapper) selectedObject);
-                        aliquot.setQuantityFromType();
-                        if (volume != null) {
-                            volume.setText(aliquot.getQuantity().toString());
+        sampleTypeComboViewer = createComboViewer(client, "Type", sampleTypes,
+            aliquot.getSampleType(), "Aliquot must have a sample type",
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    aliquot.setSampleType((SampleTypeWrapper) selectedObject);
+                    aliquot.setQuantityFromType();
+                    Double volume = aliquot.getQuantity();
+                    if (volumeField != null) {
+                        if (volume == null) {
+                            volumeField.setText("");
+                        } else {
+                            volumeField.setText(volume.toString());
                         }
                     }
-                });
+                }
+            });
 
         createReadOnlyLabelledField(client, SWT.NONE, "Link Date",
             aliquot.getFormattedLinkDate());
 
-        volume =
-            createReadOnlyLabelledField(client, SWT.NONE, "Volume (ml)",
-                aliquot.getQuantity() == null ? null : aliquot.getQuantity()
-                    .toString());
+        volumeField = createReadOnlyLabelledField(client, SWT.NONE,
+            "Volume (ml)", aliquot.getQuantity() == null ? null : aliquot
+                .getQuantity().toString());
 
         createReadOnlyLabelledField(client, SWT.NONE, "Shipment Waybill",
             aliquot.getPatientVisit().getShipment().getWaybill());
@@ -133,18 +133,17 @@ public class AliquotEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Position",
             aliquot.getPositionString(true, false));
 
-        activityStatusComboViewer =
-            createComboViewer(client, "Activity Status",
-                ActivityStatusWrapper.getAllActivityStatuses(appService),
-                aliquot.getActivityStatus(),
-                "Aliquot must have an activity status",
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        aliquot
-                            .setActivityStatus((ActivityStatusWrapper) selectedObject);
-                    }
-                });
+        activityStatusComboViewer = createComboViewer(client,
+            "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            aliquot.getActivityStatus(),
+            "Aliquot must have an activity status", new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    aliquot
+                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                }
+            });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
             | SWT.MULTI, "Comments", null,
@@ -171,8 +170,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        ActivityStatusWrapper currentActivityStatus =
-            aliquot.getActivityStatus();
+        ActivityStatusWrapper currentActivityStatus = aliquot
+            .getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 currentActivityStatus));

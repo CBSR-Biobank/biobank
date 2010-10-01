@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrappe
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
@@ -78,11 +79,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                     }
                     return null;
                 }
-
-                @Override
-                public SiteWrapper getSite() {
-                    return ContainerWrapper.this.getSite();
-                }
             };
     }
 
@@ -113,6 +109,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         checkContainerTypeSameSite();
         checkHasPosition();
         objectWithPositionManagement.persistChecks();
+        checkParentFromSameSite();
+    }
+
+    private void checkParentFromSameSite() throws BiobankCheckException {
+        if (getParent() != null && !getParent().getSite().equals(getSite())) {
+            throw new BiobankCheckException(
+                "Parent should be part of the same site");
+        }
     }
 
     private void checkContainerTypeNotNull() throws BiobankCheckException {
@@ -321,15 +325,35 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     private ContainerPathWrapper getContainerPath() throws Exception {
-        return ContainerPathWrapper.getContainerPath(appService, this);
+        ContainerPathWrapper cp = ContainerPathWrapper.getContainerPath(
+            appService, this);
+
+        if (cp == null) {
+            cp = new ContainerPathWrapper(appService, new ContainerPath());
+        }
+
+        cp.setContainer(this);
+        cp.getWrappedObject().setPath(getPath());
+
+        return cp;
     }
 
-    public String getPath() throws Exception {
-        ContainerPathWrapper containerPath = getContainerPath();
-        if (containerPath == null) {
-            return null;
+    public String getPath() {
+        StringBuilder sb = new StringBuilder();
+        ContainerWrapper container = this;
+
+        while (container != null) {
+            if (container.isNew()) {
+                return null;
+            }
+
+            sb.insert(0, container.getId());
+            sb.insert(0, "/");
+            container = container.getParent();
         }
-        return containerPath.getPath();
+        sb.deleteCharAt(0);
+
+        return sb.toString();
     }
 
     /**

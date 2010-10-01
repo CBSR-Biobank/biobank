@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -14,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.DispatchShipmentAliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -38,34 +39,28 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     private void initManagement() {
-        objectWithPositionManagement =
-            new AbstractObjectWithPositionManagement<AliquotPosition>() {
+        objectWithPositionManagement = new AbstractObjectWithPositionManagement<AliquotPosition>() {
 
-                @Override
-                protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
-                    boolean initIfNoPosition) {
-                    if (nullPositionSet)
-                        return null;
-
-                    AliquotPosition pos = wrappedObject.getAliquotPosition();
-                    if (pos != null) {
-                        return new AliquotPositionWrapper(appService, pos);
-                    } else if (initIfNoPosition) {
-                        AliquotPositionWrapper posWrapper =
-                            new AliquotPositionWrapper(appService);
-                        posWrapper.setAliquot(AliquotWrapper.this);
-                        wrappedObject.setAliquotPosition(posWrapper
-                            .getWrappedObject());
-                        return posWrapper;
-                    }
+            @Override
+            protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(
+                boolean initIfNoPosition) {
+                if (nullPositionSet)
                     return null;
-                }
 
-                @Override
-                public SiteWrapper getSite() {
-                    return AliquotWrapper.this.getSite();
+                AliquotPosition pos = wrappedObject.getAliquotPosition();
+                if (pos != null) {
+                    return new AliquotPositionWrapper(appService, pos);
+                } else if (initIfNoPosition) {
+                    AliquotPositionWrapper posWrapper = new AliquotPositionWrapper(
+                        appService);
+                    posWrapper.setAliquot(AliquotWrapper.this);
+                    wrappedObject.setAliquotPosition(posWrapper
+                        .getWrappedObject());
+                    return posWrapper;
                 }
-            };
+                return null;
+            }
+        };
     }
 
     @Override
@@ -86,8 +81,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             // get original position
             AliquotPosition rawPos = wrappedObject.getAliquotPosition();
             if (rawPos != null) {
-                AbstractPositionWrapper<AliquotPosition> pos =
-                    new AliquotPositionWrapper(appService, rawPos);
+                AbstractPositionWrapper<AliquotPosition> pos = new AliquotPositionWrapper(
+                    appService, rawPos);
                 pos.delete();
             }
             wrappedObject.setAliquotPosition(null);
@@ -128,8 +123,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        List<AliquotWrapper> aliquots =
-            getAliquots(appService, getInventoryId());
+        List<AliquotWrapper> aliquots = getAliquots(appService,
+            getInventoryId());
         boolean alreadyExists = false;
         if (aliquots.size() > 0 && isNew()) {
             alreadyExists = true;
@@ -156,8 +151,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             } catch (Exception e) {
                 throw new BiobankCheckException(e);
             }
-            List<SampleTypeWrapper> types =
-                parentType.getSampleTypeCollection();
+            List<SampleTypeWrapper> types = parentType
+                .getSampleTypeCollection();
             if (types == null || !types.contains(getSampleType())) {
                 throw new BiobankCheckException("Container "
                     + getParent().getFullInfoLabel()
@@ -192,8 +187,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public PatientVisitWrapper getPatientVisit() {
-        PatientVisitWrapper patientVisit =
-            (PatientVisitWrapper) propertiesMap.get("patientVisit");
+        PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
+            .get("patientVisit");
         if (patientVisit == null) {
             PatientVisit pv = wrappedObject.getPatientVisit();
             if (pv == null)
@@ -209,8 +204,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
      */
     public void setAliquotPositionFromString(String positionString,
         ContainerWrapper parentContainer) throws Exception {
-        RowColPos rcp =
-            parentContainer.getContainerType().getRowColFromPositionString(
+        RowColPos rcp = parentContainer.getContainerType()
+            .getRowColFromPositionString(
                 positionString.replaceFirst(parentContainer.getLabel(), ""));
         if ((rcp.row > -1) && (rcp.col > -1)) {
             setPosition(rcp);
@@ -227,12 +222,12 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         throws ApplicationException {
         RowColPos position = getPosition();
         if (position != null) {
-            HQLCriteria criteria =
-                new HQLCriteria("from " + Aliquot.class.getName()
-                    + " where aliquotPosition.row=? and aliquotPosition.col=?"
-                    + " and aliquotPosition.container=?",
-                    Arrays.asList(new Object[] { position.row, position.col,
-                        parentContainer.getWrappedObject() }));
+            HQLCriteria criteria = new HQLCriteria("from "
+                + Aliquot.class.getName()
+                + " where aliquotPosition.row=? and aliquotPosition.col=?"
+                + " and aliquotPosition.container=?",
+                Arrays.asList(new Object[] { position.row, position.col,
+                    parentContainer.getWrappedObject() }));
 
             List<Aliquot> samples = appService.query(criteria);
             if (samples.size() > 0) {
@@ -255,8 +250,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public SampleTypeWrapper getSampleType() {
-        SampleTypeWrapper sampleType =
-            (SampleTypeWrapper) propertiesMap.get("sampleType");
+        SampleTypeWrapper sampleType = (SampleTypeWrapper) propertiesMap
+            .get("sampleType");
         if (sampleType == null) {
             SampleType s = wrappedObject.getSampleType();
             if (s == null)
@@ -293,8 +288,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activity =
-            (ActivityStatusWrapper) propertiesMap.get("activityStatus");
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activity == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
@@ -388,12 +383,12 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setQuantityFromType() {
-        PatientVisitWrapper patientVisit =
-            (PatientVisitWrapper) propertiesMap.get("patientVisit");
+        PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
+            .get("patientVisit");
         StudyWrapper study = patientVisit.getPatient().getStudy();
         Double volume = null;
-        Collection<SampleStorageWrapper> sampleStorageCollection =
-            study.getSampleStorageCollection();
+        Collection<SampleStorageWrapper> sampleStorageCollection = study
+            .getSampleStorageCollection();
         if (sampleStorageCollection != null) {
             for (SampleStorageWrapper ss : sampleStorageCollection) {
                 if (ss.getSampleType().getId().equals(getSampleType().getId())) {
@@ -422,10 +417,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     public static List<AliquotWrapper> getAliquots(
         WritableApplicationService appService, String inventoryId)
         throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria("from " + Aliquot.class.getName()
-                + " where inventoryId = ?",
-                Arrays.asList(new Object[] { inventoryId }));
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Aliquot.class.getName() + " where inventoryId = ?",
+            Arrays.asList(new Object[] { inventoryId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
         for (Aliquot aliquot : aliquots) {
@@ -438,13 +432,12 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     public static List<AliquotWrapper> getAliquotsNonActive(
         WritableApplicationService appService, SiteWrapper site)
         throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "from "
-                    + Aliquot.class.getName()
-                    + " a where a.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ? and activityStatus.name != ?",
-                Arrays.asList(new Object[] { site.getId(),
-                    ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Aliquot.class.getName()
+                + " a where a.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ? and activityStatus.name != ?",
+            Arrays.asList(new Object[] { site.getId(),
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
 
@@ -458,16 +451,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         WritableApplicationService appService, SiteWrapper site,
         String positionString) throws ApplicationException,
         BiobankCheckException {
-        List<ContainerWrapper> possibleContainers =
-            ContainerWrapper.getPossibleParents(appService, positionString,
-                site, null);
+        List<ContainerWrapper> possibleContainers = ContainerWrapper
+            .getPossibleParents(appService, positionString, site, null);
         List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
         for (ContainerWrapper container : possibleContainers) {
             RowColPos rcp = null;
             try {
-                rcp =
-                    container.getContainerType().getRowColFromPositionString(
-                        positionString.replaceFirst(container.getLabel(), ""));
+                rcp = container.getContainerType().getRowColFromPositionString(
+                    positionString.replaceFirst(container.getLabel(), ""));
             } catch (Exception e) {
                 // Should never happen: it has been already tested in
                 // getPossibleParentsMethod
@@ -475,8 +466,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             }
             if (rcp != null) {
                 if ((rcp.row > -1) && (rcp.col > -1)) {
-                    AliquotWrapper aliquot =
-                        container.getAliquot(rcp.row, rcp.col);
+                    AliquotWrapper aliquot = container.getAliquot(rcp.row,
+                        rcp.col);
                     if (aliquot != null) {
                         aliquots.add(aliquot);
                     }
@@ -500,20 +491,21 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return getInventoryId();
     }
 
-    public List<DispatchShipmentWrapper> getDispatchShipments()
-        throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria("select ship from "
-                + DispatchShipment.class.getName()
-                + " ship where ship.aliquotCollection.id = ?",
-                Arrays.asList(new Object[] { getId() }));
-        List<DispatchShipment> ships = appService.query(criteria);
-        List<DispatchShipmentWrapper> shipWrappers =
-            new ArrayList<DispatchShipmentWrapper>();
-        for (DispatchShipment ship : ships) {
-            shipWrappers.add(new DispatchShipmentWrapper(appService, ship));
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getDispatchShipments() {
+        List<DispatchShipmentWrapper> dispatchShipments = (List<DispatchShipmentWrapper>) propertiesMap
+            .get("dispatchShipments");
+        if (dispatchShipments == null) {
+            List<DispatchShipmentAliquotWrapper> dsaList = getDispatchShipmentAliquotCollection();
+            if (dsaList != null) {
+                dispatchShipments = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipmentAliquotWrapper dsa : dsaList) {
+                    dispatchShipments.add(dsa.getShipment());
+                }
+                propertiesMap.put("dispatchShipments", dispatchShipments);
+            }
         }
-        return shipWrappers;
+        return dispatchShipments;
     }
 
     @Override
@@ -551,5 +543,41 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public ContainerWrapper getTop() {
         return objectWithPositionManagement.getTop();
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection(
+        boolean sort) {
+        List<DispatchShipmentAliquotWrapper> dsaCollection = (List<DispatchShipmentAliquotWrapper>) propertiesMap
+            .get("dispatchShipmentAliquotCollection");
+        if (dsaCollection == null) {
+            Collection<DispatchShipmentAliquot> children = wrappedObject
+                .getDispatchShipmentAliquotCollection();
+            if (children != null) {
+                dsaCollection = new ArrayList<DispatchShipmentAliquotWrapper>();
+                for (DispatchShipmentAliquot dsa : children) {
+                    dsaCollection.add(new DispatchShipmentAliquotWrapper(
+                        appService, dsa));
+                }
+                propertiesMap.put("dispatchShipmentAliquotCollection",
+                    dsaCollection);
+            }
+        }
+        if ((dsaCollection != null) && sort)
+            Collections.sort(dsaCollection);
+        return dsaCollection;
+    }
+
+    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection() {
+        return getDispatchShipmentAliquotCollection(true);
+    }
+
+    public boolean isInTransit() {
+        for (DispatchShipmentAliquotWrapper dsa : getDispatchShipmentAliquotCollection()) {
+            if (dsa.getShipment().isInTransitState()) {
+                return true;
+            }
+        }
+        return false;
     }
 }

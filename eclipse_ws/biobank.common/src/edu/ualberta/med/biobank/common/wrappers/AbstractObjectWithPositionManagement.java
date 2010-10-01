@@ -16,8 +16,10 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     private ContainerWrapper parent;
 
     protected void persist() {
-        boolean origPositionSet = (!nullPositionSet && (rowColPosition != null));
-        AbstractPositionWrapper<T> posWrapper = getPositionWrapper(origPositionSet);
+        boolean origPositionSet =
+            (!nullPositionSet && (rowColPosition != null));
+        AbstractPositionWrapper<T> posWrapper =
+            getPositionWrapper(origPositionSet);
         if ((posWrapper != null) && origPositionSet) {
             posWrapper.setRow(rowColPosition.row);
             posWrapper.setCol(rowColPosition.col);
@@ -27,21 +29,12 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         boolean origPositionSet = (!nullPositionSet && rowColPosition != null);
-        AbstractPositionWrapper<T> posWrapper = getPositionWrapper(origPositionSet);
+        AbstractPositionWrapper<T> posWrapper =
+            getPositionWrapper(origPositionSet);
         if (posWrapper != null) {
             posWrapper.persistChecks();
         }
-        checkParentFromSameSite();
     }
-
-    private void checkParentFromSameSite() throws BiobankCheckException {
-        if (getParent() != null && !getParent().getSite().equals(getSite())) {
-            throw new BiobankCheckException(
-                "Parent should be part of the same site");
-        }
-    }
-
-    public abstract SiteWrapper getSite();
 
     protected void resetInternalFields() {
         rowColPosition = null;

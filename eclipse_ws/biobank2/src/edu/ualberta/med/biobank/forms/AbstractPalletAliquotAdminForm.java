@@ -41,7 +41,7 @@ import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
-import edu.ualberta.med.scannerconfig.preferences.profiles.ProfileManager;
+import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractPalletAliquotAdminForm extends
     AbstractAliquotAdminForm {
@@ -64,9 +64,6 @@ public abstract class AbstractPalletAliquotAdminForm extends
     private boolean rescanMode = false;
 
     private PalletScanManagement palletScanManagement;
-
-    // the pallet container type name contains this text
-    protected String palletNameContains = ""; //$NON-NLS-1$
 
     private boolean scanTubeAloneMode = false;
 

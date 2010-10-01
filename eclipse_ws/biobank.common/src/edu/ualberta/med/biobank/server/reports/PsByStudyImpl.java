@@ -6,22 +6,24 @@ import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
 
 public class PsByStudyImpl extends AbstractReport {
 
-    private static final String QUERY = "select pv.patient.study.nameShort,"
-        + " year(pv.dateProcessed), "
-        + GROUPBY_DATE
-        + "(pv.dateProcessed), "
-        + "count(distinct pv.patient) from edu.ualberta.med.biobank.model.PatientVisit pv"
-        + " where pv.dateProcessed between ? and ? and pv.shipment.site "
-        + SITE_OPERATOR + SITE_ID
-        + " group by pv.patient.study.nameShort, year(pv.dateProcessed), "
-        + GROUPBY_DATE + "(pv.dateProcessed)";
+    private static final String QUERY =
+        "select pv.clinicShipmentPatient.patient.study.nameShort,"
+            + " year(pv.dateProcessed), "
+            + GROUPBY_DATE
+            + "(pv.dateProcessed), "
+            + "count(distinct pv.clinicShipmentPatient.patient) from edu.ualberta.med.biobank.model.PatientVisit pv"
+            + " where pv.dateProcessed between ? and ? and pv.clinicShipmentPatient.clinicShipment.site "
+            + SITE_OPERATOR
+            + SITE_ID
+            + " group by pv.clinicShipmentPatient.patient.study.nameShort, year(pv.dateProcessed), "
+            + GROUPBY_DATE + "(pv.dateProcessed)";
 
     private DateRangeRowPostProcess dateRangePostProcess;
 
     public PsByStudyImpl(BiobankReport report) {
         super(QUERY, report);
-        dateRangePostProcess = new DateRangeRowPostProcess(report.getGroupBy()
-            .equals("Year"), 1);
+        dateRangePostProcess =
+            new DateRangeRowPostProcess(report.getGroupBy().equals("Year"), 1);
     }
 
     @Override

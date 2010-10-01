@@ -140,7 +140,7 @@ UPDATE container_labeling_scheme set min_chars=2,max_chars=3,max_rows=16,max_col
 UPDATE container_labeling_scheme set min_chars=2,max_chars=2,max_capacity=576 where id=2;
 UPDATE container_labeling_scheme set min_chars=2,max_chars=2,max_capacity=99 where id=3;
 UPDATE container_labeling_scheme set min_chars=2,max_chars=2,max_rows=2,max_cols=2,max_capacity=4 where id=4;
-INSERT INTO container_labeling_scheme values (5,"Box81",2,2,9,9,81);
+INSERT INTO container_labeling_scheme values (5,"CBSR SBS",2,2,9,9,81);
 
 UPDATE container_type set child_labeling_scheme_id=5 where name="Box 81";
 
@@ -154,14 +154,14 @@ CREATE TABLE abstract_shipment (
     WAYBILL varchar(255) NULL DEFAULT NULL COMMENT '' COLLATE latin1_swedish_ci,
     DATE_SHIPPED datetime NULL DEFAULT NULL COMMENT '',
     BOX_NUMBER varchar(255) NULL DEFAULT NULL COMMENT '' COLLATE latin1_swedish_ci,
-    SHIPPING_METHOD_ID int(11) NULL DEFAULT NULL,
+    STATE int(11) NULL DEFAULT NULL COMMENT '',
+    SHIPPING_METHOD_ID INT(11) NULL DEFAULT NULL,
     ACTIVITY_STATUS_ID INT(11) NULL DEFAULT NULL,
     SITE_ID int(11) NULL DEFAULT NULL COMMENT '',
     STUDY_ID INT(11) NULL DEFAULT NULL COMMENT '',
     CLINIC_ID int(11) NULL DEFAULT NULL COMMENT '',
     DISPATCH_RECEIVER_ID int(11) NULL DEFAULT NULL COMMENT '',
     DISPATCH_SENDER_ID int(11) NULL DEFAULT NULL COMMENT '',
-    STATE int(11) NULL DEFAULT NULL COMMENT '',
     PRIMARY KEY (ID),
     INDEX FK70F1B917FB659898 (DISPATCH_RECEIVER_ID),
     INDEX FK70F1B917DCA49682 (SHIPPING_METHOD_ID),
@@ -172,7 +172,7 @@ CREATE TABLE abstract_shipment (
     INDEX FK70F1B9173F52C885 (SITE_ID),
     INDEX DATE_RECV_IDX (DATE_RECEIVED),
     INDEX WAYBILL_IDX (WAYBILL)
-) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 INSERT INTO abstract_shipment (ID, DISCRIMINATOR, DATE_RECEIVED, COMMENT, WAYBILL, DATE_SHIPPED,
 BOX_NUMBER, SHIPPING_METHOD_ID, CLINIC_ID, SITE_ID, ACTIVITY_STATUS_ID)
@@ -186,15 +186,34 @@ DROP TABLE shipment;
 DROP TABLE IF EXISTS  clinic_shipment_patient;
 
 CREATE TABLE clinic_shipment_patient (
-    PATIENT_ID int(11) NOT NULL DEFAULT 0 COMMENT '',
+    ID int(11) NOT NULL AUTO_INCREMENT,
+    PATIENT_ID int(11) NOT NULL,
     CLINIC_SHIPMENT_ID int(11) NOT NULL,
-    PRIMARY KEY (CLINIC_SHIPMENT_ID, PATIENT_ID),
+    PRIMARY KEY (ID),
     INDEX FKF4B18BB7E5B2B216 (CLINIC_SHIPMENT_ID),
     INDEX FKF4B18BB7B563F38F (PATIENT_ID)
-) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 INSERT INTO clinic_shipment_patient (PATIENT_ID, CLINIC_SHIPMENT_ID)
 SELECT PATIENT_ID, SHIPMENT_ID FROM shipment_patient;
+
+ALTER TABLE clinic_shipment_patient
+      MODIFY COLUMN ID int(11) NOT NULL DEFAULT 0 COMMENT '';
+
+ALTER TABLE patient_visit
+    CHANGE COLUMN SHIPMENT_ID CLINIC_SHIPMENT_PATIENT_ID int(11) NOT NULL AFTER PATIENT_ID,
+    DROP INDEX FKA09CAF51B1D3625,
+    ADD INDEX FKA09CAF5183AE7BBB (CLINIC_SHIPMENT_PATIENT_ID);
+
+UPDATE patient_visit
+    SET clinic_shipment_patient_id=(
+        SELECT id FROM clinic_shipment_patient
+        WHERE clinic_shipment_patient.patient_id=patient_visit.patient_id
+        AND clinic_shipment_id=clinic_shipment_patient_id);
+
+ALTER TABLE patient_visit
+    DROP COLUMN PATIENT_ID,
+    DROP INDEX FKA09CAF51B563F38F;
 
 DROP TABLE shipment_patient;
 
@@ -207,7 +226,7 @@ CREATE TABLE dispatch_info (
     PRIMARY KEY (ID),
     INDEX FK3D4D9D53CDCA092A (SRC_SITE_ID),
     INDEX FK3D4D9D53F2A2464F (STUDY_ID)
-) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 DROP TABLE IF EXISTS  dispatch_info_site;
 
@@ -217,9 +236,20 @@ CREATE TABLE dispatch_info_site (
     PRIMARY KEY (DISPATCH_INFO_ID, SITE_ID),
     INDEX FK86B04EB33F52C885 (SITE_ID),
     INDEX FK86B04EB3A927DCFA (DISPATCH_INFO_ID)
-) DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci;
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-DROP TABLE IF EXISTS  dispatch_position;
+DROP TABLE IF EXISTS dispatch_shipment_aliquot;
+
+CREATE TABLE dispatch_shipment_aliquot (
+	ID integer not null,
+	STATE integer,
+	COMMENT text,
+	ALIQUOT_ID integer not null,
+	DISPATCH_SHIPMENT_ID integer not null,
+	PRIMARY KEY (ID),
+        INDEX FKB1B76907D8CEA57A (DISPATCH_SHIPMENT_ID),
+        INDEX FKB1B76907898584F (ALIQUOT_ID)
+) DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 ALTER TABLE clinic
     DROP COLUMN SITE_ID,
@@ -228,11 +258,6 @@ ALTER TABLE clinic
 ALTER TABLE container_path
     DROP INDEX PATH_IDC,
     ADD INDEX PATH_IDX (PATH);
-
-ALTER TABLE patient_visit
-    CHANGE COLUMN SHIPMENT_ID CLINIC_SHIPMENT_ID int(11) NOT NULL AFTER PATIENT_ID,
-    DROP INDEX FKA09CAF51B1D3625,
-    ADD INDEX FKA09CAF51E5B2B216 (CLINIC_SHIPMENT_ID);
 
 ALTER TABLE abstract_position
       ADD COLUMN DISCRIMINATOR VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT '' AFTER ID,
@@ -297,8 +322,7 @@ ALTER TABLE abstract_shipment
       MODIFY COLUMN COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
       MODIFY COLUMN WAYBILL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
       MODIFY COLUMN BOX_NUMBER VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-      MODIFY COLUMN SHIPPING_METHOD_ID INT(11) NOT NULL,
-      MODIFY COLUMN ACTIVITY_STATUS_ID INT(11) NOT NULL, COLLATE=latin1_general_cs;
+      COLLATE=latin1_general_cs;
 ALTER TABLE activity_status MODIFY COLUMN NAME VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL, COLLATE=latin1_general_cs;
 ALTER TABLE address MODIFY COLUMN STREET1 VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
       MODIFY COLUMN STREET2 VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,

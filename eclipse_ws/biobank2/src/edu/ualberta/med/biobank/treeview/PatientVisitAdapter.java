@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview.patient;
+package edu.ualberta.med.biobank.treeview;
 
 import java.util.Collection;
 
@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
 import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class PatientVisitAdapter extends AdapterBase {
 

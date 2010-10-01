@@ -697,7 +697,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
+                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -728,7 +728,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
+                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -778,7 +778,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
+                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -809,7 +809,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter">
+                           value="edu.ualberta.med.biobank.treeview.PatientVisitAdapter">
                      </instanceof>
                   </iterate>
           	  </with>

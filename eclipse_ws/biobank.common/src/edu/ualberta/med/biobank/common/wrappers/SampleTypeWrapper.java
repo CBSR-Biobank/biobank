@@ -59,11 +59,12 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
      */
     @SuppressWarnings("unchecked")
     public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
-        List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
-            .get("containerTypeCollection");
+        List<ContainerTypeWrapper> containerTypeCollection =
+            (List<ContainerTypeWrapper>) propertiesMap
+                .get("containerTypeCollection");
         if (containerTypeCollection == null) {
-            Collection<ContainerType> children = wrappedObject
-                .getContainerTypeCollection();
+            Collection<ContainerType> children =
+                wrappedObject.getContainerTypeCollection();
             if (children != null) {
                 containerTypeCollection = new ArrayList<ContainerTypeWrapper>();
                 for (ContainerType type : children) {
@@ -108,17 +109,18 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     private void checkNoDuplicates(String propertyName, String value,
         String errorMessage) throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(
-            Arrays.asList(new Object[] { value }));
+        List<Object> parameters =
+            new ArrayList<Object>(Arrays.asList(new Object[] { value }));
 
         String notSameObject = "";
         if (!isNew()) {
             notSameObject = " and id <> ?";
             parameters.add(getId());
         }
-        HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + SampleType.class.getName() + " where " + propertyName + "=? "
-            + notSameObject, parameters);
+        HQLCriteria criteria =
+            new HQLCriteria("select count(*) from "
+                + SampleType.class.getName() + " where " + propertyName + "=? "
+                + notSameObject, parameters);
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -135,9 +137,26 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     public static List<SampleTypeWrapper> getSampleTypeForContainerTypes(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String typeNameContains) throws ApplicationException {
-        List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
-            .getContainerTypesInSite(appService, siteWrapper, typeNameContains,
-                false);
+        List<ContainerTypeWrapper> containerTypes =
+            ContainerTypeWrapper.getContainerTypesInSite(appService,
+                siteWrapper, typeNameContains, false);
+        Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
+        for (ContainerTypeWrapper containerType : containerTypes) {
+            sampleTypes.addAll(containerType.getSampleTypesRecursively());
+        }
+        return new ArrayList<SampleTypeWrapper>(sampleTypes);
+    }
+
+    /**
+     * get all sample types in a site for pallet containers (8*12 size) (go
+     * recursively inside found containers)
+     */
+    public static List<SampleTypeWrapper> getSampleTypeForPallet96(
+        WritableApplicationService appService, SiteWrapper siteWrapper)
+        throws ApplicationException {
+        List<ContainerTypeWrapper> containerTypes =
+            ContainerTypeWrapper.getContainerTypesPallet96(appService,
+                siteWrapper);
         Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
         for (ContainerTypeWrapper containerType : containerTypes) {
             sampleTypes.addAll(containerType.getSampleTypesRecursively());
@@ -213,10 +232,12 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     public boolean isUsedBySamples() throws ApplicationException,
         BiobankCheckException {
-        String queryString = "select count(s) from " + Aliquot.class.getName()
-            + " as s where s.sampleType=?)";
-        HQLCriteria c = new HQLCriteria(queryString,
-            Arrays.asList(new Object[] { wrappedObject }));
+        String queryString =
+            "select count(s) from " + Aliquot.class.getName()
+                + " as s where s.sampleType=?)";
+        HQLCriteria c =
+            new HQLCriteria(queryString,
+                Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
