@@ -48,7 +48,7 @@ public abstract class DispatchAliquotListInfoTable extends
 
     public DispatchAliquotListInfoTable(Composite parent,
         final DispatchShipmentWrapper shipment, boolean editMode) {
-        super(parent, null, HEADINGS, BOUNDS, 5);
+        super(parent, null, HEADINGS, BOUNDS, 15);
         this.currentShipment = shipment;
         setCollection(getInternalDispatchShipmentAliquots());
         this.editMode = editMode;
@@ -124,8 +124,7 @@ public abstract class DispatchAliquotListInfoTable extends
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info =
-                    (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return "loading...";
@@ -156,8 +155,8 @@ public abstract class DispatchAliquotListInfoTable extends
         TableRowData info = new TableRowData();
         info.dsa = dsa;
         info.inventoryId = dsa.getAliquot().getInventoryId();
-        info.pnumber =
-            dsa.getAliquot().getPatientVisit().getPatient().getPnumber();
+        info.pnumber = dsa.getAliquot().getPatientVisit().getPatient()
+            .getPnumber();
         SampleTypeWrapper type = dsa.getAliquot().getSampleType();
         Assert.isNotNull(type, "aliquot with null for sample type");
         info.type = type.getName();

@@ -39,7 +39,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     private IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
         String.class);
     private PalletScanManagement palletScanManagement;
-    private ScanPalletWidget spw;
+    protected ScanPalletWidget spw;
     protected DispatchShipmentWrapper currentShipment;
     private IObservableValue scanHasBeenLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
@@ -62,7 +62,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
             @Override
             protected void processScanResult(IProgressMonitor monitor)
                 throws Exception {
-                setScanNotLaunched(true);
+                setScanHasBeenLaunched(true);
                 AbstractDispatchScanDialog.this.processScanResult(monitor);
             }
 
@@ -171,7 +171,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         });
     }
 
-    private void setScanNotLaunched(final boolean launched) {
+    private void setScanHasBeenLaunched(final boolean launched) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
@@ -236,9 +236,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     @Override
     protected void handleStatusChanged(IStatus status) {
         super.handleStatusChanged(status);
-        if (status.getSeverity() != IStatus.OK) {
-            scanButton.setEnabled(fieldsValid());
-        }
+        scanButton.setEnabled(fieldsValid());
     }
 
     protected boolean fieldsValid() {

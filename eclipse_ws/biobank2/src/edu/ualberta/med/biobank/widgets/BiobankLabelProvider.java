@@ -7,11 +7,13 @@ import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -113,6 +115,19 @@ public class BiobankLabelProvider extends LabelProvider implements
             } else {
                 Assert.isTrue(false, "invalid column index: " + columnIndex);
             }
+        } else if (element instanceof DispatchShipmentAliquotWrapper) {
+            DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) element;
+            if (columnIndex == 0)
+                return dsa.getAliquot().getInventoryId();
+            if (columnIndex == 1)
+                return dsa.getAliquot().getSampleType().getNameShort();
+            if (columnIndex == 2)
+                return dsa.getAliquot().getPatientVisit().getPatient()
+                    .getPnumber();
+            if (columnIndex == 3)
+                return DispatchAliquotState.getState(dsa.getState()).toString();
+            if (columnIndex == 4)
+                return dsa.getComment();
         } else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());
         }

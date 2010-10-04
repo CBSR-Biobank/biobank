@@ -178,7 +178,7 @@ public class DispatchShipmentSendingEntryForm extends
     }
 
     private void createAliquotsSelectionSection() {
-        Section section = createSection("Sent aliquots");
+        Section section = createSection("Aliquot added");
         Composite composite = toolkit.createComposite(section);
         composite.setLayout(new GridLayout(1, false));
         section.setClient(composite);
