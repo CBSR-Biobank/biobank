@@ -175,7 +175,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             SiteWrapper s = new SiteWrapper(appService, new Site());
             for (DispatchShipmentAliquotWrapper da : dsac) {
                 if (da.getShipment().isInTransitState()
-                    && da.getState().equals(DispatchAliquotState.NONE_STATE)) {
+                    && da.getState().equals(
+                        DispatchAliquotState.NONE_STATE.ordinal())) {
                     // aliquot is in transit
                     s.setNameShort("In Transit ("
                         + da.getShipment().getSender().getNameShort() + " to "
@@ -184,22 +185,22 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
                 } else if (da.getShipment().isInReceivedState()
                     && da.getState().equals(
-                        DispatchAliquotState.EXTRA_PENDING_STATE)) {
+                        DispatchAliquotState.EXTRA_PENDING_STATE.ordinal())) {
                     // aliquot has been accidentally dispatched
-                    s.setNameShort("Lost to: "
-                        + da.getShipment().getReceiver().getNameShort()
-                        + " Return to: "
-                        + da.getShipment().getSender().getNameShort());
-                    return s;
+                    return da.getShipment().getReceiver();
+                } else if (da.getShipment().isInReceivedState()
+                    && da.getState().equals(
+                        DispatchAliquotState.MISSING_PENDING_STATE.ordinal())) {
+                    // aliquot is missing
+                    return da.getShipment().getSender();
                 } else if (da.getShipment().isInReceivedState()
                     && (da.getState().equals(
-                        DispatchAliquotState.RECEIVED_STATE) || da.getState()
-                        .equals(DispatchAliquotState.NONE_STATE))) {
+                        DispatchAliquotState.RECEIVED_STATE.ordinal()) || da
+                        .getState().equals(
+                            DispatchAliquotState.NONE_STATE.ordinal()))) {
                     // aliquot has been intentionally dispatched and received
                     return da.getShipment().getReceiver();
-                } else if (da.getShipment().isInCreationState())
-                    // aliquot has not been shipped yet
-                    return da.getShipment().getSender();
+                }
             }
             // if not in a container or a dispatch, use the originating shipment
             return getPatientVisit().getShipment().getSite();
