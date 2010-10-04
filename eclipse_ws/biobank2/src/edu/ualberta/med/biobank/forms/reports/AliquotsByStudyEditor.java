@@ -29,7 +29,7 @@ public class AliquotsByStudyEditor extends ReportsEditor {
 
     @Override
     protected void createOptionSection(Composite parent) {
-        topContainers = new TopContainerListWidget(parent, SWT.NONE);
+        topContainers = new TopContainerListWidget(parent, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), listStatus, "Top Container List Empty");
         topContainers
@@ -39,7 +39,6 @@ public class AliquotsByStudyEditor extends ReportsEditor {
                     listStatus.setValue(topContainers.getEnabled());
                 }
             });
-        topContainers.adaptToToolkit(toolkit, true);
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",

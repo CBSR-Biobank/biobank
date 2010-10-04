@@ -46,7 +46,7 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
         dateRangeCombo = widgetCreator.createComboViewer(parent, "Group By",
             Arrays.asList(DateGroup.values()), null);
         dateRangeCombo.getCombo().select(0);
-        topContainers = new TopContainerListWidget(parent, SWT.NONE);
+        topContainers = new TopContainerListWidget(parent, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), listStatus, "Top Container List Empty");
         topContainers
@@ -56,7 +56,6 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
                     listStatus.setValue(topContainers.getEnabled());
                 }
             });
-        topContainers.adaptToToolkit(toolkit, true);
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",

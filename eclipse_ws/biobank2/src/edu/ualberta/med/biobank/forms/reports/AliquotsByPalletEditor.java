@@ -48,7 +48,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
     @Override
     protected void createOptionSection(Composite parameterSection) {
         palletLabel = createCustomText("Container Label", parameterSection);
-        topContainers = new TopContainerListWidget(parameterSection, SWT.NONE);
+        topContainers = new TopContainerListWidget(parameterSection, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), listStatus, "Top Container List Empty");
         topContainers
@@ -58,7 +58,6 @@ public class AliquotsByPalletEditor extends ReportsEditor {
                     listStatus.setValue(topContainers.getEnabled());
                 }
             });
-        topContainers.adaptToToolkit(toolkit, true);
     }
 
     protected BiobankText createCustomText(String labelText, Composite parent) {
