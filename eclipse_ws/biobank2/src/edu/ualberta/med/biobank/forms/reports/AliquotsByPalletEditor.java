@@ -101,16 +101,20 @@ public class AliquotsByPalletEditor extends ReportsEditor {
 
     protected void validate(String label) {
         try {
-            if (label.equals("")
-                || ContainerWrapper.getContainersByLabel(
-                    SessionManager.getAppService(), label).size() > 0)
+            List<ContainerWrapper> validContainers = new ArrayList<ContainerWrapper>();
+            List<ContainerWrapper> containers = ContainerWrapper
+                .getContainersByLabel(SessionManager.getAppService(), label);
+            for (ContainerWrapper c : containers)
+                if (c.getContainerType().getSampleTypeCollection().size() > 0)
+                    validContainers.add(c);
+            if (label.equals("") || validContainers.size() > 0)
                 ;
             else {
                 throw new ApplicationException();
             }
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError("Invalid label",
-                "No container labelled " + label);
+                "No bottom-level container labelled " + label);
         }
         filterList(label);
     }
