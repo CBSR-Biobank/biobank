@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.model.DispatchShipmentAliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -164,12 +165,47 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public SiteWrapper getSite() {
-        List<DispatchShipmentAliquotWrapper> dsaw = get
+        List<DispatchShipmentAliquotWrapper> dsac = this
+            .getDispatchShipmentAliquotCollection();
+        // if in a container, use the container's site
         if (getParent() != null) {
             return getParent().getSite();
-        } else if (getActivityStatus().isDispatched()) {
-//
         } else {
+            // dispatched aliquot?
+            SiteWrapper s = new SiteWrapper(appService, new Site());
+            for (DispatchShipmentAliquotWrapper da : dsac) {
+                if (da.getShipment().isInTransitState()
+                    && da.getState().equals(
+                        DispatchShipmentAliquotWrapper.STATE.NONE_STATE)) {
+                    // aliquot is in transit
+                    s.setNameShort("In Transit ("
+                        + da.getShipment().getSender().getNameShort() + " to "
+                        + da.getShipment().getReceiver().getNameShort() + ")");
+                    return s;
+
+                } else if (da.getShipment().isInReceivedState()
+                    && da
+                        .getState()
+                        .equals(
+                            DispatchShipmentAliquotWrapper.STATE.EXTRA_PENDING_STATE)) {
+                    // aliquot has been accidentally dispatched
+                    s.setNameShort("Lost to: "
+                        + da.getShipment().getReceiver().getNameShort()
+                        + " Return to: "
+                        + da.getShipment().getSender().getNameShort());
+                    return s;
+                } else if (da.getShipment().isInReceivedState()
+                    && (da.getState().equals(
+                        DispatchShipmentAliquotWrapper.STATE.RECEIVED_STATE) || da
+                        .getState().equals(
+                            DispatchShipmentAliquotWrapper.STATE.NONE_STATE))) {
+                    // aliquot has been intentionally dispatched and received
+                    return da.getShipment().getReceiver();
+                } else if (da.getShipment().isInCreationState())
+                    // aliquot has not been shipped yet
+                    return da.getShipment().getSender();
+            }
+            // if not in a container or a dispatch, use the originating shipment
             return getPatientVisit().getShipment().getSite();
         }
     }
