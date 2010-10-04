@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -48,14 +47,11 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(DispatchShipmentSendingEntryForm.class.getName());
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm";
 
-    public static final String MSG_NEW_SHIPMENT_OK =
-        "Creating a new dispatch shipment record.";
+    public static final String MSG_NEW_SHIPMENT_OK = "Creating a new dispatch shipment record.";
 
-    public static final String MSG_SHIPMENT_OK =
-        "Editing an existing dispatch shipment record.";
+    public static final String MSG_SHIPMENT_OK = "Editing an existing dispatch shipment record.";
 
     private SiteWrapper site;
 
@@ -67,8 +63,7 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
     private DispatchAliquotListInfoTable aliquotsWidget;
 
-    private List<ContainerWrapper> removedPallets =
-        new ArrayList<ContainerWrapper>();
+    private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
 
     @Override
     protected void init() throws Exception {
@@ -89,8 +84,8 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         if (shipment.isNew()) {
             tabName = "New Dispatch Shipment";
         } else {
-            tabName =
-                "Dispatch Shipment " + shipment.getFormattedDateReceived();
+            tabName = "Dispatch Shipment "
+                + shipment.getFormattedDateReceived();
         }
         setPartName(tabName);
     }
@@ -119,15 +114,15 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText siteLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Sender Site");
+        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Sender Site");
         setTextValue(siteLabel, site.getName());
 
         createStudyAndReceiverCombos(client);
 
         if (!shipment.isNew() && !shipment.isInCreationState()) {
-            ShippingMethodWrapper selectedShippingMethod =
-                shipment.getShippingMethod();
+            ShippingMethodWrapper selectedShippingMethod = shipment
+                .getShippingMethod();
             widgetCreator.createComboViewer(client, "Shipping Method",
                 ShippingMethodWrapper.getShippingMethods(SessionManager
                     .getAppService()), selectedShippingMethod, null,
@@ -141,13 +136,12 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
 
             createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
                 "Waybill", null,
-                BeansObservables.observeValue(shipment, "waybill"), null);
+                BiobankFormBase.observeValue(shipment, "waybill"), null);
         }
 
-        BiobankText commentText =
-            (BiobankText) createBoundWidgetWithLabel(client, BiobankText.class,
-                SWT.MULTI, "Comments", null,
-                BeansObservables.observeValue(shipment, "comment"), null);
+        BiobankText commentText = (BiobankText) createBoundWidgetWithLabel(
+            client, BiobankText.class, SWT.MULTI, "Comments", null,
+            BiobankFormBase.observeValue(shipment, "comment"), null);
 
         createAliquotsSection();
 
@@ -160,62 +154,59 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
     private void createStudyAndReceiverCombos(Composite client) {
         StudyWrapper study = shipment.getStudy();
         if (shipment.isInTransitState()) {
-            BiobankText studyLabel =
-                createReadOnlyLabelledField(client, SWT.NONE, "Study");
+            BiobankText studyLabel = createReadOnlyLabelledField(client,
+                SWT.NONE, "Study");
             setTextValue(studyLabel, shipment.getStudy().getNameShort());
-            BiobankText receiverLabel =
-                createReadOnlyLabelledField(client, SWT.NONE, "Receiver Site");
+            BiobankText receiverLabel = createReadOnlyLabelledField(client,
+                SWT.NONE, "Receiver Site");
             setTextValue(receiverLabel, shipment.getReceiver().getNameShort());
         } else {
-            List<StudyWrapper> possibleStudies =
-                site.getDispatchStudiesAsSender();
+            List<StudyWrapper> possibleStudies = site
+                .getDispatchStudiesAsSender();
             if ((study == null) && (possibleStudies != null)
                 && (possibleStudies.size() == 1)) {
                 study = possibleStudies.get(0);
             }
-            studyComboViewer =
-                createComboViewer(client, "Study", possibleStudies, study,
-                    "Shipment must have a receiving site",
-                    new ComboSelectionUpdate() {
-                        @Override
-                        public void doSelection(Object selectedObject) {
-                            StudyWrapper study = (StudyWrapper) selectedObject;
-                            if (destSiteComboViewer != null) {
-                                try {
-                                    List<SiteWrapper> possibleDestSites =
-                                        site.getStudyDispachSites(study);
+            studyComboViewer = createComboViewer(client, "Study",
+                possibleStudies, study, "Shipment must have a receiving site",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        StudyWrapper study = (StudyWrapper) selectedObject;
+                        if (destSiteComboViewer != null) {
+                            try {
+                                List<SiteWrapper> possibleDestSites = site
+                                    .getStudyDispachSites(study);
+                                destSiteComboViewer.setInput(possibleDestSites);
+
+                                if (possibleDestSites.size() == 1) {
                                     destSiteComboViewer
-                                        .setInput(possibleDestSites);
-
-                                    if (possibleDestSites.size() == 1) {
-                                        destSiteComboViewer
-                                            .setSelection(new StructuredSelection(
-                                                possibleDestSites.get(0)));
-                                    } else {
-                                        destSiteComboViewer.setSelection(null);
-                                    }
-                                } catch (Exception e) {
-                                    logger
-                                        .error(
-                                            "Error while retrieving dispatch shipment destination sites",
-                                            e);
+                                        .setSelection(new StructuredSelection(
+                                            possibleDestSites.get(0)));
+                                } else {
+                                    destSiteComboViewer.setSelection(null);
                                 }
+                            } catch (Exception e) {
+                                logger
+                                    .error(
+                                        "Error while retrieving dispatch shipment destination sites",
+                                        e);
                             }
-                            shipment.setStudy(study);
-                            setDirty(true);
                         }
-                    });
+                        shipment.setStudy(study);
+                        setDirty(true);
+                    }
+                });
 
-            destSiteComboViewer =
-                createComboViewer(client, "Receiver Site", null, null,
-                    "Shipment must have an associated study",
-                    new ComboSelectionUpdate() {
-                        @Override
-                        public void doSelection(Object selectedObject) {
-                            shipment.setReceiver((SiteWrapper) selectedObject);
-                            setDirty(true);
-                        }
-                    });
+            destSiteComboViewer = createComboViewer(client, "Receiver Site",
+                null, null, "Shipment must have an associated study",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        shipment.setReceiver((SiteWrapper) selectedObject);
+                        setDirty(true);
+                    }
+                });
 
             if ((possibleStudies == null) || (possibleStudies.size() == 0)) {
                 BioBankPlugin.openAsyncError("Sender Site Error",
@@ -246,8 +237,8 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
             Composite addComposite = toolkit.createComposite(composite);
             addComposite.setLayout(new GridLayout(5, false));
             toolkit.createLabel(addComposite, "Enter inventory ID to add:");
-            final BiobankText newAliquotText =
-                new BiobankText(addComposite, SWT.NONE, toolkit);
+            final BiobankText newAliquotText = new BiobankText(addComposite,
+                SWT.NONE, toolkit);
             newAliquotText.addListener(SWT.DefaultSelection, new Listener() {
                 @Override
                 public void handleEvent(Event e) {
@@ -266,8 +257,8 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                 }
             });
             toolkit.createLabel(addComposite, "or open scan dialog:");
-            Button openScanButton =
-                toolkit.createButton(addComposite, "", SWT.PUSH);
+            Button openScanButton = toolkit.createButton(addComposite, "",
+                SWT.PUSH);
             openScanButton.setImage(BioBankPlugin.getDefault()
                 .getImageRegistry()
                 .get(BioBankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
@@ -278,13 +269,13 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                 }
             });
         }
-        aliquotsWidget =
-            new DispatchAliquotListInfoTable(composite, shipment, true) {
-                @Override
-                public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
-                    return shipment.getDispatchShipmentAliquotCollection();
-                }
-            };
+        aliquotsWidget = new DispatchAliquotListInfoTable(composite, shipment,
+            true) {
+            @Override
+            public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
+                return shipment.getDispatchShipmentAliquotCollection();
+            }
+        };
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
         aliquotsWidget
@@ -297,9 +288,9 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
     }
 
     private void openScanDialog() {
-        DispatchCreateScanDialog dialog =
-            new DispatchCreateScanDialog(PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow().getShell(), shipment);
+        DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            shipment);
         dialog.open();
         setDirty(true); // FIXME need to do this better !
         aliquotsWidget.reloadCollection();
@@ -309,9 +300,8 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
     protected void addAliquot(String inventoryId) {
         if (!inventoryId.isEmpty()) {
             try {
-                List<AliquotWrapper> aliquots =
-                    AliquotWrapper.getAliquots(shipment.getAppService(),
-                        inventoryId);
+                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
+                    shipment.getAppService(), inventoryId);
                 if (aliquots.size() == 0)
                     BioBankPlugin.openError("Aliquot not found",
                         "Aliquot with inventory id " + inventoryId
@@ -360,10 +350,9 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         if (shipment.isInTransitState()
             && shipment.getAliquotCollection().size() == 0) {
-            boolean ok =
-                BioBankPlugin.openConfirm("No aliquots",
-                    "There are no aliquots added to this shipment, are you sure"
-                        + " it should be save with a 'Sent' status ?");
+            boolean ok = BioBankPlugin.openConfirm("No aliquots",
+                "There are no aliquots added to this shipment, are you sure"
+                    + " it should be save with a 'Sent' status ?");
             if (!ok) {
                 setDirty(true);
                 return;

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -36,8 +35,7 @@ import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class StudyEntryForm extends BiobankEntryForm {
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.StudyEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.StudyEntryForm";
 
     private static final String MSG_NEW_STUDY_OK = "Creating a new study.";
 
@@ -53,13 +51,12 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private SampleStorageEntryInfoTable sampleStorageEntryTable;
 
-    private BiobankEntryFormWidgetListener listener =
-        new BiobankEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
+    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     private ComboViewer activityStatusComboViewer;
 
@@ -111,29 +108,28 @@ public class StudyEntryForm extends BiobankEntryForm {
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
             SWT.NONE, "Name", null,
-            BeansObservables.observeValue(study, "name"),
+            BiobankFormBase.observeValue(study, "name"),
             new NonEmptyStringValidator("Study name cannot be blank")));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             "Short Name", null,
-            BeansObservables.observeValue(study, "nameShort"),
+            BiobankFormBase.observeValue(study, "nameShort"),
             new NonEmptyStringValidator("Study short name cannot be blank"));
 
-        activityStatusComboViewer =
-            createComboViewer(client, "Activity Status",
-                ActivityStatusWrapper.getAllActivityStatuses(appService),
-                study.getActivityStatus(),
-                "Study must have an activity status",
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        study
-                            .setActivityStatus((ActivityStatusWrapper) selectedObject);
-                    }
-                });
+        activityStatusComboViewer = createComboViewer(client,
+            "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            study.getActivityStatus(), "Study must have an activity status",
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    study
+                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                }
+            });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, BeansObservables.observeValue(study, "comment"),
+            "Comments", null, BiobankFormBase.observeValue(study, "comment"),
             null);
 
         createClinicSection();
@@ -161,8 +157,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createSampleStorageSection() {
         Section section = createSection("Sample Storage");
-        sampleStorageEntryTable =
-            new SampleStorageEntryInfoTable(section, study);
+        sampleStorageEntryTable = new SampleStorageEntryInfoTable(section,
+            study);
         sampleStorageEntryTable.adaptToToolkit(toolkit, true);
         sampleStorageEntryTable.addSelectionChangedListener(listener);
 
@@ -178,8 +174,8 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void createSourceVesselsSection() {
         Section section = createSection("Source Vessels");
-        studySourceVesselEntryTable =
-            new StudySourceVesselEntryInfoTable(section, study);
+        studySourceVesselEntryTable = new StudySourceVesselEntryInfoTable(
+            section, study);
         studySourceVesselEntryTable.adaptToToolkit(toolkit, true);
         studySourceVesselEntryTable.addSelectionChangedListener(listener);
 
@@ -193,8 +189,7 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void createPvCustomInfoSection() throws Exception {
-        Composite client =
-            createSectionWithClient("Patient Visit Information Collected");
+        Composite client = createSectionWithClient("Patient Visit Information Collected");
         GridLayout gl = (GridLayout) client.getLayout();
         gl.numColumns = 1;
 
@@ -211,16 +206,16 @@ public class StudyEntryForm extends BiobankEntryForm {
             studyPvAttrCustom.setLabel(field);
             studyPvAttrCustom.setType("date_time");
             studyPvAttrCustom.setIsDefault(true);
-            studyPvAttrCustom.widget =
-                new PvInfoWidget(client, SWT.NONE, studyPvAttrCustom, true);
+            studyPvAttrCustom.widget = new PvInfoWidget(client, SWT.NONE,
+                studyPvAttrCustom, true);
             studyPvAttrCustom.inStudy = false;
             pvCustomInfoList.add(studyPvAttrCustom);
         }
         //
         // END KLUDGE
 
-        List<String> studyPvInfoLabels =
-            Arrays.asList(study.getStudyPvAttrLabels());
+        List<String> studyPvInfoLabels = Arrays.asList(study
+            .getStudyPvAttrLabels());
 
         for (GlobalPvAttrWrapper pvAttr : GlobalPvAttrWrapper
             .getAllGlobalPvAttrs(appService)) {
@@ -235,8 +230,8 @@ public class StudyEntryForm extends BiobankEntryForm {
                 selected = true;
             }
             studyPvAttrCustom.setIsDefault(false);
-            studyPvAttrCustom.widget =
-                new PvInfoWidget(client, SWT.NONE, studyPvAttrCustom, selected);
+            studyPvAttrCustom.widget = new PvInfoWidget(client, SWT.NONE,
+                studyPvAttrCustom, selected);
             studyPvAttrCustom.widget.addSelectionChangedListener(listener);
             studyPvAttrCustom.inStudy = studyPvInfoLabels.contains(label);
             pvCustomInfoList.add(studyPvAttrCustom);
@@ -345,8 +340,8 @@ public class StudyEntryForm extends BiobankEntryForm {
     }
 
     private void resetPvCustomInfo() throws Exception {
-        List<String> studyPvInfoLabels =
-            Arrays.asList(study.getStudyPvAttrLabels());
+        List<String> studyPvInfoLabels = Arrays.asList(study
+            .getStudyPvAttrLabels());
 
         for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             boolean selected = false;

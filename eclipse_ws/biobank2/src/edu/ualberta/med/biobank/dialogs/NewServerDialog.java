@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -14,8 +12,10 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 public class NewServerDialog extends BiobankDialog {
 
     private static final String TITLE = "New Server";
+
     protected BiobankText textBox;
-    protected IObservableValue text = new WritableValue("", String.class);
+
+    protected String text;
 
     public NewServerDialog(Shell parentShell) {
         super(parentShell);
@@ -41,8 +41,8 @@ public class NewServerDialog extends BiobankDialog {
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
             "Server field cannot be empty");
         textBox = (BiobankText) createBoundWidgetWithLabel(area,
-            BiobankText.class, SWT.NONE, "Address", new String[0], text,
-            validator);
+            BiobankText.class, SWT.NONE, "Address", new String[0], this,
+            "text", validator);
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.horizontalAlignment = SWT.FILL;
@@ -60,7 +60,11 @@ public class NewServerDialog extends BiobankDialog {
     }
 
     public String getText() {
-        return (String) text.getValue();
+        return text;
+    }
+
+    public void setText(String text) {
+        this.text = text;
     }
 
 }

@@ -5,10 +5,12 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 
 import org.acegisecurity.AccessDeniedException;
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.ChangeEvent;
 import org.eclipse.core.databinding.observable.IChangeListener;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -20,6 +22,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Widget;
 import org.springframework.remoting.RemoteAccessException;
@@ -178,20 +181,53 @@ public abstract class BiobankDialog extends TitleAreaDialog {
         }
     }
 
+    private IObservableValue createPojoObservable(Object pojo,
+        String propertyName) {
+        if (pojo == null)
+            return null;
+        Assert.isNotNull(propertyName);
+        return PojoObservables.observeValue(pojo, propertyName);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, Object pojo, String propertyName,
+        AbstractValidator validator) {
+        return widgetCreator.createBoundWidget(composite, widgetClass,
+            widgetOptions, label, widgetValues,
+            createPojoObservable(pojo, propertyName), validator);
+    }
+
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions,
-        String fieldLabel, String[] widgetValues,
-        IObservableValue modelObservableValue, AbstractValidator validator) {
+        String fieldLabel, String[] widgetValues, Object pojo,
+        String propertyName, AbstractValidator validator) {
         return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
-            widgetOptions, fieldLabel, widgetValues, modelObservableValue,
-            validator);
+            widgetOptions, fieldLabel, widgetValues,
+            createPojoObservable(pojo, propertyName), validator);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client, Label label,
+        Date date, Object pojo, String propertyName,
+        AbstractValidator validator, int typeShown, String bindingKey) {
+        return widgetCreator.createDateTimeWidget(client, label, date,
+            createPojoObservable(pojo, propertyName), validator, typeShown,
+            bindingKey);
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, IObservableValue modelObservableValue,
+        String nameLabel, Date date, Object pojo, String propertyName,
         AbstractValidator validator) {
+        return createDateTimeWidget(client, nameLabel, date, pojo,
+            propertyName, validator, SWT.DATE | SWT.TIME);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object pojo, String propertyName,
+        AbstractValidator validator, int typeShown) {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
-            modelObservableValue, validator);
+            createPojoObservable(pojo, propertyName), validator, typeShown,
+            null);
     }
 
     protected WidgetCreator getWidgetCreator() {

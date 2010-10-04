@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
@@ -152,7 +151,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
             | SWT.MULTI, "Comments", null,
-            BeansObservables.observeValue(aliquot, "comment"), null);
+            BiobankEntryForm.observeValue(aliquot, "comment"), null);
 
         setFirstControl(sampleTypeComboViewer.getControl());
     }

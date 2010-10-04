@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -51,8 +50,8 @@ public class ActivityStatusDialog extends BiobankDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Name", null, PojoObservables.observeValue(activityStatus, "name"),
-            new NonEmptyStringValidator(MSG_NO_ST_NAME));
+            "Name", null, activityStatus, "name", new NonEmptyStringValidator(
+                MSG_NO_ST_NAME));
     }
 
     public ActivityStatusWrapper getActivityStatusCopy() {
