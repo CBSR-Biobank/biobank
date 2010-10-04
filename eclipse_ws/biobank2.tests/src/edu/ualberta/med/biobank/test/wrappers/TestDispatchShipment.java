@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper.STATE;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -395,7 +394,7 @@ public class TestDispatchShipment extends TestDatabase {
         List<AliquotWrapper> aliquotSet2 =
             addAliquotsToContainerRow(visit, container, 1, sampleTypes);
 
-        shipment.addAliquots(aliquotSet1, STATE.NONE_STATE);
+        shipment.addNewAliquots(aliquotSet1);
         shipment.persist();
         shipment.reload();
 
@@ -404,7 +403,7 @@ public class TestDispatchShipment extends TestDatabase {
 
         // add more aliquots to row 2
 
-        shipment.addAliquots(aliquotSet2, STATE.NONE_STATE);
+        shipment.addNewAliquots(aliquotSet2);
         shipment.persist();
         shipment.reload();
 

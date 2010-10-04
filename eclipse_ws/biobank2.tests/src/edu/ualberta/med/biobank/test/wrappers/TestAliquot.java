@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper.STATE;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -583,7 +582,7 @@ public class TestAliquot extends TestDatabase {
 
         // add an aliquot that has not been persisted
         try {
-            dShipment.addAliquots(Arrays.asList(aliquot), STATE.NONE_STATE);
+            dShipment.addNewAliquots(Arrays.asList(aliquot));
             Assert.fail("Should not be allowed to add aliquots not yet in DB");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -594,7 +593,7 @@ public class TestAliquot extends TestDatabase {
 
         dShipment =
             DispatchShipmentHelper.newShipment(site, destSite, study, method);
-        dShipment.addAliquots(Arrays.asList(aliquot), STATE.NONE_STATE);
+        dShipment.addNewAliquots(Arrays.asList(aliquot));
         dShipment.persist();
         aliquot.reload();
 
@@ -602,6 +601,19 @@ public class TestAliquot extends TestDatabase {
             aliquot.getDispatchShipments();
         Assert.assertEquals(1, aliquotDispatchShipments.size());
         Assert.assertTrue(aliquotDispatchShipments.contains(dShipment));
+
+        Assert.assertTrue(dShipment.isInCreationState());
+
+        // site send aliquots
+        dShipment.setNextState();
+        dShipment.persist();
+        Assert.assertTrue(dShipment.isInTransitState());
+
+        // dest site receive aliquot
+        dShipment.setNextState();
+        dShipment.receiveAliquots(Arrays.asList(aliquot));
+        dShipment.persist();
+        Assert.assertTrue(dShipment.isInReceivedState());
 
         // dispatch aliquot to second site
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
@@ -616,17 +628,14 @@ public class TestAliquot extends TestDatabase {
             DispatchShipmentHelper.newShipment(destSite, destSite2, study,
                 method);
         try {
-            dShipment2.addAliquots(Arrays.asList(aliquot), STATE.NONE_STATE);
+            dShipment2.addNewAliquots(Arrays.asList(aliquot));
             Assert
-                .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Actvive' status)");
+                .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Active' status)");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
 
-        // dest site receive aliquot
-        dShipment.receiveAliquots(Arrays.asList(aliquot));
-        dShipment.persist();
-
+        aliquot.reload();
         // assign a position to this aliquot
         ContainerTypeWrapper topType =
             ContainerTypeHelper.addContainerType(destSite, "ct11", "ct11", 1,
@@ -648,7 +657,7 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
 
         // add to new shipment
-        dShipment2.addAliquots(Arrays.asList(aliquot), STATE.NONE_STATE);
+        dShipment2.addNewAliquots(Arrays.asList(aliquot));
         dShipment2.persist();
 
         aliquot.reload();

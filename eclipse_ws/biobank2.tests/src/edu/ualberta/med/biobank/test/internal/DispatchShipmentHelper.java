@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Date;
 
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper.STATE;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -32,7 +31,7 @@ public class DispatchShipmentHelper extends DbHelper {
         shipment.setDateShipped(Utils.getRandomDate());
 
         if (aliquots != null) {
-            shipment.addAliquots(Arrays.asList(aliquots), STATE.NONE_STATE);
+            shipment.addNewAliquots(Arrays.asList(aliquots));
         }
 
         return shipment;

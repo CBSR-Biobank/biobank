@@ -73,10 +73,17 @@ public class PalletCell extends Cell {
 
     public static Map<RowColPos, PalletCell> getRandomAliquotsAlreadyAssigned(
         WritableApplicationService appService, Integer siteId) throws Exception {
+        return getRandomAliquotsAlreadyAssigned(appService, siteId, null);
+    }
+
+    public static Map<RowColPos, PalletCell> getRandomAliquotsAlreadyAssigned(
+        WritableApplicationService appService, Integer siteId, Integer studyId)
+        throws Exception {
         Map<RowColPos, PalletCell> palletScanned =
             new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots =
-            DebugUtil.getRandomAliquotsAlreadyAssigned(appService, siteId);
+            DebugUtil.getRandomAliquotsAlreadyAssigned(appService, siteId,
+                studyId);
         if (randomAliquots.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
                 0, 0, randomAliquots.get(0).getInventoryId())));
