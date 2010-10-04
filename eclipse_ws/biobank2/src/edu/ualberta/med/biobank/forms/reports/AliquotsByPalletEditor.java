@@ -108,7 +108,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
                 if (c.getContainerType().getSampleTypeCollection().size() > 0)
                     validContainers.add(c);
             if (label.equals("") || validContainers.size() > 0)
-                ;
+                filterList(label);
             else {
                 throw new ApplicationException();
             }
@@ -116,7 +116,6 @@ public class AliquotsByPalletEditor extends ReportsEditor {
             BioBankPlugin.openAsyncError("Invalid label",
                 "No bottom-level container labelled " + label);
         }
-        filterList(label);
     }
 
     @Override
