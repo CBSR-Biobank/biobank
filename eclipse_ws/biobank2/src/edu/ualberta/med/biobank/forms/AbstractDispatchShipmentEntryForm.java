@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -15,14 +13,12 @@ import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
@@ -36,18 +32,10 @@ public abstract class AbstractDispatchShipmentEntryForm extends
 
     protected DispatchShipmentWrapper shipment;
 
-    protected DispatchAliquotListInfoTable aliquotsNonProcessedTable;
-
-    protected DispatchAliquotListInfoTable aliquotsReceivedTable;
-
-    protected DispatchAliquotListInfoTable aliquotsExtraTable;
-
-    protected DispatchAliquotListInfoTable aliquotsMissingTable;
-
-    protected BiobankEntryFormWidgetListener biobankTableListener = new BiobankEntryFormWidgetListener() {
+    protected BiobankEntryFormWidgetListener biobankListener = new BiobankEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
-            reloadAliquotsTables();
+            reloadAliquots();
             setDirty(true);
         }
     };
@@ -79,106 +67,6 @@ public abstract class AbstractDispatchShipmentEntryForm extends
     }
 
     protected abstract String getTextForPartName();
-
-    protected void createAliquotsNonProcessedSection(boolean edit) {
-        String title = "Non processed aliquots";
-        if (shipment.isInCreationState()) {
-            title = "Added aliquots";
-        }
-        Composite parent = createSectionWithClient(title);
-        aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(parent,
-            shipment, edit) {
-            @Override
-            public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
-                return shipment
-                    .getNonProcessedDispatchShipmentAliquotCollection();
-            }
-
-        };
-        aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
-        aliquotsNonProcessedTable
-            .addDoubleClickListener(collectionDoubleClickListener);
-        aliquotsNonProcessedTable
-            .addSelectionChangedListener(biobankTableListener);
-    }
-
-    @Deprecated
-    protected void createAliquotsReceivedSection(boolean edit) {
-        if (!shipment.isInCreationState()) {
-            Composite parent = createSectionWithClient("Aliquots received");
-            aliquotsReceivedTable = new DispatchAliquotListInfoTable(parent,
-                shipment, edit) {
-                @Override
-                public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
-                    return shipment.getReceivedDispatchShipmentAliquots();
-                }
-            };
-            aliquotsReceivedTable.adaptToToolkit(toolkit, true);
-            aliquotsReceivedTable
-                .addDoubleClickListener(collectionDoubleClickListener);
-            aliquotsReceivedTable
-                .addSelectionChangedListener(biobankTableListener);
-        }
-    }
-
-    @Deprecated
-    protected void createAliquotsExtraSection(boolean edit) {
-        if (!shipment.isInCreationState()) {
-            Composite parent = createSectionWithClient("Extra Aliquots");
-            aliquotsExtraTable = new DispatchAliquotListInfoTable(parent,
-                shipment, edit) {
-                @Override
-                public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
-                    return shipment.getExtraDispatchShipmentAliquots();
-                }
-
-            };
-            aliquotsExtraTable.adaptToToolkit(toolkit, true);
-            aliquotsExtraTable
-                .addDoubleClickListener(collectionDoubleClickListener);
-            aliquotsExtraTable
-                .addSelectionChangedListener(biobankTableListener);
-        }
-    }
-
-    @Deprecated
-    protected void createAliquotsMissingSection(boolean edit) {
-        if (!shipment.isInCreationState()) {
-            Composite parent = createSectionWithClient("Missing Aliquots");
-            aliquotsMissingTable = new DispatchAliquotListInfoTable(parent,
-                shipment, edit) {
-                @Override
-                public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
-                    return shipment.getMissingDispatchShipmentAliquots();
-                }
-
-            };
-            aliquotsMissingTable.adaptToToolkit(toolkit, true);
-            aliquotsMissingTable
-                .addDoubleClickListener(collectionDoubleClickListener);
-            aliquotsExtraTable
-                .addSelectionChangedListener(biobankTableListener);
-        }
-    }
-
-    @Override
-    public void reset() throws Exception {
-        super.reset();
-        reloadAliquotsTables();
-    }
-
-    protected void reloadAliquotsTables() {
-        if (aliquotsNonProcessedTable != null)
-            aliquotsNonProcessedTable.reloadCollection();
-        if (aliquotsReceivedTable != null)
-            aliquotsReceivedTable.reloadCollection();
-        if (aliquotsExtraTable != null)
-            aliquotsExtraTable.reloadCollection();
-        if (aliquotsMissingTable != null)
-            aliquotsMissingTable.reloadCollection();
-        page.layout(true, true);
-        book.reflow(true);
-    }
 
     protected void createAliquotsSelectionActions(Composite composite,
         boolean setAsFirstControl) {
@@ -236,5 +124,7 @@ public abstract class AbstractDispatchShipmentEntryForm extends
             }
         });
     }
+
+    protected abstract void reloadAliquots();
 
 }

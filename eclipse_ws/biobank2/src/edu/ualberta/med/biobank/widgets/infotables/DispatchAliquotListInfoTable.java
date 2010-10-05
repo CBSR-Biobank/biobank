@@ -1,16 +1,13 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.MenuItem;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
@@ -44,12 +41,9 @@ public abstract class DispatchAliquotListInfoTable extends
 
     private boolean editMode = false;
 
-    private DispatchShipmentWrapper currentShipment;
-
     public DispatchAliquotListInfoTable(Composite parent,
         final DispatchShipmentWrapper shipment, boolean editMode) {
         super(parent, null, HEADINGS, BOUNDS, 15);
-        this.currentShipment = shipment;
         setCollection(getInternalDispatchShipmentAliquots());
         this.editMode = editMode;
         if (editMode) {
@@ -76,40 +70,8 @@ public abstract class DispatchAliquotListInfoTable extends
                         }
                     }
                 });
-            } else {
-                MenuItem item = new MenuItem(menu, SWT.PUSH);
-                item.setText("Set as missing-pending");
-                item.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        setItemMissingPending();
-                    }
-                });
-                item = new MenuItem(menu, SWT.PUSH);
-                item.setText("Set as missing");
-                item.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        setItemMissing();
-                    }
-                });
             }
         }
-    }
-
-    protected void setItemMissing() {
-        modifyState(DispatchAliquotState.MISSING);
-    }
-
-    protected void setItemMissingPending() {
-        modifyState(DispatchAliquotState.MISSING_PENDING_STATE);
-    }
-
-    private void modifyState(DispatchAliquotState newState) {
-        DispatchShipmentAliquotWrapper dsa = getSelection();
-        dsa.setState(newState.ordinal());
-        currentShipment.resetStateLists();
-        notifyListeners();
     }
 
     public abstract List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots();
@@ -201,7 +163,11 @@ public abstract class DispatchAliquotListInfoTable extends
     }
 
     public void reloadCollection() {
-        reloadCollection(getInternalDispatchShipmentAliquots());
+        List<DispatchShipmentAliquotWrapper> dsaList = getInternalDispatchShipmentAliquots();
+        if (dsaList == null) {
+            dsaList = new ArrayList<DispatchShipmentAliquotWrapper>();
+        }
+        reloadCollection(dsaList);
     }
 
 }

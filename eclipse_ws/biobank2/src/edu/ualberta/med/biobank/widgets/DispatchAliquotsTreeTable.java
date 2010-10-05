@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -21,15 +22,19 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchShipmentDialog;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 
 public class DispatchAliquotsTreeTable extends BiobankWidget {
@@ -38,7 +43,7 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
     private DispatchShipmentWrapper shipment;
 
     public DispatchAliquotsTreeTable(Composite parent,
-        final DispatchShipmentWrapper shipment, boolean edit) {
+        final DispatchShipmentWrapper shipment, final boolean edit) {
         super(parent, SWT.NONE);
 
         this.shipment = shipment;
@@ -114,7 +119,7 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         };
         tv.setContentProvider(contentProvider);
 
-        BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
+        final BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 if (element instanceof DispatchTableGroup) {
@@ -138,32 +143,70 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             }
         });
 
-        Menu menu = new Menu(this);
+        final Menu menu = new Menu(this);
         tv.getTree().setMenu(menu);
-        addClipboardCopySupport(menu, labelProvider);
-        if (edit) {
-            MenuItem item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Set as missing-pending");
-            item.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    setItemMissingPending((IStructuredSelection) tv
-                        .getSelection());
+
+        menu.addListener(SWT.Show, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                for (MenuItem menuItem : menu.getItems()) {
+                    menuItem.dispose();
                 }
-            });
-            item = new MenuItem(menu, SWT.PUSH);
-            item.setText("Set as missing");
-            item.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    setItemMissing((IStructuredSelection) tv.getSelection());
+                addClipboardCopySupport(menu, labelProvider);
+                if (edit) {
+                    DispatchShipmentAliquotWrapper dsa = getSelectedAliquot();
+                    if (dsa != null) {
+                        switch (DispatchAliquotState.getState(dsa.getState())) {
+                        case EXTRA_PENDING_STATE:
+                            break;
+                        case MISSING_PENDING_STATE:
+                            addSetMissingMenu(menu);
+                            break;
+                        case NONE_STATE:
+                            addSetMissingMenu(menu);
+                            addSetMissingPendingMenu(menu);
+                            break;
+                        }
+                    }
                 }
-            });
+            }
+        });
+    }
+
+    protected DispatchShipmentAliquotWrapper getSelectedAliquot() {
+        IStructuredSelection selection = (IStructuredSelection) tv
+            .getSelection();
+        if (selection != null && selection.size() > 0) {
+            return (DispatchShipmentAliquotWrapper) selection.getFirstElement();
         }
+        return null;
     }
 
     protected void setItemMissing(IStructuredSelection iStructuredSelection) {
         modifyState(iStructuredSelection, DispatchAliquotState.MISSING);
+    }
+
+    private void addSetMissingMenu(final Menu menu) {
+        MenuItem item;
+        item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Set as missing");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                setItemMissing((IStructuredSelection) tv.getSelection());
+            }
+        });
+    }
+
+    private void addSetMissingPendingMenu(final Menu menu) {
+        MenuItem item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Set as missing-pending");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                setItemMissingPending((IStructuredSelection) tv.getSelection());
+            }
+        });
     }
 
     protected void setItemMissingPending(
@@ -174,13 +217,26 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
 
     private void modifyState(IStructuredSelection iStructuredSelection,
         DispatchAliquotState newState) {
-        for (@SuppressWarnings("rawtypes")
-        Iterator iter = iStructuredSelection.iterator(); iter.hasNext();) {
-            DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) iter
-                .next();
-            dsa.setState(newState.ordinal());
+        ModifyStateDispatchShipmentDialog dialog = new ModifyStateDispatchShipmentDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
+            newState);
+        int res = dialog.open();
+        if (res == Dialog.OK) {
+            String comment = dialog.getComment();
+            for (@SuppressWarnings("rawtypes")
+            Iterator iter = iStructuredSelection.iterator(); iter.hasNext();) {
+                DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) iter
+                    .next();
+                dsa.setComment(comment);
+                dsa.setState(newState.ordinal());
+            }
+            shipment.resetStateLists();
+            tv.refresh();
+            notifyListeners();
         }
-        shipment.resetStateLists();
+    }
+
+    public void refresh() {
         tv.refresh();
     }
 

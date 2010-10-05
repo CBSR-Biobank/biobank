@@ -53,7 +53,7 @@ public class DispatchShipmentReceivingEntryForm extends
         if (dialog.hasReceivedAliquots()) {
             setDirty(true);
         }
-        reloadAliquotsTables();
+        aliquotsTree.refresh();
     }
 
     private void createMainSection() {
@@ -156,7 +156,7 @@ public class DispatchShipmentReceivingEntryForm extends
         switch (info.type) {
         case OK:
             shipment.receiveAliquots(Arrays.asList(info.aliquot));
-            reloadAliquotsTables();
+            aliquotsTree.refresh();
             setDirty(true);
             break;
         case RECEIVED:
@@ -174,7 +174,7 @@ public class DispatchShipmentReceivingEntryForm extends
             } catch (BiobankCheckException e) {
                 BioBankPlugin.openAsyncError("Eror adding extra aliquot", e);
             }
-            reloadAliquotsTables();
+            aliquotsTree.refresh();
             setDirty(true);
             break;
         case NOT_IN_DB:
@@ -196,6 +196,11 @@ public class DispatchShipmentReceivingEntryForm extends
     @Override
     protected String getTextForPartName() {
         return "Dispatch Shipment sent on " + shipment.getDateShipped();
+    }
+
+    @Override
+    protected void reloadAliquots() {
+        aliquotsTree.refresh();
     }
 
 }

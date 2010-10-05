@@ -93,6 +93,7 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         retrieveShipment();
         setPartName("Dispatch Shipment sent on " + shipment.getDateShipped());
         setShipmentValues();
+        aliquotsTree.refresh();
     }
 
     @Override
@@ -117,7 +118,9 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         if (shipment.canBeSentBy(user, currentSite))
             createSendButton();
         else if (shipment.canBeReceivedBy(user, currentSite))
-            createReceiveButton();
+            createReceiveButtons();
+        else if (shipment.canBeClosedBy(user, currentSite))
+            createCloseButton();
     }
 
     private void createTreeTableSection() {
@@ -147,9 +150,9 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         }
     }
 
-    private void createReceiveButton() {
+    private void createReceiveButtons() {
         Composite composite = toolkit.createComposite(page);
-        composite.setLayout(new GridLayout(2, false));
+        composite.setLayout(new GridLayout(3, false));
         Button sendButton = toolkit
             .createButton(composite, "Receive", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
@@ -165,6 +168,27 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 shipmentAdapter.doReceiveAndProcess();
+            }
+        });
+
+        Button lostProcessButton = toolkit.createButton(composite, "Lost",
+            SWT.PUSH);
+        lostProcessButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                shipmentAdapter.doSetAsLost();
+            }
+        });
+    }
+
+    private void createCloseButton() {
+        Composite composite = toolkit.createComposite(page);
+        composite.setLayout(new GridLayout(2, false));
+        Button sendButton = toolkit.createButton(composite, "Close", SWT.PUSH);
+        sendButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                shipmentAdapter.doClose();
             }
         });
     }
