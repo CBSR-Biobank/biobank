@@ -54,58 +54,67 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         return TITLE;
     }
 
+    /**
+     * set the status of the cell
+     */
+    protected void processCellStatus(PalletCell cell) throws Exception {
+        AliquotInfo info = DispatchShipmentReceivingEntryForm
+            .getInfoForInventoryId(currentShipment, cell.getValue());
+        if (info.aliquot != null) {
+            cell.setAliquot(info.aliquot);
+            cell.setTitle(info.aliquot.getPatientVisit().getPatient()
+                .getPnumber());
+        }
+        switch (info.type) {
+        case RECEIVED:
+            cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
+            break;
+        case DUPLICATE:
+            cell.setStatus(CellStatus.ERROR);
+            cell.setInformation("Found more than one aliquot with inventoryId "
+                + cell.getValue());
+            cell.setTitle("!");
+            errors++;
+            break;
+        case NOT_IN_DB:
+            cell.setStatus(CellStatus.ERROR);
+            cell.setInformation("Aliquot " + cell.getValue()
+                + " not found in database");
+            cell.setTitle("!");
+            errors++;
+            break;
+        case NOT_IN_SHIPMENT:
+            cell.setStatus(CellStatus.NOT_IN_SHIPMENT);
+            cell.setInformation("Aliquot should not be in shipment");
+            pendingAliquotsNumber++;
+            break;
+        case OK:
+            cell.setStatus(CellStatus.IN_SHIPMENT_EXPECTED);
+            pendingAliquotsNumber++;
+            break;
+        case EXTRA:
+            cell.setStatus(CellStatus.EXTRA);
+            pendingAliquotsNumber++;
+            break;
+        }
+    }
+
     @Override
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         pendingAliquotsNumber = 0;
         errors = 0;
-        final List<AliquotWrapper> notInShipmentAliquots =
-            new ArrayList<AliquotWrapper>();
+        final List<AliquotWrapper> notInShipmentAliquots = new ArrayList<AliquotWrapper>();
         final List<PalletCell> notInShipmentCells = new ArrayList<PalletCell>();
         if (cells != null) {
             for (RowColPos rcp : cells.keySet()) {
                 monitor.subTask("Processing position "
                     + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 PalletCell cell = cells.get(rcp);
-                AliquotInfo info =
-                    DispatchShipmentReceivingEntryForm.getInfoForInventoryId(
-                        currentShipment, cell.getValue());
-                if (info.aliquot != null) {
-                    cell.setAliquot(info.aliquot);
-                    cell.setTitle(info.aliquot.getPatientVisit().getPatient()
-                        .getPnumber());
-                }
-                switch (info.type) {
-                case RECEIVED:
-                    cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
-                    break;
-                case DUPLICATE:
-                    cell.setStatus(CellStatus.ERROR);
-                    cell.setInformation("Found more than one aliquot with inventoryId "
-                        + cell.getValue());
-                    cell.setTitle("!");
-                    errors++;
-                    break;
-                case NOT_IN_DB:
-                    cell.setStatus(CellStatus.ERROR);
-                    cell.setInformation("Aliquot " + cell.getValue()
-                        + " not found in database");
-                    cell.setTitle("!");
-                    errors++;
-                    break;
-                case NOT_IN_SHIPMENT:
-                    cell.setStatus(CellStatus.NOT_IN_SHIPMENT);
-                    cell.setInformation("Aliquot should not be in shipment");
-                    notInShipmentAliquots.add(info.aliquot);
+                processCellStatus(cell);
+                if (cell.getStatus().equals(CellStatus.NOT_IN_SHIPMENT)) {
+                    notInShipmentAliquots.add(cell.getAliquot());
                     notInShipmentCells.add(cell);
-                    break;
-                case OK:
-                    cell.setStatus(CellStatus.IN_SHIPMENT_EXPECTED);
-                    pendingAliquotsNumber++;
-                    break;
-                case EXTRA:
-                    cell.setStatus(CellStatus.EXTRA);
-                    break;
                 }
             }
             if (notInShipmentAliquots.size() > 0) {
@@ -181,8 +190,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned =
-            new TreeMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         if (currentShipment.getAliquotCollection().size() > 0) {
             // AliquotWrapper aliquotNotReceived = null;
             int i = 0;
@@ -219,5 +227,11 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
     public boolean hasReceivedAliquots() {
         return aliquotsReceived;
+    }
+
+    @Override
+    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+        processCellStatus(cell);
+        super.postprocessScanTubeAlone(cell);
     }
 }

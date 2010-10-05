@@ -7,8 +7,11 @@ import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseAdapter;
+import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
@@ -19,11 +22,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -31,6 +36,7 @@ import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
@@ -47,6 +53,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         Boolean.class);
 
     private Button scanButton;
+    private Button scanTubeAloneSwitch;
+    private boolean scanTubeAloneMode = false;
 
     public AbstractDispatchScanDialog(Shell parentShell,
         final DispatchShipmentWrapper currentShipment) {
@@ -130,10 +138,25 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         });
         scanButton.setEnabled(false);
 
-        spw = new ScanPalletWidget(contents, getPalletCellStatus());
+        createScanTubeAloneButton(contents);
         GridData gd = new GridData();
         gd.horizontalSpan = 3;
+        gd.horizontalAlignment = SWT.RIGHT;
+        scanTubeAloneSwitch.setLayoutData(gd);
+
+        spw = new ScanPalletWidget(contents, getPalletCellStatus());
+        gd = new GridData();
+        gd.horizontalSpan = 3;
         spw.setLayoutData(gd);
+
+        spw.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDoubleClick(MouseEvent e) {
+                if (scanTubeAloneMode) {
+                    scanTubeAlone(e);
+                }
+            }
+        });
 
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), scanOkValue,
@@ -178,6 +201,10 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
                 scanHasBeenLaunchedValue.setValue(launched);
             }
         });
+    }
+
+    private boolean isScanHasBeenLaunched() {
+        return scanHasBeenLaunchedValue.getValue().equals(true);
     }
 
     protected Map<RowColPos, PalletCell> getCells() {
@@ -269,4 +296,81 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     }
 
     protected abstract void doProceed() throws Exception;
+
+    protected void createScanTubeAloneButton(Composite parent) {
+        scanTubeAloneSwitch = new Button(parent, SWT.NONE);
+        GridData gd = new GridData();
+        gd.verticalAlignment = SWT.TOP;
+        scanTubeAloneSwitch.setLayoutData(gd);
+        scanTubeAloneSwitch.setText("");
+        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+            .getImageRegistry().get(BioBankPlugin.IMG_SCAN_EDIT));
+        scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseDown(MouseEvent e) {
+                if (isScanHasBeenLaunched()) {
+                    scanTubeAloneMode = !scanTubeAloneMode;
+                    if (scanTubeAloneMode) {
+                        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                            .getImageRegistry()
+                            .get(BioBankPlugin.IMG_SCAN_CLOSE_EDIT));
+                    } else {
+                        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                            .getImageRegistry()
+                            .get(BioBankPlugin.IMG_SCAN_EDIT));
+                    }
+                }
+            }
+        });
+    }
+
+    protected void scanTubeAlone(MouseEvent e) {
+        if (scanTubeAloneMode && isScanHasBeenLaunched()) {
+            RowColPos rcp = ((ScanPalletWidget) e.widget)
+                .getPositionAtCoordinates(e.x, e.y);
+            Map<RowColPos, PalletCell> cells = palletScanManagement.getCells();
+            if (rcp != null) {
+                PalletCell cell = cells.get(rcp);
+                if (canScanTubeAlone(cell)) {
+                    String value = scanTubeAloneDialog(rcp);
+                    if (value != null && !value.isEmpty()) {
+                        if (cell == null) {
+                            cell = new PalletCell(new ScanCell(rcp.row,
+                                rcp.col, value));
+                            cells.put(rcp, cell);
+                        } else {
+                            cell.setValue(value);
+                        }
+                        // TODO: log this?
+                        // appendLogNLS("linkAssign.activitylog.scanTubeAlone",
+                        // value,
+                        // ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
+                        try {
+                            postprocessScanTubeAlone(cell);
+                        } catch (Exception ex) {
+                            BioBankPlugin.openAsyncError("Scan tube error", ex);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    protected boolean canScanTubeAlone(PalletCell cell) {
+        return cell == null || cell.getStatus() == CellStatus.EMPTY;
+    }
+
+    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+        spw.redraw();
+    }
+
+    private String scanTubeAloneDialog(RowColPos rcp) {
+        ScanOneTubeDialog dlg = new ScanOneTubeDialog(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(),
+            palletScanManagement.getCells(), rcp);
+        if (dlg.open() == Dialog.OK) {
+            return dlg.getScannedValue();
+        }
+        return null;
+    }
 }
