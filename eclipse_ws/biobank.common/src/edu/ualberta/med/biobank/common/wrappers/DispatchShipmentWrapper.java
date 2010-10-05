@@ -28,8 +28,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class DispatchShipmentWrapper extends
     AbstractShipmentWrapper<DispatchShipment> {
 
-    private Set<DispatchShipmentAliquotWrapper> deletedDispatchedShipmentAliquots =
-        new HashSet<DispatchShipmentAliquotWrapper>();
+    private Set<DispatchShipmentAliquotWrapper> deletedDispatchedShipmentAliquots = new HashSet<DispatchShipmentAliquotWrapper>();
 
     private boolean stateModified = false;
 
@@ -108,8 +107,8 @@ public class DispatchShipmentWrapper extends
     private void checkSenderCanSendToReceiver() throws BiobankCheckException,
         WrapperException {
         if (getSender() != null && getReceiver() != null && getStudy() != null) {
-            List<SiteWrapper> possibleReceivers =
-                getSender().getStudyDispachSites(getStudy());
+            List<SiteWrapper> possibleReceivers = getSender()
+                .getStudyDispachSites(getStudy());
             if (possibleReceivers == null
                 || !possibleReceivers.contains(getReceiver())) {
                 throw new BiobankCheckException("site "
@@ -135,9 +134,9 @@ public class DispatchShipmentWrapper extends
             isSameShipment = " and id <> ?";
             params.add(getId());
         }
-        HQLCriteria c =
-            new HQLCriteria("from " + DispatchShipment.class.getName()
-                + " where sender.id=? and waybill = ?" + isSameShipment, params);
+        HQLCriteria c = new HQLCriteria("from "
+            + DispatchShipment.class.getName()
+            + " where sender.id=? and waybill = ?" + isSameShipment, params);
 
         List<Object> results = appService.query(c);
         return results.size() == 0;
@@ -217,15 +216,13 @@ public class DispatchShipmentWrapper extends
     @SuppressWarnings("unchecked")
     public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection(
         boolean sort) {
-        List<DispatchShipmentAliquotWrapper> aliquotCollection =
-            (List<DispatchShipmentAliquotWrapper>) propertiesMap
-                .get("dispatchShipmentAliquotCollection");
+        List<DispatchShipmentAliquotWrapper> aliquotCollection = (List<DispatchShipmentAliquotWrapper>) propertiesMap
+            .get("dispatchShipmentAliquotCollection");
         if (aliquotCollection == null) {
-            Collection<DispatchShipmentAliquot> children =
-                wrappedObject.getDispatchShipmentAliquotCollection();
+            Collection<DispatchShipmentAliquot> children = wrappedObject
+                .getDispatchShipmentAliquotCollection();
             if (children != null) {
-                aliquotCollection =
-                    new ArrayList<DispatchShipmentAliquotWrapper>();
+                aliquotCollection = new ArrayList<DispatchShipmentAliquotWrapper>();
                 for (DispatchShipmentAliquot dsa : children) {
                     aliquotCollection.add(new DispatchShipmentAliquotWrapper(
                         appService, dsa));
@@ -246,11 +243,10 @@ public class DispatchShipmentWrapper extends
     @SuppressWarnings("unchecked")
     private List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollectionWithState(
         String mapKey, boolean sort, STATE... states) {
-        List<DispatchShipmentAliquotWrapper> dsaCollection =
-            (List<DispatchShipmentAliquotWrapper>) propertiesMap.get(mapKey);
+        List<DispatchShipmentAliquotWrapper> dsaCollection = (List<DispatchShipmentAliquotWrapper>) propertiesMap
+            .get(mapKey);
         if (dsaCollection == null) {
-            Collection<DispatchShipmentAliquotWrapper> children =
-                getDispatchShipmentAliquotCollection(sort);
+            Collection<DispatchShipmentAliquotWrapper> children = getDispatchShipmentAliquotCollection(sort);
             if (children != null) {
                 dsaCollection = new ArrayList<DispatchShipmentAliquotWrapper>();
                 for (DispatchShipmentAliquotWrapper dsa : children) {
@@ -286,11 +282,10 @@ public class DispatchShipmentWrapper extends
 
     @SuppressWarnings("unchecked")
     public List<AliquotWrapper> getAliquotCollection(boolean sort) {
-        List<AliquotWrapper> aliquotCollection =
-            (List<AliquotWrapper>) propertiesMap.get("aliquotCollection");
+        List<AliquotWrapper> aliquotCollection = (List<AliquotWrapper>) propertiesMap
+            .get("aliquotCollection");
         if (aliquotCollection == null) {
-            Collection<DispatchShipmentAliquotWrapper> dsaList =
-                getDispatchShipmentAliquotCollection(sort);
+            Collection<DispatchShipmentAliquotWrapper> dsaList = getDispatchShipmentAliquotCollection(sort);
             if (dsaList != null) {
                 aliquotCollection = new ArrayList<AliquotWrapper>();
                 for (DispatchShipmentAliquotWrapper dsa : dsaList) {
@@ -309,8 +304,8 @@ public class DispatchShipmentWrapper extends
     private void setDispathcShipmentAliquotCollection(
         Collection<DispatchShipmentAliquot> allDsaObjects,
         List<DispatchShipmentAliquotWrapper> allDsaWrappers) {
-        Collection<DispatchShipmentAliquot> oldList =
-            wrappedObject.getDispatchShipmentAliquotCollection();
+        Collection<DispatchShipmentAliquot> oldList = wrappedObject
+            .getDispatchShipmentAliquotCollection();
         wrappedObject.setDispatchShipmentAliquotCollection(allDsaObjects);
         propertyChangeSupport.firePropertyChange(
             "dispatchShipmentAliquotCollection", oldList, allDsaObjects);
@@ -322,13 +317,10 @@ public class DispatchShipmentWrapper extends
         if ((newAliquots == null) || (newAliquots.size() == 0))
             return;
 
-        Collection<DispatchShipmentAliquot> allDsaObjects =
-            new HashSet<DispatchShipmentAliquot>();
-        List<DispatchShipmentAliquotWrapper> allDsaWrappers =
-            new ArrayList<DispatchShipmentAliquotWrapper>();
+        Collection<DispatchShipmentAliquot> allDsaObjects = new HashSet<DispatchShipmentAliquot>();
+        List<DispatchShipmentAliquotWrapper> allDsaWrappers = new ArrayList<DispatchShipmentAliquotWrapper>();
         // already added dsa
-        List<DispatchShipmentAliquotWrapper> currentList =
-            getDispatchShipmentAliquotCollection();
+        List<DispatchShipmentAliquotWrapper> currentList = getDispatchShipmentAliquotCollection();
         List<AliquotWrapper> currentAliquots = new ArrayList<AliquotWrapper>();
         if (currentList != null) {
             for (DispatchShipmentAliquotWrapper dsa : currentList) {
@@ -369,8 +361,8 @@ public class DispatchShipmentWrapper extends
                 throw new BiobankCheckException(aliquot.getInventoryId()
                     + " is already in this shipment.");
             }
-            DispatchShipmentAliquotWrapper dsa =
-                new DispatchShipmentAliquotWrapper(appService);
+            DispatchShipmentAliquotWrapper dsa = new DispatchShipmentAliquotWrapper(
+                appService);
             dsa.setAliquot(aliquot);
             dsa.setState(stateForAliquot.ordinal());
             dsa.setShipment(this);
@@ -385,13 +377,10 @@ public class DispatchShipmentWrapper extends
         if ((dsasToRemove == null) || (dsasToRemove.size() == 0))
             return;
 
-        Collection<DispatchShipmentAliquot> allDsaObjects =
-            new HashSet<DispatchShipmentAliquot>();
-        List<DispatchShipmentAliquotWrapper> allDsaWrappers =
-            new ArrayList<DispatchShipmentAliquotWrapper>();
+        Collection<DispatchShipmentAliquot> allDsaObjects = new HashSet<DispatchShipmentAliquot>();
+        List<DispatchShipmentAliquotWrapper> allDsaWrappers = new ArrayList<DispatchShipmentAliquotWrapper>();
         // already added dsa
-        List<DispatchShipmentAliquotWrapper> currentList =
-            getDispatchShipmentAliquotCollection(false);
+        List<DispatchShipmentAliquotWrapper> currentList = getDispatchShipmentAliquotCollection(false);
         if (currentList != null) {
             for (DispatchShipmentAliquotWrapper dsa : currentList) {
                 if (!dsasToRemove.contains(dsa)) {
@@ -409,13 +398,10 @@ public class DispatchShipmentWrapper extends
         if ((aliquotsToRemove == null) || (aliquotsToRemove.size() == 0))
             return;
 
-        Collection<DispatchShipmentAliquot> allDsaObjects =
-            new HashSet<DispatchShipmentAliquot>();
-        List<DispatchShipmentAliquotWrapper> allDsaWrappers =
-            new ArrayList<DispatchShipmentAliquotWrapper>();
+        Collection<DispatchShipmentAliquot> allDsaObjects = new HashSet<DispatchShipmentAliquot>();
+        List<DispatchShipmentAliquotWrapper> allDsaWrappers = new ArrayList<DispatchShipmentAliquotWrapper>();
         // already added dsa
-        List<DispatchShipmentAliquotWrapper> currentList =
-            getDispatchShipmentAliquotCollection(false);
+        List<DispatchShipmentAliquotWrapper> currentList = getDispatchShipmentAliquotCollection(false);
         if (currentList != null) {
             for (DispatchShipmentAliquotWrapper dsa : currentList) {
                 if (!aliquotsToRemove.contains(dsa.getAliquot())) {
@@ -434,6 +420,7 @@ public class DispatchShipmentWrapper extends
 
     }
 
+    @SuppressWarnings("unused")
     @Deprecated
     public void receiveAliquots(List<AliquotWrapper> aliquotsToReceive)
         throws Exception {
@@ -449,6 +436,7 @@ public class DispatchShipmentWrapper extends
         // }
     }
 
+    @SuppressWarnings("unused")
     @Deprecated
     public void addNotInShipmentAliquots(List<AliquotWrapper> aliquotsToFlag)
         throws Exception {
@@ -508,14 +496,12 @@ public class DispatchShipmentWrapper extends
     public static List<DispatchShipmentWrapper> getShipmentsInSite(
         WritableApplicationService appService, String waybill, SiteWrapper site)
         throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria("from " + DispatchShipment.class.getName()
-                + " where (sender.id = ? or receiver.id = ?) and waybill = ?",
-                Arrays.asList(new Object[] { site.getId(), site.getId(),
-                    waybill }));
+        HQLCriteria criteria = new HQLCriteria("from "
+            + DispatchShipment.class.getName()
+            + " where (sender.id = ? or receiver.id = ?) and waybill = ?",
+            Arrays.asList(new Object[] { site.getId(), site.getId(), waybill }));
         List<DispatchShipment> shipments = appService.query(criteria);
-        List<DispatchShipmentWrapper> wrappers =
-            new ArrayList<DispatchShipmentWrapper>();
+        List<DispatchShipmentWrapper> wrappers = new ArrayList<DispatchShipmentWrapper>();
         for (DispatchShipment s : shipments) {
             wrappers.add(new DispatchShipmentWrapper(appService, s));
         }
@@ -540,16 +526,14 @@ public class DispatchShipmentWrapper extends
         // date at 0:0pm
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "from "
-                    + DispatchShipment.class.getName()
-                    + " where (sender.id = ? or receiver.id = ?) and dateShipped >= ? and dateShipped <= ?",
-                Arrays.asList(new Object[] { site.getId(), site.getId(),
-                    startDate, endDate }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + DispatchShipment.class.getName()
+                + " where (sender.id = ? or receiver.id = ?) and dateShipped >= ? and dateShipped <= ?",
+            Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
+                endDate }));
         List<DispatchShipment> shipments = appService.query(criteria);
-        List<DispatchShipmentWrapper> wrappers =
-            new ArrayList<DispatchShipmentWrapper>();
+        List<DispatchShipmentWrapper> wrappers = new ArrayList<DispatchShipmentWrapper>();
         for (DispatchShipment s : shipments) {
             wrappers.add(new DispatchShipmentWrapper(appService, s));
         }
@@ -574,16 +558,14 @@ public class DispatchShipmentWrapper extends
         // date at 0:0pm
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "from "
-                    + DispatchShipment.class.getName()
-                    + " where (sender.id = ? or receiver.id = ?) and dateReceived >= ? and dateReceived <= ?",
-                Arrays.asList(new Object[] { site.getId(), site.getId(),
-                    startDate, endDate }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + DispatchShipment.class.getName()
+                + " where (sender.id = ? or receiver.id = ?) and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
+                endDate }));
         List<DispatchShipment> shipments = appService.query(criteria);
-        List<DispatchShipmentWrapper> wrappers =
-            new ArrayList<DispatchShipmentWrapper>();
+        List<DispatchShipmentWrapper> wrappers = new ArrayList<DispatchShipmentWrapper>();
         for (DispatchShipment s : shipments) {
             wrappers.add(new DispatchShipmentWrapper(appService, s));
         }
@@ -604,8 +586,8 @@ public class DispatchShipmentWrapper extends
     private void setState(Integer state) {
         Integer oldState = wrappedObject.getState();
         wrappedObject.setState(state);
-        stateModified =
-            oldState == null || state == null || !oldState.equals(state);
+        stateModified = oldState == null || state == null
+            || !oldState.equals(state);
     }
 
     public void setNextState() {

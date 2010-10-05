@@ -216,7 +216,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             fieldsComposite, BiobankText.class, SWT.NONE,
             Messages.getString("ScanAssign.palletLabel.label"), null, //$NON-NLS-1$
             currentPalletWrapper, "label", //$NON-NLS-1$
-            palletLabelValidator); //$NON-NLS-1$
+            palletLabelValidator);
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;

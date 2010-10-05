@@ -405,6 +405,16 @@ public abstract class BiobankFormBase extends EditorPart {
             createBeansObservable(pojo, propertyName), validator);
     }
 
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, Object pojo, String propertyName,
+        AbstractValidator validator, String bindingKey) {
+        return widgetCreator.createBoundWidget(composite, widgetClass,
+            widgetOptions, label, widgetValues,
+            createBeansObservable(pojo, propertyName), validator, bindingKey);
+
+    }
+
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions,
         String fieldLabel, String[] widgetValues, Object pojo,

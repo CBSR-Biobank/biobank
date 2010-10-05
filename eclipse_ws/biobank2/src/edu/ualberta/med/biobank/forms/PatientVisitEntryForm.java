@@ -6,7 +6,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -284,15 +283,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private Control getControlForLabel(Composite client,
         FormPvCustomInfo pvCustomInfo) {
         Control control;
-        IObservableValue valueObserved = BiobankFormBase.observeValue(
-            pvCustomInfo, "value");
         if (pvCustomInfo.getType().equals("number")) {
             control = createBoundWidgetWithLabel(client, BiobankText.class,
-                SWT.NONE, pvCustomInfo.getLabel(), null, valueObserved,
+                SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
                 new DoubleNumberValidator("You should select a valid number"));
         } else if (pvCustomInfo.getType().equals("text")) {
             control = createBoundWidgetWithLabel(client, BiobankText.class,
-                SWT.NONE, pvCustomInfo.getLabel(), null, valueObserved, null);
+                SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
+                null);
         } else if (pvCustomInfo.getType().equals("date_time")) {
             control = createDateTimeWidget(client, pvCustomInfo.getLabel(),
                 DateFormatter.parseToDateTime(pvCustomInfo.getValue()), null,
@@ -300,7 +298,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         } else if (pvCustomInfo.getType().equals("select_single")) {
             control = createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
                 pvCustomInfo.getLabel(), pvCustomInfo.getAllowedValues(),
-                valueObserved, null);
+                pvCustomInfo, "value", null);
         } else if (pvCustomInfo.getType().equals("select_multiple")) {
             createFieldLabel(client, pvCustomInfo.getLabel());
             SelectMultipleWidget s = new SelectMultipleWidget(client,
