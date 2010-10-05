@@ -22,8 +22,8 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper.STATE;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper.CheckStatus;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -203,23 +203,20 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 } else {
                     scanCell.setAliquot(foundAliquot);
                     if (expectedAliquot != null || currentPallet == null) {
-                        if (foundAliquot.isDispatched()
-                            || (currentShipment.getAliquotCollection() != null && currentShipment
-                                .getAliquotCollection().contains(foundAliquot))) {
-                            scanCell.setStatus(CellStatus.ERROR);
-                            scanCell
-                                .setInformation("Already dispatched or added");
-                        } else if (foundAliquot.getPosition() == null) {
-                            scanCell.setStatus(CellStatus.ERROR);
-                            scanCell
-                                .setInformation("Should be first assigned to a position");
-                        } else {
+                        CheckStatus check =
+                            currentShipment.checkCanAddAliquot(
+                                currentShipment.getAliquotCollection(),
+                                foundAliquot);
+                        if (check.ok) {
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)
                             scanCell.setStatus(CellStatus.FILLED);
                             scanCell.setTitle(foundAliquot.getPatientVisit()
                                 .getPatient().getPnumber());
                             scanCell.setAliquot(foundAliquot);
+                        } else {
+                            scanCell.setStatus(CellStatus.ERROR);
+                            scanCell.setInformation(check.message);
                         }
                     } else {
                         // should not be there
@@ -265,7 +262,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
             aliquots.add(cell.getAliquot());
             cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
         }
-        currentShipment.addAliquots(aliquots, STATE.NONE_STATE);
+        currentShipment.addNewAliquots(aliquots);
         if (currentPallet != null) {
             removedPallets.add(currentPallet);
         }
@@ -300,8 +297,11 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 currentProductBarcode);
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
-            return PalletCell.getRandomAliquotsAlreadyAssigned(SessionManager
-                .getAppService(), currentShipment.getSender().getId());
+            Map<RowColPos, PalletCell> cells =
+                PalletCell.getRandomAliquotsAlreadyAssigned(SessionManager
+                    .getAppService(), currentShipment.getSender().getId(),
+                    currentShipment.getStudy().getId());
+            return cells;
         } else {
             for (AliquotWrapper aliquot : currentPallet.getAliquots().values()) {
                 PalletCell cell = new PalletCell(new ScanCell(

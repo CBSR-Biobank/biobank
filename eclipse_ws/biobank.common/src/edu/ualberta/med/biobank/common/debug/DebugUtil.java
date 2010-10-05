@@ -39,18 +39,31 @@ public class DebugUtil {
     public static List<AliquotWrapper> getRandomAliquotsAlreadyAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
+        return getRandomAliquotsAlreadyAssigned(appService, siteId, null);
+    }
+
+    public static List<AliquotWrapper> getRandomAliquotsAlreadyAssigned(
+        WritableApplicationService appService, Integer siteId, Integer studyId)
+        throws ApplicationException {
+        List<Object> params = new ArrayList<Object>();
+        params.add(siteId);
+        String studyString = "";
+        if (studyString != null) {
+            studyString =
+                " and a.patientVisit.clinicShipmentPatient.patient.study.id = ?";
+            params.add(studyId);
+        }
+
         HQLCriteria criteria =
-            new HQLCriteria(
-                "from "
-                    + Aliquot.class.getName()
-                    + " as s where s in (select sp.aliquot from "
-                    + AliquotPosition.class.getName()
-                    + " as sp) and s.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ?",
-                Arrays.asList(new Object[] { siteId }));
-        List<Aliquot> aliquots = appService.query(criteria);
+            new HQLCriteria("from " + Aliquot.class.getName()
+                + " as a where a in (select sp.aliquot from "
+                + AliquotPosition.class.getName()
+                + " as sp) and a.aliquotPosition.container.site.id = ?"
+                + studyString, params);
+        List<Aliquot> idList = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
         int i = 0;
-        for (Aliquot aliquot : aliquots) {
+        for (Aliquot aliquot : idList) {
             // return a list of 10 maximum
             if (i == 10) {
                 return list;

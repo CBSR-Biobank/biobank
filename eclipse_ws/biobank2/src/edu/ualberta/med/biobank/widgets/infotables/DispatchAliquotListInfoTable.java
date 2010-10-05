@@ -6,11 +6,15 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.MenuItem;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper.STATE;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -23,7 +27,7 @@ public abstract class DispatchAliquotListInfoTable extends
         String inventoryId;
         String type;
         String pnumber;
-        STATE state;
+        DispatchAliquotState state;
         String comment;
 
         @Override
@@ -40,9 +44,12 @@ public abstract class DispatchAliquotListInfoTable extends
 
     private boolean editMode = false;
 
+    private DispatchShipmentWrapper currentShipment;
+
     public DispatchAliquotListInfoTable(Composite parent,
         final DispatchShipmentWrapper shipment, boolean editMode) {
         super(parent, null, HEADINGS, BOUNDS, 5);
+        this.currentShipment = shipment;
         setCollection(getInternalDispatchShipmentAliquots());
         this.editMode = editMode;
         if (editMode) {
@@ -69,8 +76,40 @@ public abstract class DispatchAliquotListInfoTable extends
                         }
                     }
                 });
+            } else {
+                MenuItem item = new MenuItem(menu, SWT.PUSH);
+                item.setText("Set as missing-pending");
+                item.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        setItemMissingPending();
+                    }
+                });
+                item = new MenuItem(menu, SWT.PUSH);
+                item.setText("Set as missing");
+                item.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        setItemMissing();
+                    }
+                });
             }
         }
+    }
+
+    protected void setItemMissing() {
+        modifyState(DispatchAliquotState.MISSING);
+    }
+
+    protected void setItemMissingPending() {
+        modifyState(DispatchAliquotState.MISSING_PENDING_STATE);
+    }
+
+    private void modifyState(DispatchAliquotState newState) {
+        DispatchShipmentAliquotWrapper dsa = getSelection();
+        dsa.setState(newState.ordinal());
+        currentShipment.resetStateLists();
+        notifyListeners();
     }
 
     public abstract List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots();
@@ -122,8 +161,7 @@ public abstract class DispatchAliquotListInfoTable extends
         SampleTypeWrapper type = dsa.getAliquot().getSampleType();
         Assert.isNotNull(type, "aliquot with null for sample type");
         info.type = type.getName();
-        info.state =
-            DispatchShipmentAliquotWrapper.STATE.getState(dsa.getState());
+        info.state = DispatchAliquotState.getState(dsa.getState());
         info.comment = dsa.getComment();
         return info;
     }

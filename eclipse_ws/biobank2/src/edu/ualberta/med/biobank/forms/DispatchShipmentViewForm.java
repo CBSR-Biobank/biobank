@@ -253,7 +253,7 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
     }
 
     private void createAliquotsMissingSection() {
-        if (shipment.hasBeenReceived()) {
+        if (shipment.hasBeenReceived() || shipment.isInTransitState()) {
             Composite parent = createSectionWithClient("Missing aliquots");
             aliquotsMissingTable =
                 new DispatchAliquotListInfoTable(parent, shipment, false) {

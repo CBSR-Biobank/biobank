@@ -876,29 +876,29 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return shipCollection;
     }
 
-    // @SuppressWarnings("unchecked")
-    // public List<DispatchShipmentWrapper>
-    // getReceivingWithErrorsDispatchShipmentCollection() {
-    // List<DispatchShipmentWrapper> shipCollection =
-    // (List<DispatchShipmentWrapper>) propertiesMap
-    // .get("receivingWithErrorsDispatchShipmentCollection");
-    // if (shipCollection == null) {
-    // List<DispatchShipmentWrapper> children =
-    // getReceivedDispatchShipmentCollection();
-    // if (children != null) {
-    // shipCollection = new ArrayList<DispatchShipmentWrapper>();
-    // for (DispatchShipmentWrapper ship : children) {
-    // if (ship.isInErrorAndOpenState()) {
-    // shipCollection.add(ship);
-    // }
-    // }
-    // propertiesMap.put(
-    // "receivingWithErrorsDispatchShipmentCollection",
-    // shipCollection);
-    // }
-    // }
-    // return shipCollection;
-    // }
+    @SuppressWarnings("unchecked")
+    public List<DispatchShipmentWrapper> getReceivingWithErrorsDispatchShipmentCollection() {
+        List<DispatchShipmentWrapper> shipCollection =
+            (List<DispatchShipmentWrapper>) propertiesMap
+                .get("receivingWithErrorsDispatchShipmentCollection");
+        if (shipCollection == null) {
+            List<DispatchShipmentWrapper> children =
+                getReceivedDispatchShipmentCollection();
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchShipmentWrapper>();
+                for (DispatchShipmentWrapper ship : children) {
+                    if (ship.isInReceivedState() && ship.hasPendingErrors()) {
+                        shipCollection.add(ship);
+                    }
+                }
+                propertiesMap.put(
+                    "receivingWithErrorsDispatchShipmentCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
     @SuppressWarnings("unchecked")
     public List<DispatchShipmentWrapper> getInCreationDispatchShipmentCollection() {
         List<DispatchShipmentWrapper> shipCollection =
