@@ -179,10 +179,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             Messages.getString("ScanAssign.palletLabel.validationMsg"));
 
         palletproductBarcodeText = (BiobankText) createBoundWidgetWithLabel(
-            fieldsComposite, BiobankText.class, SWT.NONE,
+            fieldsComposite,
+            BiobankText.class,
+            SWT.NONE,
             Messages.getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
-            null, BiobankFormBase.observeValue(currentPalletWrapper,
-                "productBarcode"), productBarcodeValidator); //$NON-NLS-1$
+            null, currentPalletWrapper,
+            "productBarcode", productBarcodeValidator); //$NON-NLS-1$
         palletproductBarcodeText.addKeyListener(textFieldKeyListener);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
@@ -213,7 +215,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         palletPositionText = (BiobankText) createBoundWidgetWithLabel(
             fieldsComposite, BiobankText.class, SWT.NONE,
             Messages.getString("ScanAssign.palletLabel.label"), null, //$NON-NLS-1$
-            BiobankFormBase.observeValue(currentPalletWrapper, "label"), //$NON-NLS-1$
+            currentPalletWrapper, "label", //$NON-NLS-1$
             palletLabelValidator); //$NON-NLS-1$
         palletPositionText.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
         gd = new GridData();

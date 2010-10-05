@@ -158,37 +158,32 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             "Repository Site");
         setTextValue(siteLabel, containerType.getSite().getName());
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null,
-            BiobankFormBase.observeValue(containerType, "name"),
+            SWT.NONE, "Name", null, containerType, "name",
             new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null,
-            BiobankFormBase.observeValue(containerType, "nameShort"),
+            "Short Name", null, containerType, "nameShort",
             new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME_SHORT));
 
         if (containerType.getTopLevel() == null) {
             containerType.setTopLevel(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Top Level Container", null,
-            BiobankFormBase.observeValue(containerType, "topLevel"), null);
+            "Top Level Container", null, containerType, "topLevel", null);
         toolkit.paintBordersFor(client);
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE, "Rows",
-            null, BiobankFormBase.observeValue(containerType, "rowCapacity"),
-            new IntegerNumberValidator("Row capacity is not a valid number",
+            null, containerType, "rowCapacity", new IntegerNumberValidator(
+                "Row capacity is not a valid number", false));
+
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+            "Columns", null, containerType, "colCapacity",
+            new IntegerNumberValidator("Column capacity is not a valid nubmer",
                 false));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Columns", null, BiobankFormBase.observeValue(containerType,
-                "colCapacity"), new IntegerNumberValidator(
-                "Column capacity is not a valid nubmer", false));
-
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Default Temperature\n(Celcius)", null,
-            BiobankFormBase.observeValue(containerType, "defaultTemperature"),
-            new DoubleNumberValidator(
+            "Default Temperature\n(Celcius)", null, containerType,
+            "defaultTemperature", new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
 
         String currentScheme = containerType.getChildLabelingSchemeName();
@@ -226,8 +221,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null,
-            BiobankFormBase.observeValue(containerType, "comment"), null);
+            "Comments", null, containerType, "comment", null);
     }
 
     private void createContainsSection() throws Exception {

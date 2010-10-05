@@ -122,8 +122,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Patient Number", null, BiobankFormBase.observeValue(
-                patientAdapter.getWrapper(), "pnumber"),
+            "Patient Number", null, patientAdapter.getWrapper(), "pnumber",
             pnumberNonEmptyValidator);
     }
 

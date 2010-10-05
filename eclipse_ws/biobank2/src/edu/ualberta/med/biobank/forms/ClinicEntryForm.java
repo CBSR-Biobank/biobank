@@ -101,21 +101,18 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null,
-            BiobankFormBase.observeValue(clinic, "name"),
+            SWT.NONE, "Name", null, clinic, "name",
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null,
-            BiobankFormBase.observeValue(clinic, "nameShort"),
+            "Short Name", null, clinic, "nameShort",
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
         if (clinic.getSendsShipments() == null) {
             clinic.setSendsShipments(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Sends Shipments", null,
-            BiobankFormBase.observeValue(clinic, "sendsShipments"), null);
+            "Sends Shipments", null, clinic, "sendsShipments", null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewer(client,
@@ -131,8 +128,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, BiobankFormBase.observeValue(clinic, "comment"),
-            null);
+            "Comments", null, clinic, "comment", null);
     }
 
     private void createContactSection() {

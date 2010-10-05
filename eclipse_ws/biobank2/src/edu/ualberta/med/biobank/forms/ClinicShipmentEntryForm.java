@@ -166,10 +166,9 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
             GridData.VERTICAL_ALIGN_BEGINNING));
         waybillValidator = new NonEmptyStringValidator(
             "A waybill should be set");
-        waybillText = (BiobankText) widgetCreator.createBoundWidget(client,
-            BiobankText.class, SWT.NONE, waybillLabel, new String[0],
-            BiobankFormBase.observeValue(shipment, "waybill"),
-            waybillValidator, WAYBILL_BINDING);
+        waybillText = (BiobankText) createBoundWidget(client,
+            BiobankText.class, SWT.NONE, waybillLabel, new String[0], shipment,
+            "waybill", waybillValidator, WAYBILL_BINDING);
         activateWaybillField(false);
         if (clinicsComboViewer != null && selectedClinic != null) {
             clinicsComboViewer.setSelection(new StructuredSelection(
@@ -180,8 +179,7 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
             shipment.setDateShipped(new Date());
 
         dateShippedWidget = createDateTimeWidget(client, "Date Shipped",
-            shipment.getDateShipped(),
-            BiobankFormBase.observeValue(shipment, "dateShipped"),
+            shipment.getDateShipped(), shipment, "dateShipped",
             new DateNotNulValidator("Date shipped should be set"));
         setFirstControl(dateShippedWidget);
 
@@ -199,15 +197,13 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Box Number", null,
-            BiobankFormBase.observeValue(shipment, "boxNumber"), null);
+            "Box Number", null, shipment, "boxNumber", null);
 
         if (shipment.getDateReceived() == null)
             shipment.setDateReceived(new Date());
 
         dateReceivedWidget = createDateTimeWidget(client, "Date Received",
-            shipment.getDateReceived(),
-            BiobankFormBase.observeValue(shipment, "dateReceived"),
+            shipment.getDateReceived(), shipment, "dateReceived",
             new DateNotNulValidator("Date received should be set"));
         dateReceivedWidget.addModifyListener(new ModifyListener() {
             @Override
@@ -234,8 +230,7 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
         }
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null,
-            BiobankFormBase.observeValue(shipment, "comment"), null);
+            "Comments", null, shipment, "comment", null);
 
     }
 

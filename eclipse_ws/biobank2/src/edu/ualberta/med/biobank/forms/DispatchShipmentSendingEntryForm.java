@@ -135,13 +135,12 @@ public class DispatchShipmentSendingEntryForm extends BiobankEntryForm {
                 });
 
             createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-                "Waybill", null,
-                BiobankFormBase.observeValue(shipment, "waybill"), null);
+                "Waybill", null, shipment, "waybill", null);
         }
 
         BiobankText commentText = (BiobankText) createBoundWidgetWithLabel(
-            client, BiobankText.class, SWT.MULTI, "Comments", null,
-            BiobankFormBase.observeValue(shipment, "comment"), null);
+            client, BiobankText.class, SWT.MULTI, "Comments", null, shipment,
+            "comment", null);
 
         createAliquotsSection();
 

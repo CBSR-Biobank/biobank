@@ -107,13 +107,11 @@ public class StudyEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null,
-            BiobankFormBase.observeValue(study, "name"),
-            new NonEmptyStringValidator("Study name cannot be blank")));
+            SWT.NONE, "Name", null, study, "name", new NonEmptyStringValidator(
+                "Study name cannot be blank")));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null,
-            BiobankFormBase.observeValue(study, "nameShort"),
+            "Short Name", null, study, "nameShort",
             new NonEmptyStringValidator("Study short name cannot be blank"));
 
         activityStatusComboViewer = createComboViewer(client,
@@ -129,8 +127,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, BiobankFormBase.observeValue(study, "comment"),
-            null);
+            "Comments", null, study, "comment", null);
 
         createClinicSection();
         createSampleStorageSection();

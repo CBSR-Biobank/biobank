@@ -224,8 +224,7 @@ public class DispatchShipmentReceivingEntryForm extends BiobankEntryForm {
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null,
-            BiobankFormBase.observeValue(shipment, "comment"), null);
+            "Comments", null, shipment, "comment", null);
     }
 
     @Override

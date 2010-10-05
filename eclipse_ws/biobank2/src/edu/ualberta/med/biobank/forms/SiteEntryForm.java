@@ -113,13 +113,12 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null, BiobankFormBase.observeValue(site, "name"),
-            new NonEmptyStringValidator(MSG_NO_SITE_NAME)));
+            SWT.NONE, "Name", null, site, "name", new NonEmptyStringValidator(
+                MSG_NO_SITE_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null,
-            BiobankFormBase.observeValue(site, "nameShort"),
-            new NonEmptyStringValidator("Site short name cannot be blank"));
+            "Short Name", null, site, "nameShort", new NonEmptyStringValidator(
+                "Site short name cannot be blank"));
 
         activityStatusComboViewer = createComboViewer(client,
             "Activity Status",
@@ -133,8 +132,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, BiobankFormBase.observeValue(site, "comment"),
-            null);
+            "Comments", null, site, "comment", null);
     }
 
     private void createStudySection() {

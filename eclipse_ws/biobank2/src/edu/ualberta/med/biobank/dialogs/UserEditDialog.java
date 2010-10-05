@@ -112,24 +112,20 @@ public class UserEditDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         Control c = createBoundWidgetWithLabel(contents, BiobankText.class,
-            SWT.BORDER, "Login", new String[0],
-            BiobankDialog.observeValue(modifiedUser, "login"),
+            SWT.BORDER, "Login", new String[0], modifiedUser, "login",
             new NonEmptyStringValidator(MSG_LOGIN_REQUIRED));
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Email", new String[0],
-            BiobankDialog.observeValue(modifiedUser, "email"), null);
+            "Email", new String[0], modifiedUser, "email", null);
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "First Name", new String[0],
-            BiobankDialog.observeValue(modifiedUser, "firstName"), null);
+            "First Name", new String[0], modifiedUser, "firstName", null);
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Last Name", new String[0],
-            BiobankDialog.observeValue(modifiedUser, "lastName"), null);
+            "Last Name", new String[0], modifiedUser, "lastName", null);
 
         createPasswordWidgets(contents);
 
@@ -246,15 +242,14 @@ public class UserEditDialog extends BiobankDialog {
 
         BiobankText password = (BiobankText) createBoundWidgetWithLabel(parent,
             BiobankText.class, SWT.BORDER | SWT.PASSWORD, (isNewUser ? ""
-                : "New ") + "Password", new String[0],
-            BiobankDialog.observeValue(modifiedUser, "password"),
-            passwordValidator);
+                : "New ") + "Password", new String[0], modifiedUser,
+            "password", passwordValidator);
 
         BiobankText passwordRetyped = (BiobankText) createBoundWidgetWithLabel(
             parent, BiobankText.class, SWT.BORDER | SWT.PASSWORD, "Re-Type "
                 + (isNewUser ? "" : "New ") + "Password", new String[0],
-            BiobankDialog.observeValue(modifiedUser, "password"),
-            new MatchingTextValidator(MSG_PASSWORDS_MUST_MATCH, password));
+            modifiedUser, "password", new MatchingTextValidator(
+                MSG_PASSWORDS_MUST_MATCH, password));
 
         MatchingTextValidator.addListener(password, passwordRetyped);
     }

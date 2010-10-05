@@ -95,18 +95,12 @@ public class StudySourceVesselDialog extends BiobankDialog {
             });
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
-            "Need Time Drawn", new String[0],
-            BiobankDialog.observeValue(studySourceVessel, "needTimeDrawn"),
-            null);
+            "Need Time Drawn", new String[0], studySourceVessel,
+            "needTimeDrawn", null);
 
-        createBoundWidgetWithLabel(
-            contents,
-            Button.class,
-            SWT.BORDER,
-            "Need Original Volume",
-            new String[0],
-            BiobankDialog.observeValue(studySourceVessel, "needOriginalVolume"),
-            null);
+        createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
+            "Need Original Volume", new String[0], studySourceVessel,
+            "needOriginalVolume", null);
     }
 
     @Override

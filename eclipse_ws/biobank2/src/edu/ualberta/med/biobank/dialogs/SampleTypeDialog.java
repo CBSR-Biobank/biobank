@@ -65,12 +65,11 @@ public class SampleTypeDialog extends BiobankDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Name", null, BiobankDialog.observeValue(sampleType, "name"),
-            new NonEmptyStringValidator(MSG_NO_ST_NAME));
+            "Name", null, sampleType, "name", new NonEmptyStringValidator(
+                MSG_NO_ST_NAME));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Short Name", null,
-            BiobankDialog.observeValue(sampleType, "nameShort"),
+            "Short Name", null, sampleType, "nameShort",
             new NonEmptyStringValidator(MSG_NO_ST_SNAME));
     }
 

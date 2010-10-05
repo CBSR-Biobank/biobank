@@ -131,14 +131,13 @@ public class SampleStorageDialog extends BiobankDialog {
             });
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Volume (ml)", new String[0],
-            BiobankDialog.observeValue(sampleStorage, "volume"),
+            "Volume (ml)", new String[0], sampleStorage, "volume",
             new DoubleNumberValidator("Volume should be a real number", false));
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Quantity", new String[0], BiobankDialog.observeValue(
-                sampleStorage, "quantity"), new IntegerNumberValidator(
-                "Quantity should be a whole number", false));
+            "Quantity", new String[0], sampleStorage, "quantity",
+            new IntegerNumberValidator("Quantity should be a whole number",
+                false));
     }
 
     @Override

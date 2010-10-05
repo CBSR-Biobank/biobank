@@ -2,11 +2,12 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -22,8 +23,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -43,7 +46,9 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -383,7 +388,52 @@ public abstract class BiobankFormBase extends EditorPart {
         }
     }
 
-    public static IObservableValue observeValue(Object bean, String propertyName) {
-        return BeansObservables.observeValue(bean, propertyName);
+    private IObservableValue createBeansObservable(Object pojo,
+        String propertyName) {
+        if (pojo == null)
+            return null;
+        Assert.isNotNull(propertyName);
+        return PojoObservables.observeValue(pojo, propertyName);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, Object pojo, String propertyName,
+        AbstractValidator validator) {
+        return widgetCreator.createBoundWidget(composite, widgetClass,
+            widgetOptions, label, widgetValues,
+            createBeansObservable(pojo, propertyName), validator);
+    }
+
+    protected Control createBoundWidgetWithLabel(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues, Object pojo,
+        String propertyName, AbstractValidator validator) {
+        return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues,
+            createBeansObservable(pojo, propertyName), validator);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client, Label label,
+        Date date, Object pojo, String propertyName,
+        AbstractValidator validator, int typeShown, String bindingKey) {
+        return widgetCreator.createDateTimeWidget(client, label, date,
+            createBeansObservable(pojo, propertyName), validator, typeShown,
+            bindingKey);
+    }
+
+    protected DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object pojo, String propertyName,
+        AbstractValidator validator) {
+        return createDateTimeWidget(client, nameLabel, date, pojo,
+            propertyName, validator, SWT.DATE | SWT.TIME);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object pojo, String propertyName,
+        AbstractValidator validator, int typeShown) {
+        return widgetCreator.createDateTimeWidget(client, nameLabel, date,
+            createBeansObservable(pojo, propertyName), validator, typeShown,
+            null);
     }
 }

@@ -110,8 +110,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 .equals(container.getContainerType().getTopLevel()))) {
             // only allow edit to label on top level containers
             setFirstControl(createBoundWidgetWithLabel(client,
-                BiobankText.class, SWT.NONE, "Label", null,
-                BiobankFormBase.observeValue(container, "label"),
+                BiobankText.class, SWT.NONE, "Label", null, container, "label",
                 new NonEmptyStringValidator(MSG_CONTAINER_NAME_EMPTY)));
         } else {
             BiobankText l = createReadOnlyLabelledField(client, SWT.NONE,
@@ -120,8 +119,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         }
 
         Control c = createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Product Barcode", null,
-            BiobankFormBase.observeValue(container, "productBarcode"), null);
+            SWT.NONE, "Product Barcode", null, container, "productBarcode",
+            null);
         if (getFirstControl() == null)
             setFirstControl(c);
 
@@ -139,8 +138,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null,
-            BiobankFormBase.observeValue(container, "comment"), null);
+            "Comments", null, container, "comment", null);
 
         createContainerTypesSection(client);
     }
@@ -185,8 +183,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         tempWidget = (BiobankText) createBoundWidgetWithLabel(client,
             BiobankText.class, SWT.NONE, "Temperature (Celcius)", null,
-            BiobankFormBase.observeValue(container, "temperature"),
-            new DoubleNumberValidator(
+            container, "temperature", new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
         if (container.hasParent())
             tempWidget.setEnabled(false);

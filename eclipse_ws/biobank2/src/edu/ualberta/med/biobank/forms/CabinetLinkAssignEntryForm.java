@@ -279,7 +279,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
             fieldsComposite, BiobankText.class, SWT.NONE,
             Messages.getString("Cabinet.inventoryId.label"), new String[0], //$NON-NLS-1$
-            BiobankFormBase.observeValue(aliquot, "inventoryId"), //$NON-NLS-1$
+            aliquot, "inventoryId", //$NON-NLS-1$
             inventoryIDValidator);
         gd = (GridData) inventoryIdText.getLayoutData();
         gd.horizontalSpan = 2;

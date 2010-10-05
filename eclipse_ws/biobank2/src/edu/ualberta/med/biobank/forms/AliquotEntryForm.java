@@ -150,8 +150,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.WRAP
-            | SWT.MULTI, "Comments", null,
-            BiobankEntryForm.observeValue(aliquot, "comment"), null);
+            | SWT.MULTI, "Comments", null, aliquot, "comment", null);
 
         setFirstControl(sampleTypeComboViewer.getControl());
     }

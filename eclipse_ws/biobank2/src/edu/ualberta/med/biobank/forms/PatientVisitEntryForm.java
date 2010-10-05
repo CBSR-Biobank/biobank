@@ -160,19 +160,17 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.setDateProcessed(new Date());
         }
         createDateTimeWidget(client, "Date Processed",
-            patientVisit.getDateProcessed(),
-            BiobankFormBase.observeValue(patientVisit, "dateProcessed"),
+            patientVisit.getDateProcessed(), patientVisit, "dateProcessed",
             new DateNotNulValidator("Date processed should be set"));
 
         createDateTimeWidget(client, "Date Drawn", patientVisit.getDateDrawn(),
-            BiobankFormBase.observeValue(patientVisit, "dateDrawn"),
-            new DateNotNulValidator("Date Drawn should be set"));
+            patientVisit, "dateDrawn", new DateNotNulValidator(
+                "Date Drawn should be set"));
 
         createPvDataSection(client);
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null,
-            BiobankFormBase.observeValue(patientVisit, "comment"), null);
+            "Comments", null, patientVisit, "comment", null);
     }
 
     private void createShipmentsCombo(Composite client) {

@@ -65,8 +65,8 @@ public class SourceVesselDialog extends BiobankDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Name", null, BiobankDialog.observeValue(sourceVessel, "name"),
-            new NonEmptyStringValidator(MSG_NO_ST_NAME));
+            "Name", null, sourceVessel, "name", new NonEmptyStringValidator(
+                MSG_NO_ST_NAME));
 
     }
 
