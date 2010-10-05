@@ -15,8 +15,11 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -24,9 +27,10 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 
 public class TopContainerListWidget {
+
+    private SelectionListener listener;
 
     private class NameFilter extends ViewerFilter {
         @Override
@@ -145,12 +149,20 @@ public class TopContainerListWidget {
         notifyListeners();
     }
 
+    private void notifyListeners() {
+        if (listener != null) {
+            Event e1 = new Event();
+            e1.widget = siteCombo.getCombo();
+            SelectionEvent e = new SelectionEvent(e1);
+            listener.widgetSelected(e);
+        }
+    }
+
     public boolean getEnabled() {
         return enabled;
     }
 
-    public void addSelectionChangedListener(
-        BiobankEntryFormWidgetListener biobankEntryFormWidgetListener) {
-
+    public void addSelectionChangedListener(SelectionListener l) {
+        listener = l;
     }
 }
