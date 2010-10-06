@@ -200,7 +200,7 @@ public class DispatchShipmentSendingEntryForm extends
             }
         } else {
             aliquotsTreeTable = new DispatchAliquotsTreeTable(page, shipment,
-                true);
+                !shipment.isInClosedState() && !shipment.isInLostState(), true);
             aliquotsTreeTable.addSelectionChangedListener(biobankListener);
         }
     }

@@ -59,17 +59,14 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         Map<RowColPos, PalletCell> cells = getCells();
         pendingAliquotsNumber = 0;
         errors = 0;
-        final List<AliquotWrapper> notInShipmentAliquots =
-            new ArrayList<AliquotWrapper>();
-        final List<PalletCell> notInShipmentCells = new ArrayList<PalletCell>();
+        final List<AliquotWrapper> notInShipmentAliquots = new ArrayList<AliquotWrapper>();
         if (cells != null) {
             for (RowColPos rcp : cells.keySet()) {
                 monitor.subTask("Processing position "
                     + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 PalletCell cell = cells.get(rcp);
-                AliquotInfo info =
-                    DispatchShipmentReceivingEntryForm.getInfoForInventoryId(
-                        currentShipment, cell.getValue());
+                AliquotInfo info = DispatchShipmentReceivingEntryForm
+                    .getInfoForInventoryId(currentShipment, cell.getValue());
                 if (info.aliquot != null) {
                     cell.setAliquot(info.aliquot);
                     cell.setTitle(info.aliquot.getPatientVisit().getPatient()
@@ -94,10 +91,9 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                     errors++;
                     break;
                 case NOT_IN_SHIPMENT:
-                    cell.setStatus(CellStatus.NOT_IN_SHIPMENT);
+                    cell.setStatus(CellStatus.EXTRA);
                     cell.setInformation("Aliquot should not be in shipment");
                     notInShipmentAliquots.add(info.aliquot);
-                    notInShipmentCells.add(cell);
                     break;
                 case OK:
                     cell.setStatus(CellStatus.IN_SHIPMENT_EXPECTED);
@@ -117,16 +113,13 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                                 "Not in shipment aliquots",
                                 "Some of the aliquots in this pallet were not supposed"
                                     + " to be in this shipment. They will be added to the"
-                                    + " extra-pending list.");
+                                    + " extra list.");
                         try {
                             currentShipment
-                                .addExtraPendingAliquots(notInShipmentAliquots);
+                                .addExtraAliquots(notInShipmentAliquots);
                         } catch (Exception e) {
                             BioBankPlugin.openAsyncError(
                                 "Error flagging aliquots", e);
-                        }
-                        for (PalletCell cell : notInShipmentCells) {
-                            cell.setStatus(CellStatus.EXTRA);
                         }
                         setScanOkValue(errors == 0);
                         redrawPallet();
@@ -181,8 +174,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned =
-            new TreeMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         if (currentShipment.getAliquotCollection().size() > 0) {
             // AliquotWrapper aliquotNotReceived = null;
             int i = 0;
@@ -193,9 +185,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                 // }
                 int row = i / 12;
                 int col = i % 12;
-                if (dsa.getState() != DispatchAliquotState.MISSING.ordinal()
-                    && dsa.getState() != DispatchAliquotState.MISSING_PENDING_STATE
-                        .ordinal())
+                if (dsa.getState() != DispatchAliquotState.MISSING.ordinal())
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getAliquot()
                             .getInventoryId())));

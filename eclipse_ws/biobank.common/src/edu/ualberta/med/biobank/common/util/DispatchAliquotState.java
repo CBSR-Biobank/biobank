@@ -1,9 +1,8 @@
 package edu.ualberta.med.biobank.common.util;
 
 public enum DispatchAliquotState {
-    NONE_STATE("Ok"), RECEIVED_STATE("Received"), MISSING_PENDING_STATE(
-        "Missing-Pending"), MISSING("Missing"), EXTRA_PENDING_STATE(
-        "Extra-Pending"), EXTRA("Extra");
+    NONE_STATE("Ok"), RECEIVED_STATE("Received"), MISSING("Missing"), EXTRA(
+        "Extra");
 
     private String label;
 
