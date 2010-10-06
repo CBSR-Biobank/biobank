@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.AbstractAliquotAdminForm;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 
 public class BiobankPartListener implements IPartListener {

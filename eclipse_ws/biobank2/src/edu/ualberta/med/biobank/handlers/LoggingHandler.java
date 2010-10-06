@@ -8,7 +8,7 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.rcp.LoggingPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.LoggingPerspective;
 
 public class LoggingHandler extends AbstractHandler {
 

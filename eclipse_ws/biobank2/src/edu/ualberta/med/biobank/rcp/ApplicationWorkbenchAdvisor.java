@@ -13,6 +13,9 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
 
