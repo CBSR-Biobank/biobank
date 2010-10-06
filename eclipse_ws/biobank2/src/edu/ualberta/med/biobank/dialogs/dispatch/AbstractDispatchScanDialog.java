@@ -55,6 +55,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     private Button scanButton;
     private Button scanTubeAloneSwitch;
     private boolean scanTubeAloneMode = false;
+    private boolean rescanMode = false;
 
     public AbstractDispatchScanDialog(Shell parentShell,
         final DispatchShipmentWrapper currentShipment) {
@@ -86,14 +87,24 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
                     @Override
                     public void run() {
                         spw.setCells(getCells());
+                        setRescanMode();
                     }
                 });
             }
         };
     }
 
+    protected void setRescanMode() {
+        scanButton.setText("Retry scan");
+        rescanMode = true;
+    }
+
     protected void beforeScanThreadStart() {
 
+    }
+
+    protected boolean isRescanMode() {
+        return rescanMode;
     }
 
     protected abstract Map<RowColPos, PalletCell> getFakeScanCells()
@@ -177,7 +188,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     private void launchScan() {
         setScanOkValue(false);
         palletScanManagement.launchScanAndProcessResult(plateToScanValue
-            .getValue().toString());
+            .getValue().toString(), "All", isRescanMode());
     }
 
     protected void startNewPallet() {
