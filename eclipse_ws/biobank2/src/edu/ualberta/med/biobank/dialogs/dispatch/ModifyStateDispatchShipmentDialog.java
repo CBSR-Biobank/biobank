@@ -2,8 +2,6 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.text.MessageFormat;
 
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -19,7 +17,21 @@ public class ModifyStateDispatchShipmentDialog extends BiobankDialog {
 
     private static final String TITLE = "Setting {0} state to aliquots in current dispatch";
     private String currentTitle;
-    private IObservableValue commentValue = new WritableValue("", String.class);
+
+    private class CommentValue {
+        private String value;
+
+        @SuppressWarnings("unused")
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
+    }
+
+    private CommentValue commentValue = new CommentValue();
 
     public ModifyStateDispatchShipmentDialog(Shell parentShell,
         DispatchAliquotState newState) {
@@ -49,12 +61,12 @@ public class ModifyStateDispatchShipmentDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.MULTI,
-            "Comment", null, commentValue, new NonEmptyStringValidator(
-                "Comment should not be empty"));
+            "Comment", null, commentValue, "value",
+            new NonEmptyStringValidator("Comment should not be empty"));
     }
 
     public String getComment() {
-        return (String) commentValue.getValue();
+        return commentValue.getValue();
     }
 
 }

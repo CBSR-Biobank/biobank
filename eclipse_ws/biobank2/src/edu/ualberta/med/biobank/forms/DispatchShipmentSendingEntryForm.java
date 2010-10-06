@@ -96,8 +96,7 @@ public class DispatchShipmentSendingEntryForm extends
                 });
 
             createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-                "Waybill", null,
-                BeansObservables.observeValue(shipment, "waybill"), null);
+                "Waybill", null, shipment, "waybill", null);
         }
 
         BiobankText commentText = (BiobankText) createBoundWidgetWithLabel(

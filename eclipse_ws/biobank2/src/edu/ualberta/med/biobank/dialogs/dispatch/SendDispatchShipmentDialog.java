@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.Date;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -49,8 +48,8 @@ public class SendDispatchShipmentDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        ShippingMethodWrapper selectedShippingMethod =
-            shipment.getShippingMethod();
+        ShippingMethodWrapper selectedShippingMethod = shipment
+            .getShippingMethod();
         widgetCreator.createComboViewer(contents, "Shipping Method",
             ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()), selectedShippingMethod, null,
@@ -63,13 +62,12 @@ public class SendDispatchShipmentDialog extends BiobankDialog {
             });
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
-            "Waybill", null,
-            BeansObservables.observeValue(shipment, "waybill"), null);
+            "Waybill", null, shipment, "waybill", null);
 
         Date date = new Date();
         shipment.setDateShipped(date);
-        widgetCreator.createDateTimeWidget(contents, "Date Shipped", date,
-            BeansObservables.observeValue(shipment, "dateShipped"),
+        createDateTimeWidget(contents, "Date Shipped", date, shipment,
+            "dateShipped",
             new DateNotNulValidator("Date shipped should be set"));
     }
 

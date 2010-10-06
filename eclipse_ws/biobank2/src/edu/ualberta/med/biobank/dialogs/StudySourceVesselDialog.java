@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.dialogs;
 
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
@@ -96,14 +95,12 @@ public class StudySourceVesselDialog extends BiobankDialog {
             });
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
-            "Need Time Drawn", new String[0],
-            PojoObservables.observeValue(studySourceVessel, "needTimeDrawn"),
-            null);
+            "Need Time Drawn", new String[0], studySourceVessel,
+            "needTimeDrawn", null);
 
         createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
-            "Need Original Volume", new String[0],
-            PojoObservables.observeValue(studySourceVessel,
-                "needOriginalVolume"), null);
+            "Need Original Volume", new String[0], studySourceVessel,
+            "needOriginalVolume", null);
     }
 
     @Override

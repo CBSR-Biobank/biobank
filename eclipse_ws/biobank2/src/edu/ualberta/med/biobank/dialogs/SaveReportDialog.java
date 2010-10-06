@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -15,7 +13,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
  */
 public class SaveReportDialog extends BiobankDialog {
 
-    private IObservableValue fileName = new WritableValue("", String.class);
+    private String fileName;
 
     public SaveReportDialog(Shell parent) {
         super(parent);
@@ -42,11 +40,15 @@ public class SaveReportDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.FILL,
-            "Name", null, fileName, null);
+            "Name", null, this, "fileName", null);
     }
 
-    public String getName() {
-        return fileName.getValue().toString();
+    public String getFileName() {
+        return fileName;
+    }
+
+    public void setFileName(String name) {
+        fileName = name;
     }
 
 }

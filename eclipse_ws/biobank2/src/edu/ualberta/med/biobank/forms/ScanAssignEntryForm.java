@@ -180,10 +180,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             Messages.getString("ScanAssign.palletLabel.validationMsg"));
 
         palletproductBarcodeText = (BiobankText) createBoundWidgetWithLabel(
-            fieldsComposite, BiobankText.class, SWT.NONE,
+            fieldsComposite,
+            BiobankText.class,
+            SWT.NONE,
             Messages.getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
-            null, BeansObservables.observeValue(currentPalletWrapper,
-                "productBarcode"), productBarcodeValidator); //$NON-NLS-1$
+            null, currentPalletWrapper,
+            "productBarcode", productBarcodeValidator); //$NON-NLS-1$
         palletproductBarcodeText.addKeyListener(textFieldKeyListener);
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;

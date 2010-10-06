@@ -19,23 +19,13 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static final int SCHEME_SBS = 1;
 
-    private static final String SCHEME_SBS_LABEL = "SBS Standard";
-
     public static final int SCHEME_CBSR_2_CHAR_ALPHA = 2;
-
-    private static final String SCHEME_CBSR_2_CHAR_ALPHA_LABEL = "CBSR 2 char alphabetic";
 
     public static final int SCHEME_2_CHAR_NUMERIC = 3;
 
-    private static final String SCHEME_2_CHAR_NUMERIC_LABEL = "2 char numeric";
-
     public static final int SCHEME_DEWAR = 4;
 
-    private static final String SCHEME_DEWAR_LABEL = "Dewar";
-
-    public static final int SCHEME_BOX_81 = 5;
-
-    private static final String SCHEME_BOX_81_LABEL = "CBSR SBS";
+    public static final int SCHEME_CBSR_SBS = 5;
 
     public static final String CBSR_LABELLING_PATTERN = "ABCDEFGHJKLMNPQRSTUVWXYZ";
 
@@ -148,51 +138,37 @@ public class ContainerLabelingSchemeWrapper extends
                     Integer id = scheme.getId();
                     switch (id.intValue()) {
                     case SCHEME_SBS:
-                        if (!scheme.getName().equals(SCHEME_SBS_LABEL)) {
+                        if (!scheme.getName().equals("SBS Standard")) {
                             throw new ApplicationException(
-                                "Labeling scheme with id " + SCHEME_SBS
-                                    + " should have the name "
-                                    + SCHEME_SBS_LABEL);
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
                     case SCHEME_CBSR_2_CHAR_ALPHA:
-                        if (!scheme.getName().equals(
-                            SCHEME_CBSR_2_CHAR_ALPHA_LABEL)) {
+                        if (!scheme.getName().equals("CBSR 2 char alphabetic")) {
                             throw new ApplicationException(
-                                "Labeling scheme with id "
-                                    + SCHEME_CBSR_2_CHAR_ALPHA
-                                    + " should have the name "
-                                    + SCHEME_CBSR_2_CHAR_ALPHA_LABEL);
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
                     case SCHEME_2_CHAR_NUMERIC:
-                        if (!scheme.getName().equals(
-                            SCHEME_2_CHAR_NUMERIC_LABEL)) {
+                        if (!scheme.getName().equals("2 char numeric")) {
                             throw new ApplicationException(
-                                "Labeling scheme with id "
-                                    + SCHEME_2_CHAR_NUMERIC
-                                    + " should have the name "
-                                    + SCHEME_2_CHAR_NUMERIC_LABEL);
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
                     case SCHEME_DEWAR:
-                        if (!scheme.getName().equals(SCHEME_DEWAR_LABEL)) {
+                        if (!scheme.getName().equals("Dewar")) {
                             throw new ApplicationException(
-                                "Labeling scheme with id " + SCHEME_DEWAR
-                                    + " should have the name "
-                                    + SCHEME_DEWAR_LABEL);
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
-                    case SCHEME_BOX_81:
-                        if (!scheme.getName().equals(SCHEME_BOX_81_LABEL)) {
+                    case SCHEME_CBSR_SBS:
+                        if (!scheme.getName().equals("CBSR SBS")) {
                             throw new ApplicationException(
-                                "Labeling scheme with id " + SCHEME_BOX_81
-                                    + " should have the name "
-                                    + SCHEME_BOX_81_LABEL);
+                                "labeling scheme is not " + scheme.getName());
                         }
                         break;
 
@@ -329,7 +305,7 @@ public class ContainerLabelingSchemeWrapper extends
     public static RowColPos box81ToRowCol(
         WritableApplicationService appService, String pos) throws Exception {
         ContainerLabelingSchemeWrapper scheme = getLabelingSchemeById(
-            appService, SCHEME_BOX_81);
+            appService, SCHEME_CBSR_SBS);
         if (scheme == null) {
             throw new BiobankCheckException("Box81 labeling scheme not found");
         }

@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -89,8 +88,7 @@ public class DispatchShipmentReceivingEntryForm extends
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null,
-            BeansObservables.observeValue(shipment, "comment"), null);
+            "Comments", null, shipment, "comment", null);
     }
 
     @Override

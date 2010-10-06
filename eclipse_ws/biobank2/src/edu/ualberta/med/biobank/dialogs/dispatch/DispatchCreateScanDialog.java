@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
@@ -36,10 +34,22 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
 
+    private class ProductBarcodeValue {
+        private String value;
+
+        @SuppressWarnings("unused")
+        public void setValue(String value) {
+            this.value = value;
+        }
+
+        @SuppressWarnings("unused")
+        public String getValue() {
+            return value;
+        }
+    }
+
     private static final String TITLE = "Scanning aliquots";
     private BiobankText palletproductBarcodeText;
-    private IObservableValue productBarcodeValue = new WritableValue("",
-        String.class);
     private NonEmptyStringValidator productBarcodeValidator;
     private String currentProductBarcode;
     private Button newPalletCheckBox;
@@ -47,6 +57,8 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     private boolean aliquotsAdded = false;
     private ContainerWrapper currentPallet;
     private List<ContainerWrapper> removedPallets = new ArrayList<ContainerWrapper>();
+
+    private ProductBarcodeValue productBarcodeValue;
 
     public DispatchCreateScanDialog(Shell parentShell,
         DispatchShipmentWrapper currentShipment) {
@@ -60,7 +72,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
         palletproductBarcodeText = (BiobankText) createBoundWidgetWithLabel(
             parent, BiobankText.class, SWT.NONE,
             Messages.getString("ScanAssign.productBarcode.label"), //$NON-NLS-1$
-            null, productBarcodeValue, productBarcodeValidator); //$NON-NLS-1$
+            null, productBarcodeValue, "value", productBarcodeValidator); //$NON-NLS-1$
         palletproductBarcodeText
             .addKeyListener(new EnterKeyToNextFieldListener());
 

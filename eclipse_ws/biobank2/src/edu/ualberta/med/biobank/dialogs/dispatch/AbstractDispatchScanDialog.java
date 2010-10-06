@@ -36,8 +36,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     private BiobankText plateToScanText;
 
-    private IObservableValue plateToScanValue = new WritableValue("", //$NON-NLS-1$
-        String.class);
+    private String plateToScan;
+
     private PalletScanManagement palletScanManagement;
     protected ScanPalletWidget spw;
     protected DispatchShipmentWrapper currentShipment;
@@ -105,7 +105,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         plateToScanText = (BiobankText) createBoundWidgetWithLabel(contents,
             BiobankText.class, SWT.NONE,
             Messages.getString("linkAssign.plateToScan.label"), //$NON-NLS-1$
-            new String[0], plateToScanValue, new ScannerBarcodeValidator(
+            new String[0], this, "plateToScan", new ScannerBarcodeValidator(
                 Messages.getString("linkAssign.plateToScan.validationMsg"))); //$NON-NLS-1$
         plateToScanText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
@@ -153,8 +153,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     private void launchScan() {
         setScanOkValue(false);
-        palletScanManagement.launchScanAndProcessResult(plateToScanValue
-            .getValue().toString());
+        palletScanManagement.launchScanAndProcessResult(plateToScan);
     }
 
     protected void startNewPallet() {
@@ -264,6 +263,14 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         } else if (IDialogConstants.NEXT_ID == buttonId) {
             startNewPallet();
         }
+    }
+
+    public String getPlateToScan() {
+        return plateToScan;
+    }
+
+    public void setPlateToScan(String plateToScan) {
+        this.plateToScan = plateToScan;
     }
 
     protected abstract void doProceed() throws Exception;

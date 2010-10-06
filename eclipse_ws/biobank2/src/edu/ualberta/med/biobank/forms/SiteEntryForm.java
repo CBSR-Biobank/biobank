@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
@@ -34,8 +33,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SiteEntryForm.class.getName());
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.SiteEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm";
 
     private static final String MSG_NEW_SITE_OK = "Create a new BioBank site.";
     private static final String MSG_SITE_OK = "Edit a BioBank site.";
@@ -53,13 +51,12 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private SiteDispatchAddInfoTable dispatchTable;
 
-    private BiobankEntryFormWidgetListener listener =
-        new BiobankEntryFormWidgetListener() {
-            @Override
-            public void selectionChanged(MultiSelectEvent event) {
-                setDirty(true);
-            }
-        };
+    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
+        @Override
+        public void selectionChanged(MultiSelectEvent event) {
+            setDirty(true);
+        }
+    };
 
     @Override
     public void init() throws Exception {
@@ -116,29 +113,26 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null,
-            BeansObservables.observeValue(site, "name"),
-            new NonEmptyStringValidator(MSG_NO_SITE_NAME)));
+            SWT.NONE, "Name", null, site, "name", new NonEmptyStringValidator(
+                MSG_NO_SITE_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null,
-            BeansObservables.observeValue(site, "nameShort"),
-            new NonEmptyStringValidator("Site short name cannot be blank"));
+            "Short Name", null, site, "nameShort", new NonEmptyStringValidator(
+                "Site short name cannot be blank"));
 
-        activityStatusComboViewer =
-            createComboViewer(client, "Activity Status",
-                ActivityStatusWrapper.getAllActivityStatuses(appService),
-                site.getActivityStatus(), "Site must have an activity status",
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        site.setActivityStatus((ActivityStatusWrapper) selectedObject);
-                    }
-                });
+        activityStatusComboViewer = createComboViewer(client,
+            "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            site.getActivityStatus(), "Site must have an activity status",
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    site.setActivityStatus((ActivityStatusWrapper) selectedObject);
+                }
+            });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, BeansObservables.observeValue(site, "comment"),
-            null);
+            "Comments", null, site, "comment", null);
     }
 
     private void createStudySection() {

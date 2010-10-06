@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.ValidationStatus;
@@ -280,7 +279,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
             fieldsComposite, BiobankText.class, SWT.NONE,
             Messages.getString("Cabinet.inventoryId.label"), new String[0], //$NON-NLS-1$
-            BeansObservables.observeValue(aliquot, "inventoryId"), //$NON-NLS-1$
+            aliquot, "inventoryId", //$NON-NLS-1$
             inventoryIDValidator);
         gd = (GridData) inventoryIdText.getLayoutData();
         gd.horizontalSpan = 2;

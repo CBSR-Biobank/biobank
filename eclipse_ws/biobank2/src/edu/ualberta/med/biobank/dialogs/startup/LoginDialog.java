@@ -97,11 +97,11 @@ public class LoginDialog extends TitleAreaDialog {
         pluginPrefs = new InstanceScope().getNode(Application.PLUGIN_ID);
         Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
 
-        IPreferenceStore prefsStore =
-            BioBankPlugin.getDefault().getPreferenceStore();
+        IPreferenceStore prefsStore = BioBankPlugin.getDefault()
+            .getPreferenceStore();
 
-        String serverList =
-            prefsStore.getString(PreferenceConstants.SERVER_LIST);
+        String serverList = prefsStore
+            .getString(PreferenceConstants.SERVER_LIST);
         StringTokenizer st = new StringTokenizer(serverList, "\n");
         while (st.hasMoreTokens()) {
             servers.add(st.nextToken());
@@ -154,11 +154,10 @@ public class LoginDialog extends TitleAreaDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         String lastServer = pluginPrefs.get(LAST_SERVER, "");
-        NonEmptyStringValidator validator =
-            new NonEmptyStringValidator("Server field cannot be empty");
-        serverWidget =
-            createWritableCombo(contents, "&Server",
-                servers.toArray(new String[0]), "server", lastServer, validator);
+        NonEmptyStringValidator validator = new NonEmptyStringValidator(
+            "Server field cannot be empty");
+        serverWidget = createWritableCombo(contents, "&Server",
+            servers.toArray(new String[0]), "server", lastServer, validator);
 
         NonEmptyStringValidator userNameValidator = null;
         NonEmptyStringValidator passwordValidator = null;
@@ -177,20 +176,18 @@ public class LoginDialog extends TitleAreaDialog {
                 }
             });
         } else {
-            userNameValidator =
-                new NonEmptyStringValidator("Username field cannot be empty");
-            passwordValidator =
-                new NonEmptyStringValidator("Password field cannot be empty");
+            userNameValidator = new NonEmptyStringValidator(
+                "Username field cannot be empty");
+            passwordValidator = new NonEmptyStringValidator(
+                "Password field cannot be empty");
         }
 
-        userNameWidget =
-            createWritableCombo(contents, "&User Name",
-                userNames.toArray(new String[0]), "username",
-                pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator);
+        userNameWidget = createWritableCombo(contents, "&User Name",
+            userNames.toArray(new String[0]), "username",
+            pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator);
 
-        passwordWidget =
-            createPassWordText(contents, "&Password", "password",
-                passwordValidator);
+        passwordWidget = createPassWordText(contents, "&Password", "password",
+            passwordValidator);
 
         bindChangeListener();
 
@@ -251,8 +248,8 @@ public class LoginDialog extends TitleAreaDialog {
         statusObservable.addChangeListener(new IChangeListener() {
             @Override
             public void handleChange(ChangeEvent event) {
-                IObservableValue validationStatus =
-                    (IObservableValue) event.getSource();
+                IObservableValue validationStatus = (IObservableValue) event
+                    .getSource();
                 IStatus status = (IStatus) validationStatus.getValue();
                 if (status.getSeverity() == IStatus.OK) {
                     setErrorMessage(null);
@@ -302,13 +299,12 @@ public class LoginDialog extends TitleAreaDialog {
             return;
         }
 
-        boolean secureConnection =
-            ((secureConnectionButton == null) || secureConnectionButton
-                .getSelection());
+        boolean secureConnection = ((secureConnectionButton == null) || secureConnectionButton
+            .getSelection());
 
-        SessionHelper sessionHelper =
-            new SessionHelper(serverWidget.getText(), secureConnection,
-                userNameWidget.getText(), passwordWidget.getText());
+        SessionHelper sessionHelper = new SessionHelper(serverWidget.getText(),
+            secureConnection, userNameWidget.getText(),
+            passwordWidget.getText());
 
         BusyIndicator.showWhile(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
@@ -322,8 +318,8 @@ public class LoginDialog extends TitleAreaDialog {
             if ((serverWidget.getText().length() > 0)
                 && (serverWidget.getSelectionIndex() == -1)
                 && !servers.contains(serverWidget.getText())) {
-                IPreferenceStore prefsStore =
-                    BioBankPlugin.getDefault().getPreferenceStore();
+                IPreferenceStore prefsStore = BioBankPlugin.getDefault()
+                    .getPreferenceStore();
                 StringBuilder serverList = new StringBuilder();
                 for (String server : servers) {
                     serverList.append(server);
@@ -337,8 +333,8 @@ public class LoginDialog extends TitleAreaDialog {
                 && (userNameWidget.getSelectionIndex() == -1)
                 && !userNames.contains(userNameWidget.getText())) {
                 Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
-                Preferences prefsUserName =
-                    prefsUserNames.node(Integer.toString(userNames.size()));
+                Preferences prefsUserName = prefsUserNames.node(Integer
+                    .toString(userNames.size()));
                 prefsUserName.put(USER_NAME, userNameWidget.getText().trim());
             }
 
