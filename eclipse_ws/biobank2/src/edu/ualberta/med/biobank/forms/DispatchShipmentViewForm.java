@@ -9,6 +9,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -34,6 +36,7 @@ import edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
@@ -138,7 +141,20 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             };
             aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
             aliquotsNonProcessedTable
-                .addDoubleClickListener(collectionDoubleClickListener);
+                .addDoubleClickListener(new IDoubleClickListener() {
+                    @Override
+                    public void doubleClick(DoubleClickEvent event) {
+                        Object selection = event.getSelection();
+                        if (selection instanceof InfoTableSelection) {
+                            InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                            DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) tableSelection
+                                .getObject();
+                            if (dsa != null) {
+                                SessionManager.openViewForm(dsa.getAliquot());
+                            }
+                        }
+                    }
+                });
             aliquotsNonProcessedTable
                 .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                     @Override
