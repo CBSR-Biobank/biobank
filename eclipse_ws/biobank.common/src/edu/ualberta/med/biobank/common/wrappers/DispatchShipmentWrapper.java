@@ -363,9 +363,11 @@ public class DispatchShipmentWrapper extends
         }
         // new aliquots added
         for (AliquotWrapper aliquot : newAliquots) {
-            CheckStatus check = checkCanAddAliquot(currentAliquots, aliquot);
-            if (!check.ok)
-                throw new BiobankCheckException(check.message);
+            if (stateForAliquot != DispatchAliquotState.EXTRA) {
+                CheckStatus check = checkCanAddAliquot(currentAliquots, aliquot);
+                if (!check.ok)
+                    throw new BiobankCheckException(check.message);
+            }
             // FIXME if state is "Extra". Should be able to add it anyway ?
             DispatchShipmentAliquotWrapper dsa = new DispatchShipmentAliquotWrapper(
                 appService);
