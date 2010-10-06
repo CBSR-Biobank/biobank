@@ -333,6 +333,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 });
             }
         }
+        setChildrenActionSectionEnabled(false);
     }
 
     private void setChildrenActionSectionEnabled(boolean enable) {
