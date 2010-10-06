@@ -42,8 +42,8 @@ public class DispatchShipmentAdapter extends AdapterBase {
     public boolean isEditable() {
         boolean editable = super.isEditable();
         if (getWrapper() != null) {
-            SiteWrapper currentSite =
-                SessionManager.getInstance().getCurrentSite();
+            SiteWrapper currentSite = SessionManager.getInstance()
+                .getCurrentSite();
             return editable
                 && (getWrapper().isNew() || currentSite == null || !(currentSite
                     .equals(getWrapper().getReceiver()) && getWrapper()
@@ -122,9 +122,25 @@ public class DispatchShipmentAdapter extends AdapterBase {
         openEntryForm();
     }
 
+    public void doClose() {
+        getWrapper().setNextState();
+        persistShipment();
+        openViewForm();
+    }
+
+    public void doSetAsLost() {
+        getWrapper().setInLostState();
+        persistShipment();
+        openViewForm();
+    }
+
     private void setShipmentAsReceived() {
         getWrapper().setDateReceived(new Date());
         getWrapper().setNextState();
+        persistShipment();
+    }
+
+    private void persistShipment() {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {

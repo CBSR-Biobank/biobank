@@ -19,12 +19,15 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
+import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -43,6 +46,10 @@ public class DispatchShipmentSendingEntryForm extends
     private ComboViewer studyComboViewer;
 
     private ComboViewer destSiteComboViewer;
+
+    protected DispatchAliquotListInfoTable aliquotsNonProcessedTable;
+
+    private DispatchAliquotsTreeTable aliquotsTreeTable;
 
     @Override
     public void createPartControl(Composite parent) {
@@ -89,8 +96,7 @@ public class DispatchShipmentSendingEntryForm extends
                 });
 
             createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-                "Waybill", null,
-                BeansObservables.observeValue(shipment, "waybill"), null);
+                "Waybill", null, shipment, "waybill", null);
         }
 
         BiobankText commentText = (BiobankText) createBoundWidgetWithLabel(
@@ -98,9 +104,6 @@ public class DispatchShipmentSendingEntryForm extends
             BeansObservables.observeValue(shipment, "comment"), null);
 
         createAliquotsSelectionSection();
-        createAliquotsReceivedSection(false);
-        createAliquotsExtraSection(false);
-        createAliquotsMissingSection(false);
 
         if (studyComboViewer == null)
             setFirstControl(commentText);
@@ -178,22 +181,49 @@ public class DispatchShipmentSendingEntryForm extends
     }
 
     private void createAliquotsSelectionSection() {
-        Section section = createSection("Sent aliquots");
-        Composite composite = toolkit.createComposite(section);
-        composite.setLayout(new GridLayout(1, false));
-        section.setClient(composite);
         if (shipment.isInCreationState()) {
-            addSectionToolbar(section, "Add aliquots to this shipment",
-                new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        openScanDialog();
-                    }
-                }, null, BioBankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT);
+            Section section = createSection("Aliquot added");
+            Composite composite = toolkit.createComposite(section);
+            composite.setLayout(new GridLayout(1, false));
+            section.setClient(composite);
+            if (shipment.isInCreationState()) {
+                addSectionToolbar(section, "Add aliquots to this shipment",
+                    new SelectionAdapter() {
+                        @Override
+                        public void widgetSelected(SelectionEvent e) {
+                            openScanDialog();
+                        }
+                    }, null, BioBankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT);
 
-            createAliquotsSelectionActions(composite, false);
+                createAliquotsSelectionActions(composite, false);
+                createAliquotsNonProcessedSection(true);
+            }
+        } else {
+            aliquotsTreeTable = new DispatchAliquotsTreeTable(page, shipment,
+                true);
+            aliquotsTreeTable.addSelectionChangedListener(biobankListener);
         }
-        createAliquotsNonProcessedSection(true);
+    }
+
+    protected void createAliquotsNonProcessedSection(boolean edit) {
+        String title = "Non processed aliquots";
+        if (shipment.isInCreationState()) {
+            title = "Added aliquots";
+        }
+        Composite parent = createSectionWithClient(title);
+        aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(parent,
+            shipment, edit) {
+            @Override
+            public List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots() {
+                return shipment
+                    .getNonProcessedDispatchShipmentAliquotCollection();
+            }
+
+        };
+        aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
+        aliquotsNonProcessedTable
+            .addDoubleClickListener(collectionDoubleClickListener);
+        aliquotsNonProcessedTable.addSelectionChangedListener(biobankListener);
     }
 
     @Override
@@ -203,7 +233,7 @@ public class DispatchShipmentSendingEntryForm extends
             shipment);
         dialog.open();
         setDirty(true); // FIXME need to do this better !
-        reloadAliquotsTables();
+        reloadAliquots();
     }
 
     @Override
@@ -247,8 +277,7 @@ public class DispatchShipmentSendingEntryForm extends
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error adding aliquots", e);
         }
-        reloadAliquotsTables();
-        aliquotsNonProcessedTable.notifyListeners();
+        reloadAliquots();
     }
 
     @Override
@@ -264,17 +293,41 @@ public class DispatchShipmentSendingEntryForm extends
     @Override
     public void reset() throws Exception {
         super.reset();
-        StudyWrapper study = shipment.getStudy();
-        if (study != null) {
-            studyComboViewer.setSelection(new StructuredSelection(study));
-        } else if (studyComboViewer.getCombo().getItemCount() > 1) {
-            studyComboViewer.getCombo().deselectAll();
+        shipment.setSender(SessionManager.getInstance().getCurrentSite());
+        if (studyComboViewer != null) {
+            StudyWrapper study = shipment.getStudy();
+            if (study != null) {
+                studyComboViewer.setSelection(new StructuredSelection(study));
+            } else if (studyComboViewer.getCombo().getItemCount() == 1)
+                studyComboViewer.setSelection(new StructuredSelection(
+                    studyComboViewer.getElementAt(0)));
+            else
+                studyComboViewer.getCombo().deselectAll();
+
         }
-        SiteWrapper destSite = shipment.getReceiver();
-        if (destSite != null) {
-            destSiteComboViewer.setSelection(new StructuredSelection(destSite));
-        } else if (destSiteComboViewer.getCombo().getItemCount() > 1) {
-            destSiteComboViewer.getCombo().deselectAll();
+        if (destSiteComboViewer != null) {
+            SiteWrapper destSite = shipment.getReceiver();
+            if (destSite != null) {
+                destSiteComboViewer.setSelection(new StructuredSelection(
+                    destSite));
+            } else if (destSiteComboViewer.getCombo().getItemCount() == 1)
+                destSiteComboViewer.setSelection(new StructuredSelection(
+                    destSiteComboViewer.getElementAt(0)));
+            else
+                destSiteComboViewer.getCombo().deselectAll();
+        }
+        reloadAliquots();
+    }
+
+    @Override
+    protected void reloadAliquots() {
+        if (aliquotsNonProcessedTable != null) {
+            aliquotsNonProcessedTable.reloadCollection();
+            page.layout(true, true);
+            book.reflow(true);
+        }
+        if (aliquotsTreeTable != null) {
+            aliquotsTreeTable.refresh();
         }
     }
 
