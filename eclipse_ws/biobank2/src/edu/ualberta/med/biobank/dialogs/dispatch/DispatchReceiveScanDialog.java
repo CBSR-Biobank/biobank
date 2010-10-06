@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -102,47 +104,78 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     @Override
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
+        if (cells != null) {
+            processCells(cells.keySet(), monitor);
+        }
+    }
+
+    private void processCells(Collection<RowColPos> rcps,
+        IProgressMonitor monitor) throws Exception {
         pendingAliquotsNumber = 0;
         errors = 0;
-        final List<AliquotWrapper> notInShipmentAliquots = new ArrayList<AliquotWrapper>();
-        final List<PalletCell> notInShipmentCells = new ArrayList<PalletCell>();
+
+        Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
-            for (RowColPos rcp : cells.keySet()) {
-                monitor.subTask("Processing position "
-                    + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
+            setScanOkValue(false);
+
+            for (RowColPos rcp : rcps) {
+                if (monitor != null) {
+                    monitor.subTask("Processing position "
+                        + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
+                }
                 PalletCell cell = cells.get(rcp);
                 processCellStatus(cell);
-                if (cell.getStatus().equals(CellStatus.NOT_IN_SHIPMENT)) {
-                    notInShipmentAliquots.add(cell.getAliquot());
-                    notInShipmentCells.add(cell);
-                }
             }
-            if (notInShipmentAliquots.size() > 0) {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        BioBankPlugin
-                            .openInformation(
-                                "Not in shipment aliquots",
-                                "Some of the aliquots in this pallet were not supposed"
-                                    + " to be in this shipment. They will be added to the"
-                                    + " extra-pending list.");
-                        try {
-                            currentShipment
-                                .addExtraPendingAliquots(notInShipmentAliquots);
-                        } catch (Exception e) {
-                            BioBankPlugin.openAsyncError(
-                                "Error flagging aliquots", e);
-                        }
-                        for (PalletCell cell : notInShipmentCells) {
-                            cell.setStatus(CellStatus.EXTRA);
-                        }
-                        setScanOkValue(errors == 0);
-                        redrawPallet();
-                    }
-                });
-            }
+
+            Collection<PalletCell> extraCells = getExtraCells(cells);
+            addExtraCells(extraCells);
+
             setScanOkValue(errors == 0);
+        }
+    }
+
+    private Collection<PalletCell> getExtraCells(
+        Map<RowColPos, PalletCell> cells) {
+        Collection<PalletCell> extraCells = new ArrayList<PalletCell>();
+        for (PalletCell cell : cells.values()) {
+            if (cell.getStatus().equals(CellStatus.NOT_IN_SHIPMENT)) {
+                extraCells.add(cell);
+            }
+        }
+        return extraCells;
+    }
+
+    private void addExtraCells(final Collection<PalletCell> extraCells) {
+        if (extraCells.size() > 0) {
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    BioBankPlugin
+                        .openInformation(
+                            "Not in shipment aliquots",
+                            "Some of the aliquots in this pallet were not supposed"
+                                + " to be in this shipment. They will be added to the"
+                                + " extra-pending list.");
+
+                    List<AliquotWrapper> notInShipmentAliquots = new ArrayList<AliquotWrapper>();
+                    for (PalletCell cell : extraCells) {
+                        notInShipmentAliquots.add(cell.getAliquot());
+                    }
+
+                    try {
+                        currentShipment
+                            .addExtraPendingAliquots(notInShipmentAliquots);
+                    } catch (Exception e) {
+                        BioBankPlugin.openAsyncError("Error flagging aliquots",
+                            e);
+                    }
+                    for (PalletCell cell : extraCells) {
+                        cell.setStatus(CellStatus.EXTRA);
+                    }
+
+                    redrawPallet();
+                }
+            });
         }
     }
 
@@ -181,6 +214,12 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         }
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(false);
+    }
+
+    @Override
+    protected void startNewPallet() {
+        setRescanMode(false);
+        super.startNewPallet();
     }
 
     @Override
@@ -231,7 +270,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
-        processCellStatus(cell);
+        processCells(Arrays.asList(cell.getRowColPos()), null);
         super.postprocessScanTubeAlone(cell);
     }
 }

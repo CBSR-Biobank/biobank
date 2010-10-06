@@ -87,16 +87,24 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
                     @Override
                     public void run() {
                         spw.setCells(getCells());
-                        setRescanMode();
+                        setRescanMode(true);
                     }
                 });
             }
         };
     }
 
-    protected void setRescanMode() {
-        scanButton.setText("Retry scan");
-        rescanMode = true;
+    protected void setRescanMode(boolean isOn) {
+        if (isOn) {
+            scanButton.setText("Retry scan");
+        } else {
+            String scanButtonText = "Launch Scan";
+            if (!BioBankPlugin.isRealScanEnabled()) {
+                scanButtonText = "Fake scan";
+            }
+            scanButton.setText(scanButtonText);
+        }
+        rescanMode = isOn;
     }
 
     protected void beforeScanThreadStart() {
@@ -187,8 +195,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     private void launchScan() {
         setScanOkValue(false);
-        palletScanManagement.launchScanAndProcessResult(plateToScanValue
-            .getValue().toString(), "All", isRescanMode());
+        palletScanManagement.launchScanAndProcessResult(plateToScan, "All",
+            isRescanMode());
     }
 
     protected void startNewPallet() {

@@ -274,6 +274,12 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     }
 
     @Override
+    protected void startNewPallet() {
+        setRescanMode(false);
+        super.startNewPallet();
+    }
+
+    @Override
     protected boolean canActivateProceedButton() {
         return !aliquotsAdded;
     }
