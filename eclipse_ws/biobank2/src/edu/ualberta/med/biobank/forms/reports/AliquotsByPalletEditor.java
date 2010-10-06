@@ -10,6 +10,8 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
@@ -19,8 +21,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AliquotsByPalletEditor extends ReportsEditor {
@@ -48,17 +48,19 @@ public class AliquotsByPalletEditor extends ReportsEditor {
     @Override
     protected void createOptionSection(Composite parameterSection) {
         palletLabel = createCustomText("Container Label", parameterSection);
-        topContainers = new TopContainerListWidget(parameterSection, SWT.NONE);
+        topContainers = new TopContainerListWidget(parameterSection, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
             Boolean.class), listStatus, "Top Container List Empty");
-        topContainers
-            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
-                @Override
-                public void selectionChanged(MultiSelectEvent event) {
-                    listStatus.setValue(topContainers.getEnabled());
-                }
-            });
-        topContainers.adaptToToolkit(toolkit, true);
+        topContainers.addSelectionChangedListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                listStatus.setValue(topContainers.getEnabled());
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
     }
 
     protected BiobankText createCustomText(String labelText, Composite parent) {
@@ -101,18 +103,21 @@ public class AliquotsByPalletEditor extends ReportsEditor {
 
     protected void validate(String label) {
         try {
-            if (label.equals("")
-                || ContainerWrapper.getContainersByLabel(
-                    SessionManager.getAppService(), label).size() > 0)
-                ;
+            List<ContainerWrapper> validContainers = new ArrayList<ContainerWrapper>();
+            List<ContainerWrapper> containers = ContainerWrapper
+                .getContainersByLabel(SessionManager.getAppService(), label);
+            for (ContainerWrapper c : containers)
+                if (c.getContainerType().getSampleTypeCollection().size() > 0)
+                    validContainers.add(c);
+            if (label.equals("") || validContainers.size() > 0)
+                filterList(label);
             else {
                 throw new ApplicationException();
             }
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError("Invalid label",
-                "No container labelled " + label);
+                "No bottom-level container labelled " + label);
         }
-        filterList(label);
     }
 
     @Override
