@@ -185,12 +185,12 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
                 } else if (da.getShipment().isInReceivedState()
                     && da.getState().equals(
-                        DispatchAliquotState.EXTRA_PENDING_STATE.ordinal())) {
+                        DispatchAliquotState.EXTRA.ordinal())) {
                     // aliquot has been accidentally dispatched
                     return da.getShipment().getReceiver();
                 } else if (da.getShipment().isInReceivedState()
                     && da.getState().equals(
-                        DispatchAliquotState.MISSING_PENDING_STATE.ordinal())) {
+                        DispatchAliquotState.MISSING.ordinal())) {
                     // aliquot is missing
                     return da.getShipment().getSender();
                 } else if (da.getShipment().isInReceivedState()
