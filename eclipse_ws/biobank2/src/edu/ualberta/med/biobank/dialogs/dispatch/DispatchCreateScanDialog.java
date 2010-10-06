@@ -274,6 +274,12 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     }
 
     @Override
+    protected void startNewPallet() {
+        setRescanMode(false);
+        super.startNewPallet();
+    }
+
+    @Override
     protected boolean canActivateProceedButton() {
         return !aliquotsAdded;
     }
@@ -315,5 +321,11 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
 
     public List<ContainerWrapper> getRemovedPallets() {
         return removedPallets;
+    }
+
+    @Override
+    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+        processCellStatus(cell);
+        super.postprocessScanTubeAlone(cell);
     }
 }

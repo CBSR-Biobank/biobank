@@ -368,7 +368,6 @@ public class DispatchShipmentWrapper extends
                 if (!check.ok)
                     throw new BiobankCheckException(check.message);
             }
-            // FIXME if state is "Extra". Should be able to add it anyway ?
             DispatchShipmentAliquotWrapper dsa = new DispatchShipmentAliquotWrapper(
                 appService);
             dsa.setAliquot(aliquot);
