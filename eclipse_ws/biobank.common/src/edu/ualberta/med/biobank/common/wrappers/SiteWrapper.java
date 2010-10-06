@@ -829,7 +829,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getReceivingDispatchShipmentCollection() {
+    public List<DispatchShipmentWrapper> getReceivingNoErrorsDispatchShipmentCollection() {
         List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
             .get("receivingDispatchShipmentCollection");
         if (shipCollection == null) {
@@ -837,7 +837,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchShipmentWrapper>();
                 for (DispatchShipmentWrapper ship : children) {
-                    if (ship.isInReceivedState()) {
+                    if (ship.isInReceivedState() && !ship.hasErrors()) {
                         shipCollection.add(ship);
                     }
                 }

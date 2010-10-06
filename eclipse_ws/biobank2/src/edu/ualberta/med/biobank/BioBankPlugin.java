@@ -45,7 +45,7 @@ import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
-import edu.ualberta.med.biobank.treeview.dispatch.ReceivingDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchShipmentGroup;
@@ -170,7 +170,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
         classToImageKey.put(SentInTransitDispatchShipmentGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
-        classToImageKey.put(ReceivingDispatchShipmentGroup.class.getName(),
+        classToImageKey.put(ReceivingNoErrorsDispatchShipmentGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
         classToImageKey.put(
             ReceivingWithErrorsDispatchShipmentGroup.class.getName(),

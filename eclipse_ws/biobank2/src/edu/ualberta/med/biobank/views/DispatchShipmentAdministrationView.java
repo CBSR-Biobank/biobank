@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
-import edu.ualberta.med.biobank.treeview.dispatch.ReceivingDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchShipmentGroup;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -40,7 +40,7 @@ public class DispatchShipmentAdministrationView extends
 
     public ReceivingInTransitDispatchShipmentGroup receivedTransitNode;
 
-    public ReceivingDispatchShipmentGroup receivingNode;
+    public ReceivingNoErrorsDispatchShipmentGroup receivingNode;
 
     private Button radioWaybill;
 

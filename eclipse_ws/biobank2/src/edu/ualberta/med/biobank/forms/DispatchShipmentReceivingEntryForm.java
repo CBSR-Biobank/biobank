@@ -41,6 +41,7 @@ public class DispatchShipmentReceivingEntryForm extends
             createAliquotsSelectionActions(page, true);
         aliquotsTree = new DispatchAliquotsTreeTable(page, shipment,
             editAliquots, true);
+        aliquotsTree.addSelectionChangedListener(biobankListener);
     }
 
     @Override
