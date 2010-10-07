@@ -1097,7 +1097,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         // search for containers at this position, with type in one of the type
         // listed
         List<ContainerWrapper> containersAtPosition = currentPalletWrapper
-            .getContainersWithSameLabelWithType(palletTypes);
+            .getContainersWithSameLabelWithType(palletContainerTypes);
         String palletLabel = currentPalletWrapper.getLabel();
         if (containersAtPosition.size() == 0) {
             currentPalletWrapper.setPositionAndParentFromLabel(palletLabel,
