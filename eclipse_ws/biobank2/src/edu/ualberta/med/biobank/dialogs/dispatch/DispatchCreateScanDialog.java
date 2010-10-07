@@ -259,8 +259,10 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     protected void doProceed() throws Exception {
         List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
         for (PalletCell cell : getCells().values()) {
-            aliquots.add(cell.getAliquot());
-            cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
+            if (cell.getStatus() != CellStatus.MISSING) {
+                aliquots.add(cell.getAliquot());
+                cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
+            }
         }
         currentShipment.addNewAliquots(aliquots);
         if (currentPallet != null) {
