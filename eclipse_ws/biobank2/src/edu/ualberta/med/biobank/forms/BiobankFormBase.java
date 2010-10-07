@@ -7,7 +7,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
+import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -388,62 +388,62 @@ public abstract class BiobankFormBase extends EditorPart {
         }
     }
 
-    private IObservableValue createBeansObservable(Object pojo,
+    private IObservableValue createBeansObservable(Object bean,
         String propertyName) {
-        if (pojo == null)
+        if (bean == null)
             return null;
         Assert.isNotNull(propertyName);
-        return PojoObservables.observeValue(pojo, propertyName);
+        return BeansObservables.observeValue(bean, propertyName);
     }
 
     public Control createBoundWidget(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions, Label label,
-        String[] widgetValues, Object pojo, String propertyName,
+        String[] widgetValues, Object bean, String propertyName,
         AbstractValidator validator) {
         return widgetCreator.createBoundWidget(composite, widgetClass,
             widgetOptions, label, widgetValues,
-            createBeansObservable(pojo, propertyName), validator);
+            createBeansObservable(bean, propertyName), validator);
     }
 
     public Control createBoundWidget(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions, Label label,
-        String[] widgetValues, Object pojo, String propertyName,
+        String[] widgetValues, Object bean, String propertyName,
         AbstractValidator validator, String bindingKey) {
         return widgetCreator.createBoundWidget(composite, widgetClass,
             widgetOptions, label, widgetValues,
-            createBeansObservable(pojo, propertyName), validator, bindingKey);
+            createBeansObservable(bean, propertyName), validator, bindingKey);
 
     }
 
     protected Control createBoundWidgetWithLabel(Composite composite,
         Class<? extends Widget> widgetClass, int widgetOptions,
-        String fieldLabel, String[] widgetValues, Object pojo,
+        String fieldLabel, String[] widgetValues, Object bean,
         String propertyName, AbstractValidator validator) {
         return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
             widgetOptions, fieldLabel, widgetValues,
-            createBeansObservable(pojo, propertyName), validator);
+            createBeansObservable(bean, propertyName), validator);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
-        Date date, Object pojo, String propertyName,
+        Date date, Object bean, String propertyName,
         AbstractValidator validator, int typeShown, String bindingKey) {
         return widgetCreator.createDateTimeWidget(client, label, date,
-            createBeansObservable(pojo, propertyName), validator, typeShown,
+            createBeansObservable(bean, propertyName), validator, typeShown,
             bindingKey);
     }
 
     protected DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, Object pojo, String propertyName,
+        String nameLabel, Date date, Object bean, String propertyName,
         AbstractValidator validator) {
-        return createDateTimeWidget(client, nameLabel, date, pojo,
+        return createDateTimeWidget(client, nameLabel, date, bean,
             propertyName, validator, SWT.DATE | SWT.TIME);
     }
 
     public DateTimeWidget createDateTimeWidget(Composite client,
-        String nameLabel, Date date, Object pojo, String propertyName,
+        String nameLabel, Date date, Object bean, String propertyName,
         AbstractValidator validator, int typeShown) {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
-            createBeansObservable(pojo, propertyName), validator, typeShown,
+            createBeansObservable(bean, propertyName), validator, typeShown,
             null);
     }
 }

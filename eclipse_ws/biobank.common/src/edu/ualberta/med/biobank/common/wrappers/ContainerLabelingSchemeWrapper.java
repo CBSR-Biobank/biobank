@@ -499,7 +499,7 @@ public class ContainerLabelingSchemeWrapper extends
             // dewar
             return rowColToDewar(rcp, colCapacity);
         case 5:
-            // box81
+            // CBSR SBS
             return rowColtoCbsrSbs(rcp);
         }
         return null;
