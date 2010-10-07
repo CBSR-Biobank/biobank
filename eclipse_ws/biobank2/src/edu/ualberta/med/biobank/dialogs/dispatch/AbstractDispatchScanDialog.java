@@ -385,6 +385,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         return cell == null || cell.getStatus() == CellStatus.EMPTY;
     }
 
+    @SuppressWarnings("unused")
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
         spw.redraw();
     }
