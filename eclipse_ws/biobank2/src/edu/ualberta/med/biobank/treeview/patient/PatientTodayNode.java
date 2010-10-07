@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -46,8 +47,11 @@ public class PatientTodayNode extends AbstractTodayNode {
     @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
-        return PatientWrapper.getPatientsInTodayShipments(SessionManager
-            .getAppService(), SessionManager.getInstance().getCurrentSite());
+        if (SessionManager.getInstance().isConnected())
+            return PatientWrapper
+                .getPatientsInTodayShipments(SessionManager.getAppService(),
+                    SessionManager.getInstance().getCurrentSite());
+        return new ArrayList<ModelWrapper<?>>();
     }
 
     @Override

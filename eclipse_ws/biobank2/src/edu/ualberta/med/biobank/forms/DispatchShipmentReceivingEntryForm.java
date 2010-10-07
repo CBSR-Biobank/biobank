@@ -146,10 +146,10 @@ public class DispatchShipmentReceivingEntryForm extends
             }
             return new AliquotInfo(aliquots.get(0), ResType.NOT_IN_SHIPMENT);
         }
-        if (dsa.getState() == DispatchAliquotState.RECEIVED_STATE.ordinal()) {
+        if (DispatchAliquotState.RECEIVED_STATE.isEquals(dsa.getState())) {
             return new AliquotInfo(dsa.getAliquot(), ResType.RECEIVED);
         }
-        if (dsa.getState() == DispatchAliquotState.EXTRA.ordinal()) {
+        if (DispatchAliquotState.EXTRA.isEquals(dsa.getState())) {
             return new AliquotInfo(dsa.getAliquot(), ResType.EXTRA);
         }
         return new AliquotInfo(dsa.getAliquot(), ResType.OK);
