@@ -913,7 +913,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return infos;
     }
 
-    public Set<ClinicWrapper> getStudyClinics() {
+    public Set<ClinicWrapper> getWorkingClinicCollection() {
         List<StudyWrapper> studies = getStudyCollection();
         Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
         for (StudyWrapper study : studies) {

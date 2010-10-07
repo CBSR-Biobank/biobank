@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -126,11 +126,11 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
         ClinicWrapper selectedClinic = null;
         if (shipment.isNew()) {
             // choose clinic for new shipment
-            List<ClinicWrapper> siteClinics = SessionManager.getInstance()
-                .getSession().getClinicCollection(true);
+            Set<ClinicWrapper> siteClinics = SessionManager.getInstance()
+                .getCurrentSite().getWorkingClinicCollection();
             selectedClinic = shipment.getClinic();
             if (siteClinics.size() == 1) {
-                selectedClinic = siteClinics.get(0);
+                selectedClinic = siteClinics.toArray(new ClinicWrapper[1])[0];
             }
             clinicsComboViewer = createComboViewer(client, "Clinic",
                 siteClinics, selectedClinic, "A clinic should be selected",
