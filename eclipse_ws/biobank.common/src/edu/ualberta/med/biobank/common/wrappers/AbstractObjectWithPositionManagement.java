@@ -16,10 +16,8 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     private ContainerWrapper parent;
 
     protected void persist() {
-        boolean origPositionSet =
-            (!nullPositionSet && (rowColPosition != null));
-        AbstractPositionWrapper<T> posWrapper =
-            getPositionWrapper(origPositionSet);
+        boolean origPositionSet = (!nullPositionSet && (rowColPosition != null));
+        AbstractPositionWrapper<T> posWrapper = getPositionWrapper(origPositionSet);
         if ((posWrapper != null) && origPositionSet) {
             posWrapper.setRow(rowColPosition.row);
             posWrapper.setCol(rowColPosition.col);
@@ -29,8 +27,7 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
         boolean origPositionSet = (!nullPositionSet && rowColPosition != null);
-        AbstractPositionWrapper<T> posWrapper =
-            getPositionWrapper(origPositionSet);
+        AbstractPositionWrapper<T> posWrapper = getPositionWrapper(origPositionSet);
         if (posWrapper != null) {
             posWrapper.persistChecks();
         }
@@ -97,7 +94,9 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
         this.parent = container;
         // AbstractContainerWrapper<?, ?> oldValue = getParent();
         AbstractPositionWrapper<T> pos = getPositionWrapper(true);
-        pos.setParent(container);
+        if (pos != null) {
+            pos.setParent(container);
+        }
         // propertyChangeSupport.firePropertyChange("parent", oldValue,
         // container);
     }

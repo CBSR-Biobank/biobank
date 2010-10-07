@@ -62,7 +62,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     protected List<AliquotWrapper> processCellStatus(PalletCell cell) {
         AliquotInfo info = DispatchShipmentReceivingEntryForm
             .getInfoForInventoryId(currentShipment, cell.getValue());
-        List<AliquotWrapper> extraAliquots = new ArrayList<AliquotWrapper>();
+        List<AliquotWrapper> newExtraAliquots = new ArrayList<AliquotWrapper>();
         if (info.aliquot != null) {
             cell.setAliquot(info.aliquot);
             cell.setTitle(info.aliquot.getPatientVisit().getPatient()
@@ -89,7 +89,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         case NOT_IN_SHIPMENT:
             cell.setStatus(CellStatus.EXTRA);
             cell.setInformation("Aliquot should not be in shipment");
-            extraAliquots.add(cell.getAliquot());
+            newExtraAliquots.add(cell.getAliquot());
             pendingAliquotsNumber++;
             break;
         case OK:
@@ -98,11 +98,10 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             break;
         case EXTRA:
             cell.setStatus(CellStatus.EXTRA);
-            extraAliquots.add(cell.getAliquot());
             pendingAliquotsNumber++;
             break;
         }
-        return extraAliquots;
+        return newExtraAliquots;
     }
 
     @Override
@@ -120,16 +119,16 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             setScanOkValue(false);
-            List<AliquotWrapper> extraAliquots = null;
+            List<AliquotWrapper> newExtraAliquots = null;
             for (RowColPos rcp : rcps) {
                 if (monitor != null) {
                     monitor.subTask("Processing position "
                         + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 }
                 PalletCell cell = cells.get(rcp);
-                extraAliquots = processCellStatus(cell);
+                newExtraAliquots = processCellStatus(cell);
             }
-            addExtraCells(extraAliquots);
+            addExtraCells(newExtraAliquots);
             setScanOkValue(errors == 0);
         }
     }
