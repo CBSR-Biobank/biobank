@@ -151,7 +151,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createDispatchSection() {
-        Section section = createSection("Dispatch");
+        Section section = createSection("Dispatches");
         addSectionToolbar(section, "Add Dispatch Relation",
             new SelectionAdapter() {
                 @Override

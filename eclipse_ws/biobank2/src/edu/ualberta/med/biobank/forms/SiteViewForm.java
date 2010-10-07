@@ -177,7 +177,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createDispatchSection() {
-        Section section = createSection("Dispatch");
+        Section section = createSection("Dispatches");
         dispatchTable = new SiteDispatchInfoTable(section, site);
         dispatchTable.adaptToToolkit(toolkit, true);
         dispatchTable.addDoubleClickListener(collectionDoubleClickListener);
