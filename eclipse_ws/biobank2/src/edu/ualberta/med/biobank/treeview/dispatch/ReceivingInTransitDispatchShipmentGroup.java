@@ -20,7 +20,6 @@ public class ReceivingInTransitDispatchShipmentGroup extends
         throws Exception {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
-            site.reload();
             return site.getInTransitReceiveDispatchShipmentCollection();
         }
         return new ArrayList<ModelWrapper<?>>();

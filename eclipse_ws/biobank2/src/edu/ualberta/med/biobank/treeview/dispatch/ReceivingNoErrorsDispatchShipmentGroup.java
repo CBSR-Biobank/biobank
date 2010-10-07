@@ -20,7 +20,6 @@ public class ReceivingNoErrorsDispatchShipmentGroup extends
         throws Exception {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
-            site.reload();
             return site.getReceivingNoErrorsDispatchShipmentCollection();
         }
         return new ArrayList<ModelWrapper<?>>();
