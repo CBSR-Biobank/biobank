@@ -15,8 +15,10 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class ModifyStateDispatchShipmentDialog extends BiobankDialog {
 
-    private static final String TITLE = "Setting {0} state to aliquots in current dispatch";
+    private static final String TITLE_STATE = "Setting {0} state to aliquots in current dispatch";
+    private static final String TITLE_COMMENT_ONLY = "Modifying comment of aliquots in current dispatch";
     private String currentTitle;
+    private String message;
 
     private class CommentValue {
         private String value;
@@ -36,12 +38,20 @@ public class ModifyStateDispatchShipmentDialog extends BiobankDialog {
     public ModifyStateDispatchShipmentDialog(Shell parentShell,
         DispatchAliquotState newState) {
         super(parentShell);
-        currentTitle = MessageFormat.format(TITLE, newState.getLabel());
+        if (newState == null) {
+            currentTitle = TITLE_COMMENT_ONLY;
+            message = "Set a comment";
+
+        } else {
+            currentTitle = MessageFormat.format(TITLE_STATE,
+                newState.getLabel());
+            message = "Set a comment to explain the state modification";
+        }
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Set a comment to explain the state modification";
+        return message;
     }
 
     @Override

@@ -8,7 +8,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.rcp.MainPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 
 public class MainAdministrationHandler extends AbstractHandler implements
     IHandler {

@@ -6,6 +6,8 @@ import java.util.List;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -28,6 +30,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -200,7 +203,7 @@ public class DispatchShipmentSendingEntryForm extends
             }
         } else {
             aliquotsTreeTable = new DispatchAliquotsTreeTable(page, shipment,
-                true);
+                !shipment.isInClosedState() && !shipment.isInLostState(), true);
             aliquotsTreeTable.addSelectionChangedListener(biobankListener);
         }
     }
@@ -222,7 +225,20 @@ public class DispatchShipmentSendingEntryForm extends
         };
         aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
         aliquotsNonProcessedTable
-            .addDoubleClickListener(collectionDoubleClickListener);
+            .addDoubleClickListener(new IDoubleClickListener() {
+                @Override
+                public void doubleClick(DoubleClickEvent event) {
+                    Object selection = event.getSelection();
+                    if (selection instanceof InfoTableSelection) {
+                        InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                        DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) tableSelection
+                            .getObject();
+                        if (dsa != null) {
+                            SessionManager.openViewForm(dsa.getAliquot());
+                        }
+                    }
+                }
+            });
         aliquotsNonProcessedTable.addSelectionChangedListener(biobankListener);
     }
 

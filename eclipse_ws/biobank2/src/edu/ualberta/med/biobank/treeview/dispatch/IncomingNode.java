@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class IncomingNode extends AdapterBase {
 
     private ReceivingInTransitDispatchShipmentGroup receivedTransitNode;
-    private ReceivingDispatchShipmentGroup receivingNode;
+    private ReceivingNoErrorsDispatchShipmentGroup receivingNode;
     private ReceivingWithErrorsDispatchShipmentGroup receivingWithErrorsNode;
 
     public IncomingNode(AdapterBase parent, int id) {
@@ -22,7 +22,7 @@ public class IncomingNode extends AdapterBase {
         receivedTransitNode.setParent(this);
         addChild(receivedTransitNode);
 
-        receivingNode = new ReceivingDispatchShipmentGroup(this, 1);
+        receivingNode = new ReceivingNoErrorsDispatchShipmentGroup(this, 1);
         receivingNode.setParent(this);
         addChild(receivingNode);
 

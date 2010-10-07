@@ -299,15 +299,16 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     /**
-     * Get the rowColPos corresponding to the given box81 2 or 3 char string
-     * position. Could be A2 or F12. (box81 skip I and O)
+     * Get the rowColPos corresponding to the given CBSR SBS 2 or 3 char string
+     * position. Could be A2 or F12. (CBSR SBS skip I and O)
      */
-    public static RowColPos box81ToRowCol(
+    public static RowColPos cbsrSbsToRowCol(
         WritableApplicationService appService, String pos) throws Exception {
         ContainerLabelingSchemeWrapper scheme = getLabelingSchemeById(
             appService, SCHEME_CBSR_SBS);
         if (scheme == null) {
-            throw new BiobankCheckException("Box81 labeling scheme not found");
+            throw new BiobankCheckException(
+                "CBSR SBS labeling scheme not found");
         }
         if ((pos.length() != scheme.getMinChars())
             && (pos.length() != scheme.getMaxChars())) {
@@ -330,7 +331,7 @@ public class ContainerLabelingSchemeWrapper extends
      * Get the string corresponding to the given RowColPos and using the SBS
      * standard. 2:1 will return C2.
      */
-    private static String rowColtoBox81(RowColPos rcp) {
+    private static String rowColtoCbsrSbs(RowColPos rcp) {
         return "" + BOX81_LABELLING_PATTERN.charAt(rcp.row) + (rcp.col + 1);
     }
 
@@ -498,8 +499,8 @@ public class ContainerLabelingSchemeWrapper extends
             // dewar
             return rowColToDewar(rcp, colCapacity);
         case 5:
-            // box81
-            return rowColtoBox81(rcp);
+            // CBSR SBS
+            return rowColtoCbsrSbs(rcp);
         }
         return null;
     }
@@ -528,7 +529,7 @@ public class ContainerLabelingSchemeWrapper extends
             return dewarToRowCol(appService, position, colCapacity);
         case 5:
             // Box81
-            return box81ToRowCol(appService, position);
+            return cbsrSbsToRowCol(appService, position);
         }
         return null;
     }

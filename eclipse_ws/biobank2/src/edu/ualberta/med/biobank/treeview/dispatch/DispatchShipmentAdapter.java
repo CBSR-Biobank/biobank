@@ -123,7 +123,7 @@ public class DispatchShipmentAdapter extends AdapterBase {
     }
 
     public void doClose() {
-        getWrapper().setNextState();
+        getWrapper().setInCloseState();
         persistShipment();
         openViewForm();
     }
@@ -136,7 +136,7 @@ public class DispatchShipmentAdapter extends AdapterBase {
 
     private void setShipmentAsReceived() {
         getWrapper().setDateReceived(new Date());
-        getWrapper().setNextState();
+        getWrapper().setInReceivedState();
         persistShipment();
     }
 

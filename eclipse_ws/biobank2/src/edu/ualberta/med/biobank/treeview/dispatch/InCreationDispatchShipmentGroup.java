@@ -50,11 +50,11 @@ public class InCreationDispatchShipmentGroup extends
     }
 
     protected void addDispatchShipment() {
-        DispatchShipmentWrapper shipment =
-            new DispatchShipmentWrapper(SessionManager.getAppService());
+        DispatchShipmentWrapper shipment = new DispatchShipmentWrapper(
+            SessionManager.getAppService());
         shipment.setSender(SessionManager.getInstance().getCurrentSite());
-        DispatchShipmentAdapter shipNode =
-            new DispatchShipmentAdapter(this, shipment);
+        DispatchShipmentAdapter shipNode = new DispatchShipmentAdapter(this,
+            shipment);
         shipNode.openEntryForm();
     }
 

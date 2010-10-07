@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.rcp;
+package edu.ualberta.med.biobank.rcp.perspective;
 
 import org.eclipse.ui.IPageLayout;
 import org.eclipse.ui.IPerspectiveFactory;

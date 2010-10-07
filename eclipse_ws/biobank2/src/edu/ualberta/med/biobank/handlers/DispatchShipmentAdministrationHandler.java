@@ -8,7 +8,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.DispatchShipmentAdministrationPerspective;
 
 public class DispatchShipmentAdministrationHandler extends AbstractHandler
     implements IHandler {

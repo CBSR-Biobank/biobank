@@ -8,10 +8,10 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class ReceivingDispatchShipmentGroup extends
+public class ReceivingNoErrorsDispatchShipmentGroup extends
     AbstractDispatchShipmentGroup {
 
-    public ReceivingDispatchShipmentGroup(AdapterBase parent, int id) {
+    public ReceivingNoErrorsDispatchShipmentGroup(AdapterBase parent, int id) {
         super(parent, id, "Receiving");
     }
 
@@ -21,7 +21,7 @@ public class ReceivingDispatchShipmentGroup extends
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             site.reload();
-            return site.getReceivingDispatchShipmentCollection();
+            return site.getReceivingNoErrorsDispatchShipmentCollection();
         }
         return new ArrayList<ModelWrapper<?>>();
     }

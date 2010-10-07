@@ -17,22 +17,21 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.DispatchShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
-import edu.ualberta.med.biobank.treeview.dispatch.ReceivingDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchShipmentGroup;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class DispatchShipmentAdministrationView extends
     AbstractAdministrationView {
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView";
+    public static final String ID = "edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView";
 
     public InCreationDispatchShipmentGroup creationNode;
 
@@ -40,7 +39,7 @@ public class DispatchShipmentAdministrationView extends
 
     public ReceivingInTransitDispatchShipmentGroup receivedTransitNode;
 
-    public ReceivingDispatchShipmentGroup receivingNode;
+    public ReceivingNoErrorsDispatchShipmentGroup receivingNode;
 
     private Button radioWaybill;
 
@@ -175,6 +174,8 @@ public class DispatchShipmentAdministrationView extends
         if (sourceValue != null
             && !SessionManager.getInstance().isAllSitesSelected()) {
             reload();
+        } else {
+            rootNode.removeAll();
         }
     }
 
@@ -198,9 +199,8 @@ public class DispatchShipmentAdministrationView extends
                 if (radioWaybill.getSelection()) {
                     msg += " for waybill " + treeText.getText();
                 } else {
-                    msg +=
-                        " for date "
-                            + DateFormatter.formatAsDate(dateWidget.getDate());
+                    msg += " for date "
+                        + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
                 BioBankPlugin.openMessage("Shipment not found", msg);
             } else {

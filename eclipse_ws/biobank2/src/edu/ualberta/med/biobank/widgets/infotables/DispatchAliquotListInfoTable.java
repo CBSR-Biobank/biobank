@@ -10,7 +10,6 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -24,18 +23,18 @@ public abstract class DispatchAliquotListInfoTable extends
         String inventoryId;
         String type;
         String pnumber;
-        DispatchAliquotState state;
+        String status;
         String comment;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { inventoryId, type, pnumber,
-                state.toString(), comment }, "\t");
+                status, comment }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] { "Inventory ID",
-        "Type", "Patient Number", "State", "Comment" };
+        "Type", "Patient Number", "Activity Status", "Dispatch comment" };
 
     private static final int[] BOUNDS = new int[] { 100, 100, 120, 120, -1 };
 
@@ -101,7 +100,7 @@ public abstract class DispatchAliquotListInfoTable extends
                 case 2:
                     return info.pnumber;
                 case 3:
-                    return info.state.toString();
+                    return info.status;
                 case 4:
                     return info.comment;
                 default:
@@ -122,7 +121,7 @@ public abstract class DispatchAliquotListInfoTable extends
         SampleTypeWrapper type = dsa.getAliquot().getSampleType();
         Assert.isNotNull(type, "aliquot with null for sample type");
         info.type = type.getName();
-        info.state = DispatchAliquotState.getState(dsa.getState());
+        info.status = dsa.getAliquot().getActivityStatus().toString();
         info.comment = dsa.getComment();
         return info;
     }
