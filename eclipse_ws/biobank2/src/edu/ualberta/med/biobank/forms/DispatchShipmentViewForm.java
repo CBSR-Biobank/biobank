@@ -9,6 +9,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,6 +19,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -33,6 +36,7 @@ import edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
@@ -137,7 +141,20 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
             };
             aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
             aliquotsNonProcessedTable
-                .addDoubleClickListener(collectionDoubleClickListener);
+                .addDoubleClickListener(new IDoubleClickListener() {
+                    @Override
+                    public void doubleClick(DoubleClickEvent event) {
+                        Object selection = event.getSelection();
+                        if (selection instanceof InfoTableSelection) {
+                            InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                            DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) tableSelection
+                                .getObject();
+                            if (dsa != null) {
+                                SessionManager.openViewForm(dsa.getAliquot());
+                            }
+                        }
+                    }
+                });
             aliquotsNonProcessedTable
                 .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                     @Override
@@ -146,7 +163,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
                     }
                 });
         } else {
-            aliquotsTree = new DispatchAliquotsTreeTable(page, shipment, false);
+            aliquotsTree = new DispatchAliquotsTreeTable(page, shipment, false,
+                false);
         }
     }
 
@@ -208,7 +226,7 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
                             public void run(final IProgressMonitor monitor) {
                                 monitor.beginTask("Saving...",
                                     IProgressMonitor.UNKNOWN);
-                                shipment.setNextState();
+                                shipment.setInTransitState();
                                 try {
                                     shipment.persist();
                                 } catch (final RemoteConnectFailureException exp) {
@@ -248,6 +266,25 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
+
+        String stateMessage = null;
+        if (shipment.isInLostState())
+            stateMessage = " Shipment Lost ";
+        else if (shipment.isInClosedState())
+            stateMessage = " Shipment Closed ";
+        if (stateMessage != null) {
+            Label label = widgetCreator.createLabel(client, stateMessage,
+                SWT.CENTER, false);
+            label.setBackground(Display.getDefault().getSystemColor(
+                SWT.COLOR_RED));
+            label.setForeground(Display.getDefault().getSystemColor(
+                SWT.COLOR_WHITE));
+            GridData gd = new GridData();
+            gd.horizontalAlignment = SWT.CENTER;
+            gd.grabExcessHorizontalSpace = true;
+            gd.horizontalSpan = 2;
+            label.setLayoutData(gd);
+        }
 
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");

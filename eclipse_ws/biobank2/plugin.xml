@@ -67,42 +67,42 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="edu.ualberta.med.biobank.rcp.MainPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.MainPerspective"
             id="edu.ualberta.med.biobank.perspective.main"
             icon="icons/mainPerspective.png"
             name="Administration View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.ReportsPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective"
             id="edu.ualberta.med.biobank.perspective.reports"
             icon="icons/reportsPerspective.png"
             name="Reports View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective"
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.perspective.patients"
             name="Patients View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.AliquotManagementPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective"
             id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
             name="Samples Management Perspective">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.ShipmentAdministrationPerspective"
             id="edu.ualberta.med.biobank.perspective.shipments"
             icon="icons/clinicShipment.png"
             name="Clinic Shipment View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.DispatchShipmentAdministrationPerspective"
             id="edu.ualberta.med.biobank.perspective.dispatchShipments"
             icon="icons/dispatchShipment.png"
             name="Dispatch View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.LoggingPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.LoggingPerspective"
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.perspective.logging"
             name="Logging View">

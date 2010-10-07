@@ -43,7 +43,8 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
     private DispatchShipmentWrapper shipment;
 
     public DispatchAliquotsTreeTable(Composite parent,
-        final DispatchShipmentWrapper shipment, final boolean edit) {
+        final DispatchShipmentWrapper shipment,
+        final boolean editAliquotsState, final boolean editAliquotsComment) {
         super(parent, SWT.NONE);
 
         this.shipment = shipment;
@@ -70,14 +71,14 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
 
         tc = new TreeColumn(tree, SWT.LEFT);
         tc.setText("Patient Number");
-        tc.setWidth(150);
+        tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("State");
-        tc.setWidth(100);
+        tc.setText("Activity Status");
+        tc.setWidth(120);
 
         tc = new TreeColumn(tree, SWT.LEFT);
-        tc.setText("Comment");
+        tc.setText("Dispatch comment");
         tc.setWidth(100);
 
         ITreeContentProvider contentProvider = new ITreeContentProvider() {
@@ -153,20 +154,14 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
                     menuItem.dispose();
                 }
                 addClipboardCopySupport(menu, labelProvider);
-                if (edit) {
+                if (editAliquotsState || editAliquotsComment) {
                     DispatchShipmentAliquotWrapper dsa = getSelectedAliquot();
                     if (dsa != null) {
-                        switch (DispatchAliquotState.getState(dsa.getState())) {
-                        case EXTRA_PENDING_STATE:
-                            break;
-                        case MISSING_PENDING_STATE:
+                        if (editAliquotsState
+                            && DispatchAliquotState.getState(dsa.getState()) == DispatchAliquotState.NONE_STATE)
                             addSetMissingMenu(menu);
-                            break;
-                        case NONE_STATE:
-                            addSetMissingMenu(menu);
-                            addSetMissingPendingMenu(menu);
-                            break;
-                        }
+                        if (editAliquotsComment)
+                            addModifyCommentMenu(menu);
                     }
                 }
             }
@@ -182,8 +177,17 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         return null;
     }
 
-    protected void setItemMissing(IStructuredSelection iStructuredSelection) {
-        modifyState(iStructuredSelection, DispatchAliquotState.MISSING);
+    protected void addModifyCommentMenu(Menu menu) {
+        MenuItem item;
+        item = new MenuItem(menu, SWT.PUSH);
+        item.setText("Modify comment");
+        item.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
+                    null);
+            }
+        });
     }
 
     private void addSetMissingMenu(final Menu menu) {
@@ -193,30 +197,14 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                setItemMissing((IStructuredSelection) tv.getSelection());
+                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
+                    DispatchAliquotState.MISSING);
             }
         });
     }
 
-    private void addSetMissingPendingMenu(final Menu menu) {
-        MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Set as missing-pending");
-        item.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent event) {
-                setItemMissingPending((IStructuredSelection) tv.getSelection());
-            }
-        });
-    }
-
-    protected void setItemMissingPending(
-        IStructuredSelection iStructuredSelection) {
-        modifyState(iStructuredSelection,
-            DispatchAliquotState.MISSING_PENDING_STATE);
-    }
-
-    private void modifyState(IStructuredSelection iStructuredSelection,
-        DispatchAliquotState newState) {
+    private void modifyCommentAndState(
+        IStructuredSelection iStructuredSelection, DispatchAliquotState newState) {
         ModifyStateDispatchShipmentDialog dialog = new ModifyStateDispatchShipmentDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             newState);
@@ -228,7 +216,8 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
                 DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) iter
                     .next();
                 dsa.setComment(comment);
-                dsa.setState(newState.ordinal());
+                if (newState != null)
+                    dsa.setState(newState.ordinal());
             }
             shipment.resetStateLists();
             tv.refresh();

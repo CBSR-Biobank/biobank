@@ -19,7 +19,7 @@ import org.eclipse.ui.console.IConsoleConstants;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.rcp.AliquotManagementPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 /**

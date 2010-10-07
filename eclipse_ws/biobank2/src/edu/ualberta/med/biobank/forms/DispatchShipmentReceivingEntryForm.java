@@ -7,6 +7,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -34,8 +35,13 @@ public class DispatchShipmentReceivingEntryForm extends
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
-        createAliquotsSelectionActions(page, true);
-        aliquotsTree = new DispatchAliquotsTreeTable(page, shipment, true);
+        boolean editAliquots = !shipment.isInClosedState()
+            && !shipment.isInLostState();
+        if (editAliquots)
+            createAliquotsSelectionActions(page, true);
+        aliquotsTree = new DispatchAliquotsTreeTable(page, shipment,
+            editAliquots, true);
+        aliquotsTree.addSelectionChangedListener(biobankListener);
     }
 
     @Override
@@ -87,8 +93,10 @@ public class DispatchShipmentReceivingEntryForm extends
             SWT.NONE, "Date received");
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, shipment, "comment", null);
+        Control commentsWidget = createBoundWidgetWithLabel(client,
+            BiobankText.class, SWT.MULTI, "Comments", null, shipment,
+            "comment", null);
+        setFirstControl(commentsWidget);
     }
 
     @Override
@@ -141,9 +149,7 @@ public class DispatchShipmentReceivingEntryForm extends
         if (dsa.getState() == DispatchAliquotState.RECEIVED_STATE.ordinal()) {
             return new AliquotInfo(dsa.getAliquot(), ResType.RECEIVED);
         }
-        if (dsa.getState() == DispatchAliquotState.EXTRA.ordinal()
-            || dsa.getState() == DispatchAliquotState.EXTRA_PENDING_STATE
-                .ordinal()) {
+        if (dsa.getState() == DispatchAliquotState.EXTRA.ordinal()) {
             return new AliquotInfo(dsa.getAliquot(), ResType.EXTRA);
         }
         return new AliquotInfo(dsa.getAliquot(), ResType.OK);
@@ -168,7 +174,7 @@ public class DispatchShipmentReceivingEntryForm extends
                     + " has not been found in this shipment."
                     + " It will be moved into the extra-pending list.");
             try {
-                shipment.addExtraPendingAliquots(Arrays.asList(info.aliquot));
+                shipment.addExtraAliquots(Arrays.asList(info.aliquot));
             } catch (BiobankCheckException e) {
                 BioBankPlugin.openAsyncError("Eror adding extra aliquot", e);
             }

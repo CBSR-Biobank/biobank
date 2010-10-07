@@ -7,7 +7,6 @@ import org.eclipse.swt.graphics.Image;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -125,7 +124,7 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return dsa.getAliquot().getPatientVisit().getPatient()
                     .getPnumber();
             if (columnIndex == 3)
-                return DispatchAliquotState.getState(dsa.getState()).toString();
+                return dsa.getAliquot().getActivityStatus().toString();
             if (columnIndex == 4)
                 return dsa.getComment();
         } else {

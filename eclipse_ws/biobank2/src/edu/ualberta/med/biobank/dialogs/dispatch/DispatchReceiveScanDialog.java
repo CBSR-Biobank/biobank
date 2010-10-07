@@ -59,9 +59,10 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     /**
      * set the status of the cell
      */
-    protected void processCellStatus(PalletCell cell) throws Exception {
+    protected List<AliquotWrapper> processCellStatus(PalletCell cell) {
         AliquotInfo info = DispatchShipmentReceivingEntryForm
             .getInfoForInventoryId(currentShipment, cell.getValue());
+        List<AliquotWrapper> extraAliquots = new ArrayList<AliquotWrapper>();
         if (info.aliquot != null) {
             cell.setAliquot(info.aliquot);
             cell.setTitle(info.aliquot.getPatientVisit().getPatient()
@@ -86,8 +87,9 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             errors++;
             break;
         case NOT_IN_SHIPMENT:
-            cell.setStatus(CellStatus.NOT_IN_SHIPMENT);
+            cell.setStatus(CellStatus.EXTRA);
             cell.setInformation("Aliquot should not be in shipment");
+            extraAliquots.add(cell.getAliquot());
             pendingAliquotsNumber++;
             break;
         case OK:
@@ -96,9 +98,11 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             break;
         case EXTRA:
             cell.setStatus(CellStatus.EXTRA);
+            extraAliquots.add(cell.getAliquot());
             pendingAliquotsNumber++;
             break;
         }
+        return extraAliquots;
     }
 
     @Override
@@ -110,43 +114,28 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     }
 
     private void processCells(Collection<RowColPos> rcps,
-        IProgressMonitor monitor) throws Exception {
+        IProgressMonitor monitor) {
         pendingAliquotsNumber = 0;
         errors = 0;
-
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             setScanOkValue(false);
-
+            List<AliquotWrapper> extraAliquots = null;
             for (RowColPos rcp : rcps) {
                 if (monitor != null) {
                     monitor.subTask("Processing position "
                         + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 }
                 PalletCell cell = cells.get(rcp);
-                processCellStatus(cell);
+                extraAliquots = processCellStatus(cell);
             }
-
-            Collection<PalletCell> extraCells = getExtraCells(cells);
-            addExtraCells(extraCells);
-
+            addExtraCells(extraAliquots);
             setScanOkValue(errors == 0);
         }
     }
 
-    private Collection<PalletCell> getExtraCells(
-        Map<RowColPos, PalletCell> cells) {
-        Collection<PalletCell> extraCells = new ArrayList<PalletCell>();
-        for (PalletCell cell : cells.values()) {
-            if (cell.getStatus().equals(CellStatus.NOT_IN_SHIPMENT)) {
-                extraCells.add(cell);
-            }
-        }
-        return extraCells;
-    }
-
-    private void addExtraCells(final Collection<PalletCell> extraCells) {
-        if (extraCells.size() > 0) {
+    private void addExtraCells(final List<AliquotWrapper> extraAliquots) {
+        if (extraAliquots.size() > 0) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
@@ -156,24 +145,12 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                             "Some of the aliquots in this pallet were not supposed"
                                 + " to be in this shipment. They will be added to the"
                                 + " extra-pending list.");
-
-                    List<AliquotWrapper> notInShipmentAliquots = new ArrayList<AliquotWrapper>();
-                    for (PalletCell cell : extraCells) {
-                        notInShipmentAliquots.add(cell.getAliquot());
-                    }
-
                     try {
-                        currentShipment
-                            .addExtraPendingAliquots(notInShipmentAliquots);
+                        currentShipment.addExtraAliquots(extraAliquots);
                     } catch (Exception e) {
                         BioBankPlugin.openAsyncError("Error flagging aliquots",
                             e);
                     }
-                    for (PalletCell cell : extraCells) {
-                        cell.setStatus(CellStatus.EXTRA);
-                    }
-
-                    redrawPallet();
                 }
             });
         }
@@ -240,9 +217,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                 // }
                 int row = i / 12;
                 int col = i % 12;
-                if (dsa.getState() != DispatchAliquotState.MISSING.ordinal()
-                    && dsa.getState() != DispatchAliquotState.MISSING_PENDING_STATE
-                        .ordinal())
+                if (dsa.getState() != DispatchAliquotState.MISSING.ordinal())
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getAliquot()
                             .getInventoryId())));
