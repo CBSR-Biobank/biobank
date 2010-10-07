@@ -16,12 +16,11 @@ public class DebugUtil {
     public static List<AliquotWrapper> getRandomAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "from "
-                    + Aliquot.class.getName()
-                    + " as s where s.patientVisit.clinicPatient.clinic.site.id = ?",
-                Arrays.asList(new Object[] { siteId }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Aliquot.class.getName()
+                + " as s where s.patientVisit.shipmentPatient.shipment.site.id = ?",
+            Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
         int i = 0;
@@ -49,17 +48,16 @@ public class DebugUtil {
         params.add(siteId);
         String studyString = "";
         if (studyString != null) {
-            studyString =
-                " and a.patientVisit.clinicPatient.patient.study.id = ?";
+            studyString = " and a.patientVisit.shipmentPatient.patient.study.id = ?";
             params.add(studyId);
         }
 
-        HQLCriteria criteria =
-            new HQLCriteria("from " + Aliquot.class.getName()
-                + " as a where a in (select sp.aliquot from "
-                + AliquotPosition.class.getName()
-                + " as sp) and a.aliquotPosition.container.site.id = ?"
-                + studyString, params);
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Aliquot.class.getName()
+            + " as a where a in (select sp.aliquot from "
+            + AliquotPosition.class.getName()
+            + " as sp) and a.aliquotPosition.container.site.id = ?"
+            + studyString, params);
         List<Aliquot> idList = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
         int i = 0;
@@ -77,14 +75,12 @@ public class DebugUtil {
     public static List<AliquotWrapper> getRandomAliquotsNotAssignedNoDispatch(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "select a from "
-                    + Aliquot.class.getName()
-                    + " as a left join a.aliquotPosition as ap where ap is null"
-                    + " and a.patientVisit.clinicPatient.clinic.site.id = ?"
-                    + " and a.activityStatus.name != 'Dispatched'",
-                Arrays.asList(new Object[] { siteId }));
+        HQLCriteria criteria = new HQLCriteria("select a from "
+            + Aliquot.class.getName()
+            + " as a left join a.aliquotPosition as ap where ap is null"
+            + " and a.patientVisit.shipmentPatient.shipment.site.id = ?"
+            + " and a.activityStatus.name != 'Dispatched'",
+            Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
         for (int i = 0; i < aliquots.size() && i < 100; i++) {
@@ -97,12 +93,11 @@ public class DebugUtil {
     public static List<AliquotWrapper> getRandomAliquotsDispatched(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "from "
-                    + Aliquot.class.getName()
-                    + " as s where s.patientVisit.shipment.site.id = ? and a.activityStatus.name='Dispatched'",
-                Arrays.asList(new Object[] { siteId }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Aliquot.class.getName()
+                + " as s where s.patientVisit.shipment.site.id = ? and a.activityStatus.name='Dispatched'",
+            Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
         int i = 0;
