@@ -89,12 +89,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
-                    if (sourceValue != null
-                        && sourceValue.equals(SessionState.LOGGED_IN)) {
-                        updatedTitle(SessionManager.getServer(), SessionManager
-                            .getUser().getLogin());
-                    } else {
-                        resetTitle();
+                    if (sourceValue != null) {
+                        if (sourceValue.equals(SessionState.LOGGED_IN))
+                            updatedTitle(SessionManager.getServer(),
+                                SessionManager.getUser().getLogin());
+                        else if (sourceValue.equals(SessionState.LOGGED_OUT))
+                            resetTitle();
                     }
                 }
 
