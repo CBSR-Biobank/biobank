@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.AbstractShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
@@ -53,9 +53,9 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod(name + "_2");
 
-        ClinicShipmentHelper.addShipment(site, clinic, method1, patient1);
-        ClinicShipmentHelper.addShipment(site, clinic, method2, patient1);
-        ClinicShipmentHelper.addShipment(site, clinic, method2, patient1);
+        ShipmentHelper.addShipment(site, clinic, method1, patient1);
+        ShipmentHelper.addShipment(site, clinic, method2, patient1);
+        ShipmentHelper.addShipment(site, clinic, method2, patient1);
 
         method1.reload();
         method2.reload();
@@ -78,15 +78,15 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodHelper
             .addShippingMethod(name);
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
             site, clinic, method, patient1);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(
             site, clinic, method, patient1);
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
-        ClinicShipmentWrapper shipment3 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment3 = ShipmentHelper.addShipment(
             site, clinic, method, patient1);
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
@@ -202,7 +202,7 @@ public class TestShippingMethod extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
             site, clinic, method, patient1);
         shipment1.persist();
         method.reload();
@@ -281,7 +281,7 @@ public class TestShippingMethod extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
             site, clinic, methods[0], patient1);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
@@ -289,7 +289,7 @@ public class TestShippingMethod extends TestDatabase {
         Assert.assertTrue(methods[0].isUsed());
         Assert.assertFalse(methods[1].isUsed());
 
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(
             site, clinic, methods[1], patient1);
         shipment2.setWaybill(name + "QWERTY");
         shipment2.persist();

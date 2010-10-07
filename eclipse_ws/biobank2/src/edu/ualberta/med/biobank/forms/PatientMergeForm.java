@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -222,9 +222,9 @@ public class PatientMergeForm extends BiobankEntryForm {
             // FIXME: need to make sure this can be removed
             // patient2Wrapper
             // .setPatientVisitCollection(new ArrayList<PatientVisitWrapper>());
-            List<ClinicShipmentWrapper> shipments =
+            List<ShipmentWrapper> shipments =
                 patient2.getShipmentCollection();
-            for (ClinicShipmentWrapper shipment : shipments) {
+            for (ShipmentWrapper shipment : shipments) {
                 List<PatientWrapper> patients = shipment.getPatientCollection();
                 for (PatientWrapper p : patients)
                     if (p.equals(patient2)) {

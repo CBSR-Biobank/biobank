@@ -38,7 +38,7 @@ public class AliquotsByPalletImpl extends AbstractReport {
         for (Object ob : results) {
             Aliquot a = (Aliquot) ob;
             String pnumber =
-                a.getPatientVisit().getClinicShipmentPatient().getPatient()
+                a.getPatientVisit().getShipmentPatient().getPatient()
                     .getPnumber();
             String inventoryId = a.getInventoryId();
             String stName = a.getSampleType().getNameShort();

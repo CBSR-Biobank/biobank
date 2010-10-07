@@ -24,8 +24,8 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper.CheckStatus;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -50,7 +50,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
         new ArrayList<ContainerWrapper>();
 
     public DispatchCreateScanDialog(Shell parentShell,
-        DispatchShipmentWrapper currentShipment) {
+        DispatchWrapper currentShipment) {
         super(parentShell, currentShipment);
     }
 

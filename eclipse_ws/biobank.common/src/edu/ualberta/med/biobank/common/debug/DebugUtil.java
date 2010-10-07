@@ -20,7 +20,7 @@ public class DebugUtil {
             new HQLCriteria(
                 "from "
                     + Aliquot.class.getName()
-                    + " as s where s.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ?",
+                    + " as s where s.patientVisit.clinicPatient.clinic.site.id = ?",
                 Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
@@ -50,7 +50,7 @@ public class DebugUtil {
         String studyString = "";
         if (studyString != null) {
             studyString =
-                " and a.patientVisit.clinicShipmentPatient.patient.study.id = ?";
+                " and a.patientVisit.clinicPatient.patient.study.id = ?";
             params.add(studyId);
         }
 
@@ -82,7 +82,7 @@ public class DebugUtil {
                 "select a from "
                     + Aliquot.class.getName()
                     + " as a left join a.aliquotPosition as ap where ap is null"
-                    + " and a.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ?"
+                    + " and a.patientVisit.clinicPatient.clinic.site.id = ?"
                     + " and a.activityStatus.name != 'Dispatched'",
                 Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);

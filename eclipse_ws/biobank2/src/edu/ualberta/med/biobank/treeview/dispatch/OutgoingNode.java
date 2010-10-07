@@ -11,22 +11,22 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class OutgoingNode extends AdapterBase {
 
-    private InCreationDispatchShipmentGroup creationNode;
-    private SentInTransitDispatchShipmentGroup sentTransitNode;
+    private InCreationDispatchGroup creationNode;
+    private SentInTransitDispatchGroup sentTransitNode;
 
     public OutgoingNode(AdapterBase parent, int id) {
         super(parent, id, "Outgoing", true, false);
-        creationNode = new InCreationDispatchShipmentGroup(this, 0);
+        creationNode = new InCreationDispatchGroup(this, 0);
         creationNode.setParent(this);
         addChild(creationNode);
 
-        sentTransitNode = new SentInTransitDispatchShipmentGroup(this, 1);
+        sentTransitNode = new SentInTransitDispatchGroup(this, 1);
         sentTransitNode.setParent(this);
         addChild(sentTransitNode);
     }
@@ -43,13 +43,13 @@ public class OutgoingNode extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(DispatchShipmentWrapper.class)) {
+        if (SessionManager.canCreate(DispatchWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Dispatch Shipment");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addDispatchShipment();
+                    addDispatch();
                 }
             });
         }
@@ -98,8 +98,8 @@ public class OutgoingNode extends AdapterBase {
         return searchChildren(searchedObject);
     }
 
-    public void addDispatchShipment() {
-        creationNode.addDispatchShipment();
+    public void addDispatch() {
+        creationNode.addDispatch();
     }
 
 }

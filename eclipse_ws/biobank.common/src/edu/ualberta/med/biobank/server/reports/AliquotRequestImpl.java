@@ -19,12 +19,12 @@ public class AliquotRequestImpl extends AbstractReport {
     private static final String QUERY =
         "select p.aliquot from "
             + AliquotPosition.class.getName()
-            + " p where p.aliquot.patientVisit.clinicShipmentPatient.clinicShipment.site "
+            + " p where p.aliquot.patientVisit.shipmentPatient.shipment.site "
             + SITE_OPERATOR
             + SITE_ID
             + " and p.container.label not like '"
             + SENT_SAMPLES_FREEZER_NAME
-            + "' and p.aliquot.patientVisit.clinicShipmentPatient.patient.pnumber like ? and"
+            + "' and p.aliquot.patientVisit.shipmentPatient.patient.pnumber like ? and"
             + " datediff(p.aliquot.patientVisit.dateDrawn, ?) = 0  and"
             + " p.aliquot.sampleType.nameShort like ? and p.aliquot.activityStatus.name != 'Closed' ORDER BY p.aliquot.activityStatus.name, RAND()";
 
@@ -83,7 +83,7 @@ public class AliquotRequestImpl extends AbstractReport {
             } else {
                 Aliquot aliquot = (Aliquot) ob;
                 String pnumber =
-                    aliquot.getPatientVisit().getClinicShipmentPatient()
+                    aliquot.getPatientVisit().getShipmentPatient()
                         .getPatient().getPnumber();
                 String inventoryId = aliquot.getInventoryId();
                 Date dateDrawn = aliquot.getPatientVisit().getDateDrawn();

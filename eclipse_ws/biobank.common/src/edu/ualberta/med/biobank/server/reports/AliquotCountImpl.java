@@ -11,7 +11,7 @@ public class AliquotCountImpl extends AbstractReport {
             + Aliquot.class.getName()
             + " as Alias left join Alias.aliquotPosition as p where (p is null or p not in (from "
             + AliquotPosition.class.getName()
-            + " a where a.container.label like 'SS%')) and Alias.linkDate between ? and ? and Alias.patientVisit.clinicShipmentPatient.clinicShipment.site "
+            + " a where a.container.label like 'SS%')) and Alias.linkDate between ? and ? and Alias.patientVisit.shipmentPatient.shipment.site "
             + SITE_OPERATOR + SITE_ID + " GROUP BY Alias.sampleType.name";
 
     public AliquotCountImpl(BiobankReport report) {

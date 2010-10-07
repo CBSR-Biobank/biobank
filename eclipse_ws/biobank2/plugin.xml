@@ -92,13 +92,13 @@
       <perspective
             class="edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective"
             id="edu.ualberta.med.biobank.perspective.shipments"
-            icon="icons/clinicShipment.png"
+            icon="icons/shipment.png"
             name="Clinic Shipment View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.DispatchShipmentAdministrationPerspective"
-            id="edu.ualberta.med.biobank.perspective.dispatchShipments"
-            icon="icons/dispatchShipment.png"
+            class="edu.ualberta.med.biobank.rcp.DispatchAdministrationPerspective"
+            id="edu.ualberta.med.biobank.perspective.dispatchs"
+            icon="icons/dispatch.png"
             name="Dispatch View">
       </perspective>
       <perspective
@@ -298,7 +298,7 @@
             name="Add User">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
+            id="edu.ualberta.med.biobank.commands.dispatchAdmin"
             name="Dispatch Shipment Administration">
       </command>
        <command
@@ -647,7 +647,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.clinicShipment.ClinicShipmentAdapter">
+                           value="edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter">
                      </instanceof>
                   </iterate>
                </with>
@@ -993,8 +993,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.DispatchShipmentAdministrationHandler"
-            commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin">
+            class="edu.ualberta.med.biobank.handlers.DispatchAdministrationHandler"
+            commandId="edu.ualberta.med.biobank.commands.dispatchAdmin">
          <enabledWhen>
             <and>
                <not>
@@ -1017,12 +1017,12 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.DispatchShipmentAddHandler"
+            class="edu.ualberta.med.biobank.handlers.DispatchAddHandler"
             commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd">
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.dispatchShipmentsPerspectiveSelected">
+                    definitionId="biobank2.dispatchsPerspectiveSelected">
               </reference>
               <reference
                     definitionId="biobank2.siteSelected">
@@ -1031,7 +1031,7 @@
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.dispatchShipmentsPerspectiveSelected">
+                  definitionId="biobank2.dispatchsPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -1154,7 +1154,7 @@
                label="Clinic Shipments">
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
-                  icon="icons/clinicShipment_add.png"
+                  icon="icons/shipment_add.png"
                   label="Add Clinic Shipment"
                   style="push">
             </command>
@@ -1164,7 +1164,7 @@
                label="Dispatch Shipments">
             <command
                   commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
-                  icon="icons/dispatchShipment_add.png"
+                  icon="icons/dispatch_add.png"
                   label="Add Dispatch Shipment"
                   style="push">
             </command>
@@ -1255,7 +1255,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-                  icon="icons/clinicShipment.png"
+                  icon="icons/shipment.png"
                   label="Clinic Shipment View"
                   style="push">
             </command>
@@ -1395,13 +1395,13 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-                  icon="icons/clinicShipment.png"
+                  icon="icons/shipment.png"
                   label="Clinic Shipment View"
                   style="push">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
-                  icon="icons/dispatchShipment.png"
+                  commandId="edu.ualberta.med.biobank.commands.dispatchAdmin"
+                  icon="icons/dispatch.png"
                   label="Dispatch Shipment View"
                   style="push">
             </command>
@@ -1631,7 +1631,7 @@
                id="edu.ualberta.med.biobank.views.ShipmentAdminView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
-                  icon="icons/clinicShipment_add.png"
+                  icon="icons/shipment_add.png"
                   label="Add Clinic Shipment"
                   style="push">
                <visibleWhen
@@ -1643,7 +1643,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipments.shipmentDelete"
-                  icon="icons/clinicShipment_delete.png"
+                  icon="icons/shipment_delete.png"
                   label="Delete Shipment"
                   style="push">
                <visibleWhen
@@ -1669,16 +1669,16 @@
             </command>
          </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView">
+               id="edu.ualberta.med.biobank.views.DispatchAdministrationView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
-                  icon="icons/dispatchShipment_add.png"
+                  icon="icons/dispatch_add.png"
                   label="Add Dispatch Shipment"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.dispatchShipmentsPerspectiveSelected">
+                        definitionId="biobank2.dispatchsPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1883,7 +1883,7 @@
          </view>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.dispatchShipments">
+            targetID="edu.ualberta.med.biobank.perspective.dispatchs">
          <view
                closeable="true"
                id="org.eclipse.pde.runtime.LogView"
@@ -1897,7 +1897,7 @@
          </view>
          <view
                closeable="false"
-               id="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView"
+               id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
                minimized="false"
                moveable="false"
                ratio="0.20"
@@ -1914,7 +1914,7 @@
                moveable="true"
                ratio="0.85"
                relationship="bottom"
-               relative="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView"
+               relative="edu.ualberta.med.biobank.views.DispatchAdministrationView"
                showTitle="true"
                standalone="false"
                visible="false">
@@ -2070,31 +2070,31 @@
             name="Sample Types Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ClinicShipmentEntryForm"
+            class="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
             default="false"
-            icon="icons/clinicShipment.png"
-            id="edu.ualberta.med.biobank.forms.ClinicShipmentEntryForm"
+            icon="icons/shipment.png"
+            id="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
             name="Clinic Shipment Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.ClinicShipmentViewForm"
+            class="edu.ualberta.med.biobank.forms.ShipmentViewForm"
             default="false" 
-            icon="icons/clinicShipment.png"
-            id="edu.ualberta.med.biobank.forms.ClinicShipmentViewForm"
+            icon="icons/shipment.png"
+            id="edu.ualberta.med.biobank.forms.ShipmentViewForm"
             name="Clinic Shipment View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm"
+            class="edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"
             default="false"
-            icon="icons/clinicShipment.png"
-            id="edu.ualberta.med.biobank.forms.DispatchShipmentEntryForm"
+            icon="icons/shipment.png"
+            id="edu.ualberta.med.biobank.forms.DispatchEntryForm"
             name="Dispatch Shipment Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+            class="edu.ualberta.med.biobank.forms.DispatchViewForm"
             default="false"
-            icon="icons/clinicShipment.png"
-            id="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+            icon="icons/shipment.png"
+            id="edu.ualberta.med.biobank.forms.DispatchViewForm"
             name="Dispatch Shipment View">
       </editor>
       <editor
@@ -2312,24 +2312,24 @@
       name="Invoicing Report">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+      class="edu.ualberta.med.biobank.forms.DispatchViewForm"
       default="false"
-      icon="icons/dispatchShipment.png"
-      id="edu.ualberta.med.biobank.forms.DispatchShipmentViewForm"
+      icon="icons/dispatch.png"
+      id="edu.ualberta.med.biobank.forms.DispatchViewForm"
       name="Dispatch Shipment View">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm"
+      class="edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"
       default="false"
-      icon="icons/dispatchShipment.png"
-      id="edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm"
+      icon="icons/dispatch.png"
+      id="edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm"
       name="Dispatch Shipment Receiver Entry">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm"
+      class="edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"
       default="false"
-      icon="icons/dispatchShipment.png"
-      id="edu.ualberta.med.biobank.forms.DispatchShipmentSendingEntryForm"
+      icon="icons/dispatch.png"
+      id="edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"
       name="Dispatch Shipment Sending Entry">
 </editor>
    </extension>
@@ -2556,15 +2556,15 @@
       </view>
       <view
             class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
-            icon="icons/clinicShipment.png"
+            icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.views.ShipmentAdminView"
             name="Clinic Shipment Administration"
             restorable="true">
       </view>
       <view
-            class="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView"
-            icon="icons/dispatchShipment.png"
-            id="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView"
+            class="edu.ualberta.med.biobank.views.DispatchAdministrationView"
+            icon="icons/dispatch.png"
+            id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
             name="Dispatch Administration"
             restorable="true">
       </view>
@@ -2623,11 +2623,11 @@
          </with>
       </definition>
       <definition
-            id="biobank2.dispatchShipmentsPerspectiveSelected">
+            id="biobank2.dispatchsPerspectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
-                  value="edu.ualberta.med.biobank.perspective.dispatchShipments">
+                  value="edu.ualberta.med.biobank.perspective.dispatchs">
             </equals>
          </with>
       </definition>
@@ -2756,7 +2756,7 @@
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
-                  value="edu.ualberta.med.biobank.perspective.dispatchShipments">
+                  value="edu.ualberta.med.biobank.perspective.dispatchs">
             </equals>
          </with>
       </definition>

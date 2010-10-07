@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Study;
@@ -379,21 +379,21 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ClinicShipmentWrapper> getShipmentCollection() {
-        List<ClinicShipmentWrapper> shipmentCollection = (List<ClinicShipmentWrapper>) propertiesMap
+    public List<ShipmentWrapper> getShipmentCollection() {
+        List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
         if (shipmentCollection == null) {
-            Collection<ClinicShipment> children = wrappedObject
+            Collection<Shipment> children = wrappedObject
                 .getShipmentCollection();
             if (children != null) {
-                shipmentCollection = new ArrayList<ClinicShipmentWrapper>();
-                for (ClinicShipment s : children) {
-                    shipmentCollection.add(new ClinicShipmentWrapper(
+                shipmentCollection = new ArrayList<ShipmentWrapper>();
+                for (Shipment s : children) {
+                    shipmentCollection.add(new ShipmentWrapper(
                         appService, s));
                 }
                 propertiesMap.put("shipmentCollection", shipmentCollection);
             } else
-                return new ArrayList<ClinicShipmentWrapper>();
+                return new ArrayList<ShipmentWrapper>();
         }
         return shipmentCollection;
     }
@@ -411,7 +411,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         BiobankCheckException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(
-                "select count(shipment) from " + ClinicShipment.class.getName()
+                "select count(shipment) from " + Shipment.class.getName()
                     + " as shipment where shipment.clinic.id = ?",
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
@@ -421,30 +421,30 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             }
             return results.get(0);
         }
-        List<ClinicShipmentWrapper> list = getShipmentCollection();
+        List<ShipmentWrapper> list = getShipmentCollection();
         if (list == null) {
             return 0;
         }
         return list.size();
     }
 
-    public void addShipments(Collection<ClinicShipmentWrapper> newShipments) {
+    public void addShipments(Collection<ShipmentWrapper> newShipments) {
         if (newShipments != null && newShipments.size() > 0) {
-            Collection<ClinicShipment> allShipmentObjects = new HashSet<ClinicShipment>();
-            List<ClinicShipmentWrapper> allShipmentWrappers = new ArrayList<ClinicShipmentWrapper>();
+            Collection<Shipment> allShipmentObjects = new HashSet<Shipment>();
+            List<ShipmentWrapper> allShipmentWrappers = new ArrayList<ShipmentWrapper>();
             // already added shipments
-            List<ClinicShipmentWrapper> currentList = getShipmentCollection();
+            List<ShipmentWrapper> currentList = getShipmentCollection();
             if (currentList != null) {
-                for (ClinicShipmentWrapper ship : currentList) {
+                for (ShipmentWrapper ship : currentList) {
                     allShipmentObjects.add(ship.getWrappedObject());
                     allShipmentWrappers.add(ship);
                 }
             }
-            for (ClinicShipmentWrapper ship : newShipments) {
+            for (ShipmentWrapper ship : newShipments) {
                 allShipmentObjects.add(ship.getWrappedObject());
                 allShipmentWrappers.add(ship);
             }
-            Collection<ClinicShipment> oldCollection = wrappedObject
+            Collection<Shipment> oldCollection = wrappedObject
                 .getShipmentCollection();
             wrappedObject.setShipmentCollection(allShipmentObjects);
             propertyChangeSupport.firePropertyChange("shipmentCollection",
@@ -456,10 +456,10 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     /**
      * Search for a shipment in the clinic with the given date received
      */
-    public ClinicShipmentWrapper getShipment(Date dateReceived) {
-        List<ClinicShipmentWrapper> shipments = getShipmentCollection();
+    public ShipmentWrapper getShipment(Date dateReceived) {
+        List<ShipmentWrapper> shipments = getShipmentCollection();
         if (shipments != null) {
-            for (ClinicShipmentWrapper ship : shipments) {
+            for (ShipmentWrapper ship : shipments) {
                 if (DateCompare.compare(ship.getDateReceived(), dateReceived) == 0)
                     return ship;
             }
@@ -471,11 +471,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      * Search for a shipment in the clinic with the given date received and
      * patient number.
      */
-    public ClinicShipmentWrapper getShipment(Date dateReceived,
+    public ShipmentWrapper getShipment(Date dateReceived,
         String patientNumber) {
-        List<ClinicShipmentWrapper> shipments = getShipmentCollection();
+        List<ShipmentWrapper> shipments = getShipmentCollection();
         if (shipments != null)
-            for (ClinicShipmentWrapper ship : shipments)
+            for (ShipmentWrapper ship : shipments)
                 if (DateCompare.compare(ship.getDateReceived(), dateReceived) == 0) {
                     List<PatientWrapper> patients = ship.getPatientCollection();
                     for (PatientWrapper p : patients)
@@ -514,7 +514,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             HQLCriteria criteria = new HQLCriteria(
                 "select count(distinct csps.patient) from "
                     + Clinic.class.getName()
-                    + " as clinic join clinic.shipmentCollection as shipments join shipments.clinicShipmentPatientCollection as csps where clinic.id = ?",
+                    + " as clinic join clinic.shipmentCollection as shipments join shipments.shipmentPatientCollection as csps where clinic.id = ?",
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
@@ -524,9 +524,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             return results.get(0);
         }
         HashSet<PatientWrapper> uniquePatients = new HashSet<PatientWrapper>();
-        List<ClinicShipmentWrapper> ships = getShipmentCollection();
+        List<ShipmentWrapper> ships = getShipmentCollection();
         if (ships != null)
-            for (ClinicShipmentWrapper ship : ships) {
+            for (ShipmentWrapper ship : ships) {
                 if (ship.getPatientCollection() != null)
                     uniquePatients.addAll(ship.getPatientCollection());
             }
@@ -544,7 +544,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             HQLCriteria c = new HQLCriteria(
                 "select distinct pv from "
                     + PatientVisit.class.getName()
-                    + " as pv where clinicShipmentPatient.clinicShipment.clinic.id = ?",
+                    + " as pv where shipmentPatient.shipment.clinic.id = ?",
                 Arrays.asList(new Object[] { getId() }));
             List<PatientVisit> collection = appService.query(c);
             for (PatientVisit pv : collection) {

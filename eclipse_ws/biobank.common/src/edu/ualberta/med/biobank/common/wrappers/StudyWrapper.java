@@ -33,14 +33,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
-    private Set<SampleStorageWrapper> deletedSampleStorages =
-        new HashSet<SampleStorageWrapper>();
+    private Set<SampleStorageWrapper> deletedSampleStorages = new HashSet<SampleStorageWrapper>();
 
-    private Set<StudySourceVesselWrapper> deletedStudySourceVessels =
-        new HashSet<StudySourceVesselWrapper>();
+    private Set<StudySourceVesselWrapper> deletedStudySourceVessels = new HashSet<StudySourceVesselWrapper>();
 
-    private Set<StudyPvAttrWrapper> deletedStudyPvAttr =
-        new HashSet<StudyPvAttrWrapper>();
+    private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
 
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
@@ -73,8 +70,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus =
-            (ActivityStatusWrapper) propertiesMap.get("activityStatus");
+        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activityStatus == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
@@ -110,8 +107,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     @SuppressWarnings("unchecked")
     public List<SiteWrapper> getSiteCollection(boolean sort) {
-        List<SiteWrapper> siteCollection =
-            (List<SiteWrapper>) propertiesMap.get("siteCollection");
+        List<SiteWrapper> siteCollection = (List<SiteWrapper>) propertiesMap
+            .get("siteCollection");
         if (siteCollection == null) {
             siteCollection = new ArrayList<SiteWrapper>();
             Collection<Site> children = wrappedObject.getSiteCollection();
@@ -175,8 +172,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     @SuppressWarnings("unchecked")
     public List<ContactWrapper> getContactCollection(boolean sort) {
-        List<ContactWrapper> contactCollection =
-            (List<ContactWrapper>) propertiesMap.get("contactCollection");
+        List<ContactWrapper> contactCollection = (List<ContactWrapper>) propertiesMap
+            .get("contactCollection");
         if (contactCollection == null) {
             contactCollection = new ArrayList<ContactWrapper>();
             Collection<Contact> children = wrappedObject.getContactCollection();
@@ -210,8 +207,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
             return;
 
         Collection<Contact> allContactObjects = new HashSet<Contact>();
-        List<ContactWrapper> allContactWrappers =
-            new ArrayList<ContactWrapper>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
         // already added contacts
         List<ContactWrapper> currentList = getContactCollection();
         if (currentList != null) {
@@ -240,8 +236,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
 
         Collection<Contact> allContactObjects = new HashSet<Contact>();
-        List<ContactWrapper> allContactWrappers =
-            new ArrayList<ContactWrapper>();
+        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
         // already added contacts
         if (currentList != null) {
             for (ContactWrapper contact : currentList) {
@@ -256,12 +251,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     @SuppressWarnings("unchecked")
     public List<SampleStorageWrapper> getSampleStorageCollection(boolean sort) {
-        List<SampleStorageWrapper> ssCollection =
-            (List<SampleStorageWrapper>) propertiesMap
-                .get("sampleStorageCollection");
+        List<SampleStorageWrapper> ssCollection = (List<SampleStorageWrapper>) propertiesMap
+            .get("sampleStorageCollection");
         if (ssCollection == null) {
-            Collection<SampleStorage> children =
-                wrappedObject.getSampleStorageCollection();
+            Collection<SampleStorage> children = wrappedObject
+                .getSampleStorageCollection();
             if (children != null) {
                 ssCollection = new ArrayList<SampleStorageWrapper>();
                 for (SampleStorage study : children) {
@@ -282,13 +276,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public void addSampleStorage(List<SampleStorageWrapper> newSampleStorages) {
         if (newSampleStorages != null && newSampleStorages.size() > 0) {
-            Collection<SampleStorage> allSsObjects =
-                new HashSet<SampleStorage>();
-            List<SampleStorageWrapper> allSsWrappers =
-                new ArrayList<SampleStorageWrapper>();
+            Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
+            List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
             // already in list
-            List<SampleStorageWrapper> currentList =
-                getSampleStorageCollection();
+            List<SampleStorageWrapper> currentList = getSampleStorageCollection();
             if (currentList != null) {
                 for (SampleStorageWrapper ss : currentList) {
                     allSsObjects.add(ss.getWrappedObject());
@@ -310,13 +301,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
         List<SampleStorageWrapper> sampleStoragesToRemove) {
         if (sampleStoragesToRemove != null && sampleStoragesToRemove.size() > 0) {
             deletedSampleStorages.addAll(sampleStoragesToRemove);
-            Collection<SampleStorage> allSsObjects =
-                new HashSet<SampleStorage>();
-            List<SampleStorageWrapper> allSsWrappers =
-                new ArrayList<SampleStorageWrapper>();
+            Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
+            List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
             // already in list
-            List<SampleStorageWrapper> currentList =
-                getSampleStorageCollection();
+            List<SampleStorageWrapper> currentList = getSampleStorageCollection();
             if (currentList != null) {
                 for (SampleStorageWrapper ss : currentList) {
                     if (!sampleStoragesToRemove.contains(ss)) {
@@ -331,8 +319,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     private void setSampleStorages(Collection<SampleStorage> allSsObjects,
         List<SampleStorageWrapper> allSsWrappers) {
-        Collection<SampleStorage> oldSampleStorage =
-            wrappedObject.getSampleStorageCollection();
+        Collection<SampleStorage> oldSampleStorage = wrappedObject
+            .getSampleStorageCollection();
         wrappedObject.setSampleStorageCollection(allSsObjects);
         propertyChangeSupport.firePropertyChange("sampleStorageCollection",
             oldSampleStorage, allSsObjects);
@@ -377,12 +365,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @SuppressWarnings("unchecked")
     public List<StudySourceVesselWrapper> getStudySourceVesselCollection(
         boolean sort) {
-        List<StudySourceVesselWrapper> ssCollection =
-            (List<StudySourceVesselWrapper>) propertiesMap
-                .get("studySourceVesselCollection");
+        List<StudySourceVesselWrapper> ssCollection = (List<StudySourceVesselWrapper>) propertiesMap
+            .get("studySourceVesselCollection");
         if (ssCollection == null) {
-            Collection<StudySourceVessel> children =
-                wrappedObject.getStudySourceVesselCollection();
+            Collection<StudySourceVessel> children = wrappedObject
+                .getStudySourceVesselCollection();
             if (children != null) {
                 ssCollection = new ArrayList<StudySourceVesselWrapper>();
                 for (StudySourceVessel study : children) {
@@ -404,8 +391,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
     private void setStudySourceVessels(
         Collection<StudySourceVessel> allSsObject,
         List<StudySourceVesselWrapper> allSsWrappers) {
-        Collection<StudySourceVessel> oldSourceVessels =
-            wrappedObject.getStudySourceVesselCollection();
+        Collection<StudySourceVessel> oldSourceVessels = wrappedObject
+            .getStudySourceVesselCollection();
         wrappedObject.setStudySourceVesselCollection(allSsObject);
         propertyChangeSupport.firePropertyChange("studySourceVesselCollection",
             oldSourceVessels, allSsObject);
@@ -415,13 +402,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public void addStudySourceVessels(
         List<StudySourceVesselWrapper> newStudySourceVessels) {
         if (newStudySourceVessels != null && newStudySourceVessels.size() > 0) {
-            Collection<StudySourceVessel> allSsObjects =
-                new HashSet<StudySourceVessel>();
-            List<StudySourceVesselWrapper> allSsWrappers =
-                new ArrayList<StudySourceVesselWrapper>();
+            Collection<StudySourceVessel> allSsObjects = new HashSet<StudySourceVessel>();
+            List<StudySourceVesselWrapper> allSsWrappers = new ArrayList<StudySourceVesselWrapper>();
             // already in list
-            List<StudySourceVesselWrapper> currentList =
-                getStudySourceVesselCollection();
+            List<StudySourceVesselWrapper> currentList = getStudySourceVesselCollection();
             if (currentList != null) {
                 for (StudySourceVesselWrapper ss : currentList) {
                     allSsObjects.add(ss.getWrappedObject());
@@ -443,13 +427,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
         if (studySourceVesselsToDelete != null
             && studySourceVesselsToDelete.size() > 0) {
             deletedStudySourceVessels.addAll(studySourceVesselsToDelete);
-            Collection<StudySourceVessel> allSsObjects =
-                new HashSet<StudySourceVessel>();
-            List<StudySourceVesselWrapper> allSsWrappers =
-                new ArrayList<StudySourceVesselWrapper>();
+            Collection<StudySourceVessel> allSsObjects = new HashSet<StudySourceVessel>();
+            List<StudySourceVesselWrapper> allSsWrappers = new ArrayList<StudySourceVesselWrapper>();
             // already in list
-            List<StudySourceVesselWrapper> currentList =
-                getStudySourceVesselCollection();
+            List<StudySourceVesselWrapper> currentList = getStudySourceVesselCollection();
             if (currentList != null) {
                 for (StudySourceVesselWrapper ss : currentList) {
                     if (!deletedStudySourceVessels.contains(ss)) {
@@ -543,8 +524,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
      */
     public void setStudyPvAttr(String label, String type,
         String[] permissibleValues) throws Exception {
-        Map<String, PvAttrTypeWrapper> pvAttrTypeMap =
-            PvAttrTypeWrapper.getAllPvAttrTypesMap(appService);
+        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = PvAttrTypeWrapper
+            .getAllPvAttrTypesMap(appService);
         PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
         if (pvAttrType == null) {
             throw new Exception("the pv attribute type \"" + type
@@ -653,8 +634,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     @SuppressWarnings("unchecked")
     public List<PatientWrapper> getPatientCollection(boolean sort) {
-        List<PatientWrapper> patientCollection =
-            (List<PatientWrapper>) propertiesMap.get("patientCollection");
+        List<PatientWrapper> patientCollection = (List<PatientWrapper>) propertiesMap
+            .get("patientCollection");
         if (patientCollection == null) {
             Collection<Patient> children = wrappedObject.getPatientCollection();
             if (children != null) {
@@ -676,11 +657,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public PatientWrapper getPatient(String patientNumber) throws Exception {
-        HQLCriteria criteria =
-            new HQLCriteria("select patients from " + Study.class.getName()
-                + " as study inner join study.patientCollection"
-                + " as patients where patients.pnumber = ? and study.id = ?",
-                Arrays.asList(new Object[] { patientNumber, getId() }));
+        HQLCriteria criteria = new HQLCriteria("select patients from "
+            + Study.class.getName()
+            + " as study inner join study.patientCollection"
+            + " as patients where patients.pnumber = ? and study.id = ?",
+            Arrays.asList(new Object[] { patientNumber, getId() }));
         List<Patient> result = appService.query(criteria);
         if (result.size() > 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -692,12 +673,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public boolean hasPatients() throws ApplicationException,
         BiobankCheckException {
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "select count(patient) from "
-                    + Study.class.getName()
-                    + " as study inner join study.patientCollection as patient where study.id = ?",
-                Arrays.asList(new Object[] { getId() }));
+        HQLCriteria criteria = new HQLCriteria(
+            "select count(patient) from "
+                + Study.class.getName()
+                + " as study inner join study.patientCollection as patient where study.id = ?",
+            Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -717,12 +697,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public long getPatientCount(boolean fast) throws ApplicationException,
         BiobankCheckException {
         if (fast) {
-            HQLCriteria criteria =
-                new HQLCriteria(
-                    "select count(patient) from "
-                        + Study.class.getName()
-                        + " as study inner join study.patientCollection as patient where study.id = ?",
-                    Arrays.asList(new Object[] { getId() }));
+            HQLCriteria criteria = new HQLCriteria(
+                "select count(patient) from "
+                    + Study.class.getName()
+                    + " as study inner join study.patientCollection as patient where study.id = ?",
+                Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
                 throw new BiobankCheckException(
@@ -749,8 +728,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public void addPatients(List<PatientWrapper> newPatients) {
         if (newPatients != null && newPatients.size() > 0) {
             Collection<Patient> allPatientObjects = new HashSet<Patient>();
-            List<PatientWrapper> allPatientWrappers =
-                new ArrayList<PatientWrapper>();
+            List<PatientWrapper> allPatientWrappers = new ArrayList<PatientWrapper>();
             // already added patients
             List<PatientWrapper> currentList = getPatientCollection();
             if (currentList != null) {
@@ -770,12 +748,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     @SuppressWarnings("unchecked")
     public List<DispatchInfoWrapper> getDispatchInfoCollection() {
-        List<DispatchInfoWrapper> infoCollection =
-            (List<DispatchInfoWrapper>) propertiesMap
-                .get("dispatchInfoCollection");
+        List<DispatchInfoWrapper> infoCollection = (List<DispatchInfoWrapper>) propertiesMap
+            .get("dispatchInfoCollection");
         if (infoCollection == null) {
-            Collection<DispatchInfo> children =
-                wrappedObject.getDispatchInfoCollection();
+            Collection<DispatchInfo> children = wrappedObject
+                .getDispatchInfoCollection();
             if (children != null) {
                 infoCollection = new ArrayList<DispatchInfoWrapper>();
                 for (DispatchInfo info : children) {
@@ -811,14 +788,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientCountForSite(SiteWrapper site)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c =
-            new HQLCriteria("select count(distinct patients) from "
-                + Site.class.getName() + " as site"
-                + " join site.shipmentCollection as shipments"
-                + " join shipments.clinicShipmentPatientCollection as csps"
-                + " join csps.patient as patients"
-                + " where site.id=? and patients.study.id=?",
-                Arrays.asList(new Object[] { site.getId(), getId() }));
+        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
+            + Site.class.getName() + " as site"
+            + " join site.shipmentCollection as shipments"
+            + " join shipments.shipmentPatientCollection as csps"
+            + " join csps.patient as patients"
+            + " where site.id=? and patients.study.id=?",
+            Arrays.asList(new Object[] { site.getId(), getId() }));
         List<Long> result = appService.query(c);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -828,14 +804,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientVisitCountForSite(SiteWrapper site)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c =
-            new HQLCriteria("select count(distinct visits) from "
-                + Site.class.getName() + " as site"
-                + " join site.shipmentCollection as shipments"
-                + " join shipments.clinicShipmentPatientCollection as csps"
-                + " join csps.patientVisitCollection as visits"
-                + " where site.id=? and csps.patient.study.id=?",
-                Arrays.asList(new Object[] { site.getId(), getId() }));
+        HQLCriteria c = new HQLCriteria("select count(distinct visits) from "
+            + Site.class.getName() + " as site"
+            + " join site.shipmentCollection as shipments"
+            + " join shipments.shipmentPatientCollection as csps"
+            + " join csps.patientVisitCollection as visits"
+            + " where site.id=? and csps.patient.study.id=?",
+            Arrays.asList(new Object[] { site.getId(), getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -845,14 +820,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c =
-            new HQLCriteria("select count(distinct patients) from "
-                + Study.class.getName() + " as study"
-                + " join study.patientCollection as patients"
-                + " join patients.clinicShipmentPatientCollection as csps"
-                + " join csps.clinicShipment.clinic as clinic"
-                + " where study.id=? and clinic.id=?",
-                Arrays.asList(new Object[] { getId(), clinic.getId() }));
+        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
+            + Study.class.getName() + " as study"
+            + " join study.patientCollection as patients"
+            + " join patients.shipmentPatientCollection as csps"
+            + " join csps.shipment.clinic as clinic"
+            + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
+            getId(), clinic.getId() }));
         List<Long> result = appService.query(c);
         if (result.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -862,16 +836,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientVisitCountForClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c =
-            new HQLCriteria("select count(distinct visits) from "
-                + Study.class.getName() + " as study"
-                + " join study.patientCollection as patients"
-                + " join patients.clinicShipmentPatientCollection as csps"
-                + " join csps.clinicShipment.clinic as clinic"
-                + " join csps.patientVisitCollection as visits"
-                + " where study.id=? and clinic.id=?"
-                + " and csps.patient.study=study", Arrays.asList(new Object[] {
-                getId(), clinic.getId() }));
+        HQLCriteria c = new HQLCriteria("select count(distinct visits) from "
+            + Study.class.getName() + " as study"
+            + " join study.patientCollection as patients"
+            + " join patients.shipmentPatientCollection as csps"
+            + " join csps.shipment.clinic as clinic"
+            + " join csps.patientVisitCollection as visits"
+            + " where study.id=? and clinic.id=?"
+            + " and csps.patient.study=study", Arrays.asList(new Object[] {
+            getId(), clinic.getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -881,16 +854,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public long getPatientVisitCount() throws ApplicationException,
         BiobankCheckException {
-        HQLCriteria c =
-            new HQLCriteria(
-                "select count(visits) from "
-                    + Study.class.getName()
-                    + " as study"
-                    + " inner join study.patientCollection as patients"
-                    + " inner join patients.clinicShipmentPatientCollection as csps"
-                    + " inner join csps.patientVisitCollection as visits"
-                    + " where study.id=? ",
-                Arrays.asList(new Object[] { getId() }));
+        HQLCriteria c = new HQLCriteria("select count(visits) from "
+            + Study.class.getName() + " as study"
+            + " inner join study.patientCollection as patients"
+            + " inner join patients.shipmentPatientCollection as csps"
+            + " inner join csps.patientVisitCollection as visits"
+            + " where study.id=? ", Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -901,16 +870,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected void persistDependencies(Study origObject) throws Exception {
         if (studyPvAttrMap != null) {
-            Collection<StudyPvAttr> allStudyPvAttrObjects =
-                new HashSet<StudyPvAttr>();
-            List<StudyPvAttrWrapper> allStudyPvAttrWrappers =
-                new ArrayList<StudyPvAttrWrapper>();
+            Collection<StudyPvAttr> allStudyPvAttrObjects = new HashSet<StudyPvAttr>();
+            List<StudyPvAttrWrapper> allStudyPvAttrWrappers = new ArrayList<StudyPvAttrWrapper>();
             for (StudyPvAttrWrapper ss : studyPvAttrMap.values()) {
                 allStudyPvAttrObjects.add(ss.getWrappedObject());
                 allStudyPvAttrWrappers.add(ss);
             }
-            Collection<StudyPvAttr> oldStudyPvAttrs =
-                wrappedObject.getStudyPvAttrCollection();
+            Collection<StudyPvAttr> oldStudyPvAttrs = wrappedObject
+                .getStudyPvAttrCollection();
             wrappedObject.setStudyPvAttrCollection(allStudyPvAttrObjects);
             propertyChangeSupport.firePropertyChange("studyPvAttrCollection",
                 oldStudyPvAttrs, allStudyPvAttrObjects);
@@ -927,12 +894,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
      */
     public boolean isLinkedToClinic(ClinicWrapper clinic)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria c =
-            new HQLCriteria("select count(clinics) from "
-                + Contact.class.getName() + " as contacts"
-                + " join contacts.clinic as clinics"
-                + " where contacts.studyCollection.id = ? and clinics.id = ?",
-                Arrays.asList(new Object[] { getId(), clinic.getId() }));
+        HQLCriteria c = new HQLCriteria("select count(clinics) from "
+            + Contact.class.getName() + " as contacts"
+            + " join contacts.clinic as clinics"
+            + " where contacts.studyCollection.id = ? and clinics.id = ?",
+            Arrays.asList(new Object[] { getId(), clinic.getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -966,11 +932,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public List<SiteWrapper> getDispatchDestSiteCollection(SiteWrapper site)
         throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria("select info.destSiteCollection from "
+        HQLCriteria criteria = new HQLCriteria(
+            "select info.destSiteCollection from "
                 + DispatchInfo.class.getName()
                 + " as info where info.study.id = ? and info.site.id=?",
-                Arrays.asList(new Object[] { getId(), site.getId() }));
+            Arrays.asList(new Object[] { getId(), site.getId() }));
         List<Site> results = appService.query(criteria);
         List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         for (Site res : results) {
@@ -981,11 +947,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public List<SiteWrapper> getDispatchAllSrcSites()
         throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria("select info.srcSite from "
-                + DispatchInfo.class.getName()
+        HQLCriteria criteria = new HQLCriteria(
+            "select info.srcSite from " + DispatchInfo.class.getName()
                 + " as info where info.study.id = ?",
-                Arrays.asList(new Object[] { getId() }));
+            Arrays.asList(new Object[] { getId() }));
         List<Site> results = appService.query(criteria);
         List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         for (Site res : results) {

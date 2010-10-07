@@ -16,10 +16,10 @@ import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
-import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm;
-import edu.ualberta.med.biobank.forms.DispatchShipmentReceivingEntryForm.AliquotInfo;
+import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
+import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -35,7 +35,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     private int errors;
 
     public DispatchReceiveScanDialog(Shell parentShell,
-        final DispatchShipmentWrapper currentShipment) {
+        final DispatchWrapper currentShipment) {
         super(parentShell, currentShipment);
     }
 
@@ -68,7 +68,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                     + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 PalletCell cell = cells.get(rcp);
                 AliquotInfo info =
-                    DispatchShipmentReceivingEntryForm.getInfoForInventoryId(
+                    DispatchReceivingEntryForm.getInfoForInventoryId(
                         currentShipment, cell.getValue());
                 if (info.aliquot != null) {
                     cell.setAliquot(info.aliquot);
@@ -186,8 +186,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         if (currentShipment.getAliquotCollection().size() > 0) {
             // AliquotWrapper aliquotNotReceived = null;
             int i = 0;
-            for (DispatchShipmentAliquotWrapper dsa : currentShipment
-                .getDispatchShipmentAliquotCollection()) {
+            for (DispatchAliquotWrapper dsa : currentShipment
+                .getDispatchAliquotCollection()) {
                 // if (dsa.getState() != DispatchAliquotState.RECEIVED_STATE) {
                 // aliquotFlagged = aliquot;
                 // }

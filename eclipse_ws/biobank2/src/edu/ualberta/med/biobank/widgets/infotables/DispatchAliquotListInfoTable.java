@@ -14,16 +14,16 @@ import org.eclipse.swt.widgets.MenuItem;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public abstract class DispatchAliquotListInfoTable extends
-    InfoTableWidget<DispatchShipmentAliquotWrapper> {
+    InfoTableWidget<DispatchAliquotWrapper> {
 
     protected class TableRowData {
-        DispatchShipmentAliquotWrapper dsa;
+        DispatchAliquotWrapper dsa;
         String inventoryId;
         String type;
         String pnumber;
@@ -44,20 +44,20 @@ public abstract class DispatchAliquotListInfoTable extends
 
     private boolean editMode = false;
 
-    private DispatchShipmentWrapper currentShipment;
+    private DispatchWrapper currentShipment;
 
     public DispatchAliquotListInfoTable(Composite parent,
-        final DispatchShipmentWrapper shipment, boolean editMode) {
+        final DispatchWrapper shipment, boolean editMode) {
         super(parent, null, HEADINGS, BOUNDS, 5);
         this.currentShipment = shipment;
-        setCollection(getInternalDispatchShipmentAliquots());
+        setCollection(getInternalDispatchAliquots());
         this.editMode = editMode;
         if (editMode) {
             if (shipment.isInCreationState()) {
                 addDeleteItemListener(new IInfoTableDeleteItemListener() {
                     @Override
                     public void deleteItem(InfoTableEvent event) {
-                        DispatchShipmentAliquotWrapper dsa = getSelection();
+                        DispatchAliquotWrapper dsa = getSelection();
                         if (dsa != null) {
                             if (!BioBankPlugin.openConfirm("Remove Aliquot",
                                 "Are you sure you want to remove aliquot \""
@@ -65,7 +65,7 @@ public abstract class DispatchAliquotListInfoTable extends
                                     + "\" from this shipment ?"))
                                 return;
                             try {
-                                shipment.removeDispatchShipmentAliquots(Arrays
+                                shipment.removeDispatchAliquots(Arrays
                                     .asList(getSelection()));
                                 reloadCollection();
                                 notifyListeners();
@@ -106,13 +106,13 @@ public abstract class DispatchAliquotListInfoTable extends
     }
 
     private void modifyState(DispatchAliquotState newState) {
-        DispatchShipmentAliquotWrapper dsa = getSelection();
+        DispatchAliquotWrapper dsa = getSelection();
         dsa.setState(newState.ordinal());
         currentShipment.resetStateLists();
         notifyListeners();
     }
 
-    public abstract List<DispatchShipmentAliquotWrapper> getInternalDispatchShipmentAliquots();
+    public abstract List<DispatchAliquotWrapper> getInternalDispatchAliquots();
 
     @Override
     protected boolean isEditMode() {
@@ -152,7 +152,7 @@ public abstract class DispatchAliquotListInfoTable extends
 
     @Override
     public TableRowData getCollectionModelObject(
-        DispatchShipmentAliquotWrapper dsa) throws Exception {
+        DispatchAliquotWrapper dsa) throws Exception {
         TableRowData info = new TableRowData();
         info.dsa = dsa;
         info.inventoryId = dsa.getAliquot().getInventoryId();
@@ -174,7 +174,7 @@ public abstract class DispatchAliquotListInfoTable extends
         return r.toString();
     }
 
-    public void setSelection(DispatchShipmentAliquotWrapper selectedSample) {
+    public void setSelection(DispatchAliquotWrapper selectedSample) {
         if (selectedSample == null)
             return;
         for (BiobankCollectionModel item : model) {
@@ -187,7 +187,7 @@ public abstract class DispatchAliquotListInfoTable extends
     }
 
     @Override
-    public DispatchShipmentAliquotWrapper getSelection() {
+    public DispatchAliquotWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
@@ -202,7 +202,7 @@ public abstract class DispatchAliquotListInfoTable extends
     }
 
     public void reloadCollection() {
-        reloadCollection(getInternalDispatchShipmentAliquots());
+        reloadCollection(getInternalDispatchAliquots());
     }
 
 }

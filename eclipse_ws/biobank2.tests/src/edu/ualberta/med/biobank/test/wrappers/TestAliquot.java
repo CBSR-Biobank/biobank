@@ -16,12 +16,12 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -34,11 +34,11 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
-import edu.ualberta.med.biobank.test.internal.DispatchShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
@@ -96,8 +96,8 @@ public class TestAliquot extends TestDatabase {
         site.persist();
         site.reload();
 
-        ClinicShipmentWrapper shipment =
-            ClinicShipmentHelper.addShipment(site, clinic,
+        ShipmentWrapper shipment =
+            ShipmentHelper.addShipment(site, clinic,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
                 patient);
         PatientVisitWrapper pv =
@@ -565,8 +565,8 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testGetDispatchShipments() throws Exception {
-        String name = "testGetDispatchShipments" + r.nextInt();
+    public void testGetDispatchs() throws Exception {
+        String name = "testGetDispatchs" + r.nextInt();
         SiteWrapper destSite = SiteHelper.addSite(name);
         StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
         destSite.addStudies(Arrays.asList(study));
@@ -577,8 +577,8 @@ public class TestAliquot extends TestDatabase {
         site.reload();
         ShippingMethodWrapper method =
             ShippingMethodWrapper.getShippingMethods(appService).get(0);
-        DispatchShipmentWrapper dShipment =
-            DispatchShipmentHelper.newShipment(site, destSite, study, method);
+        DispatchWrapper dShipment =
+            DispatchHelper.newShipment(site, destSite, study, method);
 
         // add an aliquot that has not been persisted
         try {
@@ -592,15 +592,15 @@ public class TestAliquot extends TestDatabase {
         aliquot.reload();
 
         dShipment =
-            DispatchShipmentHelper.newShipment(site, destSite, study, method);
+            DispatchHelper.newShipment(site, destSite, study, method);
         dShipment.addNewAliquots(Arrays.asList(aliquot));
         dShipment.persist();
         aliquot.reload();
 
-        List<DispatchShipmentWrapper> aliquotDispatchShipments =
-            aliquot.getDispatchShipments();
-        Assert.assertEquals(1, aliquotDispatchShipments.size());
-        Assert.assertTrue(aliquotDispatchShipments.contains(dShipment));
+        List<DispatchWrapper> aliquotDispatchs =
+            aliquot.getDispatchs();
+        Assert.assertEquals(1, aliquotDispatchs.size());
+        Assert.assertTrue(aliquotDispatchs.contains(dShipment));
 
         Assert.assertTrue(dShipment.isInCreationState());
 
@@ -624,8 +624,8 @@ public class TestAliquot extends TestDatabase {
         destSite.persist();
 
         destSite.reload();
-        DispatchShipmentWrapper dShipment2 =
-            DispatchShipmentHelper.newShipment(destSite, destSite2, study,
+        DispatchWrapper dShipment2 =
+            DispatchHelper.newShipment(destSite, destSite2, study,
                 method);
         try {
             dShipment2.addNewAliquots(Arrays.asList(aliquot));
@@ -661,9 +661,9 @@ public class TestAliquot extends TestDatabase {
         dShipment2.persist();
 
         aliquot.reload();
-        aliquotDispatchShipments = aliquot.getDispatchShipments();
-        Assert.assertEquals(2, aliquotDispatchShipments.size());
-        Assert.assertTrue(aliquotDispatchShipments.contains(dShipment));
-        Assert.assertTrue(aliquotDispatchShipments.contains(dShipment2));
+        aliquotDispatchs = aliquot.getDispatchs();
+        Assert.assertEquals(2, aliquotDispatchs.size());
+        Assert.assertTrue(aliquotDispatchs.contains(dShipment));
+        Assert.assertTrue(aliquotDispatchs.contains(dShipment2));
     }
 }

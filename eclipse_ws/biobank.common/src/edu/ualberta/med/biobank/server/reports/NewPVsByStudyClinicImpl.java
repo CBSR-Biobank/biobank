@@ -8,15 +8,15 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 public class NewPVsByStudyClinicImpl extends AbstractReport {
 
     private static final String QUERY =
-        "Select Alias.clinicShipmentPatient.patient.study.nameShort, "
-            + "Alias.clinicShipmentPatient.clinicShipment.clinic.name, Year(Alias.dateProcessed), "
+        "Select Alias.shipmentPatient.patient.study.nameShort, "
+            + "Alias.shipmentPatient.shipment.clinic.name, Year(Alias.dateProcessed), "
             + GROUPBY_DATE
             + "(Alias.dateProcessed), count(*) from "
             + PatientVisit.class.getName()
-            + " as Alias where Alias.dateProcessed between ? and ? and Alias.clinicShipmentPatient.clinicShipment.site "
+            + " as Alias where Alias.dateProcessed between ? and ? and Alias.shipmentPatient.shipment.site "
             + SITE_OPERATOR
             + SITE_ID
-            + " GROUP BY Alias.clinicShipmentPatient.patient.study.nameShort, Alias.clinicShipmentPatient.clinicShipment.clinic.name, "
+            + " GROUP BY Alias.shipmentPatient.patient.study.nameShort, Alias.shipmentPatient.shipment.clinic.name, "
             + "Year(Alias.dateProcessed), " + GROUPBY_DATE
             + "(Alias.dateProcessed)";
 

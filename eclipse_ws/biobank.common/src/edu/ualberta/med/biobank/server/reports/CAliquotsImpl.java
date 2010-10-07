@@ -7,7 +7,7 @@ import edu.ualberta.med.biobank.model.ContainerPath;
 public class CAliquotsImpl extends AbstractReport {
 
     private static final String QUERY =
-        "select aliquot.patientVisit.clinicShipmentPatient.patient.study.nameShort, aliquot.patientVisit.clinicShipmentPatient.clinicShipment.clinic.nameShort, count(*) from "
+        "select aliquot.patientVisit.shipmentPatient.patient.study.nameShort, aliquot.patientVisit.shipmentPatient.shipment.clinic.nameShort, count(*) from "
             + Aliquot.class.getName()
             + " as aliquot where aliquot.aliquotPosition.container.id in (select path1.container.id from "
             + ContainerPath.class.getName()
@@ -15,7 +15,7 @@ public class CAliquotsImpl extends AbstractReport {
             + ContainerPath.class.getName()
             + " as path2 where path1.path like path2.path || '/%' and path2.container.id in ("
             + CONTAINER_LIST
-            + ")) and aliquot.linkDate between ? and ? group by aliquot.patientVisit.clinicShipmentPatient.patient.study.nameShort, aliquot.patientVisit.clinicShipmentPatient.clinicShipment.clinic.nameShort";
+            + ")) and aliquot.linkDate between ? and ? group by aliquot.patientVisit.shipmentPatient.patient.study.nameShort, aliquot.patientVisit.shipmentPatient.shipment.clinic.nameShort";
 
     public CAliquotsImpl(BiobankReport report) {
         super(QUERY, report);
