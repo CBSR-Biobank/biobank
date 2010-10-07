@@ -276,7 +276,7 @@ public class DispatchShipmentWrapper extends
                 for (DispatchShipmentAliquotWrapper dsa : children) {
                     boolean hasState = false;
                     for (DispatchAliquotState state : states) {
-                        if (dsa.getState() == state.ordinal()) {
+                        if (state.isEquals(dsa.getState())) {
                             hasState = true;
                             break;
                         }
@@ -371,7 +371,7 @@ public class DispatchShipmentWrapper extends
             DispatchShipmentAliquotWrapper dsa = new DispatchShipmentAliquotWrapper(
                 appService);
             dsa.setAliquot(aliquot);
-            dsa.setState(stateForAliquot.ordinal());
+            dsa.setState(stateForAliquot.getId());
             if (stateForAliquot == DispatchAliquotState.EXTRA) {
                 aliquot.setPosition(null);
                 modifiedAliquots.add(aliquot);
@@ -491,7 +491,7 @@ public class DispatchShipmentWrapper extends
         List<DispatchShipmentAliquotWrapper> nonProcessedAliquots = getNonProcessedDispatchShipmentAliquotCollection();
         for (DispatchShipmentAliquotWrapper dsa : nonProcessedAliquots) {
             if (aliquotsToReceive.contains(dsa.getAliquot())) {
-                dsa.setState(DispatchAliquotState.RECEIVED_STATE.ordinal());
+                dsa.setState(DispatchAliquotState.RECEIVED_STATE.getId());
             }
         }
         propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
@@ -505,32 +505,31 @@ public class DispatchShipmentWrapper extends
 
     public boolean isInTransitState() {
         return wrappedObject.getState() != null
-            && wrappedObject.getState() == DispatchShipmentState.IN_TRANSIT
-                .ordinal();
+            && DispatchShipmentState.IN_TRANSIT.isEquals(wrappedObject
+                .getState());
     }
 
     public boolean isInReceivedState() {
         return wrappedObject.getState() != null
-            && wrappedObject.getState() == DispatchShipmentState.RECEIVED
-                .ordinal();
+            && DispatchShipmentState.RECEIVED
+                .isEquals(wrappedObject.getState());
     }
 
     public boolean hasBeenReceived() {
         return wrappedObject.getState() != null
-            && (wrappedObject.getState() == DispatchShipmentState.RECEIVED
-                .ordinal() || wrappedObject.getState() == DispatchShipmentState.CLOSED
-                .ordinal());
+            && (DispatchShipmentState.RECEIVED.isEquals(wrappedObject
+                .getState()) || DispatchShipmentState.CLOSED
+                .isEquals(wrappedObject.getState()));
     }
 
     public boolean isInClosedState() {
         return wrappedObject.getState() != null
-            && wrappedObject.getState() == DispatchShipmentState.CLOSED
-                .ordinal();
+            && DispatchShipmentState.CLOSED.isEquals(wrappedObject.getState());
     }
 
     public boolean isInLostState() {
         return wrappedObject.getState() != null
-            && wrappedObject.getState() == DispatchShipmentState.LOST.ordinal();
+            && DispatchShipmentState.LOST.isEquals(wrappedObject.getState());
     }
 
     /**
@@ -629,7 +628,7 @@ public class DispatchShipmentWrapper extends
 
     private void setState(DispatchShipmentState state) {
         Integer oldState = wrappedObject.getState();
-        Integer newState = state.ordinal();
+        Integer newState = state.getId();
         wrappedObject.setState(newState);
         stateModified = oldState == null || state == null
             || !oldState.equals(newState);

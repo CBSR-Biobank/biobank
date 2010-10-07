@@ -14,7 +14,7 @@ public class SiteClinicGroup extends AbstractClinicGroup {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         SiteAdapter site = getParentFromClass(SiteAdapter.class);
-        return site.getWrapper().getStudyClinics();
+        return site.getWrapper().getWorkingClinicCollection();
     }
 
 }

@@ -1260,6 +1260,12 @@
                   style="push">
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
+                  icon="icons/dispatchShipment.png"
+                  label="Dispatch Shipment View"
+                  style="push">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.reports"
                   icon="icons/reportsPerspective.png"
                   label="Reports View"
@@ -2460,6 +2466,11 @@
             commandId="edu.ualberta.med.biobank.commands.edit"
             schemeId="biobank2.scheme"
             sequence="M1+D">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
+            schemeId="biobank2.scheme"
+            sequence="M1+M2+D">
       </key>
    </extension>
     <extension
