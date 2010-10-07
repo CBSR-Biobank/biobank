@@ -175,8 +175,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             SiteWrapper s = new SiteWrapper(appService, new Site());
             for (DispatchShipmentAliquotWrapper da : dsac) {
                 if (da.getShipment().isInTransitState()
-                    && da.getState().equals(
-                        DispatchAliquotState.NONE_STATE.ordinal())) {
+                    && DispatchAliquotState.NONE_STATE.isEquals(da.getState())) {
                     // aliquot is in transit
                     s.setNameShort("In Transit ("
                         + da.getShipment().getSender().getNameShort() + " to "
@@ -184,20 +183,17 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                     return s;
 
                 } else if (da.getShipment().isInReceivedState()
-                    && da.getState().equals(
-                        DispatchAliquotState.EXTRA.ordinal())) {
+                    && DispatchAliquotState.EXTRA.isEquals(da.getState())) {
                     // aliquot has been accidentally dispatched
                     return da.getShipment().getReceiver();
                 } else if (da.getShipment().isInReceivedState()
-                    && da.getState().equals(
-                        DispatchAliquotState.MISSING.ordinal())) {
+                    && DispatchAliquotState.MISSING.isEquals(da.getState())) {
                     // aliquot is missing
                     return da.getShipment().getSender();
                 } else if (da.getShipment().isInReceivedState()
-                    && (da.getState().equals(
-                        DispatchAliquotState.RECEIVED_STATE.ordinal()) || da
-                        .getState().equals(
-                            DispatchAliquotState.NONE_STATE.ordinal()))) {
+                    && (DispatchAliquotState.RECEIVED_STATE.isEquals(da
+                        .getState()) || DispatchAliquotState.NONE_STATE
+                        .isEquals(da.getState()))) {
                     // aliquot has been intentionally dispatched and received
                     return da.getShipment().getReceiver();
                 }
@@ -597,7 +593,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         for (DispatchShipmentAliquotWrapper dsa : getDispatchShipmentAliquotCollection()) {
             DispatchShipmentWrapper ship = dsa.getShipment();
             if (ship.isInTransitState() || ship.isInCreationState()) {
-                if (dsa.getState() == DispatchAliquotState.MISSING.ordinal()) {
+                if (DispatchAliquotState.MISSING.isEquals(dsa.getState())) {
                     return false;
                 }
                 return true;

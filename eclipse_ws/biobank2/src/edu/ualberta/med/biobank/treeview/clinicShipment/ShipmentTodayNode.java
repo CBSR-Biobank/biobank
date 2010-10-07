@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.clinicShipment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -34,8 +35,11 @@ public class ShipmentTodayNode extends AbstractTodayNode {
     @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
-        return ClinicShipmentWrapper.getTodayShipments(SessionManager
-            .getAppService(), SessionManager.getInstance().getCurrentSite());
+        if (SessionManager.getInstance().isConnected())
+            return ClinicShipmentWrapper
+                .getTodayShipments(SessionManager.getAppService(),
+                    SessionManager.getInstance().getCurrentSite());
+        return new ArrayList<ModelWrapper<?>>();
 
     }
 

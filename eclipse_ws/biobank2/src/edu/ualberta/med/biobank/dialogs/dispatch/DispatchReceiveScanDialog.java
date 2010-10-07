@@ -216,7 +216,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                 // }
                 int row = i / 12;
                 int col = i % 12;
-                if (dsa.getState() != DispatchAliquotState.MISSING.ordinal())
+                if (!DispatchAliquotState.MISSING.isEquals(dsa.getState()))
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getAliquot()
                             .getInventoryId())));
