@@ -330,6 +330,10 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     @Override
     protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
         processCellStatus(cell);
+        if (cell.getStatus() == CellStatus.ERROR) {
+            Button okButton = getButton(IDialogConstants.PROCEED_ID);
+            okButton.setEnabled(false);
+        }
         super.postprocessScanTubeAlone(cell);
     }
 }
