@@ -45,7 +45,7 @@ public abstract class AbstractAdministrationView extends
         gl.marginHeight = 0;
         gl.horizontalSpacing = 0;
         gl.verticalSpacing = 0;
-        gl.marginBottom = 3;
+        gl.marginBottom = 5;
         searchComposite.setLayout(gl);
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
