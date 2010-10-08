@@ -63,7 +63,12 @@ public class DateTimeWidget extends BiobankWidget {
 
         GridData gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
-        gd.widthHint = SWT.DEFAULT;
+        // DD: SWT.DEFAULT works great on Linux, not on Windows...
+        // gd.widthHint = SWT.DEFAULT;
+        if ((style & SWT.TIME) != 0 && (style & SWT.DATE) != 0)
+            gd.widthHint = 130;
+        else
+            gd.widthHint = 110;
         gd.heightHint = SWT.DEFAULT;
         dateEntry.setLayoutData(gd);
 
