@@ -29,7 +29,6 @@ public class InCreationDispatchShipmentGroup extends
         throws Exception {
         SiteWrapper site = SessionManager.getInstance().getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
-            site.reload();
             return site.getInCreationDispatchShipmentCollection();
         }
         return new ArrayList<ModelWrapper<?>>();

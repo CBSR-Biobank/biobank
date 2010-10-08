@@ -138,9 +138,12 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         tv.addDoubleClickListener(new IDoubleClickListener() {
             @Override
             public void doubleClick(DoubleClickEvent event) {
-                DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) ((IStructuredSelection) tv
-                    .getSelection()).getFirstElement();
-                SessionManager.openViewForm(dsa.getAliquot());
+                Object o = ((IStructuredSelection) tv.getSelection())
+                    .getFirstElement();
+                if (o instanceof DispatchShipmentAliquotWrapper) {
+                    DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) o;
+                    SessionManager.openViewForm(dsa.getAliquot());
+                }
             }
         });
 

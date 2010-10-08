@@ -278,6 +278,8 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     @Override
     protected void startNewPallet() {
         setRescanMode(false);
+        Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
+        cancelButton.setEnabled(true);
         super.startNewPallet();
     }
 

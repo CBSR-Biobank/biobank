@@ -66,16 +66,14 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public boolean isUsed() throws ApplicationException, BiobankCheckException {
         long usedCount = 0;
 
-        Class<?>[] classes =
-            new Class[] { Aliquot.class, Clinic.class, Container.class,
-                ContainerType.class, SampleStorage.class, Site.class,
-                Study.class, StudyPvAttr.class };
+        Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
+            Container.class, ContainerType.class, SampleStorage.class,
+            Site.class, Study.class, StudyPvAttr.class };
 
         for (Class<?> clazz : classes) {
-            HQLCriteria c =
-                new HQLCriteria("select count(x) from " + clazz.getName()
-                    + " as x where x.activityStatus=?",
-                    Arrays.asList(new Object[] { wrappedObject }));
+            HQLCriteria c = new HQLCriteria("select count(x) from "
+                + clazz.getName() + " as x where x.activityStatus=?",
+                Arrays.asList(new Object[] { wrappedObject }));
             List<Long> results = appService.query(c);
             if (results.size() != 1) {
                 throw new BiobankCheckException(
@@ -97,7 +95,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         ApplicationException, WrapperException {
         checkNoDuplicates(ActivityStatus.class, "name", getName(),
             "An activity status with name \"" + getName()
-                + "\" already exists.");
+                + "\" already exists.", true);
     }
 
     @Override
@@ -125,11 +123,10 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public static List<ActivityStatusWrapper> getAllActivityStatuses(
         WritableApplicationService appService) throws ApplicationException {
 
-        List<ActivityStatusWrapper> activities =
-            new ArrayList<ActivityStatusWrapper>();
+        List<ActivityStatusWrapper> activities = new ArrayList<ActivityStatusWrapper>();
 
-        HQLCriteria c =
-            new HQLCriteria("from " + ActivityStatus.class.getName());
+        HQLCriteria c = new HQLCriteria("from "
+            + ActivityStatus.class.getName());
         List<ActivityStatus> result = appService.query(c);
         for (ActivityStatus ac : result) {
             activities.add(new ActivityStatusWrapper(appService, ac));
@@ -142,9 +139,9 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         WritableApplicationService appService, String name)
         throws ApplicationException, BiobankCheckException {
 
-        HQLCriteria c =
-            new HQLCriteria("from " + ActivityStatus.class.getName()
-                + " where name = ?", Arrays.asList(new Object[] { name }));
+        HQLCriteria c = new HQLCriteria("from "
+            + ActivityStatus.class.getName() + " where name = ?",
+            Arrays.asList(new Object[] { name }));
 
         List<ActivityStatus> result = appService.query(c);
 
