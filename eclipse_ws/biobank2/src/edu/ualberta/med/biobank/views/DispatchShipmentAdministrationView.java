@@ -144,7 +144,7 @@ public class DispatchShipmentAdministrationView extends
         gd.exclude = true;
         dateComposite.setLayoutData(gd);
 
-        dateWidget = new DateTimeWidget(dateComposite, SWT.DATE, new Date());
+        dateWidget = new DateTimeWidget(dateComposite, SWT.DATE, null);
         dateWidget.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {

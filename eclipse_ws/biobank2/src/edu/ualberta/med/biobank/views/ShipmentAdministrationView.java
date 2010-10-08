@@ -94,8 +94,7 @@ public class ShipmentAdministrationView extends
         gd.exclude = true;
         dateComposite.setLayoutData(gd);
 
-        dateReceivedWidget = new DateTimeWidget(dateComposite, SWT.DATE,
-            new Date());
+        dateReceivedWidget = new DateTimeWidget(dateComposite, SWT.DATE, null);
         dateReceivedWidget.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
