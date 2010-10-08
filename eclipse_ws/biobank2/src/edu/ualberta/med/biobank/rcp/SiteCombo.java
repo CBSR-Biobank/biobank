@@ -69,34 +69,36 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
         combo.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
-                IWorkbenchPartSite wbSite = PlatformUI.getWorkbench()
+                updateStatusLineMessage(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getActivePage().getActivePart()
-                    .getSite();
-                if (wbSite instanceof IViewSite) {
-                    String message = "";
-
-                    if (!"All Sites".equals(comboViewer.getCombo().getText())) {
-                        Object o = ((StructuredSelection) comboViewer
-                            .getSelection()).getFirstElement();
-                        if (o instanceof SiteWrapper) {
-                            SiteWrapper site = (SiteWrapper) o;
-                            int numPending = site
-                                .getInTransitReceiveDispatchShipmentCollection()
-                                .size();
-
-                            message = MessageFormat.format(
-                                DISPATCH_SHIPMENTS_STATUS_MSG,
-                                numPending == 0 ? "No" : numPending);
-                        }
-                    }
-
-                    ((IViewSite) wbSite).getActionBars().getStatusLineManager()
-                        .setMessage(message);
-                }
+                    .getSite());
             }
         });
 
         return resizedComboPanel;
+    }
+
+    public void updateStatusLineMessage(IWorkbenchPartSite wbSite) {
+        if (wbSite instanceof IViewSite) {
+            String message = "";
+
+            if (!"All Sites".equals(comboViewer.getCombo().getText())) {
+                Object o = ((StructuredSelection) comboViewer.getSelection())
+                    .getFirstElement();
+                if (o instanceof SiteWrapper) {
+                    SiteWrapper site = (SiteWrapper) o;
+                    int numPending = site
+                        .getInTransitReceiveDispatchShipmentCollection().size();
+
+                    message = MessageFormat.format(
+                        DISPATCH_SHIPMENTS_STATUS_MSG, numPending == 0 ? "No"
+                            : numPending);
+                }
+            }
+
+            ((IViewSite) wbSite).getActionBars().getStatusLineManager()
+                .setMessage(message);
+        }
     }
 
     public void addSelectionChangedListener(ISelectionChangedListener listener) {

@@ -181,6 +181,12 @@ public class DispatchShipmentAdministrationView extends
 
     @Override
     public void reload() {
+        try {
+            SessionManager.getInstance().getCurrentSite().reload();
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Unable to reload site information.",
+                e);
+        }
         rootNode.removeAll();
         createNodes();
         for (AdapterBase adaper : rootNode.getChildren()) {

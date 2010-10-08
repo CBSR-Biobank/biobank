@@ -84,7 +84,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             if (rawPos != null) {
                 AbstractPositionWrapper<AliquotPosition> pos = new AliquotPositionWrapper(
                     appService, rawPos);
-                pos.delete();
+                if (!pos.isNew()) {
+                    pos.delete();
+                }
             }
             wrappedObject.setAliquotPosition(null);
         }

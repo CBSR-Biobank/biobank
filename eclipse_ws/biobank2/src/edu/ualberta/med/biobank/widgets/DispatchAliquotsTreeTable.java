@@ -138,9 +138,12 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         tv.addDoubleClickListener(new IDoubleClickListener() {
             @Override
             public void doubleClick(DoubleClickEvent event) {
-                DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) ((IStructuredSelection) tv
-                    .getSelection()).getFirstElement();
-                SessionManager.openViewForm(dsa.getAliquot());
+                Object o = ((IStructuredSelection) tv.getSelection())
+                    .getFirstElement();
+                if (o instanceof DispatchShipmentAliquotWrapper) {
+                    DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) o;
+                    SessionManager.openViewForm(dsa.getAliquot());
+                }
             }
         });
 
@@ -171,7 +174,9 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
     protected DispatchShipmentAliquotWrapper getSelectedAliquot() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
-        if (selection != null && selection.size() > 0) {
+        if (selection != null
+            && selection.size() > 0
+            && selection.getFirstElement() instanceof DispatchShipmentAliquotWrapper) {
             return (DispatchShipmentAliquotWrapper) selection.getFirstElement();
         }
         return null;

@@ -399,4 +399,9 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
         }
         return null;
     }
+
+    protected void resetScan() {
+        spw.setCells(null);
+        palletScanManagement.reset();
+    }
 }
