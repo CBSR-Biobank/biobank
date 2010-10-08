@@ -581,8 +581,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     public void reload() throws Exception {
-        super.reload();
         address = null;
+        super.reload();
+
     }
 
 }
