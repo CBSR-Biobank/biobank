@@ -174,7 +174,9 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
     protected DispatchShipmentAliquotWrapper getSelectedAliquot() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
-        if (selection != null && selection.size() > 0) {
+        if (selection != null
+            && selection.size() > 0
+            && selection.getFirstElement() instanceof DispatchShipmentAliquotWrapper) {
             return (DispatchShipmentAliquotWrapper) selection.getFirstElement();
         }
         return null;

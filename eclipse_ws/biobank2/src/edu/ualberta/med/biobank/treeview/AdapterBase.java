@@ -153,7 +153,7 @@ public abstract class AdapterBase {
     public String getLabel() {
         if (modelObject != null) {
             return getLabelInternal();
-        } else if (parent.loadChildrenInBackground) {
+        } else if (parent != null && parent.loadChildrenInBackground) {
             return BGR_LOADING_LABEL;
         }
         return label;
@@ -410,18 +410,22 @@ public abstract class AdapterBase {
                 text = modelObject.toString();
             }
             logger.error("Error while loading children of node " + text, e);
+        } finally {
+            loadChildrenSemaphore.release();
         }
-        loadChildrenSemaphore.release();
     }
 
     public void loadChildrenBackground(final boolean updateNode) {
-        if ((childUpdateThread != null) && childUpdateThread.isAlive())
+        if ((childUpdateThread != null) && childUpdateThread.isAlive()) {
+            loadChildrenSemaphore.release();
             return;
+        }
 
         try {
             int childCount = getWrapperChildCount();
             if (childCount == 0) {
                 setHasChildren(false);
+                loadChildrenSemaphore.release();
                 return;
             }
             setHasChildren(true);
@@ -480,9 +484,9 @@ public abstract class AdapterBase {
                         }
                         logger.error("Error while loading children of node "
                             + modelString + " in background", e);
+                    } finally {
+                        loadChildrenSemaphore.release();
                     }
-
-                    loadChildrenSemaphore.release();
                 }
             };
             childUpdateThread.start();
@@ -493,6 +497,7 @@ public abstract class AdapterBase {
             }
             logger.error(
                 "Error while expanding children of node " + nodeString, e);
+            loadChildrenSemaphore.release();
         }
     }
 
