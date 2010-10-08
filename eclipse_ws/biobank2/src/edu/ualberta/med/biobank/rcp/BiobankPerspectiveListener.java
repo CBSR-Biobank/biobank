@@ -14,7 +14,10 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
         IPerspectiveDescriptor perspective) {
         AbstractViewWithAdapterTree view = SessionManager
             .getCurrentAdapterViewWithTree();
-        if (view != null)
+        if (view != null) {
             view.reload();
+            SessionManager.getInstance().getSiteCombo()
+                .updateStatusLineMessage(view.getSite());
+        }
     }
 }
