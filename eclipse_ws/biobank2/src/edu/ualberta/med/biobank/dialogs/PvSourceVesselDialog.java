@@ -64,6 +64,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     private String currentTitle;
 
+    private boolean dialogCreated = false;
+
     public PvSourceVesselDialog(Shell parent,
         PvSourceVesselWrapper pvSourceVessel,
         List<StudySourceVesselWrapper> studySourceVessels,
@@ -199,10 +201,14 @@ public class PvSourceVesselDialog extends BiobankDialog {
         gd = (GridData) volumeText.getLayoutData();
         gd.horizontalSpan = 2;
 
+        dialogCreated = true;
         updateWidgetVisibilityAndValues();
     }
 
     public void updateWidgetVisibilityAndValues() {
+        if (!dialogCreated)
+            return;
+
         StudySourceVesselWrapper ssv = null;
         SourceVesselWrapper currentSourceVessel = internalSourceVessel
             .getSourceVessel();
@@ -213,6 +219,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
             && (ssv == null || Boolean.TRUE.equals(ssv.getNeedTimeDrawn()));
         boolean enableVolume = (currentSourceVessel != null)
             && (ssv == null || Boolean.TRUE.equals(ssv.getNeedOriginalVolume()));
+
         timeDrawnLabel.setVisible(enableTimeDrawn);
         timeDrawnWidget.setVisible(enableTimeDrawn);
         volumeLabel.setVisible(enableVolume);
