@@ -46,6 +46,8 @@ public class ShipmentAdministrationView extends
 
     private Composite dateComposite;
 
+    private Composite searchFieldComposite;
+
     public ShipmentAdministrationView() {
         currentInstance = this;
         SessionManager.addView(ShipmentAdministrationPerspective.ID, this);
@@ -53,14 +55,14 @@ public class ShipmentAdministrationView extends
 
     @Override
     protected void createTreeTextOptions(Composite parent) {
-        Composite composite = new Composite(parent, SWT.NONE);
+        searchFieldComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 0;
         layout.marginHeight = 0;
         layout.verticalSpacing = 0;
-        composite.setLayout(layout);
+        searchFieldComposite.setLayout(layout);
 
-        radioWaybill = new Button(composite, SWT.RADIO);
+        radioWaybill = new Button(searchFieldComposite, SWT.RADIO);
         radioWaybill.setText("Waybill");
         radioWaybill.setSelection(true);
         radioWaybill.addSelectionListener(new SelectionAdapter() {
@@ -71,7 +73,7 @@ public class ShipmentAdministrationView extends
                 }
             }
         });
-        radioDateReceived = new Button(composite, SWT.RADIO);
+        radioDateReceived = new Button(searchFieldComposite, SWT.RADIO);
         radioDateReceived.setText("Date Received");
         radioDateReceived.addSelectionListener(new SelectionAdapter() {
             @Override
