@@ -81,7 +81,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
         newPalletCheckBox.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                spw.setCells(null);
+                resetScan();
                 if (newPalletCheckBox.getSelection()) {
                     palletproductBarcodeText.setEnabled(false);
                     palletproductBarcodeText.setText("no product barcode");
