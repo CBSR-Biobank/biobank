@@ -51,9 +51,6 @@ ALTER TABLE activity_status
 #  Possibly data modifications needed!
 #
 
-INSERT INTO `ACTIVITY_STATUS` (ID, NAME) VALUES
-( 5, "Dispatched");
-
 ALTER TABLE aliquot
     ADD INDEX FKF4502987C449A4 (ACTIVITY_STATUS_ID);
 
