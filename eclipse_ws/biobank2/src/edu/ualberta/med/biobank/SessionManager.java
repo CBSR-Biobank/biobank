@@ -40,6 +40,8 @@ public class SessionManager {
 
     private static SessionManager instance = null;
 
+    private static IWorkbenchWindow workbenchWindow;
+
     private SessionsView view;
 
     private SessionAdapter sessionAdapter;
@@ -198,10 +200,15 @@ public class SessionManager {
 
     public static AbstractViewWithAdapterTree getCurrentAdapterViewWithTree() {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
-        IWorkbenchPage activePage = workbench.getActiveWorkbenchWindow()
-            .getActivePage();
-        return getInstance().possibleViewMap.get(activePage.getPerspective()
-            .getId());
+        if (workbench != null) {
+            workbenchWindow = workbench.getActiveWorkbenchWindow();
+            if (workbenchWindow != null) {
+                IWorkbenchPage activePage = workbenchWindow.getActivePage();
+                return getInstance().possibleViewMap.get(activePage
+                    .getPerspective().getId());
+            }
+        }
+        return null;
     }
 
     public static AdapterBase searchNode(ModelWrapper<?> wrapper) {
