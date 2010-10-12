@@ -185,6 +185,12 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     @Override
+    public void setFocus() {
+        // aliquots are not present in treeviews, unnecessary reloads can be
+        // prevented with this method
+    }
+
+    @Override
     public void reload() {
         retrieveAliquot();
         setValues();

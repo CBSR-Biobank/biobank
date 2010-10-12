@@ -166,6 +166,12 @@ public class AliquotEntryForm extends BiobankEntryForm {
     }
 
     @Override
+    public void setFocus() {
+        // aliquots are not present in treeviews, unnecessary reloads can be
+        // prevented with this method
+    }
+
+    @Override
     public void reset() throws Exception {
         super.reset();
         ActivityStatusWrapper currentActivityStatus = aliquot
