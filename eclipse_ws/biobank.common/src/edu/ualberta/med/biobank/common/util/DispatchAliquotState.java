@@ -17,7 +17,12 @@ public enum DispatchAliquotState {
     }
 
     public static DispatchAliquotState getState(Integer state) {
-        return values()[state];
+        for (DispatchAliquotState das : values()) {
+            if (das.isEquals(state)) {
+                return das;
+            }
+        }
+        return null;
     }
 
     public String getLabel() {
