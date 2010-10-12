@@ -192,13 +192,13 @@ public class UserInfoTable extends InfoTableWidget<User> {
 
             if (BioBankPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
                 SessionManager.getAppService().deleteUser(loginName);
+
+                // remove the user from the collection
+                getCollection().remove(user);
+
+                reloadCollection(getCollection(), null);
+                notifyListeners();
             }
-
-            // remove the user from the collection
-            getCollection().remove(user);
-
-            reloadCollection(getCollection(), null);
-            notifyListeners();
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError(USER_DELETE_ERROR, e);
             return;

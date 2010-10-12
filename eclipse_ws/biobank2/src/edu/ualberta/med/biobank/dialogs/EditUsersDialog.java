@@ -86,7 +86,7 @@ public class EditUsersDialog extends BiobankDialog {
 
     @Override
     protected void createButtonsForButtonBar(Composite parent) {
-        super.createButtonsForButtonBar(parent);
-        getButton(IDialogConstants.OK_ID).setEnabled(false);
+        createButton(parent, IDialogConstants.OK_ID, IDialogConstants.OK_LABEL,
+            true);
     }
 }
