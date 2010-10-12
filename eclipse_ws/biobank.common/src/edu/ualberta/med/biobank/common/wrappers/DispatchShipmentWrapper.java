@@ -634,6 +634,10 @@ public class DispatchShipmentWrapper extends
             || !oldState.equals(newState);
     }
 
+    public void setInCreationState() {
+        setState(DispatchShipmentState.CREATION);
+    }
+
     public void setInTransitState() {
         setState(DispatchShipmentState.IN_TRANSIT);
     }
