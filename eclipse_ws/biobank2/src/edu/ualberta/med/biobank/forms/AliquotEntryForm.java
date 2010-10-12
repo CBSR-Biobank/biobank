@@ -87,7 +87,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
         }
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
-        setTextValue(siteLabel, aliquot.getSite().getNameShort());
+        setTextValue(siteLabel, aliquot.getSiteString());
 
         sampleTypeComboViewer = createComboViewer(client, "Type", sampleTypes,
             aliquot.getSampleType(), "Aliquot must have a sample type",
