@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 
 public class AliquotViewForm extends BiobankViewForm {
 
@@ -54,6 +55,9 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private BiobankText positionLabel;
 
+    @SuppressWarnings("unused")
+    private DispatchInfoTable dispatchInfoTable;
+
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof AliquotAdapter),
@@ -87,8 +91,21 @@ public class AliquotViewForm extends BiobankViewForm {
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createInformationSection();
+        createDispatchSection();
         createContainersSection();
         setValues();
+    }
+
+    private void createDispatchSection() {
+        Section section = createSection("Dispatch History");
+        Composite client = toolkit.createComposite(section);
+        section.setClient(client);
+        section.setExpanded(false);
+        GridLayout layout = new GridLayout(1, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        dispatchInfoTable = new DispatchInfoTable(client, aliquot);
     }
 
     private void createInformationSection() {
