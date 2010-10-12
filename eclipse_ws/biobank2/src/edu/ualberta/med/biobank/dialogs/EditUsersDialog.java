@@ -20,7 +20,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class EditUsersDialog extends BiobankDialog {
     private final String TITLE = "Edit Users";
-    private final String TITLE_AREA_MESSAGE = "Modify and/or delete users.";
+    private final String TITLE_AREA_MESSAGE = "Right-click to modify, delete or unlock users.";
     private UserInfoTable userInfoTable;
 
     public EditUsersDialog(Shell parentShell) {
