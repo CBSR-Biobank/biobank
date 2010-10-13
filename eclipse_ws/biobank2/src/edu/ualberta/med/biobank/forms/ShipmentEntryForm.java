@@ -74,7 +74,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private boolean dateReceivedModified;
 
-    private DateTimeWidget dateShippedWidget;
+    private DateTimeWidget departedWidget;
 
     private DateTimeWidget dateReceivedWidget;
 
@@ -97,11 +97,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         }
         String tabName;
         if (shipment.isNew()) {
-            tabName = "New Clinic Shipment";
+            tabName = "New Shipment";
             shipment.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            tabName = "Clinic Shipment " + shipment.getFormattedDateReceived();
+            tabName = "Shipment " + shipment.getFormattedDateReceived();
         }
         setPartName(tabName);
     }
@@ -183,15 +183,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 selectedClinic));
         }
 
-        if (shipment.getDateShipped() == null)
-            shipment.setDateShipped(new Date());
+        if (shipment.getDeparted() == null)
+            shipment.setDeparted(new Date());
 
-        dateShippedWidget =
-            createDateTimeWidget(client, "Date Shipped",
-                shipment.getDateShipped(),
-                BeansObservables.observeValue(shipment, "dateShipped"),
+        departedWidget =
+            createDateTimeWidget(client, "Departed",
+                shipment.getDeparted(),
+                BeansObservables.observeValue(shipment, "departed"),
                 new DateNotNulValidator("Date shipped should be set"));
-        setFirstControl(dateShippedWidget);
+        setFirstControl(departedWidget);
 
         ShippingMethodWrapper selectedShippingMethod =
             shipment.getShippingMethod();
@@ -344,7 +344,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             && clinicsComboViewer.getCombo().getItemCount() > 1) {
             clinicsComboViewer.getCombo().deselectAll();
         }
-        dateShippedWidget.setDate(new Date());
+        departedWidget.setDate(new Date());
         dateReceivedWidget.setDate(new Date());
 
         shipmentPatientsWidget.updateList();

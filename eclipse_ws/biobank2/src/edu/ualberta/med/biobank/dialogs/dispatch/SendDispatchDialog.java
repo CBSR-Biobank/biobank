@@ -67,9 +67,9 @@ public class SendDispatchDialog extends BiobankDialog {
             BeansObservables.observeValue(shipment, "waybill"), null);
 
         Date date = new Date();
-        shipment.setDateShipped(date);
-        widgetCreator.createDateTimeWidget(contents, "Date Shipped", date,
-            BeansObservables.observeValue(shipment, "dateShipped"),
+        shipment.setDeparted(date);
+        widgetCreator.createDateTimeWidget(contents, "Departed", date,
+            BeansObservables.observeValue(shipment, "departed"),
             new DateNotNulValidator("Date shipped should be set"));
     }
 

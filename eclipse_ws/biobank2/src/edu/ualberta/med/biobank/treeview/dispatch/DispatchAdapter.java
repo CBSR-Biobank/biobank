@@ -63,19 +63,19 @@ public class DispatchAdapter extends AdapterBase {
             label += study.getNameShort() + " - ";
         }
 
-        label += shipment.getFormattedDateShipped();
+        label += shipment.getFormattedDeparted();
         return label;
 
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Dispatch Shipment");
+        return getTooltipText("Dispatch");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Dispatch Shipment");
+        addViewMenu(menu, "Dispatch");
         SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
         if (currentSite.equals(getWrapper().getSender())
             && SessionManager.canDelete(DispatchWrapper.class)

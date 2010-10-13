@@ -166,7 +166,7 @@ public class SearchUtils {
                 path = path.replace('.', '_') + "shipmentCollection.";
             else
                 path = path + "shipment.";
-            add(searchableFields, path, "dateShipped", Date.class);
+            add(searchableFields, path, "departed", Date.class);
             add(searchableFields, path, "dateReceived", Date.class);
             add(searchableFields, path, "comment", String.class);
             add(searchableFields, path, "waybill", String.class);

@@ -217,7 +217,7 @@ public class Importer {
 
     private static SourceVesselWrapper importSourceVessel;
 
-    private static Date defaultDateShipped;
+    private static Date defaultDeparted;
 
     public static void main(String[] args) {
         try {
@@ -316,7 +316,7 @@ public class Importer {
             checkContainerConfiguration();
         }
 
-        defaultDateShipped = getDateFromStr("1900-01-01");
+        defaultDeparted = getDateFromStr("1900-01-01");
 
         if (configuration.importPatients()) {
             importPatients();
@@ -910,7 +910,7 @@ public class Importer {
                         clinic.getNameShort(), getWaybillDate(dateReceived)));
                 }
                 shipment.setDateReceived(dateReceived);
-                shipment.setDateShipped(defaultDateShipped);
+                shipment.setDeparted(defaultDeparted);
                 shipment.addPatients(Arrays.asList(patient));
                 shipment.setShippingMethod(unknownShippingCompany);
                 shipment.persist();

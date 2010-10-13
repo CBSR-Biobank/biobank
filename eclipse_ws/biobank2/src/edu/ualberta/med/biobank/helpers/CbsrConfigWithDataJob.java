@@ -125,7 +125,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
                 appService);
             String dateStr = String.format("2009-%02d-%02d %02d:%02d",
                 r.nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
-            shipment.setDateShipped(DateFormatter.parseToDateTime(dateStr));
+            shipment.setDeparted(DateFormatter.parseToDateTime(dateStr));
             dateStr = String.format("2009-%02d-%02d %02d:%02d",
                 r.nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
             shipment.setDateReceived(DateFormatter.parseToDateTime(dateStr));

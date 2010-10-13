@@ -80,7 +80,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
                 + getWaybill() + " already exists for sending site "
                 + getSender().getNameShort());
         }
-        if (isInTransitState() && getDateShipped() == null) {
+        if (isInTransitState() && getDeparted() == null) {
             throw new BiobankCheckException(
                 "Date shipped should be set when this shipment is in transit.");
         }
@@ -541,7 +541,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Dispatch.class.getName()
-                + " where (sender.id = ? or receiver.id = ?) and dateShipped >= ? and dateShipped <= ?",
+                + " where (sender.id = ? or receiver.id = ?) and departed >= ? and departed <= ?",
             Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
                 endDate }));
         List<Dispatch> shipments = appService.query(criteria);
@@ -590,7 +590,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         sb.append(getSender() == null ? "" : getSender().getNameShort() + "/");
         sb.append(getReceiver() == null ? "" : getReceiver().getNameShort()
             + "/");
-        sb.append(getFormattedDateShipped() + "/");
+        sb.append(getFormattedDeparted() + "/");
         sb.append(getFormattedDateReceived());
         return sb.toString();
     }

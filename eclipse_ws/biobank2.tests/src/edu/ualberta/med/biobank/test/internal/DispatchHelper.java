@@ -28,7 +28,7 @@ public class DispatchHelper extends DbHelper {
             shipment.setDateReceived(dateReceived);
         }
 
-        shipment.setDateShipped(Utils.getRandomDate());
+        shipment.setDeparted(Utils.getRandomDate());
 
         if (aliquots != null) {
             shipment.addNewAliquots(Arrays.asList(aliquots));

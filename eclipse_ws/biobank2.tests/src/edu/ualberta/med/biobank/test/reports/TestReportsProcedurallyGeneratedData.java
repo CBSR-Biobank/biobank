@@ -533,7 +533,7 @@ public final class TestReportsProcedurallyGeneratedData implements
                             .get(0), patients.get(patientIndex));
 
                     // TODO: more appropriate Date-s?
-                    shipment.setDateShipped(calendar.getTime());
+                    shipment.setDeparted(calendar.getTime());
                     calendar.add(Calendar.DAY_OF_YEAR, 1);
                     shipment.setDateReceived(calendar.getTime());
 
@@ -586,7 +586,7 @@ public final class TestReportsProcedurallyGeneratedData implements
             List<PatientWrapper> patients = shipment.getPatientCollection();
 
             for (PatientWrapper patient : patients) {
-                calendar.setTime(shipment.getDateShipped());
+                calendar.setTime(shipment.getDeparted());
                 calendar.add(Calendar.DAY_OF_YEAR, -1);
 
                 // TODO: more appropriate Date-s?

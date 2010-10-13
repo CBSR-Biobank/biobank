@@ -26,7 +26,7 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "dateReceived", "comment", "waybill",
-            "dateShipped", "boxNumber", "shippingMethod" };
+            "departed", "boxNumber", "shippingMethod" };
     }
 
     @Override
@@ -41,18 +41,18 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
                 "'Date Received' is a required field. You must set this value before saving a shipment.");
     }
 
-    public Date getDateShipped() {
-        return wrappedObject.getDispatchTime();
+    public Date getDeparted() {
+        return wrappedObject.getDeparted();
     }
 
-    public String getFormattedDateShipped() {
-        return DateFormatter.formatAsDateTime(getDateShipped());
+    public String getFormattedDeparted() {
+        return DateFormatter.formatAsDateTime(getDeparted());
     }
 
-    public void setDateShipped(Date date) {
-        Date oldDate = getDateShipped();
-        wrappedObject.setDispatchTime(date);
-        propertyChangeSupport.firePropertyChange("dateShipped", oldDate, date);
+    public void setDeparted(Date date) {
+        Date oldDate = getDeparted();
+        wrappedObject.setDeparted(date);
+        propertyChangeSupport.firePropertyChange("departed", oldDate, date);
     }
 
     public Date getDateReceived() {

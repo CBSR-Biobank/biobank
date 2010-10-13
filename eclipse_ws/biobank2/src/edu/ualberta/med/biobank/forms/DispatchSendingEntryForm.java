@@ -281,9 +281,9 @@ public class DispatchSendingEntryForm extends
     @Override
     protected String getTextForPartName() {
         if (shipment.isNew()) {
-            return "New Dispatch Shipment";
+            return "New Dispatch";
         } else {
-            return "Dispatch Shipment " + shipment.getFormattedDateReceived();
+            return "Dispatch " + shipment.getFormattedDateReceived();
         }
     }
 }

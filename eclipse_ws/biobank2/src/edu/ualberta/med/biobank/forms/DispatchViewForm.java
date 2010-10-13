@@ -51,7 +51,7 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private BiobankText receiverLabel;
 
-    private BiobankText dateShippedLabel;
+    private BiobankText departedLabel;
 
     private BiobankText shippingMethodLabel;
 
@@ -78,7 +78,7 @@ public class DispatchViewForm extends BiobankViewForm {
         shipmentAdapter = (DispatchAdapter) adapter;
         shipment = (DispatchWrapper) adapter.getModelObject();
         retrieveShipment();
-        setPartName("Dispatch Shipment");
+        setPartName("Dispatch");
     }
 
     private void retrieveShipment() {
@@ -93,7 +93,7 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     public void reload() throws Exception {
         retrieveShipment();
-        setPartName("Dispatch Shipment sent on " + shipment.getDateShipped());
+        setPartName("Dispatch sent on " + shipment.getDeparted());
         setShipmentValues();
         aliquotsExpectedTable.reloadCollection();
         if (aliquotsAcceptedTable != null)
@@ -105,8 +105,8 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         String dateString = "";
-        if (shipment.getDateShipped() != null) {
-            dateString = " on " + shipment.getFormattedDateShipped();
+        if (shipment.getDeparted() != null) {
+            dateString = " on " + shipment.getFormattedDeparted();
         }
         form.setText("Shipment sent" + dateString + " from "
             + shipment.getSender().getNameShort());
@@ -281,8 +281,8 @@ public class DispatchViewForm extends BiobankViewForm {
         receiverLabel =
             createReadOnlyLabelledField(client, SWT.NONE, "Receiver");
         if (!shipment.isInCreationState()) {
-            dateShippedLabel =
-                createReadOnlyLabelledField(client, SWT.NONE, "Date Shipped");
+            departedLabel =
+                createReadOnlyLabelledField(client, SWT.NONE, "Departed");
             shippingMethodLabel =
                 createReadOnlyLabelledField(client, SWT.NONE, "Shipping Method");
             waybillLabel =
@@ -300,8 +300,8 @@ public class DispatchViewForm extends BiobankViewForm {
         setTextValue(studyLabel, shipment.getStudy().getName());
         setTextValue(senderLabel, shipment.getSender().getName());
         setTextValue(receiverLabel, shipment.getReceiver().getName());
-        if (dateShippedLabel != null)
-            setTextValue(dateShippedLabel, shipment.getFormattedDateShipped());
+        if (departedLabel != null)
+            setTextValue(departedLabel, shipment.getFormattedDeparted());
         if (shippingMethodLabel != null)
             setTextValue(shippingMethodLabel,
                 shipment.getShippingMethod() == null ? "" : shipment
