@@ -637,8 +637,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     public void resetInternalFields() {
-        address = null;
+
         removedDispatchInfoWrapper.clear();
+    }
+
+    @Override
+    public void reload() throws Exception {
+        address = null;
+        super.reload();
+
     }
 
     public List<StudyWrapper> getDispatchStudiesAsSender() {
