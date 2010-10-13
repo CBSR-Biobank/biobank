@@ -20,11 +20,6 @@ public class PsByStudyDateEditor extends ReportsEditor {
     protected DateTimeWidget end;
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100 };
-    }
-
-    @Override
     protected String[] getColumnNames() {
         return new String[] {
             "Study",

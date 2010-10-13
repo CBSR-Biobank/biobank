@@ -33,11 +33,6 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
         Boolean.class);
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100 };
-    }
-
-    @Override
     protected List<Object> getParams() {
         List<Object> params = new ArrayList<Object>();
         params.add(containerLabel.getText());

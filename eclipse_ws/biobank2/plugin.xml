@@ -1347,6 +1347,14 @@
                id="edu.ualberta.med.biobank.toolbar.siteSelection">
             <control
                   class="edu.ualberta.med.biobank.rcp.SiteCombo">
+               <visibleWhen
+                     checkEnabled="false">
+                  <not>
+                     <reference
+                           definitionId="biobank2.reportsPerspectiveSelected">
+                     </reference>
+                  </not>
+               </visibleWhen>
             </control>
          </toolbar>
       </menuContribution>

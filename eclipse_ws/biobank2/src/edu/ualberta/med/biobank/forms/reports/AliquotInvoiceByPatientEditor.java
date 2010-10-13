@@ -15,11 +15,6 @@ public class AliquotInvoiceByPatientEditor extends ReportsEditor {
     protected DateTimeWidget end;
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);

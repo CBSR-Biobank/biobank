@@ -35,11 +35,6 @@ public class QAAliquotsEditor extends ReportsEditor {
     TopContainerListWidget topContainers;
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) throws Exception {
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);
@@ -63,23 +58,27 @@ public class QAAliquotsEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() throws Exception {
+    protected void initReport() throws Exception {
         List<Object> params = new ArrayList<Object>();
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
         params.add(((SampleTypeWrapper) ((IStructuredSelection) sampleType
             .getSelection()).getFirstElement()).getNameShort());
-        params.add(topContainers.getSelectedContainers());
+        report.setContainerList(ReportsEditor
+            .containerIdsToString(topContainers.getSelectedContainerIds()));
         params.add(Integer.parseInt((String) numAliquots.getValue()));
-        return params;
+        report.setParams(params);
     }
 
     @Override
     protected List<Object> getPrintParams() throws Exception {
-        List<Object> params = getParams();
-        Object comboInfo = params.get(2);
-        params.set(2, params.get(3));
-        params.set(3, comboInfo);
+        List<Object> params = new ArrayList<Object>();
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
+        params.add(topContainers.getSelectedContainerNames());
+        params.add(((SampleTypeWrapper) ((IStructuredSelection) sampleType
+            .getSelection()).getFirstElement()).getNameShort());
+        params.add(Integer.parseInt((String) numAliquots.getValue()));
         return params;
     }
 

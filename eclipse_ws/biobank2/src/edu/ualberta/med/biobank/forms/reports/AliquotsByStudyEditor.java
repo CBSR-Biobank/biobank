@@ -23,11 +23,6 @@ public class AliquotsByStudyEditor extends ReportsEditor {
         Boolean.class);
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) {
         topContainers = new TopContainerListWidget(parent, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,

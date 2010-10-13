@@ -24,11 +24,6 @@ public class FTAReportEditor extends ReportsEditor {
     private DateTimeWidget afterDate;
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) throws Exception {
         studyCombo = createStudyComboOption("Study", parent);
         afterDate = widgetCreator.createDateTimeWidget(parent,

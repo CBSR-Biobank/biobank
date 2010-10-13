@@ -15,11 +15,6 @@ public class InvoicingReportEditor extends ReportsEditor {
     protected DateTimeWidget end;
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Processed/Linked)", null, null, null, SWT.DATE);
