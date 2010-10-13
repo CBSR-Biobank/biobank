@@ -55,7 +55,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
+    public void deleteChecks() throws Exception {
         if (isUsed()) {
             throw new BiobankCheckException("Unable to delete activity status "
                 + getName()
