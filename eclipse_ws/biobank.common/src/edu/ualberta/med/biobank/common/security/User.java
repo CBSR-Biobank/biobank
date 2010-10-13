@@ -112,7 +112,12 @@ public class User implements Serializable, NotAProxy {
     }
 
     public boolean hasPrivilegeOnObject(Privilege privilege, Class<?> clazz) {
-        String objectName;
+        return hasPrivilegeOnObject(privilege, clazz, null);
+    }
+
+    public boolean hasPrivilegeOnObject(Privilege privilege, Class<?> clazz,
+        Integer id) {
+        String type;
         if (ModelWrapper.class.isAssignableFrom(clazz)) {
             ModelWrapper<?> wrapper = null;
             try {
@@ -125,20 +130,25 @@ public class User implements Serializable, NotAProxy {
                 e.printStackTrace();
                 return false;
             }
-            objectName = wrapper.getWrappedClass().getName();
+            type = wrapper.getWrappedClass().getName();
         } else {
-            objectName = clazz.getName();
+            type = clazz.getName();
         }
-        return hasPrivilegeOnObject(privilege, objectName);
+        return hasPrivilegeOnObject(privilege, type, id);
     }
 
-    public boolean hasPrivilegeOnObject(Privilege privilege, String objectName) {
+    public boolean hasPrivilegeOnObject(Privilege privilege, String type,
+        Integer id) {
         for (Group group : groups) {
-            if (group.hasPrivilegeOnObject(privilege, objectName)) {
+            if (group.hasPrivilegeOnObject(privilege, type, id)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean hasPrivilegeOnObject(Privilege privilege, String type) {
+        return hasPrivilegeOnObject(privilege, type, null);
     }
 
     public boolean isContainerAdministrator() {

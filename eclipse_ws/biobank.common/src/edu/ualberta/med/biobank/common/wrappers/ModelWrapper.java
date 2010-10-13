@@ -491,7 +491,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public boolean canRead(User user) {
         return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass()
-            .getName());
+            .getName(), getId());
     }
 
     /**
@@ -499,7 +499,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public boolean canUpdate(User user) {
         return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass()
-            .getName());
+            .getName(), getId());
     }
 
     public void addWrapperListener(WrapperListener listener) {

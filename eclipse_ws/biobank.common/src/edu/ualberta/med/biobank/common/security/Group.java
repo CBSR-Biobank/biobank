@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.common.security;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -16,12 +16,15 @@ public class Group implements Serializable, NotAProxy {
 
     private String name;
 
-    private Map<String, ProtectionElementPrivilege> pePrivilegeMap;
+    private Map<ProtectionElementPrivilege, Set<Privilege>> pePrivilegeMap;
+
+    private Map<String, ProtectionGroupPrivilege> pgMap;
 
     public Group(Long id, String name) {
         this.id = id;
         this.name = name;
-        pePrivilegeMap = new HashMap<String, ProtectionElementPrivilege>();
+        pePrivilegeMap = new HashMap<ProtectionElementPrivilege, Set<Privilege>>();
+        pgMap = new HashMap<String, ProtectionGroupPrivilege>();
     }
 
     public void setId(Long id) {
@@ -44,30 +47,63 @@ public class Group implements Serializable, NotAProxy {
         return name != null && name.equals(GROUP_NAME_WEBSITE_ADMINISTRATOR);
     }
 
-    public void addProtectionElementPrivilege(String objectName,
-        Set<Privilege> privileges, String objectId) {
-        ProtectionElementPrivilege per = pePrivilegeMap.get(objectName);
-        if (per == null) {
-            per = new ProtectionElementPrivilege(objectName, objectId);
-            pePrivilegeMap.put(objectName, per);
+    public void addProtectionElementPrivilege(String type, String id,
+        Set<Privilege> newPrivileges) {
+        ProtectionElementPrivilege pep = new ProtectionElementPrivilege(type,
+            id);
+        Set<Privilege> privileges = pePrivilegeMap.get(pep);
+        if (privileges == null) {
+            privileges = new HashSet<Privilege>();
+            pePrivilegeMap.put(pep, privileges);
         }
-        per.addPrivileges(privileges);
+        privileges.addAll(newPrivileges);
     }
 
-    public Collection<ProtectionElementPrivilege> getProtectionElementPrivileges() {
-        return pePrivilegeMap.values();
+    public void addProtectionGroupPrivilege(String name,
+        Set<Privilege> newPrivileges) {
+        ProtectionGroupPrivilege pgp = pgMap.get(name);
+        if (pgp == null) {
+            pgp = new ProtectionGroupPrivilege(name);
+            pgMap.put(name, pgp);
+        }
+        pgp.addPrivileges(newPrivileges);
     }
 
-    public boolean hasPrivilegeOnObject(Privilege privilege, String objectName) {
-        ProtectionElementPrivilege per = pePrivilegeMap.get(objectName);
-        if (per == null) {
-            return false;
+    /**
+     * When no id is specified, type=name
+     */
+    public boolean hasPrivilegeOnObject(Privilege privilege, String type) {
+        return hasPrivilegeOnObject(privilege, type, null);
+    }
+
+    /**
+     * When no id is specified, type=name; otherwise, need to check the
+     * protection element privilege type
+     */
+    public boolean hasPrivilegeOnObject(Privilege privilege, String type,
+        Integer id) {
+        ProtectionElementPrivilege pep = new ProtectionElementPrivilege(type,
+            id);
+        Set<Privilege> privileges = pePrivilegeMap.get(pep);
+        if (privileges == null) {
+            if (id == null) {
+                return false;
+            }
+            return hasPrivilegeOnObject(privilege, type, null);
         }
-        return per.getPrivileges().contains(privilege);
+        return privileges.contains(privilege);
     }
 
     @Override
     public String toString() {
         return getId() + "/" + getName();
+    }
+
+    public Map<ProtectionElementPrivilege, Set<Privilege>> getPrivilegesMap() {
+        return pePrivilegeMap;
+    }
+
+    public Map<String, ProtectionGroupPrivilege> getProtectionGroupMap() {
+        return pgMap;
     }
 }

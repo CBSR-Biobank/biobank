@@ -6,16 +6,17 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.server.reports.ReportFactory;
-import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authorization.domainobjects.Group;
 import gov.nih.nci.security.authorization.domainobjects.Privilege;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElementPrivilegeContext;
+import gov.nih.nci.security.authorization.domainobjects.ProtectionGroup;
+import gov.nih.nci.security.authorization.domainobjects.ProtectionGroupRoleContext;
+import gov.nih.nci.security.authorization.domainobjects.Role;
 import gov.nih.nci.security.authorization.domainobjects.User;
 import gov.nih.nci.security.dao.GroupSearchCriteria;
-import gov.nih.nci.security.exceptions.CSException;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
@@ -58,48 +59,8 @@ public class BiobankApplicationServiceImpl extends
 
     private static final String SITE_ADMIN_PG_ID = "11";
 
-    // private static final String CONTAINER_ADMINISTRATION_STRING =
-    // "biobank.cbsr.container.administration";
-
-    private Map<String, Map<String, Boolean>> cachedPrivilegesMap = new HashMap<String, Map<String, Boolean>>();
-
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
-    }
-
-    @Override
-    public boolean hasPrivilege(Class<?> clazz, Integer id, String privilegeName)
-        throws ApplicationException {
-        try {
-            String userLogin = SecurityContextHolder.getContext()
-                .getAuthentication().getName();
-            AuthorizationManager am = SecurityServiceProvider
-                .getAuthorizationManager(APPLICATION_CONTEXT_NAME);
-            String objectId = clazz.getName();
-            if (id == null) {
-                return checkPermission(am, userLogin, objectId, privilegeName);
-            }
-            return am.checkPermission(userLogin, objectId, "id", id.toString(),
-                privilegeName);
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
-    }
-
-    private Boolean checkPermission(AuthorizationManager am, String userLogin,
-        String objectId, String privilegeName) throws CSException {
-        Map<String, Boolean> objectsMap = cachedPrivilegesMap
-            .get(privilegeName);
-        if (objectsMap == null) {
-            objectsMap = new HashMap<String, Boolean>();
-            cachedPrivilegesMap.put(privilegeName, objectsMap);
-        }
-        Boolean res = objectsMap.get(objectId);
-        if (res == null) {
-            res = am.checkPermission(userLogin, objectId, privilegeName);
-        }
-        objectsMap.put(objectId, res);
-        return res;
     }
 
     private boolean isWebsiteAdministrator() throws ApplicationException {
@@ -312,9 +273,33 @@ public class BiobankApplicationServiceImpl extends
                     .add(edu.ualberta.med.biobank.common.security.Privilege
                         .valueOf(csmPrivilege.getName()));
             }
-            biobankGroup.addProtectionElementPrivilege(
-                pe.getProtectionElementName(), privileges, pe.getValue());
+            String type = pe.getObjectId();
+            String id = null;
+            if ("id".equals(pe.getAttribute())) {
+                id = pe.getValue();
+            }
+            biobankGroup.addProtectionElementPrivilege(type, id, privileges);
         }
+
+        Set<?> pgrcList = upm.getProtectionGroupRoleContextForGroup(group
+            .getGroupId().toString());
+        for (Object o : pgrcList) {
+            ProtectionGroupRoleContext pgrc = (ProtectionGroupRoleContext) o;
+            ProtectionGroup pg = pgrc.getProtectionGroup();
+            Set<edu.ualberta.med.biobank.common.security.Privilege> privileges = new HashSet<edu.ualberta.med.biobank.common.security.Privilege>();
+            for (Object r : pgrc.getRoles()) {
+                Role role = (Role) r;
+                for (Object p : upm.getPrivileges(role.getId().toString())) {
+                    Privilege csmPrivilege = (Privilege) p;
+                    privileges
+                        .add(edu.ualberta.med.biobank.common.security.Privilege
+                            .valueOf(csmPrivilege.getName()));
+                }
+            }
+            biobankGroup.addProtectionGroupPrivilege(
+                pg.getProtectionGroupName(), privileges);
+        }
+
         return biobankGroup;
     }
 

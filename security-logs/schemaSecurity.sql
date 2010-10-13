@@ -47,7 +47,6 @@ LOCK TABLES `csm_application` WRITE;
 /*!40000 ALTER TABLE `csm_application` DISABLE KEYS */;
 INSERT INTO `csm_application` VALUES (1,'csmupt','CSM UPT Super Admin Application',0,0,'2009-07-22',NULL,NULL,NULL,NULL,NULL);
 INSERT INTO `csm_application` VALUES (2,'biobank2','biobank2',0,0,'2009-07-22','jdbc:mysql://localhost:3306/biobank2','dummy','4UlzrQJztJY=','org.hibernate.dialect.MySQLDialect','com.mysql.jdbc.Driver');
-INSERT INTO `csm_application` VALUES (3,'CLM','CLM',1,1,'2009-07-27','jdbc:mysql://localhost:3306/biobank2','dummy','4UlzrQJztJY=','org.hibernate.dialect.MySQL5Dialect','com.mysql.jdbc.Driver');
 /*!40000 ALTER TABLE `csm_application` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -148,7 +147,6 @@ CREATE TABLE `csm_pg_pe` (
 
 LOCK TABLES `csm_pg_pe` WRITE;
 /*!40000 ALTER TABLE `csm_pg_pe` DISABLE KEYS */;
-INSERT INTO `csm_pg_pe` VALUES (65,10,29,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (106,12,27,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (117,5,8,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (125,19,9,'0000-00-00');
@@ -360,8 +358,6 @@ INSERT INTO `csm_protection_element` VALUES (21,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (24,'edu.ualberta.med.biobank.model.SourceVessel','edu.ualberta.med.biobank.model.SourceVessel','edu.ualberta.med.biobank.model.SourceVessel','','','',2,'2009-07-23');
 INSERT INTO `csm_protection_element` VALUES (25,'edu.ualberta.med.biobank.model.SampleStorage','edu.ualberta.med.biobank.model.SampleStorage','edu.ualberta.med.biobank.model.SampleStorage','','','',2,'2009-07-23');
 INSERT INTO `csm_protection_element` VALUES (27,'edu.ualberta.med.biobank.model.ContainerLabelingScheme','edu.ualberta.med.biobank.model.ContainerLabelingScheme','edu.ualberta.med.biobank.model.ContainerLabelingScheme','','','',2,'2009-07-26');
-INSERT INTO `csm_protection_element` VALUES (28,'CLM','','CLM','','','',1,'2009-07-27');
-INSERT INTO `csm_protection_element` VALUES (29,'APPLICATION_NAME:biobank2','','APPLICATION_NAME:biobank2','','','',3,'2009-07-27');
 INSERT INTO `csm_protection_element` VALUES (30,'edu.ualberta.med.biobank.model.Contact','edu.ualberta.med.biobank.model.Contact','edu.ualberta.med.biobank.model.Contact','','','',2,'2009-08-24');
 INSERT INTO `csm_protection_element` VALUES (31,'edu.ualberta.med.biobank.model.ClinicShipment','edu.ualberta.med.biobank.model.ClinicShipment','edu.ualberta.med.biobank.model.ClinicShipment','','','',2,'2010-08-18');
 INSERT INTO `csm_protection_element` VALUES (32,'edu.ualberta.med.biobank.model.ShippingMethod','edu.ualberta.med.biobank.model.ShippingMethod','edu.ualberta.med.biobank.model.ShippingMethod','','','',2,'2009-11-30');
@@ -417,7 +413,6 @@ INSERT INTO `csm_protection_group` VALUES (5,'pg-patients','',2,0,'2009-07-23',1
 INSERT INTO `csm_protection_group` VALUES (6,'pg-clinics','',2,0,'2009-07-23',27);
 INSERT INTO `csm_protection_group` VALUES (7,'pg-study','',2,0,'2009-07-23',25);
 INSERT INTO `csm_protection_group` VALUES (9,'pg-aliquots','',2,0,'2010-03-15',21);
-INSERT INTO `csm_protection_group` VALUES (10,'pg-biobank-clm','',3,0,'2009-07-27',NULL);
 INSERT INTO `csm_protection_group` VALUES (11,'CBSR Site Access','CBSR access to all added sites',2,0,'2010-04-20',NULL);
 INSERT INTO `csm_protection_group` VALUES (12,'pg-labelingscheme','',2,0,'2010-01-29',13);
 INSERT INTO `csm_protection_group` VALUES (13,'pg-containers-parent','Children=pg-container-type, pg-container, pg-labelingScheme, pg-container-position',2,0,'2010-01-29',NULL);
@@ -478,7 +473,6 @@ LOCK TABLES `csm_role` WRITE;
 /*!40000 ALTER TABLE `csm_role` DISABLE KEYS */;
 INSERT INTO `csm_role` VALUES (1,'read','',2,1,'2009-07-22');
 INSERT INTO `csm_role` VALUES (2,'create-delete-update','',2,1,'2009-07-22');
-INSERT INTO `csm_role` VALUES (3,'READ','',3,1,'2009-07-27');
 INSERT INTO `csm_role` VALUES (4,'create','',2,1,'2010-01-28');
 INSERT INTO `csm_role` VALUES (5,'delete','',2,1,'2010-01-28');
 INSERT INTO `csm_role` VALUES (6,'update','',2,1,'2010-01-28');
@@ -514,7 +508,6 @@ LOCK TABLES `csm_role_privilege` WRITE;
 INSERT INTO `csm_role_privilege` VALUES (10,2,1);
 INSERT INTO `csm_role_privilege` VALUES (13,4,1);
 INSERT INTO `csm_role_privilege` VALUES (8,1,3);
-INSERT INTO `csm_role_privilege` VALUES (12,3,3);
 INSERT INTO `csm_role_privilege` VALUES (11,2,5);
 INSERT INTO `csm_role_privilege` VALUES (15,6,5);
 INSERT INTO `csm_role_privilege` VALUES (9,2,6);
@@ -716,4 +709,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-09-30 14:25:11
+-- Dump completed on 2010-10-13 16:32:20

@@ -21,9 +21,6 @@ import java.util.List;
  */
 public interface BiobankApplicationService extends WritableApplicationService {
 
-    public boolean hasPrivilege(Class<?> clazz, Integer id, String privilege)
-        throws ApplicationException;
-
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException;
 
