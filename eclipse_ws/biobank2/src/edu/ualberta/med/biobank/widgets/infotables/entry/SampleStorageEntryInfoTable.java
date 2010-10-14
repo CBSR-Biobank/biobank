@@ -108,7 +108,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
     }
 
     private void addEditSupport() {
-        if (SessionManager.canCreate(SampleStorageWrapper.class)) {
+        if (SessionManager.canCreate(SampleStorageWrapper.class, null)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
@@ -116,7 +116,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
                 }
             });
         }
-        if (SessionManager.canUpdate(SampleStorageWrapper.class)) {
+        if (SessionManager.canUpdate(SampleStorageWrapper.class, null)) {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
@@ -126,7 +126,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
                 }
             });
         }
-        if (SessionManager.canDelete(SampleStorageWrapper.class)) {
+        if (SessionManager.canDelete(SampleStorageWrapper.class, null)) {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {

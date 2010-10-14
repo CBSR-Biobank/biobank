@@ -9,7 +9,6 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -1083,11 +1082,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         objectWithPositionManagement.resetInternalFields();
     }
 
-    @Override
-    public boolean canUpdate(User user) {
-        return super.canUpdate(user) && user.isContainerAdministrator();
-    }
-
     /**
      * @return true if there is no free position for a new child container
      * @throws ApplicationException
@@ -1191,4 +1185,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return objectWithPositionManagement.getTop();
     }
 
+    @Override
+    public SiteWrapper getSiteLinkedToObject() {
+        return getSite();
+    }
 }

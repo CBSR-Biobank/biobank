@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.Collection;
 
@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ContainerTypeEntryForm;
 import edu.ualberta.med.biobank.forms.ContainerTypeViewForm;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ContainerTypeAdapter extends AdapterBase {
 

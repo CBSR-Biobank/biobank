@@ -17,8 +17,8 @@ public class PatientAddHandler extends AbstractHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
-            PatientWrapper patientWrapper = new PatientWrapper(SessionManager
-                .getAppService());
+            PatientWrapper patientWrapper = new PatientWrapper(
+                SessionManager.getAppService());
             PatientAdministrationView.getCurrent().openNewPatientForm(
                 patientWrapper);
         } catch (Exception exp) {
@@ -29,7 +29,7 @@ public class PatientAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(PatientWrapper.class);
+        return SessionManager.canCreate(PatientWrapper.class, null);
     }
 
 }

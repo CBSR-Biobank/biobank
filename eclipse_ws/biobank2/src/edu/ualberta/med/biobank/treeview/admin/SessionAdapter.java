@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
@@ -55,8 +56,10 @@ public class SessionAdapter extends AdapterBase {
     }
 
     private void addGroupNodes() {
-        addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
-        addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
+        if (user.isWebsiteAdministrator()) {
+            addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
+            addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
+        }
         addChild(new SiteGroup(this, SITES_NODE_ID));
     }
 
@@ -92,13 +95,13 @@ public class SessionAdapter extends AdapterBase {
         return (SiteGroup) adapter;
     }
 
-    public StudyMasterGroup getStudiesGroupNode() {
+    private StudyMasterGroup getStudiesGroupNode() {
         AdapterBase adapter = getChild(STUDIES_NODE_ID);
         Assert.isNotNull(adapter);
         return (StudyMasterGroup) adapter;
     }
 
-    public ClinicMasterGroup getClinicGroupNode() {
+    private ClinicMasterGroup getClinicGroupNode() {
         AdapterBase adapter = getChild(CLINICS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
         return (ClinicMasterGroup) adapter;
@@ -175,5 +178,19 @@ public class SessionAdapter extends AdapterBase {
                 "Unable to load clinics from database", e);
         }
         return null;
+    }
+
+    public void addStudy() {
+        StudyMasterGroup g = getStudiesGroupNode();
+        if (g != null) {
+            g.addStudy();
+        }
+    }
+
+    public void addClinic() {
+        ClinicMasterGroup g = getClinicGroupNode();
+        if (g != null) {
+            g.addClinic();
+        }
     }
 }

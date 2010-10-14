@@ -489,17 +489,27 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canRead(User user) {
-        return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass()
-            .getName(), getId());
+    public boolean canRead(User user, Integer siteId) {
+        return user.hasPrivilegeOnObject(Privilege.READ, siteId, getClass(),
+            getId());
     }
 
     /**
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass()
-            .getName(), getId());
+        SiteWrapper site = getSiteLinkedToObject();
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, site == null ? null
+            : site.getId(), getClass(), getId());
+    }
+
+    /**
+     * return true if the user can delete this object
+     */
+    public boolean canDelete(User user) {
+        SiteWrapper site = getSiteLinkedToObject();
+        return user.hasPrivilegeOnObject(Privilege.DELETE, site == null ? null
+            : site.getId(), getClass(), getId());
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -558,5 +568,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     @Override
     public int compareTo(ModelWrapper<E> arg0) {
         return this.getId().compareTo(arg0.getId());
+    }
+
+    public SiteWrapper getSiteLinkedToObject() {
+        return null;
     }
 }

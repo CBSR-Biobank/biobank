@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.ActivityStatusDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.ActivityStatusInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -31,9 +30,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
 
     private List<ActivityStatusWrapper> localActivityStatuses = new ArrayList<ActivityStatusWrapper>();
-
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(ActivityStatusEntryInfoTable.class.getName());
 
     private String addMessage;
     private String editMessage;

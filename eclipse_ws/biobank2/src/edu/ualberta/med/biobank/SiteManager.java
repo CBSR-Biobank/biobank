@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SiteManager {

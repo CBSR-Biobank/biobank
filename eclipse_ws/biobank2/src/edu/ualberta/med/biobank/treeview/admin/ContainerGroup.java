@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class ContainerGroup extends AdapterBase {
@@ -46,8 +47,8 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(ContainerWrapper.class)
-            && SessionManager.getUser().isContainerAdministrator()) {
+        if (SessionManager.canCreate(ContainerWrapper.class,
+            getParentFromClass(SiteAdapter.class).getWrapper())) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add a Container");
             mi.addSelectionListener(new SelectionAdapter() {

@@ -26,8 +26,8 @@ import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
@@ -285,20 +285,36 @@ public class SessionManager {
         return getInstance().getSession().getServerName();
     }
 
-    public static boolean canCreate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
+    /**
+     * Site specific only if currentSite != null
+     */
+    public static boolean canCreate(Class<?> clazz, SiteWrapper currentSite) {
+        return getUser().hasPrivilegeOnObject(Privilege.CREATE,
+            currentSite == null ? null : currentSite.getId(), clazz);
     }
 
-    public static boolean canDelete(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
+    /**
+     * Site specific only if currentSite != null
+     */
+    public static boolean canDelete(Class<?> clazz, SiteWrapper currentSite) {
+        return getUser().hasPrivilegeOnObject(Privilege.DELETE,
+            currentSite == null ? null : currentSite.getId(), clazz);
+    }
+
+    public static boolean canDelete(ModelWrapper<?> wrapper) {
+        return wrapper.canDelete(getUser());
     }
 
     public static boolean canView(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
+        return getUser().hasPrivilegeOnObject(Privilege.READ, null, clazz);
     }
 
-    public static boolean canUpdate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
+    /**
+     * Site specific only if currentSite != null
+     */
+    public static boolean canUpdate(Class<?> clazz, SiteWrapper currentSite) {
+        return getUser().hasPrivilegeOnObject(Privilege.UPDATE,
+            currentSite == null ? null : currentSite.getId(), clazz);
     }
 
     public boolean isConnected() {

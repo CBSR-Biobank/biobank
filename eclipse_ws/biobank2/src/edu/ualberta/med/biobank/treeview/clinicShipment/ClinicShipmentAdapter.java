@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.forms.ClinicShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ClinicShipmentViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 
 public class ClinicShipmentAdapter extends AdapterBase {
 

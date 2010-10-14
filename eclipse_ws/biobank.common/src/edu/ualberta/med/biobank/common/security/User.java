@@ -9,10 +9,11 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class User implements Serializable, NotAProxy {
-    private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
+    @Deprecated
     private static final long serialVersionUID = 1L;
 
     private Long id;
@@ -111,13 +112,34 @@ public class User implements Serializable, NotAProxy {
         return false;
     }
 
-    public boolean hasPrivilegeOnObject(Privilege privilege, Class<?> clazz) {
-        return hasPrivilegeOnObject(privilege, clazz, null);
+    public boolean isSiteAdministrator(Integer siteId) {
+        for (Group group : groups) {
+            if (group.isSiteAdministrator(siteId)) {
+                return true;
+            }
+        }
+        return false;
     }
 
-    public boolean hasPrivilegeOnObject(Privilege privilege, Class<?> clazz,
-        Integer id) {
+    public boolean canUpdateSite(Integer siteId) {
+        for (Group group : groups) {
+            if (group.hasPrivilegeOnObject(Privilege.UPDATE,
+                Site.class.getName(), siteId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
+        Class<?> clazz) {
+        return hasPrivilegeOnObject(privilege, siteId, clazz, null);
+    }
+
+    public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
+        Class<?> clazz, Integer id) {
         String type;
+        boolean canCreateDeleteUpdate = true;
         if (ModelWrapper.class.isAssignableFrom(clazz)) {
             ModelWrapper<?> wrapper = null;
             try {
@@ -131,13 +153,16 @@ public class User implements Serializable, NotAProxy {
                 return false;
             }
             type = wrapper.getWrappedClass().getName();
+            if (privilege != Privilege.READ && siteId != null)
+                canCreateDeleteUpdate = isSiteAdministrator(siteId);
         } else {
             type = clazz.getName();
         }
-        return hasPrivilegeOnObject(privilege, type, id);
+        return canCreateDeleteUpdate
+            && hasPrivilegeOnObject(privilege, type, id);
     }
 
-    public boolean hasPrivilegeOnObject(Privilege privilege, String type,
+    private boolean hasPrivilegeOnObject(Privilege privilege, String type,
         Integer id) {
         for (Group group : groups) {
             if (group.hasPrivilegeOnObject(privilege, type, id)) {
@@ -145,15 +170,6 @@ public class User implements Serializable, NotAProxy {
             }
         }
         return false;
-    }
-
-    public boolean hasPrivilegeOnObject(Privilege privilege, String type) {
-        return hasPrivilegeOnObject(privilege, type, null);
-    }
-
-    public boolean isContainerAdministrator() {
-        return hasPrivilegeOnObject(Privilege.CREATE,
-            CONTAINER_ADMINISTRATION_STRING);
     }
 
     @Override

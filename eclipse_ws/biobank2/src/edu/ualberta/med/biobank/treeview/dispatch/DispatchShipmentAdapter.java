@@ -78,7 +78,7 @@ public class DispatchShipmentAdapter extends AdapterBase {
         addViewMenu(menu, "Dispatch Shipment");
         SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
         if (currentSite.equals(getWrapper().getSender())
-            && SessionManager.canDelete(DispatchShipmentWrapper.class)
+            && SessionManager.canDelete(DispatchShipmentWrapper.class, null)
             && getWrapper().isInCreationState()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Delete");

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.Collection;
 
@@ -14,6 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public class SiteGroup extends AdapterBase {
@@ -39,7 +40,7 @@ public class SiteGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(SiteWrapper.class)) {
+        if (SessionManager.canCreate(SiteWrapper.class, null)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Site");
             mi.addSelectionListener(new SelectionAdapter() {

@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
 public class SiteAddHandler extends AbstractHandler {
 
@@ -23,7 +23,7 @@ public class SiteAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(SiteWrapper.class)
+        return SessionManager.canCreate(SiteWrapper.class, null)
             && SessionManager.getInstance().getSession() != null;
     }
 }

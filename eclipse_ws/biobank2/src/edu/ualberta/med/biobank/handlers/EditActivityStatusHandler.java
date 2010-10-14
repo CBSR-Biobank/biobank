@@ -11,8 +11,8 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.ActivityStatusEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 
 public class EditActivityStatusHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.editActivityStatusMethods";
@@ -39,9 +39,9 @@ public class EditActivityStatusHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.canCreate(ActivityStatusWrapper.class)
-            || SessionManager.canUpdate(ActivityStatusWrapper.class) || SessionManager
-            .canDelete(ActivityStatusWrapper.class))
+        return (SessionManager.canCreate(ActivityStatusWrapper.class, null)
+            || SessionManager.canUpdate(ActivityStatusWrapper.class, null) || SessionManager
+            .canDelete(ActivityStatusWrapper.class, null))
             && (SessionManager.getInstance().getSession() != null);
     }
 }

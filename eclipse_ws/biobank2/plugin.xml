@@ -430,7 +430,7 @@
                      definitionId="biobank2.mainPerspectiveSelected">
                </reference>
                <reference
-                    definitionId="biobank2.siteSelected">
+                     definitionId="biobank2.canUpdateSiteSelected">
                </reference>
             </and>
          </activeWhen>
@@ -447,7 +447,7 @@
                      definitionId="biobank2.mainPerspectiveSelected">
                </reference>
                <reference
-                    definitionId="biobank2.siteSelected">
+                     definitionId="biobank2.canUpdateSiteSelected">
                </reference>
             </and>
          </activeWhen>
@@ -697,7 +697,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
+                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -728,7 +728,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
+                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -778,7 +778,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
+                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -809,7 +809,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.PatientVisitAdapter">
+                           value="edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -2768,6 +2768,15 @@
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.dispatchShipments">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.canUpdateSiteSelected">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.canUpdateSiteSelected">
+            <equals
+                  value="true">
             </equals>
          </with>
       </definition>

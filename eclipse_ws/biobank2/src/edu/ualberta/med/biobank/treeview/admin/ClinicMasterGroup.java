@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.Collection;
 
@@ -11,24 +11,25 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 
-public class StudyMasterGroup extends AbstractStudyGroup {
+public class ClinicMasterGroup extends AbstractClinicGroup {
 
-    public StudyMasterGroup(SessionAdapter parent, int id) {
-        super(parent, id, "Studies Master");
+    public ClinicMasterGroup(SessionAdapter sessionAdapter, int id) {
+        super(sessionAdapter, id, "Clinics Master");
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(StudyWrapper.class)) {
+        if (SessionManager.canCreate(ClinicWrapper.class, null)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Study");
+            mi.setText("Add Clinic");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    addStudy();
+                    addClinic();
                 }
             });
         }
@@ -37,12 +38,12 @@ public class StudyMasterGroup extends AbstractStudyGroup {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return StudyWrapper.getAllStudies(getAppService());
+        return ClinicWrapper.getAllClinics(SessionManager.getAppService());
     }
 
-    public void addStudy() {
-        StudyWrapper study = new StudyWrapper(SessionManager.getAppService());
-        StudyAdapter adapter = new StudyAdapter(this, study);
+    public void addClinic() {
+        ClinicWrapper clinic = new ClinicWrapper(getAppService());
+        ClinicAdapter adapter = new ClinicAdapter(this, clinic);
         adapter.openEntryForm();
     }
 

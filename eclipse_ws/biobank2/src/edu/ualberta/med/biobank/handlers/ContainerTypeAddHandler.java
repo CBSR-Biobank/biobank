@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 
 public class ContainerTypeAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.containerTypeAdd";
@@ -24,6 +24,8 @@ public class ContainerTypeAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ContainerTypeWrapper.class);
+        boolean can = SessionManager.canCreate(ContainerTypeWrapper.class,
+            SessionManager.getInstance().getCurrentSite());
+        return can;
     }
 }

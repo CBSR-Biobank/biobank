@@ -41,8 +41,8 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.ContainerCell;
-import edu.ualberta.med.biobank.treeview.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
@@ -109,10 +109,10 @@ public class ContainerViewForm extends BiobankViewForm {
         setPartName(container.getLabel() + " ("
             + container.getContainerType().getNameShort() + ")");
         initCells();
-        canCreate = SessionManager.canCreate(ContainerWrapper.class)
-            && SessionManager.getUser().isContainerAdministrator();
-        canDelete = SessionManager.canCreate(ContainerWrapper.class)
-            && SessionManager.getUser().isContainerAdministrator();
+        canCreate = SessionManager.canCreate(ContainerWrapper.class,
+            container.getSite());
+        canDelete = SessionManager.canDelete(ContainerWrapper.class,
+            container.getSite());
     }
 
     @Override

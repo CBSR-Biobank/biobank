@@ -7,9 +7,11 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.model.Site;
 
 public class Group implements Serializable, NotAProxy {
     public static final String GROUP_NAME_WEBSITE_ADMINISTRATOR = "Website Administrator";
+    public static final String PG_GROUP_NAME_SITE_ADMINISTRATION = "site-administration-features";
     private static final long serialVersionUID = 1L;
 
     private Long id;
@@ -106,4 +108,16 @@ public class Group implements Serializable, NotAProxy {
     public Map<String, ProtectionGroupPrivilege> getProtectionGroupMap() {
         return pgMap;
     }
+
+    public boolean isSiteAdministrator(Integer siteId) {
+        ProtectionGroupPrivilege pgv = pgMap
+            .get(PG_GROUP_NAME_SITE_ADMINISTRATION);
+        if (pgv == null) {
+            return false;
+        }
+        return pgv.getPrivileges().contains(Privilege.UPDATE)
+            && hasPrivilegeOnObject(Privilege.UPDATE, Site.class.getName(),
+                siteId);
+    }
+
 }
