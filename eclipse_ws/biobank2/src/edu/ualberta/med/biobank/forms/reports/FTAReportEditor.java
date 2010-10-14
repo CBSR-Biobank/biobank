@@ -31,12 +31,12 @@ public class FTAReportEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(((StudyWrapper) ((IStructuredSelection) studyCombo
             .getSelection()).getFirstElement()).getNameShort());
         params.add(ReportsEditor.processDate(afterDate.getDate(), true));
-        return params;
+        report.setParams(params);
     }
 
     protected ComboViewer createStudyComboOption(String labelText,
@@ -72,5 +72,14 @@ public class FTAReportEditor extends ReportsEditor {
         names.add("Study");
         names.add("After Date (Processed)");
         return names;
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(((StudyWrapper) ((IStructuredSelection) studyCombo
+            .getSelection()).getFirstElement()).getNameShort());
+        params.add(ReportsEditor.processDate(afterDate.getDate(), true));
+        return params;
     }
 }

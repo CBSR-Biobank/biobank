@@ -52,16 +52,14 @@ public class SessionHelper implements Runnable {
             if (userName.length() == 0) {
                 if (BioBankPlugin.getDefault().isDebugging()) {
                     userName = "testuser";
-                    appService =
-                        ServiceConnection.getAppService(serverUrl, userName,
-                            "test");
+                    appService = ServiceConnection.getAppService(serverUrl,
+                        userName, "test");
                 } else {
                     appService = ServiceConnection.getAppService(serverUrl);
                 }
             } else {
-                appService =
-                    ServiceConnection.getAppService(serverUrl, userName,
-                        password);
+                appService = ServiceConnection.getAppService(serverUrl,
+                    userName, password);
             }
             siteWrappers = SiteWrapper.getSites(appService);
             user = appService.getCurrentUser();
@@ -69,8 +67,7 @@ public class SessionHelper implements Runnable {
             logger.error("Error while logging to application", exp);
             if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
-                BioBankPlugin.openAsyncError("Login Failed", exp.getCause()
-                    .getMessage());
+                BioBankPlugin.openAsyncError("Login Failed", "Bad credentials");
                 return;
             }
             BioBankPlugin.openRemoteConnectErrorMessage(exp);

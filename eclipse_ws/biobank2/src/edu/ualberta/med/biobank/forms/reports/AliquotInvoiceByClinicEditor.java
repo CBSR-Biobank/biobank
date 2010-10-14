@@ -23,11 +23,19 @@ public class AliquotInvoiceByClinicEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected List<Object> getPrintParams() {
         List<Object> params = new ArrayList<Object>();
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
         return params;
+    }
+
+    @Override
+    protected void initReport() {
+        List<Object> params = new ArrayList<Object>();
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
+        report.setParams(params);
     }
 
     @Override

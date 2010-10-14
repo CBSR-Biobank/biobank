@@ -31,8 +31,8 @@ public class AliquotRequestEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() throws Exception {
-        return parseCSV();
+    protected void initReport() throws Exception {
+        report.setParams(parseCSV());
     }
 
     @Override

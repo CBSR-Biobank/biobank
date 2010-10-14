@@ -44,9 +44,9 @@ public class AliquotsByStudyClinicEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected List<Object> getPrintParams() {
         List<Object> params = new ArrayList<Object>();
-        params.add(topContainers.getSelectedContainers());
+        params.add(topContainers.getSelectedContainerNames());
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
         return params;
@@ -64,6 +64,16 @@ public class AliquotsByStudyClinicEditor extends ReportsEditor {
         paramNames.add("Start Date (Linked)");
         paramNames.add("End Date (Linked)");
         return paramNames;
+    }
+
+    @Override
+    protected void initReport() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        report.setContainerList(ReportsEditor
+            .containerIdsToString(topContainers.getSelectedContainerIds()));
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
+        report.setParams(params);
     }
 
 }

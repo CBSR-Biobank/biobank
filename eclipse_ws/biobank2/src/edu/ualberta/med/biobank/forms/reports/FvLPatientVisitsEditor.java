@@ -14,11 +14,6 @@ public class FvLPatientVisitsEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
-        return new ArrayList<Object>();
-    }
-
-    @Override
     protected String[] getColumnNames() {
         return new String[] { "Study", "Clinic", "First Visit", "Last Visit" };
     }
@@ -26,6 +21,15 @@ public class FvLPatientVisitsEditor extends ReportsEditor {
     @Override
     protected List<String> getParamNames() {
         return new ArrayList<String>();
+    }
+
+    @Override
+    protected void initReport() throws Exception {
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        return new ArrayList<Object>();
     }
 
 }

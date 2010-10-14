@@ -66,6 +66,7 @@ public class TopContainerListWidget {
             allsites.setNameShort("All Sites");
             sites.add(allsites);
             siteCombo.setInput(sites);
+            siteCombo.getCombo().select(0);
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Failed to load sites", e1);
         }

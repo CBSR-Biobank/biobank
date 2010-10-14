@@ -14,11 +14,6 @@ public class PatientWBCEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
-        return new ArrayList<Object>();
-    }
-
-    @Override
     protected String[] getColumnNames() {
         return new String[] { "Study", "Clinic", "Patient", "Date",
             "Sample Type", "Inventory ID", "Location" };
@@ -27,6 +22,18 @@ public class PatientWBCEditor extends ReportsEditor {
     @Override
     protected List<String> getParamNames() {
         return new ArrayList<String>();
+    }
+
+    @Override
+    protected void initReport() throws Exception {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        // TODO Auto-generated method stub
+        return null;
     }
 
 }

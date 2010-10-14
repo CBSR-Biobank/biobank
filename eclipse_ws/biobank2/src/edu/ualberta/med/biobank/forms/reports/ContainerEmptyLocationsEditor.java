@@ -33,11 +33,11 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
         Boolean.class);
 
     @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(containerLabel.getText());
-        params.add(topContainers.getSelectedContainers());
-        return params;
+        params.add(topContainers.getSelectedContainerIds());
+        report.setParams(params);
     }
 
     @Override
@@ -126,4 +126,11 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
         return paramNames;
     }
 
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(containerLabel.getText());
+        params.add(topContainers.getSelectedContainerNames());
+        return params;
+    }
 }
