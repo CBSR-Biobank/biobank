@@ -40,15 +40,13 @@ public abstract class DispatchAliquotListInfoTable extends
     private static final String[] HEADINGS = new String[] { "Inventory ID",
         "Type", "Patient Number", "State", "Comment" };
 
-    private static final int[] BOUNDS = new int[] { 100, 100, 120, 120, -1 };
-
     private boolean editMode = false;
 
     private DispatchWrapper currentShipment;
 
     public DispatchAliquotListInfoTable(Composite parent,
         final DispatchWrapper shipment, boolean editMode) {
-        super(parent, null, HEADINGS, BOUNDS, 5);
+        super(parent, null, HEADINGS, 5);
         this.currentShipment = shipment;
         setCollection(getInternalDispatchAliquots());
         this.editMode = editMode;
@@ -124,8 +122,7 @@ public abstract class DispatchAliquotListInfoTable extends
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData info =
-                    (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
                         return "loading...";
@@ -151,13 +148,13 @@ public abstract class DispatchAliquotListInfoTable extends
     }
 
     @Override
-    public TableRowData getCollectionModelObject(
-        DispatchAliquotWrapper dsa) throws Exception {
+    public TableRowData getCollectionModelObject(DispatchAliquotWrapper dsa)
+        throws Exception {
         TableRowData info = new TableRowData();
         info.dsa = dsa;
         info.inventoryId = dsa.getAliquot().getInventoryId();
-        info.pnumber =
-            dsa.getAliquot().getPatientVisit().getPatient().getPnumber();
+        info.pnumber = dsa.getAliquot().getPatientVisit().getPatient()
+            .getPnumber();
         SampleTypeWrapper type = dsa.getAliquot().getSampleType();
         Assert.isNotNull(type, "aliquot with null for sample type");
         info.type = type.getName();

@@ -33,14 +33,10 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] { "Patient Number",
-        "Study", "Waybill", "Departed", "Clinic", "Source Vessels",
-        "Aliquots" };
-
-    private static final int[] BOUNDS = new int[] { 100, 100, 150, 130, 120,
-        120, 120, 120 };
+        "Study", "Waybill", "Departed", "Clinic", "Source Vessels", "Aliquots" };
 
     public PvListInfoTable(Composite parent, List<PatientVisitWrapper> pvs) {
-        super(parent, pvs, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override

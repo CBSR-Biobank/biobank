@@ -31,11 +31,9 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
     private static final String[] HEADINGS = new String[] { "Name",
         "Container Type", "Status", "Product Barcode", "Temperature" };
 
-    private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130 };
-
     public ContainerInfoTable(Composite parent,
         List<ContainerWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, 10);
     }
 
     @Override

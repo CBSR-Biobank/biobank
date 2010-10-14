@@ -16,13 +16,10 @@ public class LoggingInfoTable extends InfoTableWidget<LogWrapper> {
         "Date", "Action", "Type", "Patient #", "Inventory ID", "Location",
         "Details" };
 
-    private static final int[] BOUNDS = new int[] { 80, 102, 110, 80, 100, 102,
-        102, 120, 200 };
-
     private static final int PAGE_SIZE_ROWS = 20;
 
     public LoggingInfoTable(Composite parent, List<LogWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     class TableRowData {
