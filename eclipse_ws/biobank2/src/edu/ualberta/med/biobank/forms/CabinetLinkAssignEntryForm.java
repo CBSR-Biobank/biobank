@@ -182,8 +182,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         drawerLabel = toolkit.createLabel(client, "Drawer"); //$NON-NLS-1$
 
         List<ContainerTypeWrapper> types = ContainerTypeWrapper
-            .getContainerTypesInSite(appService, SessionManager.getInstance()
-                .getCurrentSite(), cabinetNameContains, false);
+            .getContainerTypesInSite(appService,
+                SessionManager.getCurrentSite(), cabinetNameContains, false);
         ContainerTypeWrapper cabinetType = null;
         ContainerTypeWrapper drawerType = null;
         if (types.size() == 0) {
@@ -468,8 +468,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     - removeSize);
                 labelsTested.add(binLabel);
                 for (ContainerWrapper cont : ContainerWrapper
-                    .getContainersInSite(appService, SessionManager
-                        .getInstance().getCurrentSite(), binLabel)) {
+                    .getContainersInSite(appService,
+                        SessionManager.getCurrentSite(), binLabel)) {
                     boolean canContainSamples = cont.getContainerType()
                         .getSampleTypeCollection() != null
                         && cont.getContainerType().getSampleTypeCollection()
@@ -607,16 +607,16 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private void initCabinetContainerTypesList() throws ApplicationException {
         cabinetContainerTypes = ContainerTypeWrapper.getContainerTypesInSite(
-            appService, SessionManager.getInstance().getCurrentSite(),
-            cabinetNameContains, false);
+            appService, SessionManager.getCurrentSite(), cabinetNameContains,
+            false);
     }
 
     private List<SampleTypeWrapper> getCabinetSampleTypes()
         throws ApplicationException {
         if (cabinetSampleTypes == null) {
             cabinetSampleTypes = SampleTypeWrapper
-                .getSampleTypeForContainerTypes(appService, SessionManager
-                    .getInstance().getCurrentSite(), cabinetNameContains);
+                .getSampleTypeForContainerTypes(appService,
+                    SessionManager.getCurrentSite(), cabinetNameContains);
         }
         return cabinetSampleTypes;
     }
@@ -850,16 +850,16 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         appendLogNLS("Cabinet.activitylog.checkingParent", binLabel, //$NON-NLS-1$ 
             aliquot.getSampleType().getName());
         List<ContainerWrapper> containers = ContainerWrapper
-            .getContainersHoldingSampleType(appService, SessionManager
-                .getInstance().getCurrentSite(), binLabel, aliquot
-                .getSampleType());
+            .getContainersHoldingSampleType(appService,
+                SessionManager.getCurrentSite(), binLabel,
+                aliquot.getSampleType());
         if (containers.size() == 1) {
             bin = containers.get(0);
             drawer = bin.getParent();
             cabinet = drawer.getParent();
         } else if (containers.size() == 0) {
             containers = ContainerWrapper.getContainersInSite(appService,
-                SessionManager.getInstance().getCurrentSite(), binLabel);
+                SessionManager.getCurrentSite(), binLabel);
             String errorMsg = null;
             if (containers.size() > 0) {
                 errorMsg = Messages.getFormattedString(

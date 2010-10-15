@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -748,5 +749,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     @Override
     public SiteWrapper getSiteLinkedToObject() {
         return getSite();
+    }
+
+    @Override
+    public boolean checkSpecificAccess(User user, Integer siteId) {
+        return user.isSiteAdministrator(siteId);
     }
 }

@@ -118,7 +118,7 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         setShipmentValues();
 
         User user = SessionManager.getUser();
-        SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper currentSite = SessionManager.getCurrentSite();
         if (shipment.canBeSentBy(user, currentSite))
             createSendButton();
         else if (shipment.canBeReceivedBy(user, currentSite))

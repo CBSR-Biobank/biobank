@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -1188,5 +1189,10 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     @Override
     public SiteWrapper getSiteLinkedToObject() {
         return getSite();
+    }
+
+    @Override
+    public boolean checkSpecificAccess(User user, Integer siteId) {
+        return user.isSiteAdministrator(siteId);
     }
 }

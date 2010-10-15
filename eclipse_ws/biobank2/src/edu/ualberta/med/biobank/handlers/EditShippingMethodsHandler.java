@@ -22,7 +22,7 @@ public class EditShippingMethodsHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        SiteWrapper siteWrapper = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper siteWrapper = SessionManager.getCurrentSite();
         SiteAdapter sa = new SiteAdapter(sessionAdapter, siteWrapper);
         try {
             PlatformUI

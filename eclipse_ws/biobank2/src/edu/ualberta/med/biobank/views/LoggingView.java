@@ -297,8 +297,8 @@ public class LoggingView extends ViewPart {
             setEnableAllFields(true);
             loadComboFields();
             if (!SessionManager.getInstance().isAllSitesSelected()) {
-                String currentSiteName = SessionManager.getInstance()
-                    .getCurrentSite().getNameShort();
+                String currentSiteName = SessionManager.getCurrentSite()
+                    .getNameShort();
                 for (int i = 0; i < siteComboOptions.length; ++i) {
                     if (siteComboOptions[i].equals(currentSiteName)) {
                         siteCombo.select(i);

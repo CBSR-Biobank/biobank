@@ -96,8 +96,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patient = patientVisit.getPatient();
         retrieve();
         try {
-            patientVisit.logEdit(SessionManager.getInstance().getCurrentSite()
-                .getNameShort());
+            patientVisit
+                .logEdit(SessionManager.getCurrentSite().getNameShort());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log edit failed", e);
         }
@@ -143,7 +143,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper site = SessionManager.getCurrentSite();
 
         createReadOnlyLabelledField(client, SWT.NONE, "Site", site.getName());
 
@@ -202,7 +202,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         setFirstControl(shipmentsComboViewer.getControl());
 
         if (SessionManager.getUser().isSiteAdministrator(
-            SessionManager.getInstance().getCurrentSite().getId())) {
+            SessionManager.getCurrentSite())) {
             final Button shipmentsListCheck = toolkit.createButton(composite,
                 "Last 7 days", SWT.CHECK);
             shipmentsListCheck.setSelection(true);

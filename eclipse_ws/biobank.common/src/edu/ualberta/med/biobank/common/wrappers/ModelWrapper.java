@@ -573,4 +573,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public SiteWrapper getSiteLinkedToObject() {
         return null;
     }
+
+    /**
+     * return true if access is authorized
+     */
+    public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
+        @SuppressWarnings("unused") Integer siteId) {
+        return true;
+    }
 }

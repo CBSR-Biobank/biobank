@@ -38,7 +38,7 @@ public class ShipmentTodayNode extends AbstractTodayNode {
         if (SessionManager.getInstance().isConnected())
             return ClinicShipmentWrapper
                 .getTodayShipments(SessionManager.getAppService(),
-                    SessionManager.getInstance().getCurrentSite());
+                    SessionManager.getCurrentSite());
         return new ArrayList<ModelWrapper<?>>();
 
     }

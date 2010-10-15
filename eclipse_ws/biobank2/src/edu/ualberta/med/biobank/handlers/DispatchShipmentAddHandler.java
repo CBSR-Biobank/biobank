@@ -19,7 +19,7 @@ public class DispatchShipmentAddHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper site = SessionManager.getCurrentSite();
         List<StudyWrapper> dispatchStudies = site.getDispatchStudiesAsSender();
         if (dispatchStudies == null || dispatchStudies.size() == 0) {
             BioBankPlugin.openAsyncError("Sender Site Error",
@@ -37,6 +37,6 @@ public class DispatchShipmentAddHandler extends AbstractHandler {
     @Override
     public boolean isEnabled() {
         return SessionManager.canCreate(DispatchShipmentWrapper.class,
-            SessionManager.getInstance().getCurrentSite());
+            SessionManager.getCurrentSite());
     }
 }

@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.server.reports.ReportFactory;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
+import gov.nih.nci.security.authorization.domainobjects.Application;
 import gov.nih.nci.security.authorization.domainobjects.Group;
 import gov.nih.nci.security.authorization.domainobjects.Privilege;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
@@ -28,6 +29,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -130,45 +132,78 @@ public class BiobankApplicationServiceImpl extends
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
             Set<ProtectionElement> siteAdminPEs = upm
                 .getProtectionElements(SITE_ADMIN_PG_ID);
+            List<String> pgIdsToDelete = new ArrayList<String>();
+            List<String> peIdsToDelete = new ArrayList<String>();
             for (ProtectionElement pe : siteAdminPEs) {
-                if (pe.getValue().equals(id.toString())) {
-                    upm.removeProtectionElement(pe.getProtectionElementId()
-                        .toString());
-                    return;
+                if (pe.getObjectId() != null
+                    && pe.getObjectId().equals(Site.class.getName())
+                    && pe.getAttribute() != null
+                    && pe.getAttribute().equals("id") && pe.getValue() != null
+                    && pe.getValue().equals(id.toString())) {
+                    Set<ProtectionGroup> pgs = upm.getProtectionGroups(pe
+                        .getProtectionElementId().toString());
+                    for (ProtectionGroup pg : pgs) {
+                        // remove the protection group only if it contains only
+                        // this protection element and is not the main site
+                        // admin group
+                        String pgId = pg.getProtectionGroupId().toString();
+                        if (!pgId.equals(SITE_ADMIN_PG_ID)
+                            && upm.getProtectionElements(pgId).size() == 1) {
+                            pgIdsToDelete.add(pgId);
+                        }
+                    }
+                    peIdsToDelete.add(pe.getProtectionElementId().toString());
                 }
+            }
+            for (String peId : peIdsToDelete) {
+                upm.removeProtectionElement(peId);
+            }
+            for (String pgId : pgIdsToDelete) {
+                upm.removeProtectionGroup(pgId);
             }
         } catch (Exception e) {
             throw new ApplicationException("Error deleting site " + id + ":"
-                + nameShort + "security: " + e.getMessage());
+                + nameShort + " security: " + e.getMessage());
         }
 
     }
 
     private void newSiteSecurity(Site site) throws ApplicationException {
-        Object id = null;
+        Integer siteId = null;
         String nameShort = null;
         try {
-            id = site.getId();
+            siteId = site.getId();
             nameShort = site.getNameShort();
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+            Application currentApplication = upm
+                .getApplication(APPLICATION_CONTEXT_NAME);
             // Create protection element for the site
             ProtectionElement pe = new ProtectionElement();
-            pe.setApplication(upm.getApplication(APPLICATION_CONTEXT_NAME));
+            pe.setApplication(currentApplication);
             pe.setProtectionElementName(SITE_CLASS_NAME + "/" + nameShort);
             pe.setProtectionElementDescription(nameShort);
             pe.setObjectId(SITE_CLASS_NAME);
             pe.setAttribute("id");
-            pe.setValue(id.toString());
+            pe.setValue(siteId.toString());
             upm.createProtectionElement(pe);
             // Add the new protection element to the protection group
             // "Site Admin PG"
             upm.addProtectionElements(SITE_ADMIN_PG_ID, new String[] { pe
                 .getProtectionElementId().toString() });
+            // Create a new protection group for this protection element only
+            ProtectionGroup pg = new ProtectionGroup();
+            pg.setApplication(currentApplication);
+            pg.setProtectionGroupName(nameShort + " site");
+            pg.setProtectionGroupDescription("Protection group for site "
+                + nameShort + " (id=" + siteId + ")");
+            pg.setProtectionElements(new HashSet<ProtectionElement>(Arrays
+                .asList(pe)));
+            upm.createProtectionGroup(pg);
         } catch (Exception e) {
             log.error("error adding new site security", e);
-            throw new ApplicationException("Error adding new site " + id + ":"
-                + nameShort + "security:" + e.getMessage());
+            throw new ApplicationException("Error adding new site " + siteId
+                + ":" + nameShort + "security:" + e.getMessage());
         }
     }
 

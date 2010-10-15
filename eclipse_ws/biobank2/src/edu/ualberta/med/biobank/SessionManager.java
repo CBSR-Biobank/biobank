@@ -223,8 +223,8 @@ public class SessionManager {
         return rootNode;
     }
 
-    public SiteWrapper getCurrentSite() {
-        return siteManager.getCurrentSite();
+    public static SiteWrapper getCurrentSite() {
+        return getInstance().siteManager.getCurrentSite();
     }
 
     public void setSiteManagerEnabled(boolean enable) {
@@ -330,8 +330,7 @@ public class SessionManager {
 
     public static void log(String action, String details, String type)
         throws Exception {
-        getAppService().logActivity(action,
-            getInstance().getCurrentSite().getNameShort(), null, null, null,
-            details, type);
+        getAppService().logActivity(action, getCurrentSite().getNameShort(),
+            null, null, null, details, type);
     }
 }

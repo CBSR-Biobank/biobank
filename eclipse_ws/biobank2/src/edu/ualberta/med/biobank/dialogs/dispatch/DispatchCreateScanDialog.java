@@ -121,9 +121,9 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
             }
         } else {
             currentPallet = ContainerWrapper
-                .getContainerWithProductBarcodeInSite(SessionManager
-                    .getAppService(), SessionManager.getInstance()
-                    .getCurrentSite(), currentProductBarcode);
+                .getContainerWithProductBarcodeInSite(
+                    SessionManager.getAppService(),
+                    SessionManager.getCurrentSite(), currentProductBarcode);
             if (currentPallet != null) {
                 // FIXME check it is a pallet ? Should we do it when enter
                 // barcode ?
@@ -301,10 +301,9 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
         ContainerWrapper currentPallet = ContainerWrapper
-            .getContainerWithProductBarcodeInSite(SessionManager
-                .getAppService(),
-                SessionManager.getInstance().getCurrentSite(),
-                currentProductBarcode);
+            .getContainerWithProductBarcodeInSite(
+                SessionManager.getAppService(),
+                SessionManager.getCurrentSite(), currentProductBarcode);
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell

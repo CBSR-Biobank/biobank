@@ -65,8 +65,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         patientVisitAdapter = (PatientVisitAdapter) adapter;
         patientVisit = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
-        patientVisit.logLookup(SessionManager.getInstance().getCurrentSite()
-            .getNameShort());
+        patientVisit.logLookup(SessionManager.getCurrentSite().getNameShort());
 
         setPartName("Visit " + patientVisit.getFormattedDateProcessed());
     }

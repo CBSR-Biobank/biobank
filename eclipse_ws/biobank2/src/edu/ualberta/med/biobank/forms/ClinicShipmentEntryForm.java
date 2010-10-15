@@ -84,7 +84,7 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
 
         shipmentAdapter = (ClinicShipmentAdapter) adapter;
         shipment = shipmentAdapter.getWrapper();
-        site = SessionManager.getInstance().getCurrentSite();
+        site = SessionManager.getCurrentSite();
         try {
             site.reload();
             shipment.reload();
@@ -126,8 +126,8 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
         ClinicWrapper selectedClinic = null;
         if (shipment.isNew()) {
             // choose clinic for new shipment
-            Set<ClinicWrapper> siteClinics = SessionManager.getInstance()
-                .getCurrentSite().getWorkingClinicCollection();
+            Set<ClinicWrapper> siteClinics = SessionManager.getCurrentSite()
+                .getWorkingClinicCollection();
             selectedClinic = shipment.getClinic();
             if (siteClinics.size() == 1) {
                 selectedClinic = siteClinics.toArray(new ClinicWrapper[1])[0];

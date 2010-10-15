@@ -36,8 +36,8 @@ public enum SearchType {
         public List<? extends ModelWrapper<?>> search(String searchString)
             throws Exception {
             return AliquotWrapper.getAliquotsInSiteWithPositionLabel(
-                SessionManager.getAppService(), SessionManager.getInstance()
-                    .getCurrentSite(), searchString);
+                SessionManager.getAppService(),
+                SessionManager.getCurrentSite(), searchString);
         }
     },
 
@@ -45,10 +45,9 @@ public enum SearchType {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString)
             throws Exception {
-            List<AliquotWrapper> aliquots =
-                AliquotWrapper.getAliquotsNonActive(SessionManager
-                    .getAppService(), SessionManager.getInstance()
-                    .getCurrentSite());
+            List<AliquotWrapper> aliquots = AliquotWrapper
+                .getAliquotsNonActive(SessionManager.getAppService(),
+                    SessionManager.getCurrentSite());
             return aliquots;
         }
 
@@ -75,9 +74,9 @@ public enum SearchType {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString)
             throws Exception {
-            return ContainerWrapper.getContainersInSite(SessionManager
-                .getAppService(),
-                SessionManager.getInstance().getCurrentSite(), searchString);
+            return ContainerWrapper.getContainersInSite(
+                SessionManager.getAppService(),
+                SessionManager.getCurrentSite(), searchString);
         }
     },
 
@@ -85,10 +84,10 @@ public enum SearchType {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString)
             throws Exception {
-            ContainerWrapper container =
-                ContainerWrapper.getContainerWithProductBarcodeInSite(
-                    SessionManager.getAppService(), SessionManager
-                        .getInstance().getCurrentSite(), searchString);
+            ContainerWrapper container = ContainerWrapper
+                .getContainerWithProductBarcodeInSite(
+                    SessionManager.getAppService(),
+                    SessionManager.getCurrentSite(), searchString);
             if (container != null) {
                 return Arrays.asList(container);
             }
@@ -101,9 +100,9 @@ public enum SearchType {
         public List<? extends ModelWrapper<?>> search(String searchString)
             throws Exception {
 
-            List<PatientVisitWrapper> pvs =
-                PatientVisitWrapper.getPatientVisitsWithWorksheet(
-                    SessionManager.getAppService(), searchString);
+            List<PatientVisitWrapper> pvs = PatientVisitWrapper
+                .getPatientVisitsWithWorksheet(SessionManager.getAppService(),
+                    searchString);
 
             if (pvs == null)
                 return null;
@@ -149,8 +148,8 @@ public enum SearchType {
         if (size == 1) {
             openResult(res.get(0));
         } else {
-            boolean open =
-                MessageDialog.openQuestion(PlatformUI.getWorkbench()
+            boolean open = MessageDialog
+                .openQuestion(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow().getShell(), "Search Result",
                     "Found " + size
                         + " results. Do you want to open all of them ?");

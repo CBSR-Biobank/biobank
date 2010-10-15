@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -64,15 +65,17 @@ public class PatientAdapter extends AdapterBase {
         addDeleteMenu(menu, "Patient",
             "Are you sure you want to delete this patient?");
 
-        if (isEditable()) {
+        if (isEditable()
+            && SessionManager.canCreate(PatientVisitWrapper.class,
+                SessionManager.getCurrentSite())) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Patient Visit");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    PatientVisitAdapter adapter =
-                        new PatientVisitAdapter(PatientAdapter.this,
-                            new PatientVisitWrapper(getAppService()));
+                    PatientVisitAdapter adapter = new PatientVisitAdapter(
+                        PatientAdapter.this, new PatientVisitWrapper(
+                            getAppService()));
                     adapter.getWrapper().setPatient(getWrapper());
                     adapter.openEntryForm();
                 }

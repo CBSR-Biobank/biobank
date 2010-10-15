@@ -77,9 +77,9 @@ public class MoveAliquotsToDialog extends BiobankDialog {
             .getContainerType().getSampleTypeCollection();
         List<ContainerWrapper> conts = ContainerWrapper
             .getEmptyContainersHoldingSampleType(
-                SessionManager.getAppService(), SessionManager.getInstance()
-                    .getCurrentSite(), typesFromOlContainer, oldContainer
-                    .getRowCapacity(), oldContainer.getColCapacity());
+                SessionManager.getAppService(),
+                SessionManager.getCurrentSite(), typesFromOlContainer,
+                oldContainer.getRowCapacity(), oldContainer.getColCapacity());
 
         map = new HashMap<String, ContainerWrapper>();
         for (ContainerWrapper cont : conts) {

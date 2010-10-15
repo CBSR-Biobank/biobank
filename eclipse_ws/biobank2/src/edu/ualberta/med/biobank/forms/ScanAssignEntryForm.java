@@ -463,9 +463,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private boolean getExistingPalletFromProductBarcode() throws Exception {
         palletFoundWithProductBarcode = ContainerWrapper
-            .getContainerWithProductBarcodeInSite(appService, SessionManager
-                .getInstance().getCurrentSite(), currentPalletWrapper
-                .getProductBarcode());
+            .getContainerWithProductBarcodeInSite(appService,
+                SessionManager.getCurrentSite(),
+                currentPalletWrapper.getProductBarcode());
         if (palletFoundWithProductBarcode == null) {
             // no pallet found with this barcode
             setTypes(palletContainerTypes, true);
@@ -540,10 +540,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
         if (isFakeScanLinkedOnly) {
             return PalletCell.getRandomAliquotsNotAssigned(appService,
-                SessionManager.getInstance().getCurrentSite().getId());
+                SessionManager.getCurrentSite().getId());
         }
         return PalletCell.getRandomAliquotsAlreadyAssigned(appService,
-            SessionManager.getInstance().getCurrentSite().getId());
+            SessionManager.getCurrentSite().getId());
     }
 
     /**
@@ -715,7 +715,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private void processCellWithPreviousPosition(PalletCell scanCell,
         String positionString, AliquotWrapper foundAliquot) {
         if (foundAliquot.getParent().getSite()
-            .equals(SessionManager.getInstance().getCurrentSite())) {
+            .equals(SessionManager.getCurrentSite())) {
             if (foundAliquot.getParent().equals(currentPalletWrapper)) {
                 // same pallet
                 RowColPos rcp = new RowColPos(scanCell.getRow(),
@@ -1000,8 +1000,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             currentPalletWrapper.reset();
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            currentPalletWrapper.setSite(SessionManager.getInstance()
-                .getCurrentSite());
+            currentPalletWrapper.setSite(SessionManager.getCurrentSite());
         } catch (Exception e) {
             logger.error("Error while reseting pallet values", e); //$NON-NLS-1$
         }

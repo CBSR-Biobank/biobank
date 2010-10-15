@@ -57,8 +57,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  */
 public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.ScanLinkEntryForm"; //$NON-NLS-1$
+    public static final String ID = "edu.ualberta.med.biobank.forms.ScanLinkEntryForm"; //$NON-NLS-1$
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ScanLinkEntryForm.class.getName());
@@ -100,8 +99,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     protected void init() throws Exception {
         super.init();
         setPartName(Messages.getString("ScanLink.tabTitle")); //$NON-NLS-1$
-        linkFormPatientManagement =
-            new LinkFormPatientManagement(widgetCreator, this);
+        linkFormPatientManagement = new LinkFormPatientManagement(
+            widgetCreator, this);
         setCanLaunchScan(true);
     }
 
@@ -122,8 +121,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
         createCancelConfirmWidget();
 
-        SampleTypeSelectionWidget lastWidget =
-            sampleTypeWidgets.get(sampleTypeWidgets.size() - 1);
+        SampleTypeSelectionWidget lastWidget = sampleTypeWidgets
+            .get(sampleTypeWidgets.size() - 1);
         lastWidget.setNextWidget(cancelConfirmWidget);
 
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
@@ -152,9 +151,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         client.setLayoutData(gd);
         containersScroll.setContent(client);
 
-        spw =
-            new ScanPalletWidget(client,
-                CellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
+        spw = new ScanPalletWidget(client,
+            CellStatus.DEFAULT_PALLET_SCAN_LINK_STATUS_LIST);
         spw.setVisible(true);
         toolkit.adapt(spw);
         spw.setLayoutData(new GridData(SWT.CENTER, SWT.TOP, true, false));
@@ -195,16 +193,15 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         radioComponents.setEnabled(false);
 
         // radio button to choose how the sample types are selected
-        final Button radioRowSelection =
-            toolkit.createButton(radioComponents,
-                Messages.getString("ScanLink.rowChoice.label"), SWT.RADIO); //$NON-NLS-1$
-        final Button radioCustomSelection =
-            toolkit.createButton(radioComponents,
-                Messages.getString("ScanLink.customChoice.label"), SWT.RADIO); //$NON-NLS-1$
-        IPreferenceStore store =
-            BioBankPlugin.getDefault().getPreferenceStore();
-        boolean hideRadio =
-            store.getBoolean(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY);
+        final Button radioRowSelection = toolkit.createButton(radioComponents,
+            Messages.getString("ScanLink.rowChoice.label"), SWT.RADIO); //$NON-NLS-1$
+        final Button radioCustomSelection = toolkit.createButton(
+            radioComponents,
+            Messages.getString("ScanLink.customChoice.label"), SWT.RADIO); //$NON-NLS-1$
+        IPreferenceStore store = BioBankPlugin.getDefault()
+            .getPreferenceStore();
+        boolean hideRadio = store
+            .getBoolean(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY);
         radioComponents.setVisible(!hideRadio);
 
         // stackLayout
@@ -225,8 +222,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (radioRowSelection.getSelection()) {
-                    selectionStackLayout.topControl =
-                        typesSelectionPerRowComposite;
+                    selectionStackLayout.topControl = typesSelectionPerRowComposite;
                     selectionComp.layout();
                     for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
                         sampleType.addBinding(widgetCreator);
@@ -243,8 +239,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (radioCustomSelection.getSelection()) {
-                    selectionStackLayout.topControl =
-                        typesSelectionCustomComposite;
+                    selectionStackLayout.topControl = typesSelectionCustomComposite;
                     selectionComp.layout();
                     for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
                         sampleType.removeBinding(widgetCreator);
@@ -274,9 +269,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void initAuthorizedSampleTypeList() throws ApplicationException {
-        authorizedSampleTypes =
-            SampleTypeWrapper.getSampleTypeForPallet96(appService,
-                SessionManager.getInstance().getCurrentSite());
+        authorizedSampleTypes = SampleTypeWrapper.getSampleTypeForPallet96(
+            appService, SessionManager.getCurrentSite());
         if (authorizedSampleTypes.size() == 0) {
             BioBankPlugin
                 .openAsyncError(
@@ -297,21 +291,18 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         typesSelectionCustomComposite.setLayout(layout);
         toolkit.paintBordersFor(typesSelectionCustomComposite);
 
-        Label label =
-            toolkit.createLabel(typesSelectionCustomComposite,
-                Messages.getString("ScanLink.custom.type.label")); //$NON-NLS-1$
+        Label label = toolkit.createLabel(typesSelectionCustomComposite,
+            Messages.getString("ScanLink.custom.type.label")); //$NON-NLS-1$
         GridData gd = new GridData();
         gd.horizontalSpan = 3;
         label.setLayoutData(gd);
 
-        customSelectionWidget =
-            new SampleTypeSelectionWidget(typesSelectionCustomComposite, null,
-                sampleTypes, toolkit);
+        customSelectionWidget = new SampleTypeSelectionWidget(
+            typesSelectionCustomComposite, null, sampleTypes, toolkit);
         customSelectionWidget.resetValues(true);
 
-        Button applyType =
-            toolkit.createButton(typesSelectionCustomComposite,
-                "Apply", SWT.PUSH); //$NON-NLS-1$
+        Button applyType = toolkit.createButton(typesSelectionCustomComposite,
+            "Apply", SWT.PUSH); //$NON-NLS-1$
         applyType.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -346,10 +337,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
         SampleTypeSelectionWidget precedent = null;
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
-            final SampleTypeSelectionWidget typeWidget =
-                new SampleTypeSelectionWidget(typesSelectionPerRowComposite,
-                    ContainerLabelingSchemeWrapper.SBS_ROW_LABELLING_PATTERN
-                        .charAt(i), sampleTypes, toolkit);
+            final SampleTypeSelectionWidget typeWidget = new SampleTypeSelectionWidget(
+                typesSelectionPerRowComposite,
+                ContainerLabelingSchemeWrapper.SBS_ROW_LABELLING_PATTERN
+                    .charAt(i), sampleTypes, toolkit);
             final int indexRow = i;
             typeWidget
                 .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -465,8 +456,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     protected void beforeScanThreadStart() {
-        isFakeScanRandom =
-            fakeScanRandom != null && fakeScanRandom.getSelection();
+        isFakeScanRandom = fakeScanRandom != null
+            && fakeScanRandom.getSelection();
     }
 
     @Override
@@ -476,8 +467,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
         try {
             return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                appService, SessionManager.getInstance().getCurrentSite()
-                    .getId());
+                appService, SessionManager.getCurrentSite().getId());
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }
@@ -494,8 +484,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         boolean everythingOk = true;
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
-            final Map<Integer, Integer> typesRows =
-                new HashMap<Integer, Integer>();
+            final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
             for (RowColPos rcp : cells.keySet()) {
                 monitor.subTask("Processing position "
                     + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
@@ -511,8 +500,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         .getStatus() != CellStatus.NO_TYPE)) {
                     processCellStatus(cell, false);
                 }
-                everythingOk =
-                    cell.getStatus() != CellStatus.ERROR && everythingOk;
+                everythingOk = cell.getStatus() != CellStatus.ERROR
+                    && everythingOk;
                 if (PalletCell.hasValue(cell)) {
                     typesRowsCount++;
                     typesRows.put(rcp.row, typesRowsCount);
@@ -572,17 +561,15 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         } else {
             String value = cell.getValue();
             if (value != null) {
-                List<AliquotWrapper> aliquots =
-                    AliquotWrapper.getAliquots(appService, value);
+                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
+                    appService, value);
                 if (aliquots.size() > 0) {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages
                         .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
                     AliquotWrapper aliquot = aliquots.get(0);
-                    String palletPosition =
-                        ContainerLabelingSchemeWrapper
-                            .rowColToSbs(new RowColPos(cell.getRow(), cell
-                                .getCol()));
+                    String palletPosition = ContainerLabelingSchemeWrapper
+                        .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                     appendLogNLS("ScanLink.activitylog.aliquot.existsError",
                         palletPosition, value, aliquot.getPatientVisit()
                             .getFormattedDateProcessed(), aliquot
@@ -590,8 +577,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);
                     if (independantProcess) {
-                        SampleTypeSelectionWidget widget =
-                            sampleTypeWidgets.get(cell.getRow());
+                        SampleTypeSelectionWidget widget = sampleTypeWidgets
+                            .get(cell.getRow());
                         widget.addOneToNumber();
                         SampleTypeWrapper type = widget.getSelection();
                         if (type != null) {
@@ -610,15 +597,15 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     @SuppressWarnings("unchecked")
     @Override
     protected void saveForm() throws Exception {
-        Map<RowColPos, PalletCell> cells =
-            (Map<RowColPos, PalletCell>) spw.getCells();
-        PatientVisitWrapper patientVisit =
-            linkFormPatientManagement.getSelectedPatientVisit();
+        Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
+            .getCells();
+        PatientVisitWrapper patientVisit = linkFormPatientManagement
+            .getSelectedPatientVisit();
 
         StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:\n"); //$NON-NLS-1$
         int nber = 0;
-        ActivityStatusWrapper activeStatus =
-            ActivityStatusWrapper.getActiveActivityStatus(appService);
+        ActivityStatusWrapper activeStatus = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
         List<AliquotWrapper> newAliquots = new ArrayList<AliquotWrapper>();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
@@ -656,8 +643,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         if (typeWidget.needToSave()) {
             SampleTypeWrapper type = typeWidget.getSelection();
             if (type != null) {
-                Map<RowColPos, PalletCell> cells =
-                    (Map<RowColPos, PalletCell>) spw.getCells();
+                Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
+                    .getCells();
                 if (cells != null) {
                     for (RowColPos rcp : cells.keySet()) {
                         if (rcp.row == indexRow) {

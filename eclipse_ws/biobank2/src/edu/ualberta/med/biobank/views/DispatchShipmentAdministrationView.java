@@ -72,19 +72,22 @@ public class DispatchShipmentAdministrationView extends
     }
 
     private void createNodes() {
-        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
-        if (SessionManager.getInstance().isAllSitesSelected()
-            || site.getDispatchStudiesAsSender().size() > 0) {
-            outgoingNode = new OutgoingNode(rootNode, 0);
-            outgoingNode.setParent(rootNode);
-            rootNode.addChild(outgoingNode);
-        }
+        SiteWrapper site = SessionManager.getCurrentSite();
+        if (SessionManager.getInstance().isConnected()
+            && SessionManager.getUser().canUpdateSite(site)) {
+            if (SessionManager.getInstance().isAllSitesSelected()
+                || site.getDispatchStudiesAsSender().size() > 0) {
+                outgoingNode = new OutgoingNode(rootNode, 0);
+                outgoingNode.setParent(rootNode);
+                rootNode.addChild(outgoingNode);
+            }
 
-        if (SessionManager.getInstance().isAllSitesSelected()
-            || site.getDispatchStudiesAsReceiver().size() > 0) {
-            incomingNode = new IncomingNode(rootNode, 1);
-            incomingNode.setParent(rootNode);
-            rootNode.addChild(incomingNode);
+            if (SessionManager.getInstance().isAllSitesSelected()
+                || site.getDispatchStudiesAsReceiver().size() > 0) {
+                incomingNode = new IncomingNode(rootNode, 1);
+                incomingNode.setParent(rootNode);
+                rootNode.addChild(incomingNode);
+            }
         }
 
         searchedNode = new DispatchShipmentSearchedNode(rootNode, 2);
@@ -182,7 +185,7 @@ public class DispatchShipmentAdministrationView extends
     @Override
     public void reload() {
         try {
-            SessionManager.getInstance().getCurrentSite().reload();
+            SessionManager.getCurrentSite().reload();
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Unable to reload site information.",
                 e);
@@ -222,7 +225,7 @@ public class DispatchShipmentAdministrationView extends
         if (radioWaybill.getSelection()) {
             return DispatchShipmentWrapper.getShipmentsInSite(
                 SessionManager.getAppService(), treeText.getText().trim(),
-                SessionManager.getInstance().getCurrentSite());
+                SessionManager.getCurrentSite());
         } else {
             Date date = dateWidget.getDate();
             if (date != null) {
@@ -230,12 +233,12 @@ public class DispatchShipmentAdministrationView extends
                     return DispatchShipmentWrapper
                         .getShipmentsInSiteByDateSent(
                             SessionManager.getAppService(), date,
-                            SessionManager.getInstance().getCurrentSite());
+                            SessionManager.getCurrentSite());
                 else
                     return DispatchShipmentWrapper
                         .getShipmentsInSiteByDateReceived(
                             SessionManager.getAppService(), date,
-                            SessionManager.getInstance().getCurrentSite());
+                            SessionManager.getCurrentSite());
             }
         }
         return null;

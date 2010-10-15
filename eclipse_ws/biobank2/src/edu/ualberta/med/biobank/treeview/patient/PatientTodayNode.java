@@ -50,7 +50,7 @@ public class PatientTodayNode extends AbstractTodayNode {
         if (SessionManager.getInstance().isConnected())
             return PatientWrapper
                 .getPatientsInTodayShipments(SessionManager.getAppService(),
-                    SessionManager.getInstance().getCurrentSite());
+                    SessionManager.getCurrentSite());
         return new ArrayList<ModelWrapper<?>>();
     }
 

@@ -9,6 +9,7 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -112,13 +113,30 @@ public class User implements Serializable, NotAProxy {
         return false;
     }
 
+    public boolean isSiteAdministrator(SiteWrapper site) {
+        Integer id = null;
+        if (site != null)
+            id = site.getId();
+        return isSiteAdministrator(id);
+    }
+
     public boolean isSiteAdministrator(Integer siteId) {
+        if (isWebsiteAdministrator()) {
+            return true;
+        }
         for (Group group : groups) {
             if (group.isSiteAdministrator(siteId)) {
                 return true;
             }
         }
         return false;
+    }
+
+    public boolean canUpdateSite(SiteWrapper site) {
+        Integer id = null;
+        if (site != null)
+            id = site.getId();
+        return canUpdateSite(id);
     }
 
     public boolean canUpdateSite(Integer siteId) {
@@ -154,7 +172,9 @@ public class User implements Serializable, NotAProxy {
             }
             type = wrapper.getWrappedClass().getName();
             if (privilege != Privilege.READ && siteId != null)
-                canCreateDeleteUpdate = isSiteAdministrator(siteId);
+                canCreateDeleteUpdate = canUpdateSite(siteId);
+            canCreateDeleteUpdate = canCreateDeleteUpdate
+                && wrapper.checkSpecificAccess(this, siteId);
         } else {
             type = clazz.getName();
         }

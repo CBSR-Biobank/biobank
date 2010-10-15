@@ -309,7 +309,7 @@ public class DispatchShipmentSendingEntryForm extends
     @Override
     public void reset() throws Exception {
         super.reset();
-        shipment.setSender(SessionManager.getInstance().getCurrentSite());
+        shipment.setSender(SessionManager.getCurrentSite());
         if (studyComboViewer != null) {
             StudyWrapper study = shipment.getStudy();
             if (study != null) {

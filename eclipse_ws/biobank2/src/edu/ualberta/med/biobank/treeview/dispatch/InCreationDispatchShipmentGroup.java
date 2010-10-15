@@ -27,7 +27,7 @@ public class InCreationDispatchShipmentGroup extends
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper site = SessionManager.getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             return site.getInCreationDispatchShipmentCollection();
         }
@@ -51,7 +51,7 @@ public class InCreationDispatchShipmentGroup extends
     protected void addDispatchShipment() {
         DispatchShipmentWrapper shipment = new DispatchShipmentWrapper(
             SessionManager.getAppService());
-        shipment.setSender(SessionManager.getInstance().getCurrentSite());
+        shipment.setSender(SessionManager.getCurrentSite());
         DispatchShipmentAdapter shipNode = new DispatchShipmentAdapter(this,
             shipment);
         shipNode.openEntryForm();

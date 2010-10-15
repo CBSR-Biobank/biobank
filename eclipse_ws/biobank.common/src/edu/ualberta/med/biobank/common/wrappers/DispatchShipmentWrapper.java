@@ -662,12 +662,13 @@ public class DispatchShipmentWrapper extends
 
     public boolean canBeReceivedBy(User user, SiteWrapper site) {
         return canUpdate(user) && getReceiver().equals(site)
-            && isInTransitState();
+            && isInTransitState() && user.canUpdateSite(site);
     }
 
     public boolean canBeClosedBy(User user, SiteWrapper site) {
         return canUpdate(user) && getReceiver().equals(site)
-            && isInReceivedState() && !hasPendingAliquots();
+            && isInReceivedState() && !hasPendingAliquots()
+            && user.canUpdateSite(site);
     }
 
     private boolean hasPendingAliquots() {

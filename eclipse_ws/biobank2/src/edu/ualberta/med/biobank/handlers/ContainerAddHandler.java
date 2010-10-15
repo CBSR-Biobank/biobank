@@ -15,7 +15,7 @@ public class ContainerAddHandler extends AbstractHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SiteAdapter siteAdapter = (SiteAdapter) SessionManager
-            .searchNode(SessionManager.getInstance().getCurrentSite());
+            .searchNode(SessionManager.getCurrentSite());
         Assert.isNotNull(siteAdapter);
         siteAdapter.getContainersGroupNode().addContainer(siteAdapter, false);
         return null;
@@ -23,7 +23,7 @@ public class ContainerAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ContainerWrapper.class, SessionManager
-            .getInstance().getCurrentSite());
+        return SessionManager.canCreate(ContainerWrapper.class,
+            SessionManager.getCurrentSite());
     }
 }

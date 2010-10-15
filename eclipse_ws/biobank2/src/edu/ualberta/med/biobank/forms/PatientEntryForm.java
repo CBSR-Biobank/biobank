@@ -56,7 +56,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         retrievePatient();
         try {
             patientAdapter.getWrapper().logEdit(
-                SessionManager.getInstance().getCurrentSite().getNameShort());
+                SessionManager.getCurrentSite().getNameShort());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log edit failed", e);
         }
@@ -92,7 +92,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         BiobankText labelSite = createReadOnlyLabelledField(client, SWT.NONE,
             "Site");
-        siteWrapper = SessionManager.getInstance().getCurrentSite();
+        siteWrapper = SessionManager.getCurrentSite();
         labelSite.setText(siteWrapper.getName());
 
         siteWrapper.reload();

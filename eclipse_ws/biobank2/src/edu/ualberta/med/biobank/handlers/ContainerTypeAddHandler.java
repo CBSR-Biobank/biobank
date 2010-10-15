@@ -15,7 +15,7 @@ public class ContainerTypeAddHandler extends AbstractHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SiteAdapter siteAdapter = (SiteAdapter) SessionManager
-            .searchNode(SessionManager.getInstance().getCurrentSite());
+            .searchNode(SessionManager.getCurrentSite());
         Assert.isNotNull(siteAdapter);
         siteAdapter.getContainerTypesGroupNode().addContainerType(siteAdapter,
             false);
@@ -25,7 +25,7 @@ public class ContainerTypeAddHandler extends AbstractHandler {
     @Override
     public boolean isEnabled() {
         boolean can = SessionManager.canCreate(ContainerTypeWrapper.class,
-            SessionManager.getInstance().getCurrentSite());
+            SessionManager.getCurrentSite());
         return can;
     }
 }

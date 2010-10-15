@@ -48,7 +48,7 @@ public abstract class AbstractDispatchShipmentEntryForm extends
                 + adapter.getClass().getName());
 
         shipment = (DispatchShipmentWrapper) adapter.getModelObject();
-        site = SessionManager.getInstance().getCurrentSite();
+        site = SessionManager.getCurrentSite();
         if (shipment.isNew()) {
             shipment.setSender(site);
         }
