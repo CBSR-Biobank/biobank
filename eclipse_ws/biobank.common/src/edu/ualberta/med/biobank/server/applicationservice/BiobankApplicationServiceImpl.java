@@ -162,6 +162,7 @@ public class BiobankApplicationServiceImpl extends
                 upm.removeProtectionGroup(pgId);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ApplicationException("Error deleting site " + id + ":"
                 + nameShort + " security: " + e.getMessage());
         }

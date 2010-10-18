@@ -8,6 +8,8 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.security.Privilege;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
@@ -126,18 +128,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        List<AliquotWrapper> aliquots = getAliquots(appService,
+        AliquotWrapper existingAliquot = getAliquot(appService,
             getInventoryId());
         boolean alreadyExists = false;
-        if (aliquots.size() > 0 && isNew()) {
+        if (existingAliquot != null && isNew()) {
             alreadyExists = true;
-        } else {
-            for (AliquotWrapper aliquot : aliquots) {
-                if (!aliquot.getId().equals(getId())) {
-                    alreadyExists = true;
-                    break;
-                }
-            }
+        } else if (existingAliquot != null
+            && !existingAliquot.getId().equals(getId())) {
+            alreadyExists = true;
         }
         if (alreadyExists) {
             throw new BiobankCheckException("An aliquot with inventory id \""
@@ -445,18 +443,47 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     /**
      * search in all aliquots list. No matter which site added it.
      */
-    public static List<AliquotWrapper> getAliquots(
+    public static AliquotWrapper getAliquot(
         WritableApplicationService appService, String inventoryId)
-        throws ApplicationException {
+        throws ApplicationException, BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Aliquot.class.getName() + " where inventoryId = ?",
             Arrays.asList(new Object[] { inventoryId }));
         List<Aliquot> aliquots = appService.query(criteria);
-        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        for (Aliquot aliquot : aliquots) {
-            list.add(new AliquotWrapper(appService, aliquot));
+        if (aliquots == null || aliquots.size() == 0)
+            return null;
+        if (aliquots.size() == 1)
+            return new AliquotWrapper(appService, aliquots.get(0));
+        throw new BiobankCheckException("Error retrieving aliquots: found "
+            + aliquots.size() + " results.");
+    }
+
+    /**
+     * search in all aliquots list. No matter which site added it. If user is
+     * not null, will return only aliquot that is linked to a visit which site
+     * can be read by the user
+     * 
+     * @throws BiobankCheckException
+     */
+    public static AliquotWrapper getAliquot(
+        WritableApplicationService appService, String inventoryId, User user)
+        throws ApplicationException, BiobankCheckException {
+        AliquotWrapper aliquot = getAliquot(appService, inventoryId);
+        if (aliquot != null) {
+            SiteWrapper site = aliquot.getPatientVisit().getShipment()
+                .getSite();
+            // site might be null if can't access it !
+            if (site == null
+                || !user.hasPrivilegeOnObject(Privilege.READ, null, Site.class,
+                    site.getId())) {
+                throw new ApplicationException(
+                    "Aliquot "
+                        + inventoryId
+                        + " exists but you don't have access to it."
+                        + " Its patient visit shipment should be linked to a site you can access.");
+            }
         }
-        return list;
+        return aliquot;
     }
 
     // FIXME : do we want this search to be specific to a site ?

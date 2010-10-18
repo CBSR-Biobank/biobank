@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
@@ -184,15 +183,14 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                         "ScanAssign.scanStatus.aliquot.missing", expectedAliquot.getInventoryId())); //$NON-NLS-1$
             scanCell.setTitle("?"); //$NON-NLS-1$
         } else {
-            List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
+            AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(
                 SessionManager.getAppService(), value);
-            if (aliquots.size() == 0) {
+            if (foundAliquot == null) {
                 // not in database
                 scanCell.setStatus(CellStatus.ERROR);
                 scanCell.setInformation(Messages
                     .getString("ScanAssign.scanStatus.aliquot.notlinked")); //$NON-NLS-1$
-            } else if (aliquots.size() == 1) {
-                AliquotWrapper foundAliquot = aliquots.get(0);
+            } else {
                 if (expectedAliquot != null
                     && !foundAliquot.equals(expectedAliquot)) {
                     // Position taken
@@ -227,10 +225,6 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                             .setInformation("This aliquot should be on another pallet"); //$NON-NLS-1$
                     }
                 }
-            } else {
-                Assert.isTrue(false,
-                    "InventoryId " + value + " should be unique !"); //$NON-NLS-1$ //$NON-NLS-2$
-                scanCell.setStatus(CellStatus.ERROR);
             }
         }
     }

@@ -63,6 +63,7 @@ public class GenericAppArgs {
         remainingArgs = parser.getRemainingArgs();
     }
 
+    @Override
     public String toString() {
         return "h: " + hostname + ", p: " + port + ", u: " + username + ", w: "
             + password + ", rArgs: " + remainingArgs.toString() + ", errmsg"

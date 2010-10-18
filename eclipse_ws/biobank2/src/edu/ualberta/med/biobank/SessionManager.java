@@ -297,7 +297,7 @@ public class SessionManager {
      */
     public static boolean canCreate(Class<?> clazz, SiteWrapper currentSite) {
         return getUser().hasPrivilegeOnObject(Privilege.CREATE,
-            currentSite == null ? null : currentSite.getId(), clazz);
+            currentSite == null ? null : currentSite.getId(), clazz, null);
     }
 
     /**
@@ -305,7 +305,7 @@ public class SessionManager {
      */
     public static boolean canDelete(Class<?> clazz, SiteWrapper currentSite) {
         return getUser().hasPrivilegeOnObject(Privilege.DELETE,
-            currentSite == null ? null : currentSite.getId(), clazz);
+            currentSite == null ? null : currentSite.getId(), clazz, null);
     }
 
     public static boolean canDelete(ModelWrapper<?> wrapper) {
@@ -313,7 +313,8 @@ public class SessionManager {
     }
 
     public static boolean canView(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.READ, null, clazz);
+        return getUser()
+            .hasPrivilegeOnObject(Privilege.READ, null, clazz, null);
     }
 
     /**
@@ -321,7 +322,7 @@ public class SessionManager {
      */
     public static boolean canUpdate(Class<?> clazz, SiteWrapper currentSite) {
         return getUser().hasPrivilegeOnObject(Privilege.UPDATE,
-            currentSite == null ? null : currentSite.getId(), clazz);
+            currentSite == null ? null : currentSite.getId(), clazz, null);
     }
 
     public boolean isConnected() {

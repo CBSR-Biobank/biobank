@@ -419,7 +419,7 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testGetAliquots() throws Exception {
+    public void testGetAliquot() throws Exception {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
         PatientVisitWrapper pv = aliquot.getPatientVisit();
@@ -430,10 +430,10 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
         AliquotHelper.addAliquot(sampleType, container, pv, 3, 3);
 
-        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(appService,
+        AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(appService,
             aliquot.getInventoryId());
-        Assert.assertEquals(1, aliquots.size());
-        Assert.assertEquals(aliquots.get(0), aliquot);
+        Assert.assertNotNull(foundAliquot);
+        Assert.assertEquals(foundAliquot, aliquot);
     }
 
     @Test

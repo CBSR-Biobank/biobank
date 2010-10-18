@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.List;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -19,7 +18,6 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchShipmentReceivingEntryForm extends
     AbstractDispatchShipmentEntryForm {
@@ -129,22 +127,17 @@ public class DispatchShipmentReceivingEntryForm extends
             .getDispatchShipmentAliquot(inventoryId);
         if (dsa == null) {
             // aliquot not in shipment. Check if exists in DB:
-            List<AliquotWrapper> aliquots = null;
+            AliquotWrapper aliquot = null;
             try {
-                aliquots = AliquotWrapper.getAliquots(shipment.getAppService(),
+                aliquot = AliquotWrapper.getAliquot(shipment.getAppService(),
                     inventoryId);
-            } catch (ApplicationException ae) {
+            } catch (Exception ae) {
                 BioBankPlugin.openAsyncError("Error retrieving aliquot", ae);
             }
-            if (aliquots == null || aliquots.size() == 0) {
+            if (aliquot == null) {
                 return new AliquotInfo(null, ResType.NOT_IN_DB);
             }
-            if (aliquots.size() > 1) {
-                BioBankPlugin.openError("Duplicate aliquot !",
-                    "This aliquot exists more that once in the database !");
-                return new AliquotInfo(null, ResType.DUPLICATE);
-            }
-            return new AliquotInfo(aliquots.get(0), ResType.NOT_IN_SHIPMENT);
+            return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
         }
         if (DispatchAliquotState.RECEIVED_STATE.isEquals(dsa.getState())) {
             return new AliquotInfo(dsa.getAliquot(), ResType.RECEIVED);

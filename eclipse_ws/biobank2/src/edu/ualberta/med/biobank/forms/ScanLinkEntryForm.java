@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -553,26 +554,28 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     /**
      * Process the cell: apply a status and set correct information
+     * 
+     * @throws BiobankCheckException
      */
     private CellStatus processCellStatus(PalletCell cell,
-        boolean independantProcess) throws ApplicationException {
+        boolean independantProcess) throws ApplicationException,
+        BiobankCheckException {
         if (cell == null) {
             return CellStatus.EMPTY;
         } else {
             String value = cell.getValue();
             if (value != null) {
-                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
+                AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(
                     appService, value);
-                if (aliquots.size() > 0) {
+                if (foundAliquot != null) {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages
                         .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
-                    AliquotWrapper aliquot = aliquots.get(0);
                     String palletPosition = ContainerLabelingSchemeWrapper
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                     appendLogNLS("ScanLink.activitylog.aliquot.existsError",
-                        palletPosition, value, aliquot.getPatientVisit()
-                            .getFormattedDateProcessed(), aliquot
+                        palletPosition, value, foundAliquot.getPatientVisit()
+                            .getFormattedDateProcessed(), foundAliquot
                             .getPatientVisit().getPatient().getPnumber());
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);

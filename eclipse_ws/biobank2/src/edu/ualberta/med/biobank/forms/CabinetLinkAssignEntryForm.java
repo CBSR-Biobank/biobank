@@ -768,21 +768,14 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         appendLogNLS("Cabinet.activitylog.gettingInfoId", //$NON-NLS-1$
             aliquot.getInventoryId());
-        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(appService,
+        AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(appService,
             aliquot.getInventoryId());
-        if (aliquots.size() > 1) {
-            canLaunchCheck.setValue(false);
-            throw new Exception(
-                "Error while retrieving aliquot with inventoryId " //$NON-NLS-1$
-                    + aliquot.getInventoryId()
-                    + ": more than one aliquot found."); //$NON-NLS-1$
-        }
-        if (aliquots.size() == 0) {
+        if (aliquot == null) {
             canLaunchCheck.setValue(false);
             throw new Exception("No aliquot found with inventoryId " //$NON-NLS-1$
                 + aliquot.getInventoryId());
         }
-        aliquot.initObjectWith(aliquots.get(0));
+        aliquot.initObjectWith(foundAliquot);
         List<SampleTypeWrapper> possibleTypes = getCabinetSampleTypes();
         if (!possibleTypes.contains(aliquot.getSampleType())) {
             canLaunchCheck.setValue(false);

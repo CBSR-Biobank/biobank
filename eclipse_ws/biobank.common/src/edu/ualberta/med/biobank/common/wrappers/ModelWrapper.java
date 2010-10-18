@@ -490,8 +490,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can view this object
      */
     public boolean canRead(User user, Integer siteId) {
-        return user.hasPrivilegeOnObject(Privilege.READ, siteId, getClass(),
-            getId());
+        return user.hasPrivilegeOnObject(Privilege.READ, siteId, this);
     }
 
     /**
@@ -500,7 +499,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public boolean canUpdate(User user) {
         SiteWrapper site = getSiteLinkedToObject();
         return user.hasPrivilegeOnObject(Privilege.UPDATE, site == null ? null
-            : site.getId(), getClass(), getId());
+            : site.getId(), this);
     }
 
     /**
@@ -509,7 +508,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public boolean canDelete(User user) {
         SiteWrapper site = getSiteLinkedToObject();
         return user.hasPrivilegeOnObject(Privilege.DELETE, site == null ? null
-            : site.getId(), getClass(), getId());
+            : site.getId(), this);
     }
 
     public void addWrapperListener(WrapperListener listener) {

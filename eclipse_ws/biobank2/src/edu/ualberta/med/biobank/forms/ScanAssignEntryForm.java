@@ -8,7 +8,6 @@ import java.util.Map;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -646,52 +645,45 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         if (value == null) { // no aliquot scanned
             updateCellAsMissing(positionString, scanCell, expectedAliquot);
         } else {
-            List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
-                appService, value);
-            if (aliquots.size() == 0) {
+            AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(appService,
+                value);
+            if (foundAliquot == null) {
                 updateCellAsNotLinked(positionString, scanCell);
-            } else if (aliquots.size() == 1) {
-                AliquotWrapper foundAliquot = aliquots.get(0);
-                if (expectedAliquot != null
-                    && !foundAliquot.equals(expectedAliquot)) {
-                    updateCellAsPositionAlreadyTaken(positionString, scanCell,
-                        expectedAliquot, foundAliquot);
+            } else if (expectedAliquot != null
+                && !foundAliquot.equals(expectedAliquot)) {
+                updateCellAsPositionAlreadyTaken(positionString, scanCell,
+                    expectedAliquot, foundAliquot);
+            } else {
+                scanCell.setAliquot(foundAliquot);
+                if (expectedAliquot != null) {
+                    // aliquot scanned is already registered at this
+                    // position (everything is ok !)
+                    scanCell.setStatus(CellStatus.FILLED);
+                    scanCell.setTitle(foundAliquot.getPatientVisit()
+                        .getPatient().getPnumber());
+                    scanCell.setAliquot(expectedAliquot);
                 } else {
-                    scanCell.setAliquot(foundAliquot);
-                    if (expectedAliquot != null) {
-                        // aliquot scanned is already registered at this
-                        // position (everything is ok !)
-                        scanCell.setStatus(CellStatus.FILLED);
-                        scanCell.setTitle(foundAliquot.getPatientVisit()
-                            .getPatient().getPnumber());
-                        scanCell.setAliquot(expectedAliquot);
-                    } else {
-                        if (currentPalletWrapper.canHoldAliquot(foundAliquot)) {
-                            if (foundAliquot.hasParent()) { // moved
-                                processCellWithPreviousPosition(scanCell,
-                                    positionString, foundAliquot);
-                            } else { // new in pallet
-                                if (foundAliquot.isUsedInDispatchShipment()) {
-                                    updateCellAsDispatchedError(positionString,
-                                        scanCell, foundAliquot);
-                                } else {
-                                    scanCell.setStatus(CellStatus.NEW);
-                                    scanCell.setTitle(foundAliquot
-                                        .getPatientVisit().getPatient()
-                                        .getPnumber());
-                                }
+                    if (currentPalletWrapper.canHoldAliquot(foundAliquot)) {
+                        if (foundAliquot.hasParent()) { // moved
+                            processCellWithPreviousPosition(scanCell,
+                                positionString, foundAliquot);
+                        } else { // new in pallet
+                            if (foundAliquot.isUsedInDispatchShipment()) {
+                                updateCellAsDispatchedError(positionString,
+                                    scanCell, foundAliquot);
+                            } else {
+                                scanCell.setStatus(CellStatus.NEW);
+                                scanCell.setTitle(foundAliquot
+                                    .getPatientVisit().getPatient()
+                                    .getPnumber());
                             }
-                        } else {
-                            // pallet can't hold this aliquot type
-                            updateCellAsTypeError(positionString, scanCell,
-                                foundAliquot);
                         }
+                    } else {
+                        // pallet can't hold this aliquot type
+                        updateCellAsTypeError(positionString, scanCell,
+                            foundAliquot);
                     }
                 }
-            } else {
-                Assert.isTrue(false,
-                    "InventoryId " + value + " should be unique !"); //$NON-NLS-1$ //$NON-NLS-2$
-                updateCellAsInventoryIdError(positionString, scanCell);
             }
         }
     }
@@ -747,18 +739,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         } else {
             updateCellAsInOtherSite(positionString, scanCell, foundAliquot);
         }
-    }
-
-    private void updateCellAsInventoryIdError(String position,
-        PalletCell scanCell) {
-        String cellValue = scanCell.getValue();
-
-        scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setInformation(Messages.getFormattedString(
-            "ScanAssign.scanStatus.aliquot.inventoryIdError", cellValue)); //$NON-NLS-1$
-        scanCell.setTitle("!"); //$NON-NLS-1$
-        appendLogNLS(
-            "ScanAssign.activitylog.aliquot.inventoryIdError", position, cellValue); //$NON-NLS-1$
     }
 
     private void updateCellAsTypeError(String position, PalletCell scanCell,

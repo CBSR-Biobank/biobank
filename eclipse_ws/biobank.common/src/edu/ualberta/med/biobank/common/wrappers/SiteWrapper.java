@@ -677,6 +677,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         List<SiteWrapper> sites) throws BiobankCheckException {
         if ((sites == null) || (sites.size() == 0))
             return;
+
         Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
         DispatchInfoWrapper diw = null;
         if (infos != null) {

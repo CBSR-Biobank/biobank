@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class User implements Serializable, NotAProxy {
-    @Deprecated
     private static final long serialVersionUID = 1L;
 
     private Long id;
@@ -140,28 +139,28 @@ public class User implements Serializable, NotAProxy {
     }
 
     public boolean canUpdateSite(Integer siteId) {
-        for (Group group : groups) {
-            if (group.hasPrivilegeOnObject(Privilege.UPDATE,
-                Site.class.getName(), siteId)) {
-                return true;
-            }
-        }
-        return false;
+        return hasPrivilegeOnObject(Privilege.UPDATE, Site.class.getName(),
+            siteId);
     }
 
     public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
-        Class<?> clazz) {
-        return hasPrivilegeOnObject(privilege, siteId, clazz, null);
-    }
-
-    public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
-        Class<?> clazz, Integer id) {
-        String type;
+        ModelWrapper<?> modelWrapper) {
         boolean canCreateDeleteUpdate = true;
-        if (ModelWrapper.class.isAssignableFrom(clazz)) {
+        String type = modelWrapper.getWrappedClass().getName();
+        if (privilege != Privilege.READ && siteId != null)
+            canCreateDeleteUpdate = canUpdateSite(siteId);
+        canCreateDeleteUpdate = canCreateDeleteUpdate
+            && modelWrapper.checkSpecificAccess(this, siteId);
+        return canCreateDeleteUpdate
+            && hasPrivilegeOnObject(privilege, type, modelWrapper.getId());
+    }
+
+    public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
+        Class<?> objectClazz, Integer objectId) {
+        if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
             ModelWrapper<?> wrapper = null;
             try {
-                Constructor<?> constructor = clazz
+                Constructor<?> constructor = objectClazz
                     .getConstructor(WritableApplicationService.class);
                 wrapper = (ModelWrapper<?>) constructor
                     .newInstance((WritableApplicationService) null);
@@ -170,16 +169,10 @@ public class User implements Serializable, NotAProxy {
                 e.printStackTrace();
                 return false;
             }
-            type = wrapper.getWrappedClass().getName();
-            if (privilege != Privilege.READ && siteId != null)
-                canCreateDeleteUpdate = canUpdateSite(siteId);
-            canCreateDeleteUpdate = canCreateDeleteUpdate
-                && wrapper.checkSpecificAccess(this, siteId);
-        } else {
-            type = clazz.getName();
+            return hasPrivilegeOnObject(privilege, siteId, wrapper);
         }
-        return canCreateDeleteUpdate
-            && hasPrivilegeOnObject(privilege, type, id);
+        String type = objectClazz.getName();
+        return hasPrivilegeOnObject(privilege, type, objectId);
     }
 
     private boolean hasPrivilegeOnObject(Privilege privilege, String type,
@@ -204,4 +197,5 @@ public class User implements Serializable, NotAProxy {
         properties.put("groups", groups);
         return properties.toString();
     }
+
 }

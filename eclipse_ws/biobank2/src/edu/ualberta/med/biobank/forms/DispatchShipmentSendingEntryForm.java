@@ -32,7 +32,6 @@ import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchShipmentSendingEntryForm extends
     AbstractDispatchShipmentEntryForm {
@@ -260,20 +259,16 @@ public class DispatchShipmentSendingEntryForm extends
     protected void addAliquot(String inventoryId) {
         if (!inventoryId.isEmpty()) {
             try {
-                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
+                AliquotWrapper existingAliquot = AliquotWrapper.getAliquot(
                     shipment.getAppService(), inventoryId);
-                if (aliquots.size() == 0)
+                if (existingAliquot == null)
                     BioBankPlugin.openError("Aliquot not found",
                         "Aliquot with inventory id " + inventoryId
                             + " has not been found.");
-                else if (aliquots.size() > 1)
-                    BioBankPlugin.openError("Aliquots problems",
-                        "More than one aliquots with inventory id "
-                            + inventoryId + " has been found.");
                 else
-                    addAliquot(aliquots.get(0));
+                    addAliquot(existingAliquot);
 
-            } catch (ApplicationException ae) {
+            } catch (Exception ae) {
                 BioBankPlugin.openAsyncError("Error while looking up patient",
                     ae);
             }

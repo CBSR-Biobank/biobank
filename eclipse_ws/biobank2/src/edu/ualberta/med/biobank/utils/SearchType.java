@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,8 +26,14 @@ public enum SearchType {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString)
             throws Exception {
-            return AliquotWrapper.getAliquots(SessionManager.getAppService(),
-                searchString);
+            List<AliquotWrapper> res = new ArrayList<AliquotWrapper>();
+            AliquotWrapper aliquot = AliquotWrapper.getAliquot(
+                SessionManager.getAppService(), searchString,
+                SessionManager.getUser());
+            if (aliquot != null) {
+                res.add(aliquot);
+            }
+            return res;
         }
 
     },

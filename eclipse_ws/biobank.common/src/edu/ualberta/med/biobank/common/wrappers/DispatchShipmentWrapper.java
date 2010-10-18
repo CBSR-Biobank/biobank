@@ -651,8 +651,8 @@ public class DispatchShipmentWrapper extends
     }
 
     public boolean canBeSentBy(User user, SiteWrapper site) {
-        return canUpdate(user) && getSender().equals(site)
-            && isInCreationState() && hasAliquots();
+        return getSender() != null && canUpdate(user)
+            && getSender().equals(site) && isInCreationState() && hasAliquots();
     }
 
     public boolean hasAliquots() {
@@ -661,14 +661,15 @@ public class DispatchShipmentWrapper extends
     }
 
     public boolean canBeReceivedBy(User user, SiteWrapper site) {
-        return canUpdate(user) && getReceiver().equals(site)
-            && isInTransitState() && user.canUpdateSite(site);
+        return getReceiver() != null && canUpdate(user)
+            && getReceiver().equals(site) && isInTransitState()
+            && user.canUpdateSite(site);
     }
 
     public boolean canBeClosedBy(User user, SiteWrapper site) {
-        return canUpdate(user) && getReceiver().equals(site)
-            && isInReceivedState() && !hasPendingAliquots()
-            && user.canUpdateSite(site);
+        return getReceiver() != null && canUpdate(user)
+            && getReceiver().equals(site) && isInReceivedState()
+            && !hasPendingAliquots() && user.canUpdateSite(site);
     }
 
     private boolean hasPendingAliquots() {

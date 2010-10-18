@@ -72,8 +72,8 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         toolkit.paintBordersFor(this);
 
         if (editable) {
-            Label label =
-                toolkit.createLabel(this, "Enter patient number to add:");
+            Label label = toolkit.createLabel(this,
+                "Enter patient number to add:");
             GridData gd = new GridData();
             gd.horizontalSpan = 2;
             label.setLayoutData(gd);
@@ -127,20 +127,20 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         String patientNumber = newPatientText.getText().trim();
         if (!patientNumber.isEmpty()) {
             try {
-                PatientWrapper patient =
-                    PatientWrapper.getPatient(shipment.getAppService(),
-                        patientNumber);
+                PatientWrapper patient = PatientWrapper.getPatient(
+                    shipment.getAppService(), patientNumber,
+                    SessionManager.getUser());
                 if (patient == null) {
-                    boolean create =
-                        BioBankPlugin.openConfirm("Patient not found",
-                            "Do you want to create this patient ?");
+                    boolean create = BioBankPlugin.openConfirm(
+                        "Patient not found",
+                        "Do you want to create this patient ?");
                     if (create) {
-                        patient =
-                            new PatientWrapper(SessionManager.getAppService());
+                        patient = new PatientWrapper(
+                            SessionManager.getAppService());
                         patient.setPnumber(patientNumber);
                         addPatientListener(patient);
-                        PatientAdapter patientAdapter =
-                            new PatientAdapter(null, patient);
+                        PatientAdapter patientAdapter = new PatientAdapter(
+                            null, patient);
                         // won't be able to edit it once created :
                         patientAdapter.setEditable(false);
                         patientAdapter.openEntryForm(true);
@@ -268,8 +268,8 @@ public class ShipmentPatientsWidget extends BiobankWidget {
     }
 
     public void addBinding(WidgetCreator dbc, final String message) {
-        final ControlDecoration controlDecoration =
-            createDecorator(addButton, message);
+        final ControlDecoration controlDecoration = createDecorator(addButton,
+            message);
         WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
         UpdateValueStrategy uvs = new UpdateValueStrategy();
         uvs.setAfterGetValidator(new IValidator() {

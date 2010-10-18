@@ -10,12 +10,15 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.security.Privilege;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.common.wrappers.internal.ClinicShipmentPatientWrapper;
 import edu.ualberta.med.biobank.model.ClinicShipmentPatient;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -251,19 +254,54 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     /**
-     * Get the shipment collection. To link patients and shipments, use
-     * Shipment.setPatientCollection method
+     * Search a patient in the site with the given number. Will return the
+     * patient only if the current user has read access on a site that works
+     * with this patient study
      */
+    public static PatientWrapper getPatient(
+        WritableApplicationService appService, String patientNumber, User user)
+        throws ApplicationException {
+        PatientWrapper patient = getPatient(appService, patientNumber);
+        if (patient != null) {
+            StudyWrapper study = patient.getStudy();
+            List<SiteWrapper> sites = study.getSiteCollection();
+            boolean canRead = false;
+            for (SiteWrapper site : sites) {
+                if (user.hasPrivilegeOnObject(Privilege.READ, null, Site.class,
+                    site.getId())) {
+                    canRead = true;
+                    break;
+                }
+            }
+            if (!canRead) {
+                throw new ApplicationException("Patient " + patientNumber
+                    + " exists but you don't have access to it."
+                    + " Check studies linked to the sites you can access.");
+            }
+        }
+        return patient;
+    }
+
     public List<ClinicShipmentWrapper> getShipmentCollection(boolean sort,
         final boolean ascending) {
-        // TODO: gee, I hope that when you modify this collection it isn't meant
-        // to modify the internals of the ShipmentWrapper objects. Ask Delphine.
+        return getShipmentCollection(sort, ascending, null);
+    }
+
+    /**
+     * Get the shipment collection. To link patients and shipments, use
+     * Shipment.setPatientCollection method If user is not null, will return
+     * only shipments that are linked to a site this user can update
+     */
+    public List<ClinicShipmentWrapper> getShipmentCollection(boolean sort,
+        final boolean ascending, User user) {
         List<ClinicShipmentWrapper> shipmentCollection = new ArrayList<ClinicShipmentWrapper>();
-        ;
         Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
         if (csps != null) {
             for (ClinicShipmentPatientWrapper csp : csps) {
-                shipmentCollection.add(csp.getShipment());
+                ClinicShipmentWrapper ship = csp.getShipment();
+                if (user == null || user.canUpdateSite(ship.getSite())) {
+                    shipmentCollection.add(ship);
+                }
             }
         }
         if (sort && shipmentCollection != null) {
@@ -442,5 +480,25 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         log.setDetails(details);
         log.setType("Patient");
         return log;
+    }
+
+    @Override
+    public boolean checkSpecificAccess(User user, Integer siteId) {
+        if (isNew()) {
+            return true;
+        }
+        // won't use siteId because patient is not site specific (will be null)
+        StudyWrapper study = getStudy();
+        if (study != null) {
+            List<SiteWrapper> sites = study.getSiteCollection();
+            for (SiteWrapper site : sites) {
+                // if can update at least one site, then can add/update a
+                // patient to the linked study
+                if (user.canUpdateSite(site.getId())) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }

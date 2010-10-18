@@ -223,7 +223,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private ClinicShipmentWrapper initShipmentsCollections() {
-        allShipments = patient.getShipmentCollection(true, false);
+        allShipments = patient.getShipmentCollection(true, false,
+            SessionManager.getUser());
         recentShipments = new ArrayList<ClinicShipmentWrapper>();
         // filter for last 7 days
         Calendar c = Calendar.getInstance();
