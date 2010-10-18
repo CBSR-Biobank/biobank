@@ -103,8 +103,8 @@ public class SiteManager {
             Integer saveVal = -1;
             if ((site != null) && (site.getId() != null))
                 saveVal = site.getId();
-            Preferences prefs =
-                new InstanceScope().getNode(Application.PLUGIN_ID);
+            Preferences prefs = new InstanceScope()
+                .getNode(Application.PLUGIN_ID);
             Preferences prefNode = prefs.node(SITE_PREF_NODE);
             prefNode.put(LAST_SERVER_PREF, sessionName);
             prefNode.putInt(LAST_SITE_PREF, saveVal);
@@ -118,14 +118,12 @@ public class SiteManager {
     }
 
     private void setSiteSelectionState(SiteWrapper site) {
-        IWorkbenchWindow window =
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        ISourceProviderService service =
-            (ISourceProviderService) window
-                .getService(ISourceProviderService.class);
-        SiteSelectionState siteSelectionStateSourceProvider =
-            (SiteSelectionState) service
-                .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        SiteSelectionState siteSelectionStateSourceProvider = (SiteSelectionState) service
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
         siteSelectionStateSourceProvider.setSiteSelection(site);
     }
 
@@ -141,7 +139,7 @@ public class SiteManager {
             currentSites.add(site);
         }
         siteCombo.setInput(currentSites);
-        siteCombo.setSelection(currentSite);
+        siteCombo.setSelection(allSitesWrapper);
     }
 
     public void updateSites() {
@@ -170,10 +168,10 @@ public class SiteManager {
                 .addSelectionChangedListener(new ISelectionChangedListener() {
                     @Override
                     public void selectionChanged(SelectionChangedEvent event) {
-                        IStructuredSelection selection =
-                            (IStructuredSelection) event.getSelection();
-                        SiteWrapper siteWrapper =
-                            (SiteWrapper) selection.getFirstElement();
+                        IStructuredSelection selection = (IStructuredSelection) event
+                            .getSelection();
+                        SiteWrapper siteWrapper = (SiteWrapper) selection
+                            .getFirstElement();
 
                         if (siteWrapper == null)
                             return;

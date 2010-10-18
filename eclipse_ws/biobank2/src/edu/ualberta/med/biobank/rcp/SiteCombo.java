@@ -24,6 +24,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.WorkbenchWindowControlContribution;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -80,9 +81,11 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
                             .getSelection()).getFirstElement();
                         if (o instanceof SiteWrapper) {
                             SiteWrapper site = (SiteWrapper) o;
-                            int numPending = site
-                                .getInTransitReceiveDispatchCollection()
-                                .size();
+                            List<DispatchWrapper> dispatches = site
+                                .getInTransitReceiveDispatchCollection();
+                            int numPending = 0;
+                            if (dispatches != null)
+                                numPending = dispatches.size();
 
                             message = MessageFormat.format(
                                 DISPATCH_SHIPMENTS_STATUS_MSG,
