@@ -59,7 +59,7 @@ public class BiobankApplicationServiceImpl extends
 
     private static final String APPLICATION_CONTEXT_NAME = "biobank2";
 
-    private static final String SITE_ADMIN_PG_ID = "11";
+    private static final String ALL_SITES_PG_ID = "11";
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
@@ -131,7 +131,7 @@ public class BiobankApplicationServiceImpl extends
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
             Set<ProtectionElement> siteAdminPEs = upm
-                .getProtectionElements(SITE_ADMIN_PG_ID);
+                .getProtectionElements(ALL_SITES_PG_ID);
             List<String> pgIdsToDelete = new ArrayList<String>();
             List<String> peIdsToDelete = new ArrayList<String>();
             for (ProtectionElement pe : siteAdminPEs) {
@@ -147,7 +147,7 @@ public class BiobankApplicationServiceImpl extends
                         // this protection element and is not the main site
                         // admin group
                         String pgId = pg.getProtectionGroupId().toString();
-                        if (!pgId.equals(SITE_ADMIN_PG_ID)
+                        if (!pgId.equals(ALL_SITES_PG_ID)
                             && upm.getProtectionElements(pgId).size() == 1) {
                             pgIdsToDelete.add(pgId);
                         }
@@ -188,10 +188,7 @@ public class BiobankApplicationServiceImpl extends
             pe.setAttribute("id");
             pe.setValue(siteId.toString());
             upm.createProtectionElement(pe);
-            // Add the new protection element to the protection group
-            // "Site Admin PG"
-            upm.addProtectionElements(SITE_ADMIN_PG_ID, new String[] { pe
-                .getProtectionElementId().toString() });
+
             // Create a new protection group for this protection element only
             ProtectionGroup pg = new ProtectionGroup();
             pg.setApplication(currentApplication);
@@ -200,6 +197,10 @@ public class BiobankApplicationServiceImpl extends
                 + nameShort + " (id=" + siteId + ")");
             pg.setProtectionElements(new HashSet<ProtectionElement>(Arrays
                 .asList(pe)));
+            // parent will be the "all sites" protection group
+            ProtectionGroup allSitePg = upm
+                .getProtectionGroupById(ALL_SITES_PG_ID);
+            pg.setParentProtectionGroup(allSitePg);
             upm.createProtectionGroup(pg);
         } catch (Exception e) {
             log.error("error adding new site security", e);
