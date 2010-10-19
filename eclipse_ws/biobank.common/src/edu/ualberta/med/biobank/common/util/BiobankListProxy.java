@@ -111,8 +111,6 @@ public class BiobankListProxy implements List<Object>, Serializable {
                     if (listener != null)
                         listener.done();
                 }
-                System.out.println(loading);
-                System.out.println(listener);
                 if (nextListChunk != null) {
                     List<Object> temp = listChunk;
                     listChunk = nextListChunk;
@@ -120,8 +118,7 @@ public class BiobankListProxy implements List<Object>, Serializable {
                     int tempOffset = loadedOffset;
                     loadedOffset = offset;
                     offset = tempOffset;
-                } else
-                    System.out.println(" null swap avoided");
+                }
             } else {
                 // user loading out of order, do a query on demand
                 try {
@@ -230,8 +227,8 @@ public class BiobankListProxy implements List<Object>, Serializable {
 
     @Override
     public List<Object> subList(int fromIndex, int toIndex) {
-        Assert.isTrue(fromIndex >= 0 && toIndex >= 0);
-        Assert.isTrue(fromIndex <= toIndex);
+        assert (fromIndex >= 0 && toIndex >= 0);
+        assert (fromIndex <= toIndex);
         updateListChunk(fromIndex);
         List<Object> subList = new ArrayList<Object>();
         for (Object o : listChunk.subList(fromIndex - offset,

@@ -9,6 +9,8 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -28,12 +30,9 @@ public class QAAliquotsEditor extends ReportsEditor {
     DateTimeWidget end;
     ComboViewer sampleType;
     IObservableValue numAliquots;
+    private IObservableValue listStatus = new WritableValue(Boolean.TRUE,
+        Boolean.class);
     TopContainerListWidget topContainers;
-
-    @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100 };
-    }
 
     @Override
     protected void createOptionSection(Composite parent) throws Exception {
@@ -41,30 +40,45 @@ public class QAAliquotsEditor extends ReportsEditor {
             "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
             null, null, null, SWT.DATE);
-        widgetCreator.createLabel(parent, "Top Containers");
-        topContainers = new TopContainerListWidget(parent, SWT.NONE);
+        topContainers = new TopContainerListWidget(parent, toolkit);
+        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
+            Boolean.class), listStatus, "Top Container List Empty");
+        topContainers.addSelectionChangedListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                listStatus.setValue(topContainers.getEnabled());
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
         sampleType = createSampleTypeComboOption("Sample Type", parent);
         createValidatedIntegerText("# Aliquots", parent);
     }
 
     @Override
-    protected List<Object> getParams() throws Exception {
+    protected void initReport() throws Exception {
         List<Object> params = new ArrayList<Object>();
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
         params.add(((SampleTypeWrapper) ((IStructuredSelection) sampleType
             .getSelection()).getFirstElement()).getNameShort());
-        params.add(topContainers.getSelectedContainers());
+        report.setContainerList(ReportsEditor
+            .containerIdsToString(topContainers.getSelectedContainerIds()));
         params.add(Integer.parseInt((String) numAliquots.getValue()));
-        return params;
+        report.setParams(params);
     }
 
     @Override
     protected List<Object> getPrintParams() throws Exception {
-        List<Object> params = getParams();
-        Object comboInfo = params.get(2);
-        params.set(2, params.get(3));
-        params.set(3, comboInfo);
+        List<Object> params = new ArrayList<Object>();
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
+        params.add(topContainers.getSelectedContainerNames());
+        params.add(((SampleTypeWrapper) ((IStructuredSelection) sampleType
+            .getSelection()).getFirstElement()).getNameShort());
+        params.add(Integer.parseInt((String) numAliquots.getValue()));
         return params;
     }
 
@@ -72,9 +86,8 @@ public class QAAliquotsEditor extends ReportsEditor {
         Composite parent) throws ApplicationException {
         Collection<SampleTypeWrapper> sampleTypeWrappers = SampleTypeWrapper
             .getAllSampleTypes(SessionManager.getAppService(), true);
-        ComboViewer widget = widgetCreator
-            .createComboViewerWithNoSelectionValidator(parent, labelText,
-                sampleTypeWrappers, null, "No selection");
+        ComboViewer widget = widgetCreator.createComboViewer(parent, labelText,
+            sampleTypeWrappers, null, "No selection", null);
         widget.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {

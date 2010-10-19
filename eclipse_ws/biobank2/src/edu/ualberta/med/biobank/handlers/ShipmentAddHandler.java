@@ -6,9 +6,9 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 
 public class ShipmentAddHandler extends AbstractHandler {
 
@@ -17,9 +17,9 @@ public class ShipmentAddHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        ClinicShipmentWrapper shipment = new ClinicShipmentWrapper(SessionManager
+        ShipmentWrapper shipment = new ShipmentWrapper(SessionManager
             .getAppService());
-        ClinicShipmentAdapter shipNode = new ClinicShipmentAdapter(sessionAdapter, shipment);
+        ShipmentAdapter shipNode = new ShipmentAdapter(sessionAdapter, shipment);
         shipNode.openEntryForm();
         return null;
     }

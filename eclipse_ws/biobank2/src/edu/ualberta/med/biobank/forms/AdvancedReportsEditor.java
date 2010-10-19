@@ -54,9 +54,9 @@ import edu.ualberta.med.biobank.common.reports.AdvancedReportTreeNode;
 import edu.ualberta.med.biobank.dialogs.SaveReportDialog;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
-import edu.ualberta.med.biobank.treeview.QueryTree;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
+import edu.ualberta.med.biobank.widgets.QueryTree;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
 public class AdvancedReportsEditor extends BiobankFormBase {
@@ -383,8 +383,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                             int[] headingSizes = new int[names.length];
                             for (int i = 0; i < names.length; i++)
                                 headingSizes[i] = 100;
-                            reportTable = new ReportTableWidget<Object>(top,
-                                reportData, names, headingSizes, 40);
+                            // reportTable = new ReportTableWidget<Object>(top,
+                            // reportData, names, headingSizes, 40);
                             reportTable.adaptToToolkit(toolkit, true);
                             GridData gd = new GridData();
                             gd.horizontalSpan = 2;
@@ -410,8 +410,8 @@ public class AdvancedReportsEditor extends BiobankFormBase {
         if (reportTable != null) {
             reportTable.dispose();
         }
-        reportTable = new ReportTableWidget<Object>(top, null,
-            new String[] { " " }, new int[] { 500 });
+        // reportTable = new ReportTableWidget<Object>(top, null,
+        // new String[] { " " }, new int[] { 500 });
         reportTable.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;

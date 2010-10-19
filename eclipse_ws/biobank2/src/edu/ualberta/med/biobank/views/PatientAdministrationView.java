@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.views;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Display;
+
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -14,14 +16,15 @@ import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.PatientSearchedNode;
-import edu.ualberta.med.biobank.treeview.PatientTodayNode;
-import edu.ualberta.med.biobank.treeview.StudyWithPatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
+import edu.ualberta.med.biobank.treeview.patient.PatientTodayNode;
+import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 
 public class PatientAdministrationView extends
     AbstractTodaySearchAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.PatientsAdminView";
+    public static final String ID =
+        "edu.ualberta.med.biobank.views.PatientsAdminView";
 
     private static PatientAdministrationView currentInstance;
 
@@ -33,8 +36,9 @@ public class PatientAdministrationView extends
     @Override
     protected List<? extends ModelWrapper<?>> search(String text)
         throws Exception {
-        PatientWrapper patient = PatientWrapper.getPatient(
-            SessionManager.getAppService(), text.trim());
+        PatientWrapper patient =
+            PatientWrapper.getPatient(SessionManager.getAppService(),
+                text.trim());
         if (patient != null) {
             return Arrays.asList(patient);
         }
@@ -45,17 +49,17 @@ public class PatientAdministrationView extends
     public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
         if (wrapper instanceof PatientWrapper) {
             PatientWrapper patient = (PatientWrapper) wrapper;
-            StudyWithPatientAdapter studyAdapter = (StudyWithPatientAdapter) parentNode
-                .search(patient.getStudy());
+            StudyWithPatientAdapter studyAdapter =
+                (StudyWithPatientAdapter) parentNode.search(patient.getStudy());
             if (studyAdapter == null) {
-                studyAdapter = new StudyWithPatientAdapter(parentNode,
-                    patient.getStudy());
+                studyAdapter =
+                    new StudyWithPatientAdapter(parentNode, patient.getStudy());
                 studyAdapter.setEditable(false);
                 studyAdapter.setLoadChildrenInBackground(false);
                 parentNode.addChild(studyAdapter);
             }
-            PatientAdapter patientAdapter = (PatientAdapter) studyAdapter
-                .search(patient);
+            PatientAdapter patientAdapter =
+                (PatientAdapter) studyAdapter.search(patient);
             if (patientAdapter == null) {
                 patientAdapter = new PatientAdapter(studyAdapter, patient);
                 studyAdapter.addChild(patientAdapter);
@@ -67,11 +71,12 @@ public class PatientAdministrationView extends
 
     @Override
     protected void notFound(String text) {
-        boolean create = BioBankPlugin.openConfirm("Patient not found",
-            "Do you want to create this patient ?");
+        boolean create =
+            BioBankPlugin.openConfirm("Patient not found",
+                "Do you want to create this patient ?");
         if (create) {
-            PatientWrapper patient = new PatientWrapper(
-                SessionManager.getAppService());
+            PatientWrapper patient =
+                new PatientWrapper(SessionManager.getAppService());
             patient.setPnumber(text);
             openNewPatientForm(patient);
         }
@@ -81,7 +86,12 @@ public class PatientAdministrationView extends
         patient.addWrapperListener(new WrapperListenerAdapter() {
             @Override
             public void inserted(WrapperEvent event) {
-                showSearchedObjectsInTree(Arrays.asList(patient), true);
+                Display.getDefault().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        showSearchedObjectsInTree(Arrays.asList(patient), true);
+                    }
+                });
             }
         });
         PatientAdapter adapter = new PatientAdapter(searchedNode, patient);

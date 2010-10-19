@@ -21,29 +21,8 @@ import java.util.List;
  */
 public interface BiobankApplicationService extends WritableApplicationService {
 
-    public boolean canReadObjects(Class<?> clazz) throws ApplicationException;
-
-    public boolean canReadObject(Class<?> clazz, Integer id)
-        throws ApplicationException;
-
-    public boolean canCreateObjects(Class<?> clazz) throws ApplicationException;
-
-    public boolean canDeleteObjects(Class<?> clazz) throws ApplicationException;
-
-    public boolean canDeleteObject(Class<?> clazz, Integer id)
-        throws ApplicationException;
-
-    public boolean canUpdateObjects(Class<?> clazz) throws ApplicationException;
-
-    public boolean canUpdateObject(Class<?> clazz, Integer id)
-        throws ApplicationException;
-
     public boolean hasPrivilege(Class<?> clazz, Integer id, String privilege)
         throws ApplicationException;
-
-    public boolean isContainerAdministrator() throws ApplicationException;
-
-    public boolean isWebsiteAdministrator() throws ApplicationException;
 
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException;
@@ -69,5 +48,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public void deleteUser(String login) throws ApplicationException;
 
-    public boolean needPasswordModification() throws ApplicationException;
+    public User getCurrentUser() throws ApplicationException;
+
 }

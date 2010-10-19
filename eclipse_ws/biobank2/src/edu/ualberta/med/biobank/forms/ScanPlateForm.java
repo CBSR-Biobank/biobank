@@ -25,8 +25,9 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
-public class ScanPlateForm extends PlateForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ScanPlateForm";
+public class ScanPlateForm extends PlateForm implements PaintListener {
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ScanPlateForm";
 
     public static final String PALLET_IMAGE_FILE = "plate.bmp";
 
@@ -62,8 +63,9 @@ public class ScanPlateForm extends PlateForm {
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
-        Label label = toolkit.createLabel(page,
-            "NOTE: Cell A1 is at the TOP RIGHT corner of the image.");
+        Label label =
+            toolkit.createLabel(page,
+                "NOTE: Cell A1 is at the TOP RIGHT corner of the image.");
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -89,42 +91,43 @@ public class ScanPlateForm extends PlateForm {
         imageCanvas = new Canvas(page, SWT.BORDER);
         imageCanvas.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
         page.layout(true);
-
-        imageCanvas.addPaintListener(new PaintListener() {
-            @Override
-            public void paintControl(PaintEvent e) {
-                File plateFile = new File(PALLET_IMAGE_FILE);
-
-                if (plateFile.exists()) {
-                    img = new Image(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getShell().getDisplay(),
-                        PALLET_IMAGE_FILE);
-                }
-
-                if (img != null) {
-                    Point canvasSize = imageCanvas.getSize();
-                    Rectangle imgBounds = img.getBounds();
-
-                    double w = canvasSize.x;
-                    double h = (double) canvasSize.x
-                        * (double) imgBounds.height / imgBounds.width;
-                    if (h > canvasSize.y) {
-                        h = canvasSize.y;
-                        w = (double) canvasSize.y * (double) imgBounds.width
-                            / imgBounds.height;
-                    }
-
-                    GC gc = new GC(imageCanvas);
-                    gc.drawImage(img, 0, 0, imgBounds.width, imgBounds.height,
-                        0, 0, (int) w, (int) h);
-                    gc.dispose();
-                }
-            }
-        });
+        imageCanvas.addPaintListener(this);
 
         ScannerConfigPlugin.getDefault().getPreferenceStore()
             .addPropertyChangeListener(propertyListener);
 
+    }
+
+    @Override
+    public void paintControl(PaintEvent e) {
+        File plateFile = new File(PALLET_IMAGE_FILE);
+
+        if (plateFile.exists()) {
+            img =
+                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                    .getShell().getDisplay(), PALLET_IMAGE_FILE);
+        }
+
+        if (img == null)
+            return;
+
+        Point canvasSize = imageCanvas.getSize();
+        Rectangle imgBounds = img.getBounds();
+
+        double w = canvasSize.x;
+        double h =
+            (double) canvasSize.x * (double) imgBounds.height / imgBounds.width;
+        if (h > canvasSize.y) {
+            h = canvasSize.y;
+            w =
+                (double) canvasSize.y * (double) imgBounds.width
+                    / imgBounds.height;
+        }
+
+        GC gc = new GC(imageCanvas);
+        gc.drawImage(img, 0, 0, imgBounds.width, imgBounds.height, 0, 0,
+            (int) w, (int) h);
+        gc.dispose();
     }
 
     @Override

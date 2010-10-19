@@ -12,21 +12,22 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class InvoicingReportImpl extends AbstractReport {
 
-    private static final String QUERY = "Select Alias.patientVisit.patient.study.nameShort, "
-        + "Alias.patientVisit.shipment.clinic.nameShort, (select count(*) from "
-        + PatientVisit.class.getName()
-        + " pv where pv.shipment.clinic = Alias.patientVisit.shipment.clinic and pv.patient.study = Alias.patientVisit.patient.study and pv.dateProcessed between ? and ?),"
-        + " Alias.sampleType.nameShort, count(*) from "
-        + Aliquot.class.getName()
-        + " as Alias left join Alias.aliquotPosition p where (p is null or p not in (from "
-        + AliquotPosition.class.getName()
-        + " a where a.container.label like '"
-        + SENT_SAMPLES_FREEZER_NAME
-        + "')) and Alias.linkDate between ? and ? and Alias.patientVisit.shipment.site "
-        + SITE_OPERATOR
-        + SITE_ID
-        + " GROUP BY Alias.patientVisit.patient.study.nameShort, Alias.patientVisit.shipment.clinic.nameShort, Alias.sampleType.nameShort"
-        + " ORDER BY Alias.patientVisit.patient.study.nameShort, Alias.patientVisit.shipment.clinic.nameShort, Alias.sampleType.nameShort";
+    private static final String QUERY =
+        "Select Alias.patientVisit.shipmentPatient.patient.study.nameShort, "
+            + "Alias.patientVisit.shipmentPatient.shipment.clinic.nameShort, (select count(*) from "
+            + PatientVisit.class.getName()
+            + " pv where pv.shipmentPatient.shipment.clinic = Alias.patientVisit.shipmentPatient.shipment.clinic and pv.shipmentPatient.patient.study = Alias.patientVisit.shipmentPatient.patient.study and pv.dateProcessed between ? and ?),"
+            + " Alias.sampleType.nameShort, count(*) from "
+            + Aliquot.class.getName()
+            + " as Alias left join Alias.aliquotPosition p where (p is null or p not in (from "
+            + AliquotPosition.class.getName()
+            + " a where a.container.label like '"
+            + SENT_SAMPLES_FREEZER_NAME
+            + "')) and Alias.linkDate between ? and ? and Alias.patientVisit.shipmentPatient.shipment.site "
+            + SITE_OPERATOR
+            + SITE_ID
+            + " GROUP BY Alias.patientVisit.shipmentPatient.patient.study.nameShort, Alias.patientVisit.shipmentPatient.shipment.clinic.nameShort, Alias.sampleType.nameShort"
+            + " ORDER BY Alias.patientVisit.shipmentPatient.patient.study.nameShort, Alias.patientVisit.shipmentPatient.shipment.clinic.nameShort, Alias.sampleType.nameShort";
 
     public InvoicingReportImpl(BiobankReport report) {
         super(QUERY, report);

@@ -69,9 +69,9 @@ public class PatientAdapter extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    PatientVisitAdapter adapter = new PatientVisitAdapter(
-                        PatientAdapter.this, new PatientVisitWrapper(
-                            getAppService()));
+                    PatientVisitAdapter adapter =
+                        new PatientVisitAdapter(PatientAdapter.this,
+                            new PatientVisitWrapper(getAppService()));
                     adapter.getWrapper().setPatient(getWrapper());
                     adapter.openEntryForm();
                 }
@@ -107,7 +107,7 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+        return (getWrapperChildren() == null) ? 0 : getWrapperChildren().size();
     }
 
     @Override

@@ -11,7 +11,7 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -72,17 +72,18 @@ public abstract class AbstractTodayNode extends AdapterBase {
     public void performExpand() {
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             try {
-                List<? extends ModelWrapper<?>> todayElements = getTodayElements();
+                List<? extends ModelWrapper<?>> todayElements =
+                    getTodayElements();
 
                 // remove elements that are not in today list
                 for (AdapterBase child : getChildren()) {
                     ModelWrapper<?> childWrapper = child.getModelObject();
                     childWrapper.reload();
-                    List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
-                        child.getChildren());
+                    List<AdapterBase> subChildren =
+                        new ArrayList<AdapterBase>(child.getChildren());
                     for (AdapterBase subChild : subChildren) {
-                        ModelWrapper<?> subChildWrapper = subChild
-                            .getModelObject();
+                        ModelWrapper<?> subChildWrapper =
+                            subChild.getModelObject();
                         subChildWrapper.reload();
                         if (!todayElements.contains(subChildWrapper)
                             || !isParentTo(childWrapper, subChildWrapper)) {
@@ -94,19 +95,19 @@ public abstract class AbstractTodayNode extends AdapterBase {
                 // add today elements is not yet there
                 for (ModelWrapper<?> wrapper : todayElements) {
                     assert wrapper instanceof PatientWrapper
-                        || wrapper instanceof ClinicShipmentWrapper;
+                        || wrapper instanceof ShipmentWrapper;
                     if (wrapper instanceof PatientWrapper) {
                         PatientAdministrationView.getCurrent().addToNode(this,
                             wrapper);
-                    } else if (wrapper instanceof ClinicShipmentWrapper) {
+                    } else if (wrapper instanceof ShipmentWrapper) {
                         ShipmentAdministrationView.getCurrent().addToNode(this,
                             wrapper);
                     }
                 }
 
                 // remove sub children without any children
-                List<AdapterBase> children = new ArrayList<AdapterBase>(
-                    getChildren());
+                List<AdapterBase> children =
+                    new ArrayList<AdapterBase>(getChildren());
                 for (AdapterBase child : children) {
                     if (child.getChildren().size() == 0) {
                         removeChild(child);
@@ -126,4 +127,8 @@ public abstract class AbstractTodayNode extends AdapterBase {
     protected abstract List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException;
 
+    @Override
+    public AdapterBase search(Object searchedObject) {
+        return searchChildren(searchedObject);
+    }
 }

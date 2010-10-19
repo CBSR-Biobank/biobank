@@ -13,11 +13,9 @@ public class ShippingMethodInfoTable extends
 
     private static final String[] HEADINGS = new String[] { "Shipping method" };
 
-    private static final int[] BOUNDS = new int[] { 300, -1, -1, -1, -1, -1, -1 };
-
     public ShippingMethodInfoTable(Composite parent,
         List<ShippingMethodWrapper> sampleStorageCollection) {
-        super(parent, sampleStorageCollection, HEADINGS, BOUNDS, 10);
+        super(parent, sampleStorageCollection, HEADINGS, 10);
     }
 
     @Override

@@ -10,10 +10,8 @@ Bundle-ClassPath: .,
  lib/jdt-compiler-3.1.1.jar,
  lib/SuperCSV-1.52.jar,
  lib/spiffy-all-0.05.jar,
- lib/activation.jar,
- lib/gnumail.jar,
- lib/inetlib.jar,
- lib/gnumail-providers.jar
+ lib/mailapi.jar,
+ lib/smtp.jar
 Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
@@ -29,7 +27,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.ui.console;bundle-version="3.4.0",
  org.eclipse.ui.views.log;bundle-version="1.0.100",
  biobank.common,
- scannerConfig;bundle-version="0.9.2"
+ scannerConfig;bundle-version="0.9.6"
 Bundle-Version: 1.2.4
 Bundle-Vendor: AICML
 Import-Package: edu.ualberta.med.scannerconfig,

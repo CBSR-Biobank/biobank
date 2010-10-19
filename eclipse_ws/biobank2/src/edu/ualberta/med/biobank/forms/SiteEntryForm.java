@@ -11,6 +11,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -25,6 +26,7 @@ import edu.ualberta.med.biobank.widgets.infotables.entry.SiteDispatchAddInfoTabl
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteEntryForm extends AddressEntryFormCommon {
@@ -32,7 +34,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SiteEntryForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.SiteEntryForm";
 
     private static final String MSG_NEW_SITE_OK = "Create a new BioBank site.";
     private static final String MSG_SITE_OK = "Edit a BioBank site.";
@@ -50,12 +53,13 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private SiteDispatchAddInfoTable dispatchTable;
 
-    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BiobankEntryFormWidgetListener listener =
+        new BiobankEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     @Override
     public void init() throws Exception {
@@ -121,10 +125,16 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             BeansObservables.observeValue(site, "nameShort"),
             new NonEmptyStringValidator("Site short name cannot be blank"));
 
-        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status",
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            site.getActivityStatus(), "Site must have an activity status");
+        activityStatusComboViewer =
+            createComboViewer(client, "Activity Status",
+                ActivityStatusWrapper.getAllActivityStatuses(appService),
+                site.getActivityStatus(), "Site must have an activity status",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        site.setActivityStatus((ActivityStatusWrapper) selectedObject);
+                    }
+                });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null, BeansObservables.observeValue(site, "comment"),
@@ -172,18 +182,23 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void saveForm() throws Exception {
-        boolean newSite = site.isNew();
+        final boolean newSite = site.isNew();
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
-        site.setActivityStatus((ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
-            .getSelection()).getFirstElement());
         site.persist();
 
-        SessionManager.getInstance().updateSites();
-        if (newSite && !SessionManager.getInstance().isAllSitesSelected()) {
-            SessionManager.getInstance().getSiteCombo().setSelection(site);
-        }
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                SessionManager.getInstance().updateSites();
+                if (newSite
+                    && !SessionManager.getInstance().isAllSitesSelected()) {
+                    SessionManager.getInstance().getSiteCombo()
+                        .setSelection(site);
+                }
+            }
+        });
     }
 
     @Override

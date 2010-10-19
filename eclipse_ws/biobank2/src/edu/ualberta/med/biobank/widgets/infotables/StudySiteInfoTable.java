@@ -28,12 +28,10 @@ public class StudySiteInfoTable extends InfoTableWidget<SiteWrapper> {
     private static final String[] HEADINGS = new String[] { "Study",
         "#Patients", "#Patient Visits" };
 
-    private static final int[] BOUNDS = new int[] { 100, 80, 100 };
-
     private StudyWrapper study;
 
     public StudySiteInfoTable(Composite parent, StudyWrapper study) {
-        super(parent, null, HEADINGS, BOUNDS, 10);
+        super(parent, null, HEADINGS, 10);
         this.study = study;
         setCollection(study.getSiteCollection());
     }

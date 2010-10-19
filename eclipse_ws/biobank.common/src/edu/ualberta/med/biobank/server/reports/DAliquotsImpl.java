@@ -8,8 +8,8 @@ import edu.ualberta.med.biobank.model.ContainerPath;
 
 public class DAliquotsImpl extends AbstractReport {
 
-    private static final String QUERY = "select aliquot.patientVisit.patient.study.nameShort, "
-        + " aliquot.patientVisit.shipment.clinic.nameShort, year(aliquot.linkDate),"
+    private static final String QUERY = "select aliquot.patientVisit.shipmentPatient.patient.study.nameShort, "
+        + " aliquot.patientVisit.shipmentPatient.shipment.clinic.nameShort, year(aliquot.linkDate),"
         + GROUPBY_DATE
         + "(aliquot.linkDate), count(aliquot.linkDate) from "
         + Aliquot.class.getName()
@@ -18,14 +18,11 @@ public class DAliquotsImpl extends AbstractReport {
         + ContainerPath.class.getName()
         + " as path1, "
         + ContainerPath.class.getName()
-        + " as path2 where locate(path2.path, path1.path) > 0 and"
+        + " as path2 where path1.path like path2.path || '/%' and"
         + " path2.container.id in ("
         + CONTAINER_LIST
-        + ")) and aliquot.linkDate between ? and ? and aliquot.patientVisit.shipment.site "
-        + SITE_OPERATOR
-        + SITE_ID
-        + " group by aliquot.patientVisit.patient.study.nameShort,"
-        + " aliquot.patientVisit.shipment.clinic.nameShort, year(aliquot.linkDate), "
+        + ")) and aliquot.linkDate between ? and ? group by aliquot.patientVisit.shipmentPatient.patient.study.nameShort,"
+        + " aliquot.patientVisit.shipmentPatient.shipment.clinic.nameShort, year(aliquot.linkDate), "
         + GROUPBY_DATE + "(aliquot.linkDate)";
 
     private DateRangeRowPostProcess dateRangePostProcess;

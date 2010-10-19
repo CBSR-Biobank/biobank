@@ -7,6 +7,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
@@ -19,9 +20,9 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserInfoTable extends InfoTableWidget<User> {
+    public static final int ROWS_PER_PAGE = 10;
     private static final String[] HEADINGS = new String[] { "Login", "Email",
         "First Name", "Last Name" };
-    private static final int ROWS_PER_PAGE = 10;
     private static final String LOADING_ROW = "loading...";
     private static final String GROUPS_LOADING_ERROR = "Unable to load groups.";
     private static final String USER_DELETE_ERROR = "Unable to delete user.";
@@ -29,8 +30,13 @@ public class UserInfoTable extends InfoTableWidget<User> {
     private static final String CONFIRM_DELETE_MESSAGE = "Are you certain you want to delete \"{0}\"?";
     private static final String CONFIRM_SUICIDE_MESSAGE = "Are you certain you want to delete yourself as a user?";
 
-    public UserInfoTable(Composite parent, List<User> collection) {
-        super(parent, collection, HEADINGS, null, ROWS_PER_PAGE);
+    private Window parentWindow;
+
+    public UserInfoTable(Composite parent, List<User> collection,
+        Window parentWindow) {
+        super(parent, collection, HEADINGS, ROWS_PER_PAGE);
+
+        this.parentWindow = parentWindow;
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
@@ -122,6 +128,8 @@ public class UserInfoTable extends InfoTableWidget<User> {
         if (res == Dialog.OK) {
             reloadCollection(getCollection(), user);
             notifyListeners();
+        } else if (res == UserEditDialog.CLOSE_PARENT_RETURN_CODE) {
+            parentWindow.close();
         }
     }
 

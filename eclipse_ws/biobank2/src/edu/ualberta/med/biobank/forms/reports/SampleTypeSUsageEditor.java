@@ -10,17 +10,11 @@ public class SampleTypeSUsageEditor extends ReportsEditor {
     public static String ID = "edu.ualberta.med.biobank.editors.SampleTypeSUsageEditor";
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) {
     }
 
     @Override
-    protected List<Object> getParams() {
-        return new ArrayList<Object>();
+    protected void initReport() {
     }
 
     @Override
@@ -33,4 +27,8 @@ public class SampleTypeSUsageEditor extends ReportsEditor {
         return new ArrayList<String>();
     }
 
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        return new ArrayList<Object>();
+    }
 }

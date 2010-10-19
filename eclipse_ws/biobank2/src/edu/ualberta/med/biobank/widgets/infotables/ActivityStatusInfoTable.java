@@ -13,11 +13,9 @@ public class ActivityStatusInfoTable extends
 
     private static final String[] HEADINGS = new String[] { "Activity Status" };
 
-    private static final int[] BOUNDS = new int[] { 300, -1, -1, -1, -1, -1, -1 };
-
     public ActivityStatusInfoTable(Composite parent,
         List<ActivityStatusWrapper> activityStatusCollection) {
-        super(parent, activityStatusCollection, HEADINGS, BOUNDS, 10);
+        super(parent, activityStatusCollection, HEADINGS, 10);
     }
 
     @Override

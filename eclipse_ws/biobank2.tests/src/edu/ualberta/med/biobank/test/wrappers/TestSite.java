@@ -10,7 +10,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -551,21 +551,21 @@ public class TestSite extends TestDatabase {
         Assert.assertTrue(site.compareTo(site) == 0);
     }
 
-    private List<ClinicShipmentWrapper> createShipments(SiteWrapper site)
+    private List<ShipmentWrapper> createShipments(SiteWrapper site)
         throws Exception {
         String name = site.getName();
 
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
         ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
 
-        List<ClinicShipmentWrapper> shipments = new ArrayList<ClinicShipmentWrapper>();
-        shipments.add(ClinicShipmentHelper.addShipmentWithRandomPatient(site,
+        List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
+        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
             clinic1, name + "Study1"));
-        shipments.add(ClinicShipmentHelper.addShipmentWithRandomPatient(site,
+        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
             clinic1, name + "Study2"));
-        shipments.add(ClinicShipmentHelper.addShipmentWithRandomPatient(site,
+        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
             clinic2, name + "Study3"));
-        shipments.add(ClinicShipmentHelper.addShipmentWithRandomPatient(site,
+        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
             clinic2, name + "Study4"));
 
         site.reload();
@@ -576,15 +576,15 @@ public class TestSite extends TestDatabase {
     public void testGetShipmentCollectionSorted() throws Exception {
         String name = "testGetShipmentCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        List<ClinicShipmentWrapper> shipments = createShipments(site);
+        List<ShipmentWrapper> shipments = createShipments(site);
 
-        List<ClinicShipmentWrapper> savedShipments = site
+        List<ShipmentWrapper> savedShipments = site
             .getShipmentCollection(true);
         Assert.assertTrue(savedShipments.size() > 1);
         Assert.assertEquals(shipments.size(), savedShipments.size());
         for (int i = 0, n = savedShipments.size() - 1; i < n; i++) {
-            ClinicShipmentWrapper s1 = savedShipments.get(i);
-            ClinicShipmentWrapper s2 = savedShipments.get(i + 1);
+            ShipmentWrapper s1 = savedShipments.get(i);
+            ShipmentWrapper s2 = savedShipments.get(i + 1);
             Assert.assertTrue(s1.compareTo(s2) <= 0);
             Assert.assertTrue(s2.compareTo(s1) >= 0);
         }
@@ -594,9 +594,9 @@ public class TestSite extends TestDatabase {
     public void testGetShipmentCollection() throws Exception {
         String name = "testGetPatientVisitCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        List<ClinicShipmentWrapper> shipments = createShipments(site);
+        List<ShipmentWrapper> shipments = createShipments(site);
 
-        List<ClinicShipmentWrapper> savedShipments = site
+        List<ShipmentWrapper> savedShipments = site
             .getShipmentCollection(false);
         Assert.assertTrue(savedShipments.containsAll(shipments));
     }
@@ -630,9 +630,9 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
             site, clinic1, method, patient1, patient3);
-        ClinicShipmentHelper.addShipment(site, clinic2, method, patient2,
+        ShipmentHelper.addShipment(site, clinic2, method, patient2,
             patient3);
 
         site.reload();
@@ -643,7 +643,7 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(1, site.getShipmentCount().longValue());
 
         // add shipment again
-        shipment1 = ClinicShipmentHelper.addShipment(site, clinic1, method,
+        shipment1 = ShipmentHelper.addShipment(site, clinic1, method,
             patient3);
 
         site.reload();
@@ -679,9 +679,9 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
             site, clinic1, method, patient1, patient3);
-        ClinicShipmentHelper.addShipment(site, clinic2, method, patient2,
+        ShipmentHelper.addShipment(site, clinic2, method, patient2,
             patient3);
 
         site.reload();
@@ -692,7 +692,7 @@ public class TestSite extends TestDatabase {
         patient1.reload();
         patient1.delete();
 
-        shipment1 = ClinicShipmentHelper.addShipment(site, clinic1, method,
+        shipment1 = ShipmentHelper.addShipment(site, clinic1, method,
             patient3);
 
         site.reload();
@@ -728,9 +728,9 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
             site, clinic1, method, patient1, patient3);
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(
             site, clinic2, method, patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
@@ -796,10 +796,10 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        ClinicShipmentWrapper shipment1 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
             site, clinic1, method, patient1);
 
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(
             site, clinic2, method, patient2);
 
         // shipment 1 has patient visits for patient1 and patient2
@@ -866,7 +866,7 @@ public class TestSite extends TestDatabase {
         srcSite.persist();
         srcSite.reload();
 
-        List<StudyWrapper> siteDispatchStudies = srcSite.getDispatchStudies();
+        List<StudyWrapper> siteDispatchStudies = srcSite.getDispatchStudiesAsSender();
         Assert.assertNotNull(siteDispatchStudies);
         Assert.assertEquals(studies.size(), siteDispatchStudies.size());
         Assert.assertTrue(siteDispatchStudies.containsAll(studies));
@@ -877,7 +877,7 @@ public class TestSite extends TestDatabase {
         }
         srcSite.persist();
         srcSite.reload();
-        siteDispatchStudies = srcSite.getDispatchStudies();
+        siteDispatchStudies = srcSite.getDispatchStudiesAsSender();
         Assert.assertNotNull(siteDispatchStudies);
         Assert.assertEquals(0, siteDispatchStudies.size());
 
@@ -894,7 +894,7 @@ public class TestSite extends TestDatabase {
 
             srcSite.persist();
             srcSite.reload();
-            siteDispatchStudies = srcSite.getDispatchStudies();
+            siteDispatchStudies = srcSite.getDispatchStudiesAsSender();
             Assert.assertNotNull(siteDispatchStudies);
             Assert.assertEquals(studies.size() - count,
                 siteDispatchStudies.size());

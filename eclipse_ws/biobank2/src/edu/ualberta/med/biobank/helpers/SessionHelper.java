@@ -7,6 +7,7 @@ import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -26,6 +27,8 @@ public class SessionHelper implements Runnable {
     private BiobankApplicationService appService;
 
     private Collection<SiteWrapper> siteWrappers;
+
+    private User user;
 
     public SessionHelper(String server, boolean secureConnection,
         String userName, String password) {
@@ -59,12 +62,12 @@ public class SessionHelper implements Runnable {
                     userName, password);
             }
             siteWrappers = SiteWrapper.getSites(appService);
+            user = appService.getCurrentUser();
         } catch (ApplicationException exp) {
             logger.error("Error while logging to application", exp);
             if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
-                BioBankPlugin.openAsyncError("Login Failed", exp.getCause()
-                    .getMessage());
+                BioBankPlugin.openAsyncError("Login Failed", "Bad credentials");
                 return;
             }
             BioBankPlugin.openRemoteConnectErrorMessage(exp);
@@ -84,7 +87,7 @@ public class SessionHelper implements Runnable {
         return siteWrappers;
     }
 
-    public String getUserName() {
-        return userName;
+    public User getUser() {
+        return user;
     }
 }

@@ -33,11 +33,8 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
     private static final String[] HEADINGS = new String[] { "Name",
         "Short name", "Study Count", "Status", "Patients", "Patient Visits" };
 
-    private static final int[] BOUNDS = new int[] { 180, 130, 130, 130, 130,
-        130 };
-
     public ClinicInfoTable(Composite parent, List<ClinicWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, 10);
     }
 
     @Override

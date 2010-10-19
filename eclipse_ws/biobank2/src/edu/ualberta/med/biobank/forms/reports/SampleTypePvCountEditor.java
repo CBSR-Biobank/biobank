@@ -21,21 +21,16 @@ public class SampleTypePvCountEditor extends ReportsEditor {
     private ComboViewer studyCombo;
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) throws Exception {
         studyCombo = createStudyComboOption("Study", parent);
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(((StudyWrapper) ((IStructuredSelection) studyCombo
             .getSelection()).getFirstElement()).getNameShort());
-        return params;
+        report.setParams(params);
     }
 
     protected ComboViewer createStudyComboOption(String labelText,
@@ -72,4 +67,11 @@ public class SampleTypePvCountEditor extends ReportsEditor {
         return name;
     }
 
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> printParams = new ArrayList<Object>();
+        printParams.add(((StudyWrapper) ((IStructuredSelection) studyCombo
+            .getSelection()).getFirstElement()).getNameShort());
+        return printParams;
+    }
 }

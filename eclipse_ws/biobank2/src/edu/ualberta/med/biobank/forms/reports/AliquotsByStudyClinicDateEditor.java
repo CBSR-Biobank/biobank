@@ -4,9 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.util.DateGroup;
@@ -20,11 +24,8 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
     protected DateTimeWidget start;
     protected DateTimeWidget end;
     protected TopContainerListWidget topContainers;
-
-    @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100 };
-    }
+    private IObservableValue listStatus = new WritableValue(Boolean.TRUE,
+        Boolean.class);
 
     @Override
     protected String[] getColumnNames() {
@@ -40,8 +41,19 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
         dateRangeCombo = widgetCreator.createComboViewer(parent, "Group By",
             Arrays.asList(DateGroup.values()), null);
         dateRangeCombo.getCombo().select(0);
-        widgetCreator.createLabel(parent, "Top Containers");
-        topContainers = new TopContainerListWidget(parent, SWT.NONE);
+        topContainers = new TopContainerListWidget(parent, toolkit);
+        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
+            Boolean.class), listStatus, "Top Container List Empty");
+        topContainers.addSelectionChangedListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                listStatus.setValue(topContainers.getEnabled());
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
@@ -50,14 +62,15 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(((IStructuredSelection) dateRangeCombo.getSelection())
             .getFirstElement().toString());
-        params.add(topContainers.getSelectedContainers());
+        report.setContainerList(ReportsEditor
+            .containerIdsToString(topContainers.getSelectedContainerIds()));
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
-        return params;
+        report.setParams(params);
     }
 
     @Override
@@ -68,6 +81,17 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
         param.add("Start Date (Linked)");
         param.add("End Date (Linked)");
         return param;
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(((IStructuredSelection) dateRangeCombo.getSelection())
+            .getFirstElement().toString());
+        params.add(topContainers.getSelectedContainerNames());
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
+        return params;
     }
 
 }

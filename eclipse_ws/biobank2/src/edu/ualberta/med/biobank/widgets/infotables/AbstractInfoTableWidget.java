@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
@@ -248,8 +247,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         } else if (paginationWidget != null)
             paginationWidget.setVisible(false);
 
-        resizeTable();
         final Display display = getTableViewer().getTable().getDisplay();
+        resizeTable();
         backgroundThread = new Thread() {
             @Override
             public void run() {
@@ -279,7 +278,17 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         final int[] maxCellContentsWidths = new int[table.getColumnCount()];
         Text textRenderer = new Text(menu.getShell(), SWT.NONE);
-        Arrays.fill(maxCellContentsWidths, 0);
+        textRenderer.setVisible(false);
+
+        GridData gd = new GridData();
+        gd.exclude = true;
+        textRenderer.setLayoutData(gd);
+
+        for (int i = 0; i < table.getColumnCount(); i++) {
+            textRenderer.setText(table.getColumn(i).getText());
+            maxCellContentsWidths[i] = textRenderer.computeSize(SWT.DEFAULT,
+                SWT.DEFAULT).x;
+        }
 
         for (TableItem row : table.getItems()) {
             for (int i = 0; i < table.getColumnCount(); i++) {
@@ -300,6 +309,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             }
         }
 
+        textRenderer.dispose();
+
         int sumOfMaxTextWidths = 0;
         for (int width : maxCellContentsWidths) {
             sumOfMaxTextWidths += width;
@@ -307,10 +318,15 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
 
         int tableWidth = tableViewer.getTable().getSize().x;
 
+        int totalWidths = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
             int width = (int) ((double) maxCellContentsWidths[i]
                 / sumOfMaxTextWidths * tableWidth);
-            table.getColumn(i).setWidth(width);
+            if (i == table.getColumnCount() - 1)
+                table.getColumn(i).setWidth(tableWidth - totalWidths - 5);
+            else
+                table.getColumn(i).setWidth(width);
+            totalWidths += width;
         }
     }
 
@@ -320,7 +336,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         Table table = getTableViewer().getTable();
         GridData gd = (GridData) table.getLayoutData();
         int rows = Math.max(pageInfo.rowsPerPage, 5);
-        gd.heightHint = rows * table.getItemHeight() + table.getHeaderHeight();
+        gd.heightHint = (rows - 1) * table.getItemHeight()
+            + table.getHeaderHeight() + 4;
         layout(true, true);
     }
 

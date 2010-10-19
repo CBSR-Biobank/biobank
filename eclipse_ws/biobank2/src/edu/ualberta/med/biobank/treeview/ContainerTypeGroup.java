@@ -93,7 +93,7 @@ public class ContainerTypeGroup extends AdapterBase {
         getParent().notifyListeners(event);
     }
 
-    public static void addContainerType(SiteAdapter siteAdapter,
+    public void addContainerType(SiteAdapter siteAdapter,
         boolean hasPreviousForm) {
         ContainerTypeWrapper ct = new ContainerTypeWrapper(
             siteAdapter.getAppService());

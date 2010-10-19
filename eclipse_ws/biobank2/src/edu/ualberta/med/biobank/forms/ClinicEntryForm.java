@@ -23,10 +23,12 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ContactEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicEntryForm extends AddressEntryFormCommon {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ClinicEntryForm";
+    public static final String ID =
+        "edu.ualberta.med.biobank.forms.ClinicEntryForm";
 
     private static final String MSG_NEW_CLINIC_OK = "New clinic information.";
 
@@ -42,12 +44,13 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     protected Combo session;
 
-    private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
-        @Override
-        public void selectionChanged(MultiSelectEvent event) {
-            setDirty(true);
-        }
-    };
+    private BiobankEntryFormWidgetListener listener =
+        new BiobankEntryFormWidgetListener() {
+            @Override
+            public void selectionChanged(MultiSelectEvent event) {
+                setDirty(true);
+            }
+        };
 
     private ComboViewer activityStatusComboViewer;
 
@@ -118,10 +121,18 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             BeansObservables.observeValue(clinic, "sendsShipments"), null);
         toolkit.paintBordersFor(client);
 
-        activityStatusComboViewer = createComboViewerWithNoSelectionValidator(
-            client, "Activity Status",
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            clinic.getActivityStatus(), "Clinic must have an activity status");
+        activityStatusComboViewer =
+            createComboViewer(client, "Activity Status",
+                ActivityStatusWrapper.getAllActivityStatuses(appService),
+                clinic.getActivityStatus(),
+                "Clinic must have an activity status",
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        clinic
+                            .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                    }
+                });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null, BeansObservables.observeValue(clinic, "comment"),
@@ -156,9 +167,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     public void saveForm() throws Exception {
         clinic.addContacts(contactEntryWidget.getAddedOrModifedContacts());
-        ActivityStatusWrapper activity = (ActivityStatusWrapper) ((StructuredSelection) activityStatusComboViewer
-            .getSelection()).getFirstElement();
-        clinic.setActivityStatus(activity);
         clinic.removeContacts(contactEntryWidget.getDeletedContacts());
         clinic.persist();
         clinicAdapter.getParent().performExpand();
@@ -172,8 +180,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
     @Override
     public void reset() throws Exception {
         super.reset();
-        ActivityStatusWrapper currentActivityStatus = clinic
-            .getActivityStatus();
+        ActivityStatusWrapper currentActivityStatus =
+            clinic.getActivityStatus();
         if (currentActivityStatus != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 currentActivityStatus));

@@ -29,21 +29,26 @@ import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerGroup;
 import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.DateNode;
-import edu.ualberta.med.biobank.treeview.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.ReceivedDispatchShipmentGroup;
-import edu.ualberta.med.biobank.treeview.SentDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.SiteGroup;
 import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
+import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingDispatchGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchGroup;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -95,8 +100,13 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SCAN_ASSIGN = "scanAssign";
     public static final String IMG_SCAN_LINK = "scanLink";
     public static final String IMG_SESSIONS = "sessions";
-    public static final String IMG_CLINIC_SHIPMENT = "clinicShipment";
-    public static final String IMG_DISPATCH_SHIPMENT = "dispatchShipment";
+    public static final String IMG_CLINIC_SHIPMENT = "shipment";
+    public static final String IMG_DISPATCH_SHIPMENT = "dispatch";
+    public static final String IMG_DISPATCH_SHIPMENT_CREATION = "dispatchCreation";
+    public static final String IMG_DISPATCH_SHIPMENT_TRANSIT = "dispatchTransit";
+    public static final String IMG_DISPATCH_SHIPMENT_RECEIVING = "dispatchReceiving";
+    public static final String IMG_DISPATCH_SHIPMENT_ERROR = "dispatchError";
+    public static final String IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT = "dispatchAddAliquot";
     public static final String IMG_SITE = "site";
     public static final String IMG_SITES = "sites";
     public static final String IMG_STUDIES = "studies";
@@ -141,7 +151,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_PATIENT);
         classToImageKey.put(PatientVisitAdapter.class.getName(),
             BioBankPlugin.IMG_PATIENT_VISIT);
-        classToImageKey.put(ClinicShipmentAdapter.class.getName(),
+        classToImageKey.put(ShipmentAdapter.class.getName(),
             BioBankPlugin.IMG_CLINIC_SHIPMENT);
         classToImageKey.put(AbstractSearchedNode.class.getName(),
             BioBankPlugin.IMG_SEARCH);
@@ -149,11 +159,23 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_TODAY);
         classToImageKey.put(DateNode.class.getName(),
             BioBankPlugin.IMG_CALENDAR);
-        classToImageKey.put(SentDispatchShipmentGroup.class.getName(),
+        classToImageKey.put(OutgoingNode.class.getName(),
             BioBankPlugin.IMG_SENT);
-        classToImageKey.put(ReceivedDispatchShipmentGroup.class.getName(),
+        classToImageKey.put(IncomingNode.class.getName(),
             BioBankPlugin.IMG_RECEIVED);
-        classToImageKey.put(DispatchShipmentAdapter.class.getName(),
+        classToImageKey.put(InCreationDispatchGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_CREATION);
+        classToImageKey.put(
+            ReceivingInTransitDispatchGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
+        classToImageKey.put(SentInTransitDispatchGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
+        classToImageKey.put(ReceivingDispatchGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
+        classToImageKey.put(
+            ReceivingWithErrorsDispatchGroup.class.getName(),
+            BioBankPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
+        classToImageKey.put(DispatchAdapter.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT);
         classToImageKey.put(AliquotAdapter.class.getName(),
             BioBankPlugin.IMG_ALIQUOT);
@@ -241,8 +263,18 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SCAN_EDIT, "scan_edit.png");
         registerImage(registry, IMG_SCAN_CLOSE_EDIT, "scan_close_edit.png");
         registerImage(registry, IMG_SESSIONS, "sessions.png");
-        registerImage(registry, IMG_CLINIC_SHIPMENT, "clinicShipment.png");
-        registerImage(registry, IMG_DISPATCH_SHIPMENT, "dispatchShipment.png");
+        registerImage(registry, IMG_CLINIC_SHIPMENT, "shipment.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT, "dispatch.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_CREATION,
+            "dispatch_creation.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_TRANSIT,
+            "dispatch_transit.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_RECEIVING,
+            "dispatch_receiving.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_ERROR,
+            "dispatch_error.png");
+        registerImage(registry, IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT,
+            "dispatchScanAdd.png");
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_SITES, "sites.png");
         registerImage(registry, IMG_STUDIES, "studies.png");

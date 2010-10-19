@@ -1,6 +1,11 @@
 package edu.ualberta.med.biobank.common.util;
 
 public class RowColPos implements Comparable<RowColPos> {
+
+    public static int PALLET_96_ROW_MAX = 8;
+
+    public static int PALLET_96_COL_MAX = 12;
+
     public Integer row;
     public Integer col;
 

@@ -27,12 +27,9 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
     private static final String[] HEADINGS = new String[] { "Date processed",
         "Num Samples" };
 
-    private static final int[] BOUNDS = new int[] { 200, 130, -1, -1, -1, -1,
-        -1 };
-
     public PatientVisitInfoTable(Composite parent,
         List<PatientVisitWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, 10);
     }
 
     @Override

@@ -7,8 +7,6 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 
 public class ContainerHelper extends DbHelper {
 
@@ -64,8 +62,8 @@ public class ContainerHelper extends DbHelper {
     public static ContainerWrapper newContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
         Integer row, Integer col) throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type);
+        ContainerWrapper container =
+            newContainer(label, barcode, parent, site, type);
         container.setPosition(new RowColPos(row, col));
         return container;
     }
@@ -88,8 +86,8 @@ public class ContainerHelper extends DbHelper {
     public static ContainerWrapper addContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type)
         throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type);
+        ContainerWrapper container =
+            newContainer(label, barcode, parent, site, type);
         container.persist();
         return container;
     }
@@ -116,21 +114,23 @@ public class ContainerHelper extends DbHelper {
     public static ContainerWrapper addContainer(String label, String barcode,
         ContainerWrapper parent, SiteWrapper site, ContainerTypeWrapper type,
         Integer row, Integer col) throws Exception {
-        ContainerWrapper container = newContainer(label, barcode, parent, site,
-            type, row, col);
+        ContainerWrapper container =
+            newContainer(label, barcode, parent, site, type, row, col);
         container.persist();
         return container;
     }
 
     public static ContainerWrapper addContainerRandom(SiteWrapper site,
         String name, ContainerWrapper parent) throws Exception {
-        ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
-            site, name, parent == null);
+        ContainerTypeWrapper type =
+            ContainerTypeHelper.addContainerTypeRandom(site, name,
+                parent == null);
         String label = null;
         if ((type.getTopLevel() != null) && type.getTopLevel()) {
             label = String.valueOf(r.nextInt());
         }
-        ContainerWrapper container = addContainer(label, name, null, site, type);
+        ContainerWrapper container =
+            addContainer(label, name, null, site, type);
         if (label == null) {
             container.setParent(parent);
             container.setPosition(new RowColPos(0, 0));
@@ -141,8 +141,9 @@ public class ContainerHelper extends DbHelper {
 
     public static ContainerWrapper addTopContainerRandom(SiteWrapper site,
         String name, int typeCapacityRow, int typeCapacityCol) throws Exception {
-        ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
-            name, name, 1, typeCapacityRow, typeCapacityCol, true);
+        ContainerTypeWrapper type =
+            ContainerTypeHelper.addContainerType(site, name, name, 1,
+                typeCapacityRow, typeCapacityCol, true);
         ContainerWrapper container = addContainer(name, name, null, site, type);
         return container;
     }
@@ -150,18 +151,19 @@ public class ContainerHelper extends DbHelper {
     public static int addTopContainersWithChildren(SiteWrapper site,
         String barcode, int count) throws Exception {
         for (int i = 0; i < count; i++) {
-            ContainerWrapper topContainer = addTopContainerRandom(site, barcode
-                + "TOP" + (i + 1), 3, 6);
-            ContainerTypeWrapper type = ContainerTypeHelper
-                .addContainerTypeRandom(site, barcode + "children" + (i + 1),
-                    false);
+            ContainerWrapper topContainer =
+                addTopContainerRandom(site, barcode + "TOP" + (i + 1), 3, 6);
+            ContainerTypeWrapper type =
+                ContainerTypeHelper.addContainerTypeRandom(site, barcode
+                    + "children" + (i + 1), false);
             topContainer.getContainerType().addChildContainerTypes(
                 Arrays.asList(type));
             topContainer.getContainerType().persist();
             int maxRow = topContainer.getRowCapacity();
             for (int j = 0; j < 5; j++) {
-                ContainerWrapper child = newContainer(null, barcode + "child"
-                    + (i + 1) + "_" + j, topContainer, site, type);
+                ContainerWrapper child =
+                    newContainer(null, barcode + "child" + (i + 1) + "_" + j,
+                        topContainer, site, type);
                 int posRow = j % maxRow;
                 int posCol = j / maxRow;
                 topContainer.addChild(posRow, posCol, child);
@@ -170,12 +172,5 @@ public class ContainerHelper extends DbHelper {
         }
         site.reload();
         return count + count * 5;
-    }
-
-    public static ContainerLabelingSchemeWrapper newContainerLabelingScheme() {
-        ContainerLabelingSchemeWrapper clsw = new ContainerLabelingSchemeWrapper(
-            appService, new ContainerLabelingScheme());
-        clsw.setName("SchemeName");
-        return clsw;
     }
 }

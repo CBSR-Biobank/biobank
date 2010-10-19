@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -40,7 +40,7 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -65,7 +65,7 @@ public class TestPatientVisit extends TestDatabase {
 
     private ClinicWrapper clinic;
 
-    private ClinicShipmentWrapper shipment;
+    private ShipmentWrapper shipment;
 
     private PatientWrapper patient;
 
@@ -91,7 +91,7 @@ public class TestPatientVisit extends TestDatabase {
         study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
             study);
-        shipment = ClinicShipmentHelper.addShipment(site, clinic,
+        shipment = ShipmentHelper.addShipment(site, clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0),
             patient);
     }
@@ -167,7 +167,7 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
-        ClinicShipmentWrapper shipment2 = ClinicShipmentHelper.addShipment(
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(
             site, clinic, ShippingMethodWrapper.getShippingMethods(appService)
                 .get(0), patient);
 

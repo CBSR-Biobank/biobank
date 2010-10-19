@@ -13,9 +13,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -36,10 +34,10 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.LabelingScheme;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -52,6 +50,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -287,32 +286,26 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void createPalletTypesViewer(Composite parent) throws Exception {
         palletContainerTypes = getPalletContainerTypes();
-        palletTypesViewer = createComboViewerWithNoSelectionValidator(
+        palletTypesViewer = createComboViewer(
             parent,
             Messages.getString("ScanAssign.palletType.label"), //$NON-NLS-1$
             palletContainerTypes, null,
-            Messages.getString("ScanAssign.palletType.validationMsg")); //$NON-NLS-1$
-        palletTypesViewer
-            .addSelectionChangedListener(new ISelectionChangedListener() {
+            Messages.getString("ScanAssign.palletType.validationMsg"),
+            new ComboSelectionUpdate() {
                 @Override
-                public void selectionChanged(SelectionChangedEvent event) {
+                public void doSelection(Object selectedObject) {
                     if (!modificationMode) {
                         ContainerTypeWrapper oldContainerType = currentPalletWrapper
                             .getContainerType();
-                        IStructuredSelection selection = (IStructuredSelection) palletTypesViewer
-                            .getSelection();
-                        if (selection.size() > 0) {
-                            currentPalletWrapper
-                                .setContainerType((ContainerTypeWrapper) selection
-                                    .getFirstElement());
-                            if (oldContainerType != null) {
-                                validateValues();
-                            }
-                            palletTypesViewer.getCombo().setFocus();
+                        currentPalletWrapper
+                            .setContainerType((ContainerTypeWrapper) selectedObject);
+                        if (oldContainerType != null) {
+                            validateValues();
                         }
+                        palletTypesViewer.getCombo().setFocus();
                     }
                 }
-            });
+            }); //$NON-NLS-1$
         if (palletContainerTypes.size() == 1) {
             currentPalletWrapper.setContainerType(palletContainerTypes.get(0));
             palletTypesViewer.setSelection(new StructuredSelection(
@@ -326,14 +319,16 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private List<ContainerTypeWrapper> getPalletContainerTypes()
         throws ApplicationException {
         List<ContainerTypeWrapper> palletContainerTypes = ContainerTypeWrapper
-            .getContainerTypesInSite(appService,
-                currentPalletWrapper.getSite(), palletNameContains, false);
+            .getContainerTypesPallet96(appService,
+                currentPalletWrapper.getSite());
         if (palletContainerTypes.size() == 0) {
-            BioBankPlugin.openAsyncError(Messages
-                .getString("ScanAssign.dialog.noPalletFoundError.title"), //$NON-NLS-1$
-                Messages.getFormattedString(
-                    "ScanAssign.dialog.noPalletFoundError.msg", //$NON-NLS-1$
-                    palletNameContains));
+            BioBankPlugin
+                .openAsyncError(
+                    Messages
+                        .getString("ScanAssign.dialog.noPalletFoundError.title"), //$NON-NLS-1$
+                    Messages
+                        .getFormattedString("ScanAssign.dialog.noPalletFoundError.msg" //$NON-NLS-1$
+                        ));
         }
         return palletContainerTypes;
     }
@@ -516,6 +511,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     @Override
     protected void beforeScanThreadStart() {
         showOnlyPallet(false, false);
+        currentPalletWrapper
+            .setContainerType((ContainerTypeWrapper) ((IStructuredSelection) palletTypesViewer
+                .getSelection()).getFirstElement());
         isFakeScanLinkedOnly = fakeScanLinkedOnlyButton != null
             && fakeScanLinkedOnlyButton.getSelection();
     }
@@ -559,7 +557,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             for (int col = 0; col < currentPalletWrapper.getColCapacity(); col++) {
                 RowColPos rcp = new RowColPos(row, col);
                 monitor.subTask("Processing position "
-                    + LabelingScheme.rowColToSbs(rcp));
+                    + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 PalletCell cell = getCells().get(rcp);
                 if (!isRescanMode() || cell == null || cell.getStatus() == null
                     || cell.getStatus() == CellStatus.EMPTY
@@ -641,14 +639,13 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         AliquotWrapper expectedAliquot = scanCell.getExpectedAliquot();
         String value = scanCell.getValue();
         String positionString = currentPalletWrapper.getLabel()
-            + LabelingScheme.rowColToSbs(new RowColPos(scanCell.getRow(),
-                scanCell.getCol()));
+            + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
+                .getRow(), scanCell.getCol()));
         if (value == null) { // no aliquot scanned
             updateCellAsMissing(positionString, scanCell, expectedAliquot);
         } else {
-            List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsInSite(
-                appService, value, SessionManager.getInstance()
-                    .getCurrentSite());
+            List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
+                appService, value);
             if (aliquots.size() == 0) {
                 updateCellAsNotLinked(positionString, scanCell);
             } else if (aliquots.size() == 1) {
@@ -671,8 +668,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                             if (foundAliquot.hasParent()) { // moved
                                 processCellWithPreviousPosition(scanCell,
                                     positionString, foundAliquot);
-                            } else { // new
-                                if (foundAliquot.isDispatched()) {
+                            } else { // new in pallet
+                                if (foundAliquot.isUsedInDispatch()) {
                                     updateCellAsDispatchedError(positionString,
                                         scanCell, foundAliquot);
                                 } else {
@@ -702,11 +699,11 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setInformation(Messages.getFormattedString(
-            "ScanAssign.scanStatus.aliquot.dispatchedError",
-            ActivityStatusWrapper.DISPATCHED_STATUS_STRING)); //$NON-NLS-1$
+        scanCell
+            .setInformation(Messages
+                .getFormattedString("ScanAssign.scanStatus.aliquot.dispatchedError")); //$NON-NLS-1$
         appendLogNLS("ScanAssign.activitylog.aliquot.dispatchedError",
-            positionString, ActivityStatusWrapper.DISPATCHED_STATUS_STRING);
+            positionString);
 
     }
 
@@ -715,30 +712,38 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private void processCellWithPreviousPosition(PalletCell scanCell,
         String positionString, AliquotWrapper foundAliquot) {
-        if (foundAliquot.getParent().equals(currentPalletWrapper)) {
-            // same pallet
-            RowColPos rcp = new RowColPos(scanCell.getRow(), scanCell.getCol());
-            if (!foundAliquot.getPosition().equals(rcp)) {
-                // moved inside the same pallet
-                updateCellAsMoved(positionString, scanCell, foundAliquot);
-                RowColPos movedFromPosition = foundAliquot.getPosition();
-                PalletCell missingAliquot = movedAndMissingAliquotsFromPallet
-                    .get(movedFromPosition);
-                if (missingAliquot == null) {
-                    // missing position has not yet been processed
-                    movedAndMissingAliquotsFromPallet.put(movedFromPosition,
-                        scanCell);
-                } else {
-                    // missing position has already been processed: remove the
-                    // MISSING flag
-                    missingAliquot.setStatus(CellStatus.EMPTY);
-                    missingAliquot.setTitle("");
-                    movedAndMissingAliquotsFromPallet.remove(movedFromPosition);
+        if (foundAliquot.getParent().getSite()
+            .equals(SessionManager.getInstance().getCurrentSite())) {
+            if (foundAliquot.getParent().equals(currentPalletWrapper)) {
+                // same pallet
+                RowColPos rcp = new RowColPos(scanCell.getRow(),
+                    scanCell.getCol());
+                if (!foundAliquot.getPosition().equals(rcp)) {
+                    // moved inside the same pallet
+                    updateCellAsMoved(positionString, scanCell, foundAliquot);
+                    RowColPos movedFromPosition = foundAliquot.getPosition();
+                    PalletCell missingAliquot = movedAndMissingAliquotsFromPallet
+                        .get(movedFromPosition);
+                    if (missingAliquot == null) {
+                        // missing position has not yet been processed
+                        movedAndMissingAliquotsFromPallet.put(
+                            movedFromPosition, scanCell);
+                    } else {
+                        // missing position has already been processed: remove
+                        // the
+                        // MISSING flag
+                        missingAliquot.setStatus(CellStatus.EMPTY);
+                        missingAliquot.setTitle("");
+                        movedAndMissingAliquotsFromPallet
+                            .remove(movedFromPosition);
+                    }
                 }
+            } else {
+                // old position was on another pallet
+                updateCellAsMoved(positionString, scanCell, foundAliquot);
             }
         } else {
-            // old position was on another pallet
-            updateCellAsMoved(positionString, scanCell, foundAliquot);
+            updateCellAsInOtherSite(positionString, scanCell, foundAliquot);
         }
     }
 
@@ -785,6 +790,24 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         appendLogNLS(
             "ScanAssign.activitylog.aliquot.moved", position, scanCell.getValue(), //$NON-NLS-1$
             expectedPosition);
+    }
+
+    private void updateCellAsInOtherSite(String position, PalletCell scanCell,
+        AliquotWrapper foundAliquot) {
+        String currentPosition = foundAliquot.getPositionString(true, false);
+        if (currentPosition == null) {
+            currentPosition = "none"; //$NON-NLS-1$
+        }
+        String siteName = foundAliquot.getParent().getSite().getNameShort();
+        scanCell.setStatus(CellStatus.ERROR);
+        scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+            .getPnumber());
+        scanCell.setInformation(Messages.getFormattedString(
+            "ScanAssign.scanStatus.aliquot.otherSite", siteName)); //$NON-NLS-1$
+
+        appendLogNLS(
+            "ScanAssign.activitylog.aliquot.otherSite", position, scanCell.getValue(), //$NON-NLS-1$
+            siteName, currentPosition);
     }
 
     /**
@@ -1142,7 +1165,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             palletTypesViewer.setSelection(new StructuredSelection(typeFixed));
         }
         if (palletTypes.size() == 1) {
-            palletTypesViewer.getCombo().select(0);
+            palletTypesViewer.setSelection(new StructuredSelection(palletTypes
+                .get(0)));
         }
         palletTypesViewer.getCombo().setEnabled(typeFixed == null);
         return true;

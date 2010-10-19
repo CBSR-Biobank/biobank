@@ -16,6 +16,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -33,22 +34,22 @@ public class SessionAdapter extends AdapterBase {
 
     private BiobankApplicationService appService;
 
-    private String userName;
+    private User user;
     private String serverName;
 
     public SessionAdapter(AdapterBase parent,
         BiobankApplicationService appService, int sessionId, String serverName,
-        String userName) {
+        User user) {
         super(parent, null, false);
         this.appService = appService;
         setId(sessionId);
-        if (userName != null && userName.isEmpty()) {
+        if (user.getLogin().isEmpty()) {
             setName(serverName);
         } else {
-            setName(serverName + " [" + userName + "]");
+            setName(serverName + " [" + user.getLogin() + "]");
         }
         this.serverName = serverName;
-        this.userName = userName;
+        this.user = user;
 
         addGroupNodes();
     }
@@ -85,22 +86,22 @@ public class SessionAdapter extends AdapterBase {
         return "";
     }
 
-    public AdapterBase getSitesGroupNode() {
+    public SiteGroup getSitesGroupNode() {
         AdapterBase adapter = getChild(SITES_NODE_ID);
         Assert.isNotNull(adapter);
-        return adapter;
+        return (SiteGroup) adapter;
     }
 
-    public AdapterBase getStudiesGroupNode() {
+    public StudyMasterGroup getStudiesGroupNode() {
         AdapterBase adapter = getChild(STUDIES_NODE_ID);
         Assert.isNotNull(adapter);
-        return adapter;
+        return (StudyMasterGroup) adapter;
     }
 
-    public AdapterBase getClinicGroupNode() {
+    public ClinicMasterGroup getClinicGroupNode() {
         AdapterBase adapter = getChild(CLINICS_BASE_NODE_ID);
         Assert.isNotNull(adapter);
-        return adapter;
+        return (ClinicMasterGroup) adapter;
     }
 
     @Override
@@ -122,8 +123,8 @@ public class SessionAdapter extends AdapterBase {
         });
     }
 
-    public String getUserName() {
-        return userName;
+    public User getUser() {
+        return user;
     }
 
     public String getServerName() {

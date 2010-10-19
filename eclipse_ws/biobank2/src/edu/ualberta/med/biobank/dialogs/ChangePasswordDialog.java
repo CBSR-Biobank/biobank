@@ -17,7 +17,6 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 
 public class ChangePasswordDialog extends TitleAreaDialog {
 
@@ -140,9 +139,8 @@ public class ChangePasswordDialog extends TitleAreaDialog {
             return;
         }
         try {
-            ((BiobankApplicationService) SessionManager.getAppService())
-                .modifyPassword(this.oldPassText.getText(),
-                    this.newPass2Text.getText());
+            SessionManager.getAppService().modifyPassword(
+                this.oldPassText.getText(), this.newPass2Text.getText());
 
             SessionManager.getInstance().getSession().resetAppService();
             BioBankPlugin

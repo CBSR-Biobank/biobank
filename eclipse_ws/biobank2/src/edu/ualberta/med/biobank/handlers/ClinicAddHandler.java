@@ -3,20 +3,20 @@ package edu.ualberta.med.biobank.handlers;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.SessionAdapter;
 
 public class ClinicAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.addClinic";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        ClinicWrapper clinic = new ClinicWrapper(SessionManager.getAppService());
-        ClinicAdapter clinicNode = new ClinicAdapter(SessionManager
-            .getInstance().getSession().getClinicGroupNode(), clinic);
-        clinicNode.openEntryForm();
+        SessionAdapter session = SessionManager.getInstance().getSession();
+        Assert.isNotNull(session);
+        session.getClinicGroupNode().addClinic();
         return null;
     }
 

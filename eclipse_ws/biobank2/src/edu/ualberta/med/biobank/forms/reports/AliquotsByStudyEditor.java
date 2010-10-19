@@ -3,7 +3,11 @@ package edu.ualberta.med.biobank.forms.reports;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.databinding.observable.value.IObservableValue;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -15,16 +19,24 @@ public class AliquotsByStudyEditor extends ReportsEditor {
     protected DateTimeWidget start;
     protected DateTimeWidget end;
     protected TopContainerListWidget topContainers;
-
-    @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100 };
-    }
+    private IObservableValue listStatus = new WritableValue(Boolean.TRUE,
+        Boolean.class);
 
     @Override
     protected void createOptionSection(Composite parent) {
-        widgetCreator.createLabel(parent, "Top Containers");
-        topContainers = new TopContainerListWidget(parent, SWT.NONE);
+        topContainers = new TopContainerListWidget(parent, toolkit);
+        widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
+            Boolean.class), listStatus, "Top Container List Empty");
+        topContainers.addSelectionChangedListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                listStatus.setValue(topContainers.getEnabled());
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);
         end = widgetCreator.createDateTimeWidget(parent, "End Date (Linked)",
@@ -33,12 +45,13 @@ public class AliquotsByStudyEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
-        params.add(topContainers.getSelectedContainers());
+        report.setContainerList(ReportsEditor
+            .containerIdsToString(topContainers.getSelectedContainerIds()));
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
-        return params;
+        report.setParams(params);
     }
 
     @Override
@@ -53,6 +66,15 @@ public class AliquotsByStudyEditor extends ReportsEditor {
         paramNames.add("Start Date (Linked)");
         paramNames.add("End Date (Linked)");
         return paramNames;
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(topContainers.getSelectedContainerNames());
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
+        return params;
     }
 
 }

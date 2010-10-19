@@ -8,7 +8,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.AbstractShipment;
-import edu.ualberta.med.biobank.model.ClinicShipment;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -81,7 +81,7 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<AbstractShipmentWrapper> getShipmentCollection(boolean sort) {
+    public List<AbstractShipmentWrapper> getAllShipmentCollection(boolean sort) {
         List<AbstractShipmentWrapper> shipmentCollection = (List<AbstractShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
         if (shipmentCollection == null) {
@@ -107,20 +107,19 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<AbstractShipmentWrapper> getClinicShipmentCollection(
-        boolean sort) {
-        List<AbstractShipmentWrapper> clinicShipmentCollection = (List<AbstractShipmentWrapper>) propertiesMap
-            .get("clinicShipmentCollection");
-        if (clinicShipmentCollection == null) {
-            List<AbstractShipmentWrapper> shipmentCollection = getShipmentCollection(sort);
-            clinicShipmentCollection = new ArrayList<AbstractShipmentWrapper>();
-            for (AbstractShipmentWrapper ship : shipmentCollection) {
-                if (ship instanceof ClinicShipmentWrapper) {
-                    clinicShipmentCollection.add(ship);
+    public List<AbstractShipmentWrapper> getShipmentCollection(boolean sort) {
+        List<AbstractShipmentWrapper> shipmentCollection = (List<AbstractShipmentWrapper>) propertiesMap
+            .get("shipmentCollection");
+        if (shipmentCollection == null) {
+            List<AbstractShipmentWrapper> allShipmentCollection = getAllShipmentCollection(sort);
+            shipmentCollection = new ArrayList<AbstractShipmentWrapper>();
+            for (AbstractShipmentWrapper ship : allShipmentCollection) {
+                if (ship instanceof ShipmentWrapper) {
+                    shipmentCollection.add(ship);
                 }
             }
         }
-        return clinicShipmentCollection;
+        return shipmentCollection;
     }
 
     public static List<ShippingMethodWrapper> getShippingMethods(
@@ -140,8 +139,7 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     public boolean isUsed() throws ApplicationException, BiobankCheckException {
-        String queryString = "select count(s) from "
-            + ClinicShipment.class.getName()
+        String queryString = "select count(s) from " + Shipment.class.getName()
             + " as s where s.shippingMethod=?)";
         HQLCriteria c = new HQLCriteria(queryString,
             Arrays.asList(new Object[] { wrappedObject }));

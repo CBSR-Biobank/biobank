@@ -45,21 +45,18 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         "Inventory ID", "Type", "Position", "Link Date", "Patient Number",
         "Activity Status", "Comment" };
 
-    private static final int[] BOUNDS = new int[] { 80, 80, 120, 120, 80, 80,
-        80, -1 };
-
     private boolean showPatientNumber;
 
     public AliquotListInfoTable(Composite parent,
         List<AliquotWrapper> aliquotCollection) {
-        super(parent, aliquotCollection, HEADINGS_DFLT, BOUNDS, 20);
+        super(parent, aliquotCollection, HEADINGS_DFLT, 20);
     }
 
     public AliquotListInfoTable(Composite parent,
         List<AliquotWrapper> aliquotCollection, ColumnsShown columnsShown) {
         super(parent, aliquotCollection,
             (columnsShown == ColumnsShown.PNUMBER) ? HEADINGS_PNUMBER
-                : HEADINGS_DFLT, BOUNDS, 20);
+                : HEADINGS_DFLT, 20);
         this.showPatientNumber = (columnsShown == ColumnsShown.PNUMBER);
     }
 

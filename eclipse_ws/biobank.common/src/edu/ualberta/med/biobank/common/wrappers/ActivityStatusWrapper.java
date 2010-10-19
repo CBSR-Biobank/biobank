@@ -34,8 +34,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     public static final String DISABLED_STATUS_STRING = "Disabled";
 
-    public static final String DISPATCHED_STATUS_STRING = "Dispatched";
-
     public static final String FLAGGED_STATUS_STRING = "Flagged";
 
     public ActivityStatusWrapper(WritableApplicationService appService,
@@ -68,14 +66,16 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public boolean isUsed() throws ApplicationException, BiobankCheckException {
         long usedCount = 0;
 
-        Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
-            Container.class, ContainerType.class, SampleStorage.class,
-            Site.class, Study.class, StudyPvAttr.class };
+        Class<?>[] classes =
+            new Class[] { Aliquot.class, Clinic.class, Container.class,
+                ContainerType.class, SampleStorage.class, Site.class,
+                Study.class, StudyPvAttr.class };
 
         for (Class<?> clazz : classes) {
-            HQLCriteria c = new HQLCriteria("select count(x) from "
-                + clazz.getName() + " as x where x.activityStatus=?",
-                Arrays.asList(new Object[] { wrappedObject }));
+            HQLCriteria c =
+                new HQLCriteria("select count(x) from " + clazz.getName()
+                    + " as x where x.activityStatus=?",
+                    Arrays.asList(new Object[] { wrappedObject }));
             List<Long> results = appService.query(c);
             if (results.size() != 1) {
                 throw new BiobankCheckException(
@@ -125,10 +125,11 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     public static List<ActivityStatusWrapper> getAllActivityStatuses(
         WritableApplicationService appService) throws ApplicationException {
 
-        List<ActivityStatusWrapper> activities = new ArrayList<ActivityStatusWrapper>();
+        List<ActivityStatusWrapper> activities =
+            new ArrayList<ActivityStatusWrapper>();
 
-        HQLCriteria c = new HQLCriteria("from "
-            + ActivityStatus.class.getName());
+        HQLCriteria c =
+            new HQLCriteria("from " + ActivityStatus.class.getName());
         List<ActivityStatus> result = appService.query(c);
         for (ActivityStatus ac : result) {
             activities.add(new ActivityStatusWrapper(appService, ac));
@@ -141,9 +142,9 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         WritableApplicationService appService, String name)
         throws ApplicationException, BiobankCheckException {
 
-        HQLCriteria c = new HQLCriteria("from "
-            + ActivityStatus.class.getName() + " where name = ?",
-            Arrays.asList(new Object[] { name }));
+        HQLCriteria c =
+            new HQLCriteria("from " + ActivityStatus.class.getName()
+                + " where name = ?", Arrays.asList(new Object[] { name }));
 
         List<ActivityStatus> result = appService.query(c);
 
@@ -206,23 +207,19 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return name != null && name.equals(ACTIVE_STATUS_STRING);
     }
 
-    /**
-     * return true if this Activity status name is "Dispatched". Facility method
-     * to avoid using "Dispatched" string everywhere
-     */
-    public boolean isDispatched() {
+    public boolean isClosed() {
         String name = getName();
-        return name != null && name.equals(DISPATCHED_STATUS_STRING);
+        return name != null && name.equals(CLOSED_STATUS_STRING);
+    }
+
+    public boolean isFlagged() {
+        String name = getName();
+        return name != null && name.equals(FLAGGED_STATUS_STRING);
     }
 
     @Override
     public String toString() {
         return getName();
-    }
-
-    public boolean isClosed() {
-        String name = getName();
-        return name != null && name.equals(CLOSED_STATUS_STRING);
     }
 
 }

@@ -5,18 +5,23 @@ import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.runtime.IStatus;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.TopContainerListWidget;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ContainerEmptyLocationsEditor extends ReportsEditor {
 
@@ -24,30 +29,33 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
 
     private BiobankText containerLabel;
     private TopContainerListWidget topContainers;
-    private IObservableValue comboStatus = new WritableValue(Boolean.FALSE,
+    private IObservableValue listStatus = new WritableValue(Boolean.FALSE,
         Boolean.class);
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100 };
-    }
-
-    @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(containerLabel.getText());
-        params.add(topContainers.getSelectedContainers());
-        return params;
+        params.add(topContainers.getSelectedContainerIds());
+        report.setParams(params);
     }
 
     @Override
     protected void createOptionSection(Composite parameterSection) {
         containerLabel = createCustomText("Container Label", parameterSection);
-        widgetCreator.createLabel(parameterSection, "Top Containers");
-        topContainers = new TopContainerListWidget(parameterSection, SWT.NONE);
+        topContainers = new TopContainerListWidget(parameterSection, toolkit);
         widgetCreator.addBooleanBinding(new WritableValue(Boolean.FALSE,
-            Boolean.class), comboStatus, "Pallet not found", IStatus.ERROR);
-        topContainers.setEnabled(false);
+            Boolean.class), listStatus, "Top Container List Empty");
+        topContainers.addSelectionChangedListener(new SelectionListener() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                listStatus.setValue(topContainers.getEnabled());
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+            }
+        });
     }
 
     protected BiobankText createCustomText(String labelText, Composite parent) {
@@ -62,8 +70,7 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
             @Override
             public void keyReleased(KeyEvent e) {
                 if (e.keyCode == SWT.CR) {
-                    filterList(widget.getText());
-                    comboStatus.setValue(topContainers.getEnabled());
+                    validate(widget.getText());
                 }
             }
         });
@@ -71,8 +78,7 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
             @Override
             public void keyTraversed(TraverseEvent e) {
                 if (e.keyCode == SWT.TAB) {
-                    filterList(widget.getText());
-                    comboStatus.setValue(topContainers.getEnabled());
+                    validate(widget.getText());
                 }
             }
 
@@ -81,10 +87,25 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
             @Override
             public void modifyText(ModifyEvent e) {
                 topContainers.setEnabled(false);
-                comboStatus.setValue(false);
             }
         });
         return widget;
+    }
+
+    protected void validate(String label) {
+        try {
+            if (label.equals("")
+                || ContainerWrapper.getContainersByLabel(
+                    SessionManager.getAppService(), label).size() > 0)
+                filterList(label);
+            else {
+                throw new ApplicationException();
+            }
+        } catch (ApplicationException e) {
+            BioBankPlugin.openAsyncError("Invalid label",
+                "No container labelled " + label);
+        }
+
     }
 
     protected void filterList(String text) {
@@ -105,4 +126,11 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
         return paramNames;
     }
 
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(containerLabel.getText());
+        params.add(topContainers.getSelectedContainerNames());
+        return params;
+    }
 }

@@ -78,13 +78,13 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     protected ListenerList doubleClickListeners = new ListenerList();
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths) {
-        super(parent, collection, headings, columnWidths, 5);
+        String[] headings) {
+        super(parent, collection, headings, null, 5);
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths, int rowsPerPage) {
-        super(parent, collection, headings, columnWidths, rowsPerPage);
+        String[] headings, int rowsPerPage) {
+        super(parent, collection, headings, null, rowsPerPage);
     }
 
     @Override

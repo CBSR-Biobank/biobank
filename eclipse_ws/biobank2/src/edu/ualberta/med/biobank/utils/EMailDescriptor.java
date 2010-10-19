@@ -4,7 +4,7 @@ public class EMailDescriptor {
     private String title;
     private String description;
     private String smtpServer;
-    private int serverPort;
+    private String serverPort;
     private String serverUsername;
     private String serverPassword;
     private String receiverEmail;
@@ -49,11 +49,11 @@ public class EMailDescriptor {
         this.serverPassword = serverPassword;
     }
 
-    public int getServerPort() {
+    public String getServerPort() {
         return serverPort;
     }
 
-    public void setServerPort(int serverPort) {
+    public void setServerPort(String serverPort) {
         this.serverPort = serverPort;
     }
 

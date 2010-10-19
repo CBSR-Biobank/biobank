@@ -129,7 +129,6 @@ public class SiteManager {
 
     public void updateSites(Collection<SiteWrapper> sites) {
         Assert.isNotNull(sites, "sites collection is null");
-
         if (currentSite == null)
             currentSite = allSitesWrapper;
         logger.debug("site selected: " + currentSite.getName());
@@ -140,15 +139,21 @@ public class SiteManager {
             currentSites.add(site);
         }
         siteCombo.setInput(currentSites);
-        siteCombo.setSelection(currentSite);
+        siteCombo.setSelection(allSitesWrapper);
     }
 
     public void updateSites() {
+        updateSites(getSites());
+    }
+
+    private List<SiteWrapper> getSites() {
+        List<SiteWrapper> sites = null;
         try {
-            updateSites(SiteWrapper.getSites(appService));
+            sites = SiteWrapper.getSites(appService);
         } catch (Exception e) {
             logger.error("Cannot update Sites", e);
         }
+        return sites;
     }
 
     public SiteWrapper getCurrentSite() {

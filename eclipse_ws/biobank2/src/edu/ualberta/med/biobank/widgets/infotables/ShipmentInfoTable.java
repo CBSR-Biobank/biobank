@@ -8,14 +8,14 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class ShipmentInfoTable extends InfoTableWidget<ClinicShipmentWrapper> {
+public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
 
     private class TableRowData {
-        ClinicShipmentWrapper shipment;
+        ShipmentWrapper shipment;
         String dateReceived;
         String waybill;
         String shippingCompany;
@@ -31,10 +31,8 @@ public class ShipmentInfoTable extends InfoTableWidget<ClinicShipmentWrapper> {
     private static final String[] HEADINGS = new String[] { "Date received",
         "Waybill", "Shipping company", "No. Patients" };
 
-    private static final int[] BOUNDS = new int[] { 180, 140, 140, 100, -1 };
-
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, clinic.getShipmentCollection(), HEADINGS, BOUNDS, 10);
+        super(parent, clinic.getShipmentCollection(), HEADINGS, 10);
     }
 
     @Override
@@ -70,7 +68,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ClinicShipmentWrapper> {
      * shipment.
      */
     @Override
-    public Object getCollectionModelObject(ClinicShipmentWrapper shipment)
+    public Object getCollectionModelObject(ShipmentWrapper shipment)
         throws Exception {
         TableRowData info = new TableRowData();
         info.shipment = shipment;
@@ -99,7 +97,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ClinicShipmentWrapper> {
     }
 
     @Override
-    public ClinicShipmentWrapper getSelection() {
+    public ShipmentWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

@@ -16,16 +16,17 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AliquotRequestImpl extends AbstractReport {
 
-    private static final String QUERY = "select p.aliquot from "
-        + AliquotPosition.class.getName()
-        + " p where p.aliquot.patientVisit.shipment.site "
-        + SITE_OPERATOR
-        + SITE_ID
-        + " and p.container.label not like '"
-        + SENT_SAMPLES_FREEZER_NAME
-        + "' and p.aliquot.patientVisit.patient.pnumber like ? and"
-        + " datediff(p.aliquot.patientVisit.dateDrawn, ?) = 0  and"
-        + " p.aliquot.sampleType.nameShort like ? and p.aliquot.activityStatus.name != 'Closed' ORDER BY p.aliquot.activityStatus.name, RAND()";
+    private static final String QUERY =
+        "select p.aliquot from "
+            + AliquotPosition.class.getName()
+            + " p where p.aliquot.patientVisit.shipmentPatient.shipment.site "
+            + SITE_OPERATOR
+            + SITE_ID
+            + " and p.container.label not like '"
+            + SENT_SAMPLES_FREEZER_NAME
+            + "' and p.aliquot.patientVisit.shipmentPatient.patient.pnumber like ? and"
+            + " datediff(p.aliquot.patientVisit.dateDrawn, ?) = 0  and"
+            + " p.aliquot.sampleType.nameShort like ? and p.aliquot.activityStatus.name != 'Closed' ORDER BY p.aliquot.activityStatus.name, RAND()";
 
     public AliquotRequestImpl(BiobankReport report) {
         super(QUERY, report);
@@ -36,10 +37,11 @@ public class AliquotRequestImpl extends AbstractReport {
         throws ApplicationException {
         List<Object> parameters = report.getParams();
         List<Object> results = new ArrayList<Object>();
-        queryString = queryString.replaceAll(SITE_OPERATOR_SEARCH_STRING,
-            report.getOp());
-        queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING, report
-            .getSiteId().toString());
+        queryString =
+            queryString.replaceAll(SITE_OPERATOR_SEARCH_STRING, report.getOp());
+        queryString =
+            queryString.replaceAll(SITE_ID_SEARCH_STRING, report.getSiteId()
+                .toString());
         HQLCriteria c;
         for (Object o : parameters) {
             AliquotRequest request = (AliquotRequest) o;
@@ -80,13 +82,15 @@ public class AliquotRequestImpl extends AbstractReport {
                 modifiedResults.add(ob);
             } else {
                 Aliquot aliquot = (Aliquot) ob;
-                String pnumber = aliquot.getPatientVisit().getPatient()
-                    .getPnumber();
+                String pnumber =
+                    aliquot.getPatientVisit().getShipmentPatient()
+                        .getPatient().getPnumber();
                 String inventoryId = aliquot.getInventoryId();
                 Date dateDrawn = aliquot.getPatientVisit().getDateDrawn();
                 String stName = aliquot.getSampleType().getNameShort();
-                String aliquotLabel = new AliquotWrapper(appService, aliquot)
-                    .getPositionString(true, false);
+                String aliquotLabel =
+                    new AliquotWrapper(appService, aliquot).getPositionString(
+                        true, false);
                 String activityStatus = aliquot.getActivityStatus().getName();
                 modifiedResults.add(new Object[] { pnumber, inventoryId,
                     dateDrawn, stName, aliquotLabel, activityStatus });

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
@@ -22,6 +23,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.handlers.LogoutHandler;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.EmptyStringValidator;
 import edu.ualberta.med.biobank.validators.MatchingTextValidator;
@@ -35,6 +37,7 @@ import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class UserEditDialog extends BiobankDialog {
+    public static final int CLOSE_PARENT_RETURN_CODE = 3;
     private static final String TITLE = "User";
     private static final int PASSWORD_LENGTH_MIN = 5;
     private static final String MSG_LOGIN_REQUIRED = "A valid email address is required.";
@@ -47,6 +50,8 @@ public class UserEditDialog extends BiobankDialog {
     private static final String USER_PERSIST_ERROR_TITLE = "Unable to Save User";
     private static final String MSG_GROUP_REQUIRED = "Each user must be assigned to at least one group. Please assign a group.";
     private static final String MSG_LOGIN_UNIQUE = "Each user login must be unique: \"{0}\" is already taken. Please try a different login name.";
+    private static final String USER_PERSIST_TITLE = "User Information Saved";
+    private static final String USER_PERSIST_SELF_MESSAGE = "Your information has been successfully updated. You will be logged out and have to reconnect.";
 
     private User originalUser, modifiedUser = new User();
     private Map<Long, Group> allGroupsMap = new HashMap<Long, Group>();
@@ -139,7 +144,24 @@ public class UserEditDialog extends BiobankDialog {
         try {
             SessionManager.getAppService().persistUser(modifiedUser);
             originalUser.copy(modifiedUser);
-            super.okPressed();
+
+            if (SessionManager.getUser().getId().equals(originalUser.getId())) {
+                // if the User is making changes to himself, logout
+
+                BioBankPlugin.openInformation(USER_PERSIST_TITLE,
+                    USER_PERSIST_SELF_MESSAGE);
+
+                LogoutHandler lh = new LogoutHandler();
+                try {
+                    lh.execute(null);
+                } catch (ExecutionException e) {
+                }
+
+                setReturnCode(CLOSE_PARENT_RETURN_CODE);
+            } else {
+                setReturnCode(OK);
+            }
+            close();
         } catch (ApplicationException e) {
             String message = null;
             if (groupsWidget.getSelected().size() == 0) {
