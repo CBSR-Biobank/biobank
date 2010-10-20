@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.validators.DateNotNulValidator;
+import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
@@ -68,7 +68,7 @@ public class SendDispatchShipmentDialog extends BiobankDialog {
         shipment.setDateShipped(date);
         createDateTimeWidget(contents, "Date Shipped", date, shipment,
             "dateShipped",
-            new DateNotNulValidator("Date shipped should be set"));
+            new NotNullValidator("Date shipped should be set"));
     }
 
 }

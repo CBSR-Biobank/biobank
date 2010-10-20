@@ -339,6 +339,16 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         return widget;
     }
 
+    protected BiobankText createReadOnlyLabelledField(Composite parent,
+        int widgetOptions, String fieldLabel,
+        IObservableValue modelObservableValue) {
+        BiobankText widget = (BiobankText) createBoundWidgetWithLabel(parent,
+            BiobankText.class, widgetOptions | SWT.READ_ONLY, fieldLabel, null,
+            modelObservableValue, null);
+        widget.setBackground(READ_ONLY_TEXT_BGR);
+        return widget;
+    }
+
     protected void bindChangeListener() {
         final IObservableValue statusObservable = new WritableValue();
         statusObservable.addChangeListener(new IChangeListener() {
