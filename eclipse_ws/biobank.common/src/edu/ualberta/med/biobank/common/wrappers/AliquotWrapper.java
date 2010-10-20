@@ -8,7 +8,6 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -177,6 +176,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                 if (da.getShipment().isInTransitState()
                     && DispatchAliquotState.NONE_STATE.isEquals(da.getState())) {
                     // aliquot is in transit
+                    // FIXME what if can't read sender or recevier
                     s.setNameShort("In Transit ("
                         + da.getShipment().getSender().getNameShort() + " to "
                         + da.getShipment().getReceiver().getNameShort() + ")");
@@ -470,12 +470,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         throws ApplicationException, BiobankCheckException {
         AliquotWrapper aliquot = getAliquot(appService, inventoryId);
         if (aliquot != null) {
-            SiteWrapper site = aliquot.getPatientVisit().getShipment()
-                .getSite();
+            SiteWrapper site = aliquot.getSite();
             // site might be null if can't access it !
-            if (site == null
-                || !user.hasPrivilegeOnObject(Privilege.READ, null, Site.class,
-                    site.getId())) {
+            if (site == null) {
                 throw new ApplicationException(
                     "Aliquot "
                         + inventoryId
