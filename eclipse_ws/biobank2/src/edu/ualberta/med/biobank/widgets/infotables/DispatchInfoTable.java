@@ -126,4 +126,8 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
         return null;
     }
 
+    public void reloadCollection() {
+        reloadCollection(a.getDispatchShipments());
+    }
+
 }

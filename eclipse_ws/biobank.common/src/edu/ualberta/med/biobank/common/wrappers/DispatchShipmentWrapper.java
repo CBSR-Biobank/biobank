@@ -215,8 +215,11 @@ public class DispatchShipmentWrapper extends
     }
 
     public String getStateDescription() {
-        return DispatchShipmentState.getState(wrappedObject.getState())
-            .getLabel();
+        DispatchShipmentState state = DispatchShipmentState
+            .getState(wrappedObject.getState());
+        if (state == null)
+            return "";
+        return state.getLabel();
     }
 
     public StudyWrapper getStudy() {

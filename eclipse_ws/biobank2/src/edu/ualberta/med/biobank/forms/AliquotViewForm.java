@@ -213,6 +213,7 @@ public class AliquotViewForm extends BiobankViewForm {
         setValues();
         setPartName("Aliquot: " + aliquot.getInventoryId());
         form.setText("Aliquot: " + aliquot.getInventoryId());
+        dispatchInfoTable.reloadCollection();
     }
 
 }

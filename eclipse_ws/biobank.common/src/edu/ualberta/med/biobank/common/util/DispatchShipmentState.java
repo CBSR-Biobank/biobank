@@ -13,7 +13,13 @@ public enum DispatchShipmentState {
     }
 
     public static DispatchShipmentState getState(Integer state) {
-        return values()[state];
+        if (state == null)
+            return CREATION;
+        for (DispatchShipmentState dss : values()) {
+            if (dss.getId().equals(state))
+                return dss;
+        }
+        return null;
     }
 
     public boolean isEquals(Integer state) {
