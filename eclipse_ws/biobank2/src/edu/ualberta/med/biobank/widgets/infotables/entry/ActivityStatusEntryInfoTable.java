@@ -97,11 +97,23 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                                 + " already exists.");
                     }
                 }
-                selectActivityStatus.setName(statusCopy.getName());
-                if (add) {
-                    localActivityStatuses.add(selectActivityStatus);
+                ActivityStatusWrapper noMoreDeletedStatus = null;
+                for (ActivityStatusWrapper asw : deletedStatuses) {
+                    if (asw.getName().equals(newName)) {
+                        noMoreDeletedStatus = asw;
+                        break;
+                    }
                 }
-                addedOrModifiedStatuses.add(selectActivityStatus);
+                if (noMoreDeletedStatus == null) {
+                    selectActivityStatus.setName(statusCopy.getName());
+                    if (add) {
+                        localActivityStatuses.add(selectActivityStatus);
+                    }
+                    addedOrModifiedStatuses.add(selectActivityStatus);
+                } else {
+                    deletedStatuses.remove(noMoreDeletedStatus);
+                    localActivityStatuses.add(noMoreDeletedStatus);
+                }
                 reloadCollection(localActivityStatuses);
                 notifyListeners();
                 return true;
@@ -142,35 +154,29 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
             public void deleteItem(InfoTableEvent event) {
                 ActivityStatusWrapper activityStatus = getSelection();
                 if (activityStatus != null) {
-                    try {
-                        if (!activityStatus.isNew()
-                            && activityStatus.isActive()) {
-                            BioBankPlugin
-                                .openError(
-                                    "Activity Status Delete Error",
-                                    "Cannot delete activity status \""
-                                        + activityStatus.getName()
-                                        + "\" since created activity statuses are using it.");
+                    if (!activityStatus.isNew()) {
+                        try {
+                            activityStatus.deleteChecks();
+                        } catch (final RemoteConnectFailureException exp) {
+                            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                        } catch (Exception e) {
+                            BioBankPlugin.openAsyncError("Cannot delete", e);
                             return;
                         }
-
-                        if (!MessageDialog.openConfirm(PlatformUI
-                            .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), "Delete Activity Status",
-                            "Are you sure you want to delete activity status\""
-                                + activityStatus.getName() + "\"?")) {
-                            return;
-                        }
-                        localActivityStatuses.remove(activityStatus);
-                        deletedStatuses.add(activityStatus);
-                        reloadCollection(localActivityStatuses);
-                        notifyListeners();
-                    } catch (final RemoteConnectFailureException exp) {
-                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
-                    } catch (Exception e) {
-                        logger.error("BioBankFormBase.createPartControl Error",
-                            e);
                     }
+
+                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
+                        "Delete Activity Status",
+                        "Are you sure you want to delete activity status\""
+                            + activityStatus.getName() + "\"?")) {
+                        return;
+                    }
+                    localActivityStatuses.remove(activityStatus);
+                    deletedStatuses.add(activityStatus);
+                    reloadCollection(localActivityStatuses);
+                    notifyListeners();
+
                 }
             }
         });

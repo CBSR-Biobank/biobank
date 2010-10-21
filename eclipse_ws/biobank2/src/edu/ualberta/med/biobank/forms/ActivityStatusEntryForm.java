@@ -20,7 +20,6 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm";
     public static final String OK_MESSAGE = "View and edit activity statuses.";
 
-    // FIXME -- setDirty doesn't get called.
     private BiobankEntryFormWidgetListener tableChangeListener = new BiobankEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
