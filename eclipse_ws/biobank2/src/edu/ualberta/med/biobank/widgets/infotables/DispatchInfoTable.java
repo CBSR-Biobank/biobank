@@ -20,6 +20,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
 
         DispatchShipmentWrapper ds;
         Date dispatchTime;
+        Date dateReceived;
         String waybill;
         String dstatus;
         String astatus;
@@ -28,14 +29,15 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
         public String toString() {
             return StringUtils.join(
                 new String[] { DateFormatter.formatAsDate(dispatchTime),
-                    waybill, dstatus, astatus }, "\t");
+                    DateFormatter.formatAsDate(dateReceived), waybill, dstatus,
+                    astatus }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] { "Dispatch Time",
-        "Waybill", "Dispatch State", "Aliquot State" };
+        "Date Received", "Waybill", "Dispatch State", "Aliquot State" };
 
-    private static final int[] BOUNDS = new int[] { 100, 100, 100, 100 };
+    private static final int[] BOUNDS = new int[] { 100, 100, 100, 100, 100 };
 
     private boolean editMode = false;
 
@@ -66,10 +68,12 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
                 case 0:
                     return DateFormatter.formatAsDate(info.dispatchTime);
                 case 1:
-                    return info.waybill;
+                    return DateFormatter.formatAsDate(info.dateReceived);
                 case 2:
-                    return info.dstatus;
+                    return info.waybill;
                 case 3:
+                    return info.dstatus;
+                case 4:
                     return info.astatus;
                 default:
                     return "";
@@ -84,6 +88,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
         TableRowData info = new TableRowData();
         info.ds = ds;
         info.dispatchTime = ds.getDateShipped();
+        info.dateReceived = ds.getDateReceived();
         info.dstatus = ds.getStateDescription();
         info.astatus = ds.getDispatchShipmentAliquot(a.getInventoryId())
             .getStateDescription();
