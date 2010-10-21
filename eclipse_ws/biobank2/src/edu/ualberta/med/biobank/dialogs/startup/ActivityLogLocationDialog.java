@@ -19,6 +19,7 @@ import org.eclipse.swt.widgets.Text;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.utils.FilePromptUtil;
 
 public class ActivityLogLocationDialog extends BiobankDialog {
 
@@ -79,8 +80,7 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
     private void createFileLocationSelector(final Composite parent,
         String labelText) {
-        final Composite fileSelectionComposite =
-            new Composite(parent, SWT.NONE);
+        final Composite fileSelectionComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(3, false);
         fileSelectionComposite.setLayout(layout);
         fileSelectionComposite.setLayoutData(new GridData(SWT.FILL, SWT.FILL,
@@ -88,11 +88,10 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
         createLabel(fileSelectionComposite, labelText);
 
-        final String biobank2Dir =
-            System.getProperty("user.home")
-                + System.getProperty("file.separator") + "biobank2";
-        activityLogDirText =
-            new Text(fileSelectionComposite, SWT.BORDER | SWT.FILL);
+        final String biobank2Dir = System.getProperty("user.home")
+            + System.getProperty("file.separator") + "biobank2";
+        activityLogDirText = new Text(fileSelectionComposite, SWT.BORDER
+            | SWT.FILL);
         activityLogDirText.setLayoutData(new GridData(GridData.FILL,
             GridData.FILL, true, false));
         activityLogDirText.setText(biobank2Dir);
@@ -103,15 +102,16 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
             @Override
             public void widgetSelected(SelectionEvent e) {
-                DirectoryDialog fd =
-                    new DirectoryDialog(fileSelectionComposite.getShell(),
-                        SWT.SAVE);
+                DirectoryDialog fd = new DirectoryDialog(fileSelectionComposite
+                    .getShell(), SWT.SAVE);
                 fd.setText("Select Directory");
                 fd.setFilterPath(biobank2Dir);
                 String selected = fd.open();
-                if (selected != null)
+                if (selected != null) {
                     activityLogDirText.setText(selected);
-                else {
+                    File f = new File(selected);
+                    f.canWrite();
+                } else {
                     activityLogDirText.setText("");
                 }
             }
@@ -131,21 +131,8 @@ public class ActivityLogLocationDialog extends BiobankDialog {
 
             File activityLogDirFile = new File(activityLogDir);
 
-            if (!activityLogDirFile.exists()) {
-                boolean createPath =
-                    BioBankPlugin.openConfirm("Create path?", "Path: "
-                        + activityLogDir
-                        + "\ndoes not exist, would you like to create it?");
-
-                if (!createPath) {
-                    return;
-                }
-                if (!activityLogDirFile.mkdirs()) {
-                    BioBankPlugin.openAsyncError("Error Creating Path",
-                        "An error occured, could not create path: "
-                            + activityLogDir + ".");
-                    return;
-                }
+            if (!FilePromptUtil.isWritableDir(activityLogDirFile)) {
+                return;
             }
 
             BioBankPlugin

@@ -8,7 +8,14 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
 import org.eclipse.jface.window.Window;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -26,11 +33,13 @@ public class UserInfoTable extends InfoTableWidget<User> {
     private static final String LOADING_ROW = "loading...";
     private static final String GROUPS_LOADING_ERROR = "Unable to load groups.";
     private static final String USER_DELETE_ERROR = "Unable to delete user.";
+    private static final String CANNOT_UNLOCK_USER = "Cannot unlock user {0}.";
     private static final String CONFIRM_DELETE_TITLE = "Confirm Deletion";
     private static final String CONFIRM_DELETE_MESSAGE = "Are you certain you want to delete \"{0}\"?";
     private static final String CONFIRM_SUICIDE_MESSAGE = "Are you certain you want to delete yourself as a user?";
 
     private Window parentWindow;
+    private MenuItem unlockMenuItem;
 
     public UserInfoTable(Composite parent, List<User> collection,
         Window parentWindow) {
@@ -49,6 +58,32 @@ public class UserInfoTable extends InfoTableWidget<User> {
             @Override
             public void deleteItem(InfoTableEvent event) {
                 deleteUser(getSelection());
+            }
+        });
+
+        unlockMenuItem = new MenuItem(menu, SWT.PUSH);
+        unlockMenuItem.setText("Unlock User");
+        unlockMenuItem.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                User selectedUser = getSelection();
+                String userName = selectedUser.getLogin();
+                try {
+                    SessionManager.getAppService().unlockUser(
+                        getSelection().getLogin());
+                    selectedUser.setLockedOut(false);
+                    reloadCollection(getCollection(), selectedUser);
+                } catch (ApplicationException e) {
+                    BioBankPlugin.openAsyncError(MessageFormat.format(
+                        CANNOT_UNLOCK_USER, new Object[] { userName }), e);
+                }
+            }
+        });
+
+        menu.addListener(SWT.Show, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                unlockMenuItem.setEnabled(getSelection().isLockedOut());
             }
         });
     }
@@ -86,6 +121,16 @@ public class UserInfoTable extends InfoTableWidget<User> {
     @Override
     protected IBaseLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
+            @Override
+            public Image getColumnImage(Object element, int columnIndex) {
+                User user = (User) ((BiobankCollectionModel) element).o;
+                if (user != null && user.isLockedOut() && columnIndex == 0) {
+                    return BioBankPlugin.getDefault().getImage(
+                        BioBankPlugin.IMG_LOCK);
+                }
+                return null;
+            }
+
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 User user = (User) ((BiobankCollectionModel) element).o;
@@ -147,13 +192,13 @@ public class UserInfoTable extends InfoTableWidget<User> {
 
             if (BioBankPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
                 SessionManager.getAppService().deleteUser(loginName);
+
+                // remove the user from the collection
+                getCollection().remove(user);
+
+                reloadCollection(getCollection(), null);
+                notifyListeners();
             }
-
-            // remove the user from the collection
-            getCollection().remove(user);
-
-            reloadCollection(getCollection(), null);
-            notifyListeners();
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError(USER_DELETE_ERROR, e);
             return;

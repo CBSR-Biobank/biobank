@@ -45,8 +45,8 @@ import edu.ualberta.med.biobank.treeview.dispatch.DispatchShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
-import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchShipmentGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchShipmentGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchShipmentGroup;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
@@ -123,6 +123,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_RECEIVED = "received";
     public static final String IMG_SENT = "sent";
     public static final String IMG_ALIQUOT = "aliquot";
+    public static final String IMG_LOCK = "lock";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -170,7 +171,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
         classToImageKey.put(SentInTransitDispatchShipmentGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
-        classToImageKey.put(ReceivingNoErrorsDispatchShipmentGroup.class.getName(),
+        classToImageKey.put(
+            ReceivingNoErrorsDispatchShipmentGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
         classToImageKey.put(
             ReceivingWithErrorsDispatchShipmentGroup.class.getName(),
@@ -286,6 +288,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_RECEIVED, "received.png");
         registerImage(registry, IMG_SENT, "sent.png");
         registerImage(registry, IMG_ALIQUOT, "aliquot.png");
+        registerImage(registry, IMG_LOCK, "lock.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
