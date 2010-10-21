@@ -278,25 +278,28 @@ public class LoginDialog extends TitleAreaDialog {
 
     @Override
     protected void okPressed() {
+        URL url = null;
+
         try {
-            new URL("http://" + serverWidget.getText());
+            url = new URL("http://" + serverWidget.getText());
         } catch (MalformedURLException e) {
             MessageDialog.openError(getShell(), "Invalid Server URL",
-                "Please enter a valid server URL. Ex. hostname:port");
+                "Please enter a valid server URL.");
             return;
         }
 
-        if (!serverWidget.getText().contains(":")) {
-            MessageDialog.openError(getShell(), "Invalid Server URL",
-                "Please enter a valid server URL. Ex. hostname:port");
-            return;
-        }
-
-        if (userNameWidget.getText().equals("")
-            && !BioBankPlugin.getDefault().isDebugging()) {
-            MessageDialog.openError(getShell(), "Invalid User Name",
-                "User Name field must not be blank.");
-            return;
+        if (!BioBankPlugin.getDefault().isDebugging()) {
+            if (url.getPort() != -1) {
+                MessageDialog
+                    .openError(getShell(), "Invalid Server URL",
+                        "You are not allowed to specify a port, only a hostname and path.");
+                return;
+            }
+            if (userNameWidget.getText().equals("")) {
+                MessageDialog.openError(getShell(), "Invalid User Name",
+                    "User Name field must not be blank.");
+                return;
+            }
         }
 
         boolean secureConnection = ((secureConnectionButton == null) || secureConnectionButton

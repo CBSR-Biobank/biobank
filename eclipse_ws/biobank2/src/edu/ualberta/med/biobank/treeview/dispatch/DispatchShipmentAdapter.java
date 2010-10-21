@@ -77,11 +77,9 @@ public class DispatchShipmentAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addViewMenu(menu, "Dispatch Shipment");
         SiteWrapper currentSite = SessionManager.getCurrentSite();
-        if (SessionManager.getUser().canUpdateSite(
-            SessionManager.getCurrentSite())) {
+        if (SessionManager.getUser().canUpdateSite(currentSite)) {
             if (currentSite.equals(getWrapper().getSender())
-                && SessionManager
-                    .canDelete(DispatchShipmentWrapper.class, null)
+                && getWrapper().canDelete(SessionManager.getUser())
                 && getWrapper().isInCreationState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText("Delete");
@@ -92,8 +90,20 @@ public class DispatchShipmentAdapter extends AdapterBase {
                     }
                 });
             }
+            if (currentSite.equals(getWrapper().getSender())
+                && getWrapper().canUpdate(SessionManager.getUser())
+                && getWrapper().isInTransitState()) {
+                MenuItem mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText("Move to Creation");
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        setShipmentAsCreation();
+                    }
+                });
+            }
             if (getWrapper().canBeReceivedBy(SessionManager.getUser(),
-                SessionManager.getCurrentSite())) {
+                currentSite)) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText("Receive");
                 mi.addSelectionListener(new SelectionAdapter() {
@@ -141,6 +151,12 @@ public class DispatchShipmentAdapter extends AdapterBase {
     private void setShipmentAsReceived() {
         getWrapper().setDateReceived(new Date());
         getWrapper().setInReceivedState();
+        persistShipment();
+    }
+
+    private void setShipmentAsCreation() {
+        getWrapper().setInCreationState();
+        getWrapper().setDateShipped(null);
         persistShipment();
     }
 

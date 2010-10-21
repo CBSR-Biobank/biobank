@@ -39,7 +39,7 @@ public class UserEditDialog extends BiobankDialog {
     public static final int CLOSE_PARENT_RETURN_CODE = 3;
     private static final String TITLE = "User";
     private static final int PASSWORD_LENGTH_MIN = 5;
-    private static final String MSG_LOGIN_REQUIRED = "A valid email address is required.";
+    private static final String MSG_LOGIN_REQUIRED = "A valid login name is required.";
     private static final String MSG_PASSWORD_REQUIRED = "Passwords must be at least "
         + PASSWORD_LENGTH_MIN + " characters long.";
     private static final String MSG_PASSWORDS_MUST_MATCH = "The passwords entered do not match.";
@@ -112,20 +112,20 @@ public class UserEditDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         Control c = createBoundWidgetWithLabel(contents, BiobankText.class,
-            SWT.BORDER, "Login", new String[0], modifiedUser, "login",
+            SWT.BORDER, "Login", null, modifiedUser, "login",
             new NonEmptyStringValidator(MSG_LOGIN_REQUIRED));
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         gd.widthHint = 250;
         c.setLayoutData(gd);
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Email", new String[0], modifiedUser, "email", null);
+            "Email", null, modifiedUser, "email", null);
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "First Name", new String[0], modifiedUser, "firstName", null);
+            "First Name", null, modifiedUser, "firstName", null);
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.BORDER,
-            "Last Name", new String[0], modifiedUser, "lastName", null);
+            "Last Name", null, modifiedUser, "lastName", null);
 
         createPasswordWidgets(contents);
 

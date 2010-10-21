@@ -23,6 +23,15 @@ public class User implements Serializable, NotAProxy {
     private String lastName;
     private String password;
     private String email;
+    private boolean isLockedOut;
+
+    public boolean isLockedOut() {
+        return isLockedOut;
+    }
+
+    public void setLockedOut(boolean isLockedOut) {
+        this.isLockedOut = isLockedOut;
+    }
 
     private boolean needToChangePassword;
 

@@ -34,8 +34,8 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
-import edu.ualberta.med.biobank.validators.DateNotNulValidator;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -160,10 +160,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
         createDateTimeWidget(client, "Date Processed",
             patientVisit.getDateProcessed(), patientVisit, "dateProcessed",
-            new DateNotNulValidator("Date processed should be set"));
+            new NotNullValidator("Date processed should be set"));
 
         createDateTimeWidget(client, "Date Drawn", patientVisit.getDateDrawn(),
-            patientVisit, "dateDrawn", new DateNotNulValidator(
+            patientVisit, "dateDrawn", new NotNullValidator(
                 "Date Drawn should be set"));
 
         createPvDataSection(client);

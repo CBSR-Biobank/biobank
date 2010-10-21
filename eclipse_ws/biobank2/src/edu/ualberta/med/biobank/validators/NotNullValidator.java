@@ -4,9 +4,9 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-public class DateNotNulValidator extends AbstractValidator {
+public class NotNullValidator extends AbstractValidator {
 
-    public DateNotNulValidator(String message) {
+    public NotNullValidator(String message) {
         super(message);
     }
 

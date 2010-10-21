@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 
 public class AliquotViewForm extends BiobankViewForm {
 
@@ -54,6 +55,8 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private BiobankText positionLabel;
 
+    private DispatchInfoTable dispatchInfoTable;
+
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof AliquotAdapter),
@@ -86,8 +89,21 @@ public class AliquotViewForm extends BiobankViewForm {
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createInformationSection();
+        createDispatchSection();
         createContainersSection();
         setValues();
+    }
+
+    private void createDispatchSection() {
+        Section section = createSection("Dispatch History");
+        Composite client = toolkit.createComposite(section);
+        section.setClient(client);
+        section.setExpanded(false);
+        GridLayout layout = new GridLayout(1, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        dispatchInfoTable = new DispatchInfoTable(client, aliquot);
     }
 
     private void createInformationSection() {
@@ -163,7 +179,7 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        setTextValue(siteLabel, aliquot.getSite().getNameShort());
+        setTextValue(siteLabel, aliquot.getSiteString());
         setTextValue(sampleTypeLabel, aliquot.getSampleType().getName());
         setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
         setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
@@ -184,11 +200,18 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     @Override
+    public void setFocus() {
+        // aliquots are not present in treeviews, unnecessary reloads can be
+        // prevented with this method
+    }
+
+    @Override
     public void reload() {
         retrieveAliquot();
         setValues();
         setPartName("Aliquot: " + aliquot.getInventoryId());
         form.setText("Aliquot: " + aliquot.getInventoryId());
+        dispatchInfoTable.reloadCollection();
     }
 
 }

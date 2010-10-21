@@ -47,4 +47,5 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public User getCurrentUser() throws ApplicationException;
 
+    public void unlockUser(String userName) throws ApplicationException;
 }

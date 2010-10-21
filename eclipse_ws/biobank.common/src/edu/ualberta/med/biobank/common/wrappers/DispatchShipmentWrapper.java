@@ -214,6 +214,14 @@ public class DispatchShipmentWrapper extends
             newReceiver);
     }
 
+    public String getStateDescription() {
+        DispatchShipmentState state = DispatchShipmentState
+            .getState(wrappedObject.getState());
+        if (state == null)
+            return "";
+        return state.getLabel();
+    }
+
     public StudyWrapper getStudy() {
         StudyWrapper study = (StudyWrapper) propertiesMap.get("study");
         if (study == null) {
@@ -632,6 +640,10 @@ public class DispatchShipmentWrapper extends
         wrappedObject.setState(newState);
         stateModified = oldState == null || state == null
             || !oldState.equals(newState);
+    }
+
+    public void setInCreationState() {
+        setState(DispatchShipmentState.CREATION);
     }
 
     public void setInTransitState() {

@@ -8,6 +8,7 @@ import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.server.reports.ReportFactory;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
+import gov.nih.nci.security.authentication.LockoutManager;
 import gov.nih.nci.security.authorization.domainobjects.Application;
 import gov.nih.nci.security.authorization.domainobjects.Group;
 import gov.nih.nci.security.authorization.domainobjects.Privilege;
@@ -500,6 +501,8 @@ public class BiobankApplicationServiceImpl extends
         userDTO.setFirstName(serverUser.getFirstName());
         userDTO.setLastName(serverUser.getLastName());
         userDTO.setEmail(serverUser.getEmailId());
+        userDTO.setLockedOut(LockoutManager.getInstance().isUserLockedOut(
+            serverUser.getLoginName()));
 
         if (serverUser.getStartDate() != null) {
             userDTO.setNeedToChangePassword(true);
@@ -513,4 +516,10 @@ public class BiobankApplicationServiceImpl extends
         return userDTO;
     }
 
+    @Override
+    public void unlockUser(String userName) throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            LockoutManager.getInstance().unLockUser(userName);
+        }
+    }
 }
