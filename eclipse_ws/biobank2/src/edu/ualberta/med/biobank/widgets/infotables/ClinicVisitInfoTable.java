@@ -25,7 +25,7 @@ public class ClinicVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
 
     public ClinicVisitInfoTable(Composite parent,
         List<PatientVisitWrapper> collection) {
-        super(parent, collection, HEADINGS, 10);
+        super(parent, collection, HEADINGS);
     }
 
     @Override

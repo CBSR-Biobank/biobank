@@ -20,11 +20,12 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.AbstractInfoTableWidget;
@@ -37,11 +38,9 @@ public class PatientMergeForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientMergeForm.class.getName());
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientMergeForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.PatientMergeForm";
 
-    public static final String MSG_PATIENT_NOT_VALID =
-        "Select a second patient";
+    public static final String MSG_PATIENT_NOT_VALID = "Select a second patient";
 
     private PatientAdapter patient1Adapter;
 
@@ -126,14 +125,12 @@ public class PatientMergeForm extends BiobankEntryForm {
         patientArea2.setLayoutData(patient2Data);
         toolkit.paintBordersFor(client);
 
-        pnumber1Text =
-            createReadOnlyLabelledField(patientArea1, SWT.NONE,
-                "Patient Number");
+        pnumber1Text = createReadOnlyLabelledField(patientArea1, SWT.NONE,
+            "Patient Number");
         pnumber1Text.setText(patient1Adapter.getWrapper().getPnumber());
 
-        pnumber2Text =
-            (BiobankText) createLabelledWidget(patientArea2, BiobankText.class,
-                SWT.NONE, "Patient Number");
+        pnumber2Text = (BiobankText) createLabelledWidget(patientArea2,
+            BiobankText.class, SWT.NONE, "Patient Number");
         pnumber2Text.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -158,16 +155,15 @@ public class PatientMergeForm extends BiobankEntryForm {
         setFirstControl(pnumber2Text);
 
         StudyWrapper selectedStudy = patient1Adapter.getWrapper().getStudy();
-        study1Text =
-            createReadOnlyLabelledField(patientArea1, SWT.NONE, "Study");
+        study1Text = createReadOnlyLabelledField(patientArea1, SWT.NONE,
+            "Study");
         study1Text.setText(selectedStudy.getNameShort());
 
-        study2Text =
-            createReadOnlyLabelledField(patientArea2, SWT.NONE, "Study");
+        study2Text = createReadOnlyLabelledField(patientArea2, SWT.NONE,
+            "Study");
 
-        patient1VisitsTable =
-            new ClinicVisitInfoTable(patientArea1, patient1Adapter.getWrapper()
-                .getPatientVisitCollection(true, true));
+        patient1VisitsTable = new ClinicVisitInfoTable(patientArea1,
+            patient1Adapter.getWrapper().getPatientVisitCollection(true, true));
         GridData gd1 = new GridData();
         gd1.horizontalSpan = 2;
         gd1.grabExcessHorizontalSpace = true;
@@ -175,9 +171,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1VisitsTable.setLayoutData(gd1);
         patient1VisitsTable.adaptToToolkit(toolkit, true);
 
-        patient2VisitsTable =
-            new ClinicVisitInfoTable(patientArea2,
-                new ArrayList<PatientVisitWrapper>());
+        patient2VisitsTable = new ClinicVisitInfoTable(patientArea2,
+            new ArrayList<PatientVisitWrapper>());
         GridData gd2 = new GridData();
         gd2.horizontalSpan = 2;
         gd2.grabExcessHorizontalSpace = true;
@@ -188,9 +183,8 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     protected void populateFields(String pnumber) {
         try {
-            patient2 =
-                PatientWrapper.getPatient(SessionManager.getAppService(),
-                    pnumber);
+            patient2 = PatientWrapper.getPatient(
+                SessionManager.getAppService(), pnumber);
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError("Error retrieving patient", e);
             return;
@@ -222,8 +216,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             // FIXME: need to make sure this can be removed
             // patient2Wrapper
             // .setPatientVisitCollection(new ArrayList<PatientVisitWrapper>());
-            List<ShipmentWrapper> shipments =
-                patient2.getShipmentCollection();
+            List<ShipmentWrapper> shipments = patient2.getShipmentCollection();
             for (ShipmentWrapper shipment : shipments) {
                 List<PatientWrapper> patients = shipment.getPatientCollection();
                 for (PatientWrapper p : patients)
@@ -244,8 +237,8 @@ public class PatientMergeForm extends BiobankEntryForm {
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    PatientAdapter p =
-                        (PatientAdapter) SessionManager.searchNode(patient2);
+                    PatientAdapter p = (PatientAdapter) SessionManager
+                        .searchNode(patient2);
                     if (p != null) {
                         p.getParent().removeChild(p);
                     }
@@ -254,6 +247,19 @@ public class PatientMergeForm extends BiobankEntryForm {
                     closeEntryOpenView(false, true);
                 }
             });
+            ((BiobankApplicationService) appService).logActivity("merge", null,
+                patient2.getPnumber(), null, null, patient2.getPnumber()
+                    + " --> " + patient1Adapter.getWrapper().getPnumber(),
+                "Patient");
+            ((BiobankApplicationService) appService).logActivity(
+                "merge",
+                null,
+                patient1Adapter.getWrapper().getPnumber(),
+                null,
+                null,
+                patient1Adapter.getWrapper().getPnumber() + " <-- "
+                    + patient2.getPnumber(), "Patient");
+
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Merge failed.", e);
         }
