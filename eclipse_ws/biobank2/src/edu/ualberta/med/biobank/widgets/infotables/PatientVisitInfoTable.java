@@ -15,20 +15,23 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
     class TableRowData {
         PatientVisitWrapper visit;
         String dateProcessed;
+        String dateDrawn;
         Integer sampleCount;
+        String comment;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { dateProcessed,
-                (sampleCount != null) ? sampleCount.toString() : "0" }, "\t");
+            return StringUtils.join(
+                new String[] { dateProcessed, dateDrawn,
+                    (sampleCount != null) ? sampleCount.toString() : "0",
+                    comment }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] { "Date processed",
-        "Num Samples" };
+        "Date Drawn", "Num Samples", "Comment" };
 
-    private static final int[] BOUNDS = new int[] { 200, 130, -1, -1, -1, -1,
-        -1 };
+    private static final int[] BOUNDS = new int[] { 130, 130, 100, 200 };
 
     public PatientVisitInfoTable(Composite parent,
         List<PatientVisitWrapper> collection) {
@@ -51,8 +54,12 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
                 case 0:
                     return info.dateProcessed;
                 case 1:
+                    return info.dateDrawn;
+                case 2:
                     return (info.sampleCount != null) ? info.sampleCount
                         .toString() : "0";
+                case 3:
+                    return info.comment;
 
                 default:
                     return "";
@@ -67,10 +74,12 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
         TableRowData info = new TableRowData();
         info.visit = visit;
         info.dateProcessed = visit.getFormattedDateProcessed();
+        info.dateDrawn = visit.getFormattedDateDrawn();
         List<AliquotWrapper> samples = visit.getAliquotCollection();
         if (samples != null) {
             info.sampleCount = samples.size();
         }
+        info.comment = visit.getComment();
         return info;
     }
 
