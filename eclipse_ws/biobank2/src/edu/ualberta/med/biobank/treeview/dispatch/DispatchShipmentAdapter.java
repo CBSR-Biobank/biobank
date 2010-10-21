@@ -89,6 +89,18 @@ public class DispatchShipmentAdapter extends AdapterBase {
                 }
             });
         }
+        if (currentSite.equals(getWrapper().getSender())
+            && SessionManager.canUpdate(DispatchShipmentWrapper.class)
+            && getWrapper().isInTransitState()) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Move to Creation");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    setShipmentAsCreation();
+                }
+            });
+        }
         if (getWrapper().canBeReceivedBy(SessionManager.getUser(),
             SessionManager.getInstance().getCurrentSite())) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -137,6 +149,12 @@ public class DispatchShipmentAdapter extends AdapterBase {
     private void setShipmentAsReceived() {
         getWrapper().setDateReceived(new Date());
         getWrapper().setInReceivedState();
+        persistShipment();
+    }
+
+    private void setShipmentAsCreation() {
+        getWrapper().setInCreationState();
+        getWrapper().setDateShipped(null);
         persistShipment();
     }
 

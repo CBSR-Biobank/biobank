@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.model.DispatchShipmentAliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -166,42 +165,39 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         }
     }
 
-    public SiteWrapper getSite() {
+    public String getSiteString() {
         List<DispatchShipmentAliquotWrapper> dsac = this
             .getDispatchShipmentAliquotCollection();
         // if in a container, use the container's site
         if (getParent() != null) {
-            return getParent().getSite();
+            return getParent().getSite().getNameShort();
         } else {
             // dispatched aliquot?
-            SiteWrapper s = new SiteWrapper(appService, new Site());
             for (DispatchShipmentAliquotWrapper da : dsac) {
                 if (da.getShipment().isInTransitState()
                     && DispatchAliquotState.NONE_STATE.isEquals(da.getState())) {
                     // aliquot is in transit
-                    s.setNameShort("In Transit ("
+                    return ("In Transit ("
                         + da.getShipment().getSender().getNameShort() + " to "
                         + da.getShipment().getReceiver().getNameShort() + ")");
-                    return s;
-
                 } else if (da.getShipment().isInReceivedState()
                     && DispatchAliquotState.EXTRA.isEquals(da.getState())) {
                     // aliquot has been accidentally dispatched
-                    return da.getShipment().getReceiver();
+                    return da.getShipment().getReceiver().getNameShort();
                 } else if (da.getShipment().isInReceivedState()
                     && DispatchAliquotState.MISSING.isEquals(da.getState())) {
                     // aliquot is missing
-                    return da.getShipment().getSender();
+                    return da.getShipment().getSender().getNameShort();
                 } else if (da.getShipment().isInReceivedState()
                     && (DispatchAliquotState.RECEIVED_STATE.isEquals(da
                         .getState()) || DispatchAliquotState.NONE_STATE
                         .isEquals(da.getState()))) {
                     // aliquot has been intentionally dispatched and received
-                    return da.getShipment().getReceiver();
+                    return da.getShipment().getReceiver().getNameShort();
                 }
             }
             // if not in a container or a dispatch, use the originating shipment
-            return getPatientVisit().getShipment().getSite();
+            return getPatientVisit().getShipment().getSite().getNameShort();
         }
     }
 

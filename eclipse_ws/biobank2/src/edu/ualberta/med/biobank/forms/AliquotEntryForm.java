@@ -97,7 +97,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
         }
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
-        setTextValue(siteLabel, aliquot.getSite().getNameShort());
+        setTextValue(siteLabel, aliquot.getSiteString());
 
         sampleTypeComboViewer = createComboViewer(client, "Type", sampleTypes,
             aliquot.getSampleType(), "Aliquot must have a sample type",
@@ -216,6 +216,12 @@ public class AliquotEntryForm extends BiobankEntryForm {
     @Override
     public String getNextOpenedFormID() {
         return AliquotViewForm.ID;
+    }
+
+    @Override
+    public void setFocus() {
+        // aliquots are not present in treeviews, unnecessary reloads can be
+        // prevented with this method
     }
 
     @Override
