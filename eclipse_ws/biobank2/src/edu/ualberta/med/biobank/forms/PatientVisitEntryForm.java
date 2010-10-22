@@ -388,8 +388,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         PatientWrapper patient = patientVisit.getPatient();
         patient.reload();
         patientVisit.reload();
-        patientVisit.setPatient(patient);
         super.reset();
+        patientVisit.setPatient(patient);
 
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
