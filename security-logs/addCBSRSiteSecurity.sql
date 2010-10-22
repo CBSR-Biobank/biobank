@@ -33,40 +33,31 @@ select protection_group_id, protection_element_id,  sysdate() from csm_protectio
 /************** CBSR groups ***********************/
 /* add CBSR Tech 1 and 2 read on Calgary-F site*/
 INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 1' and role_name='read' and protection_group_name='Calgary-F site';
+select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 1' and role_name='Read Only' and protection_group_name='Calgary-F site';
 INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 2' and role_name='read' and protection_group_name='Calgary-F site';
+select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 2' and role_name='Read Only' and protection_group_name='Calgary-F site';
 
 
 /* add CBSR Tech 1 and 2 read/update on CBSR site*/
 INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 1' and role_name='read' and protection_group_name='CBSR site';
+select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 1' and role_name='Site Full Access' and protection_group_name='CBSR site';
 INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 1' and role_name='update' and protection_group_name='CBSR site';
-INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 2' and role_name='read' and protection_group_name='CBSR site';
-INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 2' and role_name='update' and protection_group_name='CBSR site';
-
+select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='CBSR Technician Level 2' and role_name='Site Full Access' and protection_group_name='CBSR site';
 /************** CBSR groups ***********************/
 
 
 /************** Calgary groups ***********************/
 /* add Calgary Admin and Calgary Tech read on CBSR site*/
 INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Administrator' and role_name='read' and protection_group_name='CBSR site';
+select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Administrator' and role_name='Read Only' and protection_group_name='CBSR site';
 INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Technicians' and role_name='read' and protection_group_name='CBSR site';
+select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Technicians' and role_name='Read Only' and protection_group_name='CBSR site';
 
 
 /* add Calgary Admin ant Calgary Tech read/update on Calgary-F site*/
 INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Administrator' and role_name='read' and protection_group_name='Calgary-F site';
+select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Administrator' and role_name='Site Full Access' and protection_group_name='Calgary-F site';
 INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Administrator' and role_name='update' and protection_group_name='Calgary-F site';
-INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Technicians' and role_name='read' and protection_group_name='Calgary-F site';
-INSERT INTO csm_user_group_role_pg (group_id, role_id, protection_group_id, update_date) 
-select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Technicians' and role_name='update' and protection_group_name='Calgary-F site';
+select group_id , role_id, protection_group_id, sysdate() from csm_group, csm_role, csm_protection_group where group_name='Calgary Technicians' and role_name='Site Full Access' and protection_group_name='Calgary-F site';
 /************** Calgary groups ***********************/
 
