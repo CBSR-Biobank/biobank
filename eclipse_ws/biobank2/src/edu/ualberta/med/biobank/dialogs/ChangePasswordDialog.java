@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
 
 public class ChangePasswordDialog extends TitleAreaDialog {
+    public static final int MIN_PASSWORD_LENGTH = 5;
 
     private boolean forceChange;
     private Text oldPassText;
@@ -87,7 +88,7 @@ public class ChangePasswordDialog extends TitleAreaDialog {
             @Override
             public void modifyText(ModifyEvent e) {
                 Text text = (Text) e.widget;
-                if (text.getText().length() < 1)
+                if (text.getText().length() < MIN_PASSWORD_LENGTH)
                     setErrorMessage("Please enter your new password (atleast 5 characters)");
                 else {
                     setErrorMessage(null);
@@ -129,8 +130,16 @@ public class ChangePasswordDialog extends TitleAreaDialog {
     }
 
     @Override
+    public boolean close() {
+        if (!forceChange || getReturnCode() == OK)
+            return super.close();
+        else
+            return false;
+    }
+
+    @Override
     protected void okPressed() {
-        if ((this.newPass1Text.getText().length() < 1)) {
+        if ((this.newPass1Text.getText().length() < MIN_PASSWORD_LENGTH)) {
             newPass1Text.notifyListeners(SWT.Modify, new Event());
             return;
         }
