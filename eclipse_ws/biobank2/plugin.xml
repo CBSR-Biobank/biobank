@@ -569,6 +569,9 @@
               <reference
                     definitionId="biobank2.siteSelected">
               </reference>
+              <reference
+                    definitionId="biobank2.canUpdateSiteSelected">
+              </reference>
             </and>
          </activeWhen>
          <enabledWhen>

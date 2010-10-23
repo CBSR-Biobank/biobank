@@ -152,6 +152,17 @@ public class User implements Serializable, NotAProxy {
             siteId);
     }
 
+    public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
+        String protectionGroupName, Integer siteId) {
+        for (Group group : groups) {
+            if (group.hasPrivilegeOnProtectionGroup(privilege,
+                protectionGroupName, siteId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
         ModelWrapper<?> modelWrapper) {
         boolean canCreateDeleteUpdate = true;

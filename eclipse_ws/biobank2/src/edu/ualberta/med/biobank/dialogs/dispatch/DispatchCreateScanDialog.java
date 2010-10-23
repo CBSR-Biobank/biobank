@@ -183,8 +183,9 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                         "ScanAssign.scanStatus.aliquot.missing", expectedAliquot.getInventoryId())); //$NON-NLS-1$
             scanCell.setTitle("?"); //$NON-NLS-1$
         } else {
-            AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(
-                SessionManager.getAppService(), value);
+            AliquotWrapper foundAliquot = AliquotWrapper
+                .getAliquot(SessionManager.getAppService(), value,
+                    SessionManager.getUser());
             if (foundAliquot == null) {
                 // not in database
                 scanCell.setStatus(CellStatus.ERROR);

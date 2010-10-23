@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -130,7 +131,7 @@ public class DispatchShipmentReceivingEntryForm extends
             AliquotWrapper aliquot = null;
             try {
                 aliquot = AliquotWrapper.getAliquot(shipment.getAppService(),
-                    inventoryId);
+                    inventoryId, SessionManager.getUser());
             } catch (Exception ae) {
                 BioBankPlugin.openAsyncError("Error retrieving aliquot", ae);
             }

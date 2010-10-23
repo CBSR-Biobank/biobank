@@ -260,7 +260,8 @@ public class DispatchShipmentSendingEntryForm extends
         if (!inventoryId.isEmpty()) {
             try {
                 AliquotWrapper existingAliquot = AliquotWrapper.getAliquot(
-                    shipment.getAppService(), inventoryId);
+                    shipment.getAppService(), inventoryId,
+                    SessionManager.getUser());
                 if (existingAliquot == null)
                     BioBankPlugin.openError("Aliquot not found",
                         "Aliquot with inventory id " + inventoryId

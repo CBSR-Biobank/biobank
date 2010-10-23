@@ -565,8 +565,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         } else {
             String value = cell.getValue();
             if (value != null) {
+                // FIXME test what happen if can't read site
                 AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(
-                    appService, value);
+                    appService, value, SessionManager.getUser());
                 if (foundAliquot != null) {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages

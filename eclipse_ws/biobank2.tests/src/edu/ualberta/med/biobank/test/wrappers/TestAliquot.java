@@ -431,7 +431,7 @@ public class TestAliquot extends TestDatabase {
         AliquotHelper.addAliquot(sampleType, container, pv, 3, 3);
 
         AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(appService,
-            aliquot.getInventoryId());
+            aliquot.getInventoryId(), null);
         Assert.assertNotNull(foundAliquot);
         Assert.assertEquals(foundAliquot, aliquot);
     }

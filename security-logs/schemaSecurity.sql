@@ -412,7 +412,7 @@ CREATE TABLE `csm_role_privilege` (
   KEY `idx_ROLE_ID` (`ROLE_ID`),
   CONSTRAINT `FK_PRIVILEGE_ROLE` FOREIGN KEY (`PRIVILEGE_ID`) REFERENCES `csm_privilege` (`PRIVILEGE_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -424,7 +424,9 @@ LOCK TABLES `csm_role_privilege` WRITE;
 INSERT INTO `csm_role_privilege` VALUES (19,8,1);
 INSERT INTO `csm_role_privilege` VALUES (16,7,3);
 INSERT INTO `csm_role_privilege` VALUES (18,8,3);
+INSERT INTO `csm_role_privilege` VALUES (21,9,3);
 INSERT INTO `csm_role_privilege` VALUES (20,8,5);
+INSERT INTO `csm_role_privilege` VALUES (22,9,5);
 INSERT INTO `csm_role_privilege` VALUES (17,8,6);
 /*!40000 ALTER TABLE `csm_role_privilege` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -476,8 +478,6 @@ INSERT INTO `csm_user` VALUES (17,'tpolasek',0,'thomas','polasek','','','','','8
 INSERT INTO `csm_user` VALUES (18,'aaron_aicml',0,'Aaron','Young','','','','','qmP9VkaU0jO32lSKMjM/lw==','aaron.young@ualberta.ca',NULL,NULL,'2010-08-31','');
 INSERT INTO `csm_user` VALUES (19,'Andrijana',0,'Andrijana','Lawton','','','','','V4PzQj6by/Q=','',NULL,NULL,'2010-08-11','');
 INSERT INTO `csm_user` VALUES (20,'Virginia',0,'Virginia','Doe','','','','','tsjSShkZ7qC8j2uyHEABIQ==','',NULL,NULL,'2010-08-11','');
-INSERT INTO `csm_user` VALUES (21,'testuser',0,'testuser','testuser',NULL,NULL,NULL,NULL,'orDBlaojDQE=',NULL,NULL,NULL,'2010-10-19',NULL);
-INSERT INTO `csm_user` VALUES (22,'tech1',0,'','','','','','','X3f7lxdk1Yg=','',NULL,NULL,'2010-10-20','');
 /*!40000 ALTER TABLE `csm_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -517,8 +517,6 @@ INSERT INTO `csm_user_group` VALUES (36,12,6);
 INSERT INTO `csm_user_group` VALUES (42,20,6);
 INSERT INTO `csm_user_group` VALUES (43,19,6);
 INSERT INTO `csm_user_group` VALUES (44,11,5);
-INSERT INTO `csm_user_group` VALUES (45,21,5);
-INSERT INTO `csm_user_group` VALUES (46,22,6);
 /*!40000 ALTER TABLE `csm_user_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -613,4 +611,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-10-20 17:44:52
+-- Dump completed on 2010-10-22 17:14:42

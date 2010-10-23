@@ -19,6 +19,8 @@ import gov.nih.nci.security.authorization.domainobjects.ProtectionGroupRoleConte
 import gov.nih.nci.security.authorization.domainobjects.Role;
 import gov.nih.nci.security.authorization.domainobjects.User;
 import gov.nih.nci.security.dao.GroupSearchCriteria;
+import gov.nih.nci.security.dao.ProtectionElementSearchCriteria;
+import gov.nih.nci.security.dao.SearchCriteria;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
@@ -82,7 +84,7 @@ public class BiobankApplicationServiceImpl extends
                 if (group
                     .getGroupName()
                     .equals(
-                        edu.ualberta.med.biobank.common.security.Group.GROUP_NAME_WEBSITE_ADMINISTRATOR)) {
+                        edu.ualberta.med.biobank.common.security.Group.GROUP_WEBSITE_ADMINISTRATOR)) {
                     return true;
                 }
             }
@@ -131,33 +133,31 @@ public class BiobankApplicationServiceImpl extends
             nameShort = site.getNameShort();
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
-            Set<ProtectionElement> siteAdminPEs = upm
-                .getProtectionElements(ALL_SITES_PG_ID);
-            List<String> pgIdsToDelete = new ArrayList<String>();
-            List<String> peIdsToDelete = new ArrayList<String>();
-            for (ProtectionElement pe : siteAdminPEs) {
-                if (pe.getObjectId() != null
-                    && pe.getObjectId().equals(Site.class.getName())
-                    && pe.getAttribute() != null
-                    && pe.getAttribute().equals("id") && pe.getValue() != null
-                    && pe.getValue().equals(id.toString())) {
-                    Set<ProtectionGroup> pgs = upm.getProtectionGroups(pe
-                        .getProtectionElementId().toString());
-                    for (ProtectionGroup pg : pgs) {
-                        // remove the protection group only if it contains only
-                        // this protection element and is not the main site
-                        // admin group
-                        String pgId = pg.getProtectionGroupId().toString();
-                        if (!pgId.equals(ALL_SITES_PG_ID)
-                            && upm.getProtectionElements(pgId).size() == 1) {
-                            pgIdsToDelete.add(pgId);
-                        }
-                    }
-                    peIdsToDelete.add(pe.getProtectionElementId().toString());
-                }
+            ProtectionElement searchPE = new ProtectionElement();
+            searchPE.setObjectId(Site.class.getName());
+            searchPE.setAttribute("id");
+            searchPE.setValue(id.toString());
+            SearchCriteria sc = new ProtectionElementSearchCriteria(searchPE);
+            List<ProtectionElement> peToDelete = upm.getObjects(sc);
+            if (peToDelete == null || peToDelete.size() == 0) {
+                return;
             }
-            for (String peId : peIdsToDelete) {
-                upm.removeProtectionElement(peId);
+            List<String> pgIdsToDelete = new ArrayList<String>();
+            for (ProtectionElement pe : peToDelete) {
+                Set<ProtectionGroup> pgs = upm.getProtectionGroups(pe
+                    .getProtectionElementId().toString());
+                for (ProtectionGroup pg : pgs) {
+                    // remove the protection group only if it contains only
+                    // this protection element and is not the main site
+                    // admin group
+                    String pgId = pg.getProtectionGroupId().toString();
+                    if (!pgId.equals(ALL_SITES_PG_ID)
+                        && upm.getProtectionElements(pgId).size() == 1) {
+                        pgIdsToDelete.add(pgId);
+                    }
+                }
+                upm.removeProtectionElement(pe.getProtectionElementId()
+                    .toString());
             }
             for (String pgId : pgIdsToDelete) {
                 upm.removeProtectionGroup(pgId);
@@ -206,7 +206,7 @@ public class BiobankApplicationServiceImpl extends
         } catch (Exception e) {
             log.error("error adding new site security", e);
             throw new ApplicationException("Error adding new site " + siteId
-                + ":" + nameShort + "security:" + e.getMessage());
+                + ":" + nameShort + " security:" + e.getMessage());
         }
     }
 

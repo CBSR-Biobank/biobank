@@ -1378,7 +1378,7 @@ public class Importer {
     public static boolean inventoryIdUnique(String inventoryId)
         throws Exception {
         AliquotWrapper aliquot = AliquotWrapper.getAliquot(appService,
-            inventoryId);
+            inventoryId, null);
         if (aliquot == null)
             return true;
 

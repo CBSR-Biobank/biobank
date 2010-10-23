@@ -247,7 +247,7 @@ public class ScanLinkdedImporter {
         int visitId, String patientNr, String sampleTypeNameShort)
         throws Exception {
         AliquotWrapper aliquot = AliquotWrapper.getAliquot(appService,
-            inventoryId);
+            inventoryId, null);
         sampleTypeNameShort = Importer.getSampleType(sampleTypeNameShort)
             .getNameShort();
         if (aliquot != null) {

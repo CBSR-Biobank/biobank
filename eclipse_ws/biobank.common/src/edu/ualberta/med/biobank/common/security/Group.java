@@ -10,12 +10,14 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Site;
 
 public class Group implements Serializable, NotAProxy {
-    // FIXME just remember the ID that should never change ?
-    public static final String GROUP_NAME_WEBSITE_ADMINISTRATOR = "Website Administrator";
+
+    private static final long serialVersionUID = 1L;
 
     // FIXME just remember the ID that should never change ?
-    public static final String PG_GROUP_NAME_SITE_ADMINISTRATION = "Site Administration Features";
-    private static final long serialVersionUID = 1L;
+    public static final String GROUP_WEBSITE_ADMINISTRATOR = "Website Administrator";
+
+    // FIXME just remember the ID that should never change ?
+    public static final String PG_SITE_ADMINISTRATION = "Site Administration Features";
 
     private Long id;
 
@@ -49,7 +51,7 @@ public class Group implements Serializable, NotAProxy {
     }
 
     public boolean isWebsiteAdministrator() {
-        return name != null && name.equals(GROUP_NAME_WEBSITE_ADMINISTRATOR);
+        return name != null && name.equals(GROUP_WEBSITE_ADMINISTRATOR);
     }
 
     public void addProtectionElementPrivilege(String type, String id,
@@ -113,14 +115,19 @@ public class Group implements Serializable, NotAProxy {
     }
 
     public boolean isSiteAdministrator(Integer siteId) {
-        ProtectionGroupPrivilege pgv = pgMap
-            .get(PG_GROUP_NAME_SITE_ADMINISTRATION);
+        return hasPrivilegeOnProtectionGroup(Privilege.UPDATE,
+            PG_SITE_ADMINISTRATION, siteId);
+    }
+
+    public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
+        String protectionGroupName, Integer siteId) {
+        ProtectionGroupPrivilege pgv = pgMap.get(protectionGroupName);
         if (pgv == null) {
             return false;
         }
-        return pgv.getPrivileges().contains(Privilege.UPDATE)
-            && hasPrivilegeOnObject(Privilege.UPDATE, Site.class.getName(),
-                siteId);
+        return pgv.getPrivileges().contains(privilege)
+            && (siteId == null || hasPrivilegeOnObject(privilege,
+                Site.class.getName(), siteId));
     }
 
 }

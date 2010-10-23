@@ -84,7 +84,7 @@ public class SentAliquots {
             PatientInfo info;
             while ((info = reader.read(PatientInfo.class, header, processors)) != null) {
                 AliquotWrapper aliquot = AliquotWrapper.getAliquot(appService,
-                    info.getInventoryId());
+                    info.getInventoryId(), null);
 
                 if (aliquot == null) {
                     System.out

@@ -645,8 +645,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         if (value == null) { // no aliquot scanned
             updateCellAsMissing(positionString, scanCell, expectedAliquot);
         } else {
+            // FIXME test what happen if can't read site
             AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(appService,
-                value);
+                value, SessionManager.getUser());
             if (foundAliquot == null) {
                 updateCellAsNotLinked(positionString, scanCell);
             } else if (expectedAliquot != null
