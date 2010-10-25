@@ -267,7 +267,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     viewerSampleTypes.setInput(null);
                     positionTextModified = true;
                     resultShownValue.setValue(Boolean.FALSE);
-                    hidePositions();
+                    displayPositions(false);
                 }
             });
 
@@ -305,7 +305,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 inventoryIdModified = true;
                 positionTextModified = true;
                 resultShownValue.setValue(Boolean.FALSE);
-                hidePositions();
+                displayPositions(false);
             }
         });
 
@@ -429,7 +429,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     viewerSampleTypes.setInput(null);
                 }
                 resultShownValue.setValue(Boolean.FALSE);
-                hidePositions();
+                displayPositions(false);
             }
         });
         newCabinetPosition.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -638,7 +638,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     String positionString = newCabinetPosition.getText();
                     if (bin == null) {
                         resultShownValue.setValue(Boolean.FALSE);
-                        hidePositions();
+                        displayPositions(false);
                         return;
                     }
                     appendLogNLS(
@@ -646,7 +646,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     aliquot.setAliquotPositionFromString(positionString, bin);
                     if (aliquot.isPositionFree(bin)) {
                         aliquot.setParent(bin);
-                        showPositions();
+                        displayPositions(true);
                         resultShownValue.setValue(Boolean.TRUE);
                         cancelConfirmWidget.setFocus();
                     } else {
@@ -811,29 +811,22 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             positionString);
     }
 
-    private void showPositions() {
-        if (drawer == null || bin == null || cabinet == null) {
-            cabinetWidget.setSelection(null);
-            cabinetLabel.setText("Cabinet"); //$NON-NLS-1$
-            drawerWidget.setSelection(null);
-            drawerLabel.setText("Drawer"); //$NON-NLS-1$
-        } else {
+    private void displayPositions(boolean show) {
+        if (show) {
             cabinetWidget.setContainerType(cabinet.getContainerType());
             cabinetWidget.setSelection(drawer.getPosition());
             cabinetLabel.setText("Cabinet " + cabinet.getLabel()); //$NON-NLS-1$
             drawerWidget.setContainer(drawer);
             drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
+        } else {
+            cabinetWidget.setSelection(null);
+            cabinetLabel.setText("Cabinet"); //$NON-NLS-1$
+            drawerWidget.setSelection(null);
+            drawerLabel.setText("Drawer"); //$NON-NLS-1$
         }
         page.layout(true, true);
         book.reflow(true);
-    }
-
-    private void hidePositions() {
-        cabinet = null;
-        bin = null;
-        drawer = null;
-        showPositions();
     }
 
     protected void initParentContainersFromPosition(String positionString)
