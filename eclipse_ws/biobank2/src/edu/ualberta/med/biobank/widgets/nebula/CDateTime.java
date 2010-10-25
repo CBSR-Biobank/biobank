@@ -1677,7 +1677,6 @@ public class CDateTime extends BaseCombo {
                     }
                     text.getControl().setSelection(selStart, selEnd);
                     text.getControl().addListener(SWT.Verify, textListener);
-
                 }
             }
         };
