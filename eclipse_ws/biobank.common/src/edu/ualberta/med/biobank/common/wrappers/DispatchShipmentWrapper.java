@@ -387,6 +387,7 @@ public class DispatchShipmentWrapper extends
             dsa.setShipment(this);
             allDsaObjects.add(dsa.getWrappedObject());
             allDsaWrappers.add(dsa);
+            currentAliquots.add(aliquot);
         }
         setDispathcShipmentAliquotCollection(allDsaObjects, allDsaWrappers);
         resetStateLists();
@@ -403,8 +404,12 @@ public class DispatchShipmentWrapper extends
 
     }
 
-    public CheckStatus checkCanAddAliquot(List<AliquotWrapper> currentAliquots,
-        AliquotWrapper aliquot) {
+    public CheckStatus checkCanAddAliquot(AliquotWrapper aliquot) {
+        return checkCanAddAliquot(getAliquotCollection(), aliquot);
+    }
+
+    protected CheckStatus checkCanAddAliquot(
+        List<AliquotWrapper> currentAliquots, AliquotWrapper aliquot) {
         if (aliquot.isNew()) {
             return new CheckStatus(false, "Cannot add aliquot "
                 + aliquot.getInventoryId() + ": it has not already been saved");
@@ -439,7 +444,7 @@ public class DispatchShipmentWrapper extends
             return new CheckStatus(false, aliquot.getInventoryId()
                 + " is already in this shipment.");
         }
-        if (aliquot.isUsedInDispatchShipment()) {
+        if (aliquot.isUsedInDispatchShipment(this)) {
             return new CheckStatus(false, aliquot.getInventoryId()
                 + " is already in a shipment in transit or in creation.");
         }

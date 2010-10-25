@@ -626,9 +626,15 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public boolean isUsedInDispatchShipment() {
+        return isUsedInDispatchShipment(null);
+    }
+
+    public boolean isUsedInDispatchShipment(
+        DispatchShipmentWrapper excludedShipment) {
         for (DispatchShipmentAliquotWrapper dsa : getDispatchShipmentAliquotCollection()) {
             DispatchShipmentWrapper ship = dsa.getShipment();
-            if (ship.isInTransitState() || ship.isInCreationState()) {
+            if (!ship.equals(excludedShipment)
+                && (ship.isInTransitState() || ship.isInCreationState())) {
                 if (DispatchAliquotState.MISSING.isEquals(dsa.getState())) {
                     return false;
                 }

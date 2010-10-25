@@ -203,9 +203,8 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 } else {
                     scanCell.setAliquot(foundAliquot);
                     if (expectedAliquot != null || currentPallet == null) {
-                        CheckStatus check = currentShipment.checkCanAddAliquot(
-                            currentShipment.getAliquotCollection(),
-                            foundAliquot);
+                        CheckStatus check = currentShipment
+                            .checkCanAddAliquot(foundAliquot);
                         if (check.ok) {
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)
