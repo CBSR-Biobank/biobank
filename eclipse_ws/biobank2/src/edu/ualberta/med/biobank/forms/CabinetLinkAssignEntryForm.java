@@ -127,6 +127,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected boolean newAliquotCreation = true;
 
+    private Composite clientInsideGridScroll;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -169,17 +171,13 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         scrollData.horizontalAlignment = SWT.FILL;
         scrollData.grabExcessHorizontalSpace = true;
         containersScroll.setLayoutData(scrollData);
-        Composite client = toolkit.createComposite(containersScroll);
+        clientInsideGridScroll = toolkit.createComposite(containersScroll);
         GridLayout layout = new GridLayout(2, false);
-        client.setLayout(layout);
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessHorizontalSpace = true;
-        client.setLayoutData(gd);
-        toolkit.paintBordersFor(client);
-        containersScroll.setContent(client);
-        cabinetLabel = toolkit.createLabel(client, "Cabinet"); //$NON-NLS-1$
-        drawerLabel = toolkit.createLabel(client, "Drawer"); //$NON-NLS-1$
+        clientInsideGridScroll.setLayout(layout);
+        toolkit.paintBordersFor(clientInsideGridScroll);
+        containersScroll.setContent(clientInsideGridScroll);
+        cabinetLabel = toolkit.createLabel(clientInsideGridScroll, "Cabinet"); //$NON-NLS-1$
+        drawerLabel = toolkit.createLabel(clientInsideGridScroll, "Drawer"); //$NON-NLS-1$
 
         List<ContainerTypeWrapper> types = ContainerTypeWrapper
             .getContainerTypesInSite(appService,
@@ -199,19 +197,19 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 drawerType = children.get(0);
             }
         }
-        cabinetWidget = new ContainerDisplayWidget(client);
+        cabinetWidget = new ContainerDisplayWidget(clientInsideGridScroll);
         cabinetWidget.setContainerType(cabinetType, true);
         toolkit.adapt(cabinetWidget);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         cabinetWidget.setLayoutData(gdDrawer);
 
-        drawerWidget = new ContainerDisplayWidget(client);
+        drawerWidget = new ContainerDisplayWidget(clientInsideGridScroll);
         drawerWidget.setContainerType(drawerType, true);
         toolkit.adapt(drawerWidget);
 
-        containersScroll.setMinSize(client
-            .computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        containersScroll.setMinSize(clientInsideGridScroll.computeSize(
+            SWT.DEFAULT, SWT.DEFAULT));
     }
 
     private void createFieldsSection() throws ApplicationException {
@@ -827,6 +825,11 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         }
         page.layout(true, true);
         book.reflow(true);
+        // FIXME this is working to display the right length of horizontal
+        // scroll bar when the drawer is very large, but doesn't seems a pretty
+        // way to do it...
+        containersScroll.setMinSize(clientInsideGridScroll.computeSize(
+            SWT.DEFAULT, SWT.DEFAULT));
     }
 
     protected void initParentContainersFromPosition(String positionString)
