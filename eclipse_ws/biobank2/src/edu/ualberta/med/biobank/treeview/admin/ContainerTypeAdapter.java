@@ -59,7 +59,7 @@ public class ContainerTypeAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        return true;
+        return internalIsDeletable();
     }
 
     @Override

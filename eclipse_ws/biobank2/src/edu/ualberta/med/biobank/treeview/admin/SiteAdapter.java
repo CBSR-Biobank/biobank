@@ -80,7 +80,7 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        return true;
+        return internalIsDeletable();
     }
 
     @Override

@@ -162,7 +162,7 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        return true;
+        return internalIsDeletable();
     }
 
     public void moveContainer(ContainerWrapper destParentContainer) {
