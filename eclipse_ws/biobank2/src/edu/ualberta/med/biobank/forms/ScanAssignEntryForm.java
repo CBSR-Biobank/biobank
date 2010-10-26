@@ -553,8 +553,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, AliquotWrapper> expectedAliquots = currentPalletWrapper
             .getAliquots();
-        System.out.println(expectedAliquots == null ? 0 : expectedAliquots
-            .size());
         currentScanState = CellStatus.EMPTY;
         for (int row = 0; row < currentPalletWrapper.getRowCapacity(); row++) {
             for (int col = 0; col < currentPalletWrapper.getColCapacity(); col++) {
@@ -982,6 +980,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         try {
             currentPalletWrapper
                 .initObjectWith(new ContainerWrapper(appService));
+            currentPalletWrapper.reset();
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
             currentPalletWrapper.setSite(SessionManager.getCurrentSite());
