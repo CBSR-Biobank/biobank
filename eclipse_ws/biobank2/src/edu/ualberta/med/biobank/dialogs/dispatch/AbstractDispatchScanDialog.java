@@ -382,7 +382,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     }
 
     protected boolean canScanTubeAlone(PalletCell cell) {
-        return cell == null || cell.getStatus() == CellStatus.EMPTY;
+        return cell == null || cell.getStatus() == CellStatus.EMPTY
+            || cell.getStatus() == CellStatus.MISSING;
     }
 
     @SuppressWarnings("unused")
