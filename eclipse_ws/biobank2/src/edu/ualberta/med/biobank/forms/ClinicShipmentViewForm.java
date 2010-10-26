@@ -101,10 +101,12 @@ public class ClinicShipmentViewForm extends BiobankViewForm {
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         waybillLabel = createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
         clinicLabel = createReadOnlyLabelledField(client, SWT.NONE, "Clinic");
-        dateShippedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date Shipped");
         shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Shipping Method");
+        if (shipment.needDateShipped()) {
+            dateShippedLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Date Shipped");
+        }
         boxNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Box number");
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -126,10 +128,11 @@ public class ClinicShipmentViewForm extends BiobankViewForm {
         setTextValue(waybillLabel, shipment.getWaybill());
         setTextValue(clinicLabel, shipment.getClinic() == null ? "" : shipment
             .getClinic().getName());
-        setTextValue(dateShippedLabel, shipment.getFormattedDateShipped());
         setTextValue(shippingMethodLabel,
             shipment.getShippingMethod() == null ? "" : shipment
                 .getShippingMethod().getName());
+        if (dateShippedLabel != null)
+            setTextValue(dateShippedLabel, shipment.getFormattedDateShipped());
         setTextValue(boxNumberLabel, shipment.getBoxNumber());
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
         setTextValue(activityStatusLabel, shipment.getActivityStatus());
