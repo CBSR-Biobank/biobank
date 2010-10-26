@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -19,7 +18,7 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
         public String pnumber;
         public String studyNameShort;
         public String waybill;
-        public Date dateShipped;
+        public String dateShipped;
         public String clinic;
         public Integer numSVs;
         public Integer numAliquots;
@@ -27,8 +26,8 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { pnumber, studyNameShort,
-                ((waybill == null) ? "None" : waybill), dateShipped.toString(),
-                clinic, numSVs.toString(), numAliquots.toString() }, "\t");
+                ((waybill == null) ? "None" : waybill), dateShipped, clinic,
+                numSVs.toString(), numAliquots.toString() }, "\t");
         }
     }
 
@@ -92,7 +91,7 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
         info.waybill = pv.getShipment().getWaybill();
         if (info.waybill == null)
             info.waybill = "None";
-        info.dateShipped = pv.getShipment().getDateShipped();
+        info.dateShipped = pv.getShipment().getFormattedDateShipped();
         info.clinic = pv.getShipment().getClinic().getNameShort();
         info.numSVs = pv.getPvSourceVesselCollection().size();
         info.numAliquots = pv.getAliquotCollection().size();
