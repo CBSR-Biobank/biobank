@@ -537,13 +537,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    public void initObjectWith(ModelWrapper<E> otherWrapper)
-        throws WrapperException {
+    public void initObjectWith(ModelWrapper<E> otherWrapper) throws Exception {
         if (otherWrapper == null) {
             throw new WrapperException(
                 "Cannot init internal object with a null wrapper");
         }
         setWrappedObject(otherWrapper.wrappedObject);
+        reset();
     }
 
     public void logLookup(String site) throws Exception {
