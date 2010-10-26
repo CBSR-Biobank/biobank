@@ -44,7 +44,11 @@ public class DateTimeWidget extends BiobankWidget {
         layout.marginHeight = 0;
         layout.verticalSpacing = 0;
         setLayout(layout);
-        setLayoutData(new GridData());
+
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        setLayoutData(gd);
 
         if ((style & SWT.DATE) != 0) {
             style |= CDT.DROP_DOWN | CDT.DATE_SHORT;
@@ -61,7 +65,7 @@ public class DateTimeWidget extends BiobankWidget {
 
         dateEntry.addListener(SWT.Modify, dataEntryModifyListener);
 
-        GridData gd = new GridData();
+        gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
         gd.widthHint = SWT.DEFAULT;
         gd.heightHint = SWT.DEFAULT;

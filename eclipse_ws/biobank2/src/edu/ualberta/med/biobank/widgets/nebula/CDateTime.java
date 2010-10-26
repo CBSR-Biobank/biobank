@@ -1674,6 +1674,7 @@ public class CDateTime extends BaseCombo {
                     text.getControl().removeListener(SWT.Verify, textListener);
                     if (!string.equals(text.getText())) {
                         text.setText(string);
+                        CDateTime.this.getParent().layout(true);
                     }
                     text.getControl().setSelection(selStart, selEnd);
                     text.getControl().addListener(SWT.Verify, textListener);
