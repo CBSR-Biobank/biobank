@@ -22,6 +22,10 @@ public class DoubleNumberValidator extends AbstractValidator {
         this.allowEmpty = allowEmpty;
     }
 
+    public void setAllowEmpty(boolean allowEmpty) {
+        this.allowEmpty = allowEmpty;
+    }
+
     @Override
     public IStatus validate(Object value) {
         if ((value == null) || (value instanceof Double)) {
