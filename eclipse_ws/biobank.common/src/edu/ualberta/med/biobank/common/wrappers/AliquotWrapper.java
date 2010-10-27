@@ -643,4 +643,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         }
         return false;
     }
+
+    @Override
+    protected void resetInternalFields() {
+        objectWithPositionManagement.resetInternalFields();
+    }
 }
