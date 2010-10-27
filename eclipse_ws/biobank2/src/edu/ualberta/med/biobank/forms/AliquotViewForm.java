@@ -55,7 +55,6 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private BiobankText positionLabel;
 
-    @SuppressWarnings("unused")
     private DispatchInfoTable dispatchInfoTable;
 
     @Override
@@ -68,8 +67,7 @@ public class AliquotViewForm extends BiobankViewForm {
         aliquot = aliquotAdapter.getAliquot();
         retrieveAliquot();
         try {
-            aliquot.logLookup(SessionManager.getInstance().getCurrentSite()
-                .getNameShort());
+            aliquot.logLookup(SessionManager.getCurrentSite().getNameShort());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log lookup failed", e);
         }

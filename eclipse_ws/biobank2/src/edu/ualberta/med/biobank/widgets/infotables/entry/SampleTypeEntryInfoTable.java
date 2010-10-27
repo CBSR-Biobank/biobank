@@ -103,7 +103,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
     }
 
     private void addEditSupport() {
-        if (SessionManager.canCreate(SampleTypeWrapper.class)) {
+        if (SessionManager.canCreate(SampleTypeWrapper.class, null)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
@@ -112,7 +112,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
             });
         }
 
-        if (SessionManager.canUpdate(SampleTypeWrapper.class)) {
+        if (SessionManager.canUpdate(SampleTypeWrapper.class, null)) {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
@@ -123,7 +123,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
             });
         }
 
-        if (SessionManager.canDelete(SampleTypeWrapper.class)) {
+        if (SessionManager.canDelete(SampleTypeWrapper.class, null)) {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {

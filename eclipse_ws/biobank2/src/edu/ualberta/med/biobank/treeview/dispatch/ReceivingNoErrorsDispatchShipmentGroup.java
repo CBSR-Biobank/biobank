@@ -18,7 +18,7 @@ public class ReceivingNoErrorsDispatchShipmentGroup extends
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper site = SessionManager.getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
             return site.getReceivingNoErrorsDispatchShipmentCollection();
         }

@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientSearchedNode extends AbstractSearchedNode {

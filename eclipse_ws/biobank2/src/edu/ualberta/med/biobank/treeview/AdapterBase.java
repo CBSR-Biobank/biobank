@@ -529,7 +529,7 @@ public abstract class AdapterBase {
 
     protected void addDeleteMenu(Menu menu, String objectName,
         final String question) {
-        if (isEditable()) {
+        if (isDeletable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Delete " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
@@ -705,8 +705,12 @@ public abstract class AdapterBase {
     }
 
     public boolean isDeletable() {
-        // derived objects can override this
+        // should override it to activate deletion
         return false;
+    }
+
+    protected boolean internalIsDeletable() {
+        return editable && modelObject.canDelete(SessionManager.getUser());
     }
 
     public boolean isEditable() {

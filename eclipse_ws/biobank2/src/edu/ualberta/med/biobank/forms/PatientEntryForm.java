@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -56,7 +56,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         retrievePatient();
         try {
             patientAdapter.getWrapper().logEdit(
-                SessionManager.getInstance().getCurrentSite().getNameShort());
+                SessionManager.getCurrentSite().getNameShort());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log edit failed", e);
         }
@@ -92,7 +92,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         BiobankText labelSite = createReadOnlyLabelledField(client, SWT.NONE,
             "Site");
-        siteWrapper = SessionManager.getInstance().getCurrentSite();
+        siteWrapper = SessionManager.getCurrentSite();
         labelSite.setText(siteWrapper.getName());
 
         siteWrapper.reload();

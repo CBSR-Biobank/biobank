@@ -71,6 +71,8 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     private DispatchAliquotListInfoTable aliquotsNonProcessedTable;
 
+    private boolean canSeeEverything;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof DispatchShipmentAdapter),
@@ -106,28 +108,56 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
         if (shipment.getDateShipped() != null) {
             dateString = " on " + shipment.getFormattedDateShipped();
         }
-        form.setText("Shipment sent" + dateString + " from "
-            + shipment.getSender().getNameShort());
+        canSeeEverything = true;
+        if (shipment.getSender() == null) {
+            canSeeEverything = false;
+            BioBankPlugin
+                .openAsyncError(
+                    "Access Denied",
+                    "It seems you don't have access to the sender site. Please see administrator to resolve this problem.");
+        } else {
+            form.setText("Shipment sent" + dateString + " from "
+                + shipment.getSender().getNameShort());
+        }
+        if (shipment.getReceiver() == null) {
+            canSeeEverything = false;
+            BioBankPlugin
+                .openAsyncError(
+                    "Access Denied",
+                    "It seems you don't have access to the receiver site. Please see administrator to resolve this problem.");
+        }
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
 
-        createTreeTableSection();
+        if (canSeeEverything) {
+            createTreeTableSection();
+        }
 
         setShipmentValues();
 
-        User user = SessionManager.getUser();
-        SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
-        if (shipment.canBeSentBy(user, currentSite))
-            createSendButton();
-        else if (shipment.canBeReceivedBy(user, currentSite))
-            createReceiveButtons();
-        else if (shipment.canBeClosedBy(user, currentSite))
-            createCloseButton();
+        if (canSeeEverything) {
+            User user = SessionManager.getUser();
+            SiteWrapper currentSite = SessionManager.getCurrentSite();
+            if (shipment.canBeSentBy(user, currentSite))
+                createSendButton();
+            else if (shipment.canBeReceivedBy(user, currentSite))
+                createReceiveButtons();
+            else if (shipment.canBeClosedBy(user, currentSite))
+                createCloseButton();
+        }
+    }
+
+    @Override
+    protected void addEditAction() {
+        if (canSeeEverything) {
+            super.addEditAction();
+        }
     }
 
     private void createTreeTableSection() {
+
         if (shipment.isInCreationState()) {
             Composite parent = createSectionWithClient("Aliquot added");
             aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(
@@ -308,8 +338,12 @@ public class DispatchShipmentViewForm extends BiobankViewForm {
 
     private void setShipmentValues() {
         setTextValue(studyLabel, shipment.getStudy().getName());
-        setTextValue(senderLabel, shipment.getSender().getName());
-        setTextValue(receiverLabel, shipment.getReceiver().getName());
+        setTextValue(senderLabel,
+            shipment.getSender() == null ? " ACCESS DENIED" : shipment
+                .getSender().getName());
+        setTextValue(receiverLabel,
+            shipment.getReceiver() == null ? "ACCESS DENIED" : shipment
+                .getReceiver().getName());
         if (dateShippedLabel != null)
             setTextValue(dateShippedLabel, shipment.getFormattedDateShipped());
         if (shippingMethodLabel != null)

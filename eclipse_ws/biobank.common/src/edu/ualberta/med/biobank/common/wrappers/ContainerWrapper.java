@@ -1083,11 +1083,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         objectWithPositionManagement.resetInternalFields();
     }
 
-    @Override
-    public boolean canUpdate(User user) {
-        return super.canUpdate(user) && user.isContainerAdministrator();
-    }
-
     /**
      * @return true if there is no free position for a new child container
      * @throws ApplicationException
@@ -1191,4 +1186,13 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return objectWithPositionManagement.getTop();
     }
 
+    @Override
+    public SiteWrapper getSiteLinkedToObject() {
+        return getSite();
+    }
+
+    @Override
+    public boolean checkSpecificAccess(User user, Integer siteId) {
+        return user.isSiteAdministrator(siteId);
+    }
 }

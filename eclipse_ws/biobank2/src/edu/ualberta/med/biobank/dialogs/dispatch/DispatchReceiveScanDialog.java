@@ -57,12 +57,11 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     }
 
     /**
-     * set the status of the cell
+     * set the status of the cell. return the aliquot if it is an extra one.
      */
-    protected List<AliquotWrapper> processCellStatus(PalletCell cell) {
+    protected void processCellStatus(PalletCell cell) {
         AliquotInfo info = DispatchShipmentReceivingEntryForm
             .getInfoForInventoryId(currentShipment, cell.getValue());
-        List<AliquotWrapper> newExtraAliquots = new ArrayList<AliquotWrapper>();
         if (info.aliquot != null) {
             cell.setAliquot(info.aliquot);
             cell.setTitle(info.aliquot.getPatientVisit().getPatient()
@@ -89,7 +88,6 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         case NOT_IN_SHIPMENT:
             cell.setStatus(CellStatus.EXTRA);
             cell.setInformation("Aliquot should not be in shipment");
-            newExtraAliquots.add(cell.getAliquot());
             pendingAliquotsNumber++;
             break;
         case OK:
@@ -101,7 +99,6 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             pendingAliquotsNumber++;
             break;
         }
-        return newExtraAliquots;
     }
 
     @Override
@@ -119,14 +116,17 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             setScanOkValue(false);
-            List<AliquotWrapper> newExtraAliquots = null;
+            List<AliquotWrapper> newExtraAliquots = new ArrayList<AliquotWrapper>();
             for (RowColPos rcp : rcps) {
                 if (monitor != null) {
                     monitor.subTask("Processing position "
                         + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
                 }
                 PalletCell cell = cells.get(rcp);
-                newExtraAliquots = processCellStatus(cell);
+                processCellStatus(cell);
+                if (cell.getStatus() == CellStatus.EXTRA) {
+                    newExtraAliquots.add(cell.getAliquot());
+                }
             }
             addExtraCells(newExtraAliquots);
             setScanOkValue(errors == 0);
@@ -214,8 +214,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                 // if (dsa.getState() != DispatchAliquotState.RECEIVED_STATE) {
                 // aliquotFlagged = aliquot;
                 // }
-                int row = i / 12;
-                int col = i % 12;
+                int row = i / 12 + 1;
+                int col = i % 12 + 1;
                 if (!DispatchAliquotState.MISSING.isEquals(dsa.getState()))
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getAliquot()
@@ -235,6 +235,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         // 1, "dddz")));
         // palletScanned.put(new RowColPos(0, 2), new PalletCell(new ScanCell(0,
         // 2, "NUBR019021")));
+        palletScanned.put(new RowColPos(0, 3), new PalletCell(new ScanCell(0,
+            3, "NUDI235244")));
         return palletScanned;
     }
 

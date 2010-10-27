@@ -105,9 +105,9 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     @Override
     protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(SampleTypeWrapper.class)
-            && !SessionManager.canCreate(SampleTypeWrapper.class)
-            && !SessionManager.canDelete(SampleTypeWrapper.class)) {
+        if (!SessionManager.canUpdate(SampleTypeWrapper.class, null)
+            && !SessionManager.canCreate(SampleTypeWrapper.class, null)
+            && !SessionManager.canDelete(SampleTypeWrapper.class, null)) {
             BioBankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Sample Type editor. Access Denied.");

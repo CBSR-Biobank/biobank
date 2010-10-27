@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientTodayNode extends AbstractTodayNode {
@@ -50,7 +50,7 @@ public class PatientTodayNode extends AbstractTodayNode {
         if (SessionManager.getInstance().isConnected())
             return PatientWrapper
                 .getPatientsInTodayShipments(SessionManager.getAppService(),
-                    SessionManager.getInstance().getCurrentSite());
+                    SessionManager.getCurrentSite());
         return new ArrayList<ModelWrapper<?>>();
     }
 

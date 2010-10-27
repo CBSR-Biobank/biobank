@@ -8,7 +8,6 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.io.FileReader;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.supercsv.cellprocessor.constraint.StrNotNullOrEmpty;
@@ -84,21 +83,17 @@ public class SentAliquots {
                 "closeComment" };
             PatientInfo info;
             while ((info = reader.read(PatientInfo.class, header, processors)) != null) {
-                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
-                    appService, info.getInventoryId());
+                AliquotWrapper aliquot = AliquotWrapper.getAliquot(appService,
+                    info.getInventoryId(), null);
 
-                if (aliquots.size() == 0) {
+                if (aliquot == null) {
                     System.out
                         .println(" ERROR: aliquot not found: inventoryId/"
                             + info.getInventoryId() + " patientNo/"
                             + info.getPatientNo());
                     continue;
-                } else if (aliquots.size() > 1) {
-                    throw new Exception("multiple aliquots with inventory id"
-                        + info.getInventoryId());
                 }
 
-                AliquotWrapper aliquot = aliquots.get(0);
                 String aliquotPnumber = aliquot.getPatientVisit().getPatient()
                     .getPnumber();
 

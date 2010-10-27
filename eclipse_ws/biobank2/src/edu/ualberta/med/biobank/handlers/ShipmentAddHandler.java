@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.clinicShipment.ClinicShipmentAdapter;
 
 public class ShipmentAddHandler extends AbstractHandler {

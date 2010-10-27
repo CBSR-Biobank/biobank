@@ -163,8 +163,8 @@ public class ClinicShipmentWrapper extends
         }
         if (!patientsInError.isEmpty()) {
             // remove last ", "
-            patientsInError =
-                patientsInError.substring(0, patientsInError.length() - 2);
+            patientsInError = patientsInError.substring(0,
+                patientsInError.length() - 2);
             throw new BiobankCheckException("Patient(s) " + patientsInError
                 + " are not part of a study that has contact with clinic "
                 + getClinic().getName());
@@ -180,9 +180,9 @@ public class ClinicShipmentWrapper extends
             isSameShipment = " and id <> ?";
             params.add(getId());
         }
-        HQLCriteria c =
-            new HQLCriteria("from " + ClinicShipment.class.getName()
-                + " where clinic.id=? and waybill = ?" + isSameShipment, params);
+        HQLCriteria c = new HQLCriteria("from "
+            + ClinicShipment.class.getName()
+            + " where clinic.id=? and waybill = ?" + isSameShipment, params);
 
         List<Object> results = appService.query(c);
         return results.size() == 0;
@@ -225,8 +225,8 @@ public class ClinicShipmentWrapper extends
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activity =
-            (ActivityStatusWrapper) propertiesMap.get("activityStatus");
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
+            .get("activityStatus");
         if (activity == null) {
             ActivityStatus a = wrappedObject.getActivityStatus();
             if (a == null)
@@ -249,10 +249,8 @@ public class ClinicShipmentWrapper extends
     }
 
     public List<PatientVisitWrapper> getPatientVisitCollection() {
-        List<PatientVisitWrapper> patientVisitCollection =
-            new ArrayList<PatientVisitWrapper>();
-        Collection<ClinicShipmentPatientWrapper> csps =
-            getClinicShipmentPatientCollection();
+        List<PatientVisitWrapper> patientVisitCollection = new ArrayList<PatientVisitWrapper>();
+        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
         if (csps != null) {
             for (ClinicShipmentPatientWrapper csp : csps) {
                 for (PatientVisitWrapper visit : csp
@@ -267,22 +265,18 @@ public class ClinicShipmentWrapper extends
     public void addPatientVisits(List<PatientVisitWrapper> newPatientVisits)
         throws BiobankCheckException {
         if (newPatientVisits != null && newPatientVisits.size() > 0) {
-            Collection<PatientVisit> allVisitObjects =
-                new HashSet<PatientVisit>();
-            List<PatientVisitWrapper> allVisitWrappers =
-                new ArrayList<PatientVisitWrapper>();
+            Collection<PatientVisit> allVisitObjects = new HashSet<PatientVisit>();
+            List<PatientVisitWrapper> allVisitWrappers = new ArrayList<PatientVisitWrapper>();
             // already added visits
             List<PatientVisitWrapper> currentList = getPatientVisitCollection();
-            Collection<PatientVisit> oldCollection =
-                new ArrayList<PatientVisit>();
+            Collection<PatientVisit> oldCollection = new ArrayList<PatientVisit>();
             for (PatientVisitWrapper visit : currentList) {
                 oldCollection.add(visit.getWrappedObject());
                 allVisitObjects.add(visit.getWrappedObject());
                 allVisitWrappers.add(visit);
             }
             // new
-            Collection<ClinicShipmentPatientWrapper> csps =
-                getClinicShipmentPatientCollection();
+            Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
             Collection<PatientVisitWrapper> pvs;
             for (PatientVisitWrapper newVisit : newPatientVisits) {
                 boolean isFound = false;
@@ -314,10 +308,8 @@ public class ClinicShipmentWrapper extends
     }
 
     public List<PatientWrapper> getPatientCollection(boolean sort) {
-        List<PatientWrapper> patientCollection =
-            new ArrayList<PatientWrapper>();
-        Collection<ClinicShipmentPatientWrapper> csps =
-            getClinicShipmentPatientCollection();
+        List<PatientWrapper> patientCollection = new ArrayList<PatientWrapper>();
+        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
         if (csps != null) {
             for (ClinicShipmentPatientWrapper csp : csps) {
                 patientCollection.add(csp.getPatient());
@@ -333,17 +325,14 @@ public class ClinicShipmentWrapper extends
         // PatientWrapper.getClinicShipmentPatientCollection() - should share
         // code
         @SuppressWarnings("unchecked")
-        Collection<ClinicShipmentPatientWrapper> csps =
-            (Collection<ClinicShipmentPatientWrapper>) propertiesMap
-                .get(PROP_KEY_CSP_COLLECTION);
+        Collection<ClinicShipmentPatientWrapper> csps = (Collection<ClinicShipmentPatientWrapper>) propertiesMap
+            .get(PROP_KEY_CSP_COLLECTION);
         if (csps == null && wrappedObject != null) {
-            Collection<ClinicShipmentPatient> rawCsps =
-                wrappedObject.getClinicShipmentPatientCollection();
+            Collection<ClinicShipmentPatient> rawCsps = wrappedObject
+                .getClinicShipmentPatientCollection();
             if (rawCsps != null) {
-                csps =
-                    ClinicShipmentPatientWrapper
-                        .wrapClinicShipmentPatientCollection(appService,
-                            rawCsps);
+                csps = ClinicShipmentPatientWrapper
+                    .wrapClinicShipmentPatientCollection(appService, rawCsps);
             }
             propertiesMap.put(PROP_KEY_CSP_COLLECTION, csps);
         }
@@ -353,18 +342,15 @@ public class ClinicShipmentWrapper extends
     private void setClinicShipmentPatientCollection(
         Collection<ClinicShipmentPatientWrapper> newCsps)
         throws ApplicationException {
-        Collection<ClinicShipmentPatient> oldRawCsps =
-            new ArrayList<ClinicShipmentPatient>();
-        Collection<ClinicShipmentPatientWrapper> csps =
-            getClinicShipmentPatientCollection();
+        Collection<ClinicShipmentPatient> oldRawCsps = new ArrayList<ClinicShipmentPatient>();
+        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
         if (csps != null) {
             for (ClinicShipmentPatientWrapper csp : csps) {
                 oldRawCsps.add(csp.getWrappedObject());
             }
         }
 
-        Collection<ClinicShipmentPatient> newRawCsps =
-            new HashSet<ClinicShipmentPatient>();
+        Collection<ClinicShipmentPatient> newRawCsps = new HashSet<ClinicShipmentPatient>();
         for (ClinicShipmentPatientWrapper csp : newCsps) {
             newRawCsps.add(csp.getWrappedObject());
         }
@@ -381,14 +367,11 @@ public class ClinicShipmentWrapper extends
         Collection<ClinicShipmentPatientWrapper> csps)
         throws ApplicationException {
 
-        Collection<ClinicShipmentPatientWrapper> updatedCsps =
-            new ArrayList<ClinicShipmentPatientWrapper>();
+        Collection<ClinicShipmentPatientWrapper> updatedCsps = new ArrayList<ClinicShipmentPatientWrapper>();
 
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "select c from "
-                    + ClinicShipmentPatient.class.getName()
-                    + " as c left join fetch c.patient p where c.clinicShipment.id = ?");
+        HQLCriteria criteria = new HQLCriteria("select c from "
+            + ClinicShipmentPatient.class.getName()
+            + " as c left join fetch c.patient p where c.clinicShipment.id = ?");
         criteria.setParameters(Arrays.asList((Object) getId()));
 
         List<ClinicShipmentPatient> rows = appService.query(criteria);
@@ -413,16 +396,14 @@ public class ClinicShipmentWrapper extends
     private void setPatients(Collection<Patient> allPatientObjects,
         List<PatientWrapper> allPatientWrappers) throws ApplicationException {
         Collection<Patient> oldPatients = new ArrayList<Patient>();
-        Collection<ClinicShipmentPatientWrapper> csps =
-            getClinicShipmentPatientCollection();
+        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
         if (csps != null) {
             for (ClinicShipmentPatientWrapper csp : csps) {
                 oldPatients.add(csp.getPatient().getWrappedObject());
             }
         }
 
-        Collection<ClinicShipmentPatientWrapper> cspCollection =
-            new ArrayList<ClinicShipmentPatientWrapper>();
+        Collection<ClinicShipmentPatientWrapper> cspCollection = new ArrayList<ClinicShipmentPatientWrapper>();
         for (PatientWrapper patient : allPatientWrappers) {
             ClinicShipmentPatientWrapper csp = null;
 
@@ -434,16 +415,14 @@ public class ClinicShipmentWrapper extends
 
                 if (csp == null) {
                     // next try to reuse the patient CSPs
-                    csp =
-                        findCspIn(getId(), patient.getId(),
-                            patient.getClinicShipmentPatientCollection());
+                    csp = findCspIn(getId(), patient.getId(),
+                        patient.getClinicShipmentPatientCollection());
                 }
             }
 
             if (csp == null) {
-                csp =
-                    new ClinicShipmentPatientWrapper(appService,
-                        new ClinicShipmentPatient());
+                csp = new ClinicShipmentPatientWrapper(appService,
+                    new ClinicShipmentPatient());
                 csp.setShipment(this);
                 csp.setPatient(patient);
             }
@@ -487,8 +466,7 @@ public class ClinicShipmentWrapper extends
         throws ApplicationException {
         if (newPatients != null && newPatients.size() > 0) {
             Collection<Patient> allPatientsObjects = new HashSet<Patient>();
-            List<PatientWrapper> allPatientsWrappers =
-                new ArrayList<PatientWrapper>();
+            List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
             // already in list
             List<PatientWrapper> patientsList = getPatientCollection();
             if (patientsList != null) {
@@ -514,8 +492,7 @@ public class ClinicShipmentWrapper extends
             patientsAdded.removeAll(patientsToRemove);
             patientsRemoved.addAll(patientsToRemove);
             Collection<Patient> allPatientsObjects = new HashSet<Patient>();
-            List<PatientWrapper> allPatientsWrappers =
-                new ArrayList<PatientWrapper>();
+            List<PatientWrapper> allPatientsWrappers = new ArrayList<PatientWrapper>();
             // already in list
             List<PatientWrapper> patientsList = getPatientCollection();
             if (patientsList != null) {
@@ -536,13 +513,12 @@ public class ClinicShipmentWrapper extends
     public static List<ClinicShipmentWrapper> getShipmentsInSite(
         WritableApplicationService appService, String waybill, SiteWrapper site)
         throws ApplicationException {
-        HQLCriteria criteria =
-            new HQLCriteria("from " + ClinicShipment.class.getName()
-                + " where site.id = ? and waybill = ?",
-                Arrays.asList(new Object[] { site.getId(), waybill }));
+        HQLCriteria criteria = new HQLCriteria("from "
+            + ClinicShipment.class.getName()
+            + " where site.id = ? and waybill = ?", Arrays.asList(new Object[] {
+            site.getId(), waybill }));
         List<ClinicShipment> shipments = appService.query(criteria);
-        List<ClinicShipmentWrapper> wrappers =
-            new ArrayList<ClinicShipmentWrapper>();
+        List<ClinicShipmentWrapper> wrappers = new ArrayList<ClinicShipmentWrapper>();
         for (ClinicShipment s : shipments) {
             wrappers.add(new ClinicShipmentWrapper(appService, s));
         }
@@ -567,16 +543,12 @@ public class ClinicShipmentWrapper extends
         // date at 0:0pm
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "from "
-                    + ClinicShipment.class.getName()
-                    + " where site.id = ? and dateReceived >= ? and dateReceived <= ?",
-                Arrays
-                    .asList(new Object[] { site.getId(), startDate, endDate }));
+        HQLCriteria criteria = new HQLCriteria("from "
+            + ClinicShipment.class.getName()
+            + " where site.id = ? and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<ClinicShipment> shipments = appService.query(criteria);
-        List<ClinicShipmentWrapper> wrappers =
-            new ArrayList<ClinicShipmentWrapper>();
+        List<ClinicShipmentWrapper> wrappers = new ArrayList<ClinicShipmentWrapper>();
         for (ClinicShipment s : shipments) {
             wrappers.add(new ClinicShipmentWrapper(appService, s));
         }
@@ -613,16 +585,12 @@ public class ClinicShipmentWrapper extends
         // today midnight
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria =
-            new HQLCriteria(
-                "from "
-                    + ClinicShipment.class.getName()
-                    + " where site.id = ? and dateReceived >= ? and dateReceived <= ?",
-                Arrays
-                    .asList(new Object[] { site.getId(), startDate, endDate }));
+        HQLCriteria criteria = new HQLCriteria("from "
+            + ClinicShipment.class.getName()
+            + " where site.id = ? and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<ClinicShipment> res = appService.query(criteria);
-        List<ClinicShipmentWrapper> ships =
-            new ArrayList<ClinicShipmentWrapper>();
+        List<ClinicShipmentWrapper> ships = new ArrayList<ClinicShipmentWrapper>();
         for (ClinicShipment s : res) {
             ships.add(new ClinicShipmentWrapper(appService, s));
         }
@@ -646,6 +614,11 @@ public class ClinicShipmentWrapper extends
         log.setDetails(details);
         log.setType("Shipment");
         return log;
+    }
+
+    public Boolean needDateShipped() {
+        ShippingMethodWrapper shippingMethod = getShippingMethod();
+        return shippingMethod == null || shippingMethod.needDate();
     }
 
 }

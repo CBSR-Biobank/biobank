@@ -8,7 +8,6 @@ import java.util.Map;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.databinding.observable.value.WritableValue;
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -463,9 +462,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private boolean getExistingPalletFromProductBarcode() throws Exception {
         palletFoundWithProductBarcode = ContainerWrapper
-            .getContainerWithProductBarcodeInSite(appService, SessionManager
-                .getInstance().getCurrentSite(), currentPalletWrapper
-                .getProductBarcode());
+            .getContainerWithProductBarcodeInSite(appService,
+                SessionManager.getCurrentSite(),
+                currentPalletWrapper.getProductBarcode());
         if (palletFoundWithProductBarcode == null) {
             // no pallet found with this barcode
             setTypes(palletContainerTypes, true);
@@ -540,10 +539,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
         if (isFakeScanLinkedOnly) {
             return PalletCell.getRandomAliquotsNotAssigned(appService,
-                SessionManager.getInstance().getCurrentSite().getId());
+                SessionManager.getCurrentSite().getId());
         }
         return PalletCell.getRandomAliquotsAlreadyAssigned(appService,
-            SessionManager.getInstance().getCurrentSite().getId());
+            SessionManager.getCurrentSite().getId());
     }
 
     /**
@@ -646,52 +645,46 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         if (value == null) { // no aliquot scanned
             updateCellAsMissing(positionString, scanCell, expectedAliquot);
         } else {
-            List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
-                appService, value);
-            if (aliquots.size() == 0) {
+            // FIXME test what happen if can't read site
+            AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(appService,
+                value, SessionManager.getUser());
+            if (foundAliquot == null) {
                 updateCellAsNotLinked(positionString, scanCell);
-            } else if (aliquots.size() == 1) {
-                AliquotWrapper foundAliquot = aliquots.get(0);
-                if (expectedAliquot != null
-                    && !foundAliquot.equals(expectedAliquot)) {
-                    updateCellAsPositionAlreadyTaken(positionString, scanCell,
-                        expectedAliquot, foundAliquot);
+            } else if (expectedAliquot != null
+                && !foundAliquot.equals(expectedAliquot)) {
+                updateCellAsPositionAlreadyTaken(positionString, scanCell,
+                    expectedAliquot, foundAliquot);
+            } else {
+                scanCell.setAliquot(foundAliquot);
+                if (expectedAliquot != null) {
+                    // aliquot scanned is already registered at this
+                    // position (everything is ok !)
+                    scanCell.setStatus(CellStatus.FILLED);
+                    scanCell.setTitle(foundAliquot.getPatientVisit()
+                        .getPatient().getPnumber());
+                    scanCell.setAliquot(expectedAliquot);
                 } else {
-                    scanCell.setAliquot(foundAliquot);
-                    if (expectedAliquot != null) {
-                        // aliquot scanned is already registered at this
-                        // position (everything is ok !)
-                        scanCell.setStatus(CellStatus.FILLED);
-                        scanCell.setTitle(foundAliquot.getPatientVisit()
-                            .getPatient().getPnumber());
-                        scanCell.setAliquot(expectedAliquot);
-                    } else {
-                        if (currentPalletWrapper.canHoldAliquot(foundAliquot)) {
-                            if (foundAliquot.hasParent()) { // moved
-                                processCellWithPreviousPosition(scanCell,
-                                    positionString, foundAliquot);
-                            } else { // new in pallet
-                                if (foundAliquot.isUsedInDispatchShipment()) {
-                                    updateCellAsDispatchedError(positionString,
-                                        scanCell, foundAliquot);
-                                } else {
-                                    scanCell.setStatus(CellStatus.NEW);
-                                    scanCell.setTitle(foundAliquot
-                                        .getPatientVisit().getPatient()
-                                        .getPnumber());
-                                }
+                    if (currentPalletWrapper.canHoldAliquot(foundAliquot)) {
+                        if (foundAliquot.hasParent()) { // moved
+                            processCellWithPreviousPosition(scanCell,
+                                positionString, foundAliquot);
+                        } else { // new in pallet
+                            if (foundAliquot.isUsedInDispatchShipment()) {
+                                updateCellAsDispatchedError(positionString,
+                                    scanCell, foundAliquot);
+                            } else {
+                                scanCell.setStatus(CellStatus.NEW);
+                                scanCell.setTitle(foundAliquot
+                                    .getPatientVisit().getPatient()
+                                    .getPnumber());
                             }
-                        } else {
-                            // pallet can't hold this aliquot type
-                            updateCellAsTypeError(positionString, scanCell,
-                                foundAliquot);
                         }
+                    } else {
+                        // pallet can't hold this aliquot type
+                        updateCellAsTypeError(positionString, scanCell,
+                            foundAliquot);
                     }
                 }
-            } else {
-                Assert.isTrue(false,
-                    "InventoryId " + value + " should be unique !"); //$NON-NLS-1$ //$NON-NLS-2$
-                updateCellAsInventoryIdError(positionString, scanCell);
             }
         }
     }
@@ -715,7 +708,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private void processCellWithPreviousPosition(PalletCell scanCell,
         String positionString, AliquotWrapper foundAliquot) {
         if (foundAliquot.getParent().getSite()
-            .equals(SessionManager.getInstance().getCurrentSite())) {
+            .equals(SessionManager.getCurrentSite())) {
             if (foundAliquot.getParent().equals(currentPalletWrapper)) {
                 // same pallet
                 RowColPos rcp = new RowColPos(scanCell.getRow(),
@@ -747,18 +740,6 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         } else {
             updateCellAsInOtherSite(positionString, scanCell, foundAliquot);
         }
-    }
-
-    private void updateCellAsInventoryIdError(String position,
-        PalletCell scanCell) {
-        String cellValue = scanCell.getValue();
-
-        scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setInformation(Messages.getFormattedString(
-            "ScanAssign.scanStatus.aliquot.inventoryIdError", cellValue)); //$NON-NLS-1$
-        scanCell.setTitle("!"); //$NON-NLS-1$
-        appendLogNLS(
-            "ScanAssign.activitylog.aliquot.inventoryIdError", position, cellValue); //$NON-NLS-1$
     }
 
     private void updateCellAsTypeError(String position, PalletCell scanCell,
@@ -997,11 +978,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void initPalletValues() {
         try {
+            currentPalletWrapper
+                .initObjectWith(new ContainerWrapper(appService));
             currentPalletWrapper.reset();
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            currentPalletWrapper.setSite(SessionManager.getInstance()
-                .getCurrentSite());
+            currentPalletWrapper.setSite(SessionManager.getCurrentSite());
         } catch (Exception e) {
             logger.error("Error while reseting pallet values", e); //$NON-NLS-1$
         }

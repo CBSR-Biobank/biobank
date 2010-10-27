@@ -1,27 +1,37 @@
 package edu.ualberta.med.biobank.common.security;
 
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.model.Site;
 
 public class Group implements Serializable, NotAProxy {
-    public static final String GROUP_NAME_WEBSITE_ADMINISTRATOR = "Website Administrator";
+
     private static final long serialVersionUID = 1L;
+
+    // FIXME just remember the ID that should never change ?
+    public static final String GROUP_WEBSITE_ADMINISTRATOR = "Website Administrator";
+
+    // FIXME just remember the ID that should never change ?
+    public static final String PG_SITE_ADMINISTRATION = "Site Administration Features";
 
     private Long id;
 
     private String name;
 
-    private Map<String, ProtectionElementPrivilege> pePrivilegeMap;
+    private Map<ProtectionElementPrivilege, Set<Privilege>> pePrivilegeMap;
+
+    private Map<String, ProtectionGroupPrivilege> pgMap;
 
     public Group(Long id, String name) {
         this.id = id;
         this.name = name;
-        pePrivilegeMap = new HashMap<String, ProtectionElementPrivilege>();
+        pePrivilegeMap = new HashMap<ProtectionElementPrivilege, Set<Privilege>>();
+        pgMap = new HashMap<String, ProtectionGroupPrivilege>();
     }
 
     public void setId(Long id) {
@@ -41,33 +51,83 @@ public class Group implements Serializable, NotAProxy {
     }
 
     public boolean isWebsiteAdministrator() {
-        return name != null && name.equals(GROUP_NAME_WEBSITE_ADMINISTRATOR);
+        return name != null && name.equals(GROUP_WEBSITE_ADMINISTRATOR);
     }
 
-    public void addProtectionElementPrivilege(String objectName,
-        Set<Privilege> privileges, String objectId) {
-        ProtectionElementPrivilege per = pePrivilegeMap.get(objectName);
-        if (per == null) {
-            per = new ProtectionElementPrivilege(objectName, objectId);
-            pePrivilegeMap.put(objectName, per);
+    public void addProtectionElementPrivilege(String type, String id,
+        Set<Privilege> newPrivileges) {
+        ProtectionElementPrivilege pep = new ProtectionElementPrivilege(type,
+            id);
+        Set<Privilege> privileges = pePrivilegeMap.get(pep);
+        if (privileges == null) {
+            privileges = new HashSet<Privilege>();
+            pePrivilegeMap.put(pep, privileges);
         }
-        per.addPrivileges(privileges);
+        privileges.addAll(newPrivileges);
     }
 
-    public Collection<ProtectionElementPrivilege> getProtectionElementPrivileges() {
-        return pePrivilegeMap.values();
-    }
-
-    public boolean hasPrivilegeOnObject(Privilege privilege, String objectName) {
-        ProtectionElementPrivilege per = pePrivilegeMap.get(objectName);
-        if (per == null) {
-            return false;
+    public void addProtectionGroupPrivilege(String name,
+        Set<Privilege> newPrivileges) {
+        ProtectionGroupPrivilege pgp = pgMap.get(name);
+        if (pgp == null) {
+            pgp = new ProtectionGroupPrivilege(name);
+            pgMap.put(name, pgp);
         }
-        return per.getPrivileges().contains(privilege);
+        pgp.addPrivileges(newPrivileges);
+    }
+
+    /**
+     * When no id is specified, type=name
+     */
+    public boolean hasPrivilegeOnObject(Privilege privilege, String type) {
+        return hasPrivilegeOnObject(privilege, type, null);
+    }
+
+    /**
+     * When no id is specified, type=name; otherwise, need to check the
+     * protection element privilege type
+     */
+    public boolean hasPrivilegeOnObject(Privilege privilege, String type,
+        Integer id) {
+        ProtectionElementPrivilege pep = new ProtectionElementPrivilege(type,
+            id);
+        Set<Privilege> privileges = pePrivilegeMap.get(pep);
+        if (privileges == null) {
+            if (id == null) {
+                return false;
+            }
+            return hasPrivilegeOnObject(privilege, type, null);
+        }
+        return privileges.contains(privilege);
     }
 
     @Override
     public String toString() {
         return getId() + "/" + getName();
     }
+
+    public Map<ProtectionElementPrivilege, Set<Privilege>> getPrivilegesMap() {
+        return pePrivilegeMap;
+    }
+
+    public Map<String, ProtectionGroupPrivilege> getProtectionGroupMap() {
+        return pgMap;
+    }
+
+    public boolean isSiteAdministrator(Integer siteId) {
+        return hasPrivilegeOnProtectionGroup(Privilege.UPDATE,
+            PG_SITE_ADMINISTRATION, siteId);
+    }
+
+    public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
+        String protectionGroupName, Integer siteId) {
+        ProtectionGroupPrivilege pgv = pgMap.get(protectionGroupName);
+        if (pgv == null) {
+            return false;
+        }
+        return pgv.getPrivileges().contains(privilege)
+            && (siteId == null || hasPrivilegeOnObject(privilege,
+                Site.class.getName(), siteId));
+    }
+
 }

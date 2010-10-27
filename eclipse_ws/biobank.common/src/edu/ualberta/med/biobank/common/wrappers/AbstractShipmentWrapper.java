@@ -46,6 +46,9 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public String getFormattedDateShipped() {
+        if (getDateShipped() == null) {
+            return "";
+        }
         return DateFormatter.formatAsDateTime(getDateShipped());
     }
 
@@ -60,6 +63,7 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public String getFormattedDateReceived() {
+        // date received is not supposed to be null
         return DateFormatter.formatAsDateTime(getDateReceived());
     }
 

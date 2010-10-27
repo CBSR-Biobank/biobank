@@ -128,7 +128,7 @@ public class ShipmentAdministrationView extends
             // mutliple shipments from different clinics
             List<ClinicShipmentWrapper> shipments = ClinicShipmentWrapper
                 .getShipmentsInSite(SessionManager.getAppService(),
-                    text.trim(), SessionManager.getInstance().getCurrentSite());
+                    text.trim(), SessionManager.getCurrentSite());
             if (shipments.size() > 1) {
                 SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -143,9 +143,9 @@ public class ShipmentAdministrationView extends
             // can find more than one shipments
             Date date = dateReceivedWidget.getDate();
             if (date != null) {
-                return ClinicShipmentWrapper.getShipmentsInSite(SessionManager
-                    .getAppService(), date, SessionManager.getInstance()
-                    .getCurrentSite());
+                return ClinicShipmentWrapper.getShipmentsInSite(
+                    SessionManager.getAppService(), date,
+                    SessionManager.getCurrentSite());
             }
         }
         return null;

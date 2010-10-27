@@ -490,17 +490,26 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canRead(User user) {
-        return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass()
-            .getName());
+    public boolean canRead(User user, Integer siteId) {
+        return user.hasPrivilegeOnObject(Privilege.READ, siteId, this);
     }
 
     /**
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass()
-            .getName());
+        SiteWrapper site = getSiteLinkedToObject();
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, site == null ? null
+            : site.getId(), this);
+    }
+
+    /**
+     * return true if the user can delete this object
+     */
+    public boolean canDelete(User user) {
+        SiteWrapper site = getSiteLinkedToObject();
+        return user.hasPrivilegeOnObject(Privilege.DELETE, site == null ? null
+            : site.getId(), this);
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -529,8 +538,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    public void initObjectWith(ModelWrapper<E> otherWrapper)
-        throws WrapperException {
+    public void initObjectWith(ModelWrapper<E> otherWrapper) throws Exception {
         if (otherWrapper == null) {
             throw new WrapperException(
                 "Cannot init internal object with a null wrapper");
@@ -559,5 +567,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     @Override
     public int compareTo(ModelWrapper<E> arg0) {
         return this.getId().compareTo(arg0.getId());
+    }
+
+    public SiteWrapper getSiteLinkedToObject() {
+        return null;
+    }
+
+    /**
+     * return true if access is authorized
+     */
+    public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
+        @SuppressWarnings("unused") Integer siteId) {
+        return true;
     }
 }

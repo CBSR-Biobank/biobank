@@ -111,7 +111,7 @@ public class TopContainerListWidget {
             new GridData(SWT.FILL, SWT.FILL, true, true));
 
         siteCombo.setSelection(new StructuredSelection(SessionManager
-            .getInstance().getCurrentSite()));
+            .getCurrentSite()));
     }
 
     public List<Integer> getSelectedContainers() {

@@ -43,7 +43,7 @@ public class OutgoingNode extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(DispatchShipmentWrapper.class)) {
+        if (SessionManager.canCreate(DispatchShipmentWrapper.class, null)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Dispatch Shipment");
             mi.addSelectionListener(new SelectionAdapter() {

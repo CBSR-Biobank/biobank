@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public abstract class AbstractClinicGroup extends AdapterBase {

@@ -32,10 +32,10 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.validators.NotNullValidator;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -96,8 +96,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patient = patientVisit.getPatient();
         retrieve();
         try {
-            patientVisit.logEdit(SessionManager.getInstance().getCurrentSite()
-                .getNameShort());
+            patientVisit
+                .logEdit(SessionManager.getCurrentSite().getNameShort());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log edit failed", e);
         }
@@ -143,7 +143,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper site = SessionManager.getCurrentSite();
 
         createReadOnlyLabelledField(client, SWT.NONE, "Site", site.getName());
 
@@ -201,7 +201,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             });
         setFirstControl(shipmentsComboViewer.getControl());
 
-        if (SessionManager.getUser().isWebsiteAdministrator()) {
+        if (SessionManager.getUser().isSiteAdministrator(
+            SessionManager.getCurrentSite())) {
             final Button shipmentsListCheck = toolkit.createButton(composite,
                 "Last 7 days", SWT.CHECK);
             shipmentsListCheck.setSelection(true);
@@ -222,7 +223,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private ClinicShipmentWrapper initShipmentsCollections() {
-        allShipments = patient.getShipmentCollection(true, false);
+        allShipments = patient.getShipmentCollection(true, false,
+            SessionManager.getUser());
         recentShipments = new ArrayList<ClinicShipmentWrapper>();
         // filter for last 7 days
         Calendar c = Calendar.getInstance();

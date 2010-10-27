@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
 public class StudyAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.addStudy";
@@ -17,13 +17,13 @@ public class StudyAddHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        sessionAdapter.getStudiesGroupNode().addStudy();
+        sessionAdapter.addStudy();
         return null;
     }
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(StudyWrapper.class)
+        return SessionManager.canCreate(StudyWrapper.class, null)
             && SessionManager.getInstance().getSession() != null;
     }
 }

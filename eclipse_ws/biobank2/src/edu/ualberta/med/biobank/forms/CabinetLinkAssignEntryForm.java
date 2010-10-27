@@ -127,6 +127,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected boolean newAliquotCreation = true;
 
+    private Composite clientInsideGridScroll;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -169,21 +171,17 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         scrollData.horizontalAlignment = SWT.FILL;
         scrollData.grabExcessHorizontalSpace = true;
         containersScroll.setLayoutData(scrollData);
-        Composite client = toolkit.createComposite(containersScroll);
+        clientInsideGridScroll = toolkit.createComposite(containersScroll);
         GridLayout layout = new GridLayout(2, false);
-        client.setLayout(layout);
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.CENTER;
-        gd.grabExcessHorizontalSpace = true;
-        client.setLayoutData(gd);
-        toolkit.paintBordersFor(client);
-        containersScroll.setContent(client);
-        cabinetLabel = toolkit.createLabel(client, "Cabinet"); //$NON-NLS-1$
-        drawerLabel = toolkit.createLabel(client, "Drawer"); //$NON-NLS-1$
+        clientInsideGridScroll.setLayout(layout);
+        toolkit.paintBordersFor(clientInsideGridScroll);
+        containersScroll.setContent(clientInsideGridScroll);
+        cabinetLabel = toolkit.createLabel(clientInsideGridScroll, "Cabinet"); //$NON-NLS-1$
+        drawerLabel = toolkit.createLabel(clientInsideGridScroll, "Drawer"); //$NON-NLS-1$
 
         List<ContainerTypeWrapper> types = ContainerTypeWrapper
-            .getContainerTypesInSite(appService, SessionManager.getInstance()
-                .getCurrentSite(), cabinetNameContains, false);
+            .getContainerTypesInSite(appService,
+                SessionManager.getCurrentSite(), cabinetNameContains, false);
         ContainerTypeWrapper cabinetType = null;
         ContainerTypeWrapper drawerType = null;
         if (types.size() == 0) {
@@ -199,19 +197,19 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 drawerType = children.get(0);
             }
         }
-        cabinetWidget = new ContainerDisplayWidget(client);
+        cabinetWidget = new ContainerDisplayWidget(clientInsideGridScroll);
         cabinetWidget.setContainerType(cabinetType, true);
         toolkit.adapt(cabinetWidget);
         GridData gdDrawer = new GridData();
         gdDrawer.verticalAlignment = SWT.TOP;
         cabinetWidget.setLayoutData(gdDrawer);
 
-        drawerWidget = new ContainerDisplayWidget(client);
+        drawerWidget = new ContainerDisplayWidget(clientInsideGridScroll);
         drawerWidget.setContainerType(drawerType, true);
         toolkit.adapt(drawerWidget);
 
-        containersScroll.setMinSize(client
-            .computeSize(SWT.DEFAULT, SWT.DEFAULT));
+        containersScroll.setMinSize(clientInsideGridScroll.computeSize(
+            SWT.DEFAULT, SWT.DEFAULT));
     }
 
     private void createFieldsSection() throws ApplicationException {
@@ -267,7 +265,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     viewerSampleTypes.setInput(null);
                     positionTextModified = true;
                     resultShownValue.setValue(Boolean.FALSE);
-                    hidePositions();
+                    displayPositions(false);
                 }
             });
 
@@ -305,7 +303,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 inventoryIdModified = true;
                 positionTextModified = true;
                 resultShownValue.setValue(Boolean.FALSE);
-                hidePositions();
+                displayPositions(false);
             }
         });
 
@@ -429,7 +427,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     viewerSampleTypes.setInput(null);
                 }
                 resultShownValue.setValue(Boolean.FALSE);
-                hidePositions();
+                displayPositions(false);
             }
         });
         newCabinetPosition.addKeyListener(EnterKeyToNextFieldListener.INSTANCE);
@@ -468,8 +466,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     - removeSize);
                 labelsTested.add(binLabel);
                 for (ContainerWrapper cont : ContainerWrapper
-                    .getContainersInSite(appService, SessionManager
-                        .getInstance().getCurrentSite(), binLabel)) {
+                    .getContainersInSite(appService,
+                        SessionManager.getCurrentSite(), binLabel)) {
                     boolean canContainSamples = cont.getContainerType()
                         .getSampleTypeCollection() != null
                         && cont.getContainerType().getSampleTypeCollection()
@@ -607,16 +605,16 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private void initCabinetContainerTypesList() throws ApplicationException {
         cabinetContainerTypes = ContainerTypeWrapper.getContainerTypesInSite(
-            appService, SessionManager.getInstance().getCurrentSite(),
-            cabinetNameContains, false);
+            appService, SessionManager.getCurrentSite(), cabinetNameContains,
+            false);
     }
 
     private List<SampleTypeWrapper> getCabinetSampleTypes()
         throws ApplicationException {
         if (cabinetSampleTypes == null) {
             cabinetSampleTypes = SampleTypeWrapper
-                .getSampleTypeForContainerTypes(appService, SessionManager
-                    .getInstance().getCurrentSite(), cabinetNameContains);
+                .getSampleTypeForContainerTypes(appService,
+                    SessionManager.getCurrentSite(), cabinetNameContains);
         }
         return cabinetSampleTypes;
     }
@@ -638,7 +636,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     String positionString = newCabinetPosition.getText();
                     if (bin == null) {
                         resultShownValue.setValue(Boolean.FALSE);
-                        hidePositions();
+                        displayPositions(false);
                         return;
                     }
                     appendLogNLS(
@@ -646,7 +644,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     aliquot.setAliquotPositionFromString(positionString, bin);
                     if (aliquot.isPositionFree(bin)) {
                         aliquot.setParent(bin);
-                        showPositions();
+                        displayPositions(true);
                         resultShownValue.setValue(Boolean.TRUE);
                         cancelConfirmWidget.setFocus();
                     } else {
@@ -768,21 +766,14 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         appendLogNLS("Cabinet.activitylog.gettingInfoId", //$NON-NLS-1$
             aliquot.getInventoryId());
-        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(appService,
-            aliquot.getInventoryId());
-        if (aliquots.size() > 1) {
-            canLaunchCheck.setValue(false);
-            throw new Exception(
-                "Error while retrieving aliquot with inventoryId " //$NON-NLS-1$
-                    + aliquot.getInventoryId()
-                    + ": more than one aliquot found."); //$NON-NLS-1$
-        }
-        if (aliquots.size() == 0) {
+        AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(appService,
+            aliquot.getInventoryId(), SessionManager.getUser());
+        if (aliquot == null) {
             canLaunchCheck.setValue(false);
             throw new Exception("No aliquot found with inventoryId " //$NON-NLS-1$
                 + aliquot.getInventoryId());
         }
-        aliquot.initObjectWith(aliquots.get(0));
+        aliquot.initObjectWith(foundAliquot);
         List<SampleTypeWrapper> possibleTypes = getCabinetSampleTypes();
         if (!possibleTypes.contains(aliquot.getSampleType())) {
             canLaunchCheck.setValue(false);
@@ -818,29 +809,27 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             positionString);
     }
 
-    private void showPositions() {
-        if (drawer == null || bin == null || cabinet == null) {
-            cabinetWidget.setSelection(null);
-            cabinetLabel.setText("Cabinet"); //$NON-NLS-1$
-            drawerWidget.setSelection(null);
-            drawerLabel.setText("Drawer"); //$NON-NLS-1$
-        } else {
+    private void displayPositions(boolean show) {
+        if (show) {
             cabinetWidget.setContainerType(cabinet.getContainerType());
             cabinetWidget.setSelection(drawer.getPosition());
             cabinetLabel.setText("Cabinet " + cabinet.getLabel()); //$NON-NLS-1$
             drawerWidget.setContainer(drawer);
             drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
+        } else {
+            cabinetWidget.setSelection(null);
+            cabinetLabel.setText("Cabinet"); //$NON-NLS-1$
+            drawerWidget.setSelection(null);
+            drawerLabel.setText("Drawer"); //$NON-NLS-1$
         }
         page.layout(true, true);
         book.reflow(true);
-    }
-
-    private void hidePositions() {
-        cabinet = null;
-        bin = null;
-        drawer = null;
-        showPositions();
+        // FIXME this is working to display the right length of horizontal
+        // scroll bar when the drawer is very large, but doesn't seems a pretty
+        // way to do it...
+        containersScroll.setMinSize(clientInsideGridScroll.computeSize(
+            SWT.DEFAULT, SWT.DEFAULT));
     }
 
     protected void initParentContainersFromPosition(String positionString)
@@ -850,16 +839,16 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         appendLogNLS("Cabinet.activitylog.checkingParent", binLabel, //$NON-NLS-1$ 
             aliquot.getSampleType().getName());
         List<ContainerWrapper> containers = ContainerWrapper
-            .getContainersHoldingSampleType(appService, SessionManager
-                .getInstance().getCurrentSite(), binLabel, aliquot
-                .getSampleType());
+            .getContainersHoldingSampleType(appService,
+                SessionManager.getCurrentSite(), binLabel,
+                aliquot.getSampleType());
         if (containers.size() == 1) {
             bin = containers.get(0);
             drawer = bin.getParent();
             cabinet = drawer.getParent();
         } else if (containers.size() == 0) {
             containers = ContainerWrapper.getContainersInSite(appService,
-                SessionManager.getInstance().getCurrentSite(), binLabel);
+                SessionManager.getCurrentSite(), binLabel);
             String errorMsg = null;
             if (containers.size() > 0) {
                 errorMsg = Messages.getFormattedString(

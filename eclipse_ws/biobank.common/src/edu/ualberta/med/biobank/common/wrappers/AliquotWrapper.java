@@ -8,6 +8,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
@@ -125,18 +126,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        List<AliquotWrapper> aliquots = getAliquots(appService,
+        AliquotWrapper existingAliquot = getAliquot(appService,
             getInventoryId());
         boolean alreadyExists = false;
-        if (aliquots.size() > 0 && isNew()) {
+        if (existingAliquot != null && isNew()) {
             alreadyExists = true;
-        } else {
-            for (AliquotWrapper aliquot : aliquots) {
-                if (!aliquot.getId().equals(getId())) {
-                    alreadyExists = true;
-                    break;
-                }
-            }
+        } else if (existingAliquot != null
+            && !existingAliquot.getId().equals(getId())) {
+            alreadyExists = true;
         }
         if (alreadyExists) {
             throw new BiobankCheckException("An aliquot with inventory id \""
@@ -166,38 +163,53 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public String getSiteString() {
+        SiteWrapper site = getLocation();
+        if (site != null) {
+            return site.getNameShort();
+        }
+        // FIXME should never see that ? should never retrieve an aliquot which
+        // site cannot be displayed ?
+        return "CANNOT DISPLAY INFORMATION";
+    }
+
+    private SiteWrapper getLocation() {
         List<DispatchShipmentAliquotWrapper> dsac = this
             .getDispatchShipmentAliquotCollection();
         // if in a container, use the container's site
         if (getParent() != null) {
-            return getParent().getSite().getNameShort();
+            return getParent().getSite();
         } else {
             // dispatched aliquot?
             for (DispatchShipmentAliquotWrapper da : dsac) {
+                DispatchAliquotState state = DispatchAliquotState.getState(da
+                    .getState());
                 if (da.getShipment().isInTransitState()
-                    && DispatchAliquotState.NONE_STATE.isEquals(da.getState())) {
+                    && DispatchAliquotState.NONE_STATE == state) {
                     // aliquot is in transit
-                    return ("In Transit ("
+                    // FIXME what if can't read sender or receiver
+                    SiteWrapper fakeSite = new SiteWrapper(appService);
+                    fakeSite.setNameShort("In Transit ("
                         + da.getShipment().getSender().getNameShort() + " to "
                         + da.getShipment().getReceiver().getNameShort() + ")");
-                } else if (da.getShipment().isInReceivedState()
-                    && DispatchAliquotState.EXTRA.isEquals(da.getState())) {
-                    // aliquot has been accidentally dispatched
-                    return da.getShipment().getReceiver().getNameShort();
-                } else if (da.getShipment().isInReceivedState()
-                    && DispatchAliquotState.MISSING.isEquals(da.getState())) {
-                    // aliquot is missing
-                    return da.getShipment().getSender().getNameShort();
-                } else if (da.getShipment().isInReceivedState()
-                    && (DispatchAliquotState.RECEIVED_STATE.isEquals(da
-                        .getState()) || DispatchAliquotState.NONE_STATE
-                        .isEquals(da.getState()))) {
-                    // aliquot has been intentionally dispatched and received
-                    return da.getShipment().getReceiver().getNameShort();
+                    return fakeSite;
+                } else if (da.getShipment().isInReceivedState()) {
+                    switch (state) {
+                    case EXTRA:
+                        // aliquot has been accidentally dispatched
+                        return da.getShipment().getReceiver();
+                    case MISSING:
+                        // aliquot is missing
+                        return da.getShipment().getSender();
+                    case RECEIVED_STATE:
+                    case NONE_STATE:
+                        // aliquot has been intentionally dispatched and
+                        // received
+                        return da.getShipment().getReceiver();
+                    }
                 }
             }
             // if not in a container or a dispatch, use the originating shipment
-            return getPatientVisit().getShipment().getSite().getNameShort();
+            return getPatientVisit().getShipment().getSite();
         }
     }
 
@@ -441,18 +453,44 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     /**
      * search in all aliquots list. No matter which site added it.
      */
-    public static List<AliquotWrapper> getAliquots(
+    protected static AliquotWrapper getAliquot(
         WritableApplicationService appService, String inventoryId)
-        throws ApplicationException {
+        throws ApplicationException, BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria("from "
             + Aliquot.class.getName() + " where inventoryId = ?",
             Arrays.asList(new Object[] { inventoryId }));
         List<Aliquot> aliquots = appService.query(criteria);
-        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        for (Aliquot aliquot : aliquots) {
-            list.add(new AliquotWrapper(appService, aliquot));
+        if (aliquots == null || aliquots.size() == 0)
+            return null;
+        if (aliquots.size() == 1)
+            return new AliquotWrapper(appService, aliquots.get(0));
+        throw new BiobankCheckException("Error retrieving aliquots: found "
+            + aliquots.size() + " results.");
+    }
+
+    /**
+     * search in all aliquots list. No matter which site added it. If user is
+     * not null, will return only aliquot that is linked to a visit which site
+     * can be read by the user
+     * 
+     * @throws BiobankCheckException
+     */
+    public static AliquotWrapper getAliquot(
+        WritableApplicationService appService, String inventoryId, User user)
+        throws ApplicationException, BiobankCheckException {
+        AliquotWrapper aliquot = getAliquot(appService, inventoryId);
+        if (aliquot != null && user != null) {
+            SiteWrapper site = aliquot.getLocation();
+            // site might be null if can't access it !
+            if (site == null) {
+                throw new ApplicationException(
+                    "Aliquot "
+                        + inventoryId
+                        + " exists but you don't have access to it."
+                        + " Its current site location should be a site you can access.");
+            }
         }
-        return list;
+        return aliquot;
     }
 
     // FIXME : do we want this search to be specific to a site ?
@@ -588,9 +626,15 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public boolean isUsedInDispatchShipment() {
+        return isUsedInDispatchShipment(null);
+    }
+
+    public boolean isUsedInDispatchShipment(
+        DispatchShipmentWrapper excludedShipment) {
         for (DispatchShipmentAliquotWrapper dsa : getDispatchShipmentAliquotCollection()) {
             DispatchShipmentWrapper ship = dsa.getShipment();
-            if (ship.isInTransitState() || ship.isInCreationState()) {
+            if (!ship.equals(excludedShipment)
+                && (ship.isInTransitState() || ship.isInCreationState())) {
                 if (DispatchAliquotState.MISSING.isEquals(dsa.getState())) {
                     return false;
                 }

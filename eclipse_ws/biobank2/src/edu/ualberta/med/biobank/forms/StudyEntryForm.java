@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
+import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;

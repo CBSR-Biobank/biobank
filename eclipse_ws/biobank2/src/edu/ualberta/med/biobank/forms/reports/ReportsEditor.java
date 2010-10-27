@@ -207,7 +207,7 @@ public abstract class ReportsEditor extends BiobankFormBase implements
 
     private void generate() {
         try {
-            SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+            SiteWrapper site = SessionManager.getCurrentSite();
             String op = "=";
             if (site.getName().compareTo("All Sites") == 0)
                 op = "!=";

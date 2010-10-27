@@ -45,7 +45,7 @@ public class UserEditDialog extends BiobankDialog {
     private static final String MSG_PASSWORDS_MUST_MATCH = "The passwords entered do not match.";
     private static final String CONFIRM_DEMOTION_TITLE = "Confirm Demotion";
     private static final String CONFIRM_DEMOTION_MESSAGE = "Are you certain you want to remove yourself as a "
-        + Group.GROUP_NAME_WEBSITE_ADMINISTRATOR + "?";
+        + Group.GROUP_WEBSITE_ADMINISTRATOR + "?";
     private static final String USER_PERSIST_ERROR_TITLE = "Unable to Save User";
     private static final String MSG_GROUP_REQUIRED = "Each user must be assigned to at least one group. Please assign a group.";
     private static final String MSG_LOGIN_UNIQUE = "Each user login must be unique: \"{0}\" is already taken. Please try a different login name.";

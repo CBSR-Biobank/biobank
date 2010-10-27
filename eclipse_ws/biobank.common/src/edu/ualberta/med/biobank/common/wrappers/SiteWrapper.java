@@ -11,8 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.security.Privilege;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -24,7 +22,6 @@ import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.DispatchShipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -620,21 +617,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getName();
     }
 
-    /**
-     * return true if the user can edit this object
-     */
-    @Override
-    public boolean canUpdate(User user) {
-        try {
-            // Need to use the appService method as the filter added for site
-            // need to be used. (see CSM documentation and configuration)
-            return ((BiobankApplicationService) appService).hasPrivilege(
-                getWrappedClass(), getId(), Privilege.CREATE.name());
-        } catch (ApplicationException e) {
-            return false;
-        }
-    }
-
     @Override
     public void resetInternalFields() {
         address = null;
@@ -688,6 +670,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         List<SiteWrapper> sites) throws BiobankCheckException {
         if ((sites == null) || (sites.size() == 0))
             return;
+
         Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
         DispatchInfoWrapper diw = null;
         if (infos != null) {

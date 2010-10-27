@@ -108,9 +108,9 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
 
     @Override
     protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(SourceVesselWrapper.class)
-            && !SessionManager.canCreate(SourceVesselWrapper.class)
-            && !SessionManager.canDelete(SourceVesselWrapper.class)) {
+        if (!SessionManager.canUpdate(SourceVesselWrapper.class, null)
+            && !SessionManager.canCreate(SourceVesselWrapper.class, null)
+            && !SessionManager.canDelete(SourceVesselWrapper.class, null)) {
             BioBankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Source Vessel editor. Access Denied.");

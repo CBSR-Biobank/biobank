@@ -8,9 +8,7 @@ USAGE="
 Usage: $SCRIPT [OPTIONS]
 
 OPTIONS
-  -e TABLE    Exclude table with name TABLE. This option can be used multiple
-              times to exclude multiple tables.
-  -d DUMP     The biobank2 database dump file name.
+  -d DUMP     The original biobank2 database dump file name.
   -H DBHOST   The hostname of the machine running the MySQL server. Defaults to
               localhost if not specified.
   -u DBUSER   The user to use on the MySQL server.
@@ -27,7 +25,6 @@ DBNAME=biobank2
 while getopts "e:d:hH:u:p:o:" OPTION
 do
   case $OPTION in
-        e) exclude=(${exclude[@]} $OPTARG );;
         d) DBDUMP=$OPTARG;;
         H) DBHOST=$OPTARG;;
         u) DBUSER=$OPTARG;;
@@ -36,6 +33,11 @@ do
   esac
 done
 
+if [ -z "$DBDUMP" ]; then
+    echo "ERROR: old database dump not specified"
+    echo "$USAGE"
+    exit
+fi
 
 if [ -z "$DBUSER" ]; then
     echo "ERROR: user not specified"
@@ -52,9 +54,13 @@ fi
 DUMPFILE="/tmp/$SCRIPT.$RANDOM.sql"
 
 ant dbcreate
-scripts/dump_csm_schema.sh -ecsm_user -H$DBHOST -u$DBUSER -p$DBPWD -o$DUMPFILE
+scripts/dump_csm_schema.sh -ecsm_user -ecsm_user_group -H$DBHOST -u$DBUSER -p$DBPWD -o$DUMPFILE
+echo "extracting old database..."
 gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2
 #mysql --safe-updates=0 -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v123_v130.sql
+echo "upgrading database..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v123_v130.sql
+echo "setting global security..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < $DUMPFILE
+echo "setting CBSR sites security..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < security-logs/addCBSRSiteSecurity.sql

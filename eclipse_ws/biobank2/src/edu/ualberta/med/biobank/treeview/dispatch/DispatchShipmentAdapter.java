@@ -42,9 +42,9 @@ public class DispatchShipmentAdapter extends AdapterBase {
     public boolean isEditable() {
         boolean editable = super.isEditable();
         if (getWrapper() != null) {
-            SiteWrapper currentSite = SessionManager.getInstance()
-                .getCurrentSite();
+            SiteWrapper currentSite = SessionManager.getCurrentSite();
             return editable
+                && SessionManager.getUser().canUpdateSite(currentSite)
                 && (getWrapper().isNew() || currentSite == null || !(currentSite
                     .equals(getWrapper().getReceiver()) && getWrapper()
                     .isInTransitState()));
@@ -76,51 +76,53 @@ public class DispatchShipmentAdapter extends AdapterBase {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addViewMenu(menu, "Dispatch Shipment");
-        SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
-        if (currentSite.equals(getWrapper().getSender())
-            && SessionManager.canDelete(DispatchShipmentWrapper.class)
-            && getWrapper().isInCreationState()) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Delete");
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    delete();
-                }
-            });
-        }
-        if (currentSite.equals(getWrapper().getSender())
-            && SessionManager.canUpdate(DispatchShipmentWrapper.class)
-            && getWrapper().isInTransitState()) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Move to Creation");
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    setShipmentAsCreation();
-                }
-            });
-        }
-        if (getWrapper().canBeReceivedBy(SessionManager.getUser(),
-            SessionManager.getInstance().getCurrentSite())) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Receive");
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    doReceive();
-                }
-            });
-            mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Receive and Process");
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    doReceiveAndProcess();
-                }
-            });
-        } else {
-            addEditMenu(menu, "Shipment");
+        SiteWrapper currentSite = SessionManager.getCurrentSite();
+        if (SessionManager.getUser().canUpdateSite(currentSite)) {
+            if (currentSite.equals(getWrapper().getSender())
+                && getWrapper().canDelete(SessionManager.getUser())
+                && getWrapper().isInCreationState()) {
+                MenuItem mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText("Delete");
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        delete();
+                    }
+                });
+            }
+            if (currentSite.equals(getWrapper().getSender())
+                && getWrapper().canUpdate(SessionManager.getUser())
+                && getWrapper().isInTransitState()) {
+                MenuItem mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText("Move to Creation");
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        setShipmentAsCreation();
+                    }
+                });
+            }
+            if (getWrapper().canBeReceivedBy(SessionManager.getUser(),
+                currentSite)) {
+                MenuItem mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText("Receive");
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        doReceive();
+                    }
+                });
+                mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText("Receive and Process");
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        doReceiveAndProcess();
+                    }
+                });
+            } else if (getWrapper().canUpdate(SessionManager.getUser())) {
+                addEditMenu(menu, "Shipment");
+            }
         }
     }
 
@@ -201,7 +203,7 @@ public class DispatchShipmentAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper currentSite = SessionManager.getCurrentSite();
         if (currentSite.equals(getWrapper().getSender()))
             return DispatchShipmentSendingEntryForm.ID;
         return DispatchShipmentReceivingEntryForm.ID;

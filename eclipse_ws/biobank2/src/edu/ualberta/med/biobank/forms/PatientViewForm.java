@@ -10,14 +10,13 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm";
 
     private PatientAdapter patientAdapter;
 
@@ -40,8 +39,7 @@ public class PatientViewForm extends BiobankViewForm {
         patientAdapter = (PatientAdapter) adapter;
         patient = patientAdapter.getWrapper();
         retrievePatient();
-        patient.logLookup(SessionManager.getInstance().getCurrentSite()
-            .getNameShort());
+        patient.logLookup(SessionManager.getCurrentSite().getNameShort());
         setPartName("Patient " + patient.getPnumber());
     }
 
@@ -69,18 +67,17 @@ public class PatientViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
-        visitCountLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Total Visits");
-        sampleCountLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Total Samples");
+        visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Total Visits");
+        sampleCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Total Samples");
     }
 
     private void createPatientVisitSection() {
         Section section = createSection("Patient Visits");
 
-        visitsTable =
-            new PatientVisitInfoTable(section,
-                patient.getPatientVisitCollection());
+        visitsTable = new PatientVisitInfoTable(section,
+            patient.getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
         visitsTable.addDoubleClickListener(collectionDoubleClickListener);

@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.treeview.ContainerAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;

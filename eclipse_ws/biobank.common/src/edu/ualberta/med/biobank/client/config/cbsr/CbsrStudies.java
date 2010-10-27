@@ -72,7 +72,7 @@ public class CbsrStudies extends ConfigStudies {
         addStudy(site,
             "Exploring the Renoprotective effects of fluid prophylaxis "
                 + "strategies for Contrast Induced Nephropathy (Study)",
-            "ERCIN", ActivityStatusWrapper.DISABLED_STATUS_STRING,
+            "ERCIN", ActivityStatusWrapper.CLOSED_STATUS_STRING,
             "Precath visit - only urine is collected");
         addStudy(site, "Fedorak Iron Deficiency Study", "FIDS",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, null);
@@ -236,11 +236,11 @@ public class CbsrStudies extends ConfigStudies {
         addSampleStorage("BBPSP", "Cells", "10", "0.5",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("BBPSP", "DNA (WBC)", "2", "0.4",
-            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+            ActivityStatusWrapper.CLOSED_STATUS_STRING);
         addSampleStorage("BBPSP", "DNA(Blood)", "2", "0.4",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("BBPSP", "F Urine", "10", "0.9",
-            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+            ActivityStatusWrapper.CLOSED_STATUS_STRING);
         addSampleStorage("BBPSP", "Paxgene", "11", "0.8",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("BBPSP", "Plasma", "16", "0.2",
@@ -282,7 +282,7 @@ public class CbsrStudies extends ConfigStudies {
         addSampleStorage("CEGIIR", "WB DMSO", "2", "0.8",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("CEGIIR", "WBE", "2", "0.8",
-            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+            ActivityStatusWrapper.CLOSED_STATUS_STRING);
         addSampleStorage("CEGIIR", "Z Urine", "6", "0.9",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
@@ -334,7 +334,7 @@ public class CbsrStudies extends ConfigStudies {
         addSampleStorage("ERCIN", "Serum", "12", "0.4",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("ERCIN", "Serum B", "12", "0.4",
-            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+            ActivityStatusWrapper.CLOSED_STATUS_STRING);
         addSampleStorage("ERCIN", "Z Urine", "12", "0.9",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
 
@@ -356,7 +356,7 @@ public class CbsrStudies extends ConfigStudies {
         addSampleStorage("FIDS", "PlasmaE500", "1", "0.5",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("FIDS", "UrineSA700", "3", "0.7",
-            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+            ActivityStatusWrapper.CLOSED_STATUS_STRING);
 
         addSampleStorage("HEART", "DNA E 1000", "5", "1",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
@@ -401,7 +401,7 @@ public class CbsrStudies extends ConfigStudies {
         addSampleStorage("KDCS", "S Water", "3", "0.9",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("KDCS", "Serum", "8", "0.4",
-            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+            ActivityStatusWrapper.CLOSED_STATUS_STRING);
         addSampleStorage("KDCS", "Serum B", "8", "0.4",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("KDCS", "T Nails", null, null,
@@ -483,7 +483,7 @@ public class CbsrStudies extends ConfigStudies {
         addSampleStorage("VAS", "Plasma", "12", "0.4",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("VAS", "Serum", "8", "0.4",
-            ActivityStatusWrapper.DISABLED_STATUS_STRING);
+            ActivityStatusWrapper.CLOSED_STATUS_STRING);
         addSampleStorage("VAS", "Serum B", "8", "0.4",
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
         addSampleStorage("VAS", "T Nails", null, null,

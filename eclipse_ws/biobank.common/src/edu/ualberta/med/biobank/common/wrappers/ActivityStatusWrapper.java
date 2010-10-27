@@ -32,8 +32,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     public static final String CLOSED_STATUS_STRING = "Closed";
 
-    public static final String DISABLED_STATUS_STRING = "Disabled";
-
     public static final String FLAGGED_STATUS_STRING = "Flagged";
 
     public ActivityStatusWrapper(WritableApplicationService appService,
