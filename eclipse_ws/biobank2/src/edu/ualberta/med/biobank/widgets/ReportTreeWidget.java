@@ -32,6 +32,7 @@ import org.eclipse.swt.widgets.TreeItem;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.AdvancedReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
@@ -52,7 +53,8 @@ public class ReportTreeWidget extends Composite {
         treeViewer.addDoubleClickListener(new IDoubleClickListener() {
             @Override
             public void doubleClick(DoubleClickEvent event) {
-                executeDoubleClick(event);
+                if (SessionManager.getInstance().isConnected())
+                    executeDoubleClick(event);
             }
         });
 
