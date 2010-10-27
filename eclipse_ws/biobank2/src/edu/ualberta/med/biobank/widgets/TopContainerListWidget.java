@@ -103,7 +103,9 @@ public class TopContainerListWidget {
                 return ((ContainerWrapper) element).getLabel()
                     + "("
                     + ((ContainerWrapper) element).getContainerType()
-                        .getNameShort() + ")";
+                        .getNameShort() + ") ("
+                    + ((ContainerWrapper) element).getSite().getNameShort()
+                    + ")";
             }
         });
         topContainers.setContentProvider(new ArrayContentProvider());
