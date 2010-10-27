@@ -20,6 +20,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -89,9 +91,14 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
-                    updateStatusLineMessage(PlatformUI.getWorkbench()
-                        .getActiveWorkbenchWindow().getActivePage()
-                        .getActivePart().getSite());
+                    IWorkbenchPage wPage = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getActivePage();
+                    if (wPage != null) {
+                        IWorkbenchPart wPart = wPage.getActivePart();
+                        if (wPart != null) {
+                            updateStatusLineMessage(wPart.getSite());
+                        }
+                    }
                 }
             });
 
