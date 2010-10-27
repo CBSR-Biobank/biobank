@@ -280,10 +280,36 @@ public class WidgetCreator {
         if (keyListener != null) {
             text.addKeyListener(keyListener);
         }
+
         if (modelObservableValue != null) {
-            Binding binding = dbc.bindValue(
+            // If the UpdateValueStrategy has an IValidator, then values that do
+            // not validate will not be copied to the model object. This is a
+            // problem in the following scenario: (1) model property has value
+            // "asdf", which is valid (2) target property's value is immediately
+            // changed to an invalid one (i.e. not through any valid
+            // intermediate value) (3) target property's value is changed back
+            // to "asdf". The problem is that since (1), the model property's
+            // value has been "asdf" since its value was not switched to the
+            // invalid value (because it did not pass validation). So, when the
+            // model property's value is changed back to "asdf", the old value
+            // and new value are both "asdf", so the target is not notified of
+            // the "change" because there was none. Note that this is a problem
+            // only when the SWT Object can be set to an invalid state (so
+            // should be fine for Combos and Buttons).
+            //
+            // Ultimately, we want our model and target values to always be
+            // synchronized. The validators are used by the GUI to indicate
+            // problem(s). So, the text-field is bound to the model property
+            // without validation and the text-field is bound to some observable
+            // string whose sole purpose is to validate the text-field's value.
+            dbc.bindValue(
                 SWTObservables.observeText(text.getTextBox(), SWT.Modify),
-                modelObservableValue, uvs, null);
+                modelObservableValue, null, null);
+            Binding binding = dbc
+                .bindValue(SWTObservables.observeText(text.getTextBox(),
+                    SWT.Modify),
+                    new WritableValue(modelObservableValue.getValue(),
+                        String.class), uvs, null);
             if (bindingKey != null) {
                 bindings.put(bindingKey, binding);
             }

@@ -113,13 +113,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public void reload() throws Exception {
+        propertiesMap.clear();
+        resetInternalFields();
         if (!isNew()) {
             E oldValue = wrappedObject;
             wrappedObject = getObjectFromDatabase();
             firePropertyChanges(oldValue, wrappedObject);
         }
-        propertiesMap.clear();
-        resetInternalFields();
     }
 
     /**
@@ -139,6 +139,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             throw new Exception("memberNames cannot be null");
         }
         for (String member : memberNames) {
+            // TODO: should send old and new PROPERTY values.
             propertyChangeSupport.firePropertyChange(member, oldWrappedObject,
                 newWrappedObject);
         }
@@ -302,13 +303,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected abstract void deleteChecks() throws Exception;
 
     public void reset() throws Exception {
+        propertiesMap.clear();
+        resetInternalFields();
         if (isNew()) {
             resetToNewObject();
         } else {
             reload();
         }
-        propertiesMap.clear();
-        resetInternalFields();
     }
 
     /**
@@ -444,7 +445,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     /**
      * If we want to reset internal fields when reload or reset is called (even
-     * if the object is new).
+     * if the object is new). Please don't touch the wrapped object.
      */
     protected void resetInternalFields() {
         // default do nothing

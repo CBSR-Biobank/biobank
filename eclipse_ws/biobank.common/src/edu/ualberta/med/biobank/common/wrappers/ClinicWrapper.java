@@ -95,7 +95,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public Boolean getSendsShipments() {
-        return wrappedObject.getSendsShipments();
+        Boolean b = wrappedObject.getSendsShipments();
+        return b == null ? Boolean.FALSE : b;
     }
 
     public ActivityStatusWrapper getActivityStatus() {
@@ -576,14 +577,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     protected void resetInternalFields() {
+        address = null;
         deletedContacts.clear();
     }
-
-    @Override
-    public void reload() throws Exception {
-        address = null;
-        super.reload();
-
-    }
-
 }

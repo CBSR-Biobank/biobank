@@ -108,9 +108,6 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Short Name", null, clinic, "nameShort",
             new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
 
-        if (clinic.getSendsShipments() == null) {
-            clinic.setSendsShipments(false);
-        }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
             "Sends Shipments", null, clinic, "sendsShipments", null);
         toolkit.paintBordersFor(client);
