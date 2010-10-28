@@ -1,11 +1,12 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
@@ -50,16 +51,24 @@ public abstract class DispatchAliquotListInfoTable extends
                 addDeleteItemListener(new IInfoTableDeleteItemListener() {
                     @Override
                     public void deleteItem(InfoTableEvent event) {
-                        DispatchShipmentAliquotWrapper dsa = getSelection();
-                        if (dsa != null) {
-                            if (!BioBankPlugin.openConfirm("Remove Aliquot",
-                                "Are you sure you want to remove aliquot \""
-                                    + dsa.getAliquot().getInventoryId()
-                                    + "\" from this shipment ?"))
+                        List<DispatchShipmentAliquotWrapper> dsaList = getSelectedItems();
+                        if (dsaList.size() > 0) {
+                            if (dsaList.size() == 1
+                                && !BioBankPlugin.openConfirm("Remove Aliquot",
+                                    "Are you sure you want to remove aliquot \""
+                                        + dsaList.get(0).getAliquot()
+                                            .getInventoryId()
+                                        + "\" from this shipment ?"))
+                                return;
+                            if (dsaList.size() > 1
+                                && !BioBankPlugin.openConfirm("Remove Aliquot",
+                                    "Are you sure you want to remove these "
+                                        + dsaList.size()
+                                        + " aliquots from this shipment ?"))
                                 return;
                             try {
-                                shipment.removeDispatchShipmentAliquots(Arrays
-                                    .asList(getSelection()));
+                                shipment
+                                    .removeDispatchShipmentAliquots(dsaList);
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {
@@ -154,6 +163,24 @@ public abstract class DispatchAliquotListInfoTable extends
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
         return row.dsa;
+    }
+
+    public List<DispatchShipmentAliquotWrapper> getSelectedItems() {
+        Assert.isTrue(!tableViewer.getTable().isDisposed(),
+            "widget is disposed");
+        IStructuredSelection stSelection = (IStructuredSelection) tableViewer
+            .getSelection();
+        List<DispatchShipmentAliquotWrapper> dsaList = new ArrayList<DispatchShipmentAliquotWrapper>();
+
+        for (Iterator<?> iter = stSelection.iterator(); iter.hasNext();) {
+            BiobankCollectionModel bcm = (BiobankCollectionModel) iter.next();
+            if (bcm != null) {
+                TableRowData row = (TableRowData) bcm.o;
+                Assert.isNotNull(row);
+                dsaList.add(row.dsa);
+            }
+        }
+        return dsaList;
     }
 
     @Override

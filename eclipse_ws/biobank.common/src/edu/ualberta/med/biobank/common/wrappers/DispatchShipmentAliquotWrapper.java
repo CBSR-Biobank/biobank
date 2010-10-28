@@ -120,4 +120,18 @@ public class DispatchShipmentAliquotWrapper extends
     public String getStateDescription() {
         return DispatchAliquotState.getState(getState()).getLabel();
     }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof DispatchShipmentAliquotWrapper && object != null) {
+            DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) object;
+            if (isNew() && dsa.isNew()) {
+                return getAliquot() != null && dsa.getAliquot() != null
+                    && getAliquot().equals(dsa.getAliquot())
+                    && getShipment() != null && dsa.getShipment() != null
+                    && getShipment().equals(dsa.getShipment());
+            }
+        }
+        return super.equals(object);
+    }
 }

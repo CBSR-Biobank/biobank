@@ -285,7 +285,7 @@ public class DispatchShipmentSendingEntryForm extends
             return;
         }
         try {
-            shipment.addNewAliquots(Arrays.asList(aliquot));
+            shipment.addNewAliquots(Arrays.asList(aliquot), true);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error adding aliquots", e);
         }
