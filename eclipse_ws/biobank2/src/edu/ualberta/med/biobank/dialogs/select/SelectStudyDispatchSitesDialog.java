@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.dialogs.select;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
     private List<SiteWrapper> currentAllSitesForStudy = new ArrayList<SiteWrapper>();
 
-    private Map<Integer, StudySites> studiesDispatchRelations;
+    private Map<Integer, StudySites> studiesDispatchRelations = new HashMap<Integer, SelectStudyDispatchSitesDialog.StudySites>();
 
     private StudyWrapper currentStudy;
 
