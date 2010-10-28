@@ -68,7 +68,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Please describe steps to reproduce the problem. A log file of the application will be attached to the email.";
+        return "Please describe steps to reproduce the problem. The application error log will be automatically attached.";
     }
 
     @Override
