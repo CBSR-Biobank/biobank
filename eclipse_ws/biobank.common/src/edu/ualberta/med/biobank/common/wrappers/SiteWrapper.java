@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -905,4 +906,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return clinics;
     }
 
+    @Override
+    public boolean canUpdate(User user) {
+        return user.isWebsiteAdministrator();
+    }
 }

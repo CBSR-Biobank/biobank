@@ -168,7 +168,7 @@ public class DispatchShipmentReceivingEntryForm extends
                     + " has not been found in this shipment."
                     + " It will be moved into the extra-pending list.");
             try {
-                shipment.addExtraAliquots(Arrays.asList(info.aliquot));
+                shipment.addExtraAliquots(Arrays.asList(info.aliquot), false);
             } catch (BiobankCheckException e) {
                 BioBankPlugin.openAsyncError("Eror adding extra aliquot", e);
             }

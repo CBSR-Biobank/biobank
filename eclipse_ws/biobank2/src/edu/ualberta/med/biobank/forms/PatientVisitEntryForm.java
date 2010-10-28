@@ -10,6 +10,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -84,6 +85,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private List<ClinicShipmentWrapper> allShipments;
 
     private ArrayList<ClinicShipmentWrapper> recentShipments;
+
+    private DateTimeWidget dateDrawnWidget;
 
     @Override
     public void init() {
@@ -162,9 +165,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patientVisit.getDateProcessed(), patientVisit, "dateProcessed",
             new NotNullValidator("Date processed should be set"));
 
-        createDateTimeWidget(client, "Date Drawn", patientVisit.getDateDrawn(),
-            patientVisit, "dateDrawn", new NotNullValidator(
-                "Date Drawn should be set"));
+        dateDrawnWidget = createDateTimeWidget(client, "Date Drawn",
+            patientVisit.getDateDrawn(), patientVisit, "dateDrawn",
+            new NotNullValidator("Date Drawn should be set"));
 
         createPvDataSection(client);
 
@@ -393,8 +396,15 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         super.reset();
         patientVisit.setPatient(patient);
 
+        shipmentsComboViewer.getCombo().deselectAll();
+        if (patientVisit.getShipment() != null)
+            shipmentsComboViewer.setSelection(new StructuredSelection(
+                patientVisit.getShipment()));
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
+        }
+        if (patientVisit.getDateDrawn() == null) {
+            dateDrawnWidget.setDate(null);
         }
         pvSourceVesseltable.reload();
         resetPvCustomInfo();

@@ -36,6 +36,8 @@ public class DispatchShipmentWrapper extends
 
     private static final String EXTRA_ALIQUOTS_KEY = "extraDispatchShipmentAliquots";
 
+    private static final String ALL_ALIQUOTS_KEY = "aliquotCollection";
+
     private Set<DispatchShipmentAliquotWrapper> deletedDispatchedShipmentAliquots = new HashSet<DispatchShipmentAliquotWrapper>();
 
     private boolean stateModified = false;
@@ -313,7 +315,7 @@ public class DispatchShipmentWrapper extends
     @SuppressWarnings("unchecked")
     public List<AliquotWrapper> getAliquotCollection(boolean sort) {
         List<AliquotWrapper> aliquotCollection = (List<AliquotWrapper>) propertiesMap
-            .get("aliquotCollection");
+            .get(ALL_ALIQUOTS_KEY);
         if (aliquotCollection == null) {
             Collection<DispatchShipmentAliquotWrapper> dsaList = getDispatchShipmentAliquotCollection(sort);
             if (dsaList != null) {
@@ -321,7 +323,7 @@ public class DispatchShipmentWrapper extends
                 for (DispatchShipmentAliquotWrapper dsa : dsaList) {
                     aliquotCollection.add(dsa.getAliquot());
                 }
-                propertiesMap.put("aliquotCollection", aliquotCollection);
+                propertiesMap.put(ALL_ALIQUOTS_KEY, aliquotCollection);
             }
         }
         return aliquotCollection;
@@ -342,18 +344,20 @@ public class DispatchShipmentWrapper extends
         propertiesMap.put("dispatchShipmentAliquotCollection", allDsaWrappers);
     }
 
-    public void addNewAliquots(List<AliquotWrapper> newAliquots)
-        throws BiobankCheckException {
-        addAliquots(newAliquots, DispatchAliquotState.NONE_STATE);
+    public void addNewAliquots(List<AliquotWrapper> newAliquots,
+        boolean checkAlreadyAdded) throws BiobankCheckException {
+        addAliquots(newAliquots, DispatchAliquotState.NONE_STATE,
+            checkAlreadyAdded);
     }
 
-    public void addExtraAliquots(List<AliquotWrapper> newAliquots)
-        throws BiobankCheckException {
-        addAliquots(newAliquots, DispatchAliquotState.EXTRA);
+    public void addExtraAliquots(List<AliquotWrapper> newAliquots,
+        boolean checkAlreadyAdded) throws BiobankCheckException {
+        addAliquots(newAliquots, DispatchAliquotState.EXTRA, checkAlreadyAdded);
     }
 
     private void addAliquots(List<AliquotWrapper> newAliquots,
-        DispatchAliquotState stateForAliquot) throws BiobankCheckException {
+        DispatchAliquotState stateForAliquot, boolean checkAlreadyAdded)
+        throws BiobankCheckException {
         if ((newAliquots == null) || (newAliquots.size() == 0))
             return;
 
@@ -372,22 +376,25 @@ public class DispatchShipmentWrapper extends
         // new aliquots added
         for (AliquotWrapper aliquot : newAliquots) {
             if (stateForAliquot != DispatchAliquotState.EXTRA) {
-                CheckStatus check = checkCanAddAliquot(currentAliquots, aliquot);
+                CheckStatus check = checkCanAddAliquot(currentAliquots,
+                    aliquot, checkAlreadyAdded);
                 if (!check.ok)
                     throw new BiobankCheckException(check.message);
             }
-            DispatchShipmentAliquotWrapper dsa = new DispatchShipmentAliquotWrapper(
-                appService);
-            dsa.setAliquot(aliquot);
-            dsa.setState(stateForAliquot.getId());
-            if (stateForAliquot == DispatchAliquotState.EXTRA) {
-                aliquot.setPosition(null);
-                modifiedAliquots.add(aliquot);
+            if (currentAliquots == null || !currentAliquots.contains(aliquot)) {
+                DispatchShipmentAliquotWrapper dsa = new DispatchShipmentAliquotWrapper(
+                    appService);
+                dsa.setAliquot(aliquot);
+                dsa.setState(stateForAliquot.getId());
+                if (stateForAliquot == DispatchAliquotState.EXTRA) {
+                    aliquot.setPosition(null);
+                    modifiedAliquots.add(aliquot);
+                }
+                dsa.setShipment(this);
+                allDsaObjects.add(dsa.getWrappedObject());
+                allDsaWrappers.add(dsa);
+                currentAliquots.add(aliquot);
             }
-            dsa.setShipment(this);
-            allDsaObjects.add(dsa.getWrappedObject());
-            allDsaWrappers.add(dsa);
-            currentAliquots.add(aliquot);
         }
         setDispathcShipmentAliquotCollection(allDsaObjects, allDsaWrappers);
         resetStateLists();
@@ -404,12 +411,15 @@ public class DispatchShipmentWrapper extends
 
     }
 
-    public CheckStatus checkCanAddAliquot(AliquotWrapper aliquot) {
-        return checkCanAddAliquot(getAliquotCollection(), aliquot);
+    public CheckStatus checkCanAddAliquot(AliquotWrapper aliquot,
+        boolean checkAlreadyAdded) {
+        return checkCanAddAliquot(getAliquotCollection(), aliquot,
+            checkAlreadyAdded);
     }
 
     protected CheckStatus checkCanAddAliquot(
-        List<AliquotWrapper> currentAliquots, AliquotWrapper aliquot) {
+        List<AliquotWrapper> currentAliquots, AliquotWrapper aliquot,
+        boolean checkAlreadyAdded) {
         if (aliquot.isNew()) {
             return new CheckStatus(false, "Cannot add aliquot "
                 + aliquot.getInventoryId() + ": it has not already been saved");
@@ -440,13 +450,14 @@ public class DispatchShipmentWrapper extends
                 + ((getStudy() == null) ? "none" : getStudy().getNameShort())
                 + ".");
         }
-        if (currentAliquots != null && currentAliquots.contains(aliquot)) {
+        if (checkAlreadyAdded && currentAliquots != null
+            && currentAliquots.contains(aliquot)) {
             return new CheckStatus(false, aliquot.getInventoryId()
                 + " is already in this shipment.");
         }
         if (aliquot.isUsedInDispatchShipment(this)) {
             return new CheckStatus(false, aliquot.getInventoryId()
-                + " is already in a shipment in transit or in creation.");
+                + " is already in another shipment in transit or in creation.");
         }
         return new CheckStatus(true, "");
     }
@@ -724,6 +735,7 @@ public class DispatchShipmentWrapper extends
         propertiesMap.put(EXTRA_ALIQUOTS_KEY, null);
         propertiesMap.put(RECEIVED_ALIQUOTS_KEY, null);
         propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
+        propertiesMap.put(ALL_ALIQUOTS_KEY, null);
     }
 
     public boolean hasErrors() {

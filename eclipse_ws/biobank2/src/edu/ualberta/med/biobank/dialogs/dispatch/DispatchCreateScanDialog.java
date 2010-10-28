@@ -116,7 +116,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 processCell(monitor,
                     new RowColPos(cell.getRow(), cell.getCol()), cell, null);
                 processCellStatus(cell);
-                scanOk = scanOk && (cell.getStatus() == CellStatus.FILLED);
+                scanOk = scanOk && cellOk(cell);
             }
         } else {
             currentPallet = ContainerWrapper
@@ -126,7 +126,6 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
             if (currentPallet != null) {
                 // FIXME check it is a pallet ? Should we do it when enter
                 // barcode ?
-
                 Map<RowColPos, AliquotWrapper> expectedAliquots = currentPallet
                     .getAliquots();
                 for (int row = 0; row < currentPallet.getRowCapacity(); row++) {
@@ -134,8 +133,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                         RowColPos rcp = new RowColPos(row, col);
                         PalletCell cell = getCells().get(rcp);
                         processCell(monitor, rcp, cell, expectedAliquots);
-                        scanOk = scanOk
-                            && (cell == null || cell.getStatus() == CellStatus.FILLED);
+                        scanOk = scanOk && cellOk(cell);
                     }
                 }
 
@@ -146,6 +144,11 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
             }
         }
         setScanOkValue(scanOk);
+    }
+
+    private boolean cellOk(PalletCell cell) {
+        return cell == null || cell.getStatus() == CellStatus.FILLED
+            || cell.getStatus() == CellStatus.IN_SHIPMENT_ADDED;
     }
 
     private void processCell(IProgressMonitor monitor, RowColPos rcp,
@@ -203,8 +206,10 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 } else {
                     scanCell.setAliquot(foundAliquot);
                     if (expectedAliquot != null || currentPallet == null) {
-                        CheckStatus check = currentShipment
-                            .checkCanAddAliquot(foundAliquot);
+                        List<AliquotWrapper> currentAliquots = currentShipment
+                            .getAliquotCollection(false);
+                        CheckStatus check = currentShipment.checkCanAddAliquot(
+                            foundAliquot, false);
                         if (check.ok) {
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)
@@ -212,6 +217,13 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                             scanCell.setTitle(foundAliquot.getPatientVisit()
                                 .getPatient().getPnumber());
                             scanCell.setAliquot(foundAliquot);
+                            if (currentAliquots != null
+                                && currentAliquots.contains(foundAliquot)) {
+                                // was already added. Ok but just display the
+                                // right color
+                                scanCell
+                                    .setStatus(CellStatus.IN_SHIPMENT_ADDED);
+                            }
                         } else {
                             scanCell.setStatus(CellStatus.ERROR);
                             scanCell.setInformation(check.message);
@@ -258,7 +270,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
             }
         }
-        currentShipment.addNewAliquots(aliquots);
+        currentShipment.addNewAliquots(aliquots, false);
         if (currentPallet != null) {
             removedPallets.add(currentPallet);
         }
