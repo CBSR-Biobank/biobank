@@ -115,9 +115,9 @@ public class ClinicShipmentViewForm extends BiobankViewForm {
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
             "Comments");
-        patientCountLabel = createReadOnlyLabelledField(client, SWT.WRAP,
+        patientCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Patients");
-        patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.WRAP,
+        patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Patient Visits");
 
         setShipmentValues();
