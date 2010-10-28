@@ -573,7 +573,7 @@ public class TestAliquot extends TestDatabase {
 
         // add an aliquot that has not been persisted
         try {
-            dShipment.addNewAliquots(Arrays.asList(aliquot));
+            dShipment.addNewAliquots(Arrays.asList(aliquot), true);
             Assert.fail("Should not be allowed to add aliquots not yet in DB");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -584,7 +584,7 @@ public class TestAliquot extends TestDatabase {
 
         dShipment = DispatchShipmentHelper.newShipment(site, destSite, study,
             method);
-        dShipment.addNewAliquots(Arrays.asList(aliquot));
+        dShipment.addNewAliquots(Arrays.asList(aliquot), true);
         dShipment.persist();
         aliquot.reload();
 
@@ -618,7 +618,7 @@ public class TestAliquot extends TestDatabase {
         DispatchShipmentWrapper dShipment2 = DispatchShipmentHelper
             .newShipment(destSite, destSite2, study, method);
         try {
-            dShipment2.addNewAliquots(Arrays.asList(aliquot));
+            dShipment2.addNewAliquots(Arrays.asList(aliquot), true);
             Assert
                 .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Active' status)");
         } catch (BiobankCheckException bce) {
@@ -644,7 +644,7 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
 
         // add to new shipment
-        dShipment2.addNewAliquots(Arrays.asList(aliquot));
+        dShipment2.addNewAliquots(Arrays.asList(aliquot), true);
         dShipment2.persist();
 
         aliquot.reload();
