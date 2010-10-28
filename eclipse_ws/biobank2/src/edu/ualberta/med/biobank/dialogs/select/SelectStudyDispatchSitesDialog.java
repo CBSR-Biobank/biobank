@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.dialogs.select;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +30,9 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
     private MultiSelectWidget siteMultiSelect;
 
-    private List<SiteWrapper> currentAllSitesForStudy;
+    private List<SiteWrapper> currentAllSitesForStudy = new ArrayList<SiteWrapper>();
 
-    private Map<Integer, StudySites> studiesDispatchRelations = new HashMap<Integer, SelectStudyDispatchSitesDialog.StudySites>();
+    private Map<Integer, StudySites> studiesDispatchRelations;
 
     private StudyWrapper currentStudy;
 
@@ -72,24 +71,28 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
-                    List<SiteWrapper> addedSites = new ArrayList<SiteWrapper>();
-                    List<SiteWrapper> removedSites = new ArrayList<SiteWrapper>();
-                    List<Integer> addedSitesIds = siteMultiSelect
-                        .getAddedToSelection();
-                    List<Integer> removedSitesIds = siteMultiSelect
-                        .getRemovedToSelection();
-                    for (SiteWrapper site : currentAllSitesForStudy) {
-                        if (addedSitesIds.contains(site.getId()))
-                            addedSites.add(site);
-                        if (removedSitesIds.contains(site.getId()))
-                            removedSites.add(site);
+                    if (studiesDispatchRelations != null) {
+                        List<SiteWrapper> addedSites = new ArrayList<SiteWrapper>();
+                        List<SiteWrapper> removedSites = new ArrayList<SiteWrapper>();
+                        List<Integer> addedSitesIds = siteMultiSelect
+                            .getAddedToSelection();
+                        List<Integer> removedSitesIds = siteMultiSelect
+                            .getRemovedToSelection();
+                        for (SiteWrapper site : currentAllSitesForStudy) {
+                            if (addedSitesIds.contains(site.getId()))
+                                addedSites.add(site);
+                            if (removedSitesIds.contains(site.getId()))
+                                removedSites.add(site);
+                        }
+                        if (currentStudy != null) {
+                            StudySites ss = studiesDispatchRelations
+                                .get(currentStudy.getId());
+                            ss.addedSites.addAll(addedSites);
+                            ss.removedSites.removeAll(removedSites);
+                            ss.removedSites.addAll(removedSites);
+                            ss.removedSites.removeAll(addedSites);
+                        }
                     }
-                    StudySites ss = studiesDispatchRelations.get(currentStudy
-                        .getId());
-                    ss.addedSites.addAll(addedSites);
-                    ss.removedSites.removeAll(removedSites);
-                    ss.removedSites.addAll(removedSites);
-                    ss.removedSites.removeAll(addedSites);
                 }
             });
     }
