@@ -246,7 +246,7 @@
             name="Reload">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMail"
+            defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMailHandler"
             id="edu.ualberta.med.biobank.commands.sendErrorMail"
             name="Send Error Mail">
       </command>
@@ -305,6 +305,11 @@
             id="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
             name="Add dispatch shipment">
       </command>
+       <command
+             defaultHandler="edu.ualberta.med.biobank.handlers.ExportErrorsLogsHandler"
+             id="edu.ualberta.med.biobank.commands.exportErrorsLogs"
+             name="Export Errors Logs">
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">

@@ -207,36 +207,18 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         if (currentShipment.getAliquotCollection().size() > 0) {
-            // AliquotWrapper aliquotNotReceived = null;
             int i = 0;
             for (DispatchShipmentAliquotWrapper dsa : currentShipment
                 .getDispatchShipmentAliquotCollection()) {
-                // if (dsa.getState() != DispatchAliquotState.RECEIVED_STATE) {
-                // aliquotFlagged = aliquot;
-                // }
-                int row = i / 12 + 1;
-                int col = i % 12 + 1;
+                int row = i / 12;
+                int col = i % 12;
                 if (!DispatchAliquotState.MISSING.isEquals(dsa.getState()))
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getAliquot()
                             .getInventoryId())));
                 i++;
             }
-            // if (aliquotNotReceived != null) {
-            // palletScanned.put(new RowColPos(0, 0), new PalletCell(
-            // new ScanCell(0, 0, aliquotNotReceived.getInventoryId())));
-            // }
-            // if (aliquotFlagged != null) {
-            // palletScanned.put(new RowColPos(0, 3), new PalletCell(
-            // new ScanCell(0, 3, aliquotFlagged.getInventoryId())));
-            // }
         }
-        // palletScanned.put(new RowColPos(0, 1), new PalletCell(new ScanCell(0,
-        // 1, "dddz")));
-        // palletScanned.put(new RowColPos(0, 2), new PalletCell(new ScanCell(0,
-        // 2, "NUBR019021")));
-        palletScanned.put(new RowColPos(0, 3), new PalletCell(new ScanCell(0,
-            3, "NUDI235244")));
         return palletScanned;
     }
 

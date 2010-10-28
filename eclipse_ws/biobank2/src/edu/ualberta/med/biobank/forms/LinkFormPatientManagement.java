@@ -59,18 +59,15 @@ public class LinkFormPatientManagement {
     }
 
     protected void createPatientNumberText(Composite parent) {
-        patientLabel =
-            widgetCreator.createLabel(parent,
-                Messages.getString("ScanLink.patientNumber.label"));
+        patientLabel = widgetCreator.createLabel(parent,
+            Messages.getString("ScanLink.patientNumber.label"));
         patientLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        patientValidator =
-            new NonEmptyStringValidator(
-                Messages.getString("ScanLink.patientNumber.validationMsg"));//$NON-NLS-1$
-        patientNumberText =
-            (BiobankText) widgetCreator.createBoundWidget(parent,
-                BiobankText.class, SWT.NONE, patientLabel, new String[0],
-                new WritableValue("", String.class), patientValidator);
+        patientValidator = new NonEmptyStringValidator(
+            Messages.getString("ScanLink.patientNumber.validationMsg"));//$NON-NLS-1$
+        patientNumberText = (BiobankText) widgetCreator.createBoundWidget(
+            parent, BiobankText.class, SWT.NONE, patientLabel, new String[0],
+            new WritableValue("", String.class), patientValidator);
         patientNumberText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -100,19 +97,17 @@ public class LinkFormPatientManagement {
     }
 
     protected void createVisitCombo(Composite compositeFields) {
-        visitComboLabel =
-            widgetCreator.createLabel(compositeFields,
-                Messages.getString("ScanLink.visit.label"));
-        viewerVisits =
-            widgetCreator.createComboViewer(compositeFields, visitComboLabel,
-                null, null, Messages.getString("ScanLink.visit.validationMsg"),
-                false, null, new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        currentVisitSelected =
-                            (PatientVisitWrapper) selectedObject;
-                    }
-                }); //$NON-NLS-1$
+        visitComboLabel = widgetCreator.createLabel(compositeFields,
+            Messages.getString("ScanLink.visit.label"));
+        viewerVisits = widgetCreator.createComboViewer(compositeFields,
+            visitComboLabel, null, null,
+            Messages.getString("ScanLink.visit.validationMsg"), false, null,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    currentVisitSelected = (PatientVisitWrapper) selectedObject;
+                }
+            }); //$NON-NLS-1$
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
@@ -121,11 +116,11 @@ public class LinkFormPatientManagement {
         viewerVisits.getCombo().addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
-                IStructuredSelection selection =
-                    (IStructuredSelection) viewerVisits.getSelection();
+                IStructuredSelection selection = (IStructuredSelection) viewerVisits
+                    .getSelection();
                 if (selection != null && selection.size() > 0) {
-                    PatientVisitWrapper pv =
-                        (PatientVisitWrapper) selection.getFirstElement();
+                    PatientVisitWrapper pv = (PatientVisitWrapper) selection
+                        .getFirstElement();
                     if (pv != null) {
                         aliquotAdminForm.appendLogNLS(
                             "linkAssign.activitylog.visit.selection", pv //$NON-NLS-1$
@@ -135,9 +130,8 @@ public class LinkFormPatientManagement {
                 }
             }
         });
-        visitsListCheck =
-            aliquotAdminForm.toolkit.createButton(compositeFields,
-                "Last 7 days", SWT.CHECK);
+        visitsListCheck = aliquotAdminForm.toolkit.createButton(
+            compositeFields, "Last 7 days", SWT.CHECK);
         visitsListCheck.setSelection(visitsListCheckSelection);
         visitsListCheck.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -151,14 +145,12 @@ public class LinkFormPatientManagement {
      * Specific to Cabinet move mode
      */
     protected void createVisitText(Composite compositeFields) {
-        visitTextLabel =
-            widgetCreator.createLabel(compositeFields,
-                Messages.getString("ScanLink.visit.label"));
+        visitTextLabel = widgetCreator.createLabel(compositeFields,
+            Messages.getString("ScanLink.visit.label"));
         visitTextLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));
-        visitText =
-            (BiobankText) widgetCreator.createWidget(compositeFields,
-                BiobankText.class, SWT.NONE, "");
+        visitText = (BiobankText) widgetCreator.createWidget(compositeFields,
+            BiobankText.class, SWT.NONE, "");
         visitText.setEnabled(false);
         ((GridData) visitText.getLayoutData()).horizontalSpan = 2;
     }
@@ -170,9 +162,8 @@ public class LinkFormPatientManagement {
     protected void setPatientSelected() {
         currentPatient = null;
         try {
-            currentPatient =
-                PatientWrapper.getPatient(aliquotAdminForm.appService,
-                    patientNumberText.getText());
+            currentPatient = PatientWrapper.getPatient(
+                aliquotAdminForm.appService, patientNumberText.getText());
             if (currentPatient != null) {
                 aliquotAdminForm.appendLog("--------");
                 aliquotAdminForm.appendLogNLS("linkAssign.activitylog.patient", //$NON-NLS-1$
@@ -201,8 +192,8 @@ public class LinkFormPatientManagement {
                 }
             }
             if (collection == null) {
-                collection =
-                    currentPatient.getPatientVisitCollection(true, false);
+                collection = currentPatient.getPatientVisitCollection(true,
+                    false);
             }
             viewerVisits.setInput(collection);
             viewerVisits.getCombo().setFocus();
@@ -244,11 +235,13 @@ public class LinkFormPatientManagement {
     }
 
     public void setCurrentPatientAndVisit(PatientWrapper patient,
-        PatientVisitWrapper patientVisit) {
+        PatientVisitWrapper patientVisit) throws Exception {
+        // FIXME need to reload otherwise get a database access problem ??
+        patient.reload();
         this.currentPatient = patient;
         patientNumberText.setText(patient.getPnumber());
-        List<PatientVisitWrapper> collection =
-            patient.getPatientVisitCollection();
+        List<PatientVisitWrapper> collection = patient
+            .getPatientVisitCollection();
         viewerVisits.setInput(collection);
         viewerVisits.setSelection(new StructuredSelection(patientVisit));
         if (visitText != null) {
@@ -302,8 +295,8 @@ public class LinkFormPatientManagement {
     }
 
     public boolean fieldsValid() {
-        IStructuredSelection selection =
-            (IStructuredSelection) viewerVisits.getSelection();
+        IStructuredSelection selection = (IStructuredSelection) viewerVisits
+            .getSelection();
         return patientValidator.validate(patientNumberText.getText()).equals(
             Status.OK_STATUS)
             && selection.size() > 0;
