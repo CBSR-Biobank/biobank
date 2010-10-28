@@ -1077,7 +1077,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     protected void resetInternalFields() {
-        super.resetInternalFields();
         addedChildren.clear();
         addedAliquots.clear();
         objectWithPositionManagement.resetInternalFields();

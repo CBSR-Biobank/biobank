@@ -7,7 +7,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.dialogs.SendErrorMessageDialog;
 
-public class SendErrorMail extends AbstractHandler {
+public class SendErrorMailHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
