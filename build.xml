@@ -440,7 +440,9 @@
   	<exclude name="**/*.java" />
       </fileset>
     </copy>
-    <javac debug="true" debuglevel="source,lines,vars" destdir="${eclipse.proj.dir.common}/output" source="1.6" target="1.6">
+    <javac debug="true" debuglevel="source,lines,vars"
+  	destdir="${eclipse.proj.dir.common}/output" source="1.6" target="1.6"
+           includeantruntime="false">
       <src path="${eclipse.proj.dir.common}/src" />
       <classpath>
   	<path id="biobank.common.classpath">
