@@ -107,4 +107,14 @@ public class PatientVisitAdapter extends AdapterBase {
         return PatientVisitViewForm.ID;
     }
 
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return "Are you sure you want to delete this patient visit?";
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return internalIsDeletable();
+    }
+
 }

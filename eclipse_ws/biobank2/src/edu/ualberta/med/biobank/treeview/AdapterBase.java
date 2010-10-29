@@ -710,7 +710,8 @@ public abstract class AdapterBase {
     }
 
     protected boolean internalIsDeletable() {
-        return editable && modelObject.canDelete(SessionManager.getUser());
+        return editable && modelObject != null
+            && modelObject.canDelete(SessionManager.getUser());
     }
 
     public boolean isEditable() {

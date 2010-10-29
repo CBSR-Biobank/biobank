@@ -10,8 +10,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class SessionDeleteSelectionHandler extends AbstractHandler implements
-    IHandler {
+public class DeleteSelectionHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -26,4 +25,12 @@ public class SessionDeleteSelectionHandler extends AbstractHandler implements
         return null;
     }
 
+    @Override
+    public boolean isEnabled() {
+        AdapterBase adapter = SessionManager.getSelectedNode();
+        boolean isEnabled = adapter != null && adapter.isDeletable()
+            && adapter.getModelObject().canDelete(SessionManager.getUser());
+        System.out.println("isEnabled: " + adapter + " " + isEnabled);
+        return isEnabled;
+    }
 }

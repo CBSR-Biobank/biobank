@@ -123,4 +123,14 @@ public class PatientAdapter extends AdapterBase {
     public String getViewFormId() {
         return PatientViewForm.ID;
     }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return "Are you sure you want to delete this patient?";
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return internalIsDeletable();
+    }
 }
