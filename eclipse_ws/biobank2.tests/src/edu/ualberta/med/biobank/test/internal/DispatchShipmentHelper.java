@@ -17,8 +17,8 @@ public class DispatchShipmentHelper extends DbHelper {
         SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method,
         String waybill, Date dateReceived, AliquotWrapper... aliquots)
         throws Exception {
-        DispatchShipmentWrapper shipment =
-            new DispatchShipmentWrapper(appService);
+        DispatchShipmentWrapper shipment = new DispatchShipmentWrapper(
+            appService);
         shipment.setSender(sender);
         shipment.setReceiver(receiver);
         shipment.setStudy(study);
@@ -31,7 +31,7 @@ public class DispatchShipmentHelper extends DbHelper {
         shipment.setDateShipped(Utils.getRandomDate());
 
         if (aliquots != null) {
-            shipment.addNewAliquots(Arrays.asList(aliquots));
+            shipment.addNewAliquots(Arrays.asList(aliquots), true);
         }
 
         return shipment;
@@ -55,9 +55,8 @@ public class DispatchShipmentHelper extends DbHelper {
         SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method,
         String waybill, Date dateReceived, AliquotWrapper... containers)
         throws Exception {
-        DispatchShipmentWrapper shipment =
-            newShipment(sender, receiver, study, method, waybill, dateReceived,
-                containers);
+        DispatchShipmentWrapper shipment = newShipment(sender, receiver, study,
+            method, waybill, dateReceived, containers);
         shipment.persist();
         return shipment;
     }
@@ -65,8 +64,8 @@ public class DispatchShipmentHelper extends DbHelper {
     public static DispatchShipmentWrapper addShipment(SiteWrapper sender,
         SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method,
         String waybill, Date dateReceived) throws Exception {
-        DispatchShipmentWrapper shipment =
-            newShipment(sender, receiver, study, method, waybill, dateReceived);
+        DispatchShipmentWrapper shipment = newShipment(sender, receiver, study,
+            method, waybill, dateReceived);
         shipment.persist();
         return shipment;
     }
@@ -74,8 +73,8 @@ public class DispatchShipmentHelper extends DbHelper {
     public static DispatchShipmentWrapper addShipment(SiteWrapper sender,
         SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method)
         throws Exception {
-        DispatchShipmentWrapper shipment =
-            newShipment(sender, receiver, study, method);
+        DispatchShipmentWrapper shipment = newShipment(sender, receiver, study,
+            method);
         shipment.persist();
         return shipment;
     }

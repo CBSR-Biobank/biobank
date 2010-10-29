@@ -289,12 +289,12 @@ public class LoginDialog extends TitleAreaDialog {
         }
 
         if (!BioBankPlugin.getDefault().isDebugging()) {
-            if (url.getPort() != -1) {
-                MessageDialog
-                    .openError(getShell(), "Invalid Server URL",
-                        "You are not allowed to specify a port, only a hostname and path.");
-                return;
-            }
+            // if (url.getPort() != -1) {
+            // MessageDialog
+            // .openError(getShell(), "Invalid Server URL",
+            // "You are not allowed to specify a port, only a hostname and path.");
+            // return;
+            // }
             if (userNameWidget.getText().equals("")) {
                 MessageDialog.openError(getShell(), "Invalid User Name",
                     "User Name field must not be blank.");

@@ -15,16 +15,15 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store =
-            BioBankPlugin.getDefault().getPreferenceStore();
+        IPreferenceStore store = BioBankPlugin.getDefault()
+            .getPreferenceStore();
         store.setDefault(PreferenceConstants.GENERAL_CONFIRM, "CONFIRM");
         store.setDefault(PreferenceConstants.GENERAL_CANCEL, "CANCEL");
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, true);
 
-        String path =
-            Platform.getInstallLocation().getURL().getPath() + File.separator
-                + "activityLogs";
+        String path = Platform.getInstallLocation().getURL().getPath()
+            + File.separator + "activityLogs";
         File file = new File(path);
         if (!file.exists()) {
             file.mkdir();
@@ -53,8 +52,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(
             PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PASSWORD, "catissue");
 
-        store
-            .setDefault(PreferenceConstants.SERVER_LIST,
-                "cbsr.med.ualberta.ca:8443\n10.8.31.50:8443\naicml-med.cs.ualberta.ca:8443");
+        store.setDefault(PreferenceConstants.SERVER_LIST,
+            "cbsr.med.ualberta.ca\n10.8.31.50\naicml-med.cs.ualberta.ca");
     }
 }
