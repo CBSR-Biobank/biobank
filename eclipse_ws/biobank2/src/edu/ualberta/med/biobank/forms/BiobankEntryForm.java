@@ -151,8 +151,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     protected void doSaveInternal(
         @SuppressWarnings("unused") final IProgressMonitor monitor) {
-        IRunnableContext context =
-            new ProgressMonitorDialog(Display.getDefault().getActiveShell());
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
         try {
             doBeforeSave();
             context.run(true, false, new IRunnableWithProgress() {
@@ -333,9 +333,18 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     protected BiobankText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
-        BiobankText widget =
-            super.createReadOnlyLabelledField(parent, widgetOptions,
-                fieldLabel, value);
+        BiobankText widget = super.createReadOnlyLabelledField(parent,
+            widgetOptions, fieldLabel, value);
+        widget.setBackground(READ_ONLY_TEXT_BGR);
+        return widget;
+    }
+
+    protected BiobankText createReadOnlyLabelledField(Composite parent,
+        int widgetOptions, String fieldLabel,
+        IObservableValue modelObservableValue) {
+        BiobankText widget = (BiobankText) createBoundWidgetWithLabel(parent,
+            BiobankText.class, widgetOptions | SWT.READ_ONLY, fieldLabel, null,
+            modelObservableValue, null);
         widget.setBackground(READ_ONLY_TEXT_BGR);
         return widget;
     }
@@ -345,8 +354,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         statusObservable.addChangeListener(new IChangeListener() {
             @Override
             public void handleChange(ChangeEvent event) {
-                IObservableValue validationStatus =
-                    (IObservableValue) event.getSource();
+                IObservableValue validationStatus = (IObservableValue) event
+                    .getSource();
                 handleStatusChanged((IStatus) validationStatus.getValue());
             }
         });
@@ -373,13 +382,11 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void setConfirmEnabled(boolean enabled) {
-        ISourceProviderService service =
-            (ISourceProviderService) PlatformUI.getWorkbench()
-                .getActiveWorkbenchWindow()
-                .getService(ISourceProviderService.class);
-        ConfirmState confirmSourceProvider =
-            (ConfirmState) service
-                .getSourceProvider(ConfirmState.SESSION_STATE);
+        ISourceProviderService service = (ISourceProviderService) PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow()
+            .getService(ISourceProviderService.class);
+        ConfirmState confirmSourceProvider = (ConfirmState) service
+            .getSourceProvider(ConfirmState.SESSION_STATE);
         confirmSourceProvider.setState(enabled);
         confirmAction.setEnabled(enabled);
         form.getToolBarManager().update(true);
@@ -429,9 +436,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void addCancelAction() {
-        CommandContributionItem cancel =
-            new CommandContributionItem(new CommandContributionItemParameter(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow(), "Cancel",
+        CommandContributionItem cancel = new CommandContributionItem(
+            new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow(), "Cancel",
                 "edu.ualberta.med.biobank.commands.cancel", null,
                 cancelActionImage, null, null, "Cancel", "Cancel", "Cancel",
                 SWT.NONE, "Cancel", true));
@@ -464,9 +471,9 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     protected void addResetAction() {
-        CommandContributionItem reset =
-            new CommandContributionItem(new CommandContributionItemParameter(
-                PlatformUI.getWorkbench().getActiveWorkbenchWindow(), "Reset",
+        CommandContributionItem reset = new CommandContributionItem(
+            new CommandContributionItemParameter(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow(), "Reset",
                 "edu.ualberta.med.biobank.commands.reset", null,
                 resetActionImage, null, null, "Reset", "Reset", "Reset",
                 SWT.NONE, "Reset", true));
@@ -497,9 +504,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
             if (previousFormIndex >= 0
                 && previousFormIndex < linkedForms.size()) {
                 BiobankFormBase form = linkedForms.get(previousFormIndex);
-                IWorkbenchPage page =
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getActivePage();
+                IWorkbenchPage page = PlatformUI.getWorkbench()
+                    .getActiveWorkbenchWindow().getActivePage();
                 page.bringToTop(form);
             }
         }
@@ -507,9 +513,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     public void cancel() {
         try {
-            boolean openView =
-                adapter.getModelObject() != null
-                    && !adapter.getModelObject().isNew();
+            boolean openView = adapter.getModelObject() != null
+                && !adapter.getModelObject().isNew();
             closeEntryOpenView(true, openView);
         } catch (Exception e) {
             logger.error("Can't cancel the form", e);

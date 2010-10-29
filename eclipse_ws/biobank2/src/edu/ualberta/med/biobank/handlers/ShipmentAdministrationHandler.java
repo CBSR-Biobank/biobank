@@ -10,7 +10,7 @@ import org.eclipse.ui.WorkbenchException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ShipmentAdministrationPerspective;
 
 public class ShipmentAdministrationHandler extends AbstractHandler implements
     IHandler {

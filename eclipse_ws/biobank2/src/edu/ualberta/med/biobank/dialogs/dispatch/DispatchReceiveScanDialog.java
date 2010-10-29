@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.dialogs.dispatch;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -54,86 +56,102 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
         return TITLE;
     }
 
+    /**
+     * set the status of the cell. return the aliquot if it is an extra one.
+     */
+    protected void processCellStatus(PalletCell cell) {
+        AliquotInfo info = DispatchReceivingEntryForm.getInfoForInventoryId(
+            currentShipment, cell.getValue());
+        if (info.aliquot != null) {
+            cell.setAliquot(info.aliquot);
+            cell.setTitle(info.aliquot.getPatientVisit().getPatient()
+                .getPnumber());
+        }
+        switch (info.type) {
+        case RECEIVED:
+            cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
+            break;
+        case DUPLICATE:
+            cell.setStatus(CellStatus.ERROR);
+            cell.setInformation("Found more than one aliquot with inventoryId "
+                + cell.getValue());
+            cell.setTitle("!");
+            errors++;
+            break;
+        case NOT_IN_DB:
+            cell.setStatus(CellStatus.ERROR);
+            cell.setInformation("Aliquot " + cell.getValue()
+                + " not found in database");
+            cell.setTitle("!");
+            errors++;
+            break;
+        case NOT_IN_SHIPMENT:
+            cell.setStatus(CellStatus.EXTRA);
+            cell.setInformation("Aliquot should not be in shipment");
+            pendingAliquotsNumber++;
+            break;
+        case OK:
+            cell.setStatus(CellStatus.IN_SHIPMENT_EXPECTED);
+            pendingAliquotsNumber++;
+            break;
+        case EXTRA:
+            cell.setStatus(CellStatus.EXTRA);
+            pendingAliquotsNumber++;
+            break;
+        }
+    }
+
     @Override
     protected void processScanResult(IProgressMonitor monitor) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
+        if (cells != null) {
+            processCells(cells.keySet(), monitor);
+        }
+    }
+
+    private void processCells(Collection<RowColPos> rcps,
+        IProgressMonitor monitor) {
         pendingAliquotsNumber = 0;
         errors = 0;
-        final List<AliquotWrapper> notInShipmentAliquots =
-            new ArrayList<AliquotWrapper>();
-        final List<PalletCell> notInShipmentCells = new ArrayList<PalletCell>();
+        Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
-            for (RowColPos rcp : cells.keySet()) {
-                monitor.subTask("Processing position "
-                    + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
+            setScanOkValue(false);
+            List<AliquotWrapper> newExtraAliquots = new ArrayList<AliquotWrapper>();
+            for (RowColPos rcp : rcps) {
+                if (monitor != null) {
+                    monitor.subTask("Processing position "
+                        + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
+                }
                 PalletCell cell = cells.get(rcp);
-                AliquotInfo info =
-                    DispatchReceivingEntryForm.getInfoForInventoryId(
-                        currentShipment, cell.getValue());
-                if (info.aliquot != null) {
-                    cell.setAliquot(info.aliquot);
-                    cell.setTitle(info.aliquot.getPatientVisit().getPatient()
-                        .getPnumber());
-                }
-                switch (info.type) {
-                case RECEIVED:
-                    cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
-                    break;
-                case DUPLICATE:
-                    cell.setStatus(CellStatus.ERROR);
-                    cell.setInformation("Found more than one aliquot with inventoryId "
-                        + cell.getValue());
-                    cell.setTitle("!");
-                    errors++;
-                    break;
-                case NOT_IN_DB:
-                    cell.setStatus(CellStatus.ERROR);
-                    cell.setInformation("Aliquot " + cell.getValue()
-                        + " not found in database");
-                    cell.setTitle("!");
-                    errors++;
-                    break;
-                case NOT_IN_SHIPMENT:
-                    cell.setStatus(CellStatus.NOT_IN_SHIPMENT);
-                    cell.setInformation("Aliquot should not be in shipment");
-                    notInShipmentAliquots.add(info.aliquot);
-                    notInShipmentCells.add(cell);
-                    break;
-                case OK:
-                    cell.setStatus(CellStatus.IN_SHIPMENT_EXPECTED);
-                    pendingAliquotsNumber++;
-                    break;
-                case EXTRA:
-                    cell.setStatus(CellStatus.EXTRA);
-                    break;
+                processCellStatus(cell);
+                if (cell.getStatus() == CellStatus.EXTRA) {
+                    newExtraAliquots.add(cell.getAliquot());
                 }
             }
-            if (notInShipmentAliquots.size() > 0) {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        BioBankPlugin
-                            .openInformation(
-                                "Not in shipment aliquots",
-                                "Some of the aliquots in this pallet were not supposed"
-                                    + " to be in this shipment. They will be added to the"
-                                    + " extra-pending list.");
-                        try {
-                            currentShipment
-                                .addExtraPendingAliquots(notInShipmentAliquots);
-                        } catch (Exception e) {
-                            BioBankPlugin.openAsyncError(
-                                "Error flagging aliquots", e);
-                        }
-                        for (PalletCell cell : notInShipmentCells) {
-                            cell.setStatus(CellStatus.EXTRA);
-                        }
-                        setScanOkValue(errors == 0);
-                        redrawPallet();
-                    }
-                });
-            }
+            addExtraCells(newExtraAliquots);
             setScanOkValue(errors == 0);
+        }
+    }
+
+    private void addExtraCells(final List<AliquotWrapper> extraAliquots) {
+        if (extraAliquots.size() > 0) {
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    BioBankPlugin
+                        .openInformation(
+                            "Not in shipment aliquots",
+                            "Some of the aliquots in this pallet were not supposed"
+                                + " to be in this shipment. They will be added to the"
+                                + " extra-pending list.");
+                    try {
+                        currentShipment.addExtraAliquots(extraAliquots, false);
+                    } catch (Exception e) {
+                        BioBankPlugin.openAsyncError("Error flagging aliquots",
+                            e);
+                    }
+                }
+            });
         }
     }
 
@@ -175,49 +193,42 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     }
 
     @Override
+    protected void startNewPallet() {
+        setRescanMode(false);
+        super.startNewPallet();
+    }
+
+    @Override
     protected List<CellStatus> getPalletCellStatus() {
         return CellStatus.DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST;
     }
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
-        Map<RowColPos, PalletCell> palletScanned =
-            new TreeMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         if (currentShipment.getAliquotCollection().size() > 0) {
-            // AliquotWrapper aliquotNotReceived = null;
             int i = 0;
             for (DispatchAliquotWrapper dsa : currentShipment
                 .getDispatchAliquotCollection()) {
-                // if (dsa.getState() != DispatchAliquotState.RECEIVED_STATE) {
-                // aliquotFlagged = aliquot;
-                // }
                 int row = i / 12;
                 int col = i % 12;
-                if (dsa.getState() != DispatchAliquotState.MISSING.ordinal()
-                    && dsa.getState() != DispatchAliquotState.MISSING_PENDING_STATE
-                        .ordinal())
+                if (!DispatchAliquotState.MISSING.isEquals(dsa.getState()))
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getAliquot()
                             .getInventoryId())));
                 i++;
             }
-            // if (aliquotNotReceived != null) {
-            // palletScanned.put(new RowColPos(0, 0), new PalletCell(
-            // new ScanCell(0, 0, aliquotNotReceived.getInventoryId())));
-            // }
-            // if (aliquotFlagged != null) {
-            // palletScanned.put(new RowColPos(0, 3), new PalletCell(
-            // new ScanCell(0, 3, aliquotFlagged.getInventoryId())));
-            // }
         }
-        // palletScanned.put(new RowColPos(0, 1), new PalletCell(new ScanCell(0,
-        // 1, "dddz")));
-        // palletScanned.put(new RowColPos(0, 2), new PalletCell(new ScanCell(0,
-        // 2, "NUBR019021")));
         return palletScanned;
     }
 
     public boolean hasReceivedAliquots() {
         return aliquotsReceived;
+    }
+
+    @Override
+    protected void postprocessScanTubeAlone(PalletCell cell) throws Exception {
+        processCells(Arrays.asList(cell.getRowColPos()), null);
+        super.postprocessScanTubeAlone(cell);
     }
 }

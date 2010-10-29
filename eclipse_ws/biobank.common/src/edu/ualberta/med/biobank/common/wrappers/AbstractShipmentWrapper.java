@@ -25,8 +25,8 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "dateReceived", "comment", "waybill",
-            "departed", "boxNumber", "shippingMethod" };
+        return new String[] { "dateReceived", "comment", "waybill", "departed",
+            "boxNumber", "shippingMethod" };
     }
 
     @Override
@@ -60,6 +60,7 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public String getFormattedDateReceived() {
+        // date received is not supposed to be null
         return DateFormatter.formatAsDateTime(getDateReceived());
     }
 

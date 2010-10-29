@@ -688,4 +688,11 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
             return null;
         return pvws;
     }
+
+    @Override
+    public SiteWrapper getSiteLinkedToObject() {
+        if (getShipment() != null)
+            return getShipment().getSite();
+        return null;
+    }
 }

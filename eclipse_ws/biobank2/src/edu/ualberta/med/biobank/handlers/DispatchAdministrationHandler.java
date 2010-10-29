@@ -8,10 +8,10 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.rcp.DispatchAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.DispatchAdministrationPerspective;
 
-public class DispatchAdministrationHandler extends AbstractHandler
-    implements IHandler {
+public class DispatchAdministrationHandler extends AbstractHandler implements
+    IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -19,8 +19,7 @@ public class DispatchAdministrationHandler extends AbstractHandler
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true))
-                workbench.showPerspective(
-                    DispatchAdministrationPerspective.ID,
+                workbench.showPerspective(DispatchAdministrationPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(

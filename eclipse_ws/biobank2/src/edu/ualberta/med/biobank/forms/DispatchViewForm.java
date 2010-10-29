@@ -9,6 +9,8 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -17,6 +19,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
@@ -31,15 +34,18 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.DispatchAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
+import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
+import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
 public class DispatchViewForm extends BiobankViewForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(DispatchViewForm.class.getName());
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.DispatchViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchViewForm";
 
     private DispatchAdapter shipmentAdapter;
 
@@ -61,13 +67,11 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private BiobankText commentLabel;
 
-    private DispatchAliquotListInfoTable aliquotsExpectedTable;
+    private DispatchAliquotsTreeTable aliquotsTree;
 
-    private DispatchAliquotListInfoTable aliquotsAcceptedTable;
+    private DispatchAliquotListInfoTable aliquotsNonProcessedTable;
 
-    private DispatchAliquotListInfoTable aliquotsExtraTable;
-
-    private DispatchAliquotListInfoTable aliquotsMissingTable;
+    private boolean canSeeEverything;
 
     @Override
     protected void init() throws Exception {
@@ -95,11 +99,7 @@ public class DispatchViewForm extends BiobankViewForm {
         retrieveShipment();
         setPartName("Dispatch sent on " + shipment.getDeparted());
         setShipmentValues();
-        aliquotsExpectedTable.reloadCollection();
-        if (aliquotsAcceptedTable != null)
-            aliquotsAcceptedTable.reloadCollection();
-        if (aliquotsExtraTable != null)
-            aliquotsExtraTable.reloadCollection();
+        aliquotsTree.refresh();
     }
 
     @Override
@@ -108,31 +108,99 @@ public class DispatchViewForm extends BiobankViewForm {
         if (shipment.getDeparted() != null) {
             dateString = " on " + shipment.getFormattedDeparted();
         }
-        form.setText("Shipment sent" + dateString + " from "
-            + shipment.getSender().getNameShort());
+        canSeeEverything = true;
+        if (shipment.getSender() == null) {
+            canSeeEverything = false;
+            BioBankPlugin
+                .openAsyncError(
+                    "Access Denied",
+                    "It seems you don't have access to the sender site. Please see administrator to resolve this problem.");
+        } else {
+            form.setText("Shipment sent" + dateString + " from "
+                + shipment.getSender().getNameShort());
+        }
+        if (shipment.getReceiver() == null) {
+            canSeeEverything = false;
+            BioBankPlugin
+                .openAsyncError(
+                    "Access Denied",
+                    "It seems you don't have access to the receiver site. Please see administrator to resolve this problem.");
+        }
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
-        createAliquotsNotReceivedSection();
-        createAliquotsReceivedSection();
-        createAliquotsExtraSection();
-        createAliquotsMissingSection();
+
+        if (canSeeEverything) {
+            createTreeTableSection();
+        }
+
         setShipmentValues();
 
-        User user = SessionManager.getUser();
-        SiteWrapper currentSite = SessionManager.getInstance().getCurrentSite();
-        if (shipment.canBeSentBy(user, currentSite))
-            createSendButton();
-        else if (shipment.canBeReceivedBy(user, currentSite))
-            createReceiveButton();
+        if (canSeeEverything) {
+            User user = SessionManager.getUser();
+            SiteWrapper currentSite = SessionManager.getCurrentSite();
+            if (shipment.canBeSentBy(user, currentSite))
+                createSendButton();
+            else if (shipment.canBeReceivedBy(user, currentSite))
+                createReceiveButtons();
+            else if (shipment.canBeClosedBy(user, currentSite))
+                createCloseButton();
+        }
     }
 
-    private void createReceiveButton() {
+    @Override
+    protected void addEditAction() {
+        if (canSeeEverything) {
+            super.addEditAction();
+        }
+    }
+
+    private void createTreeTableSection() {
+        if (shipment.isInCreationState()) {
+            Composite parent = createSectionWithClient("Aliquot added");
+            aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(
+                parent, shipment, false) {
+                @Override
+                public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
+                    return shipment.getNonProcessedDispatchAliquotCollection();
+                }
+
+            };
+            aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
+            aliquotsNonProcessedTable
+                .addDoubleClickListener(new IDoubleClickListener() {
+                    @Override
+                    public void doubleClick(DoubleClickEvent event) {
+                        Object selection = event.getSelection();
+                        if (selection instanceof InfoTableSelection) {
+                            InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                            DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) tableSelection
+                                .getObject();
+                            if (dsa != null) {
+                                SessionManager.openViewForm(dsa.getAliquot());
+                            }
+                        }
+                    }
+                });
+            aliquotsNonProcessedTable
+                .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
+                    @Override
+                    public void selectionChanged(MultiSelectEvent event) {
+                        aliquotsNonProcessedTable.reloadCollection();
+                    }
+                });
+        } else {
+            aliquotsTree = new DispatchAliquotsTreeTable(page, shipment, false,
+                false);
+        }
+    }
+
+    private void createReceiveButtons() {
         Composite composite = toolkit.createComposite(page);
-        composite.setLayout(new GridLayout(2, false));
-        Button sendButton =
-            toolkit.createButton(composite, "Receive", SWT.PUSH);
+        composite.setLayout(new GridLayout(3, false));
+        Button sendButton = toolkit
+            .createButton(composite, "Receive", SWT.PUSH);
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -140,12 +208,33 @@ public class DispatchViewForm extends BiobankViewForm {
             }
         });
 
-        Button sendProcessButton =
-            toolkit.createButton(composite, "Receive and Process", SWT.PUSH);
+        Button sendProcessButton = toolkit.createButton(composite,
+            "Receive and Process", SWT.PUSH);
         sendProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 shipmentAdapter.doReceiveAndProcess();
+            }
+        });
+
+        Button lostProcessButton = toolkit.createButton(composite, "Lost",
+            SWT.PUSH);
+        lostProcessButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                shipmentAdapter.doSetAsLost();
+            }
+        });
+    }
+
+    private void createCloseButton() {
+        Composite composite = toolkit.createComposite(page);
+        composite.setLayout(new GridLayout(2, false));
+        Button sendButton = toolkit.createButton(composite, "Close", SWT.PUSH);
+        sendButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                shipmentAdapter.doClose();
             }
         });
     }
@@ -157,16 +246,15 @@ public class DispatchViewForm extends BiobankViewForm {
             public void widgetSelected(SelectionEvent e) {
                 if (new SendDispatchDialog(Display.getDefault()
                     .getActiveShell(), shipment).open() == Dialog.OK) {
-                    IRunnableContext context =
-                        new ProgressMonitorDialog(Display.getDefault()
-                            .getActiveShell());
+                    IRunnableContext context = new ProgressMonitorDialog(
+                        Display.getDefault().getActiveShell());
                     try {
                         context.run(true, true, new IRunnableWithProgress() {
                             @Override
                             public void run(final IProgressMonitor monitor) {
                                 monitor.beginTask("Saving...",
                                     IProgressMonitor.UNKNOWN);
-                                shipment.setNextState();
+                                shipment.setInTransitState();
                                 try {
                                     shipment.persist();
                                 } catch (final RemoteConnectFailureException exp) {
@@ -199,75 +287,6 @@ public class DispatchViewForm extends BiobankViewForm {
         });
     }
 
-    private void createAliquotsNotReceivedSection() {
-        String title = "";
-        if (shipment.isInCreationState()) {
-            title = "Aliquots added";
-        } else {
-            title = "Non processed aliquots";
-        }
-        Composite parent = createSectionWithClient(title);
-        aliquotsExpectedTable =
-            new DispatchAliquotListInfoTable(parent, shipment, false) {
-                @Override
-                public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
-                    return shipment
-                        .getNonProcessedDispatchAliquotCollection();
-                }
-            };
-        aliquotsExpectedTable.adaptToToolkit(toolkit, true);
-        aliquotsExpectedTable
-            .addDoubleClickListener(collectionDoubleClickListener);
-    }
-
-    private void createAliquotsReceivedSection() {
-        if (shipment.hasBeenReceived()) {
-            Composite parent = createSectionWithClient("Aliquots received");
-            aliquotsAcceptedTable =
-                new DispatchAliquotListInfoTable(parent, shipment, false) {
-                    @Override
-                    public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
-                        return shipment.getReceivedDispatchAliquots();
-                    }
-                };
-            aliquotsAcceptedTable.adaptToToolkit(toolkit, true);
-            aliquotsAcceptedTable
-                .addDoubleClickListener(collectionDoubleClickListener);
-        }
-    }
-
-    private void createAliquotsExtraSection() {
-        if (shipment.hasBeenReceived()) {
-            Composite parent = createSectionWithClient("Extra aliquots");
-            aliquotsExtraTable =
-                new DispatchAliquotListInfoTable(parent, shipment, false) {
-                    @Override
-                    public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
-                        return shipment.getExtraDispatchAliquots();
-                    }
-                };
-            aliquotsExtraTable.adaptToToolkit(toolkit, true);
-            aliquotsExtraTable
-                .addDoubleClickListener(collectionDoubleClickListener);
-        }
-    }
-
-    private void createAliquotsMissingSection() {
-        if (shipment.hasBeenReceived() || shipment.isInTransitState()) {
-            Composite parent = createSectionWithClient("Missing aliquots");
-            aliquotsMissingTable =
-                new DispatchAliquotListInfoTable(parent, shipment, false) {
-                    @Override
-                    public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
-                        return shipment.getMissingDispatchAliquots();
-                    }
-                };
-            aliquotsMissingTable.adaptToToolkit(toolkit, true);
-            aliquotsMissingTable
-                .addDoubleClickListener(collectionDoubleClickListener);
-        }
-    }
-
     private void createMainSection() {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -276,30 +295,53 @@ public class DispatchViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        String stateMessage = null;
+        if (shipment.isInLostState())
+            stateMessage = " Shipment Lost ";
+        else if (shipment.isInClosedState())
+            stateMessage = " Shipment Closed ";
+        if (stateMessage != null) {
+            Label label = widgetCreator.createLabel(client, stateMessage,
+                SWT.CENTER, false);
+            label.setBackground(Display.getDefault().getSystemColor(
+                SWT.COLOR_RED));
+            label.setForeground(Display.getDefault().getSystemColor(
+                SWT.COLOR_WHITE));
+            GridData gd = new GridData();
+            gd.horizontalAlignment = SWT.CENTER;
+            gd.grabExcessHorizontalSpace = true;
+            gd.horizontalSpan = 2;
+            label.setLayoutData(gd);
+        }
+
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
-        receiverLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Receiver");
+        receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Receiver");
         if (!shipment.isInCreationState()) {
-            departedLabel =
-                createReadOnlyLabelledField(client, SWT.NONE, "Departed");
-            shippingMethodLabel =
-                createReadOnlyLabelledField(client, SWT.NONE, "Shipping Method");
-            waybillLabel =
-                createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
+            departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Departed");
+            shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Shipping Method");
+            waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Waybill");
         }
         if (shipment.hasBeenReceived()) {
-            dateReceivedLabel =
-                createReadOnlyLabelledField(client, SWT.NONE, "Date received");
+            dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Date received");
         }
-        commentLabel =
-            createReadOnlyLabelledField(client, SWT.MULTI, "Comments");
+        commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
+            "Comments");
     }
 
     private void setShipmentValues() {
         setTextValue(studyLabel, shipment.getStudy().getName());
-        setTextValue(senderLabel, shipment.getSender().getName());
-        setTextValue(receiverLabel, shipment.getReceiver().getName());
+        setTextValue(senderLabel,
+            shipment.getSender() == null ? " ACCESS DENIED" : shipment
+                .getSender().getName());
+        setTextValue(receiverLabel,
+            shipment.getReceiver() == null ? "ACCESS DENIED" : shipment
+                .getReceiver().getName());
         if (departedLabel != null)
             setTextValue(departedLabel, shipment.getFormattedDeparted());
         if (shippingMethodLabel != null)

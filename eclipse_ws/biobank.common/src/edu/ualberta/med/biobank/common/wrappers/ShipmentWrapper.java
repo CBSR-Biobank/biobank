@@ -83,10 +83,9 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
                     "A waybill should be set on this shipment");
             }
             if (!checkWaybillUniqueForClinic()) {
-                throw new BiobankCheckException(
-                    "A clinic shipment with waybill " + getWaybill()
-                        + " already exist in clinic "
-                        + getClinic().getNameShort());
+                throw new BiobankCheckException("A shipment with waybill "
+                    + getWaybill() + " already exist in clinic "
+                    + getClinic().getNameShort());
             }
         } else {
             if (getWaybill() != null) {
@@ -607,6 +606,11 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
         log.setDetails(details);
         log.setType("Shipment");
         return log;
+    }
+
+    public Boolean needDeparted() {
+        ShippingMethodWrapper shippingMethod = getShippingMethod();
+        return shippingMethod == null || shippingMethod.needDate();
     }
 
 }

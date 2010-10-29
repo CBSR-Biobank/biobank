@@ -509,7 +509,7 @@ public class TestPatientVisit extends TestDatabase {
         // lock an attribute
         study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
             .getActivityStatus(appService,
-                ActivityStatusWrapper.DISABLED_STATUS_STRING));
+                ActivityStatusWrapper.CLOSED_STATUS_STRING));
         study.persist();
         visit.reload();
         try {
@@ -701,13 +701,12 @@ public class TestPatientVisit extends TestDatabase {
         visit.addAliquots(Arrays.asList(newAliquot));
         visit.persist();
 
-        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(appService,
-            inventoryId);
-        Assert.assertEquals(1, aliquots.size());
-        Assert.assertEquals(aliquots.get(0).getSampleType().getId(), newAliquot
+        AliquotWrapper aliquot = AliquotWrapper.getAliquot(appService,
+            inventoryId, null);
+        Assert.assertNotNull(aliquot);
+        Assert.assertEquals(aliquot.getSampleType().getId(), newAliquot
             .getSampleType().getId());
-        Assert.assertTrue(aliquots.get(0).getQuantity().equals(3.0));
-        Assert.assertEquals(aliquots.get(0).getPatientVisit().getId(),
-            visit.getId());
+        Assert.assertTrue(aliquot.getQuantity().equals(3.0));
+        Assert.assertEquals(aliquot.getPatientVisit().getId(), visit.getId());
     }
 }

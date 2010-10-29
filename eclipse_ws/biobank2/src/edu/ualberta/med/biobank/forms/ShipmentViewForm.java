@@ -101,10 +101,12 @@ public class ShipmentViewForm extends BiobankViewForm {
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         waybillLabel = createReadOnlyLabelledField(client, SWT.NONE, "Waybill");
         clinicLabel = createReadOnlyLabelledField(client, SWT.NONE, "Clinic");
-        departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Departed");
         shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Shipping Method");
+        if (shipment.needDeparted()) {
+            departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
+                "Departed");
+        }
         boxNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Box number");
         dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -113,9 +115,9 @@ public class ShipmentViewForm extends BiobankViewForm {
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
             "Comments");
-        patientCountLabel = createReadOnlyLabelledField(client, SWT.WRAP,
+        patientCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Patients");
-        patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.WRAP,
+        patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Patient Visits");
 
         setShipmentValues();
@@ -126,10 +128,12 @@ public class ShipmentViewForm extends BiobankViewForm {
         setTextValue(waybillLabel, shipment.getWaybill());
         setTextValue(clinicLabel, shipment.getClinic() == null ? "" : shipment
             .getClinic().getName());
-        setTextValue(departedLabel, shipment.getFormattedDeparted());
+        if (departedLabel != null)
+            setTextValue(departedLabel, shipment.getFormattedDeparted());
         setTextValue(shippingMethodLabel,
             shipment.getShippingMethod() == null ? "" : shipment
                 .getShippingMethod().getName());
+
         setTextValue(boxNumberLabel, shipment.getBoxNumber());
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
         setTextValue(activityStatusLabel, shipment.getActivityStatus());

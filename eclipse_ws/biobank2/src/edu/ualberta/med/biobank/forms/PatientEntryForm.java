@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -18,7 +17,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -28,17 +27,13 @@ public class PatientEntryForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientEntryForm.class.getName());
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
-    public static final String MSG_NEW_PATIENT_OK =
-        "Creating a new patient record.";
+    public static final String MSG_NEW_PATIENT_OK = "Creating a new patient record.";
 
-    public static final String MSG_PATIENT_OK =
-        "Editing an existing patient record.";
+    public static final String MSG_PATIENT_OK = "Editing an existing patient record.";
 
-    public static final String MSG_NO_PATIENT_NUMBER =
-        "Patient must have a patient number";
+    public static final String MSG_NO_PATIENT_NUMBER = "Patient must have a patient number";
 
     public static final String MSG_NO_STUDY = "Enter a valid study short name";
 
@@ -48,8 +43,8 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private ComboViewer studiesViewer;
 
-    private NonEmptyStringValidator pnumberNonEmptyValidator =
-        new NonEmptyStringValidator(MSG_NO_PATIENT_NUMBER);
+    private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
+        MSG_NO_PATIENT_NUMBER);
 
     @Override
     public void init() {
@@ -61,7 +56,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         retrievePatient();
         try {
             patientAdapter.getWrapper().logEdit(
-                SessionManager.getInstance().getCurrentSite().getNameShort());
+                SessionManager.getCurrentSite().getNameShort());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log edit failed", e);
         }
@@ -95,14 +90,14 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText labelSite =
-            createReadOnlyLabelledField(client, SWT.NONE, "Site");
-        siteWrapper = SessionManager.getInstance().getCurrentSite();
+        BiobankText labelSite = createReadOnlyLabelledField(client, SWT.NONE,
+            "Site");
+        siteWrapper = SessionManager.getCurrentSite();
         labelSite.setText(siteWrapper.getName());
 
         siteWrapper.reload();
-        List<StudyWrapper> studies =
-            new ArrayList<StudyWrapper>(siteWrapper.getStudyCollection());
+        List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
+            siteWrapper.getStudyCollection());
         StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {
@@ -112,23 +107,22 @@ public class PatientEntryForm extends BiobankEntryForm {
             selectedStudy = patientAdapter.getWrapper().getStudy();
         }
 
-        studiesViewer =
-            createComboViewer(client, "Study", studies, selectedStudy,
-                "A study should be selected", new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        patientAdapter.getWrapper().setStudy(
-                            (StudyWrapper) selectedObject);
-                    }
-                });
+        studiesViewer = createComboViewer(client, "Study", studies,
+            selectedStudy, "A study should be selected",
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    patientAdapter.getWrapper().setStudy(
+                        (StudyWrapper) selectedObject);
+                }
+            });
         setFirstControl(studiesViewer.getControl());
         if (selectedStudy != null) {
             studiesViewer.setSelection(new StructuredSelection(selectedStudy));
         }
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Patient Number", null, BeansObservables.observeValue(
-                patientAdapter.getWrapper(), "pnumber"),
+            "Patient Number", null, patientAdapter.getWrapper(), "pnumber",
             pnumberNonEmptyValidator);
     }
 

@@ -20,7 +20,6 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.ActivityStatusMethodEntryForm";
     public static final String OK_MESSAGE = "View and edit activity statuses.";
 
-    // FIXME -- setDirty doesn't get called.
     private BiobankEntryFormWidgetListener tableChangeListener = new BiobankEntryFormWidgetListener() {
         @Override
         public void selectionChanged(MultiSelectEvent event) {
@@ -91,9 +90,9 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
 
     @Override
     protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(ActivityStatusWrapper.class)
-            && !SessionManager.canCreate(ActivityStatusWrapper.class)
-            && !SessionManager.canDelete(ActivityStatusWrapper.class)) {
+        if (!SessionManager.canUpdate(ActivityStatusWrapper.class, null)
+            && !SessionManager.canCreate(ActivityStatusWrapper.class, null)
+            && !SessionManager.canDelete(ActivityStatusWrapper.class, null)) {
             BioBankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Activity Status editor. Access Denied.");

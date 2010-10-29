@@ -1671,13 +1671,13 @@ public class CDateTime extends BaseCombo {
             @Override
             public void run() {
                 if ((text != null) && (!text.isDisposed())) {
+                    text.getControl().removeListener(SWT.Verify, textListener);
                     if (!string.equals(text.getText())) {
-                        text.getControl().removeListener(SWT.Verify,
-                            textListener);
                         text.setText(string);
-                        text.getControl().addListener(SWT.Verify, textListener);
+                        CDateTime.this.getParent().layout(true);
                     }
                     text.getControl().setSelection(selStart, selEnd);
+                    text.getControl().addListener(SWT.Verify, textListener);
                 }
             }
         };

@@ -50,8 +50,7 @@ public abstract class AbstractTodaySearchAdministrationView extends
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BioBankPlugin.openError("Search error", e);
-            notFound(text);
+            BioBankPlugin.openAsyncError("Search error", e);
         }
     }
 

@@ -90,11 +90,10 @@ public class WidgetCreator {
         for (String label : fieldsMap.keySet()) {
             fi = fieldsMap.get(label);
 
-            Control control =
-                createBoundWidgetWithLabel(client, fi.widgetClass,
-                    fi.widgetOptions, fi.label, fi.widgetValues,
-                    BeansObservables.observeValue(bean, label),
-                    fi.validatorClass, fi.errMsg);
+            Control control = createBoundWidgetWithLabel(client,
+                fi.widgetClass, fi.widgetOptions, fi.label, fi.widgetValues,
+                BeansObservables.observeValue(bean, label), fi.validatorClass,
+                fi.errMsg);
             if (controls != null) {
                 controls.put(label, control);
             }
@@ -185,9 +184,9 @@ public class WidgetCreator {
         if (toolkit != null) {
             toolkit.adapt(button, true, true);
         }
-        Binding binding =
-            dbc.bindValue(SWTObservables.observeSelection(button),
-                modelObservableValue, uvs, null);
+        Binding binding = dbc.bindValue(
+            SWTObservables.observeSelection(button), modelObservableValue, uvs,
+            null);
         if (bindingKey != null) {
             bindings.put(bindingKey, binding);
         }
@@ -200,17 +199,16 @@ public class WidgetCreator {
     private Combo createCombo(Composite composite, int options,
         String[] widgetValues, final IObservableValue modelObservableValue,
         UpdateValueStrategy uvs, String bindingKey) {
-        final Combo combo =
-            new Combo(composite, SWT.READ_ONLY | SWT.BORDER | options);
+        final Combo combo = new Combo(composite, SWT.READ_ONLY | SWT.BORDER
+            | options);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         Assert.isNotNull(widgetValues, "combo values not assigned");
         combo.setItems(widgetValues);
         if (toolkit != null) {
             toolkit.adapt(combo, true, true);
         }
-        Binding binding =
-            dbc.bindValue(SWTObservables.observeSelection(combo),
-                modelObservableValue, uvs, null);
+        Binding binding = dbc.bindValue(SWTObservables.observeSelection(combo),
+            modelObservableValue, uvs, null);
         if (bindingKey != null) {
             bindings.put(bindingKey, binding);
         }
@@ -254,8 +252,8 @@ public class WidgetCreator {
         }
 
         if ((widgetOptions & SWT.MULTI) != 0) {
-            widgetOptions =
-                widgetOptions | SWT.V_SCROLL | SWT.H_SCROLL | SWT.WRAP;
+            widgetOptions = widgetOptions | SWT.V_SCROLL | SWT.H_SCROLL
+                | SWT.WRAP;
         }
 
         BiobankText text = null;
@@ -282,11 +280,36 @@ public class WidgetCreator {
         if (keyListener != null) {
             text.addKeyListener(keyListener);
         }
+
         if (modelObservableValue != null) {
-            Binding binding =
-                dbc.bindValue(
-                    SWTObservables.observeText(text.getTextBox(), SWT.Modify),
-                    modelObservableValue, uvs, null);
+            // If the UpdateValueStrategy has an IValidator, then values that do
+            // not validate will not be copied to the model object. This is a
+            // problem in the following scenario: (1) model property has value
+            // "asdf", which is valid (2) target property's value is immediately
+            // changed to an invalid one (i.e. not through any valid
+            // intermediate value) (3) target property's value is changed back
+            // to "asdf". The problem is that since (1), the model property's
+            // value has been "asdf" since its value was not switched to the
+            // invalid value (because it did not pass validation). So, when the
+            // model property's value is changed back to "asdf", the old value
+            // and new value are both "asdf", so the target is not notified of
+            // the "change" because there was none. Note that this is a problem
+            // only when the SWT Object can be set to an invalid state (so
+            // should be fine for Combos and Buttons).
+            //
+            // Ultimately, we want our model and target values to always be
+            // synchronized. The validators are used by the GUI to indicate
+            // problem(s). So, the text-field is bound to the model property
+            // without validation and the text-field is bound to some observable
+            // string whose sole purpose is to validate the text-field's value.
+            dbc.bindValue(
+                SWTObservables.observeText(text.getTextBox(), SWT.Modify),
+                modelObservableValue, null, null);
+            Binding binding = dbc
+                .bindValue(SWTObservables.observeText(text.getTextBox(),
+                    SWT.Modify),
+                    new WritableValue(modelObservableValue.getValue(),
+                        String.class), uvs, null);
             if (bindingKey != null) {
                 bindings.put(bindingKey, binding);
             }
@@ -381,17 +404,16 @@ public class WidgetCreator {
 
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
         if (dbc != null) {
-            NonEmptyStringValidator validator =
-                new NonEmptyStringValidator(errorMessage);
+            NonEmptyStringValidator validator = new NonEmptyStringValidator(
+                errorMessage);
             validator.setControlDecoration(BiobankWidget.createDecorator(
                 fieldLabel, errorMessage));
             UpdateValueStrategy uvs = new UpdateValueStrategy();
             uvs.setAfterGetValidator(validator);
-            IObservableValue selectedValue =
-                new WritableValue("", String.class);
-            Binding binding =
-                dbc.bindValue(SWTObservables.observeSelection(combo),
-                    selectedValue, uvs, null);
+            IObservableValue selectedValue = new WritableValue("", String.class);
+            Binding binding = dbc.bindValue(
+                SWTObservables.observeSelection(combo), selectedValue, uvs,
+                null);
             if (bindingKey != null) {
                 bindings.put(bindingKey, binding);
             }
@@ -401,8 +423,8 @@ public class WidgetCreator {
                 .addSelectionChangedListener(new ISelectionChangedListener() {
                     @Override
                     public void selectionChanged(SelectionChangedEvent event) {
-                        IStructuredSelection selection =
-                            (IStructuredSelection) comboViewer.getSelection();
+                        IStructuredSelection selection = (IStructuredSelection) comboViewer
+                            .getSelection();
                         if ((selection != null) && (selection.size() > 0)) {
                             csu.doSelection(selection.getFirstElement());
                         } else {
@@ -424,7 +446,7 @@ public class WidgetCreator {
         return createLabel(parent, fieldLabel, SWT.LEFT, true);
     }
 
-    private Label createLabel(Composite parent, String fieldLabel, int options,
+    public Label createLabel(Composite parent, String fieldLabel, int options,
         boolean addColon) {
         Label label = null;
         String text = fieldLabel;
@@ -479,8 +501,8 @@ public class WidgetCreator {
     public DateTimeWidget createDateTimeWidget(Composite client, Label label,
         Date date, IObservableValue modelObservableValue,
         AbstractValidator validator, int typeShown, String bindingKey) {
-        final DateTimeWidget widget =
-            new DateTimeWidget(client, typeShown, date);
+        final DateTimeWidget widget = new DateTimeWidget(client, typeShown,
+            date);
         if (selectionListener != null) {
             widget.addModifyListener(modifyListener);
         }
@@ -495,9 +517,9 @@ public class WidgetCreator {
                 uvs = new UpdateValueStrategy();
                 uvs.setAfterConvertValidator(validator);
             }
-            Binding binding =
-                dbc.bindValue(new DateTimeObservableValue(widget),
-                    modelObservableValue, uvs, null);
+            Binding binding = dbc.bindValue(
+                new DateTimeObservableValue(widget), modelObservableValue, uvs,
+                null);
             if (bindingKey != null) {
                 bindings.put(bindingKey, binding);
             }
@@ -617,9 +639,8 @@ public class WidgetCreator {
         for (String label : fieldsMap.keySet()) {
             fi = fieldsMap.get(label);
 
-            Control control =
-                createLabelledWidget(parent, fi.widgetClass, SWT.NONE,
-                    fi.label, null);
+            Control control = createLabelledWidget(parent, fi.widgetClass,
+                SWT.NONE, fi.label, null);
             controls.put(label, control);
         }
     }
@@ -630,16 +651,15 @@ public class WidgetCreator {
             if (widgetOptions == SWT.NONE) {
                 widgetOptions = SWT.SINGLE;
             }
-            BiobankText field =
-                createText(parent, widgetOptions | SWT.LEFT, null, null);
+            BiobankText field = createText(parent, widgetOptions | SWT.LEFT,
+                null, null);
             if (value != null) {
                 field.setText(value);
             }
             return field;
         } else if (widgetClass == Label.class) {
-            Label field =
-                createLabel(parent, "", widgetOptions | SWT.LEFT | SWT.BORDER,
-                    false);
+            Label field = createLabel(parent, "", widgetOptions | SWT.LEFT
+                | SWT.BORDER, false);
             if (value != null) {
                 field.setText(value);
             }

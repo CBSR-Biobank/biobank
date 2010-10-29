@@ -17,16 +17,16 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectShipmentClinicDialog;
-import edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
-import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ClinicWithShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -46,6 +46,8 @@ public class ShipmentAdministrationView extends
 
     private Composite dateComposite;
 
+    private Composite searchFieldComposite;
+
     public ShipmentAdministrationView() {
         currentInstance = this;
         SessionManager.addView(ShipmentAdministrationPerspective.ID, this);
@@ -53,14 +55,14 @@ public class ShipmentAdministrationView extends
 
     @Override
     protected void createTreeTextOptions(Composite parent) {
-        Composite composite = new Composite(parent, SWT.NONE);
+        searchFieldComposite = new Composite(parent, SWT.NONE);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 0;
         layout.marginHeight = 0;
         layout.verticalSpacing = 0;
-        composite.setLayout(layout);
+        searchFieldComposite.setLayout(layout);
 
-        radioWaybill = new Button(composite, SWT.RADIO);
+        radioWaybill = new Button(searchFieldComposite, SWT.RADIO);
         radioWaybill.setText("Waybill");
         radioWaybill.setSelection(true);
         radioWaybill.addSelectionListener(new SelectionAdapter() {
@@ -71,7 +73,7 @@ public class ShipmentAdministrationView extends
                 }
             }
         });
-        radioDateReceived = new Button(composite, SWT.RADIO);
+        radioDateReceived = new Button(searchFieldComposite, SWT.RADIO);
         radioDateReceived.setText("Date Received");
         radioDateReceived.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -126,7 +128,7 @@ public class ShipmentAdministrationView extends
             // mutliple shipments from different clinics
             List<ShipmentWrapper> shipments = ShipmentWrapper
                 .getShipmentsInSite(SessionManager.getAppService(),
-                    text.trim(), SessionManager.getInstance().getCurrentSite());
+                    text.trim(), SessionManager.getCurrentSite());
             if (shipments.size() > 1) {
                 SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -141,9 +143,9 @@ public class ShipmentAdministrationView extends
             // can find more than one shipments
             Date date = dateReceivedWidget.getDate();
             if (date != null) {
-                return ShipmentWrapper.getShipmentsInSite(SessionManager
-                    .getAppService(), date, SessionManager.getInstance()
-                    .getCurrentSite());
+                return ShipmentWrapper.getShipmentsInSite(
+                    SessionManager.getAppService(), date,
+                    SessionManager.getCurrentSite());
             }
         }
         return null;
@@ -177,8 +179,7 @@ public class ShipmentAdministrationView extends
             ShipmentAdapter shipmentAdapter = (ShipmentAdapter) clinicAdapter
                 .search(shipment);
             if (shipmentAdapter == null) {
-                shipmentAdapter = new ShipmentAdapter(clinicAdapter,
-                    shipment);
+                shipmentAdapter = new ShipmentAdapter(clinicAdapter, shipment);
                 clinicAdapter.addChild(shipmentAdapter);
             }
             return shipmentAdapter;
@@ -197,8 +198,8 @@ public class ShipmentAdministrationView extends
                 if (radioWaybill.getSelection()) {
                     shipment.setWaybill(text);
                 }
-                ShipmentAdapter adapter = new ShipmentAdapter(
-                    searchedNode, shipment);
+                ShipmentAdapter adapter = new ShipmentAdapter(searchedNode,
+                    shipment);
                 adapter.openEntryForm();
             }
         } else {
@@ -232,8 +233,7 @@ public class ShipmentAdministrationView extends
 
     public static ShipmentAdapter getCurrentShipment() {
         AdapterBase selectedNode = currentInstance.getSelectedNode();
-        if (selectedNode != null
-            && selectedNode instanceof ShipmentAdapter) {
+        if (selectedNode != null && selectedNode instanceof ShipmentAdapter) {
             return (ShipmentAdapter) selectedNode;
         }
         return null;

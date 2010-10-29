@@ -3,8 +3,6 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IStatus;
@@ -26,9 +24,22 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
  */
 public class MoveAliquotsToDialog extends BiobankDialog {
 
-    private ContainerWrapper oldContainer;
+    private class ContainerLabelPojo {
+        private String label;
 
-    private IObservableValue newLabel = new WritableValue("", String.class);
+        @SuppressWarnings("unused")
+        public void setLabel(String label) {
+            this.label = label;
+        }
+
+        public String getLabel() {
+            return label;
+        }
+    };
+
+    private ContainerLabelPojo containerLabelPojo;
+
+    private ContainerWrapper oldContainer;
 
     private HashMap<String, ContainerWrapper> map;
 
@@ -62,48 +73,46 @@ public class MoveAliquotsToDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(1, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        List<SampleTypeWrapper> typesFromOlContainer =
-            oldContainer.getContainerType().getSampleTypeCollection();
-        List<ContainerWrapper> conts =
-            ContainerWrapper.getEmptyContainersHoldingSampleType(SessionManager
-                .getAppService(),
-                SessionManager.getInstance().getCurrentSite(),
-                typesFromOlContainer, oldContainer.getRowCapacity(),
-                oldContainer.getColCapacity());
+        List<SampleTypeWrapper> typesFromOlContainer = oldContainer
+            .getContainerType().getSampleTypeCollection();
+        List<ContainerWrapper> conts = ContainerWrapper
+            .getEmptyContainersHoldingSampleType(
+                SessionManager.getAppService(),
+                SessionManager.getCurrentSite(), typesFromOlContainer,
+                oldContainer.getRowCapacity(), oldContainer.getColCapacity());
 
         map = new HashMap<String, ContainerWrapper>();
         for (ContainerWrapper cont : conts) {
             map.put(cont.getLabel(), cont);
         }
-        AbstractValidator validator =
-            new AbstractValidator(
-                "Destination container should accept these aliquots, "
-                    + "must be initialized but empty, "
-                    + " and as big as the previous one.") {
+        AbstractValidator validator = new AbstractValidator(
+            "Destination container should accept these aliquots, "
+                + "must be initialized but empty, "
+                + " and as big as the previous one.") {
 
-                @Override
-                public IStatus validate(Object value) {
-                    if (!(value instanceof String)) {
-                        throw new RuntimeException(
-                            "Not supposed to be called for non-strings.");
-                    }
-
-                    ContainerWrapper cont = map.get(value);
-                    if (cont == null) {
-                        showDecoration();
-                        return ValidationStatus.error(errorMessage);
-                    } else {
-                        hideDecoration();
-                        return Status.OK_STATUS;
-                    }
+            @Override
+            public IStatus validate(Object value) {
+                if (!(value instanceof String)) {
+                    throw new RuntimeException(
+                        "Not supposed to be called for non-strings.");
                 }
-            };
+
+                ContainerWrapper cont = map.get(value);
+                if (cont == null) {
+                    showDecoration();
+                    return ValidationStatus.error(errorMessage);
+                } else {
+                    hideDecoration();
+                    return Status.OK_STATUS;
+                }
+            }
+        };
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.FILL,
-            "New Container Label", null, newLabel, validator);
+            "New Container Label", null, containerLabelPojo, "label", validator);
     }
 
     public ContainerWrapper getNewContainer() {
-        return map.get(newLabel.getValue());
+        return map.get(containerLabelPojo.getLabel());
     }
 
 }

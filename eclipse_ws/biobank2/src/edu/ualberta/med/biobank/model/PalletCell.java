@@ -34,8 +34,7 @@ public class PalletCell extends Cell {
     }
 
     public static Map<RowColPos, PalletCell> convertArray(ScanCell[][] scancells) {
-        Map<RowColPos, PalletCell> palletScanned =
-            new TreeMap<RowColPos, PalletCell>();
+        Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
         for (int i = 0; i < ScanCell.ROW_MAX; i++) {
             for (int j = 0; j < ScanCell.COL_MAX; j++) {
                 ScanCell scanCell = scancells[i][j];
@@ -55,13 +54,13 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        List<AliquotWrapper> aliquots =
-            DebugUtil.getRandomAliquotsAlreadyLinked(appService, siteId);
+        List<AliquotWrapper> aliquots = DebugUtil
+            .getRandomAliquotsAlreadyLinked(appService, siteId);
         if (aliquots.size() > 1) {
             int row = 2;
             int col = 3;
-            ScanCell scanCell =
-                new ScanCell(row, col, aliquots.get(0).getInventoryId());
+            ScanCell scanCell = new ScanCell(row, col, aliquots.get(0)
+                .getInventoryId());
             cells.put(new RowColPos(row, col), new PalletCell(scanCell));
             row = 3;
             col = 1;
@@ -79,11 +78,9 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomAliquotsAlreadyAssigned(
         WritableApplicationService appService, Integer siteId, Integer studyId)
         throws Exception {
-        Map<RowColPos, PalletCell> palletScanned =
-            new HashMap<RowColPos, PalletCell>();
-        List<AliquotWrapper> randomAliquots =
-            DebugUtil.getRandomAliquotsAlreadyAssigned(appService, siteId,
-                studyId);
+        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
+        List<AliquotWrapper> randomAliquots = DebugUtil
+            .getRandomAliquotsAlreadyAssigned(appService, siteId, studyId);
         if (randomAliquots.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
                 0, 0, randomAliquots.get(0).getInventoryId())));
@@ -98,11 +95,9 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomAliquotsNotAssigned(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        Map<RowColPos, PalletCell> palletScanned =
-            new HashMap<RowColPos, PalletCell>();
-        List<AliquotWrapper> randomAliquots =
-            DebugUtil
-                .getRandomAliquotsNotAssignedNoDispatch(appService, siteId);
+        Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
+        List<AliquotWrapper> randomAliquots = DebugUtil
+            .getRandomAliquotsNotAssignedNoDispatch(appService, siteId);
         int i = 0;
         while (i < randomAliquots.size() && i < 30) {
             int row = i / 12;
@@ -197,6 +192,16 @@ public class PalletCell extends Cell {
             return scanCell.getColumn();
         }
         return null;
+    }
+
+    public RowColPos getRowColPos() {
+        RowColPos rcp = null;
+        Integer row = getRow();
+        Integer col = getCol();
+        if (row != null && col != null) {
+            rcp = new RowColPos(row, col);
+        }
+        return rcp;
     }
 
     public static boolean hasValue(PalletCell cell) {

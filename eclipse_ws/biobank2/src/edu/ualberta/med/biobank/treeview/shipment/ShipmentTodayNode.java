@@ -5,12 +5,12 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentTodayNode extends AbstractTodayNode {
@@ -34,8 +34,8 @@ public class ShipmentTodayNode extends AbstractTodayNode {
     @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
-        return ShipmentWrapper.getTodayShipments(SessionManager
-            .getAppService(), SessionManager.getInstance().getCurrentSite());
+        return ShipmentWrapper.getTodayShipments(
+            SessionManager.getAppService(), SessionManager.getCurrentSite());
 
     }
 

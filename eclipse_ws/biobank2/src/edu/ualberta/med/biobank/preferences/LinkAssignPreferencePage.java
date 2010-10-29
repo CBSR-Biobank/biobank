@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.preferences;
 
+import java.io.File;
+
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.DirectoryFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
@@ -8,9 +10,12 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.utils.FilePromptUtil;
 
 public class LinkAssignPreferencePage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
+
+    private DirectoryFieldEditor logPath;
 
     public LinkAssignPreferencePage() {
         super(GRID);
@@ -31,9 +36,10 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE,
             "Save activity logs into a file", getFieldEditorParent()));
-        addField(new DirectoryFieldEditor(
+        logPath = new DirectoryFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
-            "Path for activity logs files", getFieldEditorParent()));
+            "Path for activity logs files", getFieldEditorParent());
+        addField(logPath);
         addField(new BooleanFieldEditor(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT,
             "Ask to print activity log", getFieldEditorParent()));
@@ -47,5 +53,16 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
      */
     @Override
     public void init(IWorkbench workbench) {
+    }
+
+    @Override
+    public boolean performOk() {
+        File file = new File(logPath.getStringValue());
+
+        if (!FilePromptUtil.isWritableDir(file)) {
+            return false;
+        }
+
+        return super.performOk();
     }
 }

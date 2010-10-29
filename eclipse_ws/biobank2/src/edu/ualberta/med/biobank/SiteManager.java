@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.rcp.Application;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SiteManager {
@@ -47,6 +47,8 @@ public class SiteManager {
     private SiteCombo siteCombo;
 
     private List<SiteWrapper> currentSites;
+
+    private String currentServer;
 
     protected void init(WritableApplicationService appService,
         String sessionName) {
@@ -75,7 +77,8 @@ public class SiteManager {
      * selects the site the user was working with the last time he / she logged
      * out if logged into same server and same site exists
      */
-    public void getCurrentSite(String serverName, Collection<SiteWrapper> sites) {
+    public void selectCurrentSite(String serverName,
+        Collection<SiteWrapper> sites) {
         if (currentSite != null)
             return;
 
@@ -95,6 +98,7 @@ public class SiteManager {
             if (site.getId().equals(siteId))
                 currentSite = site;
         }
+        currentServer = serverName;
     }
 
     public void setCurrentSite(SiteWrapper site) {
@@ -129,17 +133,20 @@ public class SiteManager {
 
     public void updateSites(Collection<SiteWrapper> sites) {
         Assert.isNotNull(sites, "sites collection is null");
-        if (currentSite == null)
-            currentSite = allSitesWrapper;
-        logger.debug("site selected: " + currentSite.getName());
-
         currentSites.clear();
         currentSites.add(0, allSitesWrapper);
         for (SiteWrapper site : sites) {
             currentSites.add(site);
         }
+        if (!SessionManager.getServer().equals(currentServer)
+            || currentSite == null || !currentSites.contains(currentSite)) {
+            currentSite = allSitesWrapper;
+        }
+        logger.debug("site selected: " + currentSite.getName());
+
         siteCombo.setInput(currentSites);
-        siteCombo.setSelection(allSitesWrapper);
+        siteCombo.setSelection(currentSite);
+        currentServer = SessionManager.getServer();
     }
 
     public void updateSites() {

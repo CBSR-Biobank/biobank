@@ -1,5 +1,8 @@
 package edu.ualberta.med.biobank.rcp;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.core.commands.Command;
 import org.eclipse.core.commands.IParameter;
 import org.eclipse.core.commands.Parameterization;
@@ -30,10 +33,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     public static final String VIEW_ID_PARM = "org.eclipse.ui.views.showView.viewId";
     public static final String ERROR_LOGS_VIEW = "org.eclipse.pde.runtime.LogView";
-    private Action showDlgAction;
 
+    List<Action> helpMenuCustomActions = new ArrayList<Action>();
     public static final String SEND_ERROR_EMAIL_ID = "edu.ualberta.med.biobank.commands.sendErrorMail";
-    private Action sendErrorMailAction;
+    public static final String EXPORT_ERRORS_LOGS_ID = "edu.ualberta.med.biobank.commands.exportErrorsLogs";
 
     private IWorkbenchAction aboutAction;
 
@@ -45,7 +48,10 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     @Override
     protected void makeActions(IWorkbenchWindow window) {
-        createSendErrorMailAction(window);
+        createCustomAction(window, "Send Error Mail", SEND_ERROR_EMAIL_ID,
+            "sendErrorMail");
+        createCustomAction(window, "Export Scanner Error Logs",
+            EXPORT_ERRORS_LOGS_ID, "exportErrorsLogs");
 
         createShowErrorLogsAction(window);
 
@@ -57,22 +63,23 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         register(resetPerspectiveAction);
     }
 
-    private void createSendErrorMailAction(IWorkbenchWindow window) {
+    private void createCustomAction(IWorkbenchWindow window, String text,
+        final String commandId, String actionId) {
         final IHandlerService handlerService = (IHandlerService) window
             .getService(IHandlerService.class);
-        sendErrorMailAction = new Action("Send Error Mail") {
+        Action action = new Action(text) {
             @Override
             public void run() {
                 try {
-                    handlerService.executeCommand(SEND_ERROR_EMAIL_ID, null);
+                    handlerService.executeCommand(commandId, null);
                 } catch (Exception e) {
                     BioBankPlugin.openAsyncError("Problem with command", e);
                 }
             }
         };
-        sendErrorMailAction.setId("sendErrorMail");
-        register(sendErrorMailAction);
-
+        action.setId(actionId);
+        register(action);
+        helpMenuCustomActions.add(action);
     }
 
     private void createShowErrorLogsAction(IWorkbenchWindow window) {
@@ -95,7 +102,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 nde);
         }
         final ParameterizedCommand cmd = new ParameterizedCommand(c, parms);
-        showDlgAction = new Action("Show Error Logs") {
+        Action showErrorLogsViewAction = new Action(
+            "Show Application Error Logs") {
             @Override
             public void run() {
                 try {
@@ -105,8 +113,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 }
             }
         };
-        showDlgAction.setId("showErrorLogs");
-        register(showDlgAction);
+        showErrorLogsViewAction.setId("showErrorLogs");
+        register(showErrorLogsViewAction);
+        helpMenuCustomActions.add(showErrorLogsViewAction);
     }
 
     @Override
@@ -120,8 +129,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         // activity if we don't want this menu to be displayed, but it is not
         // displayed after the product is exported
         helpMenu.add(new Separator("group.assist"));
-        helpMenu.add(sendErrorMailAction);
-        helpMenu.add(showDlgAction);
+        for (Action action : helpMenuCustomActions) {
+            helpMenu.add(action);
+        }
         helpMenu.add(resetPerspectiveAction);
         helpMenu.add(new Separator());
         helpMenu.add(aboutAction);

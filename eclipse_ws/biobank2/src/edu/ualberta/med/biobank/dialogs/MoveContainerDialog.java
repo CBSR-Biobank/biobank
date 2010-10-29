@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import org.eclipse.core.databinding.observable.value.IObservableValue;
-import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -21,7 +19,7 @@ public class MoveContainerDialog extends BiobankDialog {
     private ContainerWrapper srcContainer;
     private ContainerWrapper dstContainer;
 
-    private IObservableValue newLabel = new WritableValue("", String.class);
+    private String newLabel;
 
     public MoveContainerDialog(Shell parent, ContainerWrapper srcContainer,
         ContainerWrapper dstContainer) {
@@ -53,8 +51,8 @@ public class MoveContainerDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         BiobankText bbt = (BiobankText) createBoundWidgetWithLabel(contents,
-            BiobankText.class, SWT.FILL, "Destination Address", null, newLabel,
-            new StringLengthValidator(2,
+            BiobankText.class, SWT.FILL, "Destination Address", null, this,
+            "newLabel", new StringLengthValidator(2,
                 "Destination label must be another container "
                     + "(4 characters minimum)."));
 
@@ -63,7 +61,11 @@ public class MoveContainerDialog extends BiobankDialog {
     }
 
     public String getNewLabel() {
-        return newLabel.getValue().toString().toUpperCase();
+        return newLabel.toUpperCase();
+    }
+
+    public void setNewLabel(String label) {
+        newLabel = label;
     }
 
 }

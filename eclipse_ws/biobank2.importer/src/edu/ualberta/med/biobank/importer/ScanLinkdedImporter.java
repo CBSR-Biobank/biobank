@@ -117,19 +117,14 @@ public class ScanLinkdedImporter {
 
         String freezerLinkTable = "freezer_link";
 
-        String qryPart =
-            "from "
-                + freezerLinkTable
-                + " join sample_list on sample_list.sample_nr="
-                + freezerLinkTable
-                + ".sample_nr join patient_visit on patient_visit.visit_nr="
-                + freezerLinkTable
-                + ".visit_nr "
-                + "join patient on patient.patient_nr=patient_visit.patient_nr "
-                + "join study_list on study_list.study_nr=patient_visit.study_nr "
-                + "left join freezer on freezer.inventory_id="
-                + freezerLinkTable
-                + ".inventory_id where fnum is null order by link_date desc";
+        String qryPart = "from " + freezerLinkTable
+            + " join sample_list on sample_list.sample_nr=" + freezerLinkTable
+            + ".sample_nr join patient_visit on patient_visit.visit_nr="
+            + freezerLinkTable + ".visit_nr "
+            + "join patient on patient.patient_nr=patient_visit.patient_nr "
+            + "join study_list on study_list.study_nr=patient_visit.study_nr "
+            + "left join freezer on freezer.inventory_id=" + freezerLinkTable
+            + ".inventory_id where fnum is null order by link_date desc";
 
         Statement s = con.createStatement();
         s.execute("select count(*) " + qryPart);
@@ -188,8 +183,8 @@ public class ScanLinkdedImporter {
                 continue;
             }
 
-            String dupInvIdSampleTypeErr =
-                dupInvIdSampleTypeErrFix.get(inventoryId);
+            String dupInvIdSampleTypeErr = dupInvIdSampleTypeErrFix
+                .get(inventoryId);
             if ((dupInvIdSampleTypeErr != null)
                 && !dupInvIdSampleTypeErr.equals(sampleTypeNameShort)) {
                 logger.info("ignoring duplicate inventory id: "
@@ -199,9 +194,8 @@ public class ScanLinkdedImporter {
                 continue;
             }
 
-            AliquotWrapper aliquot =
-                isDuplicateInventoryId(inventoryId, visitId, patientNr,
-                    sampleTypeNameShort);
+            AliquotWrapper aliquot = isDuplicateInventoryId(inventoryId,
+                visitId, patientNr, sampleTypeNameShort);
 
             if (aliquot != null) {
                 aliquot.setActivityStatus(ActivityStatusWrapper
@@ -216,10 +210,9 @@ public class ScanLinkdedImporter {
                 continue;
             }
 
-            aliquot =
-                Importer.createAliquot(site, studyNameShort, patientNr,
-                    visitId, dateProcessedStr, dateTakenStr, inventoryId,
-                    sampleTypeNameShort, linkDateStr);
+            aliquot = Importer.createAliquot(site, studyNameShort, patientNr,
+                visitId, dateProcessedStr, dateTakenStr, inventoryId,
+                sampleTypeNameShort, linkDateStr);
 
             if (aliquot == null) {
                 logger
@@ -253,20 +246,18 @@ public class ScanLinkdedImporter {
     private AliquotWrapper isDuplicateInventoryId(String inventoryId,
         int visitId, String patientNr, String sampleTypeNameShort)
         throws Exception {
-        List<AliquotWrapper> aliquots =
-            AliquotWrapper.getAliquots(appService, inventoryId);
-        sampleTypeNameShort =
-            Importer.getSampleType(sampleTypeNameShort).getNameShort();
-        if (aliquots.size() > 0) {
+        AliquotWrapper aliquot = AliquotWrapper.getAliquot(appService,
+            inventoryId, null);
+        sampleTypeNameShort = Importer.getSampleType(sampleTypeNameShort)
+            .getNameShort();
+        if (aliquot != null) {
             // check if this is a duplicate
-            for (AliquotWrapper a : aliquots) {
-                if (a.getPatientVisit().getId().equals(visitId)
-                    && a.getPatientVisit().getPatient().getPnumber()
-                        .equals(patientNr)
-                    && a.getSampleType().getNameShort()
-                        .equals(sampleTypeNameShort)) {
-                    return a;
-                }
+            if (aliquot.getPatientVisit().getId().equals(visitId)
+                && aliquot.getPatientVisit().getPatient().getPnumber()
+                    .equals(patientNr)
+                && aliquot.getSampleType().getNameShort()
+                    .equals(sampleTypeNameShort)) {
+                return aliquot;
             }
             logger.error("duplicate inventory id found: inventoryId/"
                 + inventoryId + " visitId/" + visitId + " patientNr/"

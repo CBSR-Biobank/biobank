@@ -165,7 +165,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                     List<AbstractReportTreeNode> customNodes = custom
                         .getChildren();
                     for (AbstractReportTreeNode customNode : customNodes)
-                        if (customNode.getLabel().compareTo(dlg.getName()) == 0) {
+                        if (customNode.getLabel().compareTo(dlg.getFileName()) == 0) {
                             BioBankPlugin
                                 .openAsyncError(
                                     "Duplicate Name",
@@ -174,9 +174,9 @@ public class AdvancedReportsEditor extends BiobankFormBase {
                         }
                     tree.saveTree(Platform.getInstanceLocation().getURL()
                         .getPath()
-                        + "/saved_reports/", dlg.getName());
+                        + "/saved_reports/", dlg.getFileName());
                     AdvancedReportTreeNode newReport = new AdvancedReportTreeNode(
-                        dlg.getName(), (QueryTreeNode) tree.getInput());
+                        dlg.getFileName(), (QueryTreeNode) tree.getInput());
                     newReport.setParent(custom);
                     custom.addChild(newReport);
                 }

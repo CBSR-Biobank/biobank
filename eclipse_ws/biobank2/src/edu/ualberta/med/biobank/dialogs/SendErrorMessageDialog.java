@@ -19,7 +19,6 @@ import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -69,7 +68,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Please describe steps to reproduce the problem. A log file of the application will be attached to the email.";
+        return "Please describe steps to reproduce the problem. The application error log will be automatically attached.";
     }
 
     @Override
@@ -95,16 +94,13 @@ public class SendErrorMessageDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
-            "Title", new String[0],
-            PojoObservables.observeValue(email, "title"),
+            "Title", new String[0], email, "title",
             new NonEmptyStringValidator("Please enter a title"));
 
-        BiobankText descText =
-            (BiobankText) createBoundWidgetWithLabel(contents,
-                BiobankText.class, SWT.MULTI, "Description", new String[0],
-                PojoObservables.observeValue(email, "description"),
-                new NonEmptyStringValidator(
-                    "Please enter at least a very small comment"));
+        BiobankText descText = (BiobankText) createBoundWidgetWithLabel(
+            contents, BiobankText.class, SWT.MULTI, "Description",
+            new String[0], email, "description", new NonEmptyStringValidator(
+                "Please enter at least a very small comment"));
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.heightHint = 200;
         descText.setLayoutData(gd);
@@ -112,8 +108,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
         Label attLabel = widgetCreator.createLabel(contents, "Attachments");
         attLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_BEGINNING));
 
-        final Composite attachmentsComposite =
-            new Composite(contents, SWT.NONE);
+        final Composite attachmentsComposite = new Composite(contents, SWT.NONE);
         GridLayout layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
         layout.marginWidth = 0;
@@ -130,8 +125,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                AttachmentComposite attachmentComposite =
-                    new AttachmentComposite(attachmentsComposite, contents);
+                AttachmentComposite attachmentComposite = new AttachmentComposite(
+                    attachmentsComposite, contents);
                 contents.layout(true, true);
                 Point shellSize = getShell().getSize();
                 getShell().setSize(shellSize.x,
@@ -222,8 +217,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
     }
 
     private void sendMail() throws Exception {
-        IRunnableContext context =
-            new ProgressMonitorDialog(Display.getDefault().getActiveShell());
+        IRunnableContext context = new ProgressMonitorDialog(Display
+            .getDefault().getActiveShell());
         context.run(true, false, new IRunnableWithProgress() {
             @Override
             public void run(final IProgressMonitor monitor) {
@@ -239,15 +234,14 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     props.put("mail.smtp.socketFactory.class", SSL_FACTORY);
                     props.put("mail.smtp.socketFactory.fallback", "false");
 
-                    Session session =
-                        Session.getDefaultInstance(props,
-                            new javax.mail.Authenticator() {
-                                @Override
-                                protected PasswordAuthentication getPasswordAuthentication() {
-                                    return new PasswordAuthentication(
-                                        "biobank2", email.getServerPassword());
-                                }
-                            });
+                    Session session = Session.getDefaultInstance(props,
+                        new javax.mail.Authenticator() {
+                            @Override
+                            protected PasswordAuthentication getPasswordAuthentication() {
+                                return new PasswordAuthentication("biobank2",
+                                    email.getServerPassword());
+                            }
+                        });
                     // session.setDebug(true);
                     Transport.send(getEmailMessage(session));
                     monitor.done();
@@ -281,15 +275,13 @@ public class SendErrorMessageDialog extends BiobankDialog {
         MimeBodyPart mbp1 = new MimeBodyPart();
         String text = email.getDescription() + "\n\n------";
         if (SessionManager.getInstance().isConnected()) {
-            text +=
-                "\nCreated by user "
-                    + SessionManager.getInstance().getSession().getUser()
-                        .getLogin();
+            text += "\nCreated by user "
+                + SessionManager.getInstance().getSession().getUser()
+                    .getLogin();
         }
 
-        text +=
-            "\nSent from BioBank2 Java Client, version "
-                + BioBankPlugin.getDefault().getBundle().getVersion();
+        text += "\nSent from BioBank2 Java Client, version "
+            + BioBankPlugin.getDefault().getBundle().getVersion();
 
         mbp1.setText(text);
         mp.addBodyPart(mbp1);
@@ -345,16 +337,15 @@ public class SendErrorMessageDialog extends BiobankDialog {
             gd.grabExcessHorizontalSpace = true;
             setLayoutData(gd);
 
-            attachmentText =
-                (BiobankText) widgetCreator.createWidget(this,
-                    BiobankText.class, SWT.READ_ONLY, null);
+            attachmentText = (BiobankText) widgetCreator.createWidget(this,
+                BiobankText.class, SWT.READ_ONLY, null);
             browseButton = new Button(this, SWT.PUSH);
             browseButton.setText("Browse");
             browseButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    FileDialog fd =
-                        new FileDialog(browseButton.getShell(), SWT.OPEN);
+                    FileDialog fd = new FileDialog(browseButton.getShell(),
+                        SWT.OPEN);
                     fd.setText("Select attachment");
                     file = fd.open();
                     if (file != null) {
@@ -369,13 +360,12 @@ public class SendErrorMessageDialog extends BiobankDialog {
             removeButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    int height =
-                        AttachmentComposite.this.computeSize(SWT.DEFAULT,
-                            SWT.DEFAULT).y;
+                    int height = AttachmentComposite.this.computeSize(
+                        SWT.DEFAULT, SWT.DEFAULT).y;
                     attachmentText.setText("");
                     AttachmentComposite.this.setVisible(false);
-                    GridData gd =
-                        (GridData) AttachmentComposite.this.getLayoutData();
+                    GridData gd = (GridData) AttachmentComposite.this
+                        .getLayoutData();
                     gd.exclude = true;
                     attachments.remove(AttachmentComposite.this);
                     globalComposite.layout(true, true);

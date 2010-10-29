@@ -14,7 +14,7 @@ import org.eclipse.ui.console.MessageConsoleStream;
 import edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm;
 import edu.ualberta.med.biobank.forms.ScanAssignEntryForm;
 import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
-import edu.ualberta.med.biobank.rcp.AliquotManagementPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
 
 /**
  * Display in ConsoleView and possibly printed.

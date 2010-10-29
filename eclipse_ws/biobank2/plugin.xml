@@ -67,42 +67,42 @@
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
-            class="edu.ualberta.med.biobank.rcp.MainPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.MainPerspective"
             id="edu.ualberta.med.biobank.perspective.main"
             icon="icons/mainPerspective.png"
             name="Administration View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.ReportsPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective"
             id="edu.ualberta.med.biobank.perspective.reports"
             icon="icons/reportsPerspective.png"
             name="Reports View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.PatientsAdministrationPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective"
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.perspective.patients"
             name="Patients View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.AliquotManagementPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective"
             id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
             name="Samples Management Perspective">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.ShipmentAdministrationPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.ShipmentAdministrationPerspective"
             id="edu.ualberta.med.biobank.perspective.shipments"
             icon="icons/shipment.png"
             name="Shipment View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.DispatchAdministrationPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.DispatchAdministrationPerspective"
             id="edu.ualberta.med.biobank.perspective.dispatchs"
             icon="icons/dispatch.png"
             name="Dispatch View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.LoggingPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.LoggingPerspective"
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.perspective.logging"
             name="Logging View">
@@ -211,11 +211,11 @@
       </command>
        <command
             id="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
-            name="Add clinic shipment">
+            name="Add shipment">
       </command>
        <command
             id="edu.ualberta.med.biobank.commands.shipments.shipmentDelete"
-            name="Delete clinic shipment">
+            name="Delete shipment">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientAdd"
@@ -246,7 +246,7 @@
             name="Reload">
       </command>
       <command
-            defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMail"
+            defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMailHandler"
             id="edu.ualberta.med.biobank.commands.sendErrorMail"
             name="Send Error Mail">
       </command>
@@ -303,8 +303,13 @@
       </command>
        <command
             id="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
-            name="Add dispatch shipment">
+            name="Add dispatch">
       </command>
+       <command
+             defaultHandler="edu.ualberta.med.biobank.handlers.ExportErrorsLogsHandler"
+             id="edu.ualberta.med.biobank.commands.exportErrorsLogs"
+             name="Export Errors Logs">
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -430,7 +435,7 @@
                      definitionId="biobank2.mainPerspectiveSelected">
                </reference>
                <reference
-                    definitionId="biobank2.siteSelected">
+                     definitionId="biobank2.canUpdateSiteSelected">
                </reference>
             </and>
          </activeWhen>
@@ -447,7 +452,7 @@
                      definitionId="biobank2.mainPerspectiveSelected">
                </reference>
                <reference
-                    definitionId="biobank2.siteSelected">
+                     definitionId="biobank2.canUpdateSiteSelected">
                </reference>
             </and>
          </activeWhen>
@@ -568,6 +573,9 @@
               </reference>
               <reference
                     definitionId="biobank2.siteSelected">
+              </reference>
+              <reference
+                    definitionId="biobank2.canUpdateSiteSelected">
               </reference>
             </and>
          </activeWhen>
@@ -697,7 +705,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
+                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -728,7 +736,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
+                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -778,7 +786,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.PatientAdapter">
+                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -809,7 +817,7 @@
                         ifEmpty="false"
                         operator="or">
                      <instanceof
-                           value="edu.ualberta.med.biobank.treeview.PatientVisitAdapter">
+                           value="edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -1257,6 +1265,12 @@
                   commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
                   icon="icons/shipment.png"
                   label="Shipment View"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.dispatchAdmin"
+                  icon="icons/dispatch.png"
+                  label="Dispatch View"
                   style="push">
             </command>
             <command
@@ -2469,6 +2483,11 @@
             schemeId="biobank2.scheme"
             sequence="M1+D">
       </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.dispatchAdmin"
+            schemeId="biobank2.scheme"
+            sequence="M1+M2+D">
+      </key>
    </extension>
     <extension
          point="org.eclipse.ui.preferencePages">
@@ -2765,6 +2784,15 @@
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.dispatchs">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.canUpdateSiteSelected">
+         <with
+               variable="edu.ualberta.med.biobank.sourceprovider.canUpdateSiteSelected">
+            <equals
+                  value="true">
             </equals>
          </with>
       </definition>

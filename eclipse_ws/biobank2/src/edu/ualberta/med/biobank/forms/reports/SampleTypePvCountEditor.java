@@ -36,7 +36,7 @@ public class SampleTypePvCountEditor extends ReportsEditor {
     protected ComboViewer createStudyComboOption(String labelText,
         Composite parent) throws ApplicationException {
         Collection<StudyWrapper> studyWrappers;
-        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper site = SessionManager.getCurrentSite();
         if (site.getName().compareTo("All Sites") != 0)
             studyWrappers = site.getStudyCollection(true);
         else

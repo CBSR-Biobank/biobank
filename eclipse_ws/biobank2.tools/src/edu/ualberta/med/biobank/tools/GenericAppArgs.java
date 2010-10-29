@@ -11,7 +11,7 @@ public class GenericAppArgs {
     public String hostname = "localhost";
     public String username = "testuser";
     public String password = "test";
-    public int port = 8443;
+    public int port = 443;
     public String[] remainingArgs;
     public boolean error = false;
     public String errorMsg;
@@ -63,6 +63,7 @@ public class GenericAppArgs {
         remainingArgs = parser.getRemainingArgs();
     }
 
+    @Override
     public String toString() {
         return "h: " + hostname + ", p: " + port + ", u: " + username + ", w: "
             + password + ", rArgs: " + remainingArgs.toString() + ", errmsg"

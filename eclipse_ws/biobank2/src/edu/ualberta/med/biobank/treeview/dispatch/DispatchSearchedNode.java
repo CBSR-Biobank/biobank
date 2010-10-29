@@ -4,12 +4,10 @@ import java.util.Date;
 
 import org.eclipse.core.runtime.Assert;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
 
 public class DispatchSearchedNode extends AbstractSearchedNode {
 
@@ -19,13 +17,13 @@ public class DispatchSearchedNode extends AbstractSearchedNode {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        Assert.isTrue(child instanceof ClinicWrapper);
-        return new ClinicAdapter(this, (ClinicWrapper) child);
+        Assert.isTrue(child instanceof DispatchWrapper);
+        return new DispatchAdapter(this, (DispatchWrapper) child);
     }
 
     @Override
     protected AdapterBase createChildNode() {
-        return new ClinicAdapter(this, null);
+        return new DispatchAdapter(this, null);
     }
 
     @Override

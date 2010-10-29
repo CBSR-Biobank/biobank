@@ -9,10 +9,11 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class User implements Serializable, NotAProxy {
-    private static final String CONTAINER_ADMINISTRATION_STRING = "biobank.cbsr.container.administration";
     private static final long serialVersionUID = 1L;
 
     private Long id;
@@ -22,6 +23,15 @@ public class User implements Serializable, NotAProxy {
     private String lastName;
     private String password;
     private String email;
+    private boolean isLockedOut;
+
+    public boolean isLockedOut() {
+        return isLockedOut;
+    }
+
+    public void setLockedOut(boolean isLockedOut) {
+        this.isLockedOut = isLockedOut;
+    }
 
     private boolean needToChangePassword;
 
@@ -111,12 +121,66 @@ public class User implements Serializable, NotAProxy {
         return false;
     }
 
-    public boolean hasPrivilegeOnObject(Privilege privilege, Class<?> clazz) {
-        String objectName;
-        if (ModelWrapper.class.isAssignableFrom(clazz)) {
+    public boolean isSiteAdministrator(SiteWrapper site) {
+        Integer id = null;
+        if (site != null)
+            id = site.getId();
+        return isSiteAdministrator(id);
+    }
+
+    public boolean isSiteAdministrator(Integer siteId) {
+        if (isWebsiteAdministrator()) {
+            return true;
+        }
+        for (Group group : groups) {
+            if (group.isSiteAdministrator(siteId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean canUpdateSite(SiteWrapper site) {
+        Integer id = null;
+        if (site != null)
+            id = site.getId();
+        return canUpdateSite(id);
+    }
+
+    public boolean canUpdateSite(Integer siteId) {
+        return hasPrivilegeOnObject(Privilege.UPDATE, Site.class.getName(),
+            siteId);
+    }
+
+    public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
+        String protectionGroupName, Integer siteId) {
+        for (Group group : groups) {
+            if (group.hasPrivilegeOnProtectionGroup(privilege,
+                protectionGroupName, siteId)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
+        ModelWrapper<?> modelWrapper) {
+        boolean canCreateDeleteUpdate = true;
+        String type = modelWrapper.getWrappedClass().getName();
+        if (privilege != Privilege.READ && siteId != null)
+            canCreateDeleteUpdate = canUpdateSite(siteId);
+        canCreateDeleteUpdate = canCreateDeleteUpdate
+            && modelWrapper.checkSpecificAccess(this, siteId);
+        return canCreateDeleteUpdate
+            && hasPrivilegeOnObject(privilege, type, modelWrapper.getId());
+    }
+
+    public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
+        Class<?> objectClazz, Integer objectId) {
+        if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
             ModelWrapper<?> wrapper = null;
             try {
-                Constructor<?> constructor = clazz
+                Constructor<?> constructor = objectClazz
                     .getConstructor(WritableApplicationService.class);
                 wrapper = (ModelWrapper<?>) constructor
                     .newInstance((WritableApplicationService) null);
@@ -125,25 +189,20 @@ public class User implements Serializable, NotAProxy {
                 e.printStackTrace();
                 return false;
             }
-            objectName = wrapper.getWrappedClass().getName();
-        } else {
-            objectName = clazz.getName();
+            return hasPrivilegeOnObject(privilege, siteId, wrapper);
         }
-        return hasPrivilegeOnObject(privilege, objectName);
+        String type = objectClazz.getName();
+        return hasPrivilegeOnObject(privilege, type, objectId);
     }
 
-    public boolean hasPrivilegeOnObject(Privilege privilege, String objectName) {
+    private boolean hasPrivilegeOnObject(Privilege privilege, String type,
+        Integer id) {
         for (Group group : groups) {
-            if (group.hasPrivilegeOnObject(privilege, objectName)) {
+            if (group.hasPrivilegeOnObject(privilege, type, id)) {
                 return true;
             }
         }
         return false;
-    }
-
-    public boolean isContainerAdministrator() {
-        return hasPrivilegeOnObject(Privilege.CREATE,
-            CONTAINER_ADMINISTRATION_STRING);
     }
 
     @Override
@@ -158,4 +217,5 @@ public class User implements Serializable, NotAProxy {
         properties.put("groups", groups);
         return properties.toString();
     }
+
 }

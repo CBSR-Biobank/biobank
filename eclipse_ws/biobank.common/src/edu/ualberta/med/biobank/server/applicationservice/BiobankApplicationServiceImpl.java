@@ -6,16 +6,21 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.server.reports.ReportFactory;
-import gov.nih.nci.security.AuthorizationManager;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
+import gov.nih.nci.security.authentication.LockoutManager;
+import gov.nih.nci.security.authorization.domainobjects.Application;
 import gov.nih.nci.security.authorization.domainobjects.Group;
 import gov.nih.nci.security.authorization.domainobjects.Privilege;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElementPrivilegeContext;
+import gov.nih.nci.security.authorization.domainobjects.ProtectionGroup;
+import gov.nih.nci.security.authorization.domainobjects.ProtectionGroupRoleContext;
+import gov.nih.nci.security.authorization.domainobjects.Role;
 import gov.nih.nci.security.authorization.domainobjects.User;
 import gov.nih.nci.security.dao.GroupSearchCriteria;
-import gov.nih.nci.security.exceptions.CSException;
+import gov.nih.nci.security.dao.ProtectionElementSearchCriteria;
+import gov.nih.nci.security.dao.SearchCriteria;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
@@ -27,6 +32,7 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -56,50 +62,10 @@ public class BiobankApplicationServiceImpl extends
 
     private static final String APPLICATION_CONTEXT_NAME = "biobank2";
 
-    private static final String SITE_ADMIN_PG_ID = "11";
-
-    // private static final String CONTAINER_ADMINISTRATION_STRING =
-    // "biobank.cbsr.container.administration";
-
-    private Map<String, Map<String, Boolean>> cachedPrivilegesMap = new HashMap<String, Map<String, Boolean>>();
+    private static final String ALL_SITES_PG_ID = "11";
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
-    }
-
-    @Override
-    public boolean hasPrivilege(Class<?> clazz, Integer id, String privilegeName)
-        throws ApplicationException {
-        try {
-            String userLogin = SecurityContextHolder.getContext()
-                .getAuthentication().getName();
-            AuthorizationManager am = SecurityServiceProvider
-                .getAuthorizationManager(APPLICATION_CONTEXT_NAME);
-            String objectId = clazz.getName();
-            if (id == null) {
-                return checkPermission(am, userLogin, objectId, privilegeName);
-            }
-            return am.checkPermission(userLogin, objectId, "id", id.toString(),
-                privilegeName);
-        } catch (Exception e) {
-            throw new ApplicationException(e);
-        }
-    }
-
-    private Boolean checkPermission(AuthorizationManager am, String userLogin,
-        String objectId, String privilegeName) throws CSException {
-        Map<String, Boolean> objectsMap = cachedPrivilegesMap
-            .get(privilegeName);
-        if (objectsMap == null) {
-            objectsMap = new HashMap<String, Boolean>();
-            cachedPrivilegesMap.put(privilegeName, objectsMap);
-        }
-        Boolean res = objectsMap.get(objectId);
-        if (res == null) {
-            res = am.checkPermission(userLogin, objectId, privilegeName);
-        }
-        objectsMap.put(objectId, res);
-        return res;
     }
 
     private boolean isWebsiteAdministrator() throws ApplicationException {
@@ -118,7 +84,7 @@ public class BiobankApplicationServiceImpl extends
                 if (group
                     .getGroupName()
                     .equals(
-                        edu.ualberta.med.biobank.common.security.Group.GROUP_NAME_WEBSITE_ADMINISTRATOR)) {
+                        edu.ualberta.med.biobank.common.security.Group.GROUP_WEBSITE_ADMINISTRATOR)) {
                     return true;
                 }
             }
@@ -167,47 +133,80 @@ public class BiobankApplicationServiceImpl extends
             nameShort = site.getNameShort();
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
-            Set<ProtectionElement> siteAdminPEs = upm
-                .getProtectionElements(SITE_ADMIN_PG_ID);
-            for (ProtectionElement pe : siteAdminPEs) {
-                if (pe.getValue().equals(id.toString())) {
-                    upm.removeProtectionElement(pe.getProtectionElementId()
-                        .toString());
-                    return;
+            ProtectionElement searchPE = new ProtectionElement();
+            searchPE.setObjectId(Site.class.getName());
+            searchPE.setAttribute("id");
+            searchPE.setValue(id.toString());
+            SearchCriteria sc = new ProtectionElementSearchCriteria(searchPE);
+            List<ProtectionElement> peToDelete = upm.getObjects(sc);
+            if (peToDelete == null || peToDelete.size() == 0) {
+                return;
+            }
+            List<String> pgIdsToDelete = new ArrayList<String>();
+            for (ProtectionElement pe : peToDelete) {
+                Set<ProtectionGroup> pgs = upm.getProtectionGroups(pe
+                    .getProtectionElementId().toString());
+                for (ProtectionGroup pg : pgs) {
+                    // remove the protection group only if it contains only
+                    // this protection element and is not the main site
+                    // admin group
+                    String pgId = pg.getProtectionGroupId().toString();
+                    if (!pgId.equals(ALL_SITES_PG_ID)
+                        && upm.getProtectionElements(pgId).size() == 1) {
+                        pgIdsToDelete.add(pgId);
+                    }
                 }
+                upm.removeProtectionElement(pe.getProtectionElementId()
+                    .toString());
+            }
+            for (String pgId : pgIdsToDelete) {
+                upm.removeProtectionGroup(pgId);
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw new ApplicationException("Error deleting site " + id + ":"
-                + nameShort + "security: " + e.getMessage());
+                + nameShort + " security: " + e.getMessage());
         }
 
     }
 
     private void newSiteSecurity(Site site) throws ApplicationException {
-        Object id = null;
+        Integer siteId = null;
         String nameShort = null;
         try {
-            id = site.getId();
+            siteId = site.getId();
             nameShort = site.getNameShort();
             UserProvisioningManager upm = SecurityServiceProvider
                 .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+            Application currentApplication = upm
+                .getApplication(APPLICATION_CONTEXT_NAME);
             // Create protection element for the site
             ProtectionElement pe = new ProtectionElement();
-            pe.setApplication(upm.getApplication(APPLICATION_CONTEXT_NAME));
+            pe.setApplication(currentApplication);
             pe.setProtectionElementName(SITE_CLASS_NAME + "/" + nameShort);
             pe.setProtectionElementDescription(nameShort);
             pe.setObjectId(SITE_CLASS_NAME);
             pe.setAttribute("id");
-            pe.setValue(id.toString());
+            pe.setValue(siteId.toString());
             upm.createProtectionElement(pe);
-            // Add the new protection element to the protection group
-            // "Site Admin PG"
-            upm.addProtectionElements(SITE_ADMIN_PG_ID, new String[] { pe
-                .getProtectionElementId().toString() });
+
+            // Create a new protection group for this protection element only
+            ProtectionGroup pg = new ProtectionGroup();
+            pg.setApplication(currentApplication);
+            pg.setProtectionGroupName(nameShort + " site");
+            pg.setProtectionGroupDescription("Protection group for site "
+                + nameShort + " (id=" + siteId + ")");
+            pg.setProtectionElements(new HashSet<ProtectionElement>(Arrays
+                .asList(pe)));
+            // parent will be the "all sites" protection group
+            ProtectionGroup allSitePg = upm
+                .getProtectionGroupById(ALL_SITES_PG_ID);
+            pg.setParentProtectionGroup(allSitePg);
+            upm.createProtectionGroup(pg);
         } catch (Exception e) {
             log.error("error adding new site security", e);
-            throw new ApplicationException("Error adding new site " + id + ":"
-                + nameShort + "security:" + e.getMessage());
+            throw new ApplicationException("Error adding new site " + siteId
+                + ":" + nameShort + " security:" + e.getMessage());
         }
     }
 
@@ -312,9 +311,33 @@ public class BiobankApplicationServiceImpl extends
                     .add(edu.ualberta.med.biobank.common.security.Privilege
                         .valueOf(csmPrivilege.getName()));
             }
-            biobankGroup.addProtectionElementPrivilege(
-                pe.getProtectionElementName(), privileges, pe.getValue());
+            String type = pe.getObjectId();
+            String id = null;
+            if ("id".equals(pe.getAttribute())) {
+                id = pe.getValue();
+            }
+            biobankGroup.addProtectionElementPrivilege(type, id, privileges);
         }
+
+        Set<?> pgrcList = upm.getProtectionGroupRoleContextForGroup(group
+            .getGroupId().toString());
+        for (Object o : pgrcList) {
+            ProtectionGroupRoleContext pgrc = (ProtectionGroupRoleContext) o;
+            ProtectionGroup pg = pgrc.getProtectionGroup();
+            Set<edu.ualberta.med.biobank.common.security.Privilege> privileges = new HashSet<edu.ualberta.med.biobank.common.security.Privilege>();
+            for (Object r : pgrc.getRoles()) {
+                Role role = (Role) r;
+                for (Object p : upm.getPrivileges(role.getId().toString())) {
+                    Privilege csmPrivilege = (Privilege) p;
+                    privileges
+                        .add(edu.ualberta.med.biobank.common.security.Privilege
+                            .valueOf(csmPrivilege.getName()));
+                }
+            }
+            biobankGroup.addProtectionGroupPrivilege(
+                pg.getProtectionGroupName(), privileges);
+        }
+
         return biobankGroup;
     }
 
@@ -478,6 +501,8 @@ public class BiobankApplicationServiceImpl extends
         userDTO.setFirstName(serverUser.getFirstName());
         userDTO.setLastName(serverUser.getLastName());
         userDTO.setEmail(serverUser.getEmailId());
+        userDTO.setLockedOut(LockoutManager.getInstance().isUserLockedOut(
+            serverUser.getLoginName()));
 
         if (serverUser.getStartDate() != null) {
             userDTO.setNeedToChangePassword(true);
@@ -491,4 +516,10 @@ public class BiobankApplicationServiceImpl extends
         return userDTO;
     }
 
+    @Override
+    public void unlockUser(String userName) throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            LockoutManager.getInstance().unLockUser(userName);
+        }
+    }
 }

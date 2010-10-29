@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.dialogs;
 
-import org.eclipse.core.databinding.beans.PojoObservables;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -66,12 +65,11 @@ public class SampleTypeDialog extends BiobankDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Name", null, PojoObservables.observeValue(sampleType, "name"),
-            new NonEmptyStringValidator(MSG_NO_ST_NAME));
+            "Name", null, sampleType, "name", new NonEmptyStringValidator(
+                MSG_NO_ST_NAME));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Short Name", null,
-            PojoObservables.observeValue(sampleType, "nameShort"),
+            "Short Name", null, sampleType, "nameShort",
             new NonEmptyStringValidator(MSG_NO_ST_SNAME));
     }
 

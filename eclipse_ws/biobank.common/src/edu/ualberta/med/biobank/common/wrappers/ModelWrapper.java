@@ -36,11 +36,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected E wrappedObject;
 
-    protected PropertyChangeSupport propertyChangeSupport =
-        new PropertyChangeSupport(this);
+    protected PropertyChangeSupport propertyChangeSupport = new PropertyChangeSupport(
+        this);
 
-    protected HashMap<String, Object> propertiesMap =
-        new HashMap<String, Object>();
+    protected HashMap<String, Object> propertiesMap = new HashMap<String, Object>();
 
     private List<WrapperListener> listeners = new ArrayList<WrapperListener>();
 
@@ -114,13 +113,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public void reload() throws Exception {
+        propertiesMap.clear();
+        resetInternalFields();
         if (!isNew()) {
             E oldValue = wrappedObject;
             wrappedObject = getObjectFromDatabase();
             firePropertyChanges(oldValue, wrappedObject);
         }
-        propertiesMap.clear();
-        resetInternalFields();
     }
 
     /**
@@ -140,6 +139,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             throw new Exception("memberNames cannot be null");
         }
         for (String member : memberNames) {
+            // TODO: should send old and new PROPERTY values.
             propertyChangeSupport.firePropertyChange(member, oldWrappedObject,
                 newWrappedObject);
         }
@@ -194,13 +194,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             eventType = WrapperEventType.UPDATE;
         }
         persistDependencies(origObject);
-        SDKQueryResult result =
-            ((BiobankApplicationService) appService).executeQuery(query);
+        SDKQueryResult result = ((BiobankApplicationService) appService)
+            .executeQuery(query);
         wrappedObject = ((E) result.getObjectResult());
         Log logMessage = null;
         try {
-            logMessage =
-                getLogMessage(eventType.name().toLowerCase(), null, "");
+            logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
         } catch (Exception ex) {
             // Don't want the logs to affect persist
             // FIXME save somewhere this information
@@ -231,17 +230,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         String fieldValue = "";
         String[] fields = getPropertyChangeNames();
         for (int i = 0; i < fields.length; i++) {
-            Integer maxLen =
-                VarCharLengths.getMaxSize(wrappedObject.getClass(), fields[i]);
+            Integer maxLen = VarCharLengths.getMaxSize(
+                wrappedObject.getClass(), fields[i]);
             if (maxLen == null)
                 continue;
 
             Method method;
             try {
-                method =
-                    this.getClass().getMethod(
-                        "get" + Character.toUpperCase(fields[i].charAt(0))
-                            + fields[i].substring(1));
+                method = this.getClass().getMethod(
+                    "get" + Character.toUpperCase(fields[i].charAt(0))
+                        + fields[i].substring(1));
                 if (method.getReturnType().equals(String.class)) {
                     fieldValue = (String) method.invoke(this);
                     if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
@@ -305,13 +303,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected abstract void deleteChecks() throws Exception;
 
     public void reset() throws Exception {
+        propertiesMap.clear();
+        resetInternalFields();
         if (isNew()) {
             resetToNewObject();
         } else {
             reload();
         }
-        propertiesMap.clear();
-        resetInternalFields();
     }
 
     /**
@@ -349,17 +347,28 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected void checkNoDuplicates(Class<?> objectClass, String propertyName,
         String value, String errorName) throws ApplicationException,
         BiobankCheckException {
+        checkNoDuplicates(objectClass, propertyName, value, errorName, false);
+    }
+
+    protected void checkNoDuplicates(Class<?> objectClass, String propertyName,
+        String value, String errorName, boolean isCaseSensitive)
+        throws ApplicationException, BiobankCheckException {
         HQLCriteria c;
+
+        String propertyValue = "?";
+        if (!isCaseSensitive) {
+            propertyName = "lower(" + propertyName + ")";
+            propertyValue = "lower(" + propertyValue + ")";
+        }
+
         if (isNew()) {
-            c =
-                new HQLCriteria("from " + objectClass.getName() + " where "
-                    + propertyName + "= ?",
-                    Arrays.asList(new Object[] { value }));
+            c = new HQLCriteria("from " + objectClass.getName() + " where "
+                + propertyName + "=" + propertyValue,
+                Arrays.asList(new Object[] { value }));
         } else {
-            c =
-                new HQLCriteria("from " + objectClass.getName()
-                    + " where id <> ? and " + propertyName + "= ?",
-                    Arrays.asList(new Object[] { getId(), value }));
+            c = new HQLCriteria("from " + objectClass.getName()
+                + " where id <> ? and " + propertyName + "=" + propertyValue,
+                Arrays.asList(new Object[] { getId(), value }));
         }
 
         List<Object> results = appService.query(c);
@@ -372,8 +381,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected void checkNoDuplicatesInSite(Class<?> objectClass,
         String propertyName, String value, Integer siteId, String errorMessage)
         throws ApplicationException, BiobankCheckException {
-        List<Object> parameters =
-            new ArrayList<Object>(Arrays.asList(new Object[] { value }));
+        List<Object> parameters = new ArrayList<Object>(
+            Arrays.asList(new Object[] { value }));
         String siteIdTest = "site.id=?";
         if (siteId == null) {
             siteIdTest = "site.id is null";
@@ -385,10 +394,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             notSameObject = " and id <> ?";
             parameters.add(getId());
         }
-        HQLCriteria criteria =
-            new HQLCriteria("from " + objectClass.getName() + " where "
-                + propertyName + "=? and " + siteIdTest + notSameObject,
-                parameters);
+        HQLCriteria criteria = new HQLCriteria(
+            "from " + objectClass.getName() + " where " + propertyName
+                + "=? and " + siteIdTest + notSameObject, parameters);
         List<Object> results = appService.query(criteria);
         if (results.size() > 0) {
             throw new BiobankCheckException(errorMessage);
@@ -437,7 +445,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     /**
      * If we want to reset internal fields when reload or reset is called (even
-     * if the object is new).
+     * if the object is new). Please don't touch the wrapped object.
      */
     protected void resetInternalFields() {
         // default do nothing
@@ -462,8 +470,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                     && (String.class.isAssignableFrom(returnType) || Number.class
                         .isAssignableFrom(returnType))) {
                     try {
-                        Object res =
-                            method.invoke(wrappedObject, (Object[]) null);
+                        Object res = method.invoke(wrappedObject,
+                            (Object[]) null);
                         if (res != null) {
                             sb.append(name).append(":").append(res.toString())
                                 .append("/");
@@ -482,17 +490,26 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canRead(User user) {
-        return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass()
-            .getName());
+    public boolean canRead(User user, Integer siteId) {
+        return user.hasPrivilegeOnObject(Privilege.READ, siteId, this);
     }
 
     /**
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass()
-            .getName());
+        SiteWrapper site = getSiteLinkedToObject();
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, site == null ? null
+            : site.getId(), this);
+    }
+
+    /**
+     * return true if the user can delete this object
+     */
+    public boolean canDelete(User user) {
+        SiteWrapper site = getSiteLinkedToObject();
+        return user.hasPrivilegeOnObject(Privilege.DELETE, site == null ? null
+            : site.getId(), this);
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -521,8 +538,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    public void initObjectWith(ModelWrapper<E> otherWrapper)
-        throws WrapperException {
+    public void initObjectWith(ModelWrapper<E> otherWrapper) throws Exception {
         if (otherWrapper == null) {
             throw new WrapperException(
                 "Cannot init internal object with a null wrapper");
@@ -551,5 +567,17 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     @Override
     public int compareTo(ModelWrapper<E> arg0) {
         return this.getId().compareTo(arg0.getId());
+    }
+
+    public SiteWrapper getSiteLinkedToObject() {
+        return null;
+    }
+
+    /**
+     * return true if access is authorized
+     */
+    public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
+        @SuppressWarnings("unused") Integer siteId) {
+        return true;
     }
 }

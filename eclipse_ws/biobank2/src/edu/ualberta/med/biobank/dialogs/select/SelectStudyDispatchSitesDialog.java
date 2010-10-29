@@ -31,10 +31,9 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
     private MultiSelectWidget siteMultiSelect;
 
-    private List<SiteWrapper> currentAllSitesForStudy;
+    private List<SiteWrapper> currentAllSitesForStudy = new ArrayList<SiteWrapper>();
 
-    private Map<Integer, StudySites> studiesDispatchRelations =
-        new HashMap<Integer, SelectStudyDispatchSitesDialog.StudySites>();
+    private Map<Integer, StudySites> studiesDispatchRelations = new HashMap<Integer, SelectStudyDispatchSitesDialog.StudySites>();
 
     private StudyWrapper currentStudy;
 
@@ -64,9 +63,8 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
                 }
             });
 
-        siteMultiSelect =
-            new MultiSelectWidget(parent, SWT.NONE,
-                "Selected Destination Sites", "Available Sites", 100);
+        siteMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
+            "Selected Destination Sites", "Available Sites", 100);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         siteMultiSelect.setLayoutData(gd);
@@ -74,25 +72,28 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
                 @Override
                 public void selectionChanged(MultiSelectEvent event) {
-                    List<SiteWrapper> addedSites = new ArrayList<SiteWrapper>();
-                    List<SiteWrapper> removedSites =
-                        new ArrayList<SiteWrapper>();
-                    List<Integer> addedSitesIds =
-                        siteMultiSelect.getAddedToSelection();
-                    List<Integer> removedSitesIds =
-                        siteMultiSelect.getRemovedToSelection();
-                    for (SiteWrapper site : currentAllSitesForStudy) {
-                        if (addedSitesIds.contains(site.getId()))
-                            addedSites.add(site);
-                        if (removedSitesIds.contains(site.getId()))
-                            removedSites.add(site);
+                    if (studiesDispatchRelations != null) {
+                        List<SiteWrapper> addedSites = new ArrayList<SiteWrapper>();
+                        List<SiteWrapper> removedSites = new ArrayList<SiteWrapper>();
+                        List<Integer> addedSitesIds = siteMultiSelect
+                            .getAddedToSelection();
+                        List<Integer> removedSitesIds = siteMultiSelect
+                            .getRemovedToSelection();
+                        for (SiteWrapper site : currentAllSitesForStudy) {
+                            if (addedSitesIds.contains(site.getId()))
+                                addedSites.add(site);
+                            if (removedSitesIds.contains(site.getId()))
+                                removedSites.add(site);
+                        }
+                        if (currentStudy != null) {
+                            StudySites ss = studiesDispatchRelations
+                                .get(currentStudy.getId());
+                            ss.addedSites.addAll(addedSites);
+                            ss.removedSites.removeAll(removedSites);
+                            ss.removedSites.addAll(removedSites);
+                            ss.removedSites.removeAll(addedSites);
+                        }
                     }
-                    StudySites ss =
-                        studiesDispatchRelations.get(currentStudy.getId());
-                    ss.addedSites.addAll(addedSites);
-                    ss.removedSites.removeAll(removedSites);
-                    ss.removedSites.addAll(removedSites);
-                    ss.removedSites.removeAll(addedSites);
                 }
             });
     }
@@ -107,10 +108,9 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
         }
 
         try {
-            Collection<SiteWrapper> currentDestSites =
-                srcSite.getStudyDispachSites(study);
-            LinkedHashMap<Integer, String> availableSites =
-                new LinkedHashMap<Integer, String>();
+            Collection<SiteWrapper> currentDestSites = srcSite
+                .getStudyDispachSites(study);
+            LinkedHashMap<Integer, String> availableSites = new LinkedHashMap<Integer, String>();
             List<Integer> selectedSites = new ArrayList<Integer>();
             if (currentDestSites != null) {
                 for (SiteWrapper site : currentDestSites) {
@@ -120,8 +120,8 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
             for (SiteWrapper site : ss.addedSites) {
                 selectedSites.add(site.getId());
             }
-            currentAllSitesForStudy =
-                new ArrayList<SiteWrapper>(study.getSiteCollection());
+            currentAllSitesForStudy = new ArrayList<SiteWrapper>(
+                study.getSiteCollection());
             currentAllSitesForStudy.remove(srcSite);
             for (SiteWrapper site : currentAllSitesForStudy) {
                 availableSites.put(site.getId(), site.getNameShort());
@@ -151,14 +151,24 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
+        boolean newRelationsAdded = false;
         for (StudySites ss : studiesDispatchRelations.values()) {
             try {
                 srcSite.addStudyDispatchSites(ss.study, ss.addedSites);
+                if (ss.addedSites.size() > 0) {
+                    newRelationsAdded = true;
+                }
             } catch (BiobankCheckException e) {
                 BioBankPlugin.openAsyncError("Error adding dispatch relation",
                     e);
             }
             srcSite.removeStudyDispatchSites(ss.study, ss.removedSites);
+        }
+        if (newRelationsAdded) {
+            BioBankPlugin
+                .openAsyncInformation(
+                    "New sites for dispatches",
+                    "You might want to check users have access to the sites involved in dispatches.");
         }
         super.okPressed();
     }

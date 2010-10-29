@@ -1,19 +1,16 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.MenuItem;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -27,27 +24,24 @@ public abstract class DispatchAliquotListInfoTable extends
         String inventoryId;
         String type;
         String pnumber;
-        DispatchAliquotState state;
+        String status;
         String comment;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { inventoryId, type, pnumber,
-                state.toString(), comment }, "\t");
+                status, comment }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] { "Inventory ID",
-        "Type", "Patient Number", "State", "Comment" };
+        "Type", "Patient Number", "Activity Status", "Dispatch comment" };
 
     private boolean editMode = false;
 
-    private DispatchWrapper currentShipment;
-
     public DispatchAliquotListInfoTable(Composite parent,
         final DispatchWrapper shipment, boolean editMode) {
-        super(parent, null, HEADINGS, 5);
-        this.currentShipment = shipment;
+        super(parent, null, HEADINGS, 15);
         setCollection(getInternalDispatchAliquots());
         this.editMode = editMode;
         if (editMode) {
@@ -55,16 +49,23 @@ public abstract class DispatchAliquotListInfoTable extends
                 addDeleteItemListener(new IInfoTableDeleteItemListener() {
                     @Override
                     public void deleteItem(InfoTableEvent event) {
-                        DispatchAliquotWrapper dsa = getSelection();
-                        if (dsa != null) {
-                            if (!BioBankPlugin.openConfirm("Remove Aliquot",
-                                "Are you sure you want to remove aliquot \""
-                                    + dsa.getAliquot().getInventoryId()
-                                    + "\" from this shipment ?"))
+                        List<DispatchAliquotWrapper> dsaList = getSelectedItems();
+                        if (dsaList.size() > 0) {
+                            if (dsaList.size() == 1
+                                && !BioBankPlugin.openConfirm("Remove Aliquot",
+                                    "Are you sure you want to remove aliquot \""
+                                        + dsaList.get(0).getAliquot()
+                                            .getInventoryId()
+                                        + "\" from this shipment ?"))
+                                return;
+                            if (dsaList.size() > 1
+                                && !BioBankPlugin.openConfirm("Remove Aliquot",
+                                    "Are you sure you want to remove these "
+                                        + dsaList.size()
+                                        + " aliquots from this shipment ?"))
                                 return;
                             try {
-                                shipment.removeDispatchAliquots(Arrays
-                                    .asList(getSelection()));
+                                shipment.removeDispatchAliquots(dsaList);
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {
@@ -74,40 +75,8 @@ public abstract class DispatchAliquotListInfoTable extends
                         }
                     }
                 });
-            } else {
-                MenuItem item = new MenuItem(menu, SWT.PUSH);
-                item.setText("Set as missing-pending");
-                item.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        setItemMissingPending();
-                    }
-                });
-                item = new MenuItem(menu, SWT.PUSH);
-                item.setText("Set as missing");
-                item.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        setItemMissing();
-                    }
-                });
             }
         }
-    }
-
-    protected void setItemMissing() {
-        modifyState(DispatchAliquotState.MISSING);
-    }
-
-    protected void setItemMissingPending() {
-        modifyState(DispatchAliquotState.MISSING_PENDING_STATE);
-    }
-
-    private void modifyState(DispatchAliquotState newState) {
-        DispatchAliquotWrapper dsa = getSelection();
-        dsa.setState(newState.ordinal());
-        currentShipment.resetStateLists();
-        notifyListeners();
     }
 
     public abstract List<DispatchAliquotWrapper> getInternalDispatchAliquots();
@@ -137,7 +106,7 @@ public abstract class DispatchAliquotListInfoTable extends
                 case 2:
                     return info.pnumber;
                 case 3:
-                    return info.state.toString();
+                    return info.status;
                 case 4:
                     return info.comment;
                 default:
@@ -158,7 +127,7 @@ public abstract class DispatchAliquotListInfoTable extends
         SampleTypeWrapper type = dsa.getAliquot().getSampleType();
         Assert.isNotNull(type, "aliquot with null for sample type");
         info.type = type.getName();
-        info.state = DispatchAliquotState.getState(dsa.getState());
+        info.status = dsa.getAliquot().getActivityStatus().toString();
         info.comment = dsa.getComment();
         return info;
     }
@@ -193,13 +162,35 @@ public abstract class DispatchAliquotListInfoTable extends
         return row.dsa;
     }
 
+    public List<DispatchAliquotWrapper> getSelectedItems() {
+        Assert.isTrue(!tableViewer.getTable().isDisposed(),
+            "widget is disposed");
+        IStructuredSelection stSelection = (IStructuredSelection) tableViewer
+            .getSelection();
+        List<DispatchAliquotWrapper> dsaList = new ArrayList<DispatchAliquotWrapper>();
+
+        for (Iterator<?> iter = stSelection.iterator(); iter.hasNext();) {
+            BiobankCollectionModel bcm = (BiobankCollectionModel) iter.next();
+            if (bcm != null) {
+                TableRowData row = (TableRowData) bcm.o;
+                Assert.isNotNull(row);
+                dsaList.add(row.dsa);
+            }
+        }
+        return dsaList;
+    }
+
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
     }
 
     public void reloadCollection() {
-        reloadCollection(getInternalDispatchAliquots());
+        List<DispatchAliquotWrapper> dsaList = getInternalDispatchAliquots();
+        if (dsaList == null) {
+            dsaList = new ArrayList<DispatchAliquotWrapper>();
+        }
+        reloadCollection(dsaList);
     }
 
 }

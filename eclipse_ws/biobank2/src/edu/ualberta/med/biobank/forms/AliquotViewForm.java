@@ -18,14 +18,14 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
+import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 
 public class AliquotViewForm extends BiobankViewForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AliquotViewForm.class.getName());
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.AliquotViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.AliquotViewForm";
 
     private AliquotAdapter aliquotAdapter;
 
@@ -55,6 +55,8 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private BiobankText positionLabel;
 
+    private DispatchInfoTable dispatchInfoTable;
+
     @Override
     public void init() {
         Assert.isTrue((adapter instanceof AliquotAdapter),
@@ -65,8 +67,7 @@ public class AliquotViewForm extends BiobankViewForm {
         aliquot = aliquotAdapter.getAliquot();
         retrieveAliquot();
         try {
-            aliquot.logLookup(SessionManager.getInstance().getCurrentSite()
-                .getNameShort());
+            aliquot.logLookup(SessionManager.getCurrentSite().getNameShort());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log lookup failed", e);
         }
@@ -88,8 +89,21 @@ public class AliquotViewForm extends BiobankViewForm {
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createInformationSection();
+        createDispatchSection();
         createContainersSection();
         setValues();
+    }
+
+    private void createDispatchSection() {
+        Section section = createSection("Dispatch History");
+        Composite client = toolkit.createComposite(section);
+        section.setClient(client);
+        section.setExpanded(false);
+        GridLayout layout = new GridLayout(1, false);
+        layout.horizontalSpacing = 10;
+        client.setLayout(layout);
+        client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        dispatchInfoTable = new DispatchInfoTable(client, aliquot);
     }
 
     private void createInformationSection() {
@@ -101,24 +115,24 @@ public class AliquotViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         sampleTypeLabel = createReadOnlyLabelledField(client, SWT.NONE, "Type");
-        linkDateLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Link Date");
-        volumeLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Volume (ml)");
-        shipmentWaybillLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Shipment Waybill");
+        linkDateLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Link Date");
+        volumeLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Volume (ml)");
+        shipmentWaybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Shipment Waybill");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
-        dateProcessedLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Date Processed");
-        dateDrawnLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Date Drawn");
-        activityStatusLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Activity Status");
-        commentLabel =
-            createReadOnlyLabelledField(client, SWT.WRAP | SWT.MULTI, "Comment");
-        positionLabel =
-            createReadOnlyLabelledField(client, SWT.NONE, "Position");
+        dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Date Processed");
+        dateDrawnLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Date Drawn");
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Activity Status");
+        commentLabel = createReadOnlyLabelledField(client,
+            SWT.WRAP | SWT.MULTI, "Comment");
+        positionLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Position");
     }
 
     private void createContainersSection() {
@@ -144,8 +158,8 @@ public class AliquotViewForm extends BiobankViewForm {
                 } else {
                     position = parents.peek().getPosition();
                 }
-                Composite containerComposite =
-                    toolkit.createComposite(containersComposite);
+                Composite containerComposite = toolkit
+                    .createComposite(containersComposite);
                 GridLayout layout = new GridLayout(1, false);
                 layout.horizontalSpacing = 0;
                 layout.marginWidth = 0;
@@ -155,8 +169,8 @@ public class AliquotViewForm extends BiobankViewForm {
                     .createLabel(containerComposite, container.getLabel()
                         + " (" + container.getContainerType().getNameShort()
                         + ") ");
-                ContainerDisplayWidget containerWidget =
-                    new ContainerDisplayWidget(containerComposite);
+                ContainerDisplayWidget containerWidget = new ContainerDisplayWidget(
+                    containerComposite);
                 containerWidget.setContainer(container);
                 containerWidget.setSelection(position);
                 toolkit.adapt(containerWidget);
@@ -165,7 +179,7 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        setTextValue(siteLabel, aliquot.getSite().getNameShort());
+        setTextValue(siteLabel, aliquot.getSiteString());
         setTextValue(sampleTypeLabel, aliquot.getSampleType().getName());
         setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
         setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
@@ -186,11 +200,18 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     @Override
+    public void setFocus() {
+        // aliquots are not present in treeviews, unnecessary reloads can be
+        // prevented with this method
+    }
+
+    @Override
     public void reload() {
         retrieveAliquot();
         setValues();
         setPartName("Aliquot: " + aliquot.getInventoryId());
         form.setText("Aliquot: " + aliquot.getInventoryId());
+        dispatchInfoTable.reloadCollection();
     }
 
 }

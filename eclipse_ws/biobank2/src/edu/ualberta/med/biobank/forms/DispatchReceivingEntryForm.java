@@ -1,16 +1,16 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.Arrays;
-import java.util.List;
 
-import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -18,11 +18,12 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import gov.nih.nci.system.applicationservice.ApplicationException;
+import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 
 public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
+    private DispatchAliquotsTreeTable aliquotsTree;
 
     @Override
     protected void createFormContent() throws Exception {
@@ -32,11 +33,13 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
-        createAliquotsSelectionActions(page, true);
-        createAliquotsNonProcessedSection(true);
-        createAliquotsReceivedSection(false);
-        createAliquotsExtraSection(false);
-        createAliquotsMissingSection(false);
+        boolean editAliquots = !shipment.isInClosedState()
+            && !shipment.isInLostState();
+        if (editAliquots)
+            createAliquotsSelectionActions(page, true);
+        aliquotsTree = new DispatchAliquotsTreeTable(page, shipment,
+            editAliquots, true);
+        aliquotsTree.addSelectionChangedListener(biobankListener);
     }
 
     @Override
@@ -53,7 +56,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
         if (dialog.hasReceivedAliquots()) {
             setDirty(true);
         }
-        reloadAliquotsTables();
+        aliquotsTree.refresh();
     }
 
     private void createMainSection() {
@@ -88,14 +91,15 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
             SWT.NONE, "Date received");
         setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null,
-            BeansObservables.observeValue(shipment, "comment"), null);
+        Control commentsWidget = createBoundWidgetWithLabel(client,
+            BiobankText.class, SWT.MULTI, "Comments", null, shipment,
+            "comment", null);
+        setFirstControl(commentsWidget);
     }
 
     @Override
     protected String getOkMessage() {
-        return "Receiving dispatch shipment";
+        return "Receiving dispatch";
     }
 
     @Override
@@ -119,33 +123,25 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
 
     public static AliquotInfo getInfoForInventoryId(DispatchWrapper shipment,
         String inventoryId) {
-        DispatchAliquotWrapper dsa = shipment
-            .getDispatchAliquot(inventoryId);
+        DispatchAliquotWrapper dsa = shipment.getDispatchAliquot(inventoryId);
         if (dsa == null) {
             // aliquot not in shipment. Check if exists in DB:
-            List<AliquotWrapper> aliquots = null;
+            AliquotWrapper aliquot = null;
             try {
-                aliquots = AliquotWrapper.getAliquots(shipment.getAppService(),
-                    inventoryId);
-            } catch (ApplicationException ae) {
+                aliquot = AliquotWrapper.getAliquot(shipment.getAppService(),
+                    inventoryId, SessionManager.getUser());
+            } catch (Exception ae) {
                 BioBankPlugin.openAsyncError("Error retrieving aliquot", ae);
             }
-            if (aliquots == null || aliquots.size() == 0) {
+            if (aliquot == null) {
                 return new AliquotInfo(null, ResType.NOT_IN_DB);
             }
-            if (aliquots.size() > 1) {
-                BioBankPlugin.openError("Duplicate aliquot !",
-                    "This aliquot exists more that once in the database !");
-                return new AliquotInfo(null, ResType.DUPLICATE);
-            }
-            return new AliquotInfo(aliquots.get(0), ResType.NOT_IN_SHIPMENT);
+            return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
         }
-        if (dsa.getState() == DispatchAliquotState.RECEIVED_STATE.ordinal()) {
+        if (DispatchAliquotState.RECEIVED_STATE.isEquals(dsa.getState())) {
             return new AliquotInfo(dsa.getAliquot(), ResType.RECEIVED);
         }
-        if (dsa.getState() == DispatchAliquotState.EXTRA.ordinal()
-            || dsa.getState() == DispatchAliquotState.EXTRA_PENDING_STATE
-                .ordinal()) {
+        if (DispatchAliquotState.EXTRA.isEquals(dsa.getState())) {
             return new AliquotInfo(dsa.getAliquot(), ResType.EXTRA);
         }
         return new AliquotInfo(dsa.getAliquot(), ResType.OK);
@@ -156,7 +152,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
         switch (info.type) {
         case OK:
             shipment.receiveAliquots(Arrays.asList(info.aliquot));
-            reloadAliquotsTables();
+            aliquotsTree.refresh();
             setDirty(true);
             break;
         case RECEIVED:
@@ -170,11 +166,11 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
                     + " has not been found in this shipment."
                     + " It will be moved into the extra-pending list.");
             try {
-                shipment.addExtraPendingAliquots(Arrays.asList(info.aliquot));
+                shipment.addExtraAliquots(Arrays.asList(info.aliquot), false);
             } catch (BiobankCheckException e) {
                 BioBankPlugin.openAsyncError("Eror adding extra aliquot", e);
             }
-            reloadAliquotsTables();
+            aliquotsTree.refresh();
             setDirty(true);
             break;
         case NOT_IN_DB:
@@ -196,6 +192,11 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
     @Override
     protected String getTextForPartName() {
         return "Dispatch sent on " + shipment.getDeparted();
+    }
+
+    @Override
+    protected void reloadAliquots() {
+        aliquotsTree.refresh();
     }
 
 }

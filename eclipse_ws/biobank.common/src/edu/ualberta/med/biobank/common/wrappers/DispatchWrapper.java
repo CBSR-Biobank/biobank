@@ -13,6 +13,7 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchAliquot;
 import edu.ualberta.med.biobank.model.Site;
@@ -22,8 +23,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 /**
- * State 0 = Creation; State 1 = In Transit; State 2 = Received; State 3 =
- * Ok/Closed;
+ * @see DispatchState
  */
 public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
 
@@ -35,11 +35,13 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
 
     private static final String EXTRA_ALIQUOTS_KEY = "extraDispatchAliquots";
 
-    private static final String PENDING_ERRORS_ALIQUOTS_KEY = "pendingErrorsDispatchAliquots";
+    private static final String ALL_ALIQUOTS_KEY = "aliquotCollection";
 
-    private Set<DispatchAliquotWrapper> deletedDispatchedShipmentAliquots = new HashSet<DispatchAliquotWrapper>();
+    private Set<DispatchAliquotWrapper> deletedDispatchedAliquots = new HashSet<DispatchAliquotWrapper>();
 
     private boolean stateModified = false;
+
+    private Set<AliquotWrapper> modifiedAliquots = new HashSet<AliquotWrapper>();
 
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
@@ -76,37 +78,51 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
             throw new BiobankCheckException("Study should be set");
         }
         if (!checkWaybillUniqueForSender()) {
-            throw new BiobankCheckException("A dispatch shipment with waybill "
+            throw new BiobankCheckException("A dispatch with waybill "
                 + getWaybill() + " already exists for sending site "
                 + getSender().getNameShort());
         }
         if (isInTransitState() && getDeparted() == null) {
             throw new BiobankCheckException(
-                "Date shipped should be set when this shipment is in transit.");
+                "Departed should be set when this shipment is in transit.");
         }
         checkSenderCanSendToReceiver();
     }
 
     @Override
     protected void persistDependencies(Dispatch origObject) throws Exception {
-        for (DispatchAliquotWrapper dsa : deletedDispatchedShipmentAliquots) {
+        for (DispatchAliquotWrapper dsa : deletedDispatchedAliquots) {
             if (!dsa.isNew()) {
                 dsa.delete();
             }
         }
-        if (stateModified && isInTransitState()) {
-            // when is sent, need to set aliquots positions to null and to
-            // remove containers holding them
-            for (AliquotWrapper aliquot : getAliquotCollection()) {
-                if (aliquot.getPosition() != null) {
-                    ContainerWrapper parent = aliquot.getParent();
-                    aliquot.setPosition(null);
-                    aliquot.persist();
-                    parent.reload();
-                    if (!parent.hasAliquots()) {
-                        parent.delete();
+        if (stateModified) {
+            if (isInTransitState()) {
+                // when is sent, need to set aliquots positions to null and to
+                // remove containers holding them
+                for (AliquotWrapper aliquot : getAliquotCollection()) {
+                    if (aliquot.getPosition() != null) {
+                        ContainerWrapper parent = aliquot.getParent();
+                        aliquot.setPosition(null);
+                        aliquot.persist();
+                        parent.reload();
+                        if (!parent.hasAliquots()) {
+                            parent.delete();
+                        }
                     }
                 }
+            } else if (isInLostState()) {
+                // if lost, set all aliquot in close status
+                for (AliquotWrapper aliquot : getAliquotCollection()) {
+                    aliquot.setActivityStatus(ActivityStatusWrapper
+                        .getActivityStatus(appService,
+                            ActivityStatusWrapper.CLOSED_STATUS_STRING));
+                    aliquot.persist();
+                }
+            }
+        } else {
+            for (AliquotWrapper aliquot : modifiedAliquots) {
+                aliquot.persist();
             }
         }
     }
@@ -196,6 +212,13 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
             newReceiver);
     }
 
+    public String getStateDescription() {
+        DispatchState state = DispatchState.getState(wrappedObject.getState());
+        if (state == null)
+            return "";
+        return state.getLabel();
+    }
+
     public StudyWrapper getStudy() {
         StudyWrapper study = (StudyWrapper) propertiesMap.get("study");
         if (study == null) {
@@ -258,7 +281,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
                 for (DispatchAliquotWrapper dsa : children) {
                     boolean hasState = false;
                     for (DispatchAliquotState state : states) {
-                        if (dsa.getState() == state.ordinal()) {
+                        if (state.isEquals(dsa.getState())) {
                             hasState = true;
                             break;
                         }
@@ -287,7 +310,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     @SuppressWarnings("unchecked")
     public List<AliquotWrapper> getAliquotCollection(boolean sort) {
         List<AliquotWrapper> aliquotCollection = (List<AliquotWrapper>) propertiesMap
-            .get("aliquotCollection");
+            .get(ALL_ALIQUOTS_KEY);
         if (aliquotCollection == null) {
             Collection<DispatchAliquotWrapper> dsaList = getDispatchAliquotCollection(sort);
             if (dsaList != null) {
@@ -295,7 +318,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
                 for (DispatchAliquotWrapper dsa : dsaList) {
                     aliquotCollection.add(dsa.getAliquot());
                 }
-                propertiesMap.put("aliquotCollection", aliquotCollection);
+                propertiesMap.put(ALL_ALIQUOTS_KEY, aliquotCollection);
             }
         }
         return aliquotCollection;
@@ -305,7 +328,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         return getAliquotCollection(true);
     }
 
-    private void setDispathcShipmentAliquotCollection(
+    private void setDispatchAliquotCollection(
         Collection<DispatchAliquot> allDsaObjects,
         List<DispatchAliquotWrapper> allDsaWrappers) {
         Collection<DispatchAliquot> oldList = wrappedObject
@@ -316,23 +339,20 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         propertiesMap.put("dispatchAliquotCollection", allDsaWrappers);
     }
 
-    public void addNewAliquots(List<AliquotWrapper> newAliquots)
-        throws BiobankCheckException {
-        addAliquots(newAliquots, DispatchAliquotState.NONE_STATE);
+    public void addNewAliquots(List<AliquotWrapper> newAliquots,
+        boolean checkAlreadyAdded) throws BiobankCheckException {
+        addAliquots(newAliquots, DispatchAliquotState.NONE_STATE,
+            checkAlreadyAdded);
     }
 
-    public void addExtraAliquots(List<AliquotWrapper> newAliquots)
-        throws BiobankCheckException {
-        addAliquots(newAliquots, DispatchAliquotState.EXTRA);
-    }
-
-    public void addExtraPendingAliquots(List<AliquotWrapper> newAliquots)
-        throws BiobankCheckException {
-        addAliquots(newAliquots, DispatchAliquotState.EXTRA_PENDING_STATE);
+    public void addExtraAliquots(List<AliquotWrapper> newAliquots,
+        boolean checkAlreadyAdded) throws BiobankCheckException {
+        addAliquots(newAliquots, DispatchAliquotState.EXTRA, checkAlreadyAdded);
     }
 
     private void addAliquots(List<AliquotWrapper> newAliquots,
-        DispatchAliquotState stateForAliquot) throws BiobankCheckException {
+        DispatchAliquotState stateForAliquot, boolean checkAlreadyAdded)
+        throws BiobankCheckException {
         if ((newAliquots == null) || (newAliquots.size() == 0))
             return;
 
@@ -350,17 +370,28 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         }
         // new aliquots added
         for (AliquotWrapper aliquot : newAliquots) {
-            CheckStatus check = checkCanAddAliquot(currentAliquots, aliquot);
-            if (!check.ok)
-                throw new BiobankCheckException(check.message);
-            DispatchAliquotWrapper dsa = new DispatchAliquotWrapper(appService);
-            dsa.setAliquot(aliquot);
-            dsa.setState(stateForAliquot.ordinal());
-            dsa.setShipment(this);
-            allDsaObjects.add(dsa.getWrappedObject());
-            allDsaWrappers.add(dsa);
+            if (stateForAliquot != DispatchAliquotState.EXTRA) {
+                CheckStatus check = checkCanAddAliquot(currentAliquots,
+                    aliquot, checkAlreadyAdded);
+                if (!check.ok)
+                    throw new BiobankCheckException(check.message);
+            }
+            if (currentAliquots == null || !currentAliquots.contains(aliquot)) {
+                DispatchAliquotWrapper dsa = new DispatchAliquotWrapper(
+                    appService);
+                dsa.setAliquot(aliquot);
+                dsa.setState(stateForAliquot.getId());
+                if (stateForAliquot == DispatchAliquotState.EXTRA) {
+                    aliquot.setPosition(null);
+                    modifiedAliquots.add(aliquot);
+                }
+                dsa.setShipment(this);
+                allDsaObjects.add(dsa.getWrappedObject());
+                allDsaWrappers.add(dsa);
+                currentAliquots.add(aliquot);
+            }
         }
-        setDispathcShipmentAliquotCollection(allDsaObjects, allDsaWrappers);
+        setDispatchAliquotCollection(allDsaObjects, allDsaWrappers);
         resetStateLists();
     }
 
@@ -375,8 +406,15 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
 
     }
 
-    public CheckStatus checkCanAddAliquot(List<AliquotWrapper> currentAliquots,
-        AliquotWrapper aliquot) {
+    public CheckStatus checkCanAddAliquot(AliquotWrapper aliquot,
+        boolean checkAlreadyAdded) {
+        return checkCanAddAliquot(getAliquotCollection(), aliquot,
+            checkAlreadyAdded);
+    }
+
+    protected CheckStatus checkCanAddAliquot(
+        List<AliquotWrapper> currentAliquots, AliquotWrapper aliquot,
+        boolean checkAlreadyAdded) {
         if (aliquot.isNew()) {
             return new CheckStatus(false, "Cannot add aliquot "
                 + aliquot.getInventoryId() + ": it has not already been saved");
@@ -404,15 +442,17 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
             return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
                 + " is linked to study " + aliquotStudy.getNameShort()
                 + ". The study of this shipment is "
-                + getStudy().getNameShort() + ".");
+                + ((getStudy() == null) ? "none" : getStudy().getNameShort())
+                + ".");
         }
-        if (currentAliquots != null && currentAliquots.contains(aliquot)) {
+        if (checkAlreadyAdded && currentAliquots != null
+            && currentAliquots.contains(aliquot)) {
             return new CheckStatus(false, aliquot.getInventoryId()
                 + " is already in this shipment.");
         }
         if (aliquot.isUsedInDispatch()) {
             return new CheckStatus(false, aliquot.getInventoryId()
-                + " is already in a shipment in transit or in creation.");
+                + " is already in another shipment in transit or in creation.");
         }
         return new CheckStatus(true, "");
     }
@@ -431,11 +471,11 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
                     allDsaObjects.add(dsa.getWrappedObject());
                     allDsaWrappers.add(dsa);
                 } else {
-                    deletedDispatchedShipmentAliquots.add(dsa);
+                    deletedDispatchedAliquots.add(dsa);
                 }
             }
         }
-        setDispathcShipmentAliquotCollection(allDsaObjects, allDsaWrappers);
+        setDispatchAliquotCollection(allDsaObjects, allDsaWrappers);
         resetStateLists();
     }
 
@@ -453,11 +493,11 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
                     allDsaObjects.add(dsa.getWrappedObject());
                     allDsaWrappers.add(dsa);
                 } else {
-                    deletedDispatchedShipmentAliquots.add(dsa);
+                    deletedDispatchedAliquots.add(dsa);
                 }
             }
         }
-        setDispathcShipmentAliquotCollection(allDsaObjects, allDsaWrappers);
+        setDispatchAliquotCollection(allDsaObjects, allDsaWrappers);
     }
 
     @Override
@@ -469,7 +509,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         List<DispatchAliquotWrapper> nonProcessedAliquots = getNonProcessedDispatchAliquotCollection();
         for (DispatchAliquotWrapper dsa : nonProcessedAliquots) {
             if (aliquotsToReceive.contains(dsa.getAliquot())) {
-                dsa.setState(DispatchAliquotState.RECEIVED_STATE.ordinal());
+                dsa.setState(DispatchAliquotState.RECEIVED_STATE.getId());
             }
         }
         propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
@@ -483,22 +523,28 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
 
     public boolean isInTransitState() {
         return wrappedObject.getState() != null
-            && wrappedObject.getState() == 1;
+            && DispatchState.IN_TRANSIT.isEquals(wrappedObject.getState());
     }
 
     public boolean isInReceivedState() {
         return wrappedObject.getState() != null
-            && wrappedObject.getState() == 2;
+            && DispatchState.RECEIVED.isEquals(wrappedObject.getState());
     }
 
     public boolean hasBeenReceived() {
         return wrappedObject.getState() != null
-            && wrappedObject.getState() >= 2;
+            && (DispatchState.RECEIVED.isEquals(wrappedObject.getState()) || DispatchState.CLOSED
+                .isEquals(wrappedObject.getState()));
     }
 
     public boolean isInClosedState() {
         return wrappedObject.getState() != null
-            && wrappedObject.getState() == 3;
+            && DispatchState.CLOSED.isEquals(wrappedObject.getState());
+    }
+
+    public boolean isInLostState() {
+        return wrappedObject.getState() != null
+            && DispatchState.LOST.isEquals(wrappedObject.getState());
     }
 
     /**
@@ -595,29 +641,36 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         return sb.toString();
     }
 
-    private void setState(Integer state) {
+    private void setState(DispatchState state) {
         Integer oldState = wrappedObject.getState();
-        wrappedObject.setState(state);
+        wrappedObject.setState(state.getId());
         stateModified = oldState == null || state == null
             || !oldState.equals(state);
     }
 
-    public void setNextState() {
-        Integer state = wrappedObject.getState();
-        if (state == null) {
-            state = 0;
-        }
-        state++;
-        setState(state);
+    public void setInCreationState() {
+        setState(DispatchState.CREATION);
     }
 
-    public void setInErrorState() {
-        setState(4);
+    public void setInTransitState() {
+        setState(DispatchState.IN_TRANSIT);
+    }
+
+    public void setInLostState() {
+        setState(DispatchState.LOST);
+    }
+
+    public void setInCloseState() {
+        setState(DispatchState.CLOSED);
+    }
+
+    public void setInReceivedState() {
+        setState(DispatchState.RECEIVED);
     }
 
     public boolean canBeSentBy(User user, SiteWrapper site) {
-        return canUpdate(user) && getSender().equals(site)
-            && isInCreationState() && hasAliquots();
+        return getSender() != null && canUpdate(user)
+            && getSender().equals(site) && isInCreationState() && hasAliquots();
     }
 
     public boolean hasAliquots() {
@@ -626,8 +679,20 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     }
 
     public boolean canBeReceivedBy(User user, SiteWrapper site) {
-        return canUpdate(user) && getReceiver().equals(site)
-            && isInTransitState();
+        return getReceiver() != null && canUpdate(user)
+            && getReceiver().equals(site) && isInTransitState()
+            && user.canUpdateSite(site);
+    }
+
+    public boolean canBeClosedBy(User user, SiteWrapper site) {
+        return getReceiver() != null && canUpdate(user)
+            && getReceiver().equals(site) && isInReceivedState()
+            && !hasPendingAliquots() && user.canUpdateSite(site);
+    }
+
+    private boolean hasPendingAliquots() {
+        List<DispatchAliquotWrapper> dsaList = getNonProcessedDispatchAliquotCollection();
+        return dsaList == null ? false : dsaList.size() > 0;
     }
 
     public DispatchAliquotWrapper getDispatchAliquot(String inventoryId) {
@@ -638,34 +703,20 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         return null;
     }
 
-    // public boolean hasFlaggedAliquots() {
-    // List<AliquotWrapper> aliquots = getFlaggedAliquots(false, true);
-    // return aliquots != null && aliquots.size() > 0;
-    // }
-
     @Override
     protected void resetInternalFields() {
-        deletedDispatchedShipmentAliquots.clear();
+        deletedDispatchedAliquots.clear();
         stateModified = false;
     }
 
     public List<DispatchAliquotWrapper> getExtraDispatchAliquots() {
         return getDispatchAliquotCollectionWithState(EXTRA_ALIQUOTS_KEY, true,
-            DispatchAliquotState.EXTRA,
-            DispatchAliquotState.EXTRA_PENDING_STATE);
+            DispatchAliquotState.EXTRA);
     }
 
     public List<DispatchAliquotWrapper> getMissingDispatchAliquots() {
         return getDispatchAliquotCollectionWithState(MISSING_ALIQUOTS_KEY,
-            true, DispatchAliquotState.MISSING,
-            DispatchAliquotState.MISSING_PENDING_STATE);
-    }
-
-    public List<DispatchAliquotWrapper> getPendingErrorsDispatchAliquots() {
-        return getDispatchAliquotCollectionWithState(
-            PENDING_ERRORS_ALIQUOTS_KEY, true,
-            DispatchAliquotState.MISSING_PENDING_STATE,
-            DispatchAliquotState.EXTRA_PENDING_STATE);
+            true, DispatchAliquotState.MISSING);
     }
 
     public void resetStateLists() {
@@ -673,12 +724,13 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         propertiesMap.put(EXTRA_ALIQUOTS_KEY, null);
         propertiesMap.put(RECEIVED_ALIQUOTS_KEY, null);
         propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
-        propertiesMap.put(PENDING_ERRORS_ALIQUOTS_KEY, null);
+        propertiesMap.put(ALL_ALIQUOTS_KEY, null);
     }
 
-    public boolean hasPendingErrors() {
-        List<DispatchAliquotWrapper> dsaList = getPendingErrorsDispatchAliquots();
-        return dsaList != null && dsaList.size() > 0;
+    public boolean hasErrors() {
+        List<DispatchAliquotWrapper> extraList = getExtraDispatchAliquots();
+        List<DispatchAliquotWrapper> missingList = getMissingDispatchAliquots();
+        return (extraList != null && extraList.size() > 0)
+            || (missingList != null && missingList.size() > 0);
     }
-
 }

@@ -9,20 +9,19 @@ import edu.ualberta.med.biobank.model.PatientVisit;
  */
 public class SampleTypePvCountImpl extends AbstractReport {
 
-    private static final String QUERY =
-        "Select pv.shipmentPatient.patient.pnumber, pv.dateProcessed,"
-            + " pv.dateDrawn,  Alias.sampleType.name, count(*) from "
-            + PatientVisit.class.getName()
-            + " as pv join pv.aliquotCollection as Alias"
-            + " left join Alias.aliquotPosition p where (p is null or p not in (from "
-            + AliquotPosition.class.getName()
-            + " a where a.container.label like '"
-            + SENT_SAMPLES_FREEZER_NAME
-            + "')) and pv.shipmentPatient.patient.study.nameShort LIKE ? "
-            + " and Alias.patientVisit.shipmentPatient.shipment.site "
-            + SITE_OPERATOR
-            + SITE_ID
-            + " GROUP BY pv, Alias.sampleType ORDER BY pv.shipmentPatient.patient.pnumber, pv.dateProcessed";
+    private static final String QUERY = "Select pv.shipmentPatient.patient.pnumber, pv.dateProcessed,"
+        + " pv.dateDrawn,  Alias.sampleType.name, count(*) from "
+        + PatientVisit.class.getName()
+        + " as pv join pv.aliquotCollection as Alias"
+        + " left join Alias.aliquotPosition p where (p is not null and p not in (from "
+        + AliquotPosition.class.getName()
+        + " a where a.container.label like '"
+        + SENT_SAMPLES_FREEZER_NAME
+        + "')) and pv.shipmentPatient.patient.study.nameShort LIKE ? "
+        + " and Alias.patientVisit.shipmentPatient.shipment.site "
+        + SITE_OPERATOR
+        + SITE_ID
+        + " GROUP BY pv, Alias.sampleType ORDER BY pv.shipmentPatient.patient.pnumber, pv.dateProcessed";
 
     public SampleTypePvCountImpl(BiobankReport report) {
         super(QUERY, report);

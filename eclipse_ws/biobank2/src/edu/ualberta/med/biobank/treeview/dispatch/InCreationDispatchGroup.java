@@ -17,8 +17,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class InCreationDispatchGroup extends
-    AbstractDispatchGroup {
+public class InCreationDispatchGroup extends AbstractDispatchGroup {
 
     public InCreationDispatchGroup(AdapterBase parent, int id) {
         super(parent, id, "Creation");
@@ -27,9 +26,8 @@ public class InCreationDispatchGroup extends
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper site = SessionManager.getInstance().getCurrentSite();
+        SiteWrapper site = SessionManager.getCurrentSite();
         if (!SessionManager.getInstance().isAllSitesSelected()) {
-            site.reload();
             return site.getInCreationDispatchCollection();
         }
         return new ArrayList<ModelWrapper<?>>();
@@ -37,7 +35,7 @@ public class InCreationDispatchGroup extends
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(DispatchWrapper.class)) {
+        if (SessionManager.canCreate(DispatchWrapper.class, null)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Dispatch");
             mi.addSelectionListener(new SelectionAdapter() {
@@ -50,11 +48,10 @@ public class InCreationDispatchGroup extends
     }
 
     protected void addDispatch() {
-        DispatchWrapper shipment =
-            new DispatchWrapper(SessionManager.getAppService());
-        shipment.setSender(SessionManager.getInstance().getCurrentSite());
-        DispatchAdapter shipNode =
-            new DispatchAdapter(this, shipment);
+        DispatchWrapper shipment = new DispatchWrapper(
+            SessionManager.getAppService());
+        shipment.setSender(SessionManager.getCurrentSite());
+        DispatchAdapter shipNode = new DispatchAdapter(this, shipment);
         shipNode.openEntryForm();
     }
 

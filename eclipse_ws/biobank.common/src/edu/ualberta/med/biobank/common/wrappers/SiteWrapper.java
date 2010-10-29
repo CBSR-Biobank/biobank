@@ -11,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
@@ -24,7 +23,6 @@ import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -620,21 +618,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getName();
     }
 
-    /**
-     * return true if the user can edit this object
-     */
-    @Override
-    public boolean canUpdate(User user) {
-        try {
-            // Need to use the appService method as the filter added for site
-            // need to be used. (see CSM documentation and configuration)
-            return ((BiobankApplicationService) appService).hasPrivilege(
-                getWrappedClass(), getId(), Privilege.CREATE.name());
-        } catch (ApplicationException e) {
-            return false;
-        }
-    }
-
     @Override
     public void resetInternalFields() {
         address = null;
@@ -755,6 +738,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         if (shipCollection == null) {
             Collection<Dispatch> children = wrappedObject
                 .getReceivedDispatchCollection();
+
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (Dispatch ship : children) {
@@ -825,7 +809,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getReceivingDispatchCollection() {
+    public List<DispatchWrapper> getReceivingNoErrorsDispatchCollection() {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("receivingDispatchCollection");
         if (shipCollection == null) {
@@ -833,7 +817,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper ship : children) {
-                    if (ship.isInReceivedState()) {
+                    if (ship.isInReceivedState() && !ship.hasErrors()) {
                         shipCollection.add(ship);
                     }
                 }
@@ -853,7 +837,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper ship : children) {
-                    if (ship.isInReceivedState() && ship.hasPendingErrors()) {
+                    if (ship.isInReceivedState() && ship.hasErrors()) {
                         shipCollection.add(ship);
                     }
                 }
@@ -908,7 +892,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return infos;
     }
 
-    public Set<ClinicWrapper> getStudyClinics() {
+    public Set<ClinicWrapper> getWorkingClinicCollection() {
         List<StudyWrapper> studies = getStudyCollection();
         Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
         for (StudyWrapper study : studies) {
@@ -917,4 +901,8 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return clinics;
     }
 
+    @Override
+    public boolean canUpdate(User user) {
+        return user.isWebsiteAdministrator();
+    }
 }

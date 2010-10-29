@@ -12,7 +12,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.ClassUtils;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -21,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -30,18 +30,17 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestActivityStatus extends TestDatabase {
 
-    private List<ActivityStatusWrapper> addedstatus =
-        new ArrayList<ActivityStatusWrapper>();
+    private List<ActivityStatusWrapper> addedstatus = new ArrayList<ActivityStatusWrapper>();
 
     @Override
     public void tearDown() throws Exception {
@@ -54,8 +53,8 @@ public class TestActivityStatus extends TestDatabase {
     @Test
     public void testConstructors() throws Exception {
         new ActivityStatusWrapper(appService);
-        ActivityStatusWrapper activeAs =
-            ActivityStatusWrapper.getActiveActivityStatus(appService);
+        ActivityStatusWrapper activeAs = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
         new ActivityStatusWrapper(appService, activeAs.getWrappedObject());
     }
 
@@ -65,11 +64,11 @@ public class TestActivityStatus extends TestDatabase {
         ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
         as.setName(name);
         as.persist();
-        int before =
-            ActivityStatusWrapper.getAllActivityStatuses(appService).size();
+        int before = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
         as.delete();
-        List<ActivityStatusWrapper> allActivityStatuses =
-            ActivityStatusWrapper.getAllActivityStatuses(appService);
+        List<ActivityStatusWrapper> allActivityStatuses = ActivityStatusWrapper
+            .getAllActivityStatuses(appService);
         int after = allActivityStatuses.size();
         Assert.assertEquals(before - 1, after);
         Assert.assertFalse(allActivityStatuses.contains(as));
@@ -84,8 +83,8 @@ public class TestActivityStatus extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name, false);
         ClinicWrapper clinic = ClinicHelper.addClinic(name, false, false);
-        ContainerWrapper topContainer =
-            ContainerHelper.addTopContainerRandom(site, name, 2, 2);
+        ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
+            site, name, 2, 2);
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
         topContainerType.addSampleTypes(SampleTypeWrapper.getAllSampleTypes(
             appService, false));
@@ -94,11 +93,11 @@ public class TestActivityStatus extends TestDatabase {
         study.setStudyPvAttr("worksheet", "text");
         study.persist();
 
-        StudyPvAttrWrapper spa =
-            StudyPvAttrWrapper.getStudyPvAttrCollection(study).get(0);
+        StudyPvAttrWrapper spa = StudyPvAttrWrapper.getStudyPvAttrCollection(
+            study).get(0);
 
-        SampleTypeWrapper sampleType =
-            SampleTypeWrapper.getAllSampleTypes(appService, false).get(0);
+        SampleTypeWrapper sampleType = SampleTypeWrapper.getAllSampleTypes(
+            appService, false).get(0);
 
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addContacts(Arrays.asList(contact));
@@ -106,20 +105,17 @@ public class TestActivityStatus extends TestDatabase {
         study.reload();
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        ShipmentWrapper shipment =
-            ShipmentHelper.addShipment(site, clinic,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                patient);
-        PatientVisitWrapper visit =
-            PatientVisitHelper.addPatientVisit(patient, shipment,
-                Utils.getRandomDate(), Utils.getRandomDate());
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0),
+            patient);
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
-        AliquotWrapper aliquot =
-            AliquotHelper.addAliquot(sampleType, topContainer, visit, 0, 0);
+        AliquotWrapper aliquot = AliquotHelper.addAliquot(sampleType,
+            topContainer, visit, 0, 0);
 
-        ModelWrapper<?>[] wrappers =
-            new ModelWrapper<?>[] { aliquot, spa, topContainer,
-                topContainerType };
+        ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { aliquot, spa,
+            topContainer, topContainerType };
 
         for (ModelWrapper<?> wrapper : wrappers) {
             testDeleteFail(wrapper,
@@ -186,32 +182,31 @@ public class TestActivityStatus extends TestDatabase {
 
     @Test
     public void testGetWrappedClass() throws Exception {
-        ActivityStatusWrapper activeAs =
-            ActivityStatusWrapper.getActiveActivityStatus(appService);
+        ActivityStatusWrapper activeAs = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
         Assert.assertEquals(ActivityStatus.class, activeAs.getWrappedClass());
     }
 
     @Test
     public void testPersist() throws Exception {
-        int before =
-            ActivityStatusWrapper.getAllActivityStatuses(appService).size();
+        int before = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
         String name = "testPersist" + r.nextInt();
         ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
         as.setName(name);
         as.persist();
         addedstatus.add(as);
 
-        List<ActivityStatusWrapper> statuses =
-            ActivityStatusWrapper.getAllActivityStatuses(appService);
+        List<ActivityStatusWrapper> statuses = ActivityStatusWrapper
+            .getAllActivityStatuses(appService);
         int after = statuses.size();
         Assert.assertEquals(before + 1, after);
         Assert.assertTrue(statuses.contains(as));
 
         // add 5 activity status that will eventually be deleted
-        before =
-            ActivityStatusWrapper.getAllActivityStatuses(appService).size();
-        List<ActivityStatusWrapper> toDelete =
-            new ArrayList<ActivityStatusWrapper>();
+        before = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
+        List<ActivityStatusWrapper> toDelete = new ArrayList<ActivityStatusWrapper>();
         for (int i = 0; i < 5; ++i) {
             name = "testPersist" + i + r.nextInt();
             as = new ActivityStatusWrapper(appService);
@@ -228,8 +223,7 @@ public class TestActivityStatus extends TestDatabase {
 
         // create 3 new activity statuses
         before = after;
-        List<ActivityStatusWrapper> toAdd =
-            new ArrayList<ActivityStatusWrapper>();
+        List<ActivityStatusWrapper> toAdd = new ArrayList<ActivityStatusWrapper>();
         for (int i = 0; i < 3; ++i) {
             name = "testPersist" + i + r.nextInt();
             as = new ActivityStatusWrapper(appService);
@@ -251,14 +245,14 @@ public class TestActivityStatus extends TestDatabase {
     @Test
     public void testPersistFail() throws Exception {
         String name = "testPersistFail" + r.nextInt();
-        int before =
-            ActivityStatusWrapper.getAllActivityStatuses(appService).size();
+        int before = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
         ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
         as.setName(name);
         as.persist();
         addedstatus.add(as);
-        int after =
-            ActivityStatusWrapper.getAllActivityStatuses(appService).size();
+        int after = ActivityStatusWrapper.getAllActivityStatuses(appService)
+            .size();
         Assert.assertEquals(before + 1, after);
 
         ActivityStatusWrapper newAs = new ActivityStatusWrapper(appService);
@@ -274,18 +268,18 @@ public class TestActivityStatus extends TestDatabase {
 
     @Test
     public void testGetName() throws Exception {
-        ActivityStatusWrapper activeAs =
-            ActivityStatusWrapper.getActiveActivityStatus(appService);
+        ActivityStatusWrapper activeAs = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
         Assert.assertEquals(ActivityStatusWrapper.ACTIVE_STATUS_STRING,
             activeAs.getName());
     }
 
     @Test
     public void testCompareTo() throws Exception {
-        ActivityStatusWrapper activeAs =
-            ActivityStatusWrapper.getActiveActivityStatus(appService);
-        ActivityStatusWrapper closedAs =
-            ActivityStatusWrapper.getActivityStatus(appService,
+        ActivityStatusWrapper activeAs = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
+        ActivityStatusWrapper closedAs = ActivityStatusWrapper
+            .getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING);
 
         Assert.assertTrue(activeAs.compareTo(closedAs) < 0);
@@ -294,9 +288,9 @@ public class TestActivityStatus extends TestDatabase {
 
     @Test
     public void testGetAllActivityStatuses() throws Exception {
-        Collection<ActivityStatusWrapper> list =
-            ActivityStatusWrapper.getAllActivityStatuses(appService);
-        Assert.assertTrue(list.size() >= 4);
+        Collection<ActivityStatusWrapper> list = ActivityStatusWrapper
+            .getAllActivityStatuses(appService);
+        Assert.assertTrue(list.size() >= 3);
 
         List<String> names = new ArrayList<String>();
         for (ActivityStatusWrapper as : list) {
@@ -306,8 +300,6 @@ public class TestActivityStatus extends TestDatabase {
             .contains(ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         Assert.assertTrue(names
             .contains(ActivityStatusWrapper.CLOSED_STATUS_STRING));
-        Assert.assertTrue(names
-            .contains(ActivityStatusWrapper.DISABLED_STATUS_STRING));
         Assert.assertTrue(names
             .contains(ActivityStatusWrapper.FLAGGED_STATUS_STRING));
 
@@ -331,13 +323,12 @@ public class TestActivityStatus extends TestDatabase {
 
     @Test
     public void testIsActive() throws Exception {
-        ActivityStatusWrapper active =
-            ActivityStatusWrapper.getActiveActivityStatus(appService);
+        ActivityStatusWrapper active = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
         Assert.assertTrue(active.isActive());
 
-        ActivityStatusWrapper closed =
-            ActivityStatusWrapper.getActivityStatus(appService,
-                ActivityStatusWrapper.CLOSED_STATUS_STRING);
+        ActivityStatusWrapper closed = ActivityStatusWrapper.getActivityStatus(
+            appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
         Assert.assertFalse(closed.isActive());
     }
 }

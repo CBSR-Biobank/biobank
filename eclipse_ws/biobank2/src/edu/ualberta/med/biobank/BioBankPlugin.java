@@ -28,27 +28,27 @@ import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
-import edu.ualberta.med.biobank.treeview.ClinicAdapter;
-import edu.ualberta.med.biobank.treeview.ContainerAdapter;
-import edu.ualberta.med.biobank.treeview.ContainerGroup;
-import edu.ualberta.med.biobank.treeview.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.ContainerTypeGroup;
 import edu.ualberta.med.biobank.treeview.DateNode;
-import edu.ualberta.med.biobank.treeview.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.PatientVisitAdapter;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
-import edu.ualberta.med.biobank.treeview.SiteGroup;
-import edu.ualberta.med.biobank.treeview.StudyAdapter;
-import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ContainerGroup;
+import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ContainerTypeGroup;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteGroup;
+import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
 import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
-import edu.ualberta.med.biobank.treeview.dispatch.ReceivingDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchGroup;
+import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchGroup;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -123,6 +123,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_RECEIVED = "received";
     public static final String IMG_SENT = "sent";
     public static final String IMG_ALIQUOT = "aliquot";
+    public static final String IMG_LOCK = "lock";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -165,15 +166,13 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_RECEIVED);
         classToImageKey.put(InCreationDispatchGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_CREATION);
-        classToImageKey.put(
-            ReceivingInTransitDispatchGroup.class.getName(),
+        classToImageKey.put(ReceivingInTransitDispatchGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
         classToImageKey.put(SentInTransitDispatchGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
-        classToImageKey.put(ReceivingDispatchGroup.class.getName(),
+        classToImageKey.put(ReceivingNoErrorsDispatchGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
-        classToImageKey.put(
-            ReceivingWithErrorsDispatchGroup.class.getName(),
+        classToImageKey.put(ReceivingWithErrorsDispatchGroup.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
         classToImageKey.put(DispatchAdapter.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT);
@@ -286,6 +285,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_RECEIVED, "received.png");
         registerImage(registry, IMG_SENT, "sent.png");
         registerImage(registry, IMG_ALIQUOT, "aliquot.png");
+        registerImage(registry, IMG_LOCK, "lock.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,

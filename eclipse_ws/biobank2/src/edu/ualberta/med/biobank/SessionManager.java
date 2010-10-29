@@ -19,15 +19,15 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.rcp.MainPerspective;
 import edu.ualberta.med.biobank.rcp.SiteCombo;
+import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
@@ -39,6 +39,8 @@ public class SessionManager {
         .getLogger(SessionManager.class.getName());
 
     private static SessionManager instance = null;
+
+    private static IWorkbenchWindow workbenchWindow;
 
     private SessionsView view;
 
@@ -80,23 +82,22 @@ public class SessionManager {
         String serverName, User user, Collection<SiteWrapper> sites) {
         logger.debug("addSession: " + serverName + ", user/" + user.getLogin()
             + " numSites/" + sites.size());
-        sessionAdapter =
-            new SessionAdapter(rootNode, appService, 0, serverName, user);
+        sessionAdapter = new SessionAdapter(rootNode, appService, 0,
+            serverName, user);
         rootNode.addChild(sessionAdapter);
 
         siteManager.init(appService, serverName);
         Assert.isNotNull(siteCombo, "site combo is null");
         siteManager.setSiteCombo(siteCombo);
-        siteManager.getCurrentSite(serverName, sites);
+        siteManager.selectCurrentSite(serverName, sites);
         siteManager.updateSites(sites);
 
         rebuildSession();
         updateMenus();
 
         if (sessionAdapter.getUser().isNeedToChangePassword()) {
-            ChangePasswordDialog dlg =
-                new ChangePasswordDialog(PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getShell(), true);
+            ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
+                .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
             dlg.open();
         }
     }
@@ -116,23 +117,21 @@ public class SessionManager {
     }
 
     private void updateMenus() {
-        IWorkbenchWindow window =
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-        ISourceProviderService service =
-            (ISourceProviderService) window
-                .getService(ISourceProviderService.class);
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
 
         // assign logged in state
-        SessionState sessionSourceProvider =
-            (SessionState) service
-                .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
+        SessionState sessionSourceProvider = (SessionState) service
+            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
         sessionSourceProvider.setWebAdmin(sessionAdapter != null
             && sessionAdapter.getUser().isWebsiteAdministrator());
 
         // assign debug state
-        DebugState debugStateSourceProvider =
-            (DebugState) service.getSourceProvider(DebugState.SESSION_STATE);
+        DebugState debugStateSourceProvider = (DebugState) service
+            .getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BioBankPlugin.getDefault()
             .isDebugging());
 
@@ -201,10 +200,15 @@ public class SessionManager {
 
     public static AbstractViewWithAdapterTree getCurrentAdapterViewWithTree() {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
-        IWorkbenchPage activePage =
-            workbench.getActiveWorkbenchWindow().getActivePage();
-        return getInstance().possibleViewMap.get(activePage.getPerspective()
-            .getId());
+        if (workbench != null) {
+            workbenchWindow = workbench.getActiveWorkbenchWindow();
+            if (workbenchWindow != null) {
+                IWorkbenchPage activePage = workbenchWindow.getActivePage();
+                return getInstance().possibleViewMap.get(activePage
+                    .getPerspective().getId());
+            }
+        }
+        return null;
     }
 
     public static AdapterBase searchNode(ModelWrapper<?> wrapper) {
@@ -219,8 +223,8 @@ public class SessionManager {
         return rootNode;
     }
 
-    public SiteWrapper getCurrentSite() {
-        return siteManager.getCurrentSite();
+    public static SiteWrapper getCurrentSite() {
+        return getInstance().siteManager.getCurrentSite();
     }
 
     public void setSiteManagerEnabled(boolean enable) {
@@ -268,9 +272,8 @@ public class SessionManager {
         }
         if (view != null) {
             if (!isAllSitesSelected()) {
-                SiteAdapter site =
-                    (SiteAdapter) getSession().getSitesGroupNode().search(
-                        getCurrentSite());
+                SiteAdapter site = (SiteAdapter) getSession()
+                    .getSitesGroupNode().search(getCurrentSite());
                 if (site != null) {
                     site.performExpand();
                     return;
@@ -289,20 +292,37 @@ public class SessionManager {
         return getInstance().getSession().getServerName();
     }
 
-    public static boolean canCreate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
+    /**
+     * Site specific only if currentSite != null
+     */
+    public static boolean canCreate(Class<?> clazz, SiteWrapper currentSite) {
+        return getUser().hasPrivilegeOnObject(Privilege.CREATE,
+            currentSite == null ? null : currentSite.getId(), clazz, null);
     }
 
-    public static boolean canDelete(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
+    /**
+     * Site specific only if currentSite != null
+     */
+    public static boolean canDelete(Class<?> clazz, SiteWrapper currentSite) {
+        return getUser().hasPrivilegeOnObject(Privilege.DELETE,
+            currentSite == null ? null : currentSite.getId(), clazz, null);
+    }
+
+    public static boolean canDelete(ModelWrapper<?> wrapper) {
+        return wrapper.canDelete(getUser());
     }
 
     public static boolean canView(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
+        return getUser()
+            .hasPrivilegeOnObject(Privilege.READ, null, clazz, null);
     }
 
-    public static boolean canUpdate(Class<?> clazz) {
-        return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
+    /**
+     * Site specific only if currentSite != null
+     */
+    public static boolean canUpdate(Class<?> clazz, SiteWrapper currentSite) {
+        return getUser().hasPrivilegeOnObject(Privilege.UPDATE,
+            currentSite == null ? null : currentSite.getId(), clazz, null);
     }
 
     public boolean isConnected() {
@@ -311,8 +331,7 @@ public class SessionManager {
 
     public static void log(String action, String details, String type)
         throws Exception {
-        getAppService().logActivity(action,
-            getInstance().getCurrentSite().getNameShort(), null, null, null,
-            details, type);
+        getAppService().logActivity(action, getCurrentSite().getNameShort(),
+            null, null, null, details, type);
     }
 }

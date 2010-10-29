@@ -2,10 +2,13 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.value.IObservableValue;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -20,8 +23,10 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.ToolBar;
 import org.eclipse.swt.widgets.ToolItem;
+import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -41,7 +46,9 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -81,30 +88,28 @@ public abstract class BiobankFormBase extends EditorPart {
 
     public List<BiobankFormBase> linkedForms;
 
-    protected IDoubleClickListener collectionDoubleClickListener =
-        new IDoubleClickListener() {
-            @Override
-            public void doubleClick(DoubleClickEvent event) {
-                Object selection = event.getSelection();
-                if (selection instanceof StructuredSelection) {
-                    Object element =
-                        ((StructuredSelection) selection).getFirstElement();
-                    if (element instanceof AdapterBase) {
-                        ((AdapterBase) element).performDoubleClick();
-                    } else if (element instanceof ModelWrapper<?>) {
-                        SessionManager.openViewForm((ModelWrapper<?>) element);
-                    }
-                } else if (selection instanceof InfoTableSelection) {
-                    InfoTableSelection tableSelection =
-                        (InfoTableSelection) selection;
-                    if (tableSelection.getObject() instanceof ModelWrapper<?>) {
-                        SessionManager
-                            .openViewForm((ModelWrapper<?>) tableSelection
-                                .getObject());
-                    }
+    protected IDoubleClickListener collectionDoubleClickListener = new IDoubleClickListener() {
+        @Override
+        public void doubleClick(DoubleClickEvent event) {
+            Object selection = event.getSelection();
+            if (selection instanceof StructuredSelection) {
+                Object element = ((StructuredSelection) selection)
+                    .getFirstElement();
+                if (element instanceof AdapterBase) {
+                    ((AdapterBase) element).performDoubleClick();
+                } else if (element instanceof ModelWrapper<?>) {
+                    SessionManager.openViewForm((ModelWrapper<?>) element);
+                }
+            } else if (selection instanceof InfoTableSelection) {
+                InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                if (tableSelection.getObject() instanceof ModelWrapper<?>) {
+                    SessionManager
+                        .openViewForm((ModelWrapper<?>) tableSelection
+                            .getObject());
                 }
             }
-        };
+        }
+    };
 
     public BiobankFormBase() {
         widgets = new HashMap<String, Control>();
@@ -126,8 +131,8 @@ public abstract class BiobankFormBase extends EditorPart {
             // if selection fails, then the adapter needs to be matched at the
             // id level
             if (SessionManager.getSelectedNode() == null) {
-                AdapterBase node =
-                    SessionManager.searchNode(adapter.getModelObject());
+                AdapterBase node = SessionManager.searchNode(adapter
+                    .getModelObject());
                 SessionManager.setSelectedNode(node);
             }
         }
@@ -239,9 +244,8 @@ public abstract class BiobankFormBase extends EditorPart {
     protected abstract void createFormContent() throws Exception;
 
     protected Section createSection(String title) {
-        Section section =
-            toolkit.createSection(page, Section.TWISTIE | Section.TITLE_BAR
-                | Section.EXPANDED);
+        Section section = toolkit.createSection(page, Section.TWISTIE
+            | Section.TITLE_BAR | Section.EXPANDED);
         if (title != null) {
             section.setText(title);
         }
@@ -281,7 +285,7 @@ public abstract class BiobankFormBase extends EditorPart {
     protected void addSectionToolbar(Section section, String tooltip,
         SelectionListener listener, Class<?> wrapperTypeToAdd, String imageKey) {
         if (wrapperTypeToAdd == null
-            || SessionManager.canCreate(wrapperTypeToAdd)) {
+            || SessionManager.canCreate(wrapperTypeToAdd, null)) {
             ToolBar tbar = (ToolBar) section.getTextClient();
             if (tbar == null) {
                 tbar = new ToolBar(section, SWT.FLAT | SWT.HORIZONTAL);
@@ -338,9 +342,8 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected BiobankText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
-        BiobankText result =
-            (BiobankText) createLabelledWidget(parent, BiobankText.class,
-                SWT.READ_ONLY | widgetOptions, fieldLabel, value);
+        BiobankText result = (BiobankText) createLabelledWidget(parent,
+            BiobankText.class, SWT.READ_ONLY | widgetOptions, fieldLabel, value);
         return result;
     }
 
@@ -358,9 +361,8 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected BiobankText createReadOnlyWidget(Composite parent,
         int widgetOptions, String value) {
-        BiobankText result =
-            (BiobankText) createWidget(parent, BiobankText.class, SWT.READ_ONLY
-                | widgetOptions, value);
+        BiobankText result = (BiobankText) createWidget(parent,
+            BiobankText.class, SWT.READ_ONLY | widgetOptions, value);
         return result;
     }
 
@@ -384,5 +386,64 @@ public abstract class BiobankFormBase extends EditorPart {
         if (linkedForms != null) {
             linkedForms.remove(this);
         }
+    }
+
+    private IObservableValue createBeansObservable(Object bean,
+        String propertyName) {
+        if (bean == null)
+            return null;
+        Assert.isNotNull(propertyName);
+        return BeansObservables.observeValue(bean, propertyName);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, Object bean, String propertyName,
+        AbstractValidator validator) {
+        return widgetCreator.createBoundWidget(composite, widgetClass,
+            widgetOptions, label, widgetValues,
+            createBeansObservable(bean, propertyName), validator);
+    }
+
+    public Control createBoundWidget(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions, Label label,
+        String[] widgetValues, Object bean, String propertyName,
+        AbstractValidator validator, String bindingKey) {
+        return widgetCreator.createBoundWidget(composite, widgetClass,
+            widgetOptions, label, widgetValues,
+            createBeansObservable(bean, propertyName), validator, bindingKey);
+
+    }
+
+    protected Control createBoundWidgetWithLabel(Composite composite,
+        Class<? extends Widget> widgetClass, int widgetOptions,
+        String fieldLabel, String[] widgetValues, Object bean,
+        String propertyName, AbstractValidator validator) {
+        return widgetCreator.createBoundWidgetWithLabel(composite, widgetClass,
+            widgetOptions, fieldLabel, widgetValues,
+            createBeansObservable(bean, propertyName), validator);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client, Label label,
+        Date date, Object bean, String propertyName,
+        AbstractValidator validator, int typeShown, String bindingKey) {
+        return widgetCreator.createDateTimeWidget(client, label, date,
+            createBeansObservable(bean, propertyName), validator, typeShown,
+            bindingKey);
+    }
+
+    protected DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object bean, String propertyName,
+        AbstractValidator validator) {
+        return createDateTimeWidget(client, nameLabel, date, bean,
+            propertyName, validator, SWT.DATE | SWT.TIME);
+    }
+
+    public DateTimeWidget createDateTimeWidget(Composite client,
+        String nameLabel, Date date, Object bean, String propertyName,
+        AbstractValidator validator, int typeShown) {
+        return widgetCreator.createDateTimeWidget(client, nameLabel, date,
+            createBeansObservable(bean, propertyName), validator, typeShown,
+            null);
     }
 }

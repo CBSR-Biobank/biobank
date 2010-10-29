@@ -107,7 +107,9 @@ public class TopContainerListWidget {
                 return ((ContainerWrapper) element).getLabel()
                     + "("
                     + ((ContainerWrapper) element).getContainerType()
-                        .getNameShort() + ")";
+                        .getNameShort() + ") ("
+                    + ((ContainerWrapper) element).getSite().getNameShort()
+                    + ")";
             }
         });
         topContainers.setContentProvider(new ArrayContentProvider());
@@ -115,7 +117,7 @@ public class TopContainerListWidget {
             new GridData(SWT.FILL, SWT.FILL, true, true));
 
         siteCombo.setSelection(new StructuredSelection(SessionManager
-            .getInstance().getCurrentSite()));
+            .getCurrentSite()));
     }
 
     public List<Integer> getSelectedContainerIds() {

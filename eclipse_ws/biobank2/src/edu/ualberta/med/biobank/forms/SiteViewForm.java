@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.treeview.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
@@ -177,7 +177,7 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createDispatchSection() {
-        Section section = createSection("Dispatch");
+        Section section = createSection("Dispatches");
         dispatchTable = new SiteDispatchInfoTable(section, site);
         dispatchTable.adaptToToolkit(toolkit, true);
         dispatchTable.addDoubleClickListener(collectionDoubleClickListener);

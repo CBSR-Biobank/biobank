@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 
 public class ShipmentAddHandler extends AbstractHandler {
@@ -17,8 +17,8 @@ public class ShipmentAddHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        ShipmentWrapper shipment = new ShipmentWrapper(SessionManager
-            .getAppService());
+        ShipmentWrapper shipment = new ShipmentWrapper(
+            SessionManager.getAppService());
         ShipmentAdapter shipNode = new ShipmentAdapter(sessionAdapter, shipment);
         shipNode.openEntryForm();
         return null;

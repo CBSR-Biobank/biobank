@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.treeview.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
 public class ClinicAddHandler extends AbstractHandler {
     public static final String ID = "edu.ualberta.med.biobank.commands.addClinic";
@@ -16,13 +16,13 @@ public class ClinicAddHandler extends AbstractHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SessionAdapter session = SessionManager.getInstance().getSession();
         Assert.isNotNull(session);
-        session.getClinicGroupNode().addClinic();
+        session.addClinic();
         return null;
     }
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ClinicWrapper.class)
+        return SessionManager.canCreate(ClinicWrapper.class, null)
             && SessionManager.getInstance().getSession() != null;
     }
 }

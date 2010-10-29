@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.ContainerAdapter;
+import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 
 public class AdapterTreeDragDropListener implements DropTargetListener,
     DragSourceListener {

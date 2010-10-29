@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.rcp;
 
 import java.text.MessageFormat;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ComboViewer;
@@ -10,26 +11,30 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.ui.ISourceProvider;
+import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IViewSite;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.IWorkbenchPartSite;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.menus.WorkbenchWindowControlContribution;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SiteCombo extends WorkbenchWindowControlContribution {
-    private static final String DISPATCH_SHIPMENTS_STATUS_MSG = "{0} dispatch shipments to receive";
+    private static final String DISPATCH_STATUS_MSG = "{0} dispatches to receive";
     private ComboViewer comboViewer;
 
     public SiteCombo() {
@@ -67,39 +72,59 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
         combo.setLayoutData(gd);
         combo.setTextLimit(50);
 
-        combo.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                IWorkbenchPartSite wbSite = PlatformUI.getWorkbench()
-                    .getActiveWorkbenchWindow().getActivePage().getActivePart()
-                    .getSite();
-                if (wbSite instanceof IViewSite) {
-                    String message = "";
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        ISourceProvider siteSelectionStateSourceProvider = service
+            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
+        siteSelectionStateSourceProvider
+            .addSourceProviderListener(new ISourceProviderListener() {
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    @SuppressWarnings("rawtypes") Map sourceValuesByName) {
+                    updateStatusLineMessage(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getActivePage()
+                        .getActivePart().getSite());
+                }
 
-                    if (!"All Sites".equals(comboViewer.getCombo().getText())) {
-                        Object o = ((StructuredSelection) comboViewer
-                            .getSelection()).getFirstElement();
-                        if (o instanceof SiteWrapper) {
-                            SiteWrapper site = (SiteWrapper) o;
-                            List<DispatchWrapper> dispatches = site
-                                .getInTransitReceiveDispatchCollection();
-                            int numPending = 0;
-                            if (dispatches != null)
-                                numPending = dispatches.size();
-
-                            message = MessageFormat.format(
-                                DISPATCH_SHIPMENTS_STATUS_MSG,
-                                numPending == 0 ? "No" : numPending);
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    IWorkbenchPage wPage = PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getActivePage();
+                    if (wPage != null) {
+                        IWorkbenchPart wPart = wPage.getActivePart();
+                        if (wPart != null) {
+                            updateStatusLineMessage(wPart.getSite());
                         }
                     }
-
-                    ((IViewSite) wbSite).getActionBars().getStatusLineManager()
-                        .setMessage(message);
                 }
-            }
-        });
+            });
 
         return resizedComboPanel;
+    }
+
+    public void updateStatusLineMessage(IWorkbenchPartSite wbSite) {
+        if (wbSite instanceof IViewSite) {
+            String message = "";
+
+            if (!SessionManager.getInstance().isAllSitesSelected()) {
+                Object o = ((StructuredSelection) comboViewer.getSelection())
+                    .getFirstElement();
+                if (o instanceof SiteWrapper) {
+                    SiteWrapper site = (SiteWrapper) o;
+                    int numPending = site
+                        .getInTransitReceiveDispatchCollection().size();
+
+                    message = MessageFormat.format(DISPATCH_STATUS_MSG,
+                        numPending == 0 ? "No" : numPending);
+                }
+            }
+
+            ((IViewSite) wbSite).getActionBars().getStatusLineManager()
+                .setMessage(message);
+        }
     }
 
     public void addSelectionChangedListener(ISelectionChangedListener listener) {

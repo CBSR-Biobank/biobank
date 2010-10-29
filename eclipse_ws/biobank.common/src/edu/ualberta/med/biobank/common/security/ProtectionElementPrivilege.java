@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.common.security;
 
 import java.io.Serializable;
-import java.util.HashSet;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
@@ -10,34 +8,63 @@ public class ProtectionElementPrivilege implements Serializable, NotAProxy {
 
     private static final long serialVersionUID = 1L;
 
-    private String objectName;
+    /**
+     * This is the CSM protection element object id
+     */
+    private String type;
 
-    private Set<Privilege> privileges;
+    /**
+     * If the CSM protection element define a attribute "id", then this is the
+     * value of this attribute.
+     */
+    private String id;
 
-    private String objectId;
-
-    public ProtectionElementPrivilege(String objectName, String objectId) {
-        this.objectName = objectName;
-        this.objectId = objectId;
+    public ProtectionElementPrivilege(String type, String id) {
+        this.type = type;
+        this.id = id;
     }
 
-    public String getObjectName() {
-        return objectName;
+    public ProtectionElementPrivilege(String type, Integer id) {
+        this(type, id == null ? null : id.toString());
     }
 
-    public String getObjectId() {
-        return objectId;
+    public String getType() {
+        return type;
     }
 
-    public Set<Privilege> getPrivileges() {
-        return privileges;
+    public void setType(String type) {
+        this.type = type;
     }
 
-    public void addPrivileges(Set<Privilege> privileges) {
-        if (this.privileges == null) {
-            this.privileges = new HashSet<Privilege>();
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public String toString() {
+        return getType() + "/" + getId();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof ProtectionElementPrivilege) {
+            ProtectionElementPrivilege pep = (ProtectionElementPrivilege) obj;
+            boolean sameType = getType() != null && pep.getType() != null
+                && getType().equals(pep.getType());
+            boolean sameId = (getId() == null && pep.getId() == null)
+                || (getId() != null && pep.getId() != null && getId().equals(
+                    pep.getId()));
+            return sameType && sameId;
         }
-        this.privileges.addAll(privileges);
+        return false;
     }
 
+    @Override
+    public int hashCode() {
+        return (getType() + getId()).hashCode();
+    }
 }

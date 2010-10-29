@@ -6,6 +6,8 @@ import java.util.List;
 import org.eclipse.core.databinding.beans.BeansObservables;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -19,30 +21,36 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
+import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class DispatchSendingEntryForm extends
-    AbstractShipmentEntryForm {
+public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(DispatchSendingEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm";
 
-    public static final String MSG_NEW_SHIPMENT_OK = "Creating a new dispatch shipment record.";
+    public static final String MSG_NEW_SHIPMENT_OK = "Creating a new dispatch record.";
 
-    public static final String MSG_SHIPMENT_OK = "Editing an existing dispatch shipment record.";
+    public static final String MSG_SHIPMENT_OK = "Editing an existing dispatch record.";
 
     private ComboViewer studyComboViewer;
 
     private ComboViewer destSiteComboViewer;
+
+    protected DispatchAliquotListInfoTable aliquotsNonProcessedTable;
+
+    private DispatchAliquotsTreeTable aliquotsTreeTable;
 
     @Override
     public void createPartControl(Composite parent) {
@@ -89,8 +97,7 @@ public class DispatchSendingEntryForm extends
                 });
 
             createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-                "Waybill", null,
-                BeansObservables.observeValue(shipment, "waybill"), null);
+                "Waybill", null, shipment, "waybill", null);
         }
 
         BiobankText commentText = (BiobankText) createBoundWidgetWithLabel(
@@ -98,9 +105,6 @@ public class DispatchSendingEntryForm extends
             BeansObservables.observeValue(shipment, "comment"), null);
 
         createAliquotsSelectionSection();
-        createAliquotsReceivedSection(false);
-        createAliquotsExtraSection(false);
-        createAliquotsMissingSection(false);
 
         if (studyComboViewer == null)
             setFirstControl(commentText);
@@ -146,7 +150,7 @@ public class DispatchSendingEntryForm extends
                             } catch (Exception e) {
                                 logger
                                     .error(
-                                        "Error while retrieving dispatch shipment destination sites",
+                                        "Error while retrieving dispatch destination sites",
                                         e);
                             }
                         }
@@ -178,22 +182,61 @@ public class DispatchSendingEntryForm extends
     }
 
     private void createAliquotsSelectionSection() {
-        Section section = createSection("Sent aliquots");
-        Composite composite = toolkit.createComposite(section);
-        composite.setLayout(new GridLayout(1, false));
-        section.setClient(composite);
         if (shipment.isInCreationState()) {
-            addSectionToolbar(section, "Add aliquots to this shipment",
-                new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        openScanDialog();
-                    }
-                }, null, BioBankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT);
+            Section section = createSection("Aliquot added");
+            Composite composite = toolkit.createComposite(section);
+            composite.setLayout(new GridLayout(1, false));
+            section.setClient(composite);
+            if (shipment.isInCreationState()) {
+                addSectionToolbar(section, "Add aliquots to this shipment",
+                    new SelectionAdapter() {
+                        @Override
+                        public void widgetSelected(SelectionEvent e) {
+                            openScanDialog();
+                        }
+                    }, null, BioBankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT);
 
-            createAliquotsSelectionActions(composite, false);
+                createAliquotsSelectionActions(composite, false);
+                createAliquotsNonProcessedSection(true);
+            }
+        } else {
+            aliquotsTreeTable = new DispatchAliquotsTreeTable(page, shipment,
+                !shipment.isInClosedState() && !shipment.isInLostState(), true);
+            aliquotsTreeTable.addSelectionChangedListener(biobankListener);
         }
-        createAliquotsNonProcessedSection(true);
+    }
+
+    protected void createAliquotsNonProcessedSection(boolean edit) {
+        String title = "Non processed aliquots";
+        if (shipment.isInCreationState()) {
+            title = "Added aliquots";
+        }
+        Composite parent = createSectionWithClient(title);
+        aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(parent,
+            shipment, edit) {
+            @Override
+            public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
+                return shipment.getNonProcessedDispatchAliquotCollection();
+            }
+
+        };
+        aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
+        aliquotsNonProcessedTable
+            .addDoubleClickListener(new IDoubleClickListener() {
+                @Override
+                public void doubleClick(DoubleClickEvent event) {
+                    Object selection = event.getSelection();
+                    if (selection instanceof InfoTableSelection) {
+                        InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                        DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) tableSelection
+                            .getObject();
+                        if (dsa != null) {
+                            SessionManager.openViewForm(dsa.getAliquot());
+                        }
+                    }
+                }
+            });
+        aliquotsNonProcessedTable.addSelectionChangedListener(biobankListener);
     }
 
     @Override
@@ -203,7 +246,7 @@ public class DispatchSendingEntryForm extends
             shipment);
         dialog.open();
         setDirty(true); // FIXME need to do this better !
-        reloadAliquotsTables();
+        reloadAliquots();
     }
 
     @Override
@@ -214,20 +257,17 @@ public class DispatchSendingEntryForm extends
     protected void addAliquot(String inventoryId) {
         if (!inventoryId.isEmpty()) {
             try {
-                List<AliquotWrapper> aliquots = AliquotWrapper.getAliquots(
-                    shipment.getAppService(), inventoryId);
-                if (aliquots.size() == 0)
+                AliquotWrapper existingAliquot = AliquotWrapper.getAliquot(
+                    shipment.getAppService(), inventoryId,
+                    SessionManager.getUser());
+                if (existingAliquot == null)
                     BioBankPlugin.openError("Aliquot not found",
                         "Aliquot with inventory id " + inventoryId
                             + " has not been found.");
-                else if (aliquots.size() > 1)
-                    BioBankPlugin.openError("Aliquots problems",
-                        "More than one aliquots with inventory id "
-                            + inventoryId + " has been found.");
                 else
-                    addAliquot(aliquots.get(0));
+                    addAliquot(existingAliquot);
 
-            } catch (ApplicationException ae) {
+            } catch (Exception ae) {
                 BioBankPlugin.openAsyncError("Error while looking up patient",
                     ae);
             }
@@ -243,12 +283,11 @@ public class DispatchSendingEntryForm extends
             return;
         }
         try {
-            shipment.addNewAliquots(Arrays.asList(aliquot));
+            shipment.addNewAliquots(Arrays.asList(aliquot), true);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error adding aliquots", e);
         }
-        reloadAliquotsTables();
-        aliquotsNonProcessedTable.notifyListeners();
+        reloadAliquots();
     }
 
     @Override
@@ -264,17 +303,41 @@ public class DispatchSendingEntryForm extends
     @Override
     public void reset() throws Exception {
         super.reset();
-        StudyWrapper study = shipment.getStudy();
-        if (study != null) {
-            studyComboViewer.setSelection(new StructuredSelection(study));
-        } else if (studyComboViewer.getCombo().getItemCount() > 1) {
-            studyComboViewer.getCombo().deselectAll();
+        shipment.setSender(SessionManager.getCurrentSite());
+        if (studyComboViewer != null) {
+            StudyWrapper study = shipment.getStudy();
+            if (study != null) {
+                studyComboViewer.setSelection(new StructuredSelection(study));
+            } else if (studyComboViewer.getCombo().getItemCount() == 1)
+                studyComboViewer.setSelection(new StructuredSelection(
+                    studyComboViewer.getElementAt(0)));
+            else
+                studyComboViewer.getCombo().deselectAll();
+
         }
-        SiteWrapper destSite = shipment.getReceiver();
-        if (destSite != null) {
-            destSiteComboViewer.setSelection(new StructuredSelection(destSite));
-        } else if (destSiteComboViewer.getCombo().getItemCount() > 1) {
-            destSiteComboViewer.getCombo().deselectAll();
+        if (destSiteComboViewer != null) {
+            SiteWrapper destSite = shipment.getReceiver();
+            if (destSite != null) {
+                destSiteComboViewer.setSelection(new StructuredSelection(
+                    destSite));
+            } else if (destSiteComboViewer.getCombo().getItemCount() == 1)
+                destSiteComboViewer.setSelection(new StructuredSelection(
+                    destSiteComboViewer.getElementAt(0)));
+            else
+                destSiteComboViewer.getCombo().deselectAll();
+        }
+        reloadAliquots();
+    }
+
+    @Override
+    protected void reloadAliquots() {
+        if (aliquotsNonProcessedTable != null) {
+            aliquotsNonProcessedTable.reloadCollection();
+            page.layout(true, true);
+            book.reflow(true);
+        }
+        if (aliquotsTreeTable != null) {
+            aliquotsTreeTable.refresh();
         }
     }
 

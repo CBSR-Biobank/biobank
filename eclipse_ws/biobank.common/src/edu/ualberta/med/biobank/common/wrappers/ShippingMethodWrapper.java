@@ -16,6 +16,9 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
 
+    public static final String DROP_OFF_NAME = "Drop-off";
+    public static final String PICK_UP_NAME = "Pick-up";
+
     public ShippingMethodWrapper(WritableApplicationService appService) {
         super(appService);
     }
@@ -201,4 +204,9 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         }
     }
 
+    public boolean needDate() {
+        String name = getName();
+        return name != null && !name.equals(PICK_UP_NAME)
+            && !name.equals(DROP_OFF_NAME);
+    }
 }

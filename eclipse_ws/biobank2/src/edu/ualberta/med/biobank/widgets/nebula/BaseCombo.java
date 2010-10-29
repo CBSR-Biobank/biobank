@@ -57,7 +57,7 @@ public abstract class BaseCombo extends Canvas {
             boolean flushCache) {
             Point size = text.computeSize(SWT.DEFAULT, SWT.DEFAULT);
             if (button.getVisible()) {
-                size.x += size.y;
+                size.x += size.y + (win32 ? 6 : 0);
             }
 
             size.y += textMarginHeight;

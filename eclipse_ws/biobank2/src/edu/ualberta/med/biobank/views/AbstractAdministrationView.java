@@ -6,6 +6,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.ISourceProvider;
@@ -26,23 +27,42 @@ public abstract class AbstractAdministrationView extends
 
     private ISourceProviderListener siteStateListener;
 
-    protected Listener searchListener;
+    private Composite searchComposite;
 
     @Override
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(1, false));
-        searchListener = new Listener() {
+        GridLayout gl = new GridLayout(1, false);
+        gl.marginWidth = 0;
+        gl.marginHeight = 0;
+        gl.horizontalSpacing = 0;
+        gl.verticalSpacing = 0;
+        parent.setLayout(gl);
+
+        searchComposite = new Composite(parent, SWT.NONE);
+        gl = new GridLayout(1, false);
+        gl.marginWidth = 0;
+        gl.marginHeight = 0;
+        gl.horizontalSpacing = 0;
+        gl.verticalSpacing = 0;
+        gl.marginBottom = 5;
+        gl.marginTop = 2;
+        searchComposite.setLayout(gl);
+        GridData gd = new GridData();
+        gd.grabExcessHorizontalSpace = true;
+        gd.horizontalAlignment = SWT.FILL;
+        searchComposite.setLayoutData(gd);
+
+        createTreeTextOptions(searchComposite);
+
+        treeText = new BiobankText(searchComposite, SWT.SINGLE);
+        treeText.addListener(SWT.DefaultSelection, new Listener() {
             @Override
             public void handleEvent(Event e) {
                 internalSearch();
             }
-        };
-
-        createTreeTextOptions(parent);
-
-        treeText = new BiobankText(parent, SWT.SINGLE);
-        treeText.addListener(SWT.DefaultSelection, searchListener);
-        GridData gd = new GridData();
+        });
+        gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
         treeText.setLayoutData(gd);
@@ -75,14 +95,14 @@ public abstract class AbstractAdministrationView extends
         ISourceProvider siteSelectionStateSourceProvider = getSiteSelectionStateSourceProvider();
         Integer siteId = (Integer) siteSelectionStateSourceProvider
             .getCurrentState().get(SiteSelectionState.SITE_SELECTION_ID);
-        setTextEnablement(siteId);
+        setSearchFieldsEnablement(siteId);
 
         siteStateListener = new ISourceProviderListener() {
             @Override
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
                 if (sourceName.equals(SiteSelectionState.SITE_SELECTION_ID)) {
-                    setTextEnablement((Integer) sourceValue);
+                    setSearchFieldsEnablement((Integer) sourceValue);
                     getSite().getPage().closeAllEditors(true);
                     siteChanged(sourceValue);
                 }
@@ -106,8 +126,12 @@ public abstract class AbstractAdministrationView extends
         getTreeViewer().expandToLevel(3);
     }
 
-    protected void setTextEnablement(Integer siteId) {
-        treeText.setEnabled(siteId != null && siteId >= 0);
+    private void setSearchFieldsEnablement(Integer siteId) {
+        boolean enabled = siteId != null && siteId >= 0;
+        searchComposite.setEnabled(enabled);
+        for (Control c : searchComposite.getChildren()) {
+            c.setEnabled(enabled);
+        }
     }
 
     @Override

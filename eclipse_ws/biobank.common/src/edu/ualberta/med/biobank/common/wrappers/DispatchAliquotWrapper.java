@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchAliquot;
@@ -112,5 +113,23 @@ public class DispatchAliquotWrapper extends ModelWrapper<DispatchAliquot> {
             return getAliquot().compareTo(dsa.getAliquot());
         }
         return super.compareTo(object);
+    }
+
+    public String getStateDescription() {
+        return DispatchAliquotState.getState(getState()).getLabel();
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (object instanceof DispatchAliquotWrapper && object != null) {
+            DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) object;
+            if (isNew() && dsa.isNew()) {
+                return getAliquot() != null && dsa.getAliquot() != null
+                    && getAliquot().equals(dsa.getAliquot())
+                    && getShipment() != null && dsa.getShipment() != null
+                    && getShipment().equals(dsa.getShipment());
+            }
+        }
+        return super.equals(object);
     }
 }

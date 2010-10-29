@@ -18,6 +18,8 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
@@ -87,12 +89,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 @Override
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
-                    if (sourceValue != null
-                        && sourceValue.equals(SessionState.LOGGED_IN)) {
-                        updatedTitle(SessionManager.getServer(), SessionManager
-                            .getUser().getLogin());
-                    } else {
-                        resetTitle();
+                    if (sourceValue != null) {
+                        if (sourceValue.equals(SessionState.LOGGED_IN))
+                            updatedTitle(SessionManager.getServer(),
+                                SessionManager.getUser().getLogin());
+                        else if (sourceValue.equals(SessionState.LOGGED_OUT))
+                            resetTitle();
                     }
                 }
 
