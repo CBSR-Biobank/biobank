@@ -213,17 +213,9 @@
             id="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
             name="Add clinic shipment">
       </command>
-       <command
-            id="edu.ualberta.med.biobank.commands.shipments.shipmentDelete"
-            name="Delete clinic shipment">
-      </command>
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientAdd"
             name="Add patient">
-      </command>
-       <command
-            id="edu.ualberta.med.biobank.commands.patients.patientDelete"
-            name="Delete patient">
       </command>
        <command
              id="edu.ualberta.med.biobank.commands.patients.patientMerge"
@@ -232,10 +224,6 @@
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
             name="Add Patient Visit">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.patients.patientVisitDelete"
-            name="Delete Patient Visit">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.shipmentAdmin"
@@ -250,8 +238,8 @@
             id="edu.ualberta.med.biobank.commands.sendErrorMail"
             name="Send Error Mail">
       </command>
-      <command id="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
-            name="Delete tree view selection">
+      <command id="edu.ualberta.med.biobank.commands.deleteSelection"
+            name="Delete selected item">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.search"
@@ -632,37 +620,6 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.ShipmentDeleteHandler"
-            commandId="edu.ualberta.med.biobank.commands.shipments.shipmentDelete">
-         <activeWhen>
-            <and>
-              <reference
-                    definitionId="biobank2.shipmentsPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.siteSelected">
-              </reference>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <and>
-               <reference
-                     definitionId="oneElementSelected">
-               </reference>
-               <with
-                     variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <instanceof
-                           value="edu.ualberta.med.biobank.treeview.clinicShipment.ClinicShipmentAdapter">
-                     </instanceof>
-                  </iterate>
-               </with>
-            </and>
-         </enabledWhen>
-      </handler>
-      <handler
             class="edu.ualberta.med.biobank.handlers.PatientAddHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.patientAdd">
          <activeWhen>
@@ -681,37 +638,6 @@
             </reference>
          </enabledWhen>
       </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.PatientDeleteHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.patientDelete">
-         <activeWhen>
-            <and>
-              <reference
-                    definitionId="biobank2.patientsPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.siteSelected">
-              </reference>
-            </and>
-         </activeWhen>
-          <enabledWhen>
-            <and>
-               <reference
-                     definitionId="oneElementSelected">
-               </reference>
-			   <with
-                  variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <instanceof
-                           value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
-                     </instanceof>
-                  </iterate>
-          	  </with>
-            </and>
-         </enabledWhen>
-      </handler>
         <handler
             class="edu.ualberta.med.biobank.handlers.PatientMergeHandler"
             commandId="edu.ualberta.med.biobank.commands.patients.patientMerge">
@@ -728,7 +654,7 @@
           <enabledWhen>
             <and>
                <reference
-                     definitionId="oneElementSelected">
+                     definitionId="biobank2.oneElementSelected">
                </reference>
 			   <with
                   variable="selection">
@@ -778,7 +704,7 @@
          <enabledWhen>
             <and>
                <reference
-                     definitionId="oneElementSelected">
+                     definitionId="biobank2.oneElementSelected">
                </reference>
 			   <with
                   variable="selection">
@@ -787,37 +713,6 @@
                         operator="or">
                      <instanceof
                            value="edu.ualberta.med.biobank.treeview.patient.PatientAdapter">
-                     </instanceof>
-                  </iterate>
-          	  </with>
-            </and>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.PatientVisitDeleteHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.patientVisitDelete">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.patientsPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.siteSelected">
-               </reference>
-            </and>
-         </activeWhen>
-         <enabledWhen>
-            <and>
-               <reference
-                     definitionId="oneElementSelected">
-               </reference>
-			   <with
-                  variable="selection">
-                  <iterate
-                        ifEmpty="false"
-                        operator="or">
-                     <instanceof
-                           value="edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter">
                      </instanceof>
                   </iterate>
           	  </with>
@@ -858,13 +753,13 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.SessionDeleteSelectionHandler"      
-            commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection">
-         <activeWhen>
-               <reference
-                     definitionId="biobank2.loggedIn">
-               </reference>
-         </activeWhen>
+            class="edu.ualberta.med.biobank.handlers.DeleteSelectionHandler"      
+            commandId="edu.ualberta.med.biobank.commands.deleteSelection">
+         <enabledWhen>
+            <reference
+                  definitionId="biobank2.canDelete">
+            </reference>
+         </enabledWhen>
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.SearchHandler"
@@ -1169,6 +1064,12 @@
                   label="Add Clinic Shipment"
                   style="push">
             </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete select item"
+                  style="push">
+            </command>
          </menu>
          <menu
                id="edu.ualberta.med.biobank.menu.dispatch"
@@ -1177,6 +1078,12 @@
                   commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
                   icon="icons/dispatchShipment_add.png"
                   label="Add Dispatch Shipment"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete select item"
                   style="push">
             </command>
          </menu>
@@ -1197,21 +1104,15 @@
             </command>
             
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
-                  icon="icons/patient_delete.png"
-                  label="Delete Patient"
-                  style="push">
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
                   icon="icons/patientVisit_add.png"
                   label="Add Patient Visit"
                   style="push">
             </command>
-             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientVisitDelete"
-                  icon="icons/patientVisit_delete.png"
-                  label="Delete Patient Visit"
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete select item"
                   style="push">
             </command>
          </menu>
@@ -1448,63 +1349,33 @@
                   id="edu.ualberta.med.biobank.menu.siteAdd"
                   label="Add Repository Site"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.studyAdd"
                   icon="icons/studies_add.png"
                   label="Add Study"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.clinicAdd"
                   icon="icons/clinics_add.png"
                   label="Add Clinic"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
                   icon="icons/containerTypes_add.png"
                   label="Add Container Type"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.containerAdd"
                   icon="icons/containers_add.png"
                   label="Add Container"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.mainPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.sessionDeleteSelection"
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
                   icon="icons/delete.png"
                   label="Delete Selected Item"
                   style="push"
@@ -1532,12 +1403,6 @@
                   icon="icons/patient_add.png"
                   label="Add Patient"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
@@ -1546,52 +1411,23 @@
                   style="push">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
-                  icon="icons/patient_delete.png"
-                  label="Delete Patient"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
                   icon="icons/patientVisit_add.png"
                   label="Add Patient Visit"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientVisitDelete"
-                  icon="icons/patientVisit_delete.png"
-                  label="Delete Patient Visit"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
+                  style="push"
+                  tooltip="Delete Selected Item">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
                   icon="icons/scanLink.png"
                   label="Scan Link"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
                <parameter
                      name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                      value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
@@ -1602,12 +1438,6 @@
                   icon="icons/scanAssign.png"
                   label="Scan Assign"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
                <parameter
                      name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                      value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
@@ -1618,12 +1448,6 @@
                   icon="icons/cabinetLinkAssign.png"
                   label="Cabinet Link/Assign"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
                <parameter
                      name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
@@ -1651,24 +1475,13 @@
                   icon="icons/clinicShipment_add.png"
                   label="Add Clinic Shipment"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.shipmentsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.shipments.shipmentDelete"
-                  icon="icons/clinicShipment_delete.png"
-                  label="Delete Shipment"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.shipmentsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
+                  style="push"
+                  tooltip="Delete Selected Item">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
@@ -1688,16 +1501,11 @@
          <toolbar
                id="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
-                  icon="icons/dispatchShipment_add.png"
-                  label="Add Dispatch Shipment"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.dispatchShipmentsPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
+                  style="push"
+                  tooltip="Delete Selected Item">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
@@ -2719,7 +2527,7 @@
          </with>
       </definition>
       <definition
-            id="oneElementSelected">
+            id="biobank2.oneElementSelected">
          <with
                variable="selection">
             <count
@@ -2791,11 +2599,34 @@
             </equals>
          </with>
       </definition>
+      <definition
+            id="biobank2.canDelete">
+         <with
+               variable="selection">
+            <iterate
+                  ifEmpty="false"
+                  operator="and">
+               <test
+                     property="biobank2.canDelete">
+               </test>
+            </iterate>
+         </with>
+      </definition>
    </extension>
    <extension
          point="org.eclipse.ui.startup">
       <startup
             class="edu.ualberta.med.biobank.rcp.BiobankStartup">
       </startup>
+   </extension>
+   <extension
+         point="org.eclipse.core.expressions.propertyTesters">
+      <propertyTester
+            class="edu.ualberta.med.biobank.handlers.AdapterBasePropertyTester"
+            id="biobank2.adapterBasePropertyTester"
+            namespace="biobank2"
+            properties="canDelete"
+            type="edu.ualberta.med.biobank.treeview.AdapterBase">
+      </propertyTester>
    </extension>
 </plugin>
