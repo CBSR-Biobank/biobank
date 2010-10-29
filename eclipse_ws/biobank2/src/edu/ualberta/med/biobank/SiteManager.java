@@ -48,6 +48,8 @@ public class SiteManager {
 
     private List<SiteWrapper> currentSites;
 
+    private String currentServer;
+
     protected void init(WritableApplicationService appService,
         String sessionName) {
         this.appService = appService;
@@ -75,7 +77,8 @@ public class SiteManager {
      * selects the site the user was working with the last time he / she logged
      * out if logged into same server and same site exists
      */
-    public void getCurrentSite(String serverName, Collection<SiteWrapper> sites) {
+    public void selectCurrentSite(String serverName,
+        Collection<SiteWrapper> sites) {
         if (currentSite != null)
             return;
 
@@ -95,6 +98,7 @@ public class SiteManager {
             if (site.getId().equals(siteId))
                 currentSite = site;
         }
+        currentServer = serverName;
     }
 
     public void setCurrentSite(SiteWrapper site) {
@@ -134,12 +138,15 @@ public class SiteManager {
         for (SiteWrapper site : sites) {
             currentSites.add(site);
         }
-        if (currentSite == null || !currentSites.contains(currentSite))
+        if (!SessionManager.getServer().equals(currentServer)
+            || currentSite == null || !currentSites.contains(currentSite)) {
             currentSite = allSitesWrapper;
+        }
         logger.debug("site selected: " + currentSite.getName());
 
         siteCombo.setInput(currentSites);
         siteCombo.setSelection(currentSite);
+        currentServer = SessionManager.getServer();
     }
 
     public void updateSites() {

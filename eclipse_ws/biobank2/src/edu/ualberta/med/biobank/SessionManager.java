@@ -89,7 +89,7 @@ public class SessionManager {
         siteManager.init(appService, serverName);
         Assert.isNotNull(siteCombo, "site combo is null");
         siteManager.setSiteCombo(siteCombo);
-        siteManager.getCurrentSite(serverName, sites);
+        siteManager.selectCurrentSite(serverName, sites);
         siteManager.updateSites(sites);
 
         rebuildSession();
