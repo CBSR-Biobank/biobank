@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -10,6 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable.StudySiteDispatch;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
 
@@ -34,9 +36,26 @@ public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
 
     private static final int[] BOUNDS = new int[] { 130, 130, -1 };
 
-    public SiteDispatchInfoTable(Composite parent,
-        List<StudySiteDispatch> collection) {
-        super(parent, collection, HEADINGS, BOUNDS, 10);
+    private SiteWrapper srcSite;
+
+    public SiteDispatchInfoTable(Composite parent, SiteWrapper site)
+        throws ApplicationException {
+        super(parent, null, HEADINGS, BOUNDS, 10);
+        this.srcSite = site;
+        loadStudyDestSites();
+    }
+
+    protected void loadStudyDestSites() throws ApplicationException {
+        List<StudySiteDispatch> dispatchList = new ArrayList<StudySiteDispatch>();
+        for (StudyWrapper study : srcSite.getDispatchStudies()) {
+            for (SiteWrapper destSite : srcSite.getStudyDispachSites(study)) {
+                StudySiteDispatch ssd = new StudySiteDispatch();
+                ssd.study = study;
+                ssd.destSite = destSite;
+                dispatchList.add(ssd);
+            }
+        }
+        reloadCollection(dispatchList);
     }
 
     @Override

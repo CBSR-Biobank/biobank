@@ -7,7 +7,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -33,18 +32,18 @@ public class MoveContainerDialog extends BiobankDialog {
     }
 
     @Override
-    protected void configureShell(Shell shell) {
-        super.configureShell(shell);
-        String title = "Move Container";
-        shell.setText(title);
+    protected String getDialogShellTitle() {
+        return "Move Container";
     }
 
     @Override
-    protected Control createContents(Composite parent) {
-        Control contents = super.createContents(parent);
-        setTitle("Move Container " + srcContainer.getLabel());
-        setMessage("Select the destination for this container.");
-        return contents;
+    protected String getTitleAreaMessage() {
+        return "Select the destination for this container.";
+    }
+
+    @Override
+    protected String getTitleAreaTitle() {
+        return "Move Container " + srcContainer.getLabel();
     }
 
     @Override
