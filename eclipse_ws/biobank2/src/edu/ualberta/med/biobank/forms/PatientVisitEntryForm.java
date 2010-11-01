@@ -426,7 +426,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 SelectMultipleWidget s = (SelectMultipleWidget) pvCustomInfo.control;
                 if (pvCustomInfo.getValue() != null) {
                     s.setSelections(pvCustomInfo.getValue().split(";"));
-                }
+                } else
+                    s.setSelections(new String[] {});
             }
         }
     }
