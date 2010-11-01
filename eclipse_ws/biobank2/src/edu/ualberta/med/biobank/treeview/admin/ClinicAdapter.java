@@ -15,8 +15,6 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ClinicAdapter extends AdapterBase {
 
-    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this clinic?";
-
     public ClinicAdapter(AdapterBase parent, ClinicWrapper clinicWrapper) {
         super(parent, clinicWrapper);
         setEditable(parent instanceof ClinicMasterGroup || parent == null);
@@ -42,12 +40,12 @@ public class ClinicAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Clinic");
         addViewMenu(menu, "Clinic");
-        addDeleteMenu(menu, "Clinic", DEL_CONFIRM_MSG);
+        addDeleteMenu(menu, "Clinic");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return DEL_CONFIRM_MSG;
+        return "Are you sure you want to delete this clinic?";
     }
 
     @Override

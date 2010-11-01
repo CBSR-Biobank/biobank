@@ -289,6 +289,8 @@ public class LoginDialog extends TitleAreaDialog {
         }
 
         if (!BioBankPlugin.getDefault().isDebugging()) {
+            // until further notice, we still want to be able to specify the
+            // port, even in non debug mode
             // if (url.getPort() != -1) {
             // MessageDialog
             // .openError(getShell(), "Invalid Server URL",

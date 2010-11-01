@@ -270,4 +270,9 @@ public class DispatchShipmentAdministrationView extends
         return outgoingNode;
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
 }

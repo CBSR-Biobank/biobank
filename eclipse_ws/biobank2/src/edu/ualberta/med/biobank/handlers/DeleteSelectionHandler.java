@@ -30,7 +30,6 @@ public class DeleteSelectionHandler extends AbstractHandler implements IHandler 
         AdapterBase adapter = SessionManager.getSelectedNode();
         boolean isEnabled = adapter != null && adapter.isDeletable()
             && adapter.getModelObject().canDelete(SessionManager.getUser());
-        System.out.println("isEnabled: " + adapter + " " + isEnabled);
         return isEnabled;
     }
 }

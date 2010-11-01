@@ -14,6 +14,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
@@ -61,7 +64,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
  * Form creation is called in a non-UI thread so making calls to the ORM layer
  * possible. See {@link #createFormContent()}
  */
-public abstract class BiobankFormBase extends EditorPart {
+public abstract class BiobankFormBase extends EditorPart implements
+    ISelectionProvider {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(BiobankFormBase.class.getName());
@@ -180,6 +184,7 @@ public abstract class BiobankFormBase extends EditorPart {
         } catch (Exception e) {
             logger.error("BioBankFormBase.createPartControl Error", e);
         }
+        getSite().setSelectionProvider(this);
     }
 
     @Override
@@ -445,5 +450,28 @@ public abstract class BiobankFormBase extends EditorPart {
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
             createBeansObservable(bean, propertyName), validator, typeShown,
             null);
+    }
+
+    // implementation of ISelectionProvider
+
+    @Override
+    public void addSelectionChangedListener(ISelectionChangedListener listener) {
+        // Do nothing
+    }
+
+    @Override
+    public ISelection getSelection() {
+        return new StructuredSelection(adapter);
+    }
+
+    @Override
+    public void removeSelectionChangedListener(
+        ISelectionChangedListener listener) {
+        // Do nothing
+    }
+
+    @Override
+    public void setSelection(ISelection selection) {
+        // Do nothing
     }
 }

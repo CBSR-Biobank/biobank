@@ -16,7 +16,6 @@ public class AdapterBasePropertyTester extends PropertyTester {
             AdapterBase adapter = (AdapterBase) receiver;
             if (property.equals("canDelete")) {
                 boolean can = adapter.isDeletable();
-                System.out.println(adapter + " " + can);
                 return can;
             }
         }

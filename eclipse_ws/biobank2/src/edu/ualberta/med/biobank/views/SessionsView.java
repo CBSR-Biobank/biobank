@@ -33,4 +33,9 @@ public class SessionsView extends AbstractViewWithAdapterTree {
     public void reload() {
         SessionManager.getInstance().rebuildSession();
     }
+
+    @Override
+    public String getId() {
+        return ID;
+    }
 };

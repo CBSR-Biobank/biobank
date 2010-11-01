@@ -53,6 +53,14 @@ public class DispatchShipmentAdapter extends AdapterBase {
     }
 
     @Override
+    public boolean isDeletable() {
+        SiteWrapper currentSite = SessionManager.getCurrentSite();
+        return SessionManager.getUser().canUpdateSite(currentSite)
+            && currentSite.equals(getWrapper().getSender())
+            && getWrapper().isInCreationState() && super.internalIsDeletable();
+    }
+
+    @Override
     protected String getLabelInternal() {
         DispatchShipmentWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "shipment is null");
@@ -76,20 +84,9 @@ public class DispatchShipmentAdapter extends AdapterBase {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addViewMenu(menu, "Dispatch Shipment");
+        addDeleteMenu(menu, "Dispatch");
         SiteWrapper currentSite = SessionManager.getCurrentSite();
         if (SessionManager.getUser().canUpdateSite(currentSite)) {
-            if (currentSite.equals(getWrapper().getSender())
-                && getWrapper().canDelete(SessionManager.getUser())
-                && getWrapper().isInCreationState()) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Delete");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        delete();
-                    }
-                });
-            }
             if (currentSite.equals(getWrapper().getSender())
                 && getWrapper().canUpdate(SessionManager.getUser())
                 && getWrapper().isInTransitState()) {
@@ -124,6 +121,11 @@ public class DispatchShipmentAdapter extends AdapterBase {
                 addEditMenu(menu, "Shipment");
             }
         }
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return "Are you sure you want to delete this dispatch?";
     }
 
     public void doReceive() {

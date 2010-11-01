@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class SiteAdapter extends AdapterBase {
 
-    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this repository site?";
     private int nodeIdOffset = 100;
     public static final int STUDIES_BASE_NODE_ID = 0;
     public static final int CLINICS_BASE_ID = 1;
@@ -70,12 +69,12 @@ public class SiteAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Site");
         addViewMenu(menu, "Site");
-        addDeleteMenu(menu, "Site", DEL_CONFIRM_MSG);
+        addDeleteMenu(menu, "Site");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return DEL_CONFIRM_MSG;
+        return "Are you sure you want to delete this repository site?";
     }
 
     @Override
