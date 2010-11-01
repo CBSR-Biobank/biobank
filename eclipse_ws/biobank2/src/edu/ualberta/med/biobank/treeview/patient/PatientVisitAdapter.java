@@ -64,8 +64,12 @@ public class PatientVisitAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Visit");
         addViewMenu(menu, "Visit");
-        addDeleteMenu(menu, "Visit",
-            "Are you sure you want to delete this visit?");
+        addDeleteMenu(menu, "Visit");
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return "Are you sure you want to delete this visit?";
     }
 
     public void setSelectedAliquot(AliquotWrapper aliquot) {
@@ -105,11 +109,6 @@ public class PatientVisitAdapter extends AdapterBase {
     @Override
     public String getViewFormId() {
         return PatientVisitViewForm.ID;
-    }
-
-    @Override
-    protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this patient visit?";
     }
 
     @Override

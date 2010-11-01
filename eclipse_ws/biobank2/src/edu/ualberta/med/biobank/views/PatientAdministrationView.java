@@ -118,4 +118,9 @@ public class PatientAdministrationView extends
         return currentInstance;
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
 }

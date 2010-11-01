@@ -241,4 +241,9 @@ public class ShipmentAdministrationView extends
         return null;
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
 }

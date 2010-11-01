@@ -1500,6 +1500,12 @@
          </toolbar>
          <toolbar
                id="edu.ualberta.med.biobank.views.DispatchShipmentAdministrationView">
+             <command
+                  commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
+                  icon="icons/dispatchShipment_add.png"
+                  label="Add Dispatch Shipment"
+                  style="push">
+            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.deleteSelection"
                   icon="icons/delete.png"

@@ -16,8 +16,6 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ContainerTypeAdapter extends AdapterBase {
 
-    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this container type?";
-
     public ContainerTypeAdapter(AdapterBase parent,
         ContainerTypeWrapper containerType) {
         super(parent, containerType);
@@ -49,12 +47,12 @@ public class ContainerTypeAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Container Type");
         addViewMenu(menu, "Container Type");
-        addDeleteMenu(menu, "Container Type", DEL_CONFIRM_MSG);
+        addDeleteMenu(menu, "Container Type");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return DEL_CONFIRM_MSG;
+        return "Are you sure you want to delete this container type?";
     }
 
     @Override

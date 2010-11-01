@@ -14,8 +14,6 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class StudyAdapter extends AdapterBase {
 
-    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this study?";
-
     public StudyAdapter(AdapterBase parent, StudyWrapper studyWrapper) {
         super(parent, studyWrapper);
         setEditable(parent instanceof StudyMasterGroup || parent == null);
@@ -40,12 +38,12 @@ public class StudyAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Study");
         addViewMenu(menu, "Study");
-        addDeleteMenu(menu, "Study", DEL_CONFIRM_MSG);
+        addDeleteMenu(menu, "Study");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return DEL_CONFIRM_MSG;
+        return "Are you sure you want to delete this study?";
     }
 
     @Override

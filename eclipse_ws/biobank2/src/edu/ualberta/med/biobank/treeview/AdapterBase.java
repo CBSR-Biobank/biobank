@@ -527,15 +527,14 @@ public abstract class AdapterBase {
         });
     }
 
-    protected void addDeleteMenu(Menu menu, String objectName,
-        final String question) {
+    protected void addDeleteMenu(Menu menu, String objectName) {
         if (isDeletable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Delete " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    delete(question);
+                    deleteWithConfirm();
                 }
             });
         }
@@ -666,14 +665,15 @@ public abstract class AdapterBase {
         }
     }
 
-    public void delete() {
-        delete(null);
-    }
-
-    public void delete(String message) {
+    public void deleteWithConfirm() {
+        String msg = getConfirmDeleteMessage();
+        if (msg == null) {
+            throw new RuntimeException("adapter has no confirm delete msg: "
+                + getClass().getName());
+        }
         boolean doDelete = true;
-        if (message != null)
-            doDelete = BioBankPlugin.openConfirm("Confirm Delete", message);
+        if (msg != null)
+            doDelete = BioBankPlugin.openConfirm("Confirm Delete", msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -693,15 +693,6 @@ public abstract class AdapterBase {
                 }
             });
         }
-    }
-
-    public void deleteWithConfirm() {
-        String msg = getConfirmDeleteMessage();
-        if (msg == null) {
-            throw new RuntimeException("adapter has no confirm delete msg: "
-                + getClass().getName());
-        }
-        delete(msg);
     }
 
     public boolean isDeletable() {
