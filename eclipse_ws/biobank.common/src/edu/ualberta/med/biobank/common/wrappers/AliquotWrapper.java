@@ -628,16 +628,18 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public boolean isUsedInDispatch(DispatchWrapper excludedShipment) {
-        for (DispatchAliquotWrapper dsa : getDispatchAliquotCollection()) {
-            DispatchWrapper ship = dsa.getShipment();
-            if (!ship.equals(excludedShipment)
-                && (ship.isInTransitState() || ship.isInCreationState())) {
-                if (DispatchAliquotState.MISSING.isEquals(dsa.getState())) {
-                    return false;
+        List<DispatchAliquotWrapper> dsas = getDispatchAliquotCollection();
+        if (dsas != null)
+            for (DispatchAliquotWrapper dsa : dsas) {
+                DispatchWrapper ship = dsa.getShipment();
+                if (!ship.equals(excludedShipment)
+                    && (ship.isInTransitState() || ship.isInCreationState())) {
+                    if (DispatchAliquotState.MISSING.isEquals(dsa.getState())) {
+                        return false;
+                    }
+                    return true;
                 }
-                return true;
             }
-        }
         return false;
     }
 

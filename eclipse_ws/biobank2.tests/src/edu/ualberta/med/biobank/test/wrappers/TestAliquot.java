@@ -567,9 +567,21 @@ public class TestAliquot extends TestDatabase {
         site.reload();
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        DispatchWrapper dShipment = DispatchHelper.newShipment(site, destSite,
+        DispatchWrapper dShipment = DispatchHelper.newDispatch(site, destSite,
             study, method);
-        dShipment = DispatchHelper.newShipment(site, destSite, study, method);
+
+        // add an aliquot that has not been persisted
+        try {
+            dShipment.addNewAliquots(Arrays.asList(aliquot), true);
+            Assert.fail("Should not be allowed to add aliquots not yet in DB");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        aliquot.persist();
+        aliquot.reload();
+
+        dShipment = DispatchHelper.newDispatch(site, destSite, study, method);
         dShipment.addNewAliquots(Arrays.asList(aliquot), true);
         dShipment.persist();
         aliquot.reload();
@@ -577,10 +589,6 @@ public class TestAliquot extends TestDatabase {
         List<DispatchWrapper> aliquotDispatchs = aliquot.getDispatchs();
         Assert.assertEquals(1, aliquotDispatchs.size());
         Assert.assertTrue(aliquotDispatchs.contains(dShipment));
-        dShipment = DispatchHelper.newShipment(site, destSite, study, method);
-        dShipment.addNewAliquots(Arrays.asList(aliquot), true);
-        dShipment.persist();
-        aliquot.reload();
 
         Assert.assertTrue(dShipment.isInCreationState());
 
@@ -604,7 +612,7 @@ public class TestAliquot extends TestDatabase {
         destSite.persist();
 
         destSite.reload();
-        DispatchWrapper dShipment2 = DispatchHelper.newShipment(destSite,
+        DispatchWrapper dShipment2 = DispatchHelper.newDispatch(destSite,
             destSite2, study, method);
         try {
             dShipment2.addNewAliquots(Arrays.asList(aliquot), true);
