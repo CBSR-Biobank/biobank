@@ -34,12 +34,9 @@ public class SampleStorageInfoTable extends
     private static final String[] HEADINGS = new String[] { "Sample type",
         "Volume (ml)", "Quantity", "Activity status" };
 
-    private static final int[] BOUNDS = new int[] { 300, 130, 100, 100, -1, -1,
-        -1 };
-
     public SampleStorageInfoTable(Composite parent,
         List<SampleStorageWrapper> sampleStorageCollection) {
-        super(parent, sampleStorageCollection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, sampleStorageCollection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override

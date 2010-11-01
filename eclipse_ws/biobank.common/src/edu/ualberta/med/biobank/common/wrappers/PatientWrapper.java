@@ -13,11 +13,11 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DateCompare;
-import edu.ualberta.med.biobank.common.wrappers.internal.ClinicShipmentPatientWrapper;
-import edu.ualberta.med.biobank.model.ClinicShipmentPatient;
+import edu.ualberta.med.biobank.common.wrappers.internal.ShipmentPatientWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ShipmentPatient;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -111,7 +111,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private void checkVisitsFromLinkedShipment() throws BiobankCheckException {
-        List<ClinicShipmentWrapper> shipments = getShipmentCollection();
+        List<ShipmentWrapper> shipments = getShipmentCollection();
         List<PatientVisitWrapper> visits = getPatientVisitCollection();
         if (visits != null && visits.size() > 0) {
             if (shipments == null || shipments.size() == 0) {
@@ -136,10 +136,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         // TODO: gee, I hope that when you modify this collection it isn't meant
         // to modify the internals of the PatientWrapper object. Ask Delphine.
         List<PatientVisitWrapper> patientVisitCollection = null;
-        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
+        Collection<ShipmentPatientWrapper> csps = getShipmentPatientCollection();
         if (csps != null && csps.size() > 0) {
             patientVisitCollection = new ArrayList<PatientVisitWrapper>();
-            for (ClinicShipmentPatientWrapper csp : csps) {
+            for (ShipmentPatientWrapper csp : csps) {
                 patientVisitCollection.addAll(csp.getPatientVisitCollection());
             }
         }
@@ -160,16 +160,16 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patientVisitCollection;
     }
 
-    Collection<ClinicShipmentPatientWrapper> getClinicShipmentPatientCollection() {
+    Collection<ShipmentPatientWrapper> getShipmentPatientCollection() {
         @SuppressWarnings("unchecked")
-        Collection<ClinicShipmentPatientWrapper> csps = (Collection<ClinicShipmentPatientWrapper>) propertiesMap
+        Collection<ShipmentPatientWrapper> csps = (Collection<ShipmentPatientWrapper>) propertiesMap
             .get(PROP_KEY_CSP_COLLECTION);
         if (csps == null) {
-            Collection<ClinicShipmentPatient> rawCsps = wrappedObject
-                .getClinicShipmentPatientCollection();
+            Collection<ShipmentPatient> rawCsps = wrappedObject
+                .getShipmentPatientCollection();
             if (rawCsps != null) {
-                csps = ClinicShipmentPatientWrapper
-                    .wrapClinicShipmentPatientCollection(appService, rawCsps);
+                csps = ShipmentPatientWrapper.wrapShipmentPatientCollection(
+                    appService, rawCsps);
             }
             propertiesMap.put(PROP_KEY_CSP_COLLECTION, csps);
         }
@@ -191,13 +191,13 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                 allPvWrappers.add(visit);
             }
             // new
-            Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
+            Collection<ShipmentPatientWrapper> csps = getShipmentPatientCollection();
             Collection<PatientVisitWrapper> pvs;
             for (PatientVisitWrapper newVisit : newPatientVisits) {
                 boolean isFound = false;
-                for (ClinicShipmentPatientWrapper csp : csps) {
+                for (ShipmentPatientWrapper csp : csps) {
                     if (csp.isSameShipmentAndPatient(newVisit
-                        .getClinicShipmentPatient())) {
+                        .getShipmentPatient())) {
                         pvs = csp.getPatientVisitCollection();
                         pvs.add(newVisit);
                         csp.setPatientVisitCollection(pvs);
@@ -282,7 +282,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patient;
     }
 
-    public List<ClinicShipmentWrapper> getShipmentCollection(boolean sort,
+    public List<ShipmentWrapper> getShipmentCollection(boolean sort,
         final boolean ascending) {
         return getShipmentCollection(sort, ascending, null);
     }
@@ -292,13 +292,13 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      * Shipment.setPatientCollection method If user is not null, will return
      * only shipments that are linked to a site this user can update
      */
-    public List<ClinicShipmentWrapper> getShipmentCollection(boolean sort,
+    public List<ShipmentWrapper> getShipmentCollection(boolean sort,
         final boolean ascending, User user) {
-        List<ClinicShipmentWrapper> shipmentCollection = new ArrayList<ClinicShipmentWrapper>();
-        Collection<ClinicShipmentPatientWrapper> csps = getClinicShipmentPatientCollection();
+        List<ShipmentWrapper> shipmentCollection = new ArrayList<ShipmentWrapper>();
+        Collection<ShipmentPatientWrapper> csps = getShipmentPatientCollection();
         if (csps != null) {
-            for (ClinicShipmentPatientWrapper csp : csps) {
-                ClinicShipmentWrapper ship = csp.getShipment();
+            for (ShipmentPatientWrapper csp : csps) {
+                ShipmentWrapper ship = csp.getShipment();
                 if (user == null || user.canUpdateSite(ship.getSite())) {
                     shipmentCollection.add(ship);
                 }
@@ -306,10 +306,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
         if (sort && shipmentCollection != null) {
             Collections.sort(shipmentCollection,
-                new Comparator<ClinicShipmentWrapper>() {
+                new Comparator<ShipmentWrapper>() {
                     @Override
-                    public int compare(ClinicShipmentWrapper ship1,
-                        ClinicShipmentWrapper ship2) {
+                    public int compare(ShipmentWrapper ship1,
+                        ShipmentWrapper ship2) {
                         int res = ship1.compareTo(ship2);
                         if (ascending) {
                             return res;
@@ -321,7 +321,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return shipmentCollection;
     }
 
-    public List<ClinicShipmentWrapper> getShipmentCollection() {
+    public List<ShipmentWrapper> getShipmentCollection() {
         return getShipmentCollection(false, true);
     }
 
@@ -375,7 +375,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             HQLCriteria criteria = new HQLCriteria(
                 "select count(aliquots) from " + PatientVisit.class.getName()
                     + " as pv join pv.aliquotCollection as aliquots "
-                    + "join pv.clinicShipmentPatient as csp "
+                    + "join pv.shipmentPatient as csp "
                     + "where csp.patient.id = ? ",
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
@@ -408,7 +408,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return getPnumber();
     }
 
-    public boolean canBeAddedToShipment(ClinicShipmentWrapper shipment)
+    public boolean canBeAddedToShipment(ShipmentWrapper shipment)
         throws ApplicationException, BiobankCheckException {
         if (shipment.getClinic() == null) {
             return true;
@@ -431,8 +431,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         Date endDate = cal.getTime();
         HQLCriteria criteria = new HQLCriteria("select p from "
             + Patient.class.getName()
-            + " as p join p.clinicShipmentPatientCollection as csps"
-            + " join csps.clinicShipment as ships" + " where ships.site.id = ?"
+            + " as p join p.shipmentPatientCollection as csps"
+            + " join csps.shipment as ships" + " where ships.site.id = ?"
             + " and ships.dateReceived >= ? and ships.dateReceived <= ?",
             Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
         List<Patient> res = appService.query(criteria);
@@ -459,7 +459,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         HQLCriteria criteria = new HQLCriteria(
             "select visits from "
                 + Patient.class.getName()
-                + " as p join p.clinicShipmentPatientCollection as csps"
+                + " as p join p.shipmentPatientCollection as csps"
                 + " join csps.patientVisitCollection as visits"
                 + " where p.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
             Arrays.asList(new Object[] { getId(), startDate, endDate }));

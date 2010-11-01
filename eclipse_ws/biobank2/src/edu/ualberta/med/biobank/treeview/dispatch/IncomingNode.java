@@ -11,23 +11,21 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class IncomingNode extends AdapterBase {
 
-    private ReceivingInTransitDispatchShipmentGroup receivedTransitNode;
-    private ReceivingNoErrorsDispatchShipmentGroup receivingNode;
-    private ReceivingWithErrorsDispatchShipmentGroup receivingWithErrorsNode;
+    private ReceivingInTransitDispatchGroup receivedTransitNode;
+    private ReceivingNoErrorsDispatchGroup receivingNode;
+    private ReceivingWithErrorsDispatchGroup receivingWithErrorsNode;
 
     public IncomingNode(AdapterBase parent, int id) {
         super(parent, id, "Incoming", true, false);
-        receivedTransitNode = new ReceivingInTransitDispatchShipmentGroup(this,
-            0);
+        receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0);
         receivedTransitNode.setParent(this);
         addChild(receivedTransitNode);
 
-        receivingNode = new ReceivingNoErrorsDispatchShipmentGroup(this, 1);
+        receivingNode = new ReceivingNoErrorsDispatchGroup(this, 1);
         receivingNode.setParent(this);
         addChild(receivingNode);
 
-        receivingWithErrorsNode = new ReceivingWithErrorsDispatchShipmentGroup(
-            this, 2);
+        receivingWithErrorsNode = new ReceivingWithErrorsDispatchGroup(this, 2);
         receivingWithErrorsNode.setParent(this);
         addChild(receivingWithErrorsNode);
 

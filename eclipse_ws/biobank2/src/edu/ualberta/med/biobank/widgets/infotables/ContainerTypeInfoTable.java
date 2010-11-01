@@ -33,12 +33,9 @@ public class ContainerTypeInfoTable extends
     private static final String[] HEADINGS = new String[] { "Name",
         "Short Name", "Capacity", "Status", "In Use", "Temperature" };
 
-    private static final int[] BOUNDS = new int[] { 160, 130, 130, 130, 130,
-        130 };
-
     public ContainerTypeInfoTable(Composite parent,
         List<ContainerTypeWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS, 10);
     }
 
     @Override

@@ -10,17 +10,7 @@ public class ContainerCapacityEditor extends ReportsEditor {
     public static String ID = "edu.ualberta.med.biobank.editors.ContainerCapacityEditor";
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) {
-    }
-
-    @Override
-    protected List<Object> getParams() {
-        return new ArrayList<Object>();
     }
 
     @Override
@@ -31,6 +21,15 @@ public class ContainerCapacityEditor extends ReportsEditor {
     @Override
     protected List<String> getParamNames() {
         return new ArrayList<String>();
+    }
+
+    @Override
+    protected void initReport() throws Exception {
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        return new ArrayList<Object>();
     }
 
 }

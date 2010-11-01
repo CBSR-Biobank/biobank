@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -915,8 +915,8 @@ public class TestContainer extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ClinicShipmentWrapper shipment =
-            ClinicShipmentHelper.addShipment(site, clinic,
+        ShipmentWrapper shipment =
+            ShipmentHelper.addShipment(site, clinic,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
                 patient);
         PatientVisitWrapper pv =
@@ -988,8 +988,8 @@ public class TestContainer extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ClinicShipmentWrapper shipment =
-            ClinicShipmentHelper.addShipment(site, clinic,
+        ShipmentWrapper shipment =
+            ShipmentHelper.addShipment(site, clinic,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
                 patient);
         PatientVisitWrapper pv =
@@ -1816,8 +1816,8 @@ public class TestContainer extends TestDatabase {
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ClinicShipmentWrapper shipment =
-            ClinicShipmentHelper.addShipment(site, clinic,
+        ShipmentWrapper shipment =
+            ShipmentHelper.addShipment(site, clinic,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
                 patient);
         PatientVisitWrapper pv =

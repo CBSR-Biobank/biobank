@@ -37,19 +37,18 @@ public class SiteDispatchInfoTable extends InfoTableWidget<StudySiteDispatch> {
     private static final String[] HEADINGS = new String[] { "Study",
         "Destination Site" };
 
-    private static final int[] BOUNDS = new int[] { 130, 130, -1 };
-
     private SiteWrapper srcSite;
 
     public SiteDispatchInfoTable(Composite parent, SiteWrapper site) {
-        super(parent, null, HEADINGS, BOUNDS, 10);
+        super(parent, null, HEADINGS, 10);
         this.srcSite = site;
         reload();
     }
 
     public void reload() {
         List<StudySiteDispatch> dispatchList = new ArrayList<StudySiteDispatch>();
-        List<StudyWrapper> dispatchStudies = srcSite.getDispatchStudiesAsSender();
+        List<StudyWrapper> dispatchStudies = srcSite
+            .getDispatchStudiesAsSender();
         if (dispatchStudies != null) {
             for (StudyWrapper study : dispatchStudies) {
                 try {

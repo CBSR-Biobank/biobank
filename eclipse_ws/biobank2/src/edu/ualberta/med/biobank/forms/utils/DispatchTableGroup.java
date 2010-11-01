@@ -3,43 +3,38 @@ package edu.ualberta.med.biobank.forms.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 
 public enum DispatchTableGroup {
     ADDED("Added") {
         @Override
-        public List<DispatchShipmentAliquotWrapper> getChildren(
-            DispatchShipmentWrapper shipment) {
-            return shipment.getNonProcessedDispatchShipmentAliquotCollection();
+        public List<DispatchAliquotWrapper> getChildren(DispatchWrapper shipment) {
+            return shipment.getNonProcessedDispatchAliquotCollection();
         }
     },
     NON_PROCESSED("Non Processed") {
         @Override
-        public List<DispatchShipmentAliquotWrapper> getChildren(
-            DispatchShipmentWrapper shipment) {
-            return shipment.getNonProcessedDispatchShipmentAliquotCollection();
+        public List<DispatchAliquotWrapper> getChildren(DispatchWrapper shipment) {
+            return shipment.getNonProcessedDispatchAliquotCollection();
         }
     },
     RECEIVED("Received") {
         @Override
-        public List<DispatchShipmentAliquotWrapper> getChildren(
-            DispatchShipmentWrapper shipment) {
-            return shipment.getReceivedDispatchShipmentAliquots();
+        public List<DispatchAliquotWrapper> getChildren(DispatchWrapper shipment) {
+            return shipment.getReceivedDispatchAliquots();
         }
     },
     EXTRA("Extra") {
         @Override
-        public List<DispatchShipmentAliquotWrapper> getChildren(
-            DispatchShipmentWrapper shipment) {
-            return shipment.getExtraDispatchShipmentAliquots();
+        public List<DispatchAliquotWrapper> getChildren(DispatchWrapper shipment) {
+            return shipment.getExtraDispatchAliquots();
         }
     },
     MISSING("Missing") {
         @Override
-        public List<DispatchShipmentAliquotWrapper> getChildren(
-            DispatchShipmentWrapper shipment) {
-            return shipment.getMissingDispatchShipmentAliquots();
+        public List<DispatchAliquotWrapper> getChildren(DispatchWrapper shipment) {
+            return shipment.getMissingDispatchAliquots();
         }
     };
 
@@ -54,14 +49,14 @@ public enum DispatchTableGroup {
         return label;
     }
 
-    public String getTitle(DispatchShipmentWrapper ship) {
+    public String getTitle(DispatchWrapper ship) {
         return label + " (" + getChildren(ship).size() + ")";
     }
 
-    public abstract List<DispatchShipmentAliquotWrapper> getChildren(
-        DispatchShipmentWrapper shipment);
+    public abstract List<DispatchAliquotWrapper> getChildren(
+        DispatchWrapper shipment);
 
-    public static Object findParent(DispatchShipmentAliquotWrapper dsa) {
+    public static Object findParent(DispatchAliquotWrapper dsa) {
         for (DispatchTableGroup tg : values()) {
             if (tg.getChildren(dsa.getShipment()).contains(dsa)) {
                 return tg;
@@ -71,7 +66,7 @@ public enum DispatchTableGroup {
     }
 
     public static List<DispatchTableGroup> getGroupsForShipment(
-        DispatchShipmentWrapper ship) {
+        DispatchWrapper ship) {
         List<DispatchTableGroup> groups = new ArrayList<DispatchTableGroup>();
         if (ship.isInCreationState()) {
             groups.add(ADDED);

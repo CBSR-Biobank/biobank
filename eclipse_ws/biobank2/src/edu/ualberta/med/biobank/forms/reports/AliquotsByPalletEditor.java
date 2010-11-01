@@ -33,16 +33,12 @@ public class AliquotsByPalletEditor extends ReportsEditor {
         Boolean.class);
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100 };
-    }
-
-    @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(palletLabel.getText());
-        params.add(topContainers.getSelectedContainers());
-        return params;
+        report.setParams(params);
+        report.setContainerList(ReportsEditor
+            .containerIdsToString(topContainers.getSelectedContainerIds()));
     }
 
     @Override
@@ -133,4 +129,11 @@ public class AliquotsByPalletEditor extends ReportsEditor {
         return paramNames;
     }
 
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(palletLabel.getText());
+        params.add(topContainers.getSelectedContainerNames());
+        return params;
+    }
 }

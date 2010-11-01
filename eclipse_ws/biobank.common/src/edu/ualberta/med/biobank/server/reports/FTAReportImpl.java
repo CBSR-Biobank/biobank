@@ -21,14 +21,14 @@ public class FTAReportImpl extends AbstractReport {
             + " a2 where a2.patientVisit.dateProcessed = "
             + " (select min(pv.dateProcessed) from "
             + PatientVisit.class.getName()
-            + " pv where pv.clinicShipmentPatient.patient.id = a2.patientVisit.clinicShipmentPatient.patient "
-            + " and pv.clinicShipmentPatient.patient.study.nameShort = ?)"
+            + " pv where pv.shipmentPatient.patient.id = a2.patientVisit.shipmentPatient.patient "
+            + " and pv.shipmentPatient.patient.study.nameShort = ?)"
             + " and a2.sampleType.nameShort = '"
             + FTA_CARD_SAMPLE_TYPE_NAME
             + "' and a2.patientVisit.dateProcessed > ? and a2.aliquotPosition.container.label not like '"
             + SENT_SAMPLES_FREEZER_NAME
-            + "' group by a2.patientVisit.clinicShipmentPatient.patient.pnumber"
-            + " order by a2.patientVisit.clinicShipmentPatient.patient.pnumber";
+            + "' group by a2.patientVisit.shipmentPatient.patient.pnumber"
+            + " order by a2.patientVisit.shipmentPatient.patient.pnumber";
 
     public FTAReportImpl(BiobankReport report) {
         super(QUERY, report);
@@ -48,7 +48,7 @@ public class FTAReportImpl extends AbstractReport {
                 e.printStackTrace();
             }
             String pnumber =
-                a.getPatientVisit().getClinicShipmentPatient().getPatient()
+                a.getPatientVisit().getShipmentPatient().getPatient()
                     .getPnumber();
             String inventoryId = a.getInventoryId();
             String dateProcessed =

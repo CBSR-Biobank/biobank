@@ -278,6 +278,7 @@ public class LoginDialog extends TitleAreaDialog {
 
     @Override
     protected void okPressed() {
+        @SuppressWarnings("unused")
         URL url = null;
 
         try {

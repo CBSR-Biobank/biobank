@@ -61,8 +61,12 @@ public class TopContainerListWidget {
         });
         siteCombo.setContentProvider(new ArrayContentProvider());
         try {
-            siteCombo.setInput(SessionManager.getInstance().getSiteCombo()
-                .getInput());
+            List<SiteWrapper> sites = SiteWrapper.getSites(appService);
+            SiteWrapper allsites = new SiteWrapper(appService);
+            allsites.setNameShort("All Sites");
+            sites.add(allsites);
+            siteCombo.setInput(sites);
+            siteCombo.getCombo().select(0);
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Failed to load sites", e1);
         }
@@ -74,7 +78,7 @@ public class TopContainerListWidget {
                     try {
                         SiteWrapper s = (SiteWrapper) ((IStructuredSelection) siteCombo
                             .getSelection()).getFirstElement();
-                        if (s.getId() == -9999) {
+                        if (s.getNameShort().equals("All Sites")) {
                             List<SiteWrapper> sites = SiteWrapper
                                 .getSites(appService);
                             for (SiteWrapper site : sites) {
@@ -116,7 +120,7 @@ public class TopContainerListWidget {
             .getCurrentSite()));
     }
 
-    public List<Integer> getSelectedContainers() {
+    public List<Integer> getSelectedContainerIds() {
         List<Integer> containerList = new ArrayList<Integer>();
         IStructuredSelection selections = (IStructuredSelection) topContainers
             .getSelection();
@@ -166,5 +170,24 @@ public class TopContainerListWidget {
 
     public void addSelectionChangedListener(SelectionListener l) {
         listener = l;
+    }
+
+    public List<String> getSelectedContainerNames() {
+        List<String> containerList = new ArrayList<String>();
+        IStructuredSelection selections = (IStructuredSelection) topContainers
+            .getSelection();
+        Iterator<?> it = selections.iterator();
+        while (it.hasNext()) {
+            ContainerWrapper c = (ContainerWrapper) it.next();
+            containerList.add(c.getFullInfoLabel());
+        }
+        if (containerList.size() == 0) {
+            Iterator<?> it2 = ((List<?>) topContainers.getInput()).iterator();
+            while (it2.hasNext()) {
+                containerList.add(((ContainerWrapper) it2.next())
+                    .getFullInfoLabel());
+            }
+        }
+        return containerList;
     }
 }

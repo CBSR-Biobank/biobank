@@ -32,11 +32,9 @@ public class PvSourceVesselInfoTable extends
     private final static String[] HEADINGS = new String[] { "Name", "Quantity",
         "Time Drawn", "Volume (ml)" };
 
-    private final static int[] BOUNDS = new int[] { 250, 100, 100, -1, -1 };
-
     public PvSourceVesselInfoTable(Composite parent,
         List<PvSourceVesselWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override
