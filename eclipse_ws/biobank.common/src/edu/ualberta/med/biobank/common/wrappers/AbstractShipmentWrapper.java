@@ -6,8 +6,8 @@ import java.util.Date;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.model.AbstractShipment;
-import edu.ualberta.med.biobank.model.ClinicShipment;
-import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.Dispatch;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -25,8 +25,8 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "dateReceived", "comment", "waybill",
-            "dateShipped", "boxNumber", "shippingMethod" };
+        return new String[] { "dateReceived", "comment", "waybill", "departed",
+            "boxNumber", "shippingMethod" };
     }
 
     @Override
@@ -41,21 +41,18 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
                 "'Date Received' is a required field. You must set this value before saving a shipment.");
     }
 
-    public Date getDateShipped() {
-        return wrappedObject.getDateShipped();
+    public Date getDeparted() {
+        return wrappedObject.getDeparted();
     }
 
-    public String getFormattedDateShipped() {
-        if (getDateShipped() == null) {
-            return "";
-        }
-        return DateFormatter.formatAsDateTime(getDateShipped());
+    public String getFormattedDeparted() {
+        return DateFormatter.formatAsDateTime(getDeparted());
     }
 
-    public void setDateShipped(Date date) {
-        Date oldDate = getDateShipped();
-        wrappedObject.setDateShipped(date);
-        propertyChangeSupport.firePropertyChange("dateShipped", oldDate, date);
+    public void setDeparted(Date date) {
+        Date oldDate = getDeparted();
+        wrappedObject.setDeparted(date);
+        propertyChangeSupport.firePropertyChange("departed", oldDate, date);
     }
 
     public Date getDateReceived() {
@@ -162,12 +159,11 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
 
     public static AbstractShipmentWrapper<?> createInstance(
         WritableApplicationService appService, AbstractShipment ship) {
-        if (ship instanceof DispatchShipment) {
-            return new DispatchShipmentWrapper(appService,
-                (DispatchShipment) ship);
+        if (ship instanceof Dispatch) {
+            return new DispatchWrapper(appService, (Dispatch) ship);
         }
-        if (ship instanceof ClinicShipment) {
-            return new ClinicShipmentWrapper(appService, (ClinicShipment) ship);
+        if (ship instanceof Shipment) {
+            return new ShipmentWrapper(appService, (Shipment) ship);
         }
         return null;
     }

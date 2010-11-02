@@ -669,7 +669,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                             processCellWithPreviousPosition(scanCell,
                                 positionString, foundAliquot);
                         } else { // new in pallet
-                            if (foundAliquot.isUsedInDispatchShipment()) {
+                            if (foundAliquot.isUsedInDispatch()) {
                                 updateCellAsDispatchedError(positionString,
                                     scanCell, foundAliquot);
                             } else {

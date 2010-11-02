@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -18,7 +19,7 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
         public String pnumber;
         public String studyNameShort;
         public String waybill;
-        public String dateShipped;
+        public Date departed;
         public String clinic;
         public Integer numSVs;
         public Integer numAliquots;
@@ -26,20 +27,16 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
         @Override
         public String toString() {
             return StringUtils.join(new String[] { pnumber, studyNameShort,
-                ((waybill == null) ? "None" : waybill), dateShipped, clinic,
-                numSVs.toString(), numAliquots.toString() }, "\t");
+                ((waybill == null) ? "None" : waybill), departed.toString(),
+                clinic, numSVs.toString(), numAliquots.toString() }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] { "Patient Number",
-        "Study", "Waybill", "Date Shipped", "Clinic", "Source Vessels",
-        "Aliquots" };
-
-    private static final int[] BOUNDS = new int[] { 100, 100, 150, 130, 120,
-        120, 120, 120 };
+        "Study", "Waybill", "Departed", "Clinic", "Source Vessels", "Aliquots" };
 
     public PvListInfoTable(Composite parent, List<PatientVisitWrapper> pvs) {
-        super(parent, pvs, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override
@@ -62,7 +59,7 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
                 case 2:
                     return item.waybill;
                 case 3:
-                    return item.dateShipped.toString();
+                    return item.departed.toString();
                 case 4:
                     return item.clinic;
                 case 5:
@@ -91,7 +88,7 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
         info.waybill = pv.getShipment().getWaybill();
         if (info.waybill == null)
             info.waybill = "None";
-        info.dateShipped = pv.getShipment().getFormattedDateShipped();
+        info.departed = pv.getShipment().getDeparted();
         info.clinic = pv.getShipment().getClinic().getNameShort();
         info.numSVs = pv.getPvSourceVesselCollection().size();
         info.numAliquots = pv.getAliquotCollection().size();

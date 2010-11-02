@@ -6,14 +6,14 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 public class FvLPatientVisitsImpl extends AbstractReport {
 
     private static final String QUERY =
-        "Select Alias.clinicShipmentPatient.patient.study.nameShort,"
-            + " Alias.clinicShipmentPatient.clinicShipment.clinic.nameShort, MIN(Alias.clinicShipmentPatient.clinicShipment.dateReceived),"
-            + " MAX(Alias.clinicShipmentPatient.clinicShipment.dateReceived) from "
+        "Select Alias.shipmentPatient.patient.study.nameShort,"
+            + " Alias.shipmentPatient.shipment.clinic.nameShort, MIN(Alias.shipmentPatient.shipment.dateReceived),"
+            + " MAX(Alias.shipmentPatient.shipment.dateReceived) from "
             + PatientVisit.class.getName()
-            + " as Alias where Alias.clinicShipmentPatient.clinicShipment.site "
+            + " as Alias where Alias.shipmentPatient.shipment.site "
             + SITE_OPERATOR
             + SITE_ID
-            + " GROUP BY Alias.clinicShipmentPatient.patient.study.nameShort, Alias.clinicShipmentPatient.clinicShipment.clinic.nameShort";
+            + " GROUP BY Alias.shipmentPatient.patient.study.nameShort, Alias.shipmentPatient.shipment.clinic.nameShort";
 
     public FvLPatientVisitsImpl(BiobankReport report) {
         super(QUERY, report);

@@ -53,8 +53,6 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
-import edu.ualberta.med.biobank.common.util.DateGroup;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
@@ -67,7 +65,7 @@ public abstract class ReportsEditor extends BiobankFormBase implements
 
     // Report
     protected ReportTreeNode node;
-    private BiobankReport report;
+    protected BiobankReport report;
 
     public static String ID = "edu.ualberta.med.biobank.editors.ReportsEditor";
 
@@ -205,40 +203,17 @@ public abstract class ReportsEditor extends BiobankFormBase implements
         createEmptyReportTable();
     }
 
-    private void generate() {
-        try {
-            SiteWrapper site = SessionManager.getCurrentSite();
-            String op = "=";
-            if (site.getName().compareTo("All Sites") == 0)
-                op = "!=";
-            report.setSiteInfo(op, site.getId());
-            String containerListString = "";
-            List<Object> params = new ArrayList<Object>();
-            String grouping = "";
-            for (Object ob : getParams()) {
-                try {
-                    // FIXME: horrible hack: need better way to test value
-                    DateGroup.valueOf((String) ob);
-                    grouping = (String) ob;
-                } catch (Exception e) {
-                    if (ob instanceof List) {
-                        for (Object item : (List<?>) ob)
-                            containerListString = containerListString
-                                .concat(item.toString() + ",");
-                        containerListString = containerListString.substring(0,
-                            Math.max(containerListString.length() - 1, 0));
-                    } else
-                        params.add(ob);
-                }
-            }
-            report.setParams(params);
-            report.setContainerList(containerListString);
-            report.setGroupBy(grouping);
-        } catch (Exception e1) {
-            BioBankPlugin.openAsyncError("Input Error", e1);
-            return;
-        }
+    public static String containerIdsToString(List<Integer> list) {
+        String containerListString = "";
+        for (Object item : (List<?>) list)
+            containerListString = containerListString.concat(item.toString()
+                + ",");
+        containerListString = containerListString.substring(0,
+            Math.max(containerListString.length() - 1, 0));
+        return containerListString;
+    }
 
+    private void generate() {
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
         try {
@@ -316,7 +291,7 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                                 exportPDFButton.setToolTipText("Export PDF");
                             }
                             reportTable = new ReportTableWidget<Object>(page,
-                                reportData, getColumnNames(), getColumnWidths());
+                                reportData, getColumnNames());
                             reportTable.adaptToToolkit(toolkit, true);
                             page.layout(true, true);
                             book.reflow(true);
@@ -336,7 +311,7 @@ public abstract class ReportsEditor extends BiobankFormBase implements
             reportTable.dispose();
         }
         reportTable = new ReportTableWidget<Object>(page,
-            new ArrayList<Object>(), new String[] { " " }, new int[] { 500 });
+            new ArrayList<Object>(), new String[] { " " });
         reportTable.adaptToToolkit(toolkit, true);
         page.layout(true, true);
         book.reflow(true);
@@ -580,17 +555,13 @@ public abstract class ReportsEditor extends BiobankFormBase implements
     protected abstract void createOptionSection(Composite parameterSection)
         throws Exception;
 
-    protected abstract int[] getColumnWidths();
-
     protected abstract String[] getColumnNames();
 
     protected abstract List<String> getParamNames();
 
-    protected abstract List<Object> getParams() throws Exception;
+    protected abstract void initReport() throws Exception;
 
-    protected List<Object> getPrintParams() throws Exception {
-        return getParams();
-    }
+    protected abstract List<Object> getPrintParams() throws Exception;
 
     public static Date removeTime(Date date) {
         Calendar cal = Calendar.getInstance(); // locale-specific

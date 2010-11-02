@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SiteCombo extends WorkbenchWindowControlContribution {
-    private static final String DISPATCH_SHIPMENTS_STATUS_MSG = "{0} dispatch shipments to receive";
+    private static final String DISPATCH_STATUS_MSG = "{0} dispatches to receive";
     private ComboViewer comboViewer;
 
     public SiteCombo() {
@@ -115,11 +115,10 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
                 if (o instanceof SiteWrapper) {
                     SiteWrapper site = (SiteWrapper) o;
                     int numPending = site
-                        .getInTransitReceiveDispatchShipmentCollection().size();
+                        .getInTransitReceiveDispatchCollection().size();
 
-                    message = MessageFormat.format(
-                        DISPATCH_SHIPMENTS_STATUS_MSG, numPending == 0 ? "No"
-                            : numPending);
+                    message = MessageFormat.format(DISPATCH_STATUS_MSG,
+                        numPending == 0 ? "No" : numPending);
                 }
             }
 

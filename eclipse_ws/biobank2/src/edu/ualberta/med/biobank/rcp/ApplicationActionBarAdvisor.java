@@ -50,8 +50,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     protected void makeActions(IWorkbenchWindow window) {
         createCustomAction(window, "Send Error Mail", SEND_ERROR_EMAIL_ID,
             "sendErrorMail");
-        createCustomAction(window, "Export Errors Logs", EXPORT_ERRORS_LOGS_ID,
-            "exportErrorsLogs");
+        createCustomAction(window, "Export Scanner Error Logs",
+            EXPORT_ERRORS_LOGS_ID, "exportErrorsLogs");
 
         createShowErrorLogsAction(window);
 
@@ -102,7 +102,8 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 nde);
         }
         final ParameterizedCommand cmd = new ParameterizedCommand(c, parms);
-        Action showErrorLogsViewAction = new Action("Show Error Logs") {
+        Action showErrorLogsViewAction = new Action(
+            "Show Application Error Logs") {
             @Override
             public void run() {
                 try {

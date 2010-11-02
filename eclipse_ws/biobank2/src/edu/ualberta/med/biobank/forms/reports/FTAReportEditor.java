@@ -24,11 +24,6 @@ public class FTAReportEditor extends ReportsEditor {
     private DateTimeWidget afterDate;
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) throws Exception {
         studyCombo = createStudyComboOption("Study", parent);
         afterDate = widgetCreator.createDateTimeWidget(parent,
@@ -36,12 +31,12 @@ public class FTAReportEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(((StudyWrapper) ((IStructuredSelection) studyCombo
             .getSelection()).getFirstElement()).getNameShort());
         params.add(ReportsEditor.processDate(afterDate.getDate(), true));
-        return params;
+        report.setParams(params);
     }
 
     protected ComboViewer createStudyComboOption(String labelText,
@@ -77,5 +72,14 @@ public class FTAReportEditor extends ReportsEditor {
         names.add("Study");
         names.add("After Date (Processed)");
         return names;
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(((StudyWrapper) ((IStructuredSelection) studyCombo
+            .getSelection()).getFirstElement()).getNameShort());
+        params.add(ReportsEditor.processDate(afterDate.getDate(), true));
+        return params;
     }
 }

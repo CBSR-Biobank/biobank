@@ -12,11 +12,9 @@ public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> 
 
     private static final String[] HEADINGS = new String[] { "Source vessel" };
 
-    private static final int[] BOUNDS = new int[] { 300, -1, -1, -1, -1, -1, -1 };
-
     public SourceVesselInfoTable(Composite parent,
         List<SourceVesselWrapper> sampleStorageCollection) {
-        super(parent, sampleStorageCollection, HEADINGS, BOUNDS, 10);
+        super(parent, sampleStorageCollection, HEADINGS, 10);
     }
 
     @Override

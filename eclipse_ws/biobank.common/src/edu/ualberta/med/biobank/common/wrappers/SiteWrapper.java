@@ -16,11 +16,11 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchInfo;
-import edu.ualberta.med.biobank.model.DispatchShipment;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -47,9 +47,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "address", "clinicCollection", "siteCollection",
             "containerCollection", "shipmentCollection",
             "sitePvAttrCollection", "street1", "street2", "city", "province",
-            "postalCode", "sentDispatchShipmentCollection",
-            "sentDispatchShipmentCollection", "notificationCollection",
-            "srcDispatchInfoCollection", "studyCollection" };
+            "postalCode", "sentDispatchCollection", "sentDispatchCollection",
+            "notificationCollection", "srcDispatchInfoCollection",
+            "studyCollection" };
     }
 
     public String getName() {
@@ -487,16 +487,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ClinicShipmentWrapper> getShipmentCollection(boolean sort) {
-        List<ClinicShipmentWrapper> pvCollection = (List<ClinicShipmentWrapper>) propertiesMap
+    public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
+        List<ShipmentWrapper> pvCollection = (List<ShipmentWrapper>) propertiesMap
             .get("shipmentCollection");
         if (pvCollection == null) {
-            Collection<ClinicShipment> children = wrappedObject
+            Collection<Shipment> children = wrappedObject
                 .getShipmentCollection();
             if (children != null) {
-                pvCollection = new ArrayList<ClinicShipmentWrapper>();
-                for (ClinicShipment pv : children) {
-                    pvCollection.add(new ClinicShipmentWrapper(appService, pv));
+                pvCollection = new ArrayList<ShipmentWrapper>();
+                for (Shipment pv : children) {
+                    pvCollection.add(new ShipmentWrapper(appService, pv));
                 }
                 propertiesMap.put("shipmentCollection", pvCollection);
             }
@@ -506,7 +506,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return pvCollection;
     }
 
-    public List<ClinicShipmentWrapper> getShipmentCollection() {
+    public List<ShipmentWrapper> getShipmentCollection() {
         return getShipmentCollection(true);
     }
 
@@ -529,7 +529,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public Long getShipmentCount() throws ApplicationException,
         BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + ClinicShipment.class.getName() + " where site.id = ?",
+            + Shipment.class.getName() + " where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -542,7 +542,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         HQLCriteria criteria = new HQLCriteria(
             "select count(distinct patient) from " + Site.class.getName()
                 + " as site " + "join site.shipmentCollection as shipments "
-                + "join shipments.clinicShipmentPatientCollection as csps "
+                + "join shipments.shipmentPatientCollection as csps "
                 + "join csps.patient as patient " + "where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
@@ -556,7 +556,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         HQLCriteria criteria = new HQLCriteria("select count(visits) from "
             + Site.class.getName() + " as site "
             + "join site.shipmentCollection as shipments "
-            + "join shipments.clinicShipmentPatientCollection as csps "
+            + "join shipments.shipmentPatientCollection as csps "
             + "join csps.patientVisitCollection as visits "
             + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
@@ -570,7 +570,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
         HQLCriteria criteria = new HQLCriteria("select count(aliquots) from "
             + Site.class.getName() + " as site "
             + "join site.shipmentCollection as shipments "
-            + "join shipments.clinicShipmentPatientCollection as csps "
+            + "join shipments.shipmentPatientCollection as csps "
             + "join csps.patientVisitCollection as visits "
             + "join visits.aliquotCollection as aliquots where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
@@ -671,7 +671,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         List<SiteWrapper> sites) throws BiobankCheckException {
         if ((sites == null) || (sites.size() == 0))
             return;
-
         Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
         DispatchInfoWrapper diw = null;
         if (infos != null) {
@@ -733,59 +732,56 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getReceivedDispatchShipmentCollection() {
-        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("receivedDispatchShipmentCollection");
+    public List<DispatchWrapper> getReceivedDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("receivedDispatchCollection");
         if (shipCollection == null) {
-            Collection<DispatchShipment> children = wrappedObject
-                .getReceivedDispatchShipmentCollection();
+            Collection<Dispatch> children = wrappedObject
+                .getReceivedDispatchCollection();
+
             if (children != null) {
-                shipCollection = new ArrayList<DispatchShipmentWrapper>();
-                for (DispatchShipment ship : children) {
-                    shipCollection.add(new DispatchShipmentWrapper(appService,
-                        ship));
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (Dispatch ship : children) {
+                    shipCollection.add(new DispatchWrapper(appService, ship));
                 }
-                propertiesMap.put("receivedDispatchShipmentCollection",
-                    shipCollection);
+                propertiesMap.put("receivedDispatchCollection", shipCollection);
             }
         }
         return shipCollection;
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getSentDispatchShipmentCollection() {
-        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("sentDispatchShipmentCollection");
+    public List<DispatchWrapper> getSentDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("sentDispatchCollection");
         if (shipCollection == null) {
-            Collection<DispatchShipment> children = wrappedObject
-                .getSentDispatchShipmentCollection();
+            Collection<Dispatch> children = wrappedObject
+                .getSentDispatchCollection();
             if (children != null) {
-                shipCollection = new ArrayList<DispatchShipmentWrapper>();
-                for (DispatchShipment ship : children) {
-                    shipCollection.add(new DispatchShipmentWrapper(appService,
-                        ship));
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (Dispatch ship : children) {
+                    shipCollection.add(new DispatchWrapper(appService, ship));
                 }
-                propertiesMap.put("sentDispatchShipmentCollection",
-                    shipCollection);
+                propertiesMap.put("sentDispatchCollection", shipCollection);
             }
         }
         return shipCollection;
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getInTransitSentDispatchShipmentCollection() {
-        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("inTransitSentDispatchShipmentCollection");
+    public List<DispatchWrapper> getInTransitSentDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("inTransitSentDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchShipmentWrapper> children = getSentDispatchShipmentCollection();
+            List<DispatchWrapper> children = getSentDispatchCollection();
             if (children != null) {
-                shipCollection = new ArrayList<DispatchShipmentWrapper>();
-                for (DispatchShipmentWrapper ship : children) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper ship : children) {
                     if (ship.isInTransitState()) {
                         shipCollection.add(ship);
                     }
                 }
-                propertiesMap.put("inTransitSentDispatchShipmentCollection",
+                propertiesMap.put("inTransitSentDispatchCollection",
                     shipCollection);
             }
         }
@@ -793,19 +789,19 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getInTransitReceiveDispatchShipmentCollection() {
-        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("inTransitReceiveDispatchShipmentCollection");
+    public List<DispatchWrapper> getInTransitReceiveDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("inTransitReceiveDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchShipmentWrapper> children = getReceivedDispatchShipmentCollection();
+            List<DispatchWrapper> children = getReceivedDispatchCollection();
             if (children != null) {
-                shipCollection = new ArrayList<DispatchShipmentWrapper>();
-                for (DispatchShipmentWrapper ship : children) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper ship : children) {
                     if (ship.isInTransitState()) {
                         shipCollection.add(ship);
                     }
                 }
-                propertiesMap.put("inTransitReceiveDispatchShipmentCollection",
+                propertiesMap.put("inTransitReceiveDispatchCollection",
                     shipCollection);
             }
         }
@@ -813,40 +809,39 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getReceivingNoErrorsDispatchShipmentCollection() {
-        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("receivingDispatchShipmentCollection");
+    public List<DispatchWrapper> getReceivingNoErrorsDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("receivingDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchShipmentWrapper> children = getReceivedDispatchShipmentCollection();
+            List<DispatchWrapper> children = getReceivedDispatchCollection();
             if (children != null) {
-                shipCollection = new ArrayList<DispatchShipmentWrapper>();
-                for (DispatchShipmentWrapper ship : children) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper ship : children) {
                     if (ship.isInReceivedState() && !ship.hasErrors()) {
                         shipCollection.add(ship);
                     }
                 }
-                propertiesMap.put("receivingDispatchShipmentCollection",
-                    shipCollection);
+                propertiesMap
+                    .put("receivingDispatchCollection", shipCollection);
             }
         }
         return shipCollection;
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getReceivingWithErrorsDispatchShipmentCollection() {
-        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("receivingWithErrorsDispatchShipmentCollection");
+    public List<DispatchWrapper> getReceivingWithErrorsDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("receivingWithErrorsDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchShipmentWrapper> children = getReceivedDispatchShipmentCollection();
+            List<DispatchWrapper> children = getReceivedDispatchCollection();
             if (children != null) {
-                shipCollection = new ArrayList<DispatchShipmentWrapper>();
-                for (DispatchShipmentWrapper ship : children) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper ship : children) {
                     if (ship.isInReceivedState() && ship.hasErrors()) {
                         shipCollection.add(ship);
                     }
                 }
-                propertiesMap.put(
-                    "receivingWithErrorsDispatchShipmentCollection",
+                propertiesMap.put("receivingWithErrorsDispatchCollection",
                     shipCollection);
             }
         }
@@ -854,19 +849,19 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getInCreationDispatchShipmentCollection() {
-        List<DispatchShipmentWrapper> shipCollection = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("inCreationDispatchShipmentCollection");
+    public List<DispatchWrapper> getInCreationDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("inCreationDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchShipmentWrapper> children = getSentDispatchShipmentCollection();
+            List<DispatchWrapper> children = getSentDispatchCollection();
             if (children != null) {
-                shipCollection = new ArrayList<DispatchShipmentWrapper>();
-                for (DispatchShipmentWrapper ship : children) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper ship : children) {
                     if (ship.isInCreationState()) {
                         shipCollection.add(ship);
                     }
                 }
-                propertiesMap.put("inCreationDispatchShipmentCollection",
+                propertiesMap.put("inCreationDispatchCollection",
                     shipCollection);
             }
         }

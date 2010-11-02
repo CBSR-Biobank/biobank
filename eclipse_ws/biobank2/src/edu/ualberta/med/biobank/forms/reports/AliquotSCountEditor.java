@@ -15,11 +15,6 @@ public class AliquotSCountEditor extends ReportsEditor {
     protected DateTimeWidget end;
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);
@@ -28,11 +23,11 @@ public class AliquotSCountEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
-        return params;
+        report.setParams(params);
     }
 
     @Override
@@ -46,6 +41,14 @@ public class AliquotSCountEditor extends ReportsEditor {
         paramNames.add("Start Date (Linked)");
         paramNames.add("End Date (Linked)");
         return paramNames;
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
+        return params;
     }
 
 }

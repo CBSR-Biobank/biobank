@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -114,8 +114,8 @@ public class BiobankLabelProvider extends LabelProvider implements
             } else {
                 Assert.isTrue(false, "invalid column index: " + columnIndex);
             }
-        } else if (element instanceof DispatchShipmentAliquotWrapper) {
-            DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) element;
+        } else if (element instanceof DispatchAliquotWrapper) {
+            DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) element;
             if (columnIndex == 0)
                 return dsa.getAliquot().getInventoryId();
             if (columnIndex == 1)

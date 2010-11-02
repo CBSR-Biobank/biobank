@@ -781,7 +781,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 "This aliquot is of type " + aliquot.getSampleType().getNameShort() //$NON-NLS-1$
                     + ": this is not a cabinet type");
         }
-        if (aliquot.isUsedInDispatchShipment()) {
+        if (aliquot.isUsedInDispatch()) {
             canLaunchCheck.setValue(false);
             throw new Exception(
                 "This aliquot is currently in transit in a dispatch.");

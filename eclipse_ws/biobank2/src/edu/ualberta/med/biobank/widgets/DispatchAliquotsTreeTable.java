@@ -32,19 +32,19 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
-import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchShipmentDialog;
+import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.DispatchTableGroup;
 
 public class DispatchAliquotsTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
-    private DispatchShipmentWrapper shipment;
+    private DispatchWrapper shipment;
 
     public DispatchAliquotsTreeTable(Composite parent,
-        final DispatchShipmentWrapper shipment,
-        final boolean editAliquotsState, final boolean editAliquotsComment) {
+        final DispatchWrapper shipment, final boolean editAliquotsState,
+        final boolean editAliquotsComment) {
         super(parent, SWT.NONE);
 
         this.shipment = shipment;
@@ -107,9 +107,9 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
 
             @Override
             public Object getParent(Object element) {
-                if (element instanceof DispatchShipmentAliquotWrapper)
+                if (element instanceof DispatchAliquotWrapper)
                     return DispatchTableGroup
-                        .findParent((DispatchShipmentAliquotWrapper) element);
+                        .findParent((DispatchAliquotWrapper) element);
                 return null;
             }
 
@@ -140,8 +140,8 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             public void doubleClick(DoubleClickEvent event) {
                 Object o = ((IStructuredSelection) tv.getSelection())
                     .getFirstElement();
-                if (o instanceof DispatchShipmentAliquotWrapper) {
-                    DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) o;
+                if (o instanceof DispatchAliquotWrapper) {
+                    DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) o;
                     SessionManager.openViewForm(dsa.getAliquot());
                 }
             }
@@ -158,7 +158,7 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
                 }
                 addClipboardCopySupport(menu, labelProvider);
                 if (editAliquotsState || editAliquotsComment) {
-                    DispatchShipmentAliquotWrapper dsa = getSelectedAliquot();
+                    DispatchAliquotWrapper dsa = getSelectedAliquot();
                     if (dsa != null) {
                         if (editAliquotsState
                             && DispatchAliquotState.getState(dsa.getState()) == DispatchAliquotState.NONE_STATE)
@@ -171,13 +171,12 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         });
     }
 
-    protected DispatchShipmentAliquotWrapper getSelectedAliquot() {
+    protected DispatchAliquotWrapper getSelectedAliquot() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
-        if (selection != null
-            && selection.size() > 0
-            && selection.getFirstElement() instanceof DispatchShipmentAliquotWrapper) {
-            return (DispatchShipmentAliquotWrapper) selection.getFirstElement();
+        if (selection != null && selection.size() > 0
+            && selection.getFirstElement() instanceof DispatchAliquotWrapper) {
+            return (DispatchAliquotWrapper) selection.getFirstElement();
         }
         return null;
     }
@@ -210,7 +209,7 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
 
     private void modifyCommentAndState(
         IStructuredSelection iStructuredSelection, DispatchAliquotState newState) {
-        ModifyStateDispatchShipmentDialog dialog = new ModifyStateDispatchShipmentDialog(
+        ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             newState);
         int res = dialog.open();
@@ -218,7 +217,7 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             String comment = dialog.getComment();
             for (@SuppressWarnings("rawtypes")
             Iterator iter = iStructuredSelection.iterator(); iter.hasNext();) {
-                DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) iter
+                DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) iter
                     .next();
                 dsa.setComment(comment);
                 if (newState != null)

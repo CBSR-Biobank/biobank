@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.Messages;
@@ -46,7 +46,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     private PalletScanManagement palletScanManagement;
     protected ScanPalletWidget spw;
-    protected DispatchShipmentWrapper currentShipment;
+    protected DispatchWrapper currentShipment;
     private IObservableValue scanHasBeenLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
     private IObservableValue scanOkValue = new WritableValue(Boolean.TRUE,
@@ -58,7 +58,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     private boolean rescanMode = false;
 
     public AbstractDispatchScanDialog(Shell parentShell,
-        final DispatchShipmentWrapper currentShipment) {
+        final DispatchWrapper currentShipment) {
         super(parentShell);
         this.currentShipment = currentShipment;
         palletScanManagement = new PalletScanManagement() {

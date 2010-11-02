@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
@@ -21,7 +21,7 @@ public class PatientVisitHelper extends DbHelper {
      * @return A new patient visit wrapper.
      */
     public static PatientVisitWrapper newPatientVisit(PatientWrapper patient,
-        ClinicShipmentWrapper shipment, Date dateProcessed, Date dateDrawn) {
+        ShipmentWrapper shipment, Date dateProcessed, Date dateDrawn) {
         PatientVisitWrapper pv = new PatientVisitWrapper(appService);
         pv.setPatient(patient);
         pv.setDateProcessed(dateProcessed);
@@ -40,7 +40,7 @@ public class PatientVisitHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static PatientVisitWrapper addPatientVisit(PatientWrapper patient,
-        ClinicShipmentWrapper shipment, Date dateProcessed, Date dateDrawn)
+        ShipmentWrapper shipment, Date dateProcessed, Date dateDrawn)
         throws Exception {
         PatientVisitWrapper pv = newPatientVisit(patient, shipment,
             dateProcessed, dateDrawn);
@@ -59,7 +59,7 @@ public class PatientVisitHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static List<PatientVisitWrapper> addPatientVisits(
-        PatientWrapper patient, ClinicShipmentWrapper shipment,
+        PatientWrapper patient, ShipmentWrapper shipment,
         int minimumNumber, int maxNumber) throws ParseException, Exception {
         int count = r.nextInt(maxNumber - minimumNumber + 1) + minimumNumber;
         List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
@@ -71,13 +71,13 @@ public class PatientVisitHelper extends DbHelper {
     }
 
     public static List<PatientVisitWrapper> addPatientVisits(
-        PatientWrapper patient, ClinicShipmentWrapper shipment,
+        PatientWrapper patient, ShipmentWrapper shipment,
         int minimumNumber) throws ParseException, Exception {
         return addPatientVisits(patient, shipment, minimumNumber, 15);
     }
 
     public static List<PatientVisitWrapper> addPatientVisits(
-        PatientWrapper patient, ClinicShipmentWrapper shipment)
+        PatientWrapper patient, ShipmentWrapper shipment)
         throws ParseException, Exception {
         return addPatientVisits(patient, shipment, 1);
 
