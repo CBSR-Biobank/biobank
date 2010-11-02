@@ -132,7 +132,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         Section section = createSection("Studies");
         studiesTable = new StudyInfoTable(section, site.getStudyCollection());
         studiesTable.adaptToToolkit(toolkit, true);
-        studiesTable.addDoubleClickListener(collectionDoubleClickListener);
+        studiesTable.addClickListener(collectionDoubleClickListener);
         section.setClient(studiesTable);
     }
 
@@ -152,7 +152,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         containerTypesTable.adaptToToolkit(toolkit, true);
 
         containerTypesTable
-            .addDoubleClickListener(collectionDoubleClickListener);
+            .addClickListener(collectionDoubleClickListener);
         section.setClient(containerTypesTable);
     }
 
@@ -172,7 +172,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         toolkit.paintBordersFor(topContainersTable);
 
         topContainersTable
-            .addDoubleClickListener(collectionDoubleClickListener);
+            .addClickListener(collectionDoubleClickListener);
         section.setClient(topContainersTable);
     }
 
@@ -180,7 +180,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         Section section = createSection("Dispatches");
         dispatchTable = new SiteDispatchInfoTable(section, site);
         dispatchTable.adaptToToolkit(toolkit, true);
-        dispatchTable.addDoubleClickListener(collectionDoubleClickListener);
+        dispatchTable.addClickListener(collectionDoubleClickListener);
         section.setClient(dispatchTable);
         section.setExpanded(false);
     }

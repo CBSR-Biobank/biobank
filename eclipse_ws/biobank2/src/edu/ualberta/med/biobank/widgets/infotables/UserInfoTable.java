@@ -50,14 +50,14 @@ public class UserInfoTable extends InfoTableWidget<User> {
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
             public void editItem(InfoTableEvent event) {
-                editUser(getSelection());
+                editUser((User) getSelection());
             }
         });
 
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
-                deleteUser(getSelection());
+                deleteUser((User) getSelection());
             }
         });
 
@@ -66,11 +66,11 @@ public class UserInfoTable extends InfoTableWidget<User> {
         unlockMenuItem.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                User selectedUser = getSelection();
+                User selectedUser = (User) getSelection();
                 String userName = selectedUser.getLogin();
                 try {
                     SessionManager.getAppService().unlockUser(
-                        getSelection().getLogin());
+                        ((User) getSelection()).getLogin());
                     selectedUser.setLockedOut(false);
                     reloadCollection(getCollection(), selectedUser);
                 } catch (ApplicationException e) {
@@ -83,7 +83,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
         menu.addListener(SWT.Show, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                unlockMenuItem.setEnabled(getSelection().isLockedOut());
+                unlockMenuItem.setEnabled(((User) getSelection()).isLockedOut());
             }
         });
     }

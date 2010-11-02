@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
-import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -121,19 +120,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void retrieveSiteAndType() {
-        site = containerTypeAdapter.getParentFromClass(SiteAdapter.class)
-            .getWrapper();
-        try {
-            site.reload();
-        } catch (Exception e) {
-            logger.error("Can't retrieve site", e);
-        }
-        try {
-            containerType.reload();
-        } catch (Exception e) {
-            logger.error(
-                "Error while retrieving type " + containerType.getName(), e);
-        }
+        site = containerTypeAdapter.getModelObject().getSiteLinkedToObject();
     }
 
     @Override

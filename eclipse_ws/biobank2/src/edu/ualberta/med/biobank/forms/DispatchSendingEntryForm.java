@@ -222,7 +222,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         };
         aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
         aliquotsNonProcessedTable
-            .addDoubleClickListener(new IDoubleClickListener() {
+            .addClickListener(new IDoubleClickListener() {
                 @Override
                 public void doubleClick(DoubleClickEvent event) {
                     Object selection = event.getSelection();
