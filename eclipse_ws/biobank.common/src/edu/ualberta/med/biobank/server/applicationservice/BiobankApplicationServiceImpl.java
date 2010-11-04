@@ -31,6 +31,8 @@ import gov.nih.nci.system.query.example.ExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -38,6 +40,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 import org.acegisecurity.Authentication;
@@ -63,6 +66,20 @@ public class BiobankApplicationServiceImpl extends
     private static final String APPLICATION_CONTEXT_NAME = "biobank2";
 
     private static final String ALL_SITES_PG_ID = "11";
+
+    private static Properties props;
+
+    static {
+        props = new Properties();
+        try {
+            props.load(BiobankApplicationServiceImpl.class
+                .getResourceAsStream("version.properties"));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public BiobankApplicationServiceImpl(ClassCache classCache) {
         super(classCache);
@@ -521,5 +538,12 @@ public class BiobankApplicationServiceImpl extends
         if (isWebsiteAdministrator()) {
             LockoutManager.getInstance().unLockUser(userName);
         }
+    }
+
+    @Override
+    public void checkVersion(String version) throws ApplicationException {
+        if (!props.containsKey(version))
+            throw new VersionIncompatibilityException(
+                "Client authentication failed. Your version is not compatible with the server and must be upgraded.");
     }
 }

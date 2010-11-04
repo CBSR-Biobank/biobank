@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.helpers;
 
+import java.awt.Desktop;
+import java.net.URI;
 import java.util.Collection;
 
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
@@ -11,6 +13,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.applicationservice.VersionIncompatibilityException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionHelper implements Runnable {
@@ -29,6 +32,8 @@ public class SessionHelper implements Runnable {
     private Collection<SiteWrapper> siteWrappers;
 
     private User user;
+
+    private static final String DOWNLOAD_URL = "http://aicml-med.cs.ualberta.ca/CBSR/latest.html";
 
     public SessionHelper(String server, boolean secureConnection,
         String userName, String password) {
@@ -61,16 +66,33 @@ public class SessionHelper implements Runnable {
                 appService = ServiceConnection.getAppService(serverUrl,
                     userName, password);
             }
+            appService.checkVersion(BioBankPlugin.getDefault().getBundle()
+                .getVersion().toString());
             siteWrappers = SiteWrapper.getSites(appService);
             user = appService.getCurrentUser();
         } catch (ApplicationException exp) {
-            logger.error("Error while logging to application", exp);
-            if (exp.getCause() != null
-                && exp.getCause() instanceof RemoteAuthenticationException) {
-                BioBankPlugin.openAsyncError("Login Failed", "Bad credentials");
+            if (exp instanceof VersionIncompatibilityException) {
+                if (BioBankPlugin
+                    .openConfirm(
+                        "Update required",
+                        "Your client is not compatible with this server. Would you like to download the latest version?")) {
+                    try {
+                        Desktop.getDesktop().browse(new URI(DOWNLOAD_URL));
+                    } catch (Exception e1) {
+                        // ignore
+                    }
+                }
                 return;
+            } else {
+                logger.error("Error while logging to application", exp);
+                if (exp.getCause() != null
+                    && exp.getCause() instanceof RemoteAuthenticationException) {
+                    BioBankPlugin.openAsyncError("Login Failed",
+                        "Bad credentials");
+                    return;
+                }
+                BioBankPlugin.openRemoteConnectErrorMessage(exp);
             }
-            BioBankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (RemoteAccessException exp) {
             BioBankPlugin.openAsyncError(
                 "Login Failed - Remote Access Exception", exp);

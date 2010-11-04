@@ -266,7 +266,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         return item;
     }
 
-    @SuppressWarnings("unchecked")
     public Object getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
