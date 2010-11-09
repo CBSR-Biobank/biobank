@@ -10,7 +10,7 @@ import org.eclipse.ui.WorkbenchException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.rcp.perspective.ShipmentAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 
 public class ShipmentAdministrationHandler extends AbstractHandler implements
     IHandler {
@@ -23,7 +23,7 @@ public class ShipmentAdministrationHandler extends AbstractHandler implements
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true))
-                workbench.showPerspective(ShipmentAdministrationPerspective.ID,
+                workbench.showPerspective(ProcessingPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(

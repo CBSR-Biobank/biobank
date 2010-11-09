@@ -27,6 +27,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.Messages;
@@ -57,10 +58,13 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     private boolean scanTubeAloneMode = false;
     private boolean rescanMode = false;
 
+    protected SiteWrapper currentSite;
+
     public AbstractDispatchScanDialog(Shell parentShell,
-        final DispatchWrapper currentShipment) {
+        final DispatchWrapper currentShipment, SiteWrapper currentSite) {
         super(parentShell);
         this.currentShipment = currentShipment;
+        this.currentSite = currentSite;
         palletScanManagement = new PalletScanManagement() {
 
             @Override
@@ -72,7 +76,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
             protected void processScanResult(IProgressMonitor monitor)
                 throws Exception {
                 setScanHasBeenLaunched(true);
-                AbstractDispatchScanDialog.this.processScanResult(monitor);
+                AbstractDispatchScanDialog.this.processScanResult(monitor,
+                    AbstractDispatchScanDialog.this.currentSite);
             }
 
             @Override
@@ -118,8 +123,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     protected abstract Map<RowColPos, PalletCell> getFakeScanCells()
         throws Exception;
 
-    protected abstract void processScanResult(IProgressMonitor monitor)
-        throws Exception;
+    protected abstract void processScanResult(IProgressMonitor monitor,
+        SiteWrapper currentSite) throws Exception;
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {

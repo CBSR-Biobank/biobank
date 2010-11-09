@@ -36,7 +36,6 @@ public class PatientVisitAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(PatientVisitWrapper.class,
-            SessionManager.getCurrentSite());
+        return SessionManager.canCreate(PatientVisitWrapper.class, null);
     }
 }

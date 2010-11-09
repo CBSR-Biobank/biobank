@@ -13,8 +13,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -39,8 +37,6 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private PatientAdapter patientAdapter;
 
-    private SiteWrapper siteWrapper;
-
     private ComboViewer studiesViewer;
 
     private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
@@ -55,8 +51,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         patientAdapter = (PatientAdapter) adapter;
         retrievePatient();
         try {
-            patientAdapter.getWrapper().logEdit(
-                SessionManager.getCurrentSite().getNameShort());
+            patientAdapter.getWrapper().logEdit(null);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log edit failed", e);
         }
@@ -90,14 +85,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText labelSite = createReadOnlyLabelledField(client, SWT.NONE,
-            "Site");
-        siteWrapper = SessionManager.getCurrentSite();
-        labelSite.setText(siteWrapper.getName());
-
-        siteWrapper.reload();
         List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
-            siteWrapper.getStudyCollection());
+            StudyWrapper.getAllStudies(appService));
         StudyWrapper selectedStudy = null;
         if (patientAdapter.getWrapper().isNew()) {
             if (studies.size() == 1) {

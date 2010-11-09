@@ -23,4 +23,10 @@ public class ShipmentAddHandler extends AbstractHandler {
         shipNode.openEntryForm();
         return null;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return SessionManager.canCreate(ShipmentWrapper.class, null);
+    }
+
 }

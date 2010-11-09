@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletDisplay;
@@ -120,6 +121,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private boolean isFakeScanLinkedOnly;
 
+    private BasicSiteCombo siteCombo;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -173,6 +176,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
+        siteCombo = new BasicSiteCombo(fieldsComposite, appService);
+        setFirstControl(siteCombo.getControl());
+
         productBarcodeValidator = new NonEmptyStringValidator( //$NON-NLS-1$
             Messages.getString("ScanAssign.productBarcode.validationMsg"));
         palletLabelValidator = new NonEmptyStringValidator(
@@ -189,7 +195,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         palletproductBarcodeText.setLayoutData(gd);
-        setFirstControl(palletproductBarcodeText);
+
         palletproductBarcodeText.addFocusListener(new FocusAdapter() {
             @Override
             public void focusLost(FocusEvent e) {
@@ -463,8 +469,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private boolean getExistingPalletFromProductBarcode() throws Exception {
         palletFoundWithProductBarcode = ContainerWrapper
             .getContainerWithProductBarcodeInSite(appService,
-                SessionManager.getCurrentSite(),
-                currentPalletWrapper.getProductBarcode());
+                siteCombo.getSite(), currentPalletWrapper.getProductBarcode());
         if (palletFoundWithProductBarcode == null) {
             // no pallet found with this barcode
             setTypes(palletContainerTypes, true);
@@ -539,10 +544,10 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
         if (isFakeScanLinkedOnly) {
             return PalletCell.getRandomAliquotsNotAssigned(appService,
-                SessionManager.getCurrentSite().getId());
+                siteCombo.getSite().getId());
         }
         return PalletCell.getRandomAliquotsAlreadyAssigned(appService,
-            SessionManager.getCurrentSite().getId());
+            siteCombo.getSite().getId());
     }
 
     /**
@@ -707,8 +712,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private void processCellWithPreviousPosition(PalletCell scanCell,
         String positionString, AliquotWrapper foundAliquot) {
-        if (foundAliquot.getParent().getSite()
-            .equals(SessionManager.getCurrentSite())) {
+        if (foundAliquot.getParent().getSite().equals(siteCombo.getSite())) {
             if (foundAliquot.getParent().equals(currentPalletWrapper)) {
                 // same pallet
                 RowColPos rcp = new RowColPos(scanCell.getRow(),
@@ -983,7 +987,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             currentPalletWrapper.reset();
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            currentPalletWrapper.setSite(SessionManager.getCurrentSite());
+            currentPalletWrapper.setSite(siteCombo.getSite());
         } catch (Exception e) {
             logger.error("Error while reseting pallet values", e); //$NON-NLS-1$
         }

@@ -6,11 +6,10 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.AbstractAliquotAdminForm;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 
 public class BiobankPartListener implements IPartListener {
@@ -37,14 +36,12 @@ public class BiobankPartListener implements IPartListener {
             boolean reallyClose = ((AbstractAliquotAdminForm) part).onClose();
             if (reallyClose) {
                 try {
-                    workbench.showPerspective(
-                        PatientsAdministrationPerspective.ID, workbench
-                            .getActiveWorkbenchWindow());
+                    workbench.showPerspective(ProcessingPerspective.ID,
+                        workbench.getActiveWorkbenchWindow());
                 } catch (WorkbenchException e) {
                     logger.error("Error while opening patients perpective", e);
                 }
             }
-            SessionManager.getInstance().unlockSite();
         }
         if (part instanceof BiobankFormBase) {
             ((BiobankFormBase) part).setDeactivated();
@@ -57,9 +54,6 @@ public class BiobankPartListener implements IPartListener {
 
     @Override
     public void partOpened(IWorkbenchPart part) {
-        if (part instanceof AbstractAliquotAdminForm) {
-            SessionManager.getInstance().lockSite();
-        }
         if (part instanceof AbstractViewWithAdapterTree) {
             ((AbstractViewWithAdapterTree) part).opened();
         }

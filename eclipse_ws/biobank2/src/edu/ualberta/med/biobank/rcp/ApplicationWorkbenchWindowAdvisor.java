@@ -19,7 +19,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
-import edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
@@ -71,7 +71,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             .equals(AliquotManagementPerspective.ID)) {
             // can't start on this perspective: switch to patient perspective
             try {
-                workbench.showPerspective(PatientsAdministrationPerspective.ID,
+                workbench.showPerspective(ProcessingPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
             } catch (WorkbenchException e) {
                 logger.error("Error while opening patients perpective", e);

@@ -66,8 +66,7 @@ public class PatientAdapter extends AdapterBase {
             "Are you sure you want to delete this patient?");
 
         if (isEditable()
-            && SessionManager.canCreate(PatientVisitWrapper.class,
-                SessionManager.getCurrentSite())) {
+            && SessionManager.canCreate(PatientVisitWrapper.class, null)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Patient Visit");
             mi.addSelectionListener(new SelectionAdapter() {

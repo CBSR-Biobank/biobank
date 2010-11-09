@@ -48,9 +48,8 @@ public class PatientTodayNode extends AbstractTodayNode {
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
         if (SessionManager.getInstance().isConnected())
-            return PatientWrapper
-                .getPatientsInTodayShipments(SessionManager.getAppService(),
-                    SessionManager.getCurrentSite());
+            return PatientWrapper.getPatientsInTodayShipments(SessionManager
+                .getAppService());
         return new ArrayList<ModelWrapper<?>>();
     }
 

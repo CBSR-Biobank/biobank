@@ -236,12 +236,6 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                             throws ApplicationException {
                             return report.generate(SessionManager
                                 .getAppService());
-                            // TODO: FIXME
-                            /*
-                             * if (report instanceof QueryObject) { return
-                             * ((QueryObject) report).generate(
-                             * SessionManager.getAppService(), params); }
-                             */
                         }
                     };
                     monitor.beginTask("Generating Report...",

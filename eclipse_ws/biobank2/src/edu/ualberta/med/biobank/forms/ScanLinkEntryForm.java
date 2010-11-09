@@ -45,6 +45,7 @@ import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
@@ -95,6 +96,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     private boolean isFakeScanRandom;
 
     private ScrolledComposite containersScroll;
+
+    private BasicSiteCombo siteCombo;
 
     @Override
     protected void init() throws Exception {
@@ -271,7 +274,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void initAuthorizedSampleTypeList() throws ApplicationException {
         authorizedSampleTypes = SampleTypeWrapper.getSampleTypeForPallet96(
-            appService, SessionManager.getCurrentSite());
+            appService, siteCombo.getSite());
         if (authorizedSampleTypes.size() == 0) {
             BioBankPlugin
                 .openAsyncError(
@@ -384,6 +387,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
+        siteCombo = new BasicSiteCombo(fieldsComposite, appService);
+        setFirstControl(siteCombo.getControl());
+
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
 
         linkFormPatientManagement.createVisitCombo(fieldsComposite);
@@ -468,7 +474,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
         try {
             return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                appService, SessionManager.getCurrentSite().getId());
+                appService, siteCombo.getSite().getId());
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }

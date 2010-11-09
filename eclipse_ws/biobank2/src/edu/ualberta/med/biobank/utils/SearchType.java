@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.AliquotListViewForm;
 import edu.ualberta.med.biobank.forms.PvListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -24,8 +25,8 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 public enum SearchType {
     INVENTORY_ID("Inventory ID") {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString)
-            throws Exception {
+        public List<? extends ModelWrapper<?>> search(String searchString,
+            SiteWrapper site) throws Exception {
             List<AliquotWrapper> res = new ArrayList<AliquotWrapper>();
             AliquotWrapper aliquot = AliquotWrapper.getAliquot(
                 SessionManager.getAppService(), searchString,
@@ -40,21 +41,19 @@ public enum SearchType {
 
     ALIQUOT_POSITION("Aliquot position") {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString)
-            throws Exception {
+        public List<? extends ModelWrapper<?>> search(String searchString,
+            SiteWrapper site) throws Exception {
             return AliquotWrapper.getAliquotsInSiteWithPositionLabel(
-                SessionManager.getAppService(),
-                SessionManager.getCurrentSite(), searchString);
+                SessionManager.getAppService(), site, searchString);
         }
     },
 
     ALIQUOT_NON_ACTIVE("Aliquots - non active") {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString)
-            throws Exception {
+        public List<? extends ModelWrapper<?>> search(String searchString,
+            SiteWrapper site) throws Exception {
             List<AliquotWrapper> aliquots = AliquotWrapper
-                .getAliquotsNonActive(SessionManager.getAppService(),
-                    SessionManager.getCurrentSite());
+                .getAliquotsNonActive(SessionManager.getAppService(), site);
             return aliquots;
         }
 
@@ -79,22 +78,20 @@ public enum SearchType {
 
     CONTAINER_LABEL("Container label") {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString)
-            throws Exception {
+        public List<? extends ModelWrapper<?>> search(String searchString,
+            SiteWrapper site) throws Exception {
             return ContainerWrapper.getContainersInSite(
-                SessionManager.getAppService(),
-                SessionManager.getCurrentSite(), searchString);
+                SessionManager.getAppService(), site, searchString);
         }
     },
 
     CONTAINER_PRODUCT_BARCODE("Container product barcode") {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString)
-            throws Exception {
+        public List<? extends ModelWrapper<?>> search(String searchString,
+            SiteWrapper site) throws Exception {
             ContainerWrapper container = ContainerWrapper
                 .getContainerWithProductBarcodeInSite(
-                    SessionManager.getAppService(),
-                    SessionManager.getCurrentSite(), searchString);
+                    SessionManager.getAppService(), site, searchString);
             if (container != null) {
                 return Arrays.asList(container);
             }
@@ -104,8 +101,8 @@ public enum SearchType {
 
     WORKSHEET("Worksheet") {
         @Override
-        public List<? extends ModelWrapper<?>> search(String searchString)
-            throws Exception {
+        public List<? extends ModelWrapper<?>> search(String searchString,
+            SiteWrapper site) throws Exception {
 
             List<PatientVisitWrapper> pvs = PatientVisitWrapper
                 .getPatientVisitsWithWorksheet(SessionManager.getAppService(),
@@ -146,8 +143,13 @@ public enum SearchType {
         return label;
     }
 
-    public abstract List<? extends ModelWrapper<?>> search(String searchString)
-        throws Exception;
+    public List<? extends ModelWrapper<?>> search(String searchString)
+        throws Exception {
+        return search(searchString, null);
+    }
+
+    public abstract List<? extends ModelWrapper<?>> search(String searchString,
+        SiteWrapper site) throws Exception;
 
     public void processResults(List<? extends ModelWrapper<?>> res) {
         Assert.isNotNull(res);

@@ -182,28 +182,28 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             for (DispatchAliquotWrapper da : dsac) {
                 DispatchAliquotState state = DispatchAliquotState.getState(da
                     .getState());
-                if (da.getShipment().isInTransitState()
+                if (da.getDispatch().isInTransitState()
                     && DispatchAliquotState.NONE_STATE == state) {
                     // aliquot is in transit
                     // FIXME what if can't read sender or receiver
                     SiteWrapper fakeSite = new SiteWrapper(appService);
                     fakeSite.setNameShort("In Transit ("
-                        + da.getShipment().getSender().getNameShort() + " to "
-                        + da.getShipment().getReceiver().getNameShort() + ")");
+                        + da.getDispatch().getSender().getNameShort() + " to "
+                        + da.getDispatch().getReceiver().getNameShort() + ")");
                     return fakeSite;
-                } else if (da.getShipment().isInReceivedState()) {
+                } else if (da.getDispatch().isInReceivedState()) {
                     switch (state) {
                     case EXTRA:
                         // aliquot has been accidentally dispatched
-                        return da.getShipment().getReceiver();
+                        return da.getDispatch().getReceiver();
                     case MISSING:
                         // aliquot is missing
-                        return da.getShipment().getSender();
+                        return da.getDispatch().getSender();
                     case RECEIVED_STATE:
                     case NONE_STATE:
                         // aliquot has been intentionally dispatched and
                         // received
-                        return da.getShipment().getReceiver();
+                        return da.getDispatch().getReceiver();
                     }
                 }
             }
@@ -564,7 +564,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             if (dsaList != null) {
                 dispatchs = new ArrayList<DispatchWrapper>();
                 for (DispatchAliquotWrapper dsa : dsaList) {
-                    dispatchs.add(dsa.getShipment());
+                    dispatchs.add(dsa.getDispatch());
                 }
                 propertiesMap.put("dispatchs", dispatchs);
             }
@@ -631,7 +631,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         List<DispatchAliquotWrapper> dsas = getDispatchAliquotCollection();
         if (dsas != null)
             for (DispatchAliquotWrapper dsa : dsas) {
-                DispatchWrapper ship = dsa.getShipment();
+                DispatchWrapper ship = dsa.getDispatch();
                 if (!ship.equals(excludedShipment)
                     && (ship.isInTransitState() || ship.isInCreationState())) {
                     if (DispatchAliquotState.MISSING.isEquals(dsa.getState())) {

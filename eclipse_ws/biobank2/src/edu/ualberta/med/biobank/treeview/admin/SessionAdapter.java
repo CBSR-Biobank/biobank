@@ -193,4 +193,5 @@ public class SessionAdapter extends AdapterBase {
             g.addClinic();
         }
     }
+
 }

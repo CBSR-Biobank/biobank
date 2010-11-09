@@ -58,7 +58,7 @@ public enum DispatchTableGroup {
 
     public static Object findParent(DispatchAliquotWrapper dsa) {
         for (DispatchTableGroup tg : values()) {
-            if (tg.getChildren(dsa.getShipment()).contains(dsa)) {
+            if (tg.getChildren(dsa.getDispatch()).contains(dsa)) {
                 return tg;
             }
         }

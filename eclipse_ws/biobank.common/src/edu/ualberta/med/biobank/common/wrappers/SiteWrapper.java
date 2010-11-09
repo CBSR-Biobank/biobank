@@ -905,4 +905,50 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public boolean canUpdate(User user) {
         return user.isWebsiteAdministrator();
     }
+
+    public static Collection<? extends ModelWrapper<?>> getUsersInTransitReceiveDispatchCollection(
+        WritableApplicationService appService) throws Exception {
+        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
+        List<SiteWrapper> sites = getSites(appService);
+        for (SiteWrapper site : sites)
+            dispatches.addAll(site.getInTransitReceiveDispatchCollection());
+        return dispatches;
+    }
+
+    public static Collection<? extends ModelWrapper<?>> getUsersReceivingNoErrorsDispatchCollection(
+        WritableApplicationService appService) throws Exception {
+        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
+        List<SiteWrapper> sites = getSites(appService);
+        for (SiteWrapper site : sites)
+            dispatches.addAll(site.getReceivingNoErrorsDispatchCollection());
+        return dispatches;
+    }
+
+    public static Collection<? extends ModelWrapper<?>> getUsersInCreationDispatchCollection(
+        WritableApplicationService appService) throws Exception {
+        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
+        List<SiteWrapper> sites = getSites(appService);
+        for (SiteWrapper site : sites)
+            dispatches.addAll(site.getInCreationDispatchCollection());
+        return dispatches;
+    }
+
+    public static Collection<? extends ModelWrapper<?>> getUsersReceivingWithErrorsDispatchCollection(
+        WritableApplicationService appService) throws Exception {
+        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
+        List<SiteWrapper> sites = getSites(appService);
+        for (SiteWrapper site : sites)
+            dispatches.addAll(site.getReceivingWithErrorsDispatchCollection());
+        return dispatches;
+    }
+
+    public static Collection<? extends ModelWrapper<?>> getUsersInTransitSentDispatchCollection(
+        WritableApplicationService appService) throws Exception {
+        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
+        List<SiteWrapper> sites = getSites(appService);
+        for (SiteWrapper site : sites)
+            dispatches.addAll(site.getInTransitSentDispatchCollection());
+        return dispatches;
+    }
+
 }

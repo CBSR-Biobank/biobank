@@ -7,7 +7,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -39,7 +38,7 @@ public class PatientViewForm extends BiobankViewForm {
         patientAdapter = (PatientAdapter) adapter;
         patient = patientAdapter.getWrapper();
         retrievePatient();
-        patient.logLookup(SessionManager.getCurrentSite().getNameShort());
+        patient.logLookup(null);
         setPartName("Patient " + patient.getPnumber());
     }
 

@@ -34,8 +34,8 @@ public class ShipmentTodayNode extends AbstractTodayNode {
     @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
-        return ShipmentWrapper.getTodayShipments(
-            SessionManager.getAppService(), SessionManager.getCurrentSite());
+        return ShipmentWrapper
+            .getTodayShipments(SessionManager.getAppService());
 
     }
 

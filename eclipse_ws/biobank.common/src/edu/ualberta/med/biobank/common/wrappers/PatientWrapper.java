@@ -299,7 +299,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         if (csps != null) {
             for (ShipmentPatientWrapper csp : csps) {
                 ShipmentWrapper ship = csp.getShipment();
-                if (user == null || user.canUpdateSite(ship.getSite())) {
+                if (user != null && user.canUpdateSite(ship.getSite())) {
                     shipmentCollection.add(ship);
                 }
             }
@@ -417,8 +417,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public static List<PatientWrapper> getPatientsInTodayShipments(
-        WritableApplicationService appService, SiteWrapper site)
-        throws ApplicationException {
+        WritableApplicationService appService) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // yesterday midnight
         cal.set(Calendar.AM_PM, Calendar.AM);
@@ -432,9 +431,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         HQLCriteria criteria = new HQLCriteria("select p from "
             + Patient.class.getName()
             + " as p join p.shipmentPatientCollection as csps"
-            + " join csps.shipment as ships" + " where ships.site.id = ?"
+            + " join csps.shipment as ships" + " where ships.site is not null"
             + " and ships.dateReceived >= ? and ships.dateReceived <= ?",
-            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+            Arrays.asList(new Object[] { startDate, endDate }));
         List<Patient> res = appService.query(criteria);
         List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
         for (Patient p : res) {

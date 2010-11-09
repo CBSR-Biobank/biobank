@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
@@ -27,7 +26,6 @@ import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.SessionsView;
@@ -48,10 +46,6 @@ public class SessionManager {
 
     private RootNode rootNode;
 
-    private SiteCombo siteCombo;
-
-    private SiteManager siteManager;
-
     /**
      * Map a perspective ID to a AbstractViewWithTree instance visible when the
      * perspective is set
@@ -62,7 +56,6 @@ public class SessionManager {
         super();
         rootNode = new RootNode();
         possibleViewMap = new HashMap<String, AbstractViewWithAdapterTree>();
-        siteManager = new SiteManager();
     }
 
     public static SessionManager getInstance() {
@@ -86,12 +79,6 @@ public class SessionManager {
             serverName, user);
         rootNode.addChild(sessionAdapter);
 
-        siteManager.init(appService, serverName);
-        Assert.isNotNull(siteCombo, "site combo is null");
-        siteManager.setSiteCombo(siteCombo);
-        siteManager.selectCurrentSite(serverName, sites);
-        siteManager.updateSites(sites);
-
         rebuildSession();
         updateMenus();
 
@@ -104,7 +91,6 @@ public class SessionManager {
 
     public void deleteSession() throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
-        siteManager.setEnabled(false);
         rootNode.removeChild(sessionAdapter);
         sessionAdapter = null;
         updateMenus();
@@ -223,43 +209,6 @@ public class SessionManager {
         return rootNode;
     }
 
-    public static SiteWrapper getCurrentSite() {
-        return getInstance().siteManager.getCurrentSite();
-    }
-
-    public void setSiteManagerEnabled(boolean enable) {
-        Assert.isNotNull(siteManager, "site manager is null");
-        siteManager.setEnabled(enable);
-    }
-
-    public void lockSite() {
-        Assert.isNotNull(siteManager, "site manager is null");
-        siteManager.lockSite();
-    }
-
-    public void unlockSite() {
-        Assert.isNotNull(siteManager, "site manager is null");
-        siteManager.unlockSite();
-    }
-
-    public boolean isAllSitesSelected() {
-        Assert.isNotNull(siteManager, "site manager is null");
-        return siteManager.isAllSitesSelected();
-    }
-
-    public void setSiteCombo(SiteCombo siteCombo) {
-        this.siteCombo = siteCombo;
-    }
-
-    public SiteCombo getSiteCombo() {
-        return this.siteCombo;
-    }
-
-    public void updateSites() {
-        Assert.isNotNull(siteManager, "site manager is null");
-        siteManager.updateSites();
-    }
-
     public static void addView(String perspectiveId,
         AbstractViewWithAdapterTree view) {
         getInstance().possibleViewMap.put(perspectiveId, view);
@@ -271,15 +220,6 @@ public class SessionManager {
             session.rebuild();
         }
         if (view != null) {
-            if (!isAllSitesSelected()) {
-                SiteAdapter site = (SiteAdapter) getSession()
-                    .getSitesGroupNode().search(getCurrentSite());
-                if (site != null) {
-                    site.performExpand();
-                    return;
-                }
-            }
-            // if allsite selected or can't find the site node
             getSession().getSitesGroupNode().performExpand();
         }
     }
@@ -331,7 +271,19 @@ public class SessionManager {
 
     public static void log(String action, String details, String type)
         throws Exception {
-        getAppService().logActivity(action, getCurrentSite().getNameShort(),
-            null, null, null, details, type);
+        getAppService().logActivity(action, null, null, null, null, details,
+            type);
+    }
+
+    @Deprecated
+    public boolean isAllSitesSelected() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Deprecated
+    public static SiteWrapper getCurrentSite() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

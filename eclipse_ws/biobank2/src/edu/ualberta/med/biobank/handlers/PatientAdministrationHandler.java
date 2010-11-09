@@ -10,7 +10,7 @@ import org.eclipse.ui.WorkbenchException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 
 /**
  * This handler open the PatientAdministration perspective
@@ -26,7 +26,7 @@ public class PatientAdministrationHandler extends AbstractHandler implements
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true))
-                workbench.showPerspective(PatientsAdministrationPerspective.ID,
+                workbench.showPerspective(ProcessingPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(

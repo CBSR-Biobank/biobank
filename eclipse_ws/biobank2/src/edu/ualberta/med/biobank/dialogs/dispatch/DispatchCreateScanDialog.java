@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -60,8 +61,8 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     private ProductBarcodeValue productBarcodeValue;
 
     public DispatchCreateScanDialog(Shell parentShell,
-        DispatchWrapper currentShipment) {
-        super(parentShell, currentShipment);
+        DispatchWrapper currentShipment, SiteWrapper site) {
+        super(parentShell, currentShipment, site);
     }
 
     @Override
@@ -107,7 +108,8 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     }
 
     @Override
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+    protected void processScanResult(IProgressMonitor monitor, SiteWrapper site)
+        throws Exception {
         aliquotsAdded = false;
         boolean scanOk = true;
         currentPallet = null;
@@ -121,8 +123,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
         } else {
             currentPallet = ContainerWrapper
                 .getContainerWithProductBarcodeInSite(
-                    SessionManager.getAppService(),
-                    SessionManager.getCurrentSite(), currentProductBarcode);
+                    SessionManager.getAppService(), site, currentProductBarcode);
             if (currentPallet != null) {
                 // FIXME check it is a pallet ? Should we do it when enter
                 // barcode ?
@@ -308,8 +309,8 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
         ContainerWrapper currentPallet = ContainerWrapper
             .getContainerWithProductBarcodeInSite(
-                SessionManager.getAppService(),
-                SessionManager.getCurrentSite(), currentProductBarcode);
+                SessionManager.getAppService(), currentSite,
+                currentProductBarcode);
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell

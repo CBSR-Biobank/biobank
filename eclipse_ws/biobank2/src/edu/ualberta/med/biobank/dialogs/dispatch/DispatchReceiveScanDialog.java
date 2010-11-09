@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -37,8 +38,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     private int errors;
 
     public DispatchReceiveScanDialog(Shell parentShell,
-        final DispatchWrapper currentShipment) {
-        super(parentShell, currentShipment);
+        final DispatchWrapper currentShipment, SiteWrapper currentSite) {
+        super(parentShell, currentShipment, currentSite);
     }
 
     @Override
@@ -102,7 +103,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     }
 
     @Override
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+    protected void processScanResult(IProgressMonitor monitor, SiteWrapper site)
+        throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             processCells(cells.keySet(), monitor);
@@ -140,7 +142,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                 public void run() {
                     BioBankPlugin
                         .openInformation(
-                            "Not in shipment aliquots",
+                            "Not in dispatch aliquots",
                             "Some of the aliquots in this pallet were not supposed"
                                 + " to be in this shipment. They will be added to the"
                                 + " extra-pending list.");

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -17,11 +16,9 @@ public class ReceivingWithErrorsDispatchGroup extends AbstractDispatchGroup {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper site = SessionManager.getCurrentSite();
-        if (!SessionManager.getInstance().isAllSitesSelected()) {
-            return site.getReceivingWithErrorsDispatchCollection();
-        }
-        return new ArrayList<ModelWrapper<?>>();
+        return SiteWrapper
+            .getUsersReceivingWithErrorsDispatchCollection(SessionManager
+                .getAppService());
     }
 
 }

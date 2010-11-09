@@ -33,13 +33,14 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
+@Deprecated
 public class SiteCombo extends WorkbenchWindowControlContribution {
     private static final String DISPATCH_STATUS_MSG = "{0} dispatches to receive";
     private ComboViewer comboViewer;
 
     public SiteCombo() {
         super("Site Selection");
-        SessionManager.getInstance().setSiteCombo(this);
+        // SessionManager.getInstance().setSiteCombo(this);
     }
 
     public SiteCombo(String str) {
@@ -106,6 +107,7 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
     }
 
     public void updateStatusLineMessage(IWorkbenchPartSite wbSite) {
+
         if (wbSite instanceof IViewSite) {
             String message = "";
 
@@ -125,6 +127,7 @@ public class SiteCombo extends WorkbenchWindowControlContribution {
             ((IViewSite) wbSite).getActionBars().getStatusLineManager()
                 .setMessage(message);
         }
+
     }
 
     public void addSelectionChangedListener(ISelectionChangedListener listener) {

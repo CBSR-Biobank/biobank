@@ -57,14 +57,18 @@ public class AbstractReport {
     @SuppressWarnings("unused")
     public List<Object> executeQuery(WritableApplicationService appService)
         throws ApplicationException {
-        queryString = queryString.replaceAll(SITE_OPERATOR_SEARCH_STRING,
-            report.getOp());
-        queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING, report
-            .getSiteId().toString());
-        queryString = queryString.replaceAll(GROUPBY_DATE_SEARCH_STRING,
-            report.getGroupBy());
-        queryString = queryString.replaceAll(CONTAINER_LIST_SEARCH_STRING,
-            report.getContainerList());
+        if (report.getOp() != null)
+            queryString = queryString.replaceAll(SITE_OPERATOR_SEARCH_STRING,
+                report.getOp());
+        if (report.getSiteId() != null)
+            queryString = queryString.replaceAll(SITE_ID_SEARCH_STRING, report
+                .getSiteId().toString());
+        if (report.getGroupBy() != null)
+            queryString = queryString.replaceAll(GROUPBY_DATE_SEARCH_STRING,
+                report.getGroupBy());
+        if (report.getContainerList() != null)
+            queryString = queryString.replaceAll(CONTAINER_LIST_SEARCH_STRING,
+                report.getContainerList());
         HQLCriteria criteria = new HQLCriteria(queryString, report.getParams());
         return new ReportListProxy(appService, criteria, getRowPostProcess());
     }

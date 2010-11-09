@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectShipmentClinicDialog;
-import edu.ualberta.med.biobank.rcp.perspective.ShipmentAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -50,7 +50,7 @@ public class ShipmentAdministrationView extends
 
     public ShipmentAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(ShipmentAdministrationPerspective.ID, this);
+        SessionManager.addView(ProcessingPerspective.ID, this);
     }
 
     @Override
@@ -127,8 +127,8 @@ public class ShipmentAdministrationView extends
             // with waybill, should find only one corresponding shipment, or
             // mutliple shipments from different clinics
             List<ShipmentWrapper> shipments = ShipmentWrapper
-                .getShipmentsInSite(SessionManager.getAppService(),
-                    text.trim(), SessionManager.getCurrentSite());
+                .getShipmentsInSites(SessionManager.getAppService(),
+                    text.trim());
             if (shipments.size() > 1) {
                 SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
                     PlatformUI.getWorkbench().getActiveWorkbenchWindow()
@@ -143,9 +143,8 @@ public class ShipmentAdministrationView extends
             // can find more than one shipments
             Date date = dateReceivedWidget.getDate();
             if (date != null) {
-                return ShipmentWrapper.getShipmentsInSite(
-                    SessionManager.getAppService(), date,
-                    SessionManager.getCurrentSite());
+                return ShipmentWrapper.getShipmentsInSites(
+                    SessionManager.getAppService(), date);
             }
         }
         return null;

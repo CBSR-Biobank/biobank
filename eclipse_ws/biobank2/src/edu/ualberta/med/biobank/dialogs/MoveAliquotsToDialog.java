@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
 /**
@@ -42,6 +43,8 @@ public class MoveAliquotsToDialog extends BiobankDialog {
     private ContainerWrapper oldContainer;
 
     private HashMap<String, ContainerWrapper> map;
+
+    private BasicSiteCombo siteCombo;
 
     public MoveAliquotsToDialog(Shell parent, ContainerWrapper oldContainer) {
         super(parent);
@@ -77,9 +80,9 @@ public class MoveAliquotsToDialog extends BiobankDialog {
             .getContainerType().getSampleTypeCollection();
         List<ContainerWrapper> conts = ContainerWrapper
             .getEmptyContainersHoldingSampleType(
-                SessionManager.getAppService(),
-                SessionManager.getCurrentSite(), typesFromOlContainer,
-                oldContainer.getRowCapacity(), oldContainer.getColCapacity());
+                SessionManager.getAppService(), siteCombo.getSite(),
+                typesFromOlContainer, oldContainer.getRowCapacity(),
+                oldContainer.getColCapacity());
 
         map = new HashMap<String, ContainerWrapper>();
         for (ContainerWrapper cont : conts) {
@@ -107,6 +110,9 @@ public class MoveAliquotsToDialog extends BiobankDialog {
                 }
             }
         };
+
+        siteCombo = new BasicSiteCombo(contents, SessionManager.getAppService());
+
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.FILL,
             "New Container Label", null, containerLabelPojo, "label", validator);
     }

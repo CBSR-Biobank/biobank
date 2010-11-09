@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
@@ -41,12 +43,8 @@ public class DispatchAdapter extends AdapterBase {
     public boolean isEditable() {
         boolean editable = super.isEditable();
         if (getWrapper() != null) {
-            SiteWrapper currentSite = SessionManager.getCurrentSite();
             return editable
-                && SessionManager.getUser().canUpdateSite(currentSite)
-                && (getWrapper().isNew() || currentSite == null || !(currentSite
-                    .equals(getWrapper().getReceiver()) && getWrapper()
-                    .isInTransitState()));
+                && (getWrapper().isNew() || !getWrapper().isInTransitState());
         }
         return editable;
     }
@@ -54,7 +52,7 @@ public class DispatchAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         DispatchWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment, "shipment is null");
+        Assert.isNotNull(shipment, "Dispatch is null");
         String label = new String();
         StudyWrapper study = shipment.getStudy();
 
@@ -75,13 +73,18 @@ public class DispatchAdapter extends AdapterBase {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addViewMenu(menu, "Dispatch");
-        SiteWrapper currentSite = SessionManager.getCurrentSite();
-        if (SessionManager.getUser().canUpdateSite(currentSite)) {
-            if (currentSite.equals(getWrapper().getSender())
+        List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
+        try {
+            sites = SiteWrapper.getSites(SessionManager.getAppService());
+        } catch (Exception e1) {
+            BioBankPlugin.openAsyncError("Failed to retrieve sites", e1);
+        }
+        try {
+            if (sites.contains(getWrapper().getSender())
                 && getWrapper().canDelete(SessionManager.getUser())
                 && getWrapper().isInCreationState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Delete");
+                mi.setText("Delete Dispatch");
                 mi.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
@@ -89,7 +92,7 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
             }
-            if (currentSite.equals(getWrapper().getSender())
+            if (sites.contains(getWrapper().getSender())
                 && getWrapper().canUpdate(SessionManager.getUser())
                 && getWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -97,12 +100,11 @@ public class DispatchAdapter extends AdapterBase {
                 mi.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
-                        setShipmentAsCreation();
+                        setDispatchAsCreation();
                     }
                 });
             }
-            if (getWrapper().canBeReceivedBy(SessionManager.getUser(),
-                currentSite)) {
+            if (getWrapper().canBeReceivedBy(SessionManager.getUser())) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText("Receive");
                 mi.addSelectionListener(new SelectionAdapter() {
@@ -120,46 +122,48 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
             } else if (getWrapper().canUpdate(SessionManager.getUser())) {
-                addEditMenu(menu, "Shipment");
+                addEditMenu(menu, "Dispatch");
             }
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Error checking permissions", e);
         }
     }
 
     public void doReceive() {
-        setShipmentAsReceived();
+        setDispatchAsReceived();
         openViewForm();
     }
 
     public void doReceiveAndProcess() {
-        setShipmentAsReceived();
+        setDispatchAsReceived();
         openEntryForm();
     }
 
     public void doClose() {
         getWrapper().setInCloseState();
-        persistShipment();
+        persistDispatch();
         openViewForm();
     }
 
     public void doSetAsLost() {
         getWrapper().setInLostState();
-        persistShipment();
+        persistDispatch();
         openViewForm();
     }
 
-    private void setShipmentAsReceived() {
+    private void setDispatchAsReceived() {
         getWrapper().setDateReceived(new Date());
         getWrapper().setInReceivedState();
-        persistShipment();
+        persistDispatch();
     }
 
-    private void setShipmentAsCreation() {
+    private void setDispatchAsCreation() {
         getWrapper().setInCreationState();
         getWrapper().setDeparted(null);
-        persistShipment();
+        persistDispatch();
     }
 
-    private void persistShipment() {
+    private void persistDispatch() {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
@@ -202,8 +206,7 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        SiteWrapper currentSite = SessionManager.getCurrentSite();
-        if (currentSite.equals(getWrapper().getSender()))
+        if (getWrapper().isInCreationState())
             return DispatchSendingEntryForm.ID;
         return DispatchReceivingEntryForm.ID;
     }

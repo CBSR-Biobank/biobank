@@ -46,6 +46,7 @@ public class TopContainerListWidget {
     private String filterText;
     private Boolean enabled;
 
+    @SuppressWarnings("unchecked")
     public TopContainerListWidget(final Composite parent, FormToolkit toolkit) {
         filterText = "";
         enabled = true;
@@ -116,8 +117,8 @@ public class TopContainerListWidget {
         topContainers.getList().setLayoutData(
             new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        siteCombo.setSelection(new StructuredSelection(SessionManager
-            .getCurrentSite()));
+        siteCombo.setSelection(new StructuredSelection(
+            ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
     }
 
     public List<Integer> getSelectedContainerIds() {

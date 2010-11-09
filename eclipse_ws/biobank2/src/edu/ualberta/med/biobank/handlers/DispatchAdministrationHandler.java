@@ -8,7 +8,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.rcp.perspective.DispatchAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 
 public class DispatchAdministrationHandler extends AbstractHandler implements
     IHandler {
@@ -19,7 +19,7 @@ public class DispatchAdministrationHandler extends AbstractHandler implements
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true))
-                workbench.showPerspective(DispatchAdministrationPerspective.ID,
+                workbench.showPerspective(ProcessingPerspective.ID,
                     workbench.getActiveWorkbenchWindow());
         } catch (WorkbenchException e) {
             throw new ExecutionException(

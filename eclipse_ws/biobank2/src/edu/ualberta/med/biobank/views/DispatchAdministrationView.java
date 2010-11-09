@@ -16,8 +16,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.rcp.perspective.DispatchAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchSearchedNode;
 import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchGroup;
@@ -60,7 +59,7 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
 
     public DispatchAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(DispatchAdministrationPerspective.ID, this);
+        SessionManager.addView(ProcessingPerspective.ID, this);
     }
 
     @Override
@@ -70,23 +69,14 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
     }
 
     private void createNodes() {
-        SiteWrapper site = SessionManager.getCurrentSite();
-        if (SessionManager.getInstance().isConnected()
-            && SessionManager.getUser().canUpdateSite(site)) {
-            if (SessionManager.getInstance().isAllSitesSelected()
-                || site.getDispatchStudiesAsSender().size() > 0) {
-                outgoingNode = new OutgoingNode(rootNode, 0);
-                outgoingNode.setParent(rootNode);
-                rootNode.addChild(outgoingNode);
-            }
 
-            if (SessionManager.getInstance().isAllSitesSelected()
-                || site.getDispatchStudiesAsReceiver().size() > 0) {
-                incomingNode = new IncomingNode(rootNode, 1);
-                incomingNode.setParent(rootNode);
-                rootNode.addChild(incomingNode);
-            }
-        }
+        outgoingNode = new OutgoingNode(rootNode, 0);
+        outgoingNode.setParent(rootNode);
+        rootNode.addChild(outgoingNode);
+
+        incomingNode = new IncomingNode(rootNode, 1);
+        incomingNode.setParent(rootNode);
+        rootNode.addChild(incomingNode);
 
         searchedNode = new DispatchSearchedNode(rootNode, 2);
         searchedNode.setParent(rootNode);
@@ -171,19 +161,9 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    public void siteChanged(Object sourceValue) {
-        if (sourceValue != null
-            && !SessionManager.getInstance().isAllSitesSelected()) {
-            reload();
-        } else {
-            rootNode.removeAll();
-        }
-    }
-
-    @Override
     public void reload() {
         try {
-            SessionManager.getCurrentSite().reload();
+            // SessionManager.getCurrentSite().reload();
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Unable to reload site information.",
                 e);
@@ -221,20 +201,17 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
 
     protected List<DispatchWrapper> search() throws Exception {
         if (radioWaybill.getSelection()) {
-            return DispatchWrapper.getShipmentsInSite(
-                SessionManager.getAppService(), treeText.getText().trim(),
-                SessionManager.getCurrentSite());
+            return DispatchWrapper.getDispatchesInSites(
+                SessionManager.getAppService(), treeText.getText().trim());
         } else {
             Date date = dateWidget.getDate();
             if (date != null) {
                 if (radioDateSent.getSelection())
-                    return DispatchWrapper.getShipmentsInSiteByDateSent(
-                        SessionManager.getAppService(), date,
-                        SessionManager.getCurrentSite());
+                    return DispatchWrapper.getDispatchesInSitesByDateSent(
+                        SessionManager.getAppService(), date);
                 else
-                    return DispatchWrapper.getShipmentsInSiteByDateReceived(
-                        SessionManager.getAppService(), date,
-                        SessionManager.getCurrentSite());
+                    return DispatchWrapper.getDispatchesInSitesByDateReceived(
+                        SessionManager.getAppService(), date);
             }
         }
         return null;

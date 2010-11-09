@@ -40,7 +40,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LoggingView extends ViewPart {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.LoggingView";
+    public static final String ID = "edu.ualberta.med.biobank.views.LoggingView";
 
     private ISourceProviderListener siteStateListener;
 
@@ -296,15 +296,6 @@ public class LoggingView extends ViewPart {
         if (SessionManager.getInstance().isConnected()) {
             setEnableAllFields(true);
             loadComboFields();
-            if (!SessionManager.getInstance().isAllSitesSelected()) {
-                String currentSiteName = SessionManager.getCurrentSite()
-                    .getNameShort();
-                for (int i = 0; i < siteComboOptions.length; ++i) {
-                    if (siteComboOptions[i].equals(currentSiteName)) {
-                        siteCombo.select(i);
-                    }
-                }
-            }
         } else
             setEnableAllFields(false);
     }

@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class SiteManager {
 
     private static BiobankLogger logger = BiobankLogger

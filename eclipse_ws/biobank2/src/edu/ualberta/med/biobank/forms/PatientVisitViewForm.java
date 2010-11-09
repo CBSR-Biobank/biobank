@@ -9,7 +9,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -65,7 +64,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         patientVisitAdapter = (PatientVisitAdapter) adapter;
         patientVisit = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
-        patientVisit.logLookup(SessionManager.getCurrentSite().getNameShort());
+        patientVisit.logLookup(null);
 
         setPartName("Visit " + patientVisit.getFormattedDateProcessed());
     }

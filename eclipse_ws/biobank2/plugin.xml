@@ -79,33 +79,15 @@
             name="Reports View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective"
+            class="edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective"
             icon="icons/patientPerspective.png"
-            id="edu.ualberta.med.biobank.perspective.patients"
-            name="Patients View">
+            id="edu.ualberta.med.biobank.perspective.processing"
+            name="Processing View">
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective"
             id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
             name="Samples Management Perspective">
-      </perspective>
-      <perspective
-            class="edu.ualberta.med.biobank.rcp.perspective.ShipmentAdministrationPerspective"
-            id="edu.ualberta.med.biobank.perspective.shipments"
-            icon="icons/shipment.png"
-            name="Shipment View">
-      </perspective>
-      <perspective
-            class="edu.ualberta.med.biobank.rcp.perspective.DispatchAdministrationPerspective"
-            id="edu.ualberta.med.biobank.perspective.dispatchs"
-            icon="icons/dispatch.png"
-            name="Dispatch View">
-      </perspective>
-      <perspective
-            class="edu.ualberta.med.biobank.rcp.perspective.LoggingPerspective"
-            icon="icons/table_row_delete.png"
-            id="edu.ualberta.med.biobank.perspective.logging"
-            name="Logging View">
       </perspective>
    </extension>
    <extension
@@ -169,20 +151,16 @@
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.reports"
-            name="Reports">
+            name="Reports Administration">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.patientAdmin"
-            name="Patient administration">
+            id="edu.ualberta.med.biobank.commands.processingAdmin"
+            name="Processing Administration">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.mainAdmin"
             name="Main Administration">
       </command>
-      <category
-            id="edu.ualberta.med.biobank.category.patientsAdmin"
-            name="Patient Administration">
-      </category>
       <command
             id="edu.ualberta.med.biobank.commands.patients.openPatientForm"
             name="Open Patient Form">
@@ -236,10 +214,6 @@
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientVisitDelete"
             name="Delete Patient Visit">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.shipmentAdmin"
-            name="Shipment administration">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.reloadViewWithTree"
@@ -296,10 +270,6 @@
       <command
             id="edu.ualberta.med.biobank.commands.addUser"
             name="Add User">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.dispatchAdmin"
-            name="Dispatch Administration">
       </command>
        <command
             id="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
@@ -434,9 +404,6 @@
                <reference
                      definitionId="biobank2.mainPerspectiveSelected">
                </reference>
-               <reference
-                     definitionId="biobank2.canUpdateSiteSelected">
-               </reference>
             </and>
          </activeWhen>
       </handler>
@@ -450,9 +417,6 @@
                </reference>
                <reference
                      definitionId="biobank2.mainPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.canUpdateSiteSelected">
                </reference>
             </and>
          </activeWhen>
@@ -547,6 +511,9 @@
             commandId="edu.ualberta.med.biobank.commands.mainAdmin">
          <enabledWhen>
          <and>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
                   <not>
                   <or>
                      <reference
@@ -557,9 +524,6 @@
                 </reference>
                 </or>
                   </not>
-                  <reference
-                  definitionId="biobank2.loggedIn">
-            	</reference>
             	</and>
          </enabledWhen>
       </handler>
@@ -569,19 +533,13 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.patientsPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.siteSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.canUpdateSiteSelected">
+                    definitionId="biobank2.processingPerspectiveSelected">
               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.patientsPerspectiveSelected">
+                  definitionId="biobank2.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -618,16 +576,13 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.shipmentsPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.siteSelected">
+                    definitionId="biobank2.processingPerspectiveSelected">
               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.shipmentsPerspectiveSelected">
+                  definitionId="biobank2.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -637,10 +592,7 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.shipmentsPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.siteSelected">
+                    definitionId="biobank2.processingPerspectiveSelected">
               </reference>
             </and>
          </activeWhen>
@@ -668,16 +620,13 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.patientsPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.siteSelected">
+                    definitionId="biobank2.processingPerspectiveSelected">
               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.patientsPerspectiveSelected">
+                  definitionId="biobank2.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -687,10 +636,7 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.patientsPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.siteSelected">
+                    definitionId="biobank2.processingPerspectiveSelected">
               </reference>
             </and>
          </activeWhen>
@@ -718,10 +664,7 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.patientsPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.siteSelected">
+                    definitionId="biobank2.processingPerspectiveSelected">
               </reference>
             </and>
          </activeWhen>
@@ -744,20 +687,22 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.PatientAdministrationHandler"
-            commandId="edu.ualberta.med.biobank.commands.patientAdmin">
+            class="edu.ualberta.med.biobank.handlers.ProcessingAdministrationHandler"
+            commandId="edu.ualberta.med.biobank.commands.processingAdmin">
          <enabledWhen>
             <and>
                <reference
                      definitionId="biobank2.loggedIn">
                </reference>
-               <reference
-                     definitionId="biobank2.siteSelected">
-               </reference>
                <not>
-                <reference
-                     definitionId="biobank2.patientsPerspectiveSelected">
-               </reference>
+                  <or>
+                     <reference
+                           definitionId="biobank2.processingPerspectiveSelected">
+                     </reference>
+                     <reference
+                           definitionId="biobank2.sampleManagementPerspectiveSelected">
+                     </reference>
+                  </or>
                </not>
             </and>
          </enabledWhen>
@@ -768,10 +713,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.patientsPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.siteSelected">
+                     definitionId="biobank2.processingPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -799,10 +741,7 @@
          <activeWhen>
             <and>
                <reference
-                     definitionId="biobank2.patientsPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.siteSelected">
+                     definitionId="biobank2.processingPerspectiveSelected">
                </reference>
             </and>
          </activeWhen>
@@ -821,30 +760,6 @@
                      </instanceof>
                   </iterate>
           	  </with>
-            </and>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.ShipmentAdministrationHandler"
-            commandId="edu.ualberta.med.biobank.commands.shipmentAdmin">
-         <enabledWhen>
-           <and>
-               <reference
-                     definitionId="biobank2.loggedIn">
-               </reference>
-               <reference
-                     definitionId="biobank2.siteSelected">
-               </reference>
-               <not>
-               <or>
-                <reference
-                     definitionId="biobank2.shipmentsPerspectiveSelected">
-               </reference>
-               <reference
-                     definitionId="biobank2.sampleManagementPerspectiveSelected">
-               </reference>
-               </or>
-               </not>
             </and>
          </enabledWhen>
       </handler>
@@ -873,9 +788,6 @@
             <and>
                <reference
                      definitionId="biobank2.loggedIn">
-               </reference>
-               <reference
-                     definitionId="biobank2.siteSelected">
                </reference>
              </and>
          </activeWhen>
@@ -906,11 +818,6 @@
                <reference
                      definitionId="biobank2.loggedIn">
                </reference>
-               <not>
-                  <reference
-                        definitionId="biobank2.loggingPerspectiveSelected">
-                  </reference>
-               </not>
             </and>
          </enabledWhen>
       </handler>
@@ -1001,45 +908,18 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.DispatchAdministrationHandler"
-            commandId="edu.ualberta.med.biobank.commands.dispatchAdmin">
-         <enabledWhen>
-            <and>
-               <not>
-                  <or>
-                     <reference
-                           definitionId="biobank2.dispatchPerspectiveSelected">
-                     </reference>
-                     <reference
-                           definitionId="biobank2.sampleManagementPerspectiveSelected">
-                     </reference>
-                  </or>
-               </not>
-               <reference
-                     definitionId="biobank2.loggedIn">
-               </reference>
-                <reference
-                     definitionId="biobank2.siteSelected">
-               </reference>
-            </and>
-         </enabledWhen>
-      </handler>
-      <handler
             class="edu.ualberta.med.biobank.handlers.DispatchAddHandler"
             commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd">
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.dispatchPerspectiveSelected">
-              </reference>
-              <reference
-                    definitionId="biobank2.siteSelected">
+                    definitionId="biobank2.processingPerspectiveSelected">
               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.dispatchPerspectiveSelected">
+                  definitionId="biobank2.processingPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -1158,41 +1038,20 @@
                 </command>
          </menu>
          <menu
-               id="edu.ualberta.med.biobank.menu.shipments"
-               label="Shipments">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
-                  icon="icons/shipment_add.png"
-                  label="Add Shipment"
-                  style="push">
-            </command>
-         </menu>
-         <menu
-               id="edu.ualberta.med.biobank.menu.dispatch"
-               label="Dispatches">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
-                  icon="icons/dispatch_add.png"
-                  label="Add Dispatch"
-                  style="push">
-            </command>
-         </menu>
-         <menu
-               id="edu.ualberta.med.biobank.menu.patients"
-               label="Patients">
+               id="edu.ualberta.med.biobank.menu.processing"
+               label="Processing">
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
                   icon="icons/patient_add.png"
                   label="Add Patient"
                   style="push">
-            </command>      
+            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
                   icon="icons/patient_merge.png"
                   label="Merge Patients"
                   style="push">
             </command>
-            
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientDelete"
                   icon="icons/patient_delete.png"
@@ -1205,10 +1064,30 @@
                   label="Add Patient Visit"
                   style="push">
             </command>
-             <command
+            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientVisitDelete"
                   icon="icons/patientVisit_delete.png"
                   label="Delete Patient Visit"
+                  style="push">
+            </command>
+            <separator
+                  name="biobank2.separator2"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
+                  icon="icons/shipment_add.png"
+                  label="Add Shipment"
+                  style="push">
+            </command>
+            <separator
+                  name="biobank2.separator1"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
+                  icon="icons/dispatch_add.png"
+                  label="Add Dispatch"
                   style="push">
             </command>
          </menu>
@@ -1256,33 +1135,15 @@
                   style="push">
             </command>
             <command
-               commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+               commandId="edu.ualberta.med.biobank.commands.processingAdmin"
                icon="icons/patientPerspective.png"
-               label="Patients View"
+               label="Processing View"
                style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-                  icon="icons/shipment.png"
-                  label="Shipment View"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatchAdmin"
-                  icon="icons/dispatch.png"
-                  label="Dispatch View"
-                  style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.reports"
                   icon="icons/reportsPerspective.png"
                   label="Reports View"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.logging"
-                  icon="icons/table_row_delete.png"
-                  label="Logging View"
                   style="push">
             </command>
          </menu>
@@ -1358,23 +1219,6 @@
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
          <toolbar
-               id="edu.ualberta.med.biobank.toolbar.siteSelection">
-            <control
-                  class="edu.ualberta.med.biobank.rcp.SiteCombo">
-               <visibleWhen
-                     checkEnabled="false">
-                  <not>
-                     <reference
-                           definitionId="biobank2.reportsPerspectiveSelected">
-                     </reference>
-                  </not>
-               </visibleWhen>
-            </control>
-         </toolbar>
-      </menuContribution>
-      <menuContribution
-            locationURI="toolbar:org.eclipse.ui.main.toolbar?before=edu.ualberta.med.biobank.toolbar.siteSelection">
-         <toolbar
                id="edu.ualberta.med.biobank.toolbar.serverCommands">
             <command
                   commandId="edu.ualberta.med.biobank.commands.login"
@@ -1410,36 +1254,17 @@
                   style="push">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+                  commandId="edu.ualberta.med.biobank.commands.processingAdmin"
                   icon="icons/patientPerspective.png"
-                  label="Patients View"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-                  icon="icons/shipment.png"
-                  label="Shipment View"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatchAdmin"
-                  icon="icons/dispatch.png"
-                  label="Dispatch View"
+                  label="Processing View"
                   style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.reports"
                   icon="icons/reportsPerspective.png"
-                  label="Reports"
+                  label="Reports View"
                   style="push"
-                  tooltip="Reports">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.logging"
-                  icon="icons/table_row_delete.png"
-                  label="Logging"
-                  style="push"
-                  tooltip="Logging: search for specific information in stored logs">
+                  tooltip="Reports View">
             </command>
          </toolbar>
       </menuContribution>
@@ -1523,6 +1348,13 @@
                   tooltip="Search">
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.logging"
+                  icon="icons/table_row_delete.png"
+                  label="Logging"
+                  style="push"
+                  tooltip="Logging">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
@@ -1540,7 +1372,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1558,7 +1390,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1570,7 +1402,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1582,7 +1414,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1594,7 +1426,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
                <parameter
@@ -1610,7 +1442,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
                <parameter
@@ -1626,7 +1458,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.patientsPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
                <parameter
@@ -1659,7 +1491,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.shipmentsPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1671,7 +1503,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.shipmentsPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1700,7 +1532,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.dispatchPerspectiveSelected">
+                        definitionId="biobank2.processingPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -1726,17 +1558,6 @@
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.main">
          <view
-               closeable="true"
-               id="org.eclipse.pde.runtime.LogView"
-               minimized="false"
-               moveable="true"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
-         <view
                closeable="false"
                id="edu.ualberta.med.biobank.views.SessionsView"
                minimized="false"
@@ -1760,20 +1581,21 @@
                standalone="false"
                visible="false">
          </view>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.reports">
          <view
                closeable="true"
-               id="org.eclipse.pde.runtime.LogView"
+               id="edu.ualberta.med.biobank.views.LoggingView"
                minimized="false"
                moveable="true"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss"
+               ratio="0.3"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.SessionsView"
                showTitle="true"
                standalone="false"
                visible="false">
          </view>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective.reports">
          <view
                closeable="false"
                id="edu.ualberta.med.biobank.views.ReportsView"
@@ -1788,7 +1610,7 @@
          </view>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.patients">
+            targetID="edu.ualberta.med.biobank.perspective.processing">
          <view
                closeable="true"
                id="org.eclipse.pde.runtime.LogView"
@@ -1804,8 +1626,8 @@
                closeable="false"
                id="edu.ualberta.med.biobank.views.PatientsAdminView"
                minimized="false"
-               moveable="false"
-               ratio="0.20"
+               moveable="true"
+               ratio="0.40"
                relationship="left"
                relative="org.eclipse.ui.editorss"
                showTitle="false"
@@ -1823,6 +1645,30 @@
                showTitle="true"
                standalone="false"
                visible="false">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.ShipmentAdminView"
+               minimized="false"
+               moveable="truefalse"
+               ratio="0.20"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
+               minimized="false"
+               moveable="true"
+               ratio="0.20"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
+               showTitle="false"
+               standalone="false"
+               visible="true">
          </view>
       </perspectiveExtension>
       <perspectiveExtension
@@ -1846,97 +1692,6 @@
                moveable="true"
                relationship="stack"
                relative="org.eclipse.ui.console.ConsoleView"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.shipments">
-         <view
-               closeable="true"
-               id="org.eclipse.pde.runtime.LogView"
-               minimized="false"
-               moveable="true"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.ShipmentAdminView"
-               minimized="false"
-               moveable="false"
-               ratio="0.20"
-               relationship="left"
-               relative="org.eclipse.ui.editorss"
-               showTitle="false"
-               standalone="false"
-               visible="true">
-         </view>
-         <view
-               closeable="true"
-               id="edu.ualberta.med.biobank.views.SearchView"
-               minimized="false"
-               moveable="true"
-               ratio="0.85"
-               relationship="bottom"
-               relative="edu.ualberta.med.biobank.views.ShipmentAdminView"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.logging">
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.LoggingView"
-               minimized="false"
-               moveable="false"
-               ratio="0.3"
-               relationship="left"
-               relative="org.eclipse.ui.editorss"
-               showTitle="false"
-               standalone="false"
-               visible="true">
-         </view>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.dispatchs">
-         <view
-               closeable="true"
-               id="org.eclipse.pde.runtime.LogView"
-               minimized="false"
-               moveable="true"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
-               minimized="false"
-               moveable="false"
-               ratio="0.20"
-               relationship="left"
-               relative="org.eclipse.ui.editorss"
-               showTitle="false"
-               standalone="false"
-               visible="true">
-         </view>
-         <view
-               closeable="true"
-               id="edu.ualberta.med.biobank.views.SearchView"
-               minimized="false"
-               moveable="true"
-               ratio="0.85"
-               relationship="bottom"
-               relative="edu.ualberta.med.biobank.views.DispatchAdministrationView"
                showTitle="true"
                standalone="false"
                visible="false">
@@ -2361,13 +2116,9 @@
            schemeId="biobank2.scheme"
            sequence="M1+M2+A">
       </key>
-      <key commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+      <key commandId="edu.ualberta.med.biobank.commands.processingAdmin"
            schemeId="biobank2.scheme"
            sequence="M1+M2+P">
-      </key>
-      <key commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-           schemeId="biobank2.scheme"
-           sequence="M1+M2+S">
       </key>
       <key commandId="edu.ualberta.med.biobank.commands.reports"
            schemeId="biobank2.scheme"
@@ -2483,11 +2234,6 @@
             schemeId="biobank2.scheme"
             sequence="M1+D">
       </key>
-      <key
-            commandId="edu.ualberta.med.biobank.commands.dispatchAdmin"
-            schemeId="biobank2.scheme"
-            sequence="M1+M2+D">
-      </key>
    </extension>
     <extension
          point="org.eclipse.ui.preferencePages">
@@ -2578,21 +2324,21 @@
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
             icon="icons/patientPerspective.png"
             id="edu.ualberta.med.biobank.views.PatientsAdminView"
-            name="Patient administration"
+            name="Patients"
             restorable="true">
       </view>
       <view
             class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
             icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.views.ShipmentAdminView"
-            name="Shipment Administration"
+            name="Shipments"
             restorable="true">
       </view>
       <view
             class="edu.ualberta.med.biobank.views.DispatchAdministrationView"
             icon="icons/dispatch.png"
             id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
-            name="Dispatch Administration"
+            name="Dispatches"
             restorable="true">
       </view>
       <view
@@ -2632,29 +2378,11 @@
          </with>
       </definition>
       <definition
-            id="biobank2.patientsPerspectiveSelected">
+            id="biobank2.processingPerspectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
-                  value="edu.ualberta.med.biobank.perspective.patients">
-            </equals>
-         </with>
-      </definition>
-          <definition
-            id="biobank2.shipmentsPerspectiveSelected">
-         <with
-               variable="activeWorkbenchWindow.activePerspective">
-            <equals
-                  value="edu.ualberta.med.biobank.perspective.shipments">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank2.dispatchPerspectiveSelected">
-         <with
-               variable="activeWorkbenchWindow.activePerspective">
-            <equals
-                  value="edu.ualberta.med.biobank.perspective.dispatchs">
+                  value="edu.ualberta.med.biobank.perspective.processing">
             </equals>
          </with>
       </definition>
@@ -2713,17 +2441,6 @@
          </with>
       </definition>
       <definition
-            id="biobank2.siteSelected">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.siteSelectionId">
-            <not>
-               <equals
-                     value="-9999">
-               </equals>
-            </not>
-         </with>
-      </definition>
-      <definition
             id="oneElementSelected">
          <with
                variable="selection">
@@ -2750,15 +2467,6 @@
                      </with>
       </definition>
       <definition
-            id="biobank2.loggingPerspectiveSelected">
-         <with
-               variable="activeWorkbenchWindow.activePerspective">
-            <equals
-                  value="edu.ualberta.med.biobank.perspective.logging">
-            </equals>
-         </with>
-      </definition>
-      <definition
             id="biobank2.editorDirty">
          <with
                variable="activeEditorId">
@@ -2775,15 +2483,6 @@
                variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
             <equals
                   value="confirmEnabled">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank2.canUpdateSiteSelected">
-         <with
-               variable="edu.ualberta.med.biobank.sourceprovider.canUpdateSiteSelected">
-            <equals
-                  value="true">
             </equals>
          </with>
       </definition>

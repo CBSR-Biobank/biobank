@@ -37,6 +37,7 @@ import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -88,6 +89,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget dateDrawnWidget;
 
+    private ComboViewer siteCombo;
+
+    protected SiteWrapper selectedSite;
+
     @Override
     public void init() {
         Assert.isTrue(adapter instanceof PatientVisitAdapter,
@@ -99,8 +104,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patient = patientVisit.getPatient();
         retrieve();
         try {
-            patientVisit
-                .logEdit(SessionManager.getCurrentSite().getNameShort());
+            patientVisit.logEdit(null);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log edit failed", e);
         }
@@ -146,9 +150,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        SiteWrapper site = SessionManager.getCurrentSite();
-
-        createReadOnlyLabelledField(client, SWT.NONE, "Site", site.getName());
+        widgetCreator.createLabel(client, "Site");
+        siteCombo = new BasicSiteCombo(client, appService);
+        setFirstControl(siteCombo.getControl());
 
         createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
             .getStudy().getName());
@@ -201,10 +205,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     patientVisit.setShipment((ShipmentWrapper) selectedObject);
                 }
             });
-        setFirstControl(shipmentsComboViewer.getControl());
 
-        if (SessionManager.getUser().isSiteAdministrator(
-            SessionManager.getCurrentSite())) {
+        if (SessionManager.getUser().isSiteAdministrator(selectedSite)) {
             final Button shipmentsListCheck = toolkit.createButton(composite,
                 "Last 7 days", SWT.CHECK);
             shipmentsListCheck.setSelection(true);

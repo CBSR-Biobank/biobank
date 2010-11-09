@@ -10,7 +10,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -67,7 +66,7 @@ public class AliquotViewForm extends BiobankViewForm {
         aliquot = aliquotAdapter.getAliquot();
         retrieveAliquot();
         try {
-            aliquot.logLookup(SessionManager.getCurrentSite().getNameShort());
+            aliquot.logLookup(aliquot.getSiteString());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log lookup failed", e);
         }

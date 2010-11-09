@@ -50,6 +50,7 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
@@ -129,6 +130,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private Composite clientInsideGridScroll;
 
+    private BasicSiteCombo siteCombo;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -180,8 +183,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         drawerLabel = toolkit.createLabel(clientInsideGridScroll, "Drawer"); //$NON-NLS-1$
 
         List<ContainerTypeWrapper> types = ContainerTypeWrapper
-            .getContainerTypesInSite(appService,
-                SessionManager.getCurrentSite(), cabinetNameContains, false);
+            .getContainerTypesInSite(appService, siteCombo.getSite(),
+                cabinetNameContains, false);
         ContainerTypeWrapper cabinetType = null;
         ContainerTypeWrapper drawerType = null;
         if (types.size() == 0) {
@@ -222,6 +225,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
+
+        widgetCreator.createLabel(fieldsComposite, "Site");
+        siteCombo = new BasicSiteCombo(fieldsComposite, appService);
+        setFirstControl(siteCombo.getControl());
 
         // radio button to choose new or move
         radioNew = toolkit.createButton(fieldsComposite,
@@ -466,8 +473,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     - removeSize);
                 labelsTested.add(binLabel);
                 for (ContainerWrapper cont : ContainerWrapper
-                    .getContainersInSite(appService,
-                        SessionManager.getCurrentSite(), binLabel)) {
+                    .getContainersInSite(appService, siteCombo.getSite(),
+                        binLabel)) {
                     boolean canContainSamples = cont.getContainerType()
                         .getSampleTypeCollection() != null
                         && cont.getContainerType().getSampleTypeCollection()
@@ -605,8 +612,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private void initCabinetContainerTypesList() throws ApplicationException {
         cabinetContainerTypes = ContainerTypeWrapper.getContainerTypesInSite(
-            appService, SessionManager.getCurrentSite(), cabinetNameContains,
-            false);
+            appService, siteCombo.getSite(), cabinetNameContains, false);
     }
 
     private List<SampleTypeWrapper> getCabinetSampleTypes()
@@ -614,7 +620,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         if (cabinetSampleTypes == null) {
             cabinetSampleTypes = SampleTypeWrapper
                 .getSampleTypeForContainerTypes(appService,
-                    SessionManager.getCurrentSite(), cabinetNameContains);
+                    siteCombo.getSite(), cabinetNameContains);
         }
         return cabinetSampleTypes;
     }
@@ -839,16 +845,15 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         appendLogNLS("Cabinet.activitylog.checkingParent", binLabel, //$NON-NLS-1$ 
             aliquot.getSampleType().getName());
         List<ContainerWrapper> containers = ContainerWrapper
-            .getContainersHoldingSampleType(appService,
-                SessionManager.getCurrentSite(), binLabel,
-                aliquot.getSampleType());
+            .getContainersHoldingSampleType(appService, siteCombo.getSite(),
+                binLabel, aliquot.getSampleType());
         if (containers.size() == 1) {
             bin = containers.get(0);
             drawer = bin.getParent();
             cabinet = drawer.getParent();
         } else if (containers.size() == 0) {
             containers = ContainerWrapper.getContainersInSite(appService,
-                SessionManager.getCurrentSite(), binLabel);
+                siteCombo.getSite(), binLabel);
             String errorMsg = null;
             if (containers.size() > 0) {
                 errorMsg = Messages.getFormattedString(

@@ -1,11 +1,14 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Set;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -17,7 +20,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -29,6 +31,7 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
@@ -82,6 +85,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private NotNullValidator departedValidator;
 
+    private BasicSiteCombo siteCombo;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
@@ -90,9 +95,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         shipmentAdapter = (ShipmentAdapter) adapter;
         shipment = shipmentAdapter.getWrapper();
-        site = SessionManager.getCurrentSite();
+        site = shipment.getSite();
         try {
-            site.reload();
             shipment.reload();
         } catch (Exception e) {
             logger.error("Error while retrieving shipment", e);
@@ -117,6 +121,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createPatientsSection();
     }
 
+    @SuppressWarnings("unchecked")
     private void createMainSection() throws ApplicationException {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -125,22 +130,29 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Site");
-        setTextValue(siteLabel, site.getName());
+        widgetCreator.createLabel(client, "Site");
+        siteCombo = new BasicSiteCombo(client, appService);
+
+        setFirstControl(siteCombo.getCombo());
+
+        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                shipment.setSite(siteCombo.getSite());
+                if (clinicsComboViewer != null)
+                    clinicsComboViewer.setInput(siteCombo.getSite()
+                        .getWorkingClinicCollection());
+            }
+        });
 
         ClinicWrapper selectedClinic = null;
         if (shipment.isNew()) {
             // choose clinic for new shipment
-            Set<ClinicWrapper> siteClinics = SessionManager.getCurrentSite()
-                .getWorkingClinicCollection();
             selectedClinic = shipment.getClinic();
-            if (siteClinics.size() == 1) {
-                selectedClinic = siteClinics.toArray(new ClinicWrapper[1])[0];
-            }
             clinicsComboViewer = createComboViewer(client, "Clinic",
-                siteClinics, selectedClinic, "A clinic should be selected",
-                new ComboSelectionUpdate() {
+                new ArrayList<ClinicWrapper>(), selectedClinic,
+                "A clinic should be selected", new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
                         shipment.setClinic((ClinicWrapper) selectedObject);
@@ -159,7 +171,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                         }
                     }
                 });
-            setFirstControl(clinicsComboViewer.getCombo());
         } else {
             BiobankText clinicLabel = createReadOnlyLabelledField(client,
                 SWT.NONE, "Clinic");
@@ -167,6 +178,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 clinicLabel.setText(shipment.getClinic().getName());
             }
         }
+        if (shipment.isNew())
+            siteCombo.setSelection(new StructuredSelection(
+                ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
+        else
+            siteCombo.setSelection(new StructuredSelection(site));
 
         waybillLabel = widgetCreator.createLabel(client, "Waybill");
         waybillLabel.setLayoutData(new GridData(
@@ -316,7 +332,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        shipment.setSite(site);
         if (!Boolean.TRUE.equals(shipment.getClinic().getSendsShipments())) {
             shipment.setWaybill(null);
         }

@@ -5,7 +5,7 @@ import org.eclipse.ui.IPerspectiveFactory;
 
 public class ShipmentAdministrationPerspective implements IPerspectiveFactory {
 
-    public static final String ID = "edu.ualberta.med.biobank.perspective.shipments";
+    public static final String ID = "edu.ualberta.med.biobank.perspective.processing";
 
     @Override
     public void createInitialLayout(IPageLayout layout) {

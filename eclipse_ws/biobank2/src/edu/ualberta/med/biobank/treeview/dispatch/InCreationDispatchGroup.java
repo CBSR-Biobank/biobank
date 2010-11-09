@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.ArrayList;
 import java.util.Collection;
 
 import org.eclipse.jface.viewers.TreeViewer;
@@ -26,11 +25,8 @@ public class InCreationDispatchGroup extends AbstractDispatchGroup {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        SiteWrapper site = SessionManager.getCurrentSite();
-        if (!SessionManager.getInstance().isAllSitesSelected()) {
-            return site.getInCreationDispatchCollection();
-        }
-        return new ArrayList<ModelWrapper<?>>();
+        return SiteWrapper.getUsersInCreationDispatchCollection(SessionManager
+            .getAppService());
     }
 
     @Override
@@ -50,7 +46,6 @@ public class InCreationDispatchGroup extends AbstractDispatchGroup {
     protected void addDispatch() {
         DispatchWrapper shipment = new DispatchWrapper(
             SessionManager.getAppService());
-        shipment.setSender(SessionManager.getCurrentSite());
         DispatchAdapter shipNode = new DispatchAdapter(this, shipment);
         shipNode.openEntryForm();
     }

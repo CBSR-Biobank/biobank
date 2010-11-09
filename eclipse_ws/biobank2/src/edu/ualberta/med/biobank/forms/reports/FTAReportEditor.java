@@ -10,7 +10,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -42,12 +41,8 @@ public class FTAReportEditor extends ReportsEditor {
     protected ComboViewer createStudyComboOption(String labelText,
         Composite parent) throws ApplicationException {
         Collection<StudyWrapper> studyWrappers;
-        SiteWrapper site = SessionManager.getCurrentSite();
-        if (site.getName().compareTo("All Sites") != 0)
-            studyWrappers = site.getStudyCollection(true);
-        else
-            studyWrappers = StudyWrapper.getAllStudies(SessionManager
-                .getAppService());
+        studyWrappers = StudyWrapper.getAllStudies(SessionManager
+            .getAppService());
         ComboViewer combo = widgetCreator.createComboViewer(parent, labelText,
             studyWrappers, null);
         combo.setLabelProvider(new BiobankLabelProvider() {

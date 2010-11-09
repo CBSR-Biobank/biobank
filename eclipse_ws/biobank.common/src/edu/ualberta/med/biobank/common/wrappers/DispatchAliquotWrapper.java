@@ -21,7 +21,7 @@ public class DispatchAliquotWrapper extends ModelWrapper<DispatchAliquot> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "aliquot", "shipment", "state", "comment" };
+        return new String[] { "aliquot", "dispatch", "state", "comment" };
     }
 
     @Override
@@ -63,8 +63,8 @@ public class DispatchAliquotWrapper extends ModelWrapper<DispatchAliquot> {
             newAliquot);
     }
 
-    public DispatchWrapper getShipment() {
-        DispatchWrapper ship = (DispatchWrapper) propertiesMap.get("shipment");
+    public DispatchWrapper getDispatch() {
+        DispatchWrapper ship = (DispatchWrapper) propertiesMap.get("dispatch");
         if (ship == null) {
             Dispatch s = wrappedObject.getDispatch();
             if (s != null) {
@@ -74,15 +74,15 @@ public class DispatchAliquotWrapper extends ModelWrapper<DispatchAliquot> {
         return ship;
     }
 
-    public void setShipment(DispatchWrapper ship) {
-        propertiesMap.put("shipment", ship);
+    public void setDispatch(DispatchWrapper ship) {
+        propertiesMap.put("dispatch", ship);
         Dispatch oldShip = wrappedObject.getDispatch();
         Dispatch newShip = null;
         if (ship != null) {
             newShip = ship.getWrappedObject();
         }
         wrappedObject.setDispatch(newShip);
-        propertyChangeSupport.firePropertyChange("shipment", oldShip, newShip);
+        propertyChangeSupport.firePropertyChange("dispatch", oldShip, newShip);
     }
 
     public Integer getState() {
@@ -126,8 +126,8 @@ public class DispatchAliquotWrapper extends ModelWrapper<DispatchAliquot> {
             if (isNew() && dsa.isNew()) {
                 return getAliquot() != null && dsa.getAliquot() != null
                     && getAliquot().equals(dsa.getAliquot())
-                    && getShipment() != null && dsa.getShipment() != null
-                    && getShipment().equals(dsa.getShipment());
+                    && getDispatch() != null && dsa.getDispatch() != null
+                    && getDispatch().equals(dsa.getDispatch());
             }
         }
         return super.equals(object);
