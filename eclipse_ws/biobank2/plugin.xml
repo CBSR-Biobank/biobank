@@ -1030,7 +1030,7 @@
          <activeWhen>
             <and>
               <reference
-                    definitionId="biobank2.dispatchsPerspectiveSelected">
+                    definitionId="biobank2.dispatchPerspectiveSelected">
               </reference>
               <reference
                     definitionId="biobank2.siteSelected">
@@ -1042,7 +1042,7 @@
          </activeWhen>
          <enabledWhen>
             <reference
-                  definitionId="biobank2.dispatchsPerspectiveSelected">
+                  definitionId="biobank2.dispatchPerspectiveSelected">
             </reference>
          </enabledWhen>
       </handler>
@@ -1703,7 +1703,7 @@
                <visibleWhen
                      checkEnabled="false">
                   <reference
-                        definitionId="biobank2.dispatchsPerspectiveSelected">
+                        definitionId="biobank2.dispatchPerspectiveSelected">
                   </reference>
                </visibleWhen>
             </command>
@@ -2653,7 +2653,7 @@
          </with>
       </definition>
       <definition
-            id="biobank2.dispatchsPerspectiveSelected">
+            id="biobank2.dispatchPerspectiveSelected">
          <with
                variable="activeWorkbenchWindow.activePerspective">
             <equals
@@ -2778,15 +2778,6 @@
                variable="edu.ualberta.med.biobank.sourceprovider.confirmState">
             <equals
                   value="confirmEnabled">
-            </equals>
-         </with>
-      </definition>
-      <definition
-            id="biobank2.dispatchPerspectiveSelected">
-         <with
-               variable="activeWorkbenchWindow.activePerspective">
-            <equals
-                  value="edu.ualberta.med.biobank.perspective.dispatchs">
             </equals>
          </with>
       </definition>
