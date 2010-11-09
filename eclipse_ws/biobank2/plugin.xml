@@ -915,6 +915,9 @@
               <reference
                     definitionId="biobank2.processingPerspectiveSelected">
               </reference>
+              <reference
+                    definitionId="biobank2.canUpdateSiteSelected">
+              </reference>
             </and>
          </activeWhen>
          <enabledWhen>
