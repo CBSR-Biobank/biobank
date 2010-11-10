@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.server.orm;
 
+import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.dao.DAOException;
 import gov.nih.nci.system.dao.Request;
@@ -32,7 +33,13 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     @Override
     public Response query(Request request) throws DAOException {
         Object obj = request.getRequest();
-        if (obj instanceof BiobankSQLCriteria) {
+        if (obj instanceof Report) {
+            // TODO: write/ migrate ReportRunner class.
+            // Response rsp = new Response();
+            // Criteria c = getSession().createCriteria(arg0);
+            // rsp.setResponse(c.list());
+            return null;
+        } else if (obj instanceof BiobankSQLCriteria) {
             try {
                 return query(request, (BiobankSQLCriteria) obj);
             } catch (JDBCException ex) {

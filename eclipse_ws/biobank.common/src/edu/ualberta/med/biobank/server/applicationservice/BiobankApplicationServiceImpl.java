@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
@@ -236,6 +237,11 @@ public class BiobankApplicationServiceImpl extends
     public List<Object> launchReport(BiobankReport report)
         throws ApplicationException {
         return ReportFactory.createReport(report).generate(this);
+    }
+
+    @Override
+    public List<Object> runReport(Report report) throws ApplicationException {
+        return this.privateQuery(report, Report.class.getName());
     }
 
     @Override
