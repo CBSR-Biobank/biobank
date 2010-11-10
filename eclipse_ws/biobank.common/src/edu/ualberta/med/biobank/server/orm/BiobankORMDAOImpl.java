@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.orm;
 
 import edu.ualberta.med.biobank.model.Report;
+import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.dao.DAOException;
 import gov.nih.nci.system.dao.Request;
@@ -38,6 +39,9 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
             // Response rsp = new Response();
             // Criteria c = getSession().createCriteria(arg0);
             // rsp.setResponse(c.list());
+            Report report = (Report) obj;
+            for (ReportColumn col : report.getReportColumnCollection()) {
+            }
             return null;
         } else if (obj instanceof BiobankSQLCriteria) {
             try {
