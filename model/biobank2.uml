@@ -27,7 +27,7 @@
       <fontsize>12</fontsize>
       <defaultstereotypeview>0</defaultstereotypeview>
       <generationoutputdir>/tmp</generationoutputdir>
-      <activediagram>Report</activediagram>
+      <activediagram>DM-REPORT</activediagram>
     </settings>
     <searchpath href="PROJECT_DIR" />
     <members>
@@ -157,7 +157,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Nov 15 08:22:57 MST 2010'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Nov 15 08:39:47 MST 2010'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -9520,7 +9520,7 @@
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Class xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000048E5'
-                  name = 'FILTER' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                  name = 'ENTITY_FILTER' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                   isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
                   <UML:ModelElement.clientDependency>
                     <UML:Dependency xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000048F2'/>
@@ -9552,7 +9552,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000004905'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Filter.id</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.EntityFilter.id</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
                           </UML:TaggedValue.type>
@@ -9576,7 +9576,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000004906'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Entity.filterCollection</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Entity.entityFilterCollection</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
                           </UML:TaggedValue.type>
@@ -9600,7 +9600,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000004907'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Filter.filterType</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.EntityFilter.filterType</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
                           </UML:TaggedValue.type>
@@ -9624,7 +9624,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000004908'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Filter.name</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.EntityFilter.name</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
                           </UML:TaggedValue.type>
@@ -9648,7 +9648,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000569C'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Filter.property</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.EntityFilter.property</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
                           </UML:TaggedValue.type>
@@ -9702,7 +9702,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000056B2'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Filter.propertyType</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.EntityFilter.propertyType</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
                           </UML:TaggedValue.type>
@@ -9766,7 +9766,7 @@
                   </UML:Association.connection>
                 </UML:Association>
                 <UML:Class xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000490C'
-                  name = 'COLUMN' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                  name = 'ENTITY_COLUMN' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                   isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
                   <UML:ModelElement.clientDependency>
                     <UML:Dependency xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000491E'/>
@@ -9789,7 +9789,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000004919'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Column.id</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.EntityColumn.id</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
                           </UML:TaggedValue.type>
@@ -9813,7 +9813,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000561D'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Entity.columnCollection</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Entity.entityColumnCollection</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
                           </UML:TaggedValue.type>
@@ -9837,7 +9837,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000491B'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Column.name</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.EntityColumn.name</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
                           </UML:TaggedValue.type>
@@ -9861,7 +9861,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000491C'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Column.property</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.EntityColumn.property</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
                           </UML:TaggedValue.type>
@@ -9915,7 +9915,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000056B1'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Column.propertyType</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.EntityColumn.propertyType</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
                           </UML:TaggedValue.type>
@@ -9992,7 +9992,7 @@
                   </UML:Dependency.supplier>
                 </UML:Dependency>
                 <UML:Dependency xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000048F2'
-                  name = 'FILTER -&gt; Filter' isSpecification = 'false'>
+                  name = 'ENTITY_FILTER -&gt; EntityFilter' isSpecification = 'false'>
                   <UML:ModelElement.stereotype>
                     <UML:Stereotype xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000EBC4'/>
                   </UML:ModelElement.stereotype>
@@ -10004,7 +10004,7 @@
                   </UML:Dependency.supplier>
                 </UML:Dependency>
                 <UML:Dependency xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000491E'
-                  name = 'COLUMN -&gt; column' isSpecification = 'false'>
+                  name = 'ENTITY_COLUMN -&gt; EntityColumn' isSpecification = 'false'>
                   <UML:ModelElement.stereotype>
                     <UML:Stereotype xmi.idref = '-127--128-23-33--7f5efc28:11d4f40695b:-8000:000000000000EBC4'/>
                   </UML:ModelElement.stereotype>
@@ -10147,7 +10147,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000561B'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.ReportColumn.column</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.ReportColumn.entityColumn</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
                           </UML:TaggedValue.type>
@@ -10387,7 +10387,7 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005668'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.ReportFilter.filter</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.ReportFilter.entityFilter</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
                           </UML:TaggedValue.type>
@@ -15670,7 +15670,7 @@
                                       </UML:Classifier.feature>
                                     </UML:Class>
                                     <UML:Class xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000185F'
-                                      name = 'Filter' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                                      name = 'EntityFilter' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                                       isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
                                       <UML:Classifier.feature>
                                         <UML:Attribute xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000003C1F'
@@ -15890,7 +15890,7 @@
                                           </UML:AssociationEnd.participant>
                                         </UML:AssociationEnd>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000003C29'
-                                          name = 'filter' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                                          name = 'entityFilter' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
                                           ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                                           <UML:AssociationEnd.multiplicity>
                                             <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000003C2A'>
@@ -16006,7 +16006,7 @@
                                           </UML:AssociationEnd.participant>
                                         </UML:AssociationEnd>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000484A'
-                                          name = 'filterCollection' visibility = 'public' isSpecification = 'false'
+                                          name = 'entityFilterCollection' visibility = 'public' isSpecification = 'false'
                                           isNavigable = 'true' ordering = 'unordered' aggregation = 'none' targetScope = 'instance'
                                           changeability = 'changeable'>
                                           <UML:AssociationEnd.multiplicity>
@@ -16024,7 +16024,7 @@
                                       </UML:Association.connection>
                                     </UML:Association>
                                     <UML:Class xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000484F'
-                                      name = 'Column' visibility = 'public' isSpecification = 'false' isRoot = 'false'
+                                      name = 'EntityColumn' visibility = 'public' isSpecification = 'false' isRoot = 'false'
                                       isLeaf = 'false' isAbstract = 'false' isActive = 'false'>
                                       <UML:Classifier.feature>
                                         <UML:Attribute xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000004850'
@@ -16280,7 +16280,7 @@
                                           </UML:AssociationEnd.participant>
                                         </UML:AssociationEnd>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000489B'
-                                          name = 'column' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
+                                          name = 'entityColumn' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
                                           ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                                           <UML:AssociationEnd.multiplicity>
                                             <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000489C'>
@@ -16315,7 +16315,7 @@
                                           </UML:AssociationEnd.participant>
                                         </UML:AssociationEnd>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000048A4'
-                                          name = 'columnCollection' visibility = 'public' isSpecification = 'false'
+                                          name = 'entityColumnCollection' visibility = 'public' isSpecification = 'false'
                                           isNavigable = 'true' ordering = 'unordered' aggregation = 'none' targetScope = 'instance'
                                           changeability = 'changeable'>
                                           <UML:AssociationEnd.multiplicity>
@@ -39143,7 +39143,7 @@
       <text name="Fig0.3.2"
         x="225"
         y="875"
-        width="237"
+        width="240"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39159,7 +39159,7 @@
       <text name="Fig0.3.3"
         x="225"
         y="890"
-        width="339"
+        width="348"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39175,7 +39175,7 @@
       <text name="Fig0.3.4"
         x="225"
         y="905"
-        width="375"
+        width="383"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39191,7 +39191,7 @@
       <text name="Fig0.3.5"
         x="225"
         y="920"
-        width="447"
+        width="454"
         height="24"
         fill="0"
         fillcolor="white"
@@ -39240,7 +39240,7 @@
       <text name="Fig0.4.2"
         x="225"
         y="649"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39272,7 +39272,7 @@
       <text name="Fig0.4.4"
         x="225"
         y="679"
-        width="98"
+        width="100"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39288,7 +39288,7 @@
       <text name="Fig0.4.5"
         x="225"
         y="694"
-        width="93"
+        width="94"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39304,7 +39304,7 @@
       <text name="Fig0.4.6"
         x="225"
         y="709"
-        width="139"
+        width="142"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39320,7 +39320,7 @@
       <text name="Fig0.4.7"
         x="225"
         y="724"
-        width="157"
+        width="159"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39336,7 +39336,7 @@
       <text name="Fig0.4.8"
         x="225"
         y="739"
-        width="211"
+        width="213"
         height="24"
         fill="0"
         fillcolor="white"
@@ -39471,7 +39471,7 @@
       <text name="Fig1.3.2"
         x="113"
         y="298"
-        width="164"
+        width="167"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39487,7 +39487,7 @@
       <text name="Fig1.3.3"
         x="113"
         y="313"
-        width="345"
+        width="351"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39503,7 +39503,7 @@
       <text name="Fig1.3.4"
         x="113"
         y="328"
-        width="343"
+        width="345"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39519,7 +39519,7 @@
       <text name="Fig1.3.5"
         x="113"
         y="343"
-        width="383"
+        width="392"
         height="24"
         fill="0"
         fillcolor="white"
@@ -39568,7 +39568,7 @@
       <text name="Fig1.4.2"
         x="113"
         y="57"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39664,7 +39664,7 @@
       <text name="Fig1.4.8"
         x="113"
         y="147"
-        width="173"
+        width="175"
         height="18"
         fill="0"
         fillcolor="white"
@@ -39680,7 +39680,7 @@
       <text name="Fig1.4.9"
         x="113"
         y="162"
-        width="192"
+        width="195"
         height="24"
         fill="0"
         fillcolor="white"
@@ -39864,7 +39864,7 @@
       <text name="Fig2.4.2"
         x="1001"
         y="233"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -40058,7 +40058,7 @@
       <text name="Fig4.3.2"
         x="1"
         y="636"
-        width="198"
+        width="200"
         height="18"
         fill="0"
         fillcolor="white"
@@ -40074,7 +40074,7 @@
       <text name="Fig4.3.3"
         x="1"
         y="651"
-        width="261"
+        width="263"
         height="18"
         fill="0"
         fillcolor="white"
@@ -40090,7 +40090,7 @@
       <text name="Fig4.3.4"
         x="1"
         y="666"
-        width="445"
+        width="447"
         height="24"
         fill="0"
         fillcolor="white"
@@ -40139,7 +40139,7 @@
       <text name="Fig4.4.2"
         x="1"
         y="425"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -40187,7 +40187,7 @@
       <text name="Fig4.4.5"
         x="1"
         y="470"
-        width="206"
+        width="207"
         height="18"
         fill="0"
         fillcolor="white"
@@ -40379,7 +40379,7 @@
       <text name="Fig6.3.3"
         x="769"
         y="723"
-        width="266"
+        width="267"
         height="18"
         fill="0"
         fillcolor="white"
@@ -40395,7 +40395,7 @@
       <text name="Fig6.3.4"
         x="769"
         y="738"
-        width="358"
+        width="364"
         height="24"
         fill="0"
         fillcolor="white"
@@ -40444,7 +40444,7 @@
       <text name="Fig6.4.2"
         x="769"
         y="497"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -40492,7 +40492,7 @@
       <text name="Fig6.4.5"
         x="769"
         y="542"
-        width="146"
+        width="147"
         height="18"
         fill="0"
         fillcolor="white"
@@ -40508,7 +40508,7 @@
       <text name="Fig6.4.6"
         x="769"
         y="557"
-        width="192"
+        width="195"
         height="18"
         fill="0"
         fillcolor="white"
@@ -40659,7 +40659,7 @@
       <text name="Fig7.3.2"
         x="705"
         y="392"
-        width="217"
+        width="220"
         height="24"
         fill="0"
         fillcolor="white"
@@ -40708,7 +40708,7 @@
       <text name="Fig7.4.2"
         x="705"
         y="241"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -46926,7 +46926,7 @@
       <text name="Fig0.3.2"
         x="529"
         y="459"
-        width="211"
+        width="212"
         height="18"
         fill="0"
         fillcolor="white"
@@ -46942,7 +46942,7 @@
       <text name="Fig0.3.3"
         x="529"
         y="474"
-        width="398"
+        width="400"
         height="18"
         fill="0"
         fillcolor="white"
@@ -46958,7 +46958,7 @@
       <text name="Fig0.3.4"
         x="529"
         y="489"
-        width="302"
+        width="304"
         height="18"
         fill="0"
         fillcolor="white"
@@ -46974,7 +46974,7 @@
       <text name="Fig0.3.5"
         x="529"
         y="504"
-        width="430"
+        width="437"
         height="24"
         fill="0"
         fillcolor="white"
@@ -47023,7 +47023,7 @@
       <text name="Fig0.4.2"
         x="529"
         y="233"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -47071,7 +47071,7 @@
       <text name="Fig0.4.5"
         x="529"
         y="278"
-        width="132"
+        width="133"
         height="18"
         fill="0"
         fillcolor="white"
@@ -47087,7 +47087,7 @@
       <text name="Fig0.4.6"
         x="529"
         y="293"
-        width="192"
+        width="195"
         height="18"
         fill="0"
         fillcolor="white"
@@ -47103,7 +47103,7 @@
       <text name="Fig0.4.7"
         x="529"
         y="308"
-        width="176"
+        width="177"
         height="18"
         fill="0"
         fillcolor="white"
@@ -47119,7 +47119,7 @@
       <text name="Fig0.4.8"
         x="529"
         y="323"
-        width="128"
+        width="129"
         height="24"
         fill="0"
         fillcolor="white"
@@ -47303,7 +47303,7 @@
       <text name="Fig1.4.2"
         x="913"
         y="649"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -48039,7 +48039,7 @@
       <text name="Fig5.3.2"
         x="33"
         y="644"
-        width="198"
+        width="200"
         height="18"
         fill="0"
         fillcolor="white"
@@ -48055,7 +48055,7 @@
       <text name="Fig5.3.3"
         x="33"
         y="659"
-        width="261"
+        width="263"
         height="18"
         fill="0"
         fillcolor="white"
@@ -48071,7 +48071,7 @@
       <text name="Fig5.3.4"
         x="33"
         y="674"
-        width="445"
+        width="447"
         height="24"
         fill="0"
         fillcolor="white"
@@ -48120,7 +48120,7 @@
       <text name="Fig5.4.2"
         x="33"
         y="433"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -48168,7 +48168,7 @@
       <text name="Fig5.4.5"
         x="33"
         y="478"
-        width="206"
+        width="207"
         height="18"
         fill="0"
         fillcolor="white"
@@ -48319,7 +48319,7 @@
       <text name="Fig6.3.2"
         x="41"
         y="278"
-        width="165"
+        width="166"
         height="18"
         fill="0"
         fillcolor="white"
@@ -48335,7 +48335,7 @@
       <text name="Fig6.3.3"
         x="41"
         y="293"
-        width="346"
+        width="350"
         height="18"
         fill="0"
         fillcolor="white"
@@ -48351,7 +48351,7 @@
       <text name="Fig6.3.4"
         x="41"
         y="308"
-        width="372"
+        width="375"
         height="24"
         fill="0"
         fillcolor="white"
@@ -48400,7 +48400,7 @@
       <text name="Fig6.4.2"
         x="41"
         y="97"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -48432,7 +48432,7 @@
       <text name="Fig6.4.4"
         x="41"
         y="127"
-        width="173"
+        width="175"
         height="18"
         fill="0"
         fillcolor="white"
@@ -48448,7 +48448,7 @@
       <text name="Fig6.4.5"
         x="41"
         y="142"
-        width="186"
+        width="188"
         height="24"
         fill="0"
         fillcolor="white"
@@ -51043,7 +51043,7 @@
       <text name="Fig0.3.3"
         x="905"
         y="294"
-        width="254"
+        width="256"
         height="24"
         fill="0"
         fillcolor="white"
@@ -51092,7 +51092,7 @@
       <text name="Fig0.4.2"
         x="905"
         y="153"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -51124,7 +51124,7 @@
       <text name="Fig0.4.4"
         x="905"
         y="183"
-        width="128"
+        width="129"
         height="24"
         fill="0"
         fillcolor="white"
@@ -51764,7 +51764,7 @@
       <text name="Fig4.3.2"
         x="41"
         y="363"
-        width="243"
+        width="244"
         height="18"
         fill="0"
         fillcolor="white"
@@ -51780,7 +51780,7 @@
       <text name="Fig4.3.3"
         x="41"
         y="378"
-        width="484"
+        width="487"
         height="18"
         fill="0"
         fillcolor="white"
@@ -51796,7 +51796,7 @@
       <text name="Fig4.3.4"
         x="41"
         y="393"
-        width="260"
+        width="266"
         height="18"
         fill="0"
         fillcolor="white"
@@ -51812,7 +51812,7 @@
       <text name="Fig4.3.5"
         x="41"
         y="408"
-        width="238"
+        width="239"
         height="18"
         fill="0"
         fillcolor="white"
@@ -51828,7 +51828,7 @@
       <text name="Fig4.3.6"
         x="41"
         y="423"
-        width="350"
+        width="351"
         height="18"
         fill="0"
         fillcolor="white"
@@ -51844,7 +51844,7 @@
       <text name="Fig4.3.7"
         x="41"
         y="438"
-        width="368"
+        width="371"
         height="18"
         fill="0"
         fillcolor="white"
@@ -51860,7 +51860,7 @@
       <text name="Fig4.3.8"
         x="41"
         y="453"
-        width="462"
+        width="470"
         height="18"
         fill="0"
         fillcolor="white"
@@ -51876,7 +51876,7 @@
       <text name="Fig4.3.9"
         x="41"
         y="468"
-        width="264"
+        width="266"
         height="24"
         fill="0"
         fillcolor="white"
@@ -51925,7 +51925,7 @@
       <text name="Fig4.4.2"
         x="41"
         y="57"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52037,7 +52037,7 @@
       <text name="Fig4.4.9"
         x="41"
         y="162"
-        width="203"
+        width="204"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52053,7 +52053,7 @@
       <text name="Fig4.4.10"
         x="41"
         y="177"
-        width="125"
+        width="128"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52069,7 +52069,7 @@
       <text name="Fig4.4.11"
         x="41"
         y="192"
-        width="114"
+        width="115"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52085,7 +52085,7 @@
       <text name="Fig4.4.12"
         x="41"
         y="207"
-        width="204"
+        width="205"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52101,7 +52101,7 @@
       <text name="Fig4.4.13"
         x="41"
         y="222"
-        width="213"
+        width="215"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52117,7 +52117,7 @@
       <text name="Fig4.4.14"
         x="41"
         y="237"
-        width="192"
+        width="195"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52133,7 +52133,7 @@
       <text name="Fig4.4.15"
         x="41"
         y="252"
-        width="128"
+        width="129"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52284,7 +52284,7 @@
       <text name="Fig5.3.2"
         x="49"
         y="808"
-        width="217"
+        width="220"
         height="24"
         fill="0"
         fillcolor="white"
@@ -52333,7 +52333,7 @@
       <text name="Fig5.4.2"
         x="49"
         y="697"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52541,7 +52541,7 @@
       <text name="Fig7.3.4"
         x="561"
         y="700"
-        width="342"
+        width="343"
         height="24"
         fill="0"
         fillcolor="white"
@@ -52590,7 +52590,7 @@
       <text name="Fig7.4.2"
         x="561"
         y="537"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -52622,7 +52622,7 @@
       <text name="Fig7.4.4"
         x="561"
         y="567"
-        width="138"
+        width="139"
         height="24"
         fill="0"
         fillcolor="white"
@@ -56844,7 +56844,7 @@
       <text name="Fig0.3.2"
         x="209"
         y="216"
-        width="217"
+        width="220"
         height="24"
         fill="0"
         fillcolor="white"
@@ -56893,7 +56893,7 @@
       <text name="Fig0.4.2"
         x="209"
         y="65"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -57452,7 +57452,7 @@
       <text name="Fig2.3.3"
         x="617"
         y="788"
-        width="238"
+        width="244"
         height="18"
         fill="0"
         fillcolor="white"
@@ -57468,7 +57468,7 @@
       <text name="Fig2.3.4"
         x="617"
         y="803"
-        width="314"
+        width="318"
         height="18"
         fill="0"
         fillcolor="white"
@@ -57484,7 +57484,7 @@
       <text name="Fig2.3.5"
         x="617"
         y="818"
-        width="216"
+        width="217"
         height="18"
         fill="0"
         fillcolor="white"
@@ -57516,7 +57516,7 @@
       <text name="Fig2.3.7"
         x="617"
         y="848"
-        width="372"
+        width="379"
         height="24"
         fill="0"
         fillcolor="white"
@@ -57565,7 +57565,7 @@
       <text name="Fig2.4.2"
         x="617"
         y="577"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -57613,7 +57613,7 @@
       <text name="Fig2.4.5"
         x="617"
         y="622"
-        width="192"
+        width="195"
         height="18"
         fill="0"
         fillcolor="white"
@@ -57807,7 +57807,7 @@
       <text name="Fig4.3.3"
         x="97"
         y="891"
-        width="266"
+        width="267"
         height="18"
         fill="0"
         fillcolor="white"
@@ -57823,7 +57823,7 @@
       <text name="Fig4.3.4"
         x="97"
         y="906"
-        width="358"
+        width="364"
         height="24"
         fill="0"
         fillcolor="white"
@@ -57872,7 +57872,7 @@
       <text name="Fig4.4.2"
         x="97"
         y="665"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -57920,7 +57920,7 @@
       <text name="Fig4.4.5"
         x="97"
         y="710"
-        width="146"
+        width="147"
         height="18"
         fill="0"
         fillcolor="white"
@@ -57936,7 +57936,7 @@
       <text name="Fig4.4.6"
         x="97"
         y="725"
-        width="192"
+        width="195"
         height="18"
         fill="0"
         fillcolor="white"
@@ -58137,7 +58137,7 @@
       <text name="Fig7.3.2"
         x="745"
         y="420"
-        width="224"
+        width="225"
         height="18"
         fill="0"
         fillcolor="white"
@@ -58153,7 +58153,7 @@
       <text name="Fig7.3.3"
         x="745"
         y="435"
-        width="315"
+        width="317"
         height="18"
         fill="0"
         fillcolor="white"
@@ -58185,7 +58185,7 @@
       <text name="Fig7.3.5"
         x="745"
         y="465"
-        width="443"
+        width="450"
         height="24"
         fill="0"
         fillcolor="white"
@@ -58234,7 +58234,7 @@
       <text name="Fig7.4.2"
         x="745"
         y="209"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -58250,7 +58250,7 @@
       <text name="Fig7.4.3"
         x="745"
         y="224"
-        width="129"
+        width="131"
         height="18"
         fill="0"
         fillcolor="white"
@@ -58282,7 +58282,7 @@
       <text name="Fig7.4.5"
         x="745"
         y="254"
-        width="192"
+        width="195"
         height="18"
         fill="0"
         fillcolor="white"
@@ -58298,7 +58298,7 @@
       <text name="Fig7.4.6"
         x="745"
         y="269"
-        width="128"
+        width="129"
         height="18"
         fill="0"
         fillcolor="white"
@@ -58881,7 +58881,7 @@
       <text name="Fig13.3.2"
         x="1"
         y="643"
-        width="150"
+        width="153"
         height="18"
         fill="0"
         fillcolor="white"
@@ -58897,7 +58897,7 @@
       <text name="Fig13.3.3"
         x="1"
         y="658"
-        width="277"
+        width="280"
         height="18"
         fill="0"
         fillcolor="white"
@@ -58913,7 +58913,7 @@
       <text name="Fig13.3.4"
         x="1"
         y="673"
-        width="369"
+        width="378"
         height="24"
         fill="0"
         fillcolor="white"
@@ -58962,7 +58962,7 @@
       <text name="Fig13.4.2"
         x="1"
         y="417"
-        width="82"
+        width="83"
         height="18"
         fill="0"
         fillcolor="white"
@@ -59042,7 +59042,7 @@
       <text name="Fig13.4.7"
         x="1"
         y="492"
-        width="146"
+        width="147"
         height="18"
         fill="0"
         fillcolor="white"
@@ -59058,7 +59058,7 @@
       <text name="Fig13.4.8"
         x="1"
         y="507"
-        width="192"
+        width="195"
         height="24"
         fill="0"
         fillcolor="white"
@@ -65595,7 +65595,7 @@
       bold="false"
       textsize="12"
       justification="Center"
-    >Filter</text>
+    >EntityFilter</text>
     <group name="Fig2.3"
          description="org.argouml.uml.diagram.ui.FigOperationsCompartment[465, 92, 120, 23]"
          fill="1"
@@ -65665,7 +65665,7 @@
         x="465"
         y="24"
         width="74"
-        height="18"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -65681,7 +65681,7 @@
         x="465"
         y="39"
         width="120"
-        height="18"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -65697,7 +65697,7 @@
         x="465"
         y="54"
         width="90"
-        height="18"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -65713,7 +65713,7 @@
         x="465"
         y="69"
         width="108"
-        height="24"
+        height="21"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -66274,7 +66274,7 @@
       bold="false"
       textsize="12"
       justification="Center"
-    >Column</text>
+    >EntityColumn</text>
     <group name="Fig10.3"
          description="org.argouml.uml.diagram.ui.FigOperationsCompartment[593, 581, 116, 23]"
          fill="1"
@@ -66344,7 +66344,7 @@
         x="593"
         y="528"
         width="74"
-        height="18"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -66360,7 +66360,7 @@
         x="593"
         y="543"
         width="90"
-        height="18"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -66376,7 +66376,7 @@
         x="593"
         y="558"
         width="108"
-        height="24"
+        height="21"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -67700,7 +67700,7 @@
       bold="false"
       textsize="12"
       justification="Center"
-    >FILTER</text>
+    >ENTITY_FILTER</text>
     <group name="Fig3.3"
          description="org.argouml.uml.diagram.ui.FigOperationsCompartment[513, 1779, 316, 56]"
          fill="1"
@@ -67752,7 +67752,7 @@
       <text name="Fig3.3.3"
         x="513"
         y="1795"
-        width="203"
+        width="202"
         height="18"
         fill="0"
         fillcolor="white"
@@ -67849,7 +67849,7 @@
       <text name="Fig3.4.4"
         x="513"
         y="1711"
-        width="146"
+        width="145"
         height="18"
         fill="0"
         fillcolor="white"
@@ -68021,7 +68021,7 @@
       bold="false"
       textsize="12"
       justification="Center"
-    >COLUMN</text>
+    >ENTITY_COLUMN</text>
     <group name="Fig5.3"
          description="org.argouml.uml.diagram.ui.FigOperationsCompartment[1105, 828, 316, 56]"
          fill="1"
@@ -68057,8 +68057,8 @@
       <text name="Fig5.3.2"
         x="1105"
         y="829"
-        width="166"
-        height="18"
+        width="164"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68073,8 +68073,8 @@
       <text name="Fig5.3.3"
         x="1105"
         y="844"
-        width="203"
-        height="18"
+        width="200"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68090,7 +68090,7 @@
         x="1105"
         y="859"
         width="316"
-        height="24"
+        height="21"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68138,8 +68138,8 @@
       <text name="Fig5.4.2"
         x="1105"
         y="745"
-        width="83"
-        height="18"
+        width="82"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68154,8 +68154,8 @@
       <text name="Fig5.4.3"
         x="1105"
         y="760"
-        width="131"
-        height="18"
+        width="129"
+        height="15"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68203,7 +68203,7 @@
         x="1105"
         y="805"
         width="187"
-        height="24"
+        height="21"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68364,8 +68364,8 @@
       <text name="Fig7.3.2"
         x="657"
         y="1117"
-        width="218"
-        height="15"
+        width="219"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68380,8 +68380,8 @@
       <text name="Fig7.3.3"
         x="657"
         y="1132"
-        width="214"
-        height="15"
+        width="215"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68396,8 +68396,8 @@
       <text name="Fig7.3.4"
         x="657"
         y="1147"
-        width="220"
-        height="15"
+        width="223"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68412,7 +68412,7 @@
       <text name="Fig7.3.5"
         x="657"
         y="1162"
-        width="370"
+        width="373"
         height="24"
         fill="0"
         fillcolor="white"
@@ -68461,8 +68461,8 @@
       <text name="Fig7.4.2"
         x="657"
         y="1033"
-        width="82"
-        height="15"
+        width="83"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68477,8 +68477,8 @@
       <text name="Fig7.4.3"
         x="657"
         y="1048"
-        width="136"
-        height="15"
+        width="137"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68493,8 +68493,8 @@
       <text name="Fig7.4.4"
         x="657"
         y="1063"
-        width="126"
-        height="15"
+        width="127"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68509,8 +68509,8 @@
       <text name="Fig7.4.5"
         x="657"
         y="1078"
-        width="139"
-        height="15"
+        width="141"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -68525,8 +68525,8 @@
       <text name="Fig7.4.6"
         x="657"
         y="1093"
-        width="214"
-        height="21"
+        width="216"
+        height="24"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -69314,7 +69314,7 @@
         x="1361"
         y="1404"
         width="212"
-        height="21"
+        height="24"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -69362,8 +69362,8 @@
       <text name="Fig15.4.2"
         x="1361"
         y="1361"
-        width="82"
-        height="15"
+        width="83"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -69563,8 +69563,8 @@
       <text name="Fig18.3.2"
         x="1825"
         y="1178"
-        width="239"
-        height="15"
+        width="240"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -69580,7 +69580,7 @@
         x="1825"
         y="1193"
         width="316"
-        height="21"
+        height="24"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -69628,8 +69628,8 @@
       <text name="Fig18.4.2"
         x="1825"
         y="1105"
-        width="82"
-        height="15"
+        width="83"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
@@ -69645,7 +69645,7 @@
         x="1825"
         y="1120"
         width="187"
-        height="15"
+        height="18"
         fill="0"
         fillcolor="white"
         stroke="0"
