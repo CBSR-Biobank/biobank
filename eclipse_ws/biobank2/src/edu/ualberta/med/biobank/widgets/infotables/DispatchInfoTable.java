@@ -9,16 +9,16 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> {
+public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
     AliquotWrapper a;
 
     protected class TableRowData {
 
-        DispatchShipmentWrapper ds;
+        DispatchWrapper ds;
         Date dispatchTime;
         Date dateReceived;
         String waybill;
@@ -37,14 +37,12 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
     private static final String[] HEADINGS = new String[] { "Dispatch Time",
         "Date Received", "Waybill", "Dispatch State", "Aliquot State" };
 
-    private static final int[] BOUNDS = new int[] { 100, 100, 100, 100, 100 };
-
     private boolean editMode = false;
 
     public DispatchInfoTable(Composite parent, AliquotWrapper a) {
-        super(parent, null, HEADINGS, BOUNDS, 15);
+        super(parent, null, HEADINGS, 15);
         this.a = a;
-        setCollection(a.getDispatchShipments());
+        setCollection(a.getDispatchs());
     }
 
     @Override
@@ -83,14 +81,14 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
     }
 
     @Override
-    public TableRowData getCollectionModelObject(DispatchShipmentWrapper ds)
+    public TableRowData getCollectionModelObject(DispatchWrapper ds)
         throws Exception {
         TableRowData info = new TableRowData();
         info.ds = ds;
-        info.dispatchTime = ds.getDateShipped();
+        info.dispatchTime = ds.getDeparted();
         info.dateReceived = ds.getDateReceived();
         info.dstatus = ds.getStateDescription();
-        info.astatus = ds.getDispatchShipmentAliquot(a.getInventoryId())
+        info.astatus = ds.getDispatchAliquot(a.getInventoryId())
             .getStateDescription();
         info.waybill = ds.getWaybill();
         return info;
@@ -104,7 +102,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
         return r.toString();
     }
 
-    public void setSelection(DispatchShipmentWrapper selected) {
+    public void setSelection(DispatchWrapper selected) {
         if (selected == null)
             return;
         for (BiobankCollectionModel item : model) {
@@ -117,7 +115,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
     }
 
     @Override
-    public DispatchShipmentWrapper getSelection() {
+    public DispatchWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
@@ -132,7 +130,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
     }
 
     public void reloadCollection() {
-        reloadCollection(a.getDispatchShipments());
+        reloadCollection(a.getDispatchs());
     }
 
 }

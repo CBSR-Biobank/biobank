@@ -23,11 +23,9 @@ public class ClinicVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
     private static final String[] HEADINGS = new String[] { "Clinic",
         "Patient Visits (Date Processed)" };
 
-    private static final int[] BOUNDS = new int[] { 130, 180 };
-
     public ClinicVisitInfoTable(Composite parent,
         List<PatientVisitWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS, 10);
+        super(parent, collection, HEADINGS);
     }
 
     @Override

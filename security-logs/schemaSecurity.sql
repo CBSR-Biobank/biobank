@@ -306,7 +306,7 @@ INSERT INTO `csm_protection_element` VALUES (24,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (25,'edu.ualberta.med.biobank.model.SampleStorage','edu.ualberta.med.biobank.model.SampleStorage','edu.ualberta.med.biobank.model.SampleStorage','','','',2,'2009-07-23');
 INSERT INTO `csm_protection_element` VALUES (27,'edu.ualberta.med.biobank.model.ContainerLabelingScheme','edu.ualberta.med.biobank.model.ContainerLabelingScheme','edu.ualberta.med.biobank.model.ContainerLabelingScheme','','','',2,'2009-07-26');
 INSERT INTO `csm_protection_element` VALUES (30,'edu.ualberta.med.biobank.model.Contact','edu.ualberta.med.biobank.model.Contact','edu.ualberta.med.biobank.model.Contact','','','',2,'2009-08-24');
-INSERT INTO `csm_protection_element` VALUES (31,'edu.ualberta.med.biobank.model.ClinicShipment','edu.ualberta.med.biobank.model.ClinicShipment','edu.ualberta.med.biobank.model.ClinicShipment','','','',2,'2010-08-18');
+INSERT INTO `csm_protection_element` VALUES (31,'edu.ualberta.med.biobank.model.Shipment','edu.ualberta.med.biobank.model.Shipment','edu.ualberta.med.biobank.model.Shipment','','','',2,'2010-08-18');
 INSERT INTO `csm_protection_element` VALUES (32,'edu.ualberta.med.biobank.model.ShippingMethod','edu.ualberta.med.biobank.model.ShippingMethod','edu.ualberta.med.biobank.model.ShippingMethod','','','',2,'2009-11-30');
 INSERT INTO `csm_protection_element` VALUES (33,'edu.ualberta.med.biobank.model.PvSourceVessel','edu.ualberta.med.biobank.model.PvSourceVessel','edu.ualberta.med.biobank.model.PvSourceVessel','','','',2,'2009-11-30');
 INSERT INTO `csm_protection_element` VALUES (34,'edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','','','',2,'2010-01-11');
@@ -315,9 +315,9 @@ INSERT INTO `csm_protection_element` VALUES (36,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (51,'edu.ualberta.med.biobank.model.Log','','edu.ualberta.med.biobank.model.Log','','','',2,'2010-05-25');
 INSERT INTO `csm_protection_element` VALUES (62,'edu.ualberta.med.biobank.model.AbstractShipment','edu.ualberta.med.biobank.model.AbstractShipment','edu.ualberta.med.biobank.model.AbstractShipment','','','',2,'2010-08-18');
 INSERT INTO `csm_protection_element` VALUES (64,'edu.ualberta.med.biobank.model.DispatchInfo','edu.ualberta.med.biobank.model.DispatchInfo','edu.ualberta.med.biobank.model.DispatchInfo','','','',2,'2010-08-18');
-INSERT INTO `csm_protection_element` VALUES (65,'edu.ualberta.med.biobank.model.DispatchShipment','edu.ualberta.med.biobank.model.DispatchShipment','edu.ualberta.med.biobank.model.DispatchShipment','','','',2,'2010-08-18');
-INSERT INTO `csm_protection_element` VALUES (150,'edu.ualberta.med.biobank.model.ClinicShipmentPatient','edu.ualberta.med.biobank.model.ClinicShipmentPatient','edu.ualberta.med.biobank.model.ClinicShipmentPatient','','','',2,'2010-09-29');
-INSERT INTO `csm_protection_element` VALUES (151,'edu.ualberta.med.biobank.model.DispatchShipmentAliquot','edu.ualberta.med.biobank.model.DispatchShipmentAliquot','edu.ualberta.med.biobank.model.DispatchShipmentAliquot','','','',2,'2010-09-30');
+INSERT INTO `csm_protection_element` VALUES (65,'edu.ualberta.med.biobank.model.Dispatch','edu.ualberta.med.biobank.model.Dispatch','edu.ualberta.med.biobank.model.Dispatch','','','',2,'2010-08-18');
+INSERT INTO `csm_protection_element` VALUES (150,'edu.ualberta.med.biobank.model.ShipmentPatient','edu.ualberta.med.biobank.model.ShipmentPatient','edu.ualberta.med.biobank.model.ShipmentPatient','','','',2,'2010-09-29');
+INSERT INTO `csm_protection_element` VALUES (151,'edu.ualberta.med.biobank.model.DispatchAliquot','edu.ualberta.med.biobank.model.DispatchAliquot','edu.ualberta.med.biobank.model.DispatchAliquot','','','',2,'2010-09-30');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 

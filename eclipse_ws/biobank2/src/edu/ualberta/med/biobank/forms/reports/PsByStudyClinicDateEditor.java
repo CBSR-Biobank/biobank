@@ -20,11 +20,6 @@ public class PsByStudyClinicDateEditor extends ReportsEditor {
     protected DateTimeWidget end;
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100 };
-    }
-
-    @Override
     protected String[] getColumnNames() {
         return new String[] {
             "Study",
@@ -45,13 +40,14 @@ public class PsByStudyClinicDateEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
-        params.add(((IStructuredSelection) dateRangeCombo.getSelection())
-            .getFirstElement().toString());
+        report
+            .setGroupBy(((IStructuredSelection) dateRangeCombo.getSelection())
+                .getFirstElement().toString());
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
-        return params;
+        report.setParams(params);
     }
 
     @Override
@@ -61,6 +57,16 @@ public class PsByStudyClinicDateEditor extends ReportsEditor {
         param.add("Start Date (Linked)");
         param.add("End Date (Linked)");
         return param;
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(((IStructuredSelection) dateRangeCombo.getSelection())
+            .getFirstElement().toString());
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
+        return params;
     }
 
 }

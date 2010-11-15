@@ -48,7 +48,6 @@ public class BiobankReport implements Serializable {
         }
     };
 
-    protected int[] columnWidths;
     protected String[] columnNames;
 
     protected List<Object> params;
@@ -79,10 +78,6 @@ public class BiobankReport implements Serializable {
 
     public String[] getColumnNames() {
         return columnNames;
-    }
-
-    public int[] getColumnWidths() {
-        return columnWidths;
     }
 
     public List<Object> getParams() {

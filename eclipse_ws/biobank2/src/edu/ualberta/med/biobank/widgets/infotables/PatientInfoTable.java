@@ -29,10 +29,8 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
     private static final String[] HEADINGS = new String[] { "Patient Number",
         "Study" };
 
-    private static final int[] BOUNDS = new int[] { 150, 150, -1, -1, -1, -1 };
-
     public PatientInfoTable(Composite parent, List<PatientWrapper> patients) {
-        super(parent, patients, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, patients, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override

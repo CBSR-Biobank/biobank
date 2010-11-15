@@ -41,14 +41,18 @@
 #
 ################################################################################
 
-$NSIS_PROGRAM = "c:/Program\\ Files\\ \\(x86\\)/nsis/makensis";
+# fix backslashes
+($NSIS_PATH = "$ENV{'PROGRAMFILES'}/nsis") =~ s|\\|\/|;
+
+print "nsis_path: $NSIS_PATH\n";
+
+$NSIS_PROGRAM = "$NSIS_PATH/makensis";
 
 $VERSION = "";
 $BIOBANK_FOLDER = "";
 $EXPORT_DIR = "";
 $DLL_DIR = "";
 $NSIS_DIR = "";
-
 
 
 if($#ARGV == 1){
@@ -59,7 +63,7 @@ if($#ARGV == 1){
         $NSIS_DIR =~ s/\/$//;
 }
 else{
-        print "Usuage: createInstaller.pl exportDir nsisDir\n";
+        print "Usage: createInstaller.pl EXPORT_DIR NSIS_DIR\n";
         exit 0;
 }
 print "\n";
@@ -113,7 +117,7 @@ close(FH);
 -e "tmp/nsis/BiobankTMP.nsi" or die "could not create customized nsis script";
 
 print "Compiling nsis script...\n";
-`$NSIS_PROGRAM tmp/nsis/BiobankTMP.nsi`;
+`\"$NSIS_PROGRAM\" tmp/nsis/BiobankTMP.nsi`;
 -e "tmp/BioBank2Installer-${VERSION}.exe" or die "nsis could not create installer";
 
 print "Moving installer...\n";

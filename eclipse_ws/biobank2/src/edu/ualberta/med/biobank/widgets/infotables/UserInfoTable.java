@@ -43,7 +43,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
 
     public UserInfoTable(Composite parent, List<User> collection,
         Window parentWindow) {
-        super(parent, collection, HEADINGS, null, ROWS_PER_PAGE);
+        super(parent, collection, HEADINGS, ROWS_PER_PAGE);
 
         this.parentWindow = parentWindow;
 

@@ -7,16 +7,16 @@ import edu.ualberta.med.biobank.model.AliquotPosition;
 public class AliquotInvoiceByPatientImpl extends AbstractReport {
 
     private static String QUERY =
-        "Select Alias.inventoryId, Alias.patientVisit.clinicShipmentPatient.patient.pnumber, Alias.patientVisit.clinicShipmentPatient.clinicShipment.clinic.name,  Alias.linkDate, Alias.sampleType.name from "
+        "Select Alias.inventoryId, Alias.patientVisit.shipmentPatient.patient.pnumber, Alias.patientVisit.shipmentPatient.shipment.clinic.name,  Alias.linkDate, Alias.sampleType.name from "
             + Aliquot.class.getName()
             + " as Alias left join Alias.aliquotPosition p where (p is null or p not in (from "
             + AliquotPosition.class.getName()
             + " a where a.container.label like '"
             + SENT_SAMPLES_FREEZER_NAME
-            + "')) and Alias.linkDate between ? and ? and Alias.patientVisit.clinicShipmentPatient.clinicShipment.site "
+            + "')) and Alias.linkDate between ? and ? and Alias.patientVisit.shipmentPatient.shipment.site "
             + SITE_OPERATOR
             + SITE_ID
-            + " ORDER BY Alias.patientVisit.clinicShipmentPatient.patient.pnumber, Alias.inventoryId";
+            + " ORDER BY Alias.patientVisit.shipmentPatient.patient.pnumber, Alias.inventoryId";
 
     public AliquotInvoiceByPatientImpl(BiobankReport report) {
         super(QUERY, report);

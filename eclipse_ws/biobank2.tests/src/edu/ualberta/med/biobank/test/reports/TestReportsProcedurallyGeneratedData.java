@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.server.reports.AbstractReport;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ClinicShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -478,10 +478,10 @@ public final class TestReportsProcedurallyGeneratedData implements
         return patients;
     }
 
-    private static List<ClinicShipmentWrapper> generateShipments(
+    private static List<ShipmentWrapper> generateShipments(
         SiteWrapper site, final int shipmentLimit, List<ClinicWrapper> clinics)
         throws ApplicationException, Exception {
-        List<ClinicShipmentWrapper> shipments = new ArrayList<ClinicShipmentWrapper>();
+        List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date(0));
@@ -527,13 +527,13 @@ public final class TestReportsProcedurallyGeneratedData implements
                 patientLimit = Math.min(patientLimit, patients.size());
 
                 if (patientLimit > 0) {
-                    ClinicShipmentWrapper shipment = ClinicShipmentHelper
+                    ShipmentWrapper shipment = ShipmentHelper
                         .addShipment(site, clinic, ShippingMethodWrapper
                             .getShippingMethods(getInstance().getAppService())
                             .get(0), patients.get(patientIndex));
 
                     // TODO: more appropriate Date-s?
-                    shipment.setDateShipped(calendar.getTime());
+                    shipment.setDeparted(calendar.getTime());
                     calendar.add(Calendar.DAY_OF_YEAR, 1);
                     shipment.setDateReceived(calendar.getTime());
 
@@ -574,7 +574,7 @@ public final class TestReportsProcedurallyGeneratedData implements
     }
 
     private static List<PatientVisitWrapper> generatePatientVisits(
-        List<ClinicShipmentWrapper> shipments, List<PatientWrapper> allPatients)
+        List<ShipmentWrapper> shipments, List<PatientWrapper> allPatients)
         throws Exception {
         List<PatientVisitWrapper> patientVisits = new ArrayList<PatientVisitWrapper>();
 
@@ -582,11 +582,11 @@ public final class TestReportsProcedurallyGeneratedData implements
 
         for (int shipmentIndex = 0, numShipments = shipments.size()
             - NUM_SHIPMENTS_WITHOUT_PVS; shipmentIndex < numShipments; shipmentIndex++) {
-            ClinicShipmentWrapper shipment = shipments.get(shipmentIndex);
+            ShipmentWrapper shipment = shipments.get(shipmentIndex);
             List<PatientWrapper> patients = shipment.getPatientCollection();
 
             for (PatientWrapper patient : patients) {
-                calendar.setTime(shipment.getDateShipped());
+                calendar.setTime(shipment.getDeparted());
                 calendar.add(Calendar.DAY_OF_YEAR, -1);
 
                 // TODO: more appropriate Date-s?
@@ -735,7 +735,7 @@ public final class TestReportsProcedurallyGeneratedData implements
             List<PatientWrapper> patients = generatePatients(studies,
                 PATIENTS_PER_STUDY);
 
-            List<ClinicShipmentWrapper> shipments = generateShipments(site,
+            List<ShipmentWrapper> shipments = generateShipments(site,
                 SHIPMENTS_PER_SITE, clinics);
 
             List<PatientVisitWrapper> patientVisits = generatePatientVisits(

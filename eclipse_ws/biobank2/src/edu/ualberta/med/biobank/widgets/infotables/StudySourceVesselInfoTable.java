@@ -33,11 +33,9 @@ public class StudySourceVesselInfoTable extends
     private final static String[] HEADINGS = new String[] { "Name",
         "Need Time Drawn", "Need Original Volume" };
 
-    private final static int[] BOUNDS = new int[] { 250, 150, -1, -1, -1 };
-
     public StudySourceVesselInfoTable(Composite parent,
         List<StudySourceVesselWrapper> collection) {
-        super(parent, collection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override

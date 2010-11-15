@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.DispatchShipmentAliquot;
+import edu.ualberta.med.biobank.model.DispatchAliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -173,14 +173,13 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     private SiteWrapper getLocation() {
-        List<DispatchShipmentAliquotWrapper> dsac = this
-            .getDispatchShipmentAliquotCollection();
+        List<DispatchAliquotWrapper> dsac = this.getDispatchAliquotCollection();
         // if in a container, use the container's site
         if (getParent() != null) {
             return getParent().getSite();
         } else {
             // dispatched aliquot?
-            for (DispatchShipmentAliquotWrapper da : dsac) {
+            for (DispatchAliquotWrapper da : dsac) {
                 DispatchAliquotState state = DispatchAliquotState.getState(da
                     .getState());
                 if (da.getShipment().isInTransitState()
@@ -500,7 +499,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         HQLCriteria criteria = new HQLCriteria(
             "from "
                 + Aliquot.class.getName()
-                + " a where a.patientVisit.clinicShipmentPatient.clinicShipment.site.id = ? and activityStatus.name != ?",
+                + " a where a.patientVisit.shipmentPatient.shipment.site.id = ? and activityStatus.name != ?",
             Arrays.asList(new Object[] { site.getId(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Aliquot> aliquots = appService.query(criteria);
@@ -557,20 +556,20 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentWrapper> getDispatchShipments() {
-        List<DispatchShipmentWrapper> dispatchShipments = (List<DispatchShipmentWrapper>) propertiesMap
-            .get("dispatchShipments");
-        if (dispatchShipments == null) {
-            List<DispatchShipmentAliquotWrapper> dsaList = getDispatchShipmentAliquotCollection();
+    public List<DispatchWrapper> getDispatchs() {
+        List<DispatchWrapper> dispatchs = (List<DispatchWrapper>) propertiesMap
+            .get("dispatchs");
+        if (dispatchs == null) {
+            List<DispatchAliquotWrapper> dsaList = getDispatchAliquotCollection();
             if (dsaList != null) {
-                dispatchShipments = new ArrayList<DispatchShipmentWrapper>();
-                for (DispatchShipmentAliquotWrapper dsa : dsaList) {
-                    dispatchShipments.add(dsa.getShipment());
+                dispatchs = new ArrayList<DispatchWrapper>();
+                for (DispatchAliquotWrapper dsa : dsaList) {
+                    dispatchs.add(dsa.getShipment());
                 }
-                propertiesMap.put("dispatchShipments", dispatchShipments);
+                propertiesMap.put("dispatchs", dispatchs);
             }
         }
-        return dispatchShipments;
+        return dispatchs;
     }
 
     @Override
@@ -606,41 +605,41 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<DispatchShipmentAliquotWrapper> getDispatchShipmentAliquotCollection() {
-        List<DispatchShipmentAliquotWrapper> dsaCollection = (List<DispatchShipmentAliquotWrapper>) propertiesMap
-            .get("dispatchShipmentAliquotCollection");
+    public List<DispatchAliquotWrapper> getDispatchAliquotCollection() {
+        List<DispatchAliquotWrapper> dsaCollection = (List<DispatchAliquotWrapper>) propertiesMap
+            .get("dispatchAliquotCollection");
         if (dsaCollection == null) {
-            Collection<DispatchShipmentAliquot> children = wrappedObject
-                .getDispatchShipmentAliquotCollection();
+            Collection<DispatchAliquot> children = wrappedObject
+                .getDispatchAliquotCollection();
             if (children != null) {
-                dsaCollection = new ArrayList<DispatchShipmentAliquotWrapper>();
-                for (DispatchShipmentAliquot dsa : children) {
-                    dsaCollection.add(new DispatchShipmentAliquotWrapper(
-                        appService, dsa));
+                dsaCollection = new ArrayList<DispatchAliquotWrapper>();
+                for (DispatchAliquot dsa : children) {
+                    dsaCollection.add(new DispatchAliquotWrapper(appService,
+                        dsa));
                 }
-                propertiesMap.put("dispatchShipmentAliquotCollection",
-                    dsaCollection);
+                propertiesMap.put("dispatchAliquotCollection", dsaCollection);
             }
         }
         return dsaCollection;
     }
 
-    public boolean isUsedInDispatchShipment() {
-        return isUsedInDispatchShipment(null);
+    public boolean isUsedInDispatch() {
+        return isUsedInDispatch(null);
     }
 
-    public boolean isUsedInDispatchShipment(
-        DispatchShipmentWrapper excludedShipment) {
-        for (DispatchShipmentAliquotWrapper dsa : getDispatchShipmentAliquotCollection()) {
-            DispatchShipmentWrapper ship = dsa.getShipment();
-            if (!ship.equals(excludedShipment)
-                && (ship.isInTransitState() || ship.isInCreationState())) {
-                if (DispatchAliquotState.MISSING.isEquals(dsa.getState())) {
-                    return false;
+    public boolean isUsedInDispatch(DispatchWrapper excludedShipment) {
+        List<DispatchAliquotWrapper> dsas = getDispatchAliquotCollection();
+        if (dsas != null)
+            for (DispatchAliquotWrapper dsa : dsas) {
+                DispatchWrapper ship = dsa.getShipment();
+                if (!ship.equals(excludedShipment)
+                    && (ship.isInTransitState() || ship.isInCreationState())) {
+                    if (DispatchAliquotState.MISSING.isEquals(dsa.getState())) {
+                        return false;
+                    }
+                    return true;
                 }
-                return true;
             }
-        }
         return false;
     }
 

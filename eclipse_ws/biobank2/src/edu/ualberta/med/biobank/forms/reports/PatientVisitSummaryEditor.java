@@ -16,11 +16,6 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
     public static String ID = "edu.ualberta.med.biobank.editors.PatientVisitSummaryEditor";
 
     @Override
-    protected int[] getColumnWidths() {
-        return new int[] { 100, 100, 100, 100, 100, 100, 100, 100, 100 };
-    }
-
-    @Override
     protected void createOptionSection(Composite parent) {
         start = widgetCreator.createDateTimeWidget(parent,
             "Start Date (Linked)", null, null, null, SWT.DATE);
@@ -29,11 +24,11 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
     }
 
     @Override
-    protected List<Object> getParams() {
+    protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
-        return params;
+        report.setParams(params);
     }
 
     @Override
@@ -48,6 +43,14 @@ public class PatientVisitSummaryEditor extends ReportsEditor {
         param.add("Start Date (Linked)");
         param.add("End Date (Linked)");
         return param;
+    }
+
+    @Override
+    protected List<Object> getPrintParams() throws Exception {
+        List<Object> params = new ArrayList<Object>();
+        params.add(ReportsEditor.processDate(start.getDate(), true));
+        params.add(ReportsEditor.processDate(end.getDate(), false));
+        return params;
     }
 
 }

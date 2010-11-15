@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.test.internal;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -57,13 +57,13 @@ public class DbHelper {
         }
     }
 
-    public static void deleteDispatchShipments(
-        Collection<DispatchShipmentWrapper> shipments) throws Exception {
+    public static void deleteDispatchs(
+        Collection<DispatchWrapper> shipments) throws Exception {
         Assert.assertNotNull("appService is null", appService);
         if ((shipments == null) || (shipments.size() == 0))
             return;
 
-        for (DispatchShipmentWrapper shipment : shipments) {
+        for (DispatchWrapper shipment : shipments) {
             shipment.delete();
         }
     }
@@ -79,7 +79,7 @@ public class DbHelper {
             patient.reload();
             deletePatientVisits(patient.getPatientVisitCollection());
             patient.reload();
-            for (ClinicShipmentWrapper ship : patient.getShipmentCollection()) {
+            for (ShipmentWrapper ship : patient.getShipmentCollection()) {
                 ship.reload();
                 ship.removePatients(Arrays.asList(patient));
                 if (ship.getPatientCollection().size() == 0) {
