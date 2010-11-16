@@ -1,7 +1,5 @@
 package edu.ualberta.med.biobank.dialogs.startup;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.StringTokenizer;
@@ -278,23 +276,7 @@ public class LoginDialog extends TitleAreaDialog {
 
     @Override
     protected void okPressed() {
-        URL url = null;
-
-        try {
-            url = new URL("http://" + serverWidget.getText());
-        } catch (MalformedURLException e) {
-            MessageDialog.openError(getShell(), "Invalid Server URL",
-                "Please enter a valid server URL.");
-            return;
-        }
-
         if (!BioBankPlugin.getDefault().isDebugging()) {
-            // if (url.getPort() != -1) {
-            // MessageDialog
-            // .openError(getShell(), "Invalid Server URL",
-            // "You are not allowed to specify a port, only a hostname and path.");
-            // return;
-            // }
             if (userNameWidget.getText().equals("")) {
                 MessageDialog.openError(getShell(), "Invalid User Name",
                     "User Name field must not be blank.");
