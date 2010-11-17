@@ -22,6 +22,7 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -29,6 +30,8 @@ import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LinkFormPatientManagement {
+
+    private SiteWrapper site;
 
     private boolean patientNumberTextModified = false;
     protected BiobankText patientNumberText;
@@ -182,7 +185,7 @@ public class LinkFormPatientManagement {
             List<PatientVisitWrapper> collection = null;
             if (visitsListCheck.getSelection()) {
                 try {
-                    collection = currentPatient.getLast7DaysPatientVisits();
+                    collection = currentPatient.getLast7DaysPatientVisits(site);
                 } catch (ApplicationException e) {
                     BioBankPlugin.openAsyncError("Visits problem",
                         "Problem getting last 7 days visits. All visits will "
@@ -193,7 +196,7 @@ public class LinkFormPatientManagement {
             }
             if (collection == null) {
                 collection = currentPatient.getPatientVisitCollection(true,
-                    false);
+                    false, site);
             }
             viewerVisits.setInput(collection);
             viewerVisits.getCombo().setFocus();
@@ -300,6 +303,10 @@ public class LinkFormPatientManagement {
         return patientValidator.validate(patientNumberText.getText()).equals(
             Status.OK_STATUS)
             && selection.size() > 0;
+    }
+
+    public void setSite(SiteWrapper site) {
+        this.site = site;
     }
 
 }

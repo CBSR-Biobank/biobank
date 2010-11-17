@@ -12,6 +12,9 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -42,6 +45,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -215,6 +219,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             SWT.DEFAULT, SWT.DEFAULT));
     }
 
+    @SuppressWarnings("unchecked")
     private void createFieldsSection() throws ApplicationException {
         Composite fieldsComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(3, false);
@@ -225,10 +230,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
         fieldsComposite.setLayoutData(gd);
-
-        widgetCreator.createLabel(fieldsComposite, "Site");
-        siteCombo = new BasicSiteCombo(fieldsComposite, appService);
-        setFirstControl(siteCombo.getControl());
 
         // radio button to choose new or move
         radioNew = toolkit.createButton(fieldsComposite,
@@ -258,7 +259,29 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             }
         });
 
+        widgetCreator.createLabel(fieldsComposite, "Site");
+        siteCombo = new BasicSiteCombo(fieldsComposite, appService);
+        siteCombo.setSelection(new StructuredSelection(
+            ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
+        GridData gds = new GridData();
+        gds.horizontalSpan = 2;
+        gds.horizontalAlignment = SWT.FILL;
+        siteCombo.getCombo().setLayoutData(gds);
+        setFirstControl(siteCombo.getControl());
+
+        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                linkFormPatientManagement.setSite(siteCombo.getSite());
+                linkFormPatientManagement.setVisitsList();
+                String text = newCabinetPosition.getText();
+                newCabinetPosition.setText("");
+                newCabinetPosition.notifyListeners();
+            }
+        });
+
         // Patient number + visits list
+        linkFormPatientManagement.setSite(siteCombo.getSite());
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
         linkFormPatientManagement
             .setPatientTextCallback(new PatientTextCallback() {

@@ -10,6 +10,8 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -29,7 +31,6 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -37,7 +38,6 @@ import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -89,9 +89,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget dateDrawnWidget;
 
-    private ComboViewer siteCombo;
-
-    protected SiteWrapper selectedSite;
+    private BiobankText site;
 
     @Override
     public void init() {
@@ -149,10 +147,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-
-        widgetCreator.createLabel(client, "Site");
-        siteCombo = new BasicSiteCombo(client, appService);
-        setFirstControl(siteCombo.getControl());
+        if (!patientVisit.isNew())
+            site = createReadOnlyLabelledField(client, SWT.NONE, "Site",
+                patientVisit.getShipment().getSite().getNameShort());
 
         createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
             .getStudy().getName());
@@ -161,6 +158,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             patient.getPnumber());
 
         createShipmentsCombo(client);
+
+        setFirstControl(shipmentsComboViewer.getControl());
 
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
@@ -205,25 +204,33 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                     patientVisit.setShipment((ShipmentWrapper) selectedObject);
                 }
             });
+        shipmentsComboViewer
+            .addSelectionChangedListener(new ISelectionChangedListener() {
 
-        if (SessionManager.getUser().isSiteAdministrator(selectedSite)) {
-            final Button shipmentsListCheck = toolkit.createButton(composite,
-                "Last 7 days", SWT.CHECK);
-            shipmentsListCheck.setSelection(true);
-            shipmentsListCheck.addSelectionListener(new SelectionAdapter() {
                 @Override
-                public void widgetSelected(SelectionEvent e) {
-                    ISelection currentSelection = shipmentsComboViewer
-                        .getSelection();
-                    if (shipmentsListCheck.getSelection()) {
-                        shipmentsComboViewer.setInput(recentShipments);
-                    } else {
-                        shipmentsComboViewer.setInput(allShipments);
-                    }
-                    shipmentsComboViewer.setSelection(currentSelection);
+                public void selectionChanged(SelectionChangedEvent event) {
+                    site.setText(((ShipmentWrapper) ((StructuredSelection) shipmentsComboViewer
+                        .getSelection()).getFirstElement()).getSite()
+                        .getNameShort());
                 }
             });
-        }
+
+        final Button shipmentsListCheck = toolkit.createButton(composite,
+            "Last 7 days", SWT.CHECK);
+        shipmentsListCheck.setSelection(true);
+        shipmentsListCheck.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ISelection currentSelection = shipmentsComboViewer
+                    .getSelection();
+                if (shipmentsListCheck.getSelection()) {
+                    shipmentsComboViewer.setInput(recentShipments);
+                } else {
+                    shipmentsComboViewer.setInput(allShipments);
+                }
+                shipmentsComboViewer.setSelection(currentSelection);
+            }
+        });
     }
 
     private ShipmentWrapper initShipmentsCollections() {
@@ -232,18 +239,20 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         recentShipments = new ArrayList<ShipmentWrapper>();
         // filter for last 7 days
         Calendar c = Calendar.getInstance();
-        for (ShipmentWrapper shipment : allShipments) {
-            c.setTime(shipment.getDateReceived());
-            c.add(Calendar.DAY_OF_MONTH, 7);
-            if (c.getTime().after(new Date()))
-                recentShipments.add(shipment);
-        }
         ShipmentWrapper selectedShip = null;
         if (!patientVisit.isNew()) {
             selectedShip = patientVisit.getShipment();
             // need to add into the list, to be able to see it.
             recentShipments.add(selectedShip);
-        } else if (recentShipments.size() == 1) {
+        } else {
+            for (ShipmentWrapper shipment : allShipments) {
+                c.setTime(shipment.getDateReceived());
+                c.add(Calendar.DAY_OF_MONTH, 7);
+                if (c.getTime().after(new Date()))
+                    recentShipments.add(shipment);
+            }
+        }
+        if (recentShipments.size() == 1) {
             selectedShip = recentShipments.get(0);
         }
         return selectedShip;

@@ -280,6 +280,10 @@
              id="edu.ualberta.med.biobank.commands.exportErrorsLogs"
              name="Export Errors Logs">
        </command>
+       <command
+             id="edu.ualberta.med.biobank.commands.orders.processOrder"
+             name="Process Order">
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -535,6 +539,9 @@
               <reference
                     definitionId="biobank2.processingPerspectiveSelected">
               </reference>
+              <reference
+                    definitionId="biobank2.loggedIn">
+              </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -578,6 +585,9 @@
               <reference
                     definitionId="biobank2.processingPerspectiveSelected">
               </reference>
+              <reference
+                    definitionId="biobank2.loggedIn">
+              </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -593,6 +603,9 @@
             <and>
               <reference
                     definitionId="biobank2.processingPerspectiveSelected">
+              </reference>
+              <reference
+                    definitionId="biobank2.loggedIn">
               </reference>
             </and>
          </activeWhen>
@@ -622,6 +635,9 @@
               <reference
                     definitionId="biobank2.processingPerspectiveSelected">
               </reference>
+              <reference
+                    definitionId="biobank2.loggedIn">
+              </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -637,6 +653,9 @@
             <and>
               <reference
                     definitionId="biobank2.processingPerspectiveSelected">
+              </reference>
+              <reference
+                    definitionId="biobank2.loggedIn">
               </reference>
             </and>
          </activeWhen>
@@ -743,6 +762,9 @@
                <reference
                      definitionId="biobank2.processingPerspectiveSelected">
                </reference>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
             </and>
          </activeWhen>
          <enabledWhen>
@@ -785,11 +807,9 @@
             class="edu.ualberta.med.biobank.handlers.SearchHandler"
             commandId="edu.ualberta.med.biobank.commands.search">
          <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.loggedIn">
-               </reference>
-             </and>
+            <reference
+                  definitionId="biobank2.loggedIn">
+            </reference>
          </activeWhen>
       </handler>
       <handler
@@ -916,7 +936,7 @@
                     definitionId="biobank2.processingPerspectiveSelected">
               </reference>
               <reference
-                    definitionId="biobank2.canUpdateSiteSelected">
+                    definitionId="biobank2.loggedIn">
               </reference>
             </and>
          </activeWhen>
@@ -1081,6 +1101,12 @@
                   commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
                   icon="icons/shipment_add.png"
                   label="Add Shipment"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.shipments.shipmentDelete"
+                  icon="icons/shipment_delete.png"
+                  label="Delete Shipment"
                   style="push">
             </command>
             <separator
@@ -1554,6 +1580,35 @@
                   tooltip="Reload tree">
             </command>
          </toolbar>
+         <toolbar
+               id="edu.ualberta.med.biobank.views.OrderAdminView">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.orders.processOrder"
+                  icon="icons/order_edit.png"
+                  label="Process Order"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.processingPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.search"
+                  icon="icons/search.png"
+                  label="Search"
+                  style="push"
+                  tooltip="Search">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
+                  icon="icons/reload.png"
+                  label="Reload"
+                  style="push"
+                  tooltip="Reload tree">
+            </command>
+         </toolbar>
       </menuContribution>
    </extension>
    <extension
@@ -1629,7 +1684,7 @@
                closeable="false"
                id="edu.ualberta.med.biobank.views.PatientsAdminView"
                minimized="false"
-               moveable="true"
+               moveable="false"
                ratio="0.40"
                relationship="left"
                relative="org.eclipse.ui.editorss"
@@ -1653,7 +1708,7 @@
                closeable="false"
                id="edu.ualberta.med.biobank.views.ShipmentAdminView"
                minimized="false"
-               moveable="truefalse"
+               moveable="false"
                ratio="0.20"
                relationship="stack"
                relative="edu.ualberta.med.biobank.views.PatientsAdminView"
@@ -1665,7 +1720,19 @@
                closeable="false"
                id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
                minimized="false"
-               moveable="true"
+               moveable="false"
+               ratio="0.20"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.OrderAdminView"
+               minimized="false"
+               moveable="false"
                ratio="0.20"
                relationship="stack"
                relative="edu.ualberta.med.biobank.views.PatientsAdminView"
@@ -2357,6 +2424,14 @@
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.views.LoggingView"
             name="Logging"
+            restorable="true">
+      </view>
+      <view
+            allowMultiple="false"
+            class="edu.ualberta.med.biobank.views.OrderAdministrationView"
+            icon="icons/order.png"
+            id="edu.ualberta.med.biobank.views.OrderAdminView"
+            name="Orders"
             restorable="true">
       </view>
    </extension>

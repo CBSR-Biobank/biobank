@@ -12,7 +12,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -40,6 +42,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -152,6 +155,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         createCancelConfirmWidget();
     }
 
+    @SuppressWarnings("unchecked")
     private void createFieldsSection() throws Exception {
         Composite leftSideComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -176,7 +180,31 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
+        widgetCreator.createLabel(fieldsComposite, "Site");
         siteCombo = new BasicSiteCombo(fieldsComposite, appService);
+        siteCombo.setSelection(new StructuredSelection(
+            ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
+        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                try {
+                    palletContainerTypes = getPalletContainerTypes();
+                } catch (ApplicationException e) {
+                    BioBankPlugin.openAsyncError(
+                        "Error retrieving container types", e);
+                }
+                StructuredSelection oldPalletType = (StructuredSelection) palletTypesViewer
+                    .getSelection();
+                palletTypesViewer.setInput(palletContainerTypes);
+                palletTypesViewer.setSelection(new StructuredSelection(
+                    palletContainerTypes.get(0)));
+                if (oldPalletType.getFirstElement() == null) {
+                    validateValues();
+                }
+
+            }
+        });
+        currentPalletWrapper.setSite(siteCombo.getSite());
         setFirstControl(siteCombo.getControl());
 
         productBarcodeValidator = new NonEmptyStringValidator( //$NON-NLS-1$
@@ -326,8 +354,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private List<ContainerTypeWrapper> getPalletContainerTypes()
         throws ApplicationException {
         List<ContainerTypeWrapper> palletContainerTypes = ContainerTypeWrapper
-            .getContainerTypesPallet96(appService,
-                currentPalletWrapper.getSite());
+            .getContainerTypesPallet96(appService, siteCombo.getSite());
         if (palletContainerTypes.size() == 0) {
             BioBankPlugin
                 .openAsyncError(

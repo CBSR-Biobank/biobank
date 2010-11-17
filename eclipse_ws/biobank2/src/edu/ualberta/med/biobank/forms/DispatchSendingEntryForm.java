@@ -108,8 +108,12 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
         createStudyAndReceiverCombos(client);
 
-        siteCombo.setSelection(new StructuredSelection(((List<?>) siteCombo
-            .getInput()).get(0)));
+        if (!dispatch.isNew())
+            siteCombo
+                .setSelection(new StructuredSelection(dispatch.getSender()));
+        else
+            siteCombo.setSelection(new StructuredSelection(((List<?>) siteCombo
+                .getInput()).get(0)));
 
         if (!dispatch.isNew() && !dispatch.isInCreationState()) {
             ShippingMethodWrapper selectedShippingMethod = dispatch
@@ -129,8 +133,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                 "Waybill", null, dispatch, "waybill", null);
         }
 
-        BiobankText commentText = (BiobankText) createBoundWidgetWithLabel(
-            client, BiobankText.class, SWT.MULTI, "Comments", null,
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+            "Comments", null,
             BeansObservables.observeValue(dispatch, "comment"), null);
 
         createAliquotsSelectionSection();

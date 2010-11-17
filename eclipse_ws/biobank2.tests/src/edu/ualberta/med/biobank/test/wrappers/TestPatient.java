@@ -563,7 +563,8 @@ public class TestPatient extends TestDatabase {
             patient, shipment, calendar.getTime(), Utils.getRandomDate());
         patient.reload();
 
-        List<PatientVisitWrapper> visits = patient.getLast7DaysPatientVisits();
+        List<PatientVisitWrapper> visits = patient
+            .getLast7DaysPatientVisits(site);
         Assert.assertEquals(2, visits.size());
         Assert.assertTrue(visits.contains(visit2));
         Assert.assertTrue(visits.contains(visit3));

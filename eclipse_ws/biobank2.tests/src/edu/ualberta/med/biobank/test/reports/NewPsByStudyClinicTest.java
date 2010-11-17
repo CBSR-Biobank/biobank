@@ -83,7 +83,7 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
     public void testSecondPatientVisitDateRange() throws Exception {
         for (PatientWrapper patient : getPatients()) {
             List<PatientVisitWrapper> visits = patient
-                .getPatientVisitCollection(true, true);
+                .getPatientVisitCollection(true, true, null);
             if (visits.size() >= 2) {
                 PatientVisitWrapper visit = visits.get(1);
 

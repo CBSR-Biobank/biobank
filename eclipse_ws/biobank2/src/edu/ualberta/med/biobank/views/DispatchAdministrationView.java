@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchSearchedNode;
 import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchGroup;
@@ -59,7 +58,7 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
 
     public DispatchAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(ProcessingPerspective.ID, this);
+        SessionManager.addView(ID, this);
     }
 
     @Override
@@ -104,7 +103,7 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
             }
         });
         radioDateSent = new Button(composite, SWT.RADIO);
-        radioDateSent.setText("Date Sent");
+        radioDateSent.setText("Departed");
         radioDateSent.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -182,14 +181,14 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
         try {
             List<? extends ModelWrapper<?>> searchedObject = search();
             if (searchedObject == null || searchedObject.size() == 0) {
-                String msg = "No Shipment found";
+                String msg = "No Dispatch found";
                 if (radioWaybill.getSelection()) {
                     msg += " for waybill " + treeText.getText();
                 } else {
                     msg += " for date "
                         + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
-                BioBankPlugin.openMessage("Shipment not found", msg);
+                BioBankPlugin.openMessage("Dispatch not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);

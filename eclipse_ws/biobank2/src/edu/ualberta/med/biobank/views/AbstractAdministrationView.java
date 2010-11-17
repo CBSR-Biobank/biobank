@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.Map;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -7,7 +9,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.ISourceProviderListener;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.services.ISourceProviderService;
 
+import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -70,6 +77,32 @@ public abstract class AbstractAdministrationView extends
         adaptersTree.getTreeViewer().setInput(rootNode);
         getSite().setSelectionProvider(adaptersTree.getTreeViewer());
         adaptersTree.getTreeViewer().expandAll();
+
+        // listen to login state
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+        SessionState sessionSourceProvider = (SessionState) service
+            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
+        sessionSourceProvider
+            .addSourceProviderListener(new ISourceProviderListener() {
+
+                @SuppressWarnings("rawtypes")
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    Map sourceValuesByName) {
+                }
+
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    if (sourceName.equals(SessionState.LOGIN_STATE_SOURCE_NAME)) {
+                        setSearchFieldsEnablement(sourceValue
+                            .equals(SessionState.LOGGED_IN));
+                    }
+                }
+            });
 
     }
 

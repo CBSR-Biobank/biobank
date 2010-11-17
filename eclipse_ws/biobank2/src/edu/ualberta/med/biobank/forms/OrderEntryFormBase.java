@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 
-public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
+public class OrderEntryFormBase extends AbstractShipmentEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
     private DispatchAliquotsTreeTable aliquotsTree;
@@ -71,26 +71,19 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
             "Study");
         setTextValue(studyLabel, dispatch.getStudy().getName());
         BiobankText senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Sender");
+            "Research Group");
         setTextValue(senderLabel, dispatch.getSender().getName());
         BiobankText receiverLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Receiver");
         setTextValue(receiverLabel, dispatch.getReceiver().getName());
         BiobankText departedLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Departed");
+            SWT.NONE, "Order Placed");
         setTextValue(departedLabel, dispatch.getFormattedDeparted());
         BiobankText shippingMethodLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Shipping Method");
-        setTextValue(shippingMethodLabel,
-            dispatch.getShippingMethod() == null ? "" : dispatch
-                .getShippingMethod().getName());
-        BiobankText waybillLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Waybill");
-        setTextValue(waybillLabel, dispatch.getWaybill());
+            SWT.NONE, "Order Number");
         BiobankText dateReceivedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date received");
         setTextValue(dateReceivedLabel, dispatch.getFormattedDateReceived());
-
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null, dispatch, "comment", null);
 
@@ -190,7 +183,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
 
     @Override
     protected String getTextForPartName() {
-        return "Dispatch sent on " + dispatch.getDeparted();
+        return "Order placed on " + dispatch.getDeparted();
     }
 
     @Override

@@ -22,6 +22,13 @@ public class BasicSiteCombo extends ComboViewer {
     public BasicSiteCombo(Composite parent,
         WritableApplicationService appService) {
         super(parent, SWT.READ_ONLY);
+        getCombo().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        if (appService != null) {
+            init(appService);
+        }
+    }
+
+    public void init(WritableApplicationService appService) {
         setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object e) {
@@ -35,8 +42,6 @@ public class BasicSiteCombo extends ComboViewer {
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Failed to load sites", e1);
         }
-        getCombo().setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
         addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
@@ -48,6 +53,14 @@ public class BasicSiteCombo extends ComboViewer {
 
     public SiteWrapper getSite() {
         return selectedSite;
+    }
+
+    public void setEnabled(boolean b) {
+        getCombo().setEnabled(b);
+    }
+
+    public boolean isEnabled() {
+        return getCombo().isEnabled();
     }
 
 }

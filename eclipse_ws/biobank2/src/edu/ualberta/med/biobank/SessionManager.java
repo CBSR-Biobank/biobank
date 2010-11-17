@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -189,9 +190,10 @@ public class SessionManager {
         if (workbench != null) {
             workbenchWindow = workbench.getActiveWorkbenchWindow();
             if (workbenchWindow != null) {
-                IWorkbenchPage activePage = workbenchWindow.getActivePage();
-                return getInstance().possibleViewMap.get(activePage
-                    .getPerspective().getId());
+                IWorkbenchPage page = workbenchWindow.getActivePage();
+                for (IViewPart view : getInstance().possibleViewMap.values())
+                    if (page.isPartVisible(view))
+                        return (AbstractViewWithAdapterTree) view;
             }
         }
         return null;

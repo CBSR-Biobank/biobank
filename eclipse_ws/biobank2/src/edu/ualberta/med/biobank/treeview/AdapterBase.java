@@ -355,16 +355,10 @@ public abstract class AdapterBase {
             @Override
             public void run() {
                 loadChildren(true);
-                try {
-                    loadChildrenSemaphore.acquire();
-                } catch (InterruptedException e) {
-                    BioBankPlugin.openAsyncError("Child expand failed", e);
-                }
                 RootNode root = getRootNode();
                 if (root != null) {
                     root.expandChild(AdapterBase.this);
                 }
-                loadChildrenSemaphore.release();
             }
         });
     }
@@ -458,7 +452,7 @@ public abstract class AdapterBase {
                                 Assert.isNotNull(node);
                                 node.setModelObject(child);
                                 final AdapterBase nodeToUpdate = node;
-                                Display.getDefault().asyncExec(new Runnable() {
+                                Display.getDefault().syncExec(new Runnable() {
                                     @Override
                                     public void run() {
                                         SessionManager

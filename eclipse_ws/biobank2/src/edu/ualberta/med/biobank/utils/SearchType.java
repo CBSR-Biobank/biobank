@@ -143,11 +143,6 @@ public enum SearchType {
         return label;
     }
 
-    public List<? extends ModelWrapper<?>> search(String searchString)
-        throws Exception {
-        return search(searchString, null);
-    }
-
     public abstract List<? extends ModelWrapper<?>> search(String searchString,
         SiteWrapper site) throws Exception;
 

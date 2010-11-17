@@ -12,6 +12,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StackLayout;
@@ -40,6 +41,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -366,6 +368,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void createFieldsComposite() throws Exception {
         Composite leftSideComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -387,11 +390,26 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
+        widgetCreator.createLabel(fieldsComposite, "Site");
         siteCombo = new BasicSiteCombo(fieldsComposite, appService);
+        siteCombo.setSelection(new StructuredSelection(
+            ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
+        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
+            @Override
+            public void selectionChanged(SelectionChangedEvent event) {
+                linkFormPatientManagement.setSite(siteCombo.getSite());
+                linkFormPatientManagement.setVisitsList();
+            }
+        });
+
+        GridData gds = new GridData();
+        gds.horizontalSpan = 2;
+        gds.horizontalAlignment = SWT.FILL;
+        siteCombo.getCombo().setLayoutData(gds);
         setFirstControl(siteCombo.getControl());
 
+        linkFormPatientManagement.setSite(siteCombo.getSite());
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
-
         linkFormPatientManagement.createVisitCombo(fieldsComposite);
 
         createProfileComboBox(fieldsComposite);

@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectShipmentClinicDialog;
-import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -50,7 +49,7 @@ public class ShipmentAdministrationView extends
 
     public ShipmentAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(ProcessingPerspective.ID, this);
+        SessionManager.addView(ID, this);
     }
 
     @Override

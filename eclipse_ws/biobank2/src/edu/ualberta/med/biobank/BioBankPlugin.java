@@ -46,6 +46,10 @@ import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchGrou
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchGroup;
+import edu.ualberta.med.biobank.treeview.order.FilledOrderNode;
+import edu.ualberta.med.biobank.treeview.order.NewOrderNode;
+import edu.ualberta.med.biobank.treeview.order.ProcessingOrderNode;
+import edu.ualberta.med.biobank.treeview.order.ShippedOrderNode;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
@@ -122,6 +126,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SCAN_CLOSE_EDIT = "scanCloseEdit";
     public static final String IMG_RECEIVED = "received";
     public static final String IMG_SENT = "sent";
+    public static final String IMG_ORDER = "order";
+    public static final String IMG_ORDER_EDIT = "order_edit";
+    public static final String IMG_ORDER_SHIPPED = "order_shipped";
+    public static final String IMG_ORDER_FILLED = "order_filled";
     public static final String IMG_ALIQUOT = "aliquot";
     public static final String IMG_LOCK = "lock";
 
@@ -176,6 +184,14 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
         classToImageKey.put(DispatchAdapter.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT);
+        classToImageKey.put(NewOrderNode.class.getName(),
+            BioBankPlugin.IMG_ORDER);
+        classToImageKey.put(ProcessingOrderNode.class.getName(),
+            BioBankPlugin.IMG_ORDER_EDIT);
+        classToImageKey.put(ShippedOrderNode.class.getName(),
+            BioBankPlugin.IMG_ORDER_SHIPPED);
+        classToImageKey.put(FilledOrderNode.class.getName(),
+            BioBankPlugin.IMG_ORDER_FILLED);
         classToImageKey.put(AliquotAdapter.class.getName(),
             BioBankPlugin.IMG_ALIQUOT);
     };
@@ -274,6 +290,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
             "dispatch_error.png");
         registerImage(registry, IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT,
             "dispatchScanAdd.png");
+        registerImage(registry, IMG_ORDER, "order.png");
+        registerImage(registry, IMG_ORDER_EDIT, "order_edit.png");
+        registerImage(registry, IMG_ORDER_SHIPPED, "order_shipped.png");
+        registerImage(registry, IMG_ORDER_FILLED, "order_filled.png");
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_SITES, "sites.png");
         registerImage(registry, IMG_STUDIES, "studies.png");

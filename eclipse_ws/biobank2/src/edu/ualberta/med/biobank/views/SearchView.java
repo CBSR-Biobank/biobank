@@ -8,6 +8,7 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
@@ -19,7 +20,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.ISourceProvider;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -27,9 +27,12 @@ import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.sourceproviders.SiteSelectionState;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.utils.SearchType;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
 public class SearchView extends ViewPart {
@@ -38,14 +41,48 @@ public class SearchView extends ViewPart {
 
     private BiobankText searchText;
     private ComboViewer searchTypeCombo;
-
-    private ISourceProviderListener siteStateListener;
+    private BasicSiteCombo siteCombo;
 
     private Button searchButton;
+
+    protected static boolean loggedIn;
 
     @Override
     public void createPartControl(Composite parent) {
         parent.setLayout(new GridLayout(2, false));
+
+        IWorkbenchWindow window = PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow();
+        ISourceProviderService service = (ISourceProviderService) window
+            .getService(ISourceProviderService.class);
+
+        // listen to login state
+        SessionState sessionSourceProvider = (SessionState) service
+            .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
+        sessionSourceProvider
+            .addSourceProviderListener(new ISourceProviderListener() {
+
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    @SuppressWarnings("rawtypes") Map sourceValuesByName) {
+                }
+
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    if (sourceName.equals(SessionState.LOGIN_STATE_SOURCE_NAME)) {
+                        loggedIn = sourceValue.equals(SessionState.LOGGED_IN);
+                        setEnabled();
+                    }
+                }
+            });
+
+        siteCombo = new BasicSiteCombo(parent, null);
+        GridData gds = new GridData();
+        gds.horizontalSpan = 2;
+        gds.horizontalAlignment = SWT.FILL;
+        gds.grabExcessHorizontalSpace = true;
+        siteCombo.getCombo().setLayoutData(gds);
 
         searchTypeCombo = new ComboViewer(parent);
         searchTypeCombo.setContentProvider(new ArrayContentProvider());
@@ -55,6 +92,7 @@ public class SearchView extends ViewPart {
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
+
         searchTypeCombo.getCombo().setLayoutData(gd);
         searchTypeCombo
             .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -93,34 +131,11 @@ public class SearchView extends ViewPart {
             }
         });
 
-        ISourceProvider siteSelectionStateSourceProvider = getSiteSelectionStateSourceProvider();
-        Integer siteId = (Integer) siteSelectionStateSourceProvider
-            .getCurrentState().get(SiteSelectionState.SITE_SELECTION_ID);
-        setSearchEnable(siteId);
-        siteStateListener = new ISourceProviderListener() {
-            @Override
-            public void sourceChanged(int sourcePriority, String sourceName,
-                Object sourceValue) {
-                if (sourceName.equals(SiteSelectionState.SITE_SELECTION_ID)) {
-                    setSearchEnable((Integer) sourceValue);
-                }
-            }
+        loggedIn = sessionSourceProvider.getCurrentState()
+            .get(SessionState.LOGIN_STATE_SOURCE_NAME)
+            .equals(SessionState.LOGGED_IN);
+        setEnabled();
 
-            @SuppressWarnings({ "rawtypes" })
-            @Override
-            public void sourceChanged(int sourcePriority, Map sourceValuesByName) {
-            }
-        };
-
-        siteSelectionStateSourceProvider
-            .addSourceProviderListener(siteStateListener);
-    }
-
-    private void setSearchEnable(Integer siteId) {
-        boolean enable = (siteId != null && siteId >= 0);
-        searchTypeCombo.getCombo().setEnabled(enable);
-        searchText.setEnabled(enable);
-        searchButton.setEnabled(enable);
     }
 
     @Override
@@ -131,18 +146,6 @@ public class SearchView extends ViewPart {
     @Override
     public void dispose() {
         super.dispose();
-        getSiteSelectionStateSourceProvider().removeSourceProviderListener(
-            siteStateListener);
-    }
-
-    private ISourceProvider getSiteSelectionStateSourceProvider() {
-        IWorkbenchWindow window = PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow();
-        ISourceProviderService service = (ISourceProviderService) window
-            .getService(ISourceProviderService.class);
-        ISourceProvider siteSelectionStateSourceProvider = service
-            .getSourceProvider(SiteSelectionState.SITE_SELECTION_ID);
-        return siteSelectionStateSourceProvider;
     }
 
     private void search() {
@@ -154,8 +157,8 @@ public class SearchView extends ViewPart {
                 SearchType type = (SearchType) ((IStructuredSelection) searchTypeCombo
                     .getSelection()).getFirstElement();
                 try {
-                    List<? extends ModelWrapper<?>> res = type
-                        .search(searchString);
+                    List<? extends ModelWrapper<?>> res = type.search(
+                        searchString, siteCombo.getSite());
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {
@@ -169,4 +172,18 @@ public class SearchView extends ViewPart {
         });
     }
 
+    @SuppressWarnings("unchecked")
+    public void setEnabled() {
+        if (!searchText.isDisposed()) {
+            searchText.setEnabled(loggedIn);
+            searchTypeCombo.getCombo().setEnabled(loggedIn);
+            siteCombo.setEnabled(loggedIn);
+            searchButton.setEnabled(loggedIn);
+            if (loggedIn) {
+                siteCombo.init(SessionManager.getAppService());
+                siteCombo.setSelection(new StructuredSelection(
+                    ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
+            }
+        }
+    }
 }

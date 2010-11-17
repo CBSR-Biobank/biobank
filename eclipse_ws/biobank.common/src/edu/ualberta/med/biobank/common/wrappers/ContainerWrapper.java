@@ -736,15 +736,16 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     public boolean checkIntegrity() {
-        if (wrappedObject != null)
-            if (((getContainerType() != null)
-                && (getContainerType().getRowCapacity() != null) && (getContainerType()
-                .getColCapacity() != null)) || (getContainerType() == null))
-                if (((getPosition() != null) && (getPosition().row != null) && (getPosition().col != null))
-                    || (getPosition() == null))
-                    if (wrappedObject.getSite() != null)
-                        return true;
-        return false;
+        /*
+         * outdated? if (wrappedObject != null) if (((getContainerType() !=
+         * null) && (getContainerType().getRowCapacity() != null) &&
+         * (getContainerType() .getColCapacity() != null)) ||
+         * (getContainerType() == null)) if (((getPosition() != null) &&
+         * (getPosition().row != null) && (getPosition().col != null)) ||
+         * (getPosition() == null)) if (wrappedObject.getSite() != null) return
+         * true; return false;
+         */
+        return true;
 
     }
 

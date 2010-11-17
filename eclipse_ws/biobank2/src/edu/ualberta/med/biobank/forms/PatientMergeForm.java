@@ -163,7 +163,8 @@ public class PatientMergeForm extends BiobankEntryForm {
             "Study");
 
         patient1VisitsTable = new ClinicVisitInfoTable(patientArea1,
-            patient1Adapter.getWrapper().getPatientVisitCollection(true, true));
+            patient1Adapter.getWrapper().getPatientVisitCollection(true, true,
+                null));
         GridData gd1 = new GridData();
         gd1.horizontalSpan = 2;
         gd1.grabExcessHorizontalSpace = true;
@@ -294,7 +295,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         study1Text.setText(patient1Adapter.getWrapper().getStudy()
             .getNameShort());
         patient1VisitsTable.setCollection(patient1Adapter.getWrapper()
-            .getPatientVisitCollection(true, true));
+            .getPatientVisitCollection(true, true, null));
         pnumber2Text.setText("");
         study2Text.setText("");
         patient2VisitsTable.setCollection(new ArrayList<PatientVisitWrapper>());

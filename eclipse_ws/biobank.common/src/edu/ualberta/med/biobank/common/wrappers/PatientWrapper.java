@@ -128,11 +128,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public List<PatientVisitWrapper> getPatientVisitCollection() {
-        return getPatientVisitCollection(true, false);
+        return getPatientVisitCollection(true, false, null);
     }
 
     public List<PatientVisitWrapper> getPatientVisitCollection(boolean sort,
-        final boolean ascending) {
+        final boolean ascending, SiteWrapper site) {
         // TODO: gee, I hope that when you modify this collection it isn't meant
         // to modify the internals of the PatientWrapper object. Ask Delphine.
         List<PatientVisitWrapper> patientVisitCollection = null;
@@ -140,7 +140,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         if (csps != null && csps.size() > 0) {
             patientVisitCollection = new ArrayList<PatientVisitWrapper>();
             for (ShipmentPatientWrapper csp : csps) {
-                patientVisitCollection.addAll(csp.getPatientVisitCollection());
+                if (site == null || (csp.getShipment().getSite().equals(site)))
+                    patientVisitCollection.addAll(csp
+                        .getPatientVisitCollection());
             }
         }
         if (sort && patientVisitCollection != null) {
@@ -442,7 +444,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patients;
     }
 
-    public List<PatientVisitWrapper> getLast7DaysPatientVisits()
+    public List<PatientVisitWrapper> getLast7DaysPatientVisits(SiteWrapper site)
         throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // today midnight
@@ -460,8 +462,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                 + Patient.class.getName()
                 + " as p join p.shipmentPatientCollection as csps"
                 + " join csps.patientVisitCollection as visits"
-                + " where p.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
-            Arrays.asList(new Object[] { getId(), startDate, endDate }));
+                + " where p.id = ? and csps.shipment.site.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
+            Arrays.asList(new Object[] { getId(), site.getId(), startDate,
+                endDate }));
         List<PatientVisit> res = appService.query(criteria);
         List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
         for (PatientVisit v : res) {
