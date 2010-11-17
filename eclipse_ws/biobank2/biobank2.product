@@ -25,7 +25,7 @@ by AICML
 
    <splash
       location="biobank2" />
-   <launcher name="biobank2">
+   <launcher name="BioBank2">
       <linux icon="/biobank2/icons/biobank_launcher.xpm"/>
       <macosx icon="/biobank2/icons/biobank_launcher.icns"/>
       <solaris/>
