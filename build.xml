@@ -56,7 +56,7 @@
   <condition property="debugFileExtension" value="-debug" else="">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
-  <condition property="LOG4J_LEVEL" value="info" else="error">
+  <condition property="LOG4J_LEVEL" value="debug" else="error">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="isHostAicmlMed">
@@ -168,7 +168,7 @@
       <srcfiles file="model/biobank2.uml" />
     </uptodate>
   </target>
-  <target name="sdk" depends="check-cacore-sdk-uptodate"
+  <target name="sdk" depends="log4j-conf,check-cacore-sdk-uptodate"
           unless="cacore.sdk.uptodate"
           description="builds the caCORE SDK from the data model">
     <copy file="sdk_conf/deploy.properties"
@@ -179,10 +179,14 @@
     <copy file="sdk_conf/application-config-client.xml" tofile="${cacore.sdk.dir}/conf/system/package/local-client/conf/application-config-client.xml" />
     <copy file="sdk_conf/application-config-client-info.xml" tofile="${cacore.sdk.dir}/conf/system/package/remote-client/conf/application-config-client-info.xml" />
     <copy file="sdk_conf/application-config-security.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
+    <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
+  </target>
+  <target name="log4j-conf">
     <copy file="security-logs/log4j.xml"
           tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" overwrite="true"/>
     <replace file="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" token="@LOG4J_LEVEL@" value="${LOG4J_LEVEL}"/>
-    <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
+    <copy file="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml"
+	  tofile="${cacore.sdk.dir}/${build.conf.system.web.dir}/WEB-INF/classes/log4j.xml" overwrite="true"/>
   </target>
   <target name="sdk-files" depends="sdk">
     <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib"
