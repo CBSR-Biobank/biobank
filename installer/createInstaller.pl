@@ -44,8 +44,6 @@
 # fix backslashes
 ($NSIS_PATH = "$ENV{'PROGRAMFILES'}/nsis") =~ s|\\|\/|;
 
-print "nsis_path: $NSIS_PATH\n";
-
 $NSIS_PROGRAM = "$NSIS_PATH/makensis";
 
 $VERSION = "";
@@ -103,7 +101,7 @@ print "Copying the exported biobank folder...\n";
 `cp -R $NSIS_DIR tmp/nsis`;
 -d "tmp/nsis" or die "could not create nsis directory";
 
-open(FH, "tmp/nsis/Biobank.nsi") or die "failed to open tmp/nsis/Biobank.nsi";
+open(FH, "tmp/nsis/BioBank2.nsi") or die "failed to open tmp/nsis/Biobank.nsi";
 open(FHA, ">tmp/nsis/BiobankTMP.nsi") or die "failed to create tmp/nsis/BiobankTMP.nsi";
 while($line = <FH>){
         if($line =~ m/define VERSION_STR/ ){
