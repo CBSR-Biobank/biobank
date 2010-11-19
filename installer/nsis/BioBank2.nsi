@@ -162,8 +162,6 @@ Section "!BioBank Core(Required)" BioBank
   ;Make it required
   SectionIn RO
   
-  LogSet on
-  
   ; quicklaunch shortcuts should be named BioBank2 and not BioBank
   IfFileExists "$QUICKLAUNCH\BioBank.lnk" 0 CHECK_DESKTOP_SHORTCUT
   Delete "$QUICKLAUNCH\BioBank.lnk"  
@@ -175,18 +173,16 @@ CHECK_DESKTOP_SHORTCUT:
   
 CHECK_PREV_INSTALL:  
   ;If we find the BioBank key.. then uninstall the previous version of BioBank
-  WriteRegStr HKLM SOFTWARE\${PRODUCT_NAME} "debug3" "here"
-  ReadRegStr $STARTMENU_STR HKLM SOFTWARE\BioBank "BioBank"  
+  ClearErrors
+  ReadRegStr $0 HKLM Software\BioBank "BioBank"
   IfErrors 0 PREV_INSTALL 
   
-  DetailPrint "BioBank registry key: $STARTMENU_STR"
-  
-  ReadRegStr $STARTMENU_STR HKLM SOFTWARE\${PRODUCT_NAME} "${PRODUCT_NAME}"
+  StrCpy $0 "${PRODUCT_NAME}"
+  ReadRegStr $0 HKLM SOFTWARE\${PRODUCT_NAME} $0
   IfErrors NOT_PREV_INSTALLED 0
-  
+
   ;Biobank is installed from nsis, remove it.
 PREV_INSTALL:  
-  WriteRegStr HKLM SOFTWARE\${PRODUCT_NAME} "debug" "uninstalling old version"
   !insertmacro MACRO_UNINSTALL
   goto INSTALL_BIOBANK_CORE    
  
