@@ -187,8 +187,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     }
 
-    protected void createCustomDialogContents(
-        @SuppressWarnings("unused") Composite parent) {
+    @SuppressWarnings("unused")
+    protected void createCustomDialogContents(Composite parent) {
     }
 
     protected abstract List<CellStatus> getPalletCellStatus();
