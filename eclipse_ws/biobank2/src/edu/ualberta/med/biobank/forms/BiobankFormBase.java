@@ -342,9 +342,15 @@ public abstract class BiobankFormBase extends EditorPart {
 
     protected BiobankText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
-        BiobankText result = (BiobankText) createLabelledWidget(parent,
-            BiobankText.class, SWT.READ_ONLY | widgetOptions, fieldLabel, value);
-        return result;
+        return widgetCreator.createReadOnlyLabelledField(parent, widgetOptions,
+            fieldLabel, value, false);
+    }
+
+    protected BiobankText createReadOnlyLabelledField(Composite parent,
+        int widgetOptions, String fieldLabel, String value,
+        boolean useBackgroundColor) {
+        return widgetCreator.createReadOnlyLabelledField(parent, widgetOptions,
+            fieldLabel, value, useBackgroundColor);
     }
 
     protected BiobankText createReadOnlyLabelledField(Composite parent,

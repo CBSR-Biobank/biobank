@@ -269,8 +269,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 }
             });
 
-        linkFormPatientManagement.createVisitCombo(fieldsComposite);
-        linkFormPatientManagement.createVisitText(fieldsComposite);
+        linkFormPatientManagement.createVisitWidgets(fieldsComposite);
 
         // inventoryID
         inventoryIDValidator = new CabinetInventoryIDValidator();
@@ -916,8 +915,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         appendLogNLS(msgString, posStr, aliquot.getInventoryId(), aliquot
             .getSampleType().getName(), linkFormPatientManagement
             .getCurrentPatient().getPnumber(), aliquot.getPatientVisit()
-            .getFormattedDateProcessed(), aliquot.getPatientVisit()
-            .getShipment().getClinic().getName());
+            .getFormattedDateDrawn(), aliquot.getPatientVisit().getShipment()
+            .getClinic().getName());
         setFinished(false);
     }
 

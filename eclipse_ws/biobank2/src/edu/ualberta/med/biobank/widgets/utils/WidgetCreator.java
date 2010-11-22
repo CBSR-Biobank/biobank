@@ -37,11 +37,13 @@ import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Widget;
 import org.eclipse.ui.forms.widgets.FormToolkit;
@@ -70,6 +72,9 @@ public class WidgetCreator {
     private ModifyListener modifyListener;
 
     private SelectionListener selectionListener;
+
+    public static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
+        .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 
     public WidgetCreator(Map<String, Control> controls) {
         this.controls = controls;
@@ -694,5 +699,36 @@ public class WidgetCreator {
 
     public void hideWidget(Control widget) {
         showWidget(widget, false);
+    }
+
+    public BiobankText createReadOnlyLabelledField(Composite parent,
+        int widgetOptions, String fieldLabel, String value,
+        boolean useBackgroundColor) {
+        BiobankText widget = (BiobankText) createLabelledWidget(parent,
+            BiobankText.class, SWT.READ_ONLY | widgetOptions, fieldLabel, value);
+        if (useBackgroundColor)
+            widget.setBackground(READ_ONLY_TEXT_BGR);
+        return widget;
+    }
+
+    public BiobankText createReadOnlyField(Composite parent, int widgetOptions,
+        String value, boolean useBackgroundColor) {
+        BiobankText widget = (BiobankText) createWidget(parent,
+            BiobankText.class, SWT.READ_ONLY | widgetOptions, value);
+        if (useBackgroundColor)
+            widget.setBackground(READ_ONLY_TEXT_BGR);
+        return widget;
+    }
+
+    protected BiobankText createReadOnlyLabelledField(Composite parent,
+        int widgetOptions, String fieldLabel, String value) {
+        return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
+            value, false);
+    }
+
+    public BiobankText createReadOnlyLabelledField(Composite parent,
+        int widgetOptions, String fieldLabel) {
+        return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
+            null);
     }
 }

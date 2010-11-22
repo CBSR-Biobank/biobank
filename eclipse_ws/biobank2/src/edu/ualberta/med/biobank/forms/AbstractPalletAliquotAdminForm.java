@@ -253,15 +253,16 @@ public abstract class AbstractPalletAliquotAdminForm extends
     }
 
     protected void createProfileComboBox(Composite fieldsComposite) {
-
         Label lbl = widgetCreator.createLabel(fieldsComposite, "Profile");
         profilesCombo = widgetCreator.createComboViewer(fieldsComposite, lbl,
             null, null, "Invalid profile selected", false, null, null); //$NON-NLS-1$
 
-        GridData gridData = new GridData();
-        gridData.grabExcessHorizontalSpace = true;
-        gridData.horizontalAlignment = SWT.FILL;
-        profilesCombo.getCombo().setLayoutData(gridData);
+        GridData gd = new GridData();
+        gd.horizontalAlignment = SWT.FILL;
+        if (((GridLayout) fieldsComposite.getLayout()).numColumns == 3) {
+            gd.horizontalSpan = 2;
+        }
+        profilesCombo.getCombo().setLayoutData(gd);
         loadProfileCombo();
     }
 

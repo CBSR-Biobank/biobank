@@ -19,7 +19,6 @@ import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -386,22 +385,14 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
 
-        linkFormPatientManagement.createVisitCombo(fieldsComposite);
+        linkFormPatientManagement.createVisitWidgets(fieldsComposite);
 
         createProfileComboBox(fieldsComposite);
-        new Label(fieldsComposite, SWT.NONE);
-        /* expects 3 controls per line */
-        profilesCombo.getCombo().addSelectionListener(new SelectionListener() {
-
+        // specific for scan link:
+        profilesCombo.getCombo().addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 spw.loadProfile(profilesCombo.getCombo().getText());
-
-            }
-
-            @Override
-            public void widgetDefaultSelected(SelectionEvent e) {
-
             }
         });
 
@@ -624,7 +615,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 sb.append(Messages.getFormattedString(
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),
-                    patientVisit.getFormattedDateProcessed(), patientVisit
+                    patientVisit.getFormattedDateDrawn(), patientVisit
                         .getShipment().getClinic().getName(), cell.getType()
                         .getName()));
                 nber++;
@@ -633,8 +624,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         patientVisit.addAliquots(newAliquots);
         patientVisit.persist();
         appendLog(sb.toString());
-        appendLogNLS(
-            "ScanLink.activitylog.save.summary", nber, patientVisit.getFormattedDateProcessed()); //$NON-NLS-1$ 
+        appendLogNLS("ScanLink.activitylog.save.summary", nber, patientVisit
+            .getPatient().getPnumber(), patientVisit.getFormattedDateDrawn(),
+            patientVisit.getFormattedDateProcessed()); //$NON-NLS-1$
         setFinished(false);
     }
 

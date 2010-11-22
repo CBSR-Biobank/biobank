@@ -896,7 +896,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         sb.append(Messages.getFormattedString(
             "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
             posStr, cell.getValue(), aliquot.getSampleType().getName(), visit
-                .getPatient().getPnumber(), visit.getFormattedDateProcessed(),
+                .getPatient().getPnumber(), visit.getFormattedDateDrawn(),
             visit.getShipment().getClinic().getName()));
     }
 

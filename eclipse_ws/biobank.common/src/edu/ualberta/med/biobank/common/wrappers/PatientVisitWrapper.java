@@ -645,7 +645,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
     @Override
     public String toString() {
-        return getFormattedDateProcessed();
+        return "Date Processed:" + getFormattedDateProcessed()
+            + " / Date Drawn: " + getFormattedDateDrawn();
     }
 
     @Override

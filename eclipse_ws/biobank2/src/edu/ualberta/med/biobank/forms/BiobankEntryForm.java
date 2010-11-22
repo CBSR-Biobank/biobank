@@ -31,7 +31,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -73,9 +72,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(BiobankEntryForm.class.getName());
-
-    public static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
-        .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 
     protected String sessionName;
 
@@ -333,20 +329,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     protected BiobankText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
-        BiobankText widget = super.createReadOnlyLabelledField(parent,
-            widgetOptions, fieldLabel, value);
-        widget.setBackground(READ_ONLY_TEXT_BGR);
-        return widget;
-    }
-
-    protected BiobankText createReadOnlyLabelledField(Composite parent,
-        int widgetOptions, String fieldLabel,
-        IObservableValue modelObservableValue) {
-        BiobankText widget = (BiobankText) createBoundWidgetWithLabel(parent,
-            BiobankText.class, widgetOptions | SWT.READ_ONLY, fieldLabel, null,
-            modelObservableValue, null);
-        widget.setBackground(READ_ONLY_TEXT_BGR);
-        return widget;
+        return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
+            value, true);
     }
 
     protected void bindChangeListener() {
