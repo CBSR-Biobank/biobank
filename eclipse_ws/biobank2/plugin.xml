@@ -102,6 +102,12 @@
             name="Dispatch View">
       </perspective>
       <perspective
+            class="edu.ualberta.med.biobank.rcp.perspective.ReportAdministrationPerspective"
+            id="edu.ualberta.med.biobank.perspective.advancedReports"
+            icon="icons/reportsPerspective.png"
+            name="Advanced Reports View">
+      </perspective>
+      <perspective
             class="edu.ualberta.med.biobank.rcp.perspective.LoggingPerspective"
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.perspective.logging"
@@ -300,6 +306,10 @@
       <command
             id="edu.ualberta.med.biobank.commands.dispatchAdmin"
             name="Dispatch Administration">
+      </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.advancedReports"
+            name="Advanced Reports">
       </command>
        <command
             id="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
@@ -1025,6 +1035,22 @@
          </enabledWhen>
       </handler>
       <handler
+            class="edu.ualberta.med.biobank.handlers.AdvancedReportsHandler"
+            commandId="edu.ualberta.med.biobank.commands.advancedReports">
+         <enabledWhen>
+            <and>
+               <not>
+                 <reference
+                       definitionId="biobank2.advancedReportsPerspectiveSelected">
+                 </reference>
+               </not>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+            </and>
+         </enabledWhen>
+      </handler>
+      <handler
             class="edu.ualberta.med.biobank.handlers.DispatchAddHandler"
             commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd">
          <activeWhen>
@@ -1277,6 +1303,12 @@
                   style="push">
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.advancedReports"
+                  icon="icons/reportsPerspective.png"
+                  label="Advanced Reports View"
+                  style="push">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.reports"
                   icon="icons/reportsPerspective.png"
                   label="Reports View"
@@ -1428,6 +1460,12 @@
                   commandId="edu.ualberta.med.biobank.commands.dispatchAdmin"
                   icon="icons/dispatch.png"
                   label="Dispatch View"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.advancedReports"
+                  icon="icons/reportsPerspective.png"
+                  label="Advanced Reports View"
                   style="push">
             </command>
             <command
@@ -1945,6 +1983,32 @@
                visible="false">
          </view>
       </perspectiveExtension>
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective.advancedReports">
+         <view
+               closeable="true"
+               id="org.eclipse.pde.runtime.LogView"
+               minimized="false"
+               moveable="true"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.ReportAdministrationView"
+               minimized="false"
+               moveable="false"
+               ratio="0.4"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+      </perspectiveExtension>
       </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -2114,6 +2178,13 @@
             icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.forms.DispatchEntryForm"
             name="Dispatch Entry">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ReportEntryForm"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.forms.ReportEntryForm"
+            name="Report Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.DispatchViewForm"
@@ -2599,6 +2670,13 @@
             restorable="true">
       </view>
       <view
+            class="edu.ualberta.med.biobank.views.ReportAdministrationView"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.views.ReportAdministrationView"
+            name="Advanced Reports"
+            restorable="true">
+      </view>
+      <view
             class="edu.ualberta.med.biobank.views.SearchView"
             icon="icons/search.png"
             id="edu.ualberta.med.biobank.views.SearchView"
@@ -2658,6 +2736,15 @@
                variable="activeWorkbenchWindow.activePerspective">
             <equals
                   value="edu.ualberta.med.biobank.perspective.dispatchs">
+            </equals>
+         </with>
+      </definition>
+      <definition
+            id="biobank2.advancedReportsPerspectiveSelected">
+         <with
+               variable="activeWorkbenchWindow.activePerspective">
+            <equals
+                  value="edu.ualberta.med.biobank.perspective.advancedReports">
             </equals>
          </with>
       </definition>

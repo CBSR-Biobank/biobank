@@ -123,4 +123,8 @@ public class DateTimeWidget extends BiobankWidget {
     public void addSelectionListener(SelectionListener listener) {
         dateEntry.addSelectionListener(listener);
     }
+
+    public String getPattern() {
+        return dateEntry.getPattern();
+    }
 }
