@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
-import edu.ualberta.med.biobank.forms.DispatchViewForm;
+import edu.ualberta.med.biobank.forms.OrderEntryFormBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.DispatchAdministrationView;
 
@@ -60,7 +60,7 @@ public class OrderAdapter extends AdapterBase {
             label += study.getNameShort() + " - ";
         }
 
-        label += shipment.getFormattedDeparted();
+        label += "123532132";
         return label;
 
     }
@@ -185,7 +185,7 @@ public class OrderAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        return null;
+        return new OrderAdapter(this, (DispatchWrapper) child);
     }
 
     @Override
@@ -201,7 +201,7 @@ public class OrderAdapter extends AdapterBase {
 
     @Override
     public String getViewFormId() {
-        return DispatchViewForm.ID;
+        return OrderEntryFormBase.ID;
     }
 
     @Override

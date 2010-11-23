@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class OutgoingNode extends AdapterBase {
@@ -20,13 +21,13 @@ public class OutgoingNode extends AdapterBase {
     private InCreationDispatchGroup creationNode;
     private SentInTransitDispatchGroup sentTransitNode;
 
-    public OutgoingNode(AdapterBase parent, int id) {
+    public OutgoingNode(AdapterBase parent, int id, SiteWrapper site) {
         super(parent, id, "Outgoing", true, false);
-        creationNode = new InCreationDispatchGroup(this, 0);
+        creationNode = new InCreationDispatchGroup(this, 0, site);
         creationNode.setParent(this);
         addChild(creationNode);
 
-        sentTransitNode = new SentInTransitDispatchGroup(this, 1);
+        sentTransitNode = new SentInTransitDispatchGroup(this, 1, site);
         sentTransitNode.setParent(this);
         addChild(sentTransitNode);
     }

@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
+import edu.ualberta.med.biobank.views.DispatchAdministrationView;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -81,6 +82,7 @@ public class SessionManager {
         rootNode.addChild(sessionAdapter);
 
         rebuildSession();
+        rebuiltDispatch();
         updateMenus();
 
         if (sessionAdapter.getUser().isNeedToChangePassword()) {
@@ -90,9 +92,16 @@ public class SessionManager {
         }
     }
 
+    private void rebuiltDispatch() {
+        DispatchAdministrationView view = DispatchAdministrationView
+            .getCurrent();
+        view.createNodes();
+    }
+
     public void deleteSession() throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
         rootNode.removeChild(sessionAdapter);
+        DispatchAdministrationView.getCurrent().clear();
         sessionAdapter = null;
         updateMenus();
         ServiceConnection.logout(appService);

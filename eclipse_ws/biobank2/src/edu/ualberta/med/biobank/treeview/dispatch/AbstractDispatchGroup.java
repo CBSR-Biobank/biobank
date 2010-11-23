@@ -7,13 +7,18 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public abstract class AbstractDispatchGroup extends AdapterBase {
 
-    public AbstractDispatchGroup(AdapterBase parent, int id, String name) {
+    SiteWrapper site;
+
+    public AbstractDispatchGroup(AdapterBase parent, int id, String name,
+        SiteWrapper site) {
         super(parent, id, name, true, true);
+        this.site = site;
     }
 
     @Override

@@ -16,27 +16,14 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchSearchedNode;
-import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchGroup;
-import edu.ualberta.med.biobank.treeview.dispatch.IncomingNode;
-import edu.ualberta.med.biobank.treeview.dispatch.OutgoingNode;
-import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchGroup;
-import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchGroup;
-import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchGroup;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class DispatchAdministrationView extends AbstractAdministrationView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.DispatchAdministrationView";
-
-    public InCreationDispatchGroup creationNode;
-
-    public SentInTransitDispatchGroup sentTransitNode;
-
-    public ReceivingInTransitDispatchGroup receivedTransitNode;
-
-    public ReceivingNoErrorsDispatchGroup receivingNode;
 
     private Button radioWaybill;
 
@@ -48,9 +35,7 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
 
     private DispatchSearchedNode searchedNode;
 
-    private IncomingNode incomingNode;
-
-    private OutgoingNode outgoingNode;
+    List<SiteWrapper> siteNodes;
 
     private Button radioDateReceived;
 
@@ -64,18 +49,21 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
-        createNodes();
     }
 
-    private void createNodes() {
+    public void createNodes() {
+        try {
+            siteNodes = SiteWrapper.getSites(SessionManager.getAppService());
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Failed to load sites", e);
+        }
 
-        outgoingNode = new OutgoingNode(rootNode, 0);
-        outgoingNode.setParent(rootNode);
-        rootNode.addChild(outgoingNode);
-
-        incomingNode = new IncomingNode(rootNode, 1);
-        incomingNode.setParent(rootNode);
-        rootNode.addChild(incomingNode);
+        for (SiteWrapper site : siteNodes) {
+            DispatchSiteAdapter siteAdapter = new DispatchSiteAdapter(rootNode,
+                site);
+            siteAdapter.setParent(rootNode);
+            rootNode.addChild(siteAdapter);
+        }
 
         searchedNode = new DispatchSearchedNode(rootNode, 2);
         searchedNode.setParent(rootNode);
@@ -199,18 +187,22 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
     }
 
     protected List<DispatchWrapper> search() throws Exception {
-        if (radioWaybill.getSelection()) {
-            return DispatchWrapper.getDispatchesInSites(
-                SessionManager.getAppService(), treeText.getText().trim());
-        } else {
-            Date date = dateWidget.getDate();
-            if (date != null) {
-                if (radioDateSent.getSelection())
-                    return DispatchWrapper.getDispatchesInSitesByDateSent(
-                        SessionManager.getAppService(), date);
-                else
-                    return DispatchWrapper.getDispatchesInSitesByDateReceived(
-                        SessionManager.getAppService(), date);
+        for (SiteWrapper site : siteNodes) {
+            if (radioWaybill.getSelection()) {
+                return DispatchWrapper.getDispatchesInSite(
+                    SessionManager.getAppService(), treeText.getText().trim(),
+                    site);
+            } else {
+                Date date = dateWidget.getDate();
+                if (date != null) {
+                    if (radioDateSent.getSelection())
+                        return DispatchWrapper.getDispatchesInSiteByDateSent(
+                            SessionManager.getAppService(), date, site);
+                    else
+                        return DispatchWrapper
+                            .getDispatchesInSiteByDateReceived(
+                                SessionManager.getAppService(), date, site);
+                }
             }
         }
         return null;
@@ -238,8 +230,8 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
         return currentInstance;
     }
 
-    public OutgoingNode getOutgoingNode() {
-        return outgoingNode;
+    public void clear() {
+        rootNode.removeAll();
     }
 
 }

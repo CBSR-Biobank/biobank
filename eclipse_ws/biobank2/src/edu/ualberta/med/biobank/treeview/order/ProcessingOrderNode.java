@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.treeview.order;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -13,7 +15,9 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.dispatch.OrderAdapter;
 
 public class ProcessingOrderNode extends AdapterBase {
 
@@ -52,13 +56,20 @@ public class ProcessingOrderNode extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        return null;
+        return new OrderAdapter(this, (DispatchWrapper) child);
     }
 
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return null;
+        StudyWrapper s = new StudyWrapper(SessionManager.getAppService());
+        s.setNameShort("KDCS");
+        DispatchWrapper fake = new DispatchWrapper(
+            SessionManager.getAppService());
+        fake.setStudy(s);
+        List<DispatchWrapper> list = new ArrayList<DispatchWrapper>();
+        list.add(fake);
+        return list;
     }
 
     @Override

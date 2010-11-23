@@ -906,49 +906,29 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return user.isWebsiteAdministrator();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getUsersInTransitReceiveDispatchCollection(
-        WritableApplicationService appService) throws Exception {
-        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
-        List<SiteWrapper> sites = getSites(appService);
-        for (SiteWrapper site : sites)
-            dispatches.addAll(site.getInTransitReceiveDispatchCollection());
-        return dispatches;
+    public static Collection<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
+        SiteWrapper site) {
+        return site.getInTransitReceiveDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getUsersReceivingNoErrorsDispatchCollection(
-        WritableApplicationService appService) throws Exception {
-        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
-        List<SiteWrapper> sites = getSites(appService);
-        for (SiteWrapper site : sites)
-            dispatches.addAll(site.getReceivingNoErrorsDispatchCollection());
-        return dispatches;
+    public static Collection<? extends ModelWrapper<?>> getReceivingNoErrorsDispatchCollection(
+        SiteWrapper site) {
+        return site.getReceivingNoErrorsDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getUsersInCreationDispatchCollection(
-        WritableApplicationService appService) throws Exception {
-        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
-        List<SiteWrapper> sites = getSites(appService);
-        for (SiteWrapper site : sites)
-            dispatches.addAll(site.getInCreationDispatchCollection());
-        return dispatches;
+    public static Collection<? extends ModelWrapper<?>> getInCreationDispatchCollection(
+        SiteWrapper site) {
+        return site.getInCreationDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getUsersReceivingWithErrorsDispatchCollection(
-        WritableApplicationService appService) throws Exception {
-        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
-        List<SiteWrapper> sites = getSites(appService);
-        for (SiteWrapper site : sites)
-            dispatches.addAll(site.getReceivingWithErrorsDispatchCollection());
-        return dispatches;
+    public static Collection<? extends ModelWrapper<?>> getReceivingWithErrorsDispatchCollection(
+        SiteWrapper site) {
+        return site.getReceivingWithErrorsDispatchCollection();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getUsersInTransitSentDispatchCollection(
-        WritableApplicationService appService) throws Exception {
-        List<DispatchWrapper> dispatches = new ArrayList<DispatchWrapper>();
-        List<SiteWrapper> sites = getSites(appService);
-        for (SiteWrapper site : sites)
-            dispatches.addAll(site.getInTransitSentDispatchCollection());
-        return dispatches;
+    public static Collection<? extends ModelWrapper<?>> getInTransitSentDispatchCollection(
+        SiteWrapper site) {
+        return site.getInTransitSentDispatchCollection();
     }
 
 }

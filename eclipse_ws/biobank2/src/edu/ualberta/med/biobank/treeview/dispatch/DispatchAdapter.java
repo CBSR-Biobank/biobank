@@ -104,7 +104,8 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
             }
-            if (getWrapper().canBeReceivedBy(SessionManager.getUser())) {
+            if (getWrapper().isInTransitState()
+                && getWrapper().canBeReceivedBy(SessionManager.getUser())) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText("Receive");
                 mi.addSelectionListener(new SelectionAdapter() {

@@ -2179,6 +2179,13 @@
       id="edu.ualberta.med.biobank.forms.DispatchSendingEntryForm"
       name="Dispatch Sending Entry">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.OrderEntryFormBase"
+      default="false"
+      icon="icons/order.png"
+      id="edu.ualberta.med.biobank.forms.OrderEntryFormBase"
+      name="Order Receiving Form">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">

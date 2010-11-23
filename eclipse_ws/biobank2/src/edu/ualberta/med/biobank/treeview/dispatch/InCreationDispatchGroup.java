@@ -18,15 +18,14 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class InCreationDispatchGroup extends AbstractDispatchGroup {
 
-    public InCreationDispatchGroup(AdapterBase parent, int id) {
-        super(parent, id, "Creation");
+    public InCreationDispatchGroup(AdapterBase parent, int id, SiteWrapper site) {
+        super(parent, id, "Creation", site);
     }
 
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return SiteWrapper.getUsersInCreationDispatchCollection(SessionManager
-            .getAppService());
+        return SiteWrapper.getInCreationDispatchCollection(site);
     }
 
     @Override

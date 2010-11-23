@@ -1,62 +1,39 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.Arrays;
-
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
+import edu.ualberta.med.biobank.treeview.dispatch.OrderAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
+import edu.ualberta.med.biobank.widgets.OrderAliquotsTreeTable;
 
-public class OrderEntryFormBase extends AbstractShipmentEntryForm {
+public class OrderEntryFormBase extends BiobankFormBase {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm";
-    private DispatchAliquotsTreeTable aliquotsTree;
+    public static final String ID = "edu.ualberta.med.biobank.forms.OrderEntryFormBase";
+    private OrderAliquotsTreeTable aliquotsTree;
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Dispatch sent on " + dispatch.getFormattedDeparted()
-            + " from " + dispatch.getSender().getNameShort());
+        form.setText("Order placed on " + "2010-04-07" + " from "
+            + "KDCS Research Group");
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createMainSection();
-        boolean editAliquots = !dispatch.isInClosedState()
-            && !dispatch.isInLostState();
-        if (editAliquots)
-            createAliquotsSelectionActions(page, true);
-        aliquotsTree = new DispatchAliquotsTreeTable(page, dispatch,
-            editAliquots, true);
-        aliquotsTree.addSelectionChangedListener(biobankListener);
 
-    }
-
-    @Override
-    protected void doAliquotTextAction(String text) {
-        receiveAliquot(text);
-    }
-
-    @Override
-    protected void openScanDialog() {
-        DispatchReceiveScanDialog dialog = new DispatchReceiveScanDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, dispatch.getReceiver());
-        dialog.open();
-        if (dialog.hasReceivedAliquots()) {
-            setDirty(true);
-        }
-        aliquotsTree.refresh();
     }
 
     private void createMainSection() {
@@ -69,34 +46,35 @@ public class OrderEntryFormBase extends AbstractShipmentEntryForm {
 
         BiobankText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Study");
-        setTextValue(studyLabel, dispatch.getStudy().getName());
+        setTextValue(studyLabel, "KDCS");
+
         BiobankText senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Research Group");
-        setTextValue(senderLabel, dispatch.getSender().getName());
+        setTextValue(senderLabel, "KDCS Research Group");
         BiobankText receiverLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Receiver");
-        setTextValue(receiverLabel, dispatch.getReceiver().getName());
+        setTextValue(receiverLabel, "CBSR");
         BiobankText departedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Order Placed");
-        setTextValue(departedLabel, dispatch.getFormattedDeparted());
+        setTextValue(departedLabel, "2010-04-07");
         BiobankText shippingMethodLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Order Number");
+        setTextValue(shippingMethodLabel, "123532132");
         BiobankText dateReceivedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date received");
-        setTextValue(dateReceivedLabel, dispatch.getFormattedDateReceived());
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, dispatch, "comment", null);
+        setTextValue(dateReceivedLabel, "2010-04-09");
+        createReadOnlyLabelledField(client, SWT.NONE, "Comments");
+        Section s = createSection("Aliquots");
 
-    }
+        Composite c = new Composite(s, SWT.NONE);
+        c.setLayout(new GridLayout());
+        createAliquotsSelectionActions(c, false);
+        aliquotsTree = new OrderAliquotsTreeTable(c, null, true, true);
 
-    @Override
-    protected String getOkMessage() {
-        return "Receiving dispatch";
-    }
+        s.setClient(c);
 
-    @Override
-    public String getNextOpenedFormID() {
-        return DispatchViewForm.ID;
+        Button button = new Button(c, SWT.PUSH);
+        button.setText("Action Button");
     }
 
     public enum ResType {
@@ -139,56 +117,42 @@ public class OrderEntryFormBase extends AbstractShipmentEntryForm {
         return new AliquotInfo(dsa.getAliquot(), ResType.OK);
     }
 
-    protected void receiveAliquot(String inventoryId) {
-        AliquotInfo info = getInfoForInventoryId(dispatch, inventoryId);
-        switch (info.type) {
-        case OK:
-            dispatch.receiveAliquots(Arrays.asList(info.aliquot));
-            aliquotsTree.refresh();
-            setDirty(true);
-            break;
-        case RECEIVED:
-            BioBankPlugin.openInformation("Aliquot already accepted",
-                "Aliquot with inventory id " + inventoryId
-                    + " is already in received list.");
-            break;
-        case NOT_IN_SHIPMENT:
-            BioBankPlugin.openInformation("Aliquot not found",
-                "Aliquot with inventory id " + inventoryId
-                    + " has not been found in this dispatch."
-                    + " It will be moved into the extra-pending list.");
-            try {
-                dispatch.addExtraAliquots(Arrays.asList(info.aliquot), false);
-            } catch (BiobankCheckException e) {
-                BioBankPlugin.openAsyncError("Eror adding extra aliquot", e);
+    protected void createAliquotsSelectionActions(Composite composite,
+        boolean setAsFirstControl) {
+        Composite addComposite = toolkit.createComposite(composite);
+        addComposite.setLayout(new GridLayout(5, false));
+        toolkit.createLabel(addComposite, "Enter inventory ID to add:");
+        final BiobankText newAliquotText = new BiobankText(addComposite,
+            SWT.NONE, toolkit);
+        Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
+        addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_ADD));
+        addButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                newAliquotText.setFocus();
+                newAliquotText.setText("");
             }
-            aliquotsTree.refresh();
-            setDirty(true);
-            break;
-        case NOT_IN_DB:
-            BioBankPlugin.openError("Aliquot not found",
-                "This aliquot does not exists in the database.");
-            break;
-        case DUPLICATE:
-            BioBankPlugin.openError("Duplicate aliquot !",
-                "This aliquot exists more that once in the database !");
-            break;
-        case EXTRA:
-            BioBankPlugin.openInformation("Aliquot already extra",
-                "Aliquot with inventory id " + inventoryId
-                    + " is already in extra list.");
-            break;
-        }
+        });
+        toolkit.createLabel(addComposite, "or open scan dialog:");
+        Button openScanButton = toolkit
+            .createButton(addComposite, "", SWT.PUSH);
+        openScanButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
+        openScanButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+            }
+        });
     }
 
     @Override
-    protected String getTextForPartName() {
-        return "Order placed on " + dispatch.getDeparted();
-    }
+    protected void init() throws Exception {
+        Assert.isNotNull(adapter, "Adapter should be no null");
+        Assert.isTrue((adapter instanceof OrderAdapter),
+            "Invalid editor input: object of type "
+                + adapter.getClass().getName());
 
-    @Override
-    protected void reloadAliquots() {
-        aliquotsTree.refresh();
+        setPartName("New Order");
     }
-
 }

@@ -109,12 +109,6 @@ public class OrderAdministrationView extends AbstractAdministrationView {
 
     @Override
     public void reload() {
-        try {
-            // SessionManager.getCurrentSite().reload();
-        } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Unable to reload site information.",
-                e);
-        }
         rootNode.removeAll();
         createNodes();
         for (AdapterBase adaper : rootNode.getChildren()) {
@@ -144,8 +138,7 @@ public class OrderAdministrationView extends AbstractAdministrationView {
 
     protected List<DispatchWrapper> search() throws Exception {
         if (radioOrderNumber.getSelection()) {
-            return DispatchWrapper.getDispatchesInSites(
-                SessionManager.getAppService(), treeText.getText().trim());
+            return null;
         }
         return null;
     }
