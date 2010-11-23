@@ -95,6 +95,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private ScrolledComposite containersScroll;
 
+    private ArrayList<SampleTypeWrapper> preSelectedSampleTypes;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -226,7 +228,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     selectionComp.layout();
                     for (SampleTypeSelectionWidget sampleType : sampleTypeWidgets) {
                         sampleType.addBinding(widgetCreator);
-                        sampleType.resetValues(false);
+                        sampleType.resetValues(true, false);
                     }
                     customSelectionWidget.addBinding(widgetCreator);
                     spw.getMultiSelectionManager().disableMultiSelection();
@@ -299,7 +301,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
         customSelectionWidget = new SampleTypeSelectionWidget(
             typesSelectionCustomComposite, null, sampleTypes, toolkit);
-        customSelectionWidget.resetValues(true);
+        customSelectionWidget.resetValues(true, true);
 
         Button applyType = toolkit.createButton(typesSelectionCustomComposite,
             "Apply", SWT.PUSH); //$NON-NLS-1$
@@ -315,7 +317,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         pCell.setStatus(CellStatus.TYPE);
                     }
                     spw.getMultiSelectionManager().clearMultiSelection();
-                    customSelectionWidget.resetValues(true);
+                    customSelectionWidget.resetValues(true, true);
                     typesFilledValue.setValue(spw.isEverythingTyped());
                     spw.redraw();
                 }
@@ -450,6 +452,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     protected void beforeScanThreadStart() {
         isFakeScanRandom = fakeScanRandom != null
             && fakeScanRandom.getSelection();
+        preSelectedSampleTypes = new ArrayList<SampleTypeWrapper>();
+        for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
+            preSelectedSampleTypes.add(stw.getSelection());
+        }
     }
 
     @Override
@@ -483,7 +489,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 Integer typesRowsCount = typesRows.get(rcp.row);
                 if (typesRowsCount == null) {
                     typesRowsCount = 0;
-                    sampleTypeWidgets.get(rcp.row).resetValues(true, true);
+                    sampleTypeWidgets.get(rcp.row).resetValues(!isRescanMode(),
+                        true, true);
                 }
                 PalletCell cell = null;
                 cell = cells.get(rcp);
@@ -515,7 +522,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private void setTypeCombosLists(Map<Integer, Integer> typesRows) {
         List<SampleTypeWrapper> studiesSampleTypes = null;
-        if (!isRescanMode()) { // already done at first scan
+        if (isFirstSuccessfulScan()) {
+            // already done at first successful scan
             studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
             for (SampleStorageWrapper ss : linkFormPatientManagement
                 .getCurrentPatient().getStudy().getSampleStorageCollection()) {
@@ -534,10 +542,14 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         + "' and that are types possibles inside a pallet.");
             }
         }
-        for (Integer row : typesRows.keySet()) {
+        // set the list of sample type to all widget, in case the list is
+        // activated using the handheld scanner
+        for (int row = 0; row < sampleTypeWidgets.size(); row++) {
             SampleTypeSelectionWidget widget = sampleTypeWidgets.get(row);
-            widget.setNumber(typesRows.get(row));
-            if (!isRescanMode()) {
+            Integer number = typesRows.get(row);
+            if (number != null)
+                widget.setNumber(number);
+            if (isFirstSuccessfulScan()) {
                 widget.setTypes(studiesSampleTypes);
             }
         }
@@ -574,12 +586,13 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     if (independantProcess) {
                         SampleTypeSelectionWidget widget = sampleTypeWidgets
                             .get(cell.getRow());
-                        widget.addOneToNumber();
-                        SampleTypeWrapper type = widget.getSelection();
-                        if (type != null) {
-                            cell.setType(type);
-                            cell.setStatus(CellStatus.TYPE);
-                        }
+                        widget.increaseNumber();
+                    }
+                    SampleTypeWrapper type = preSelectedSampleTypes.get(cell
+                        .getRow());
+                    if (type != null) {
+                        cell.setType(type);
+                        cell.setStatus(CellStatus.TYPE);
                     }
                 }
             } else {
@@ -675,7 +688,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             resetPlateToScan();
             spw.setCells(null);
             for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
-                stw.resetValues(true);
+                stw.resetValues(true, true);
             }
         }
         setFocus();

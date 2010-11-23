@@ -481,4 +481,8 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
     protected abstract void processScanResult(IProgressMonitor monitor)
         throws Exception;
+
+    protected boolean isFirstSuccessfulScan() {
+        return palletScanManagement.getSuccessfulScansCount() == 1;
+    }
 }
