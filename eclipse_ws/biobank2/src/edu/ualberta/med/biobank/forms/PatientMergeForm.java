@@ -203,7 +203,6 @@ public class PatientMergeForm extends BiobankEntryForm {
             BioBankPlugin.openAsyncError("Duplicate Patient Number",
                 "Cannot merge a patient with himself");
             patient2VisitsTable.setCollection(newContents);
-            study2Text.setText("");
             return;
         }
 
