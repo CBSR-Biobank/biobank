@@ -37,11 +37,9 @@ public class PatientMergeForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(PatientMergeForm.class.getName());
 
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.PatientMergeForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.PatientMergeForm";
 
-    public static final String MSG_PATIENT_NOT_VALID =
-        "Select a second patient";
+    public static final String MSG_PATIENT_NOT_VALID = "Select a second patient";
 
     private PatientAdapter patient1Adapter;
 
@@ -126,14 +124,12 @@ public class PatientMergeForm extends BiobankEntryForm {
         patientArea2.setLayoutData(patient2Data);
         toolkit.paintBordersFor(client);
 
-        pnumber1Text =
-            createReadOnlyLabelledField(patientArea1, SWT.NONE,
-                "Patient Number");
+        pnumber1Text = createReadOnlyLabelledField(patientArea1, SWT.NONE,
+            "Patient Number");
         pnumber1Text.setText(patient1Adapter.getWrapper().getPnumber());
 
-        pnumber2Text =
-            (BiobankText) createLabelledWidget(patientArea2, BiobankText.class,
-                SWT.NONE, "Patient Number");
+        pnumber2Text = (BiobankText) createLabelledWidget(patientArea2,
+            BiobankText.class, SWT.NONE, "Patient Number");
         pnumber2Text.addKeyListener(new KeyListener() {
             @Override
             public void keyPressed(KeyEvent e) {
@@ -158,16 +154,15 @@ public class PatientMergeForm extends BiobankEntryForm {
         setFirstControl(pnumber2Text);
 
         StudyWrapper selectedStudy = patient1Adapter.getWrapper().getStudy();
-        study1Text =
-            createReadOnlyLabelledField(patientArea1, SWT.NONE, "Study");
+        study1Text = createReadOnlyLabelledField(patientArea1, SWT.NONE,
+            "Study");
         study1Text.setText(selectedStudy.getNameShort());
 
-        study2Text =
-            createReadOnlyLabelledField(patientArea2, SWT.NONE, "Study");
+        study2Text = createReadOnlyLabelledField(patientArea2, SWT.NONE,
+            "Study");
 
-        patient1VisitsTable =
-            new ClinicVisitInfoTable(patientArea1, patient1Adapter.getWrapper()
-                .getPatientVisitCollection(true, true));
+        patient1VisitsTable = new ClinicVisitInfoTable(patientArea1,
+            patient1Adapter.getWrapper().getPatientVisitCollection(true, true));
         GridData gd1 = new GridData();
         gd1.horizontalSpan = 2;
         gd1.grabExcessHorizontalSpace = true;
@@ -175,9 +170,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1VisitsTable.setLayoutData(gd1);
         patient1VisitsTable.adaptToToolkit(toolkit, true);
 
-        patient2VisitsTable =
-            new ClinicVisitInfoTable(patientArea2,
-                new ArrayList<PatientVisitWrapper>());
+        patient2VisitsTable = new ClinicVisitInfoTable(patientArea2,
+            new ArrayList<PatientVisitWrapper>());
         GridData gd2 = new GridData();
         gd2.horizontalSpan = 2;
         gd2.grabExcessHorizontalSpace = true;
@@ -187,68 +181,81 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     protected void populateFields(String pnumber) {
+        List<PatientVisitWrapper> newContents = new ArrayList<PatientVisitWrapper>();
         try {
-            patient2 =
-                PatientWrapper.getPatient(SessionManager.getAppService(),
-                    pnumber);
+            patient2 = PatientWrapper.getPatient(
+                SessionManager.getAppService(), pnumber);
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError("Error retrieving patient", e);
+            patient2VisitsTable.setCollection(newContents);
+            study2Text.setText("");
             return;
         }
         if (patient2 == null) {
             BioBankPlugin.openAsyncError("Invalid Patient Number",
                 "Cannot find a patient with that pnumber");
+            patient2VisitsTable.setCollection(newContents);
+            study2Text.setText("");
+            return;
+        }
+
+        if (patient2.equals(patient1Adapter.getWrapper())) {
+            BioBankPlugin.openAsyncError("Duplicate Patient Number",
+                "Cannot merge a patient with himself");
+            patient2VisitsTable.setCollection(newContents);
+            study2Text.setText("");
             return;
         }
 
         study2Text.setText(patient2.getStudy().getNameShort());
 
         if (!patient2.getStudy()
-            .equals(patient1Adapter.getWrapper().getStudy()))
+            .equals(patient1Adapter.getWrapper().getStudy())) {
+            patient2VisitsTable.setCollection(newContents);
             BioBankPlugin.openAsyncError("Invalid Patient Number",
                 "Patients from different studies cannot be merged");
-        else {
+        } else {
             patient2VisitsTable.setCollection(patient2
                 .getPatientVisitCollection());
-            patient2VisitsTable.layout();
             patientNotNullValue.setValue(Boolean.TRUE);
         }
     }
 
     private void merge() {
+
+        List<PatientVisitWrapper> pvs = patient2.getPatientVisitCollection();
+
         try {
-            patient1Adapter.getWrapper().addPatientVisits(
-                patient2.getPatientVisitCollection());
-            // FIXME: need to make sure this can be removed
-            // patient2Wrapper
-            // .setPatientVisitCollection(new ArrayList<PatientVisitWrapper>());
-            List<ClinicShipmentWrapper> shipments =
-                patient2.getShipmentCollection();
-            for (ClinicShipmentWrapper shipment : shipments) {
-                List<PatientWrapper> patients = shipment.getPatientCollection();
-                for (PatientWrapper p : patients)
-                    if (p.equals(patient2)) {
-                        shipment.removePatients(Arrays
-                            .asList(new PatientWrapper[] { patient2 }));
-                        shipment.addPatients(Arrays
-                            .asList(new PatientWrapper[] { patient1Adapter
-                                .getWrapper() }));
-                        break;
-                    }
-                shipment.persist();
-            }
-            patient1Adapter.getWrapper().persist();
+            if (pvs != null)
+                for (PatientVisitWrapper pv : pvs) {
+                    ClinicShipmentWrapper shipment = pv.getShipment();
+                    shipment.addPatients(Arrays
+                        .asList(new PatientWrapper[] { patient1Adapter
+                            .getWrapper() }));
+                    shipment.persist();
+
+                    pv.setPatient(patient1Adapter.getWrapper());
+                    pv.persist();
+
+                    patient2.reload();
+                    shipment.reload();
+                    shipment.removePatients(Arrays
+                        .asList(new PatientWrapper[] { patient2 }));
+                    shipment.persist();
+                }
+
             patient2.reload();
             patient2.delete();
 
             Display.getDefault().syncExec(new Runnable() {
                 @Override
                 public void run() {
-                    PatientAdapter p =
-                        (PatientAdapter) SessionManager.searchNode(patient2);
+                    PatientAdapter p = (PatientAdapter) SessionManager
+                        .searchNode(patient2);
                     if (p != null) {
                         p.getParent().removeChild(p);
                     }
+                    patient1Adapter.rebuild();
                     SessionManager.getCurrentAdapterViewWithTree()
                         .getTreeViewer().refresh();
                     closeEntryOpenView(false, true);
