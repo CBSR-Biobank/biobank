@@ -95,6 +95,10 @@ public class AliquotEntryForm extends BiobankEntryForm {
                 }
             }
         }
+        if (aliquot.getSampleType() != null
+            && !sampleTypes.contains(aliquot.getSampleType())) {
+            sampleTypes.add(aliquot.getSampleType());
+        }
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, aliquot.getSiteString());
