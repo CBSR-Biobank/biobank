@@ -37,12 +37,10 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchShipmentWrapper> 
     private static final String[] HEADINGS = new String[] { "Dispatch Time",
         "Date Received", "Waybill", "Dispatch State", "Aliquot State" };
 
-    private static final int[] BOUNDS = new int[] { 100, 100, 100, 100, 100 };
-
     private boolean editMode = false;
 
     public DispatchInfoTable(Composite parent, AliquotWrapper a) {
-        super(parent, null, HEADINGS, BOUNDS, 15);
+        super(parent, null, HEADINGS, 15);
         this.a = a;
         setCollection(a.getDispatchShipments());
     }

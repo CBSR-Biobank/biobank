@@ -458,7 +458,7 @@ public abstract class AdapterBase {
                                 Assert.isNotNull(node);
                                 node.setModelObject(child);
                                 final AdapterBase nodeToUpdate = node;
-                                Display.getDefault().asyncExec(new Runnable() {
+                                Display.getDefault().syncExec(new Runnable() {
                                     @Override
                                     public void run() {
                                         SessionManager

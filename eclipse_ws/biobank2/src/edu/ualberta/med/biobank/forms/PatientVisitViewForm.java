@@ -174,7 +174,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
             patientVisit.getAliquotCollection());
         aliquotWidget.adaptToToolkit(toolkit, true);
         aliquotWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
-        aliquotWidget.addDoubleClickListener(collectionDoubleClickListener);
+        aliquotWidget.addClickListener(collectionDoubleClickListener);
     }
 
     @Override

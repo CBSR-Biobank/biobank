@@ -38,7 +38,7 @@ public class AliquotListViewForm extends BiobankViewForm {
         aliquotsWidget = new AliquotListInfoTable(page, aliquots,
             AliquotListInfoTable.ColumnsShown.PNUMBER);
         aliquotsWidget.adaptToToolkit(toolkit, true);
-        aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
+        aliquotsWidget.addClickListener(collectionDoubleClickListener);
     }
 
     @Override

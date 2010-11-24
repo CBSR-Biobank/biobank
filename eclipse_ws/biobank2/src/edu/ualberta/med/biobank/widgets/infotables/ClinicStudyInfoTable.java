@@ -28,13 +28,11 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     private static final String[] HEADINGS = new String[] { "Study",
         "No. Patients", "No. Patient Visits" };
 
-    private static final int[] BOUNDS = new int[] { 160, 130, 100 };
-
     private ClinicWrapper clinic;
 
     public ClinicStudyInfoTable(Composite parent, ClinicWrapper clinic)
         throws ApplicationException {
-        super(parent, null, HEADINGS, BOUNDS, 10);
+        super(parent, null, HEADINGS, 10);
         this.clinic = clinic;
         setCollection(clinic.getStudyCollection());
     }
@@ -44,8 +42,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item =
-                    (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return "loading...";

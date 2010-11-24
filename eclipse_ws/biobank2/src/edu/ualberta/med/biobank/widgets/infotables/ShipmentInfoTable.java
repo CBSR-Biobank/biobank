@@ -31,10 +31,8 @@ public class ShipmentInfoTable extends InfoTableWidget<ClinicShipmentWrapper> {
     private static final String[] HEADINGS = new String[] { "Date received",
         "Waybill", "Shipping company", "No. Patients" };
 
-    private static final int[] BOUNDS = new int[] { 180, 140, 140, 100, -1 };
-
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, clinic.getShipmentCollection(), HEADINGS, BOUNDS, 10);
+        super(parent, clinic.getShipmentCollection(), HEADINGS, 10);
     }
 
     @Override
@@ -42,8 +40,7 @@ public class ShipmentInfoTable extends InfoTableWidget<ClinicShipmentWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item =
-                    (TableRowData) ((BiobankCollectionModel) element).o;
+                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (item == null) {
                     if (columnIndex == 0) {
                         return "loading...";

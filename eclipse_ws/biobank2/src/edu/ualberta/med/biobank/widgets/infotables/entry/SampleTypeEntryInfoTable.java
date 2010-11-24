@@ -116,7 +116,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    SampleTypeWrapper type = getSelection();
+                    SampleTypeWrapper type = (SampleTypeWrapper) getSelection();
                     if (type != null)
                         addOrEditSampleType(false, type, editMessage);
                 }
@@ -127,7 +127,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
-                    SampleTypeWrapper sampleType = getSelection();
+                    SampleTypeWrapper sampleType = (SampleTypeWrapper) getSelection();
                     if (sampleType != null) {
                         try {
                             if (!sampleType.isNew()

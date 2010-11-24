@@ -37,13 +37,11 @@ public abstract class DispatchAliquotListInfoTable extends
     private static final String[] HEADINGS = new String[] { "Inventory ID",
         "Type", "Patient Number", "Activity Status", "Dispatch comment" };
 
-    private static final int[] BOUNDS = new int[] { 100, 100, 120, 120, -1 };
-
     private boolean editMode = false;
 
     public DispatchAliquotListInfoTable(Composite parent,
         final DispatchShipmentWrapper shipment, boolean editMode) {
-        super(parent, null, HEADINGS, BOUNDS, 15);
+        super(parent, null, HEADINGS, 15);
         setCollection(getInternalDispatchShipmentAliquots());
         this.editMode = editMode;
         if (editMode) {

@@ -34,9 +34,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.AbstractReportTreeNode;
-import edu.ualberta.med.biobank.common.reports.AdvancedReportTreeNode;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.forms.AdvancedReportsEditor;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 
 public class ReportTreeWidget extends Composite {
@@ -256,20 +254,13 @@ public class ReportTreeWidget extends Composite {
         AbstractReportTreeNode node = (AbstractReportTreeNode) ((IStructuredSelection) event
             .getSelection()).getFirstElement();
         try {
-            if (node instanceof ReportTreeNode
-                && ((ReportTreeNode) node).getReport() != null)
+            if (((ReportTreeNode) node).getReport() != null)
                 PlatformUI
                     .getWorkbench()
                     .getActiveWorkbenchWindow()
                     .getActivePage()
                     .openEditor(new ReportInput(node),
                         ((ReportTreeNode) node).getReport().getEditorId());
-            else if (node instanceof AdvancedReportTreeNode)
-                PlatformUI
-                    .getWorkbench()
-                    .getActiveWorkbenchWindow()
-                    .getActivePage()
-                    .openEditor(new ReportInput(node), AdvancedReportsEditor.ID);
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Error", ex,
                 "There was an error while building page.");

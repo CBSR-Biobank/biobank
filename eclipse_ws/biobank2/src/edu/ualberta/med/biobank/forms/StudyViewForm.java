@@ -105,7 +105,7 @@ public class StudyViewForm extends BiobankViewForm {
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
 
-        contactsTable.addDoubleClickListener(new IDoubleClickListener() {
+        contactsTable.addClickListener(new IDoubleClickListener() {
             @Override
             public void doubleClick(DoubleClickEvent event) {
                 Object selection = event.getSelection();

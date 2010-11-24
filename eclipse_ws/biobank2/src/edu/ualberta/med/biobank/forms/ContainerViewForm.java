@@ -493,7 +493,7 @@ public class ContainerViewForm extends BiobankViewForm {
             .getAliquots().values());
         aliquotsWidget = new AliquotListInfoTable(parent, aliquots);
         aliquotsWidget.adaptToToolkit(toolkit, true);
-        aliquotsWidget.addDoubleClickListener(collectionDoubleClickListener);
+        aliquotsWidget.addClickListener(collectionDoubleClickListener);
     }
 
     @Override

@@ -122,7 +122,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         studiesTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studiesTable);
 
-        studiesTable.addDoubleClickListener(collectionDoubleClickListener);
+        studiesTable.addClickListener(collectionDoubleClickListener);
     }
 
     protected void createShipmentsSection() {
@@ -132,7 +132,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         shipmentsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(shipmentsTable);
 
-        shipmentsTable.addDoubleClickListener(collectionDoubleClickListener);
+        shipmentsTable.addClickListener(collectionDoubleClickListener);
     }
 
     @Override

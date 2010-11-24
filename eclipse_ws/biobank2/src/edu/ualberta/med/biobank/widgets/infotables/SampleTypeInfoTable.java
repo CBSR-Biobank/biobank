@@ -14,12 +14,9 @@ public class SampleTypeInfoTable extends InfoTableWidget<SampleTypeWrapper> {
     private static final String[] HEADINGS = new String[] { "Sample Type",
         "Short Name" };
 
-    private static final int[] BOUNDS = new int[] { 300, 130, -1, -1, -1, -1,
-        -1 };
-
     public SampleTypeInfoTable(Composite parent,
         List<SampleTypeWrapper> sampleTypeCollection) {
-        super(parent, sampleTypeCollection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, sampleTypeCollection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override

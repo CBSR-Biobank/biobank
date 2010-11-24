@@ -22,13 +22,13 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
         .getLogger(ReportTableWidget.class.getName());
 
     public ReportTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths) {
-        super(parent, collection, headings, columnWidths, 24);
+        String[] headings) {
+        super(parent, collection, headings, null, 24);
     }
 
     public ReportTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths, int rowsPerPage) {
-        super(parent, collection, headings, columnWidths, rowsPerPage);
+        String[] headings, int rowsPerPage) {
+        super(parent, collection, headings, null, rowsPerPage);
     }
 
     @Override

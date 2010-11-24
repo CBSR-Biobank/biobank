@@ -35,12 +35,9 @@ public class StudyContactEntryInfoTable extends InfoTableWidget<ContactWrapper> 
     private static final String[] HEADINGS = new String[] { "Clinic",
         "Contact Name", "Title", "Email", "Mobile #", "Pager #", "Office #" };
 
-    private static final int[] BOUNDS = new int[] { 100, 150, 150, 200, 100,
-        100, -1 };
-
     public StudyContactEntryInfoTable(Composite parent,
         List<ContactWrapper> contactCollection) {
-        super(parent, contactCollection, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, contactCollection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override

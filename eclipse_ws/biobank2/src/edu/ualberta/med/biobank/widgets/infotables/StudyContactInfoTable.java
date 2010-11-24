@@ -36,14 +36,22 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private static final String[] HEADINGS = new String[] { "Clinic",
         "#Patients", "#Patient Visits", "Contact Name", "Title" };
 
-    private static final int[] BOUNDS = new int[] { 100, 80, 100, 150, 150 };
-
     private StudyWrapper study;
 
     public StudyContactInfoTable(Composite parent, StudyWrapper study) {
-        super(parent, null, HEADINGS, BOUNDS, 10);
+        super(parent, null, HEADINGS, 10);
         this.study = study;
         this.setCollection(study.getContactCollection());
+    }
+
+    @Override
+    public ClinicWrapper getSelection() {
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.contact.getClinic();
     }
 
     @Override
@@ -92,16 +100,6 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         info.contactName = contact.getName();
         info.contactTitle = contact.getTitle();
         return info;
-    }
-
-    @Override
-    public ContactWrapper getSelection() {
-        BiobankCollectionModel item = getSelectionInternal();
-        if (item == null)
-            return null;
-        TableRowData row = (TableRowData) item.o;
-        Assert.isNotNull(row);
-        return row.contact;
     }
 
     @Override

@@ -36,11 +36,8 @@ public class ContactInfoTable extends InfoTableWidget<ContactWrapper> {
     private static final String[] HEADINGS = new String[] { "Contact Name",
         "Title", "Studies", "Email", "Mobile #", "Pager #", "Office #", "Fax #" };
 
-    private static final int[] BOUNDS = new int[] { 120, 120, 200, 120, 120,
-        120, 120, -1 };
-
     public ContactInfoTable(Composite parent, List<ContactWrapper> contacts) {
-        super(parent, contacts, HEADINGS, BOUNDS, PAGE_SIZE_ROWS);
+        super(parent, contacts, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override
