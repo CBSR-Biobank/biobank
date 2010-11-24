@@ -38,8 +38,8 @@ public class BiobankPartListener implements IPartListener {
             if (reallyClose) {
                 try {
                     workbench.showPerspective(
-                        PatientsAdministrationPerspective.ID, workbench
-                            .getActiveWorkbenchWindow());
+                        PatientsAdministrationPerspective.ID,
+                        workbench.getActiveWorkbenchWindow());
                 } catch (WorkbenchException e) {
                     logger.error("Error while opening patients perpective", e);
                 }
@@ -64,5 +64,4 @@ public class BiobankPartListener implements IPartListener {
             ((AbstractViewWithAdapterTree) part).opened();
         }
     }
-
 }

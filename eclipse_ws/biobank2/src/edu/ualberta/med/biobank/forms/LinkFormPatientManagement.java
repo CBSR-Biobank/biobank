@@ -53,7 +53,6 @@ public class LinkFormPatientManagement {
     private BiobankText visitText;
     private Label visitComboLabel;
     protected PatientVisitWrapper currentVisitSelected;
-    private Label visitProcessedLabel;
     private BiobankText visitProcessedText;
 
     public LinkFormPatientManagement(WidgetCreator widgetCreator,

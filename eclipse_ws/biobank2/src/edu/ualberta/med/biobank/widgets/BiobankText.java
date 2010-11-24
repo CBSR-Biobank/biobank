@@ -183,4 +183,9 @@ public class BiobankText extends BiobankWidget {
         text.setEnabled(enabled);
         super.setEnabled(enabled);
     }
+
+    @Override
+    public void setToolTipText(String string) {
+        text.setToolTipText(string);
+    }
 }

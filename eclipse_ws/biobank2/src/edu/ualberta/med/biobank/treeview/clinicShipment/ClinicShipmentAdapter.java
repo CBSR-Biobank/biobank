@@ -54,8 +54,12 @@ public class ClinicShipmentAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Shipment");
         addViewMenu(menu, "Shipment");
-        addDeleteMenu(menu, "Shipment",
-            "Are you sure you want to delete this shipment?");
+        addDeleteMenu(menu, "Shipment");
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return "Are you sure you want to delete this shipment?";
     }
 
     @Override
@@ -97,6 +101,11 @@ public class ClinicShipmentAdapter extends AdapterBase {
     @Override
     public String getViewFormId() {
         return ClinicShipmentViewForm.ID;
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return internalIsDeletable();
     }
 
 }

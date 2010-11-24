@@ -19,6 +19,7 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 public class PalletScanManagement {
 
     protected Map<RowColPos, PalletCell> cells;
+    private int successfulScansCount = 0;
 
     public void launchScanAndProcessResult(final String plateToScan) {
         launchScanAndProcessResult(plateToScan, "All", false);
@@ -79,6 +80,7 @@ public class PalletScanManagement {
                 try {
                     scanCells = ScannerConfigPlugin.scan(plateNum, profile);
                     cells = PalletCell.convertArray(scanCells);
+                    successfulScansCount++;
                 } catch (Exception ex) {
                     BioBankPlugin.openAsyncError("Scan error", //$NON-NLS-1$
                         ex, "You can still define barcodes one  by one.");
@@ -161,5 +163,10 @@ public class PalletScanManagement {
 
     public void reset() {
         cells = null;
+        successfulScansCount = 0;
+    }
+
+    public int getSuccessfulScansCount() {
+        return successfulScansCount;
     }
 }
