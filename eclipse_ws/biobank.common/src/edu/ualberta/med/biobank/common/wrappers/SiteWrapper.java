@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.ClinicShipment;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -910,10 +911,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * Use an HQL query to quickly get the size of the collection.
      * 
      * @return The number of clinics associated to this repository stie.
+     * @throws ApplicationException
      */
-    public Set<ClinicWrapper> getWorkingClinicCollectionSize() {
-
-        return null;
+    public int getWorkingClinicCollectionSize() throws ApplicationException {
+        HQLCriteria c = new HQLCriteria("select distinct contact.clinic "
+            + "from edu.ualberta.med.biobank.model.Site as site "
+            + "inner join site.studyCollection study "
+            + "inner join study.contactCollection contact "
+            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+        List<Clinic> clinics = appService.query(c);
+        return clinics.size();
     }
 
     @Override
