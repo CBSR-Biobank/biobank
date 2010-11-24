@@ -203,6 +203,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 }
             });
         setFirstControl(shipmentsComboViewer.getControl());
+        shipmentsComboViewer.getControl().setToolTipText(
+            "Only administrators can see more than 7 days.");
 
         final Button shipmentsListCheck = toolkit.createButton(composite,
             "Last 7 days", SWT.CHECK);
