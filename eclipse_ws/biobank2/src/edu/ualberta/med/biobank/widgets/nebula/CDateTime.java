@@ -1703,6 +1703,12 @@ public class CDateTime extends BaseCombo {
         if (field.length == 0 || activeField == FIELD_NONE)
             return;
 
+        if (!hasSelection()) {
+            setSelection(calendar.getTime());
+            fireSelectionChanged();
+            fieldFirst();
+        }
+
         char c = e.character;
         if (((e.text.length() == 1) && String.valueOf(c).equals(e.text) && Character
             .isDigit(c)) || (e.text.length() > 1)) {
