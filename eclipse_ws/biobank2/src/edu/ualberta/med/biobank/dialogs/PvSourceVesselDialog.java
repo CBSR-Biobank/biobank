@@ -273,6 +273,9 @@ public class PvSourceVesselDialog extends BiobankDialog {
         }
     }
 
+    /**
+     * Used only when editing
+     */
     @Override
     protected void okPressed() {
         editedSourceVessel.setSourceVessel(internalSourceVessel
@@ -310,8 +313,6 @@ public class PvSourceVesselDialog extends BiobankDialog {
             newPvSourceVessel.initObjectWith(internalSourceVessel);
             newPvSourceVessel.setPatientVisit(patientVisit);
             infotable.addPvSourceVessel(newPvSourceVessel);
-            quantityText.setText("");
-            volumeText.setText("");
             internalSourceVessel.reset();
             sourceVesselsComboViewer.getCombo().deselectAll();
             sourceVesselsComboViewer.getCombo().setFocus();
