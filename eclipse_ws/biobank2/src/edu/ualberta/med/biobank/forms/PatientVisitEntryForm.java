@@ -204,25 +204,26 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             });
         setFirstControl(shipmentsComboViewer.getControl());
 
-        if (SessionManager.getUser().isSiteAdministrator(
-            SessionManager.getCurrentSite())) {
-            final Button shipmentsListCheck = toolkit.createButton(composite,
-                "Last 7 days", SWT.CHECK);
-            shipmentsListCheck.setSelection(true);
-            shipmentsListCheck.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    ISelection currentSelection = shipmentsComboViewer
-                        .getSelection();
-                    if (shipmentsListCheck.getSelection()) {
-                        shipmentsComboViewer.setInput(recentShipments);
-                    } else {
-                        shipmentsComboViewer.setInput(allShipments);
-                    }
-                    shipmentsComboViewer.setSelection(currentSelection);
+        final Button shipmentsListCheck = toolkit.createButton(composite,
+            "Last 7 days", SWT.CHECK);
+        shipmentsListCheck.setSelection(true);
+        shipmentsListCheck.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ISelection currentSelection = shipmentsComboViewer
+                    .getSelection();
+                if (shipmentsListCheck.getSelection()) {
+                    shipmentsComboViewer.setInput(recentShipments);
+                } else {
+                    shipmentsComboViewer.setInput(allShipments);
                 }
-            });
-        }
+                shipmentsComboViewer.setSelection(currentSelection);
+            }
+        });
+        shipmentsListCheck
+            .setToolTipText("Only administrators have access to this option.");
+        shipmentsListCheck.setEnabled(SessionManager.getUser()
+            .isSiteAdministrator(SessionManager.getCurrentSite()));
     }
 
     private ClinicShipmentWrapper initShipmentsCollections() {

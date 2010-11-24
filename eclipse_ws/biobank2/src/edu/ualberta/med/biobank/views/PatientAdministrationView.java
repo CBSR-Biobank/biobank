@@ -123,4 +123,9 @@ public class PatientAdministrationView extends
         return ID;
     }
 
+    @Override
+    protected String getTreeTextToolTip() {
+        return "Enter a patient number and hit enter";
+    }
+
 }

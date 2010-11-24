@@ -66,6 +66,7 @@ public abstract class AbstractAdministrationView extends
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
         treeText.setLayoutData(gd);
+        treeText.setToolTipText(getTreeTextToolTip());
 
         adaptersTree = new AdapterTreeWidget(parent, false);
         getSite().setSelectionProvider(adaptersTree.getTreeViewer());
@@ -83,6 +84,8 @@ public abstract class AbstractAdministrationView extends
 
         setSiteManagement();
     }
+
+    protected abstract String getTreeTextToolTip();
 
     protected void createTreeTextOptions(
         @SuppressWarnings("unused") Composite parent) {

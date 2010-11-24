@@ -275,4 +275,9 @@ public class DispatchShipmentAdministrationView extends
         return ID;
     }
 
+    @Override
+    protected String getTreeTextToolTip() {
+        return "Enter a dispatch waybill and hit enter";
+    }
+
 }

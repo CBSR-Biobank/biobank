@@ -246,4 +246,9 @@ public class ShipmentAdministrationView extends
         return ID;
     }
 
+    @Override
+    protected String getTreeTextToolTip() {
+        return "Enter a shipment waybill and hit enter";
+    }
+
 }
