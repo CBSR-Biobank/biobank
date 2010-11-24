@@ -906,6 +906,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return clinics;
     }
 
+    /**
+     * Use an HQL query to quickly get the size of the collection.
+     * 
+     * @return The number of clinics associated to this repository stie.
+     */
+    public Set<ClinicWrapper> getWorkingClinicCollectionSize() {
+
+        return null;
+    }
+
     @Override
     public boolean canUpdate(User user) {
         return user.isWebsiteAdministrator();
