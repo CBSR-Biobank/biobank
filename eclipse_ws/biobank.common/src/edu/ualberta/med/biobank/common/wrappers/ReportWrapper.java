@@ -26,9 +26,8 @@ public class ReportWrapper extends ModelWrapper<Report> {
 
     private EntityWrapper entity;
 
-    public ReportWrapper(WritableApplicationService appService,
-        Report wrappedObject) {
-        super(appService, wrappedObject);
+    public ReportWrapper(WritableApplicationService appService, Report report) {
+        super(appService, report);
     }
 
     public ReportWrapper(WritableApplicationService appService) {

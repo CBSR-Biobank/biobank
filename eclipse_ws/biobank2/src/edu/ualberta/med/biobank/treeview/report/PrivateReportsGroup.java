@@ -16,12 +16,14 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.EntityWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PrivateReportsGroup extends AbstractReportsGroup {
@@ -40,6 +42,8 @@ public class PrivateReportsGroup extends AbstractReportsGroup {
             return lhs.getName().compareToIgnoreCase(rhs.getName());
         }
     };
+
+    private Collection<Entity> entities;
 
     public PrivateReportsGroup(AdapterBase parent, int id) {
         super(parent, id, NODE_NAME);
@@ -73,42 +77,41 @@ public class PrivateReportsGroup extends AbstractReportsGroup {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         if (SessionManager.canCreate(ReportWrapper.class, null)) {
+            if (entities == null) {
+                WritableApplicationService appService = SessionManager
+                    .getAppService();
+                entities = EntityWrapper.getEntities(appService,
+                    EntityWrapper.ORDER_BY_NAME);
+            }
 
-            Menu subMenu = new Menu(menu);
+            if (!entities.isEmpty()) {
+                Menu subMenu = new Menu(menu);
 
-            MenuItem mi = new MenuItem(menu, SWT.CASCADE);
-            mi.setMenu(subMenu);
-            mi.setText("New Report");
+                MenuItem item = new MenuItem(menu, SWT.CASCADE);
+                item.setMenu(subMenu);
+                item.setText("New Report");
 
-            MenuItem subItem = new MenuItem(subMenu, SWT.PUSH);
-            subItem.setText("Aliquot Report");
-            subItem.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    newReport();
+                for (final Entity entity : entities) {
+                    MenuItem subItem = new MenuItem(subMenu, SWT.PUSH);
+                    subItem.setText(entity.getName() + " Report");
+                    subItem.addSelectionListener(new SelectionAdapter() {
+                        @Override
+                        public void widgetSelected(SelectionEvent event) {
+                            openNewReport(entity);
+                        }
+                    });
                 }
-            });
+            }
         }
     }
 
-    protected void newReport() {
-
-        // TODO: be smarter! read once?
-        // TODO: eager load
-        HQLCriteria criteria = new HQLCriteria("from " + Entity.class.getName());
-        Entity entity = null;
-        try {
-            List<Entity> entities = SessionManager.getAppService().query(
-                criteria);
-            entity = entities.get(0);
-        } catch (ApplicationException e) {
-            e.printStackTrace();
-        }
-
+    protected void openNewReport(Entity entity) {
         ReportWrapper report = new ReportWrapper(SessionManager.getAppService());
+
         Report rawReport = report.getWrappedObject();
         rawReport.setUserId(SessionManager.getUser().getId().intValue());
         rawReport.setEntity(entity);
+
         ReportAdapter reportAdapter = new ReportAdapter(this, report);
         reportAdapter.openEntryForm();
     }

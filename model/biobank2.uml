@@ -27,7 +27,7 @@
       <fontsize>12</fontsize>
       <defaultstereotypeview>0</defaultstereotypeview>
       <generationoutputdir>/tmp</generationoutputdir>
-      <activediagram>DM-REPORT</activediagram>
+      <activediagram>Report</activediagram>
     </settings>
     <searchpath href="PROJECT_DIR" />
     <members>
@@ -157,7 +157,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Nov 22 10:41:51 MST 2010'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Nov 23 16:18:34 MST 2010'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -15904,6 +15904,13 @@
                                           isSpecification = 'false'>
                                           <UML:TaggedValue.dataValue>all</UML:TaggedValue.dataValue>
                                           <UML:TaggedValue.type>
+                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A7'/>
+                                          </UML:TaggedValue.type>
+                                        </UML:TaggedValue>
+                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057AA'
+                                          isSpecification = 'false'>
+                                          <UML:TaggedValue.dataValue>yes</UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.type>
                                             <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005716'/>
                                           </UML:TaggedValue.type>
                                         </UML:TaggedValue>
@@ -15989,6 +15996,15 @@
                                     </UML:Association>
                                     <UML:Association xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000003C25'
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                      <UML:ModelElement.taggedValue>
+                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057AE'
+                                          isSpecification = 'false'>
+                                          <UML:TaggedValue.dataValue>yes</UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.type>
+                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057AB'/>
+                                          </UML:TaggedValue.type>
+                                        </UML:TaggedValue>
+                                      </UML:ModelElement.taggedValue>
                                       <UML:Association.connection>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000003C26'
                                           visibility = 'public' isSpecification = 'false' isNavigable = 'false' ordering = 'unordered'
@@ -16076,11 +16092,11 @@
                                     <UML:Association xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000004837'
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
                                       <UML:ModelElement.taggedValue>
-                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000570C'
+                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A6'
                                           isSpecification = 'false'>
-                                          <UML:TaggedValue.dataValue>all</UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.dataValue>yes</UML:TaggedValue.dataValue>
                                           <UML:TaggedValue.type>
-                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005709'/>
+                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A3'/>
                                           </UML:TaggedValue.type>
                                         </UML:TaggedValue>
                                       </UML:ModelElement.taggedValue>
@@ -16276,6 +16292,15 @@
                                     </UML:Association>
                                     <UML:Association xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000004897'
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                      <UML:ModelElement.taggedValue>
+                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057B6'
+                                          isSpecification = 'false'>
+                                          <UML:TaggedValue.dataValue>yes</UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.type>
+                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057AF'/>
+                                          </UML:TaggedValue.type>
+                                        </UML:TaggedValue>
+                                      </UML:ModelElement.taggedValue>
                                       <UML:Association.connection>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000004898'
                                           visibility = 'public' isSpecification = 'false' isNavigable = 'false' ordering = 'unordered'
@@ -16362,6 +16387,15 @@
                                     </UML:Class>
                                     <UML:Association xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000048B3'
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                      <UML:ModelElement.taggedValue>
+                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057B5'
+                                          isSpecification = 'false'>
+                                          <UML:TaggedValue.dataValue>yes</UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.type>
+                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057B2'/>
+                                          </UML:TaggedValue.type>
+                                        </UML:TaggedValue>
+                                      </UML:ModelElement.taggedValue>
                                       <UML:Association.connection>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000048B4'
                                           visibility = 'public' isSpecification = 'false' isNavigable = 'false' ordering = 'unordered'
@@ -16398,6 +16432,15 @@
                                     </UML:Association>
                                     <UML:Association xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000048BC'
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                      <UML:ModelElement.taggedValue>
+                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A2'
+                                          isSpecification = 'false'>
+                                          <UML:TaggedValue.dataValue>yes</UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.type>
+                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000579F'/>
+                                          </UML:TaggedValue.type>
+                                        </UML:TaggedValue>
+                                      </UML:ModelElement.taggedValue>
                                       <UML:Association.connection>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000048BD'
                                           name = '' visibility = 'public' isSpecification = 'false' isNavigable = 'false'
@@ -16470,6 +16513,15 @@
                                     </UML:Class>
                                     <UML:Association xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005723'
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                      <UML:ModelElement.taggedValue>
+                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000579E'
+                                          isSpecification = 'false'>
+                                          <UML:TaggedValue.dataValue>yes</UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.type>
+                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000579B'/>
+                                          </UML:TaggedValue.type>
+                                        </UML:TaggedValue>
+                                      </UML:ModelElement.taggedValue>
                                       <UML:Association.connection>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005724'
                                           visibility = 'public' isSpecification = 'false' isNavigable = 'false' ordering = 'unordered'
@@ -16505,6 +16557,15 @@
                                     </UML:Association>
                                     <UML:Association xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000572E'
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                      <UML:ModelElement.taggedValue>
+                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000579A'
+                                          isSpecification = 'false'>
+                                          <UML:TaggedValue.dataValue>yes</UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.type>
+                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005797'/>
+                                          </UML:TaggedValue.type>
+                                        </UML:TaggedValue>
+                                      </UML:ModelElement.taggedValue>
                                       <UML:Association.connection>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000572F'
                                           name = 'entityProperty' visibility = 'public' isSpecification = 'false'
@@ -16542,6 +16603,15 @@
                                     </UML:Association>
                                     <UML:Association xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005737'
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
+                                      <UML:ModelElement.taggedValue>
+                                        <UML:TaggedValue xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000578F'
+                                          isSpecification = 'false'>
+                                          <UML:TaggedValue.dataValue>yes</UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.type>
+                                            <UML:TagDefinition xmi.idref = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005790'/>
+                                          </UML:TaggedValue.type>
+                                        </UML:TaggedValue>
+                                      </UML:ModelElement.taggedValue>
                                       <UML:Association.connection>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005738'
                                           name = 'entityProperty' visibility = 'public' isSpecification = 'false'
@@ -17102,12 +17172,119 @@
           </UML:ModelElement.taggedValue>
         </UML:TagDefinition>
         <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005716'
-          name = 'NCI_CASCADE_ASSOCIATION#edu.ualberta.med.biobank.model.ReportFilter.reportFilterValueCollection'
+          name = 'NCI_EAGER_LOAD#edu.ualberta.med.biobank.model.ReportFilter.reportFilterValueCollection'
           isSpecification = 'false'>
           <UML:TagDefinition.multiplicity>
             <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005717'>
               <UML:Multiplicity.range>
                 <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005718'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005790'
+          name = 'NCI_EAGER_LOAD#edu.ualberta.med.biobank.model.EntityProperty.entityFilterCollection'
+          isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005791'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005792'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005797'
+          name = 'NCI_EAGER_LOAD#edu.ualberta.med.biobank.model.EntityProperty.entityColumnCollection'
+          isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005798'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000005799'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000579B'
+          name = 'NCI_EAGER_LOAD#edu.ualberta.med.biobank.model.EntityProperty.propertyType'
+          isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000579C'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000579D'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:000000000000579F'
+          name = 'NCI_EAGER_LOAD#edu.ualberta.med.biobank.model.PropertyType.propertyModifierCollection'
+          isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A0'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A1'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A3'
+          name = 'NCI_EAGER_LOAD#edu.ualberta.med.biobank.model.Report.entity' isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A4'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A5'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A7'
+          name = 'NCI_CASCADE_ASSOCIATION#edu.ualberta.med.biobank.model.ReportFilter.reportFilterValueCollection'
+          isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A8'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057A9'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057AB'
+          name = 'NCI_EAGER_LOAD#edu.ualberta.med.biobank.model.ReportFilter.entityFilter'
+          isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057AC'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057AD'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057AF'
+          name = 'NCI_EAGER_LOAD#edu.ualberta.med.biobank.model.ReportColumn.entityColumn'
+          isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057B0'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057B1'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057B2'
+          name = 'NCI_EAGER_LOAD#edu.ualberta.med.biobank.model.ReportColumn.propertyModifier'
+          isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057B3'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '127-0-1-1-546a13a8:12c32bc9037:-8000:00000000000057B4'
                   lower = '0' upper = '1'/>
               </UML:Multiplicity.range>
             </UML:Multiplicity>

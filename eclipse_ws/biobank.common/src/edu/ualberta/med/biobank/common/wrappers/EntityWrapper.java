@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -11,8 +13,16 @@ import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.EntityProperty;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class EntityWrapper extends ModelWrapper<Entity> {
+    public static final Comparator<Entity> ORDER_BY_NAME = new Comparator<Entity>() {
+        @Override
+        public int compare(Entity lhs, Entity rhs) {
+            return lhs.getName().compareToIgnoreCase(rhs.getName());
+        }
+    };
+
     private Collection<EntityProperty> properties;
     private Collection<EntityFilter> filters;
     private Collection<EntityColumn> columns;
@@ -62,6 +72,10 @@ public class EntityWrapper extends ModelWrapper<Entity> {
         return columns;
     }
 
+    public String getName() {
+        return wrappedObject.getName();
+    }
+
     private static Collection<EntityColumn> getEntityColumnCollection(
         EntityProperty entityProperty) {
         Collection<EntityColumn> columns = new ArrayList<EntityColumn>();
@@ -88,6 +102,25 @@ public class EntityWrapper extends ModelWrapper<Entity> {
         return filters;
     }
 
+    public static Collection<Entity> getEntities(
+        WritableApplicationService appService, Comparator<Entity> comparator) {
+        List<Entity> entities = new ArrayList<Entity>();
+        HQLCriteria criteria = new HQLCriteria("from " + Entity.class.getName());
+
+        try {
+            List<Entity> results = appService.query(criteria);
+            entities.addAll(results);
+
+            if (comparator != null) {
+                Collections.sort(entities, comparator);
+            }
+        } catch (ApplicationException e) {
+            e.printStackTrace();
+        }
+
+        return entities;
+    }
+
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] {};
@@ -106,5 +139,4 @@ public class EntityWrapper extends ModelWrapper<Entity> {
     @Override
     protected void deleteChecks() throws Exception {
     }
-
 }

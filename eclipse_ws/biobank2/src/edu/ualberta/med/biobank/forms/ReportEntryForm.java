@@ -44,6 +44,7 @@ import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
+import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
@@ -156,11 +157,14 @@ public class ReportEntryForm extends BiobankEntryForm {
         report = reportAdapter.getWrapper();
         report.reload();
 
+        String entityName = report.getEntity().getName();
+
         String tabName;
-        if (report.isNew())
-            tabName = "New Report";
-        else
-            tabName = "Report " + report.getName();
+        if (report.isNew()) {
+            tabName = "New " + entityName + " Report";
+        } else {
+            tabName = entityName + " Report " + report.getName();
+        }
 
         setPartName(tabName);
 
@@ -491,7 +495,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         private void createContainer(Composite parent) {
             container = toolkit.createComposite(parent);
-            GridLayout layout = new GridLayout(3, false);
+            GridLayout layout = new GridLayout(4, false);
             layout.horizontalSpacing = 5;
             layout.verticalSpacing = 0;
             layout.marginWidth = 0;
@@ -647,7 +651,71 @@ public class ReportEntryForm extends BiobankEntryForm {
                         text.setText(StringUtils.join(values.toArray(), ", "));
                     }
                 };
+
+                // auto-suggest
+                // TODO: put this code elsewhere
+                Button button = new Button(container, SWT.NONE);
+                button.setText("ASDF");
+                button.addListener(SWT.Selection, new Listener() {
+                    @Override
+                    public void handleEvent(Event event) {
+                        Collection<String> suggestions = autoSuggest();
+                        System.out.println(Arrays.toString(suggestions
+                            .toArray()));
+                    }
+                });
             }
+        }
+
+        private Collection<String> autoSuggest() {
+            // TODO: set max query results
+            // TODO: set max query time
+            List<String> suggestions = new ArrayList<String>();
+
+            Report report = new Report();
+            report.setEntity(ReportEntryForm.this.report.getEntity()
+                .getWrappedObject());
+
+            Collection<ReportFilter> rfc = new HashSet<ReportFilter>();
+
+            for (ReportFilter rf : getReportFilterCollection()) {
+                if (!rf.getEntityFilter().equals(filter)) {
+                    rfc.add(rf);
+                }
+            }
+
+            report.setReportFilterCollection(rfc);
+            report.setIsCount(true);
+
+            Collection<ReportColumn> rcc = new ArrayList<ReportColumn>();
+            ReportColumn rc = new ReportColumn();
+            rc.setPosition(0);
+            EntityColumn ec = new EntityColumn();
+            ec.setEntityProperty(filter.getEntityProperty());
+            rc.setEntityColumn(ec);
+            rcc.add(rc);
+            report.setReportColumnCollection(rcc);
+
+            List<Object> results = null;
+            try {
+                results = SessionManager.getAppService().runReport(report);
+            } catch (ApplicationException e) {
+                // TODO: appropriate error message
+                e.printStackTrace();
+            }
+
+            for (Object result : results) {
+                if (result instanceof Object[]) {
+                    Object[] row = (Object[]) result;
+                    if (row.length > 0 && row[0] instanceof String) {
+                        suggestions.add((String) row[0]);
+                    }
+                }
+            }
+
+            Collections.sort(suggestions);
+
+            return suggestions;
         }
     }
 

@@ -38,7 +38,8 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
             Response rsp = new Response();
             Report report = (Report) obj;
 
-            List results = ReportRunner.runReport(getSession(), report);
+            ReportRunner reportRunner = new ReportRunner(getSession(), report);
+            List results = reportRunner.run();
 
             rsp.setResponse(results);
 
