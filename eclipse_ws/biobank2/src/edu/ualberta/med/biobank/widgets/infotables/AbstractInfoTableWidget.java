@@ -338,6 +338,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         gd.heightHint = (rows - 1) * table.getItemHeight()
             + table.getHeaderHeight() + 4;
         layout(true, true);
+
     }
 
     protected abstract void setPaginationParams(List<T> collection);
