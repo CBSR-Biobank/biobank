@@ -41,6 +41,11 @@ public class StudyMasterGroup extends AbstractStudyGroup {
         return StudyWrapper.getAllStudies(getAppService());
     }
 
+    @Override
+    protected int getWrapperChildCount() throws Exception {
+        return StudyWrapper.getAllStudies(getAppService()).size();
+    }
+
     public void addStudy() {
         StudyWrapper study = new StudyWrapper(SessionManager.getAppService());
         StudyAdapter adapter = new StudyAdapter(this, study);
