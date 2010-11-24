@@ -70,8 +70,7 @@ public class SessionHelper implements Runnable {
                 BioBankPlugin
                     .openAsyncError(
                         "Login Failed",
-                        exp.getCause().getMessage()
-                            + ". Warning: You will be locked out after 3 failed login attempts.");
+                        "Bad credentials. Warning: You will be locked out after 3 failed login attempts.");
                 return;
             }
             BioBankPlugin.openRemoteConnectErrorMessage(exp);
