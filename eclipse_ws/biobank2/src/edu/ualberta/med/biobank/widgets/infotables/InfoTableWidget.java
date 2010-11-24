@@ -15,12 +15,16 @@ import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 
 /**
  * Used to display tabular information for an object in the object model or
@@ -78,13 +82,13 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     protected ListenerList doubleClickListeners = new ListenerList();
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths) {
-        super(parent, collection, headings, columnWidths, 5);
+        String[] headings) {
+        super(parent, collection, headings, null, 5);
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
-        String[] headings, int[] columnWidths, int rowsPerPage) {
-        super(parent, collection, headings, columnWidths, rowsPerPage);
+        String[] headings, int rowsPerPage) {
+        super(parent, collection, headings, null, rowsPerPage);
     }
 
     @Override
@@ -262,23 +266,42 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
         return item;
     }
 
-    @SuppressWarnings("unchecked")
-    public T getSelection() {
+    public Object getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        T type = (T) item.o;
+        Object type = item.o;
         Assert.isNotNull(type);
         return type;
     }
 
-    public void addDoubleClickListener(IDoubleClickListener listener) {
+    public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
+        MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
+        mi.setText("Edit");
+        mi.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ModelWrapper<?> selection = (ModelWrapper<?>) InfoTableWidget.this
+                    .getSelection();
+                if (selection != null) {
+                    AdapterBase adapter = AdapterFactory.getAdapter(selection);
+                    adapter.openEntryForm();
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
     }
 
     public void doubleClick() {
         // get selection as derived class object
-        T selection = getSelection();
+        Object selection = getSelection();
 
         final DoubleClickEvent event = new DoubleClickEvent(tableViewer,
             new InfoTableSelection(selection));

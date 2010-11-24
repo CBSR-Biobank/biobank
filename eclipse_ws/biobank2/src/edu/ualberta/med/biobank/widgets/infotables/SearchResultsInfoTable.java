@@ -11,13 +11,13 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 public class SearchResultsInfoTable extends InfoTableWidget<Object> {
 
     public SearchResultsInfoTable(Composite parent, List<Object> collection,
-        String[] headings, int[] is, int rows) {
-        super(parent, collection, headings, is, rows);
+        String[] headings, int rows) {
+        super(parent, collection, headings, rows);
     }
 
     public SearchResultsInfoTable(Composite parent, List<Object> collection,
-        String[] headings, int[] is) {
-        super(parent, collection, headings, is);
+        String[] headings) {
+        super(parent, collection, headings);
     }
 
     @Override

@@ -223,21 +223,20 @@ public class DispatchShipmentSendingEntryForm extends
 
         };
         aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
-        aliquotsNonProcessedTable
-            .addDoubleClickListener(new IDoubleClickListener() {
-                @Override
-                public void doubleClick(DoubleClickEvent event) {
-                    Object selection = event.getSelection();
-                    if (selection instanceof InfoTableSelection) {
-                        InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                        DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) tableSelection
-                            .getObject();
-                        if (dsa != null) {
-                            SessionManager.openViewForm(dsa.getAliquot());
-                        }
+        aliquotsNonProcessedTable.addClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                Object selection = event.getSelection();
+                if (selection instanceof InfoTableSelection) {
+                    InfoTableSelection tableSelection = (InfoTableSelection) selection;
+                    DispatchShipmentAliquotWrapper dsa = (DispatchShipmentAliquotWrapper) tableSelection
+                        .getObject();
+                    if (dsa != null) {
+                        SessionManager.openViewForm(dsa.getAliquot());
                     }
                 }
-            });
+            }
+        });
         aliquotsNonProcessedTable.addSelectionChangedListener(biobankListener);
     }
 

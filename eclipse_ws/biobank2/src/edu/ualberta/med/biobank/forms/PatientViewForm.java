@@ -80,7 +80,7 @@ public class PatientViewForm extends BiobankViewForm {
             patient.getPatientVisitCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
-        visitsTable.addDoubleClickListener(collectionDoubleClickListener);
+        visitsTable.addClickListener(collectionDoubleClickListener);
     }
 
     private void setValues() throws BiobankCheckException, ApplicationException {
