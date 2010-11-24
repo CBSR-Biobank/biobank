@@ -47,4 +47,9 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
         adapter.openEntryForm();
     }
 
+    @Override
+    protected int getWrapperChildCount() throws Exception {
+        return getWrapperChildren().size();
+    }
+
 }
