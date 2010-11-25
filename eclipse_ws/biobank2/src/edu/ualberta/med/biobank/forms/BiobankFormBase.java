@@ -467,7 +467,9 @@ public abstract class BiobankFormBase extends EditorPart implements
 
     @Override
     public ISelection getSelection() {
-        return new StructuredSelection(adapter);
+        if (adapter != null)
+            return new StructuredSelection(adapter);
+        return null;
     }
 
     @Override

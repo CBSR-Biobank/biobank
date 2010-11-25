@@ -422,20 +422,22 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public void setQuantityFromType() {
-        PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
-            .get("patientVisit");
-        StudyWrapper study = patientVisit.getPatient().getStudy();
-        Double volume = null;
-        Collection<SampleStorageWrapper> sampleStorageCollection = study
-            .getSampleStorageCollection();
-        if (sampleStorageCollection != null) {
-            for (SampleStorageWrapper ss : sampleStorageCollection) {
-                if (ss.getSampleType().getId().equals(getSampleType().getId())) {
-                    volume = ss.getVolume();
+        if (getSampleType() != null) {
+            PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
+                .get("patientVisit");
+            StudyWrapper study = patientVisit.getPatient().getStudy();
+            Double volume = null;
+            Collection<SampleStorageWrapper> sampleStorageCollection = study
+                .getSampleStorageCollection();
+            if (sampleStorageCollection != null) {
+                for (SampleStorageWrapper ss : sampleStorageCollection) {
+                    if (getSampleType().equals(getSampleType())) {
+                        volume = ss.getVolume();
+                    }
                 }
             }
+            setQuantity(volume);
         }
-        setQuantity(volume);
     }
 
     @Override

@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.AbstractInfoTableWidget;
@@ -260,6 +261,18 @@ public class PatientMergeForm extends BiobankEntryForm {
                     closeEntryOpenView(false, true);
                 }
             });
+            ((BiobankApplicationService) appService).logActivity("merge", null,
+                patient2.getPnumber(), null, null, patient2.getPnumber()
+                    + " --> " + patient1Adapter.getWrapper().getPnumber(),
+                "Patient");
+            ((BiobankApplicationService) appService).logActivity(
+                "merge",
+                null,
+                patient1Adapter.getWrapper().getPnumber(),
+                null,
+                null,
+                patient1Adapter.getWrapper().getPnumber() + " <-- "
+                    + patient2.getPnumber(), "Patient");
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Merge failed.", e);
         }
