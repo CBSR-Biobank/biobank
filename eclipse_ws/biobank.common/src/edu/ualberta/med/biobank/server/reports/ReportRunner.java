@@ -26,7 +26,8 @@ import edu.ualberta.med.biobank.model.ReportFilter;
 public class ReportRunner {
     private static final String PROPERTY_DELIMITER = ".";
     private static final String ALIAS_DELIMITER = "-";
-    private static final Comparator<ReportColumn> COMPARE_REPORT_COLUMNS_BY_POSITION = new Comparator<ReportColumn>() {
+    private static final String MODIFIED_PROPERTY_ALIAS = "_modifiedPropertyAlias";
+    private static final Comparator<ReportColumn> COMPARE_REPORT_COLUMN_POSITION = new Comparator<ReportColumn>() {
         @Override
         public int compare(ReportColumn lhs, ReportColumn rhs) {
             return lhs.getPosition() - rhs.getPosition();
@@ -54,6 +55,10 @@ public class ReportRunner {
         criteria.setTimeout(timeoutInSeconds);
     }
 
+    public List<?> run() {
+        return criteria.list();
+    }
+
     private Collection<ReportColumn> getOrderedReportColumns() {
         List<ReportColumn> orderedCols = new ArrayList<ReportColumn>();
 
@@ -63,7 +68,7 @@ public class ReportRunner {
             orderedCols.addAll(reportCols);
         }
 
-        Collections.sort(orderedCols, COMPARE_REPORT_COLUMNS_BY_POSITION);
+        Collections.sort(orderedCols, COMPARE_REPORT_COLUMN_POSITION);
 
         return orderedCols;
     }
@@ -72,7 +77,7 @@ public class ReportRunner {
         Criteria criteria = session.createCriteria(report.getEntity()
             .getClassName());
 
-        createAssociations(session, report, criteria);
+        createAssociations(criteria);
 
         ProjectionList pList = Projections.projectionList();
 
@@ -84,15 +89,19 @@ public class ReportRunner {
 
             Projection projection = null;
             if (col.getPropertyModifier() != null) {
-                // TODO: resupport property modifiers.
-                // String modifiedProperty = col.getPropertyModifier()
-                // .modifyPath(getSqlColumn(criteria, aliasedProperty));
+                // // TODO: resupport property modifiers.
                 //
-                // // TODO: give a better alias than "_aliasx", which is may not
-                // // be unique.
-                // String sqlAlias = "_alias" + colNum;
+                // String sqlColumn = ReportsUtil.getSqlColumn(criteria,
+                // aliasedProperty);
+                // String modifiedProperty =
+                // col.getPropertyModifier().modifyPath(
+                // sqlColumn);
                 //
-                // if (report.isCount) {
+                // Messages.format(col.getPropertyModifier(), arg1)
+                //
+                // String sqlAlias = MODIFIED_PROPERTY_ALIAS + colNum;
+                //
+                // if (report.getIsCount()) {
                 // projection = Projections.sqlGroupProjection(
                 // modifiedProperty + " as " + sqlAlias, sqlAlias,
                 // new String[] { sqlAlias },
@@ -103,7 +112,7 @@ public class ReportRunner {
                 // new Type[] { Hibernate.STRING });
                 // }
             } else {
-                if (report.isCount) {
+                if (report.getIsCount()) {
                     projection = Projections.groupProperty(aliasedProperty);
                 } else {
                     projection = Projections.property(aliasedProperty);
@@ -114,7 +123,7 @@ public class ReportRunner {
             colNum++;
         }
 
-        if (report.isCount) {
+        if (report.getIsCount()) {
             pList.add(Projections.countDistinct("id"));
         }
 
@@ -143,22 +152,15 @@ public class ReportRunner {
         return criteria;
     }
 
-    public List run() {
-        return criteria.list();
-    }
-
-    private static void createAssociations(Session session, Report report,
-        Criteria criteria) {
-        Set<String> createdPaths = new HashSet<String>();
+    private void createAssociations(Criteria criteria) {
+        Set<String> createdPoperties = new HashSet<String>();
 
         Collection<ReportColumn> cols = report.getReportColumnCollection();
         if (cols != null) {
             for (ReportColumn col : cols) {
-                // attachProxy(session,
-                // col.getEntityColumn().getEntityProperty());
                 String property = col.getEntityColumn().getEntityProperty()
                     .getProperty();
-                createAssociations(criteria, property, createdPaths);
+                createAssociations(criteria, property, createdPoperties);
             }
         }
 
@@ -167,48 +169,46 @@ public class ReportRunner {
             for (ReportFilter filter : filters) {
                 String property = filter.getEntityFilter().getEntityProperty()
                     .getProperty();
-                createAssociations(criteria, property, createdPaths);
+                createAssociations(criteria, property, createdPoperties);
             }
         }
     }
 
-    private static void createAssociations(Criteria criteria, String path,
-        Set<String> createdPaths) {
-        String parentPath = getParentPath(path);
-        while (parentPath != null) {
-            if (!createdPaths.contains(parentPath)) {
-                // TODO: how do we determine if we should use a join or a left
-                // join? CriteriaSpecification.LEFT_JOIN - NOPE, null is
-                // confusing to the user.
-                criteria.createCriteria(parentPath, getPathAlias(parentPath));
-                createdPaths.add(parentPath);
+    private static void createAssociations(Criteria criteria, String property,
+        Set<String> createdProperties) {
+        String parentProperty = getParentProperty(property);
+        while (parentProperty != null) {
+            if (!createdProperties.contains(parentProperty)) {
+                criteria.createCriteria(parentProperty,
+                    getPropertyAlias(parentProperty));
+                createdProperties.add(parentProperty);
             }
-            parentPath = getParentPath(parentPath);
+            parentProperty = getParentProperty(parentProperty);
         }
     }
 
-    private static String getPathAlias(String path) {
-        return path == null ? null : path.replace(PROPERTY_DELIMITER,
+    private static String getPropertyAlias(String property) {
+        return property == null ? null : property.replace(PROPERTY_DELIMITER,
             ALIAS_DELIMITER);
     }
 
-    private static String getParentPath(String path) {
+    private static String getParentProperty(String property) {
         String parentPath = null;
-        int lastDelimiter = path.lastIndexOf(PROPERTY_DELIMITER);
+        int lastDelimiter = property.lastIndexOf(PROPERTY_DELIMITER);
         if (lastDelimiter != -1) {
-            parentPath = path.substring(0, lastDelimiter);
+            parentPath = property.substring(0, lastDelimiter);
         }
         return parentPath;
     }
 
-    private static String getAliasedProperty(String path) {
-        int lastDelimiter = path.lastIndexOf(PROPERTY_DELIMITER);
+    private static String getAliasedProperty(String property) {
+        int lastDelimiter = property.lastIndexOf(PROPERTY_DELIMITER);
         if (lastDelimiter != -1) {
-            String parentProperty = path.substring(0, lastDelimiter);
-            String lastProperty = path.substring(lastDelimiter + 1);
-            return getPathAlias(parentProperty) + PROPERTY_DELIMITER
+            String parentProperty = property.substring(0, lastDelimiter);
+            String lastProperty = property.substring(lastDelimiter + 1);
+            return getPropertyAlias(parentProperty) + PROPERTY_DELIMITER
                 + lastProperty;
         }
-        return path;
+        return property;
     }
 }

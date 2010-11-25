@@ -143,7 +143,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return report.isNew() ? OK_MSG_NEW : OK_MSG;
+        return "";
     }
 
     @Override
@@ -163,7 +163,12 @@ public class ReportEntryForm extends BiobankEntryForm {
         if (report.isNew()) {
             tabName = "New " + entityName + " Report";
         } else {
-            tabName = entityName + " Report " + report.getName();
+            String reportName = report.getName();
+            if (reportName == null || reportName.isEmpty()) {
+                tabName = "Unnamed " + entityName + " Report";
+            } else {
+                tabName = reportName;
+            }
         }
 
         setPartName(tabName);
@@ -173,7 +178,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Report Details");
+        form.setText(report.getEntity().getName() + " Report");
         page.setLayout(new GridLayout(1, false));
 
         createProperties();
