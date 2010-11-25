@@ -209,6 +209,7 @@ public class CDateTime extends BaseCombo {
                     setActiveField(FIELD_NONE);
                     updateText();
                 }
+                getParent().layout(true);
                 break;
             case SWT.KeyDown:
                 handleKey(event);
@@ -1333,6 +1334,10 @@ public class CDateTime extends BaseCombo {
     @Override
     public void setOpen(boolean open) {
         setOpen(open, null);
+
+        if (!open) {
+            getParent().layout(true);
+        }
     }
 
     @Override
@@ -1684,7 +1689,12 @@ public class CDateTime extends BaseCombo {
 
                     if (!string.equals(text.getText())) {
                         text.setText(string);
-                        CDateTime.this.getParent().layout(true);
+
+                        // if the picker is shown and the layout resizes, then
+                        // the picker is closed - avoid this
+                        if (picker == null) {
+                            getParent().layout(true);
+                        }
                     }
                     textControl.setSelection(selStart, selEnd);
 
