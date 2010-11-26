@@ -4,11 +4,10 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
 import java.util.Properties;
-import java.util.jar.Attributes;
-import java.util.jar.Manifest;
 
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.ui.IStartup;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -36,7 +35,8 @@ public class BiobankStartup implements IStartup {
             // the file is modified is the version is not correct
             // The result is displayed on the Help > About dialog
 
-            String manifestVersion = getManifestVersion();
+            String manifestVersion = Platform.getProduct().getDefiningBundle()
+                .getVersion().toString();
 
             // FIXME this doesn't work when the application is exported into a
             // final product.
@@ -92,16 +92,5 @@ public class BiobankStartup implements IStartup {
             logger.debug("Error while checking and/or modifying the "
                 + ABOUT_MAPPINGS_FILE + " file.", e);
         }
-    }
-
-    private String getManifestVersion() throws Exception {
-        URL urlManifest = FileLocator.find(BioBankPlugin.getDefault()
-            .getBundle(), new Path("META-INF/MANIFEST.MF"), null);
-        urlManifest = FileLocator.toFileURL(urlManifest);
-
-        Manifest manifest = new Manifest(new FileInputStream(
-            urlManifest.getFile()));
-        Attributes attributes = manifest.getMainAttributes();
-        return attributes.getValue("Bundle-Version");
     }
 }

@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.rcp;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProduct;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.ISourceProviderListener;
@@ -56,6 +58,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         configurer.setTitle(MAIN_TITLE);
         configurer.setShowProgressIndicator(true);
+
+        IProduct product = Platform.getProduct();
+        getWindowConfigurer().setTitle(
+            product.getName() + " " + product.getDefiningBundle().getVersion());
     }
 
     @Override
