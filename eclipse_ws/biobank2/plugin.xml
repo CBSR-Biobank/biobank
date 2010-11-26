@@ -20,10 +20,10 @@
          point="org.eclipse.core.runtime.products">
       <product
             application="biobank2.biobank2"
-            name="Biobank2">
+            name="BioBank2">
          <property
                name="appName"
-               value="Biobank2">
+               value="BioBank2">
          </property>
          <property
                name="aboutText"
