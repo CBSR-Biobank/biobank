@@ -17,12 +17,12 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ReportWrapper extends ModelWrapper<Report> {
-    private static final String PROP_KEY_NAME = "name";
-    private static final String PROP_KEY_DESCRIPTION = "description";
-    private static final String PROP_KEY_IS_COUNT = "isCount";
-    private static final String PROP_KEY_USER_ID = "userId";
-    private static final String PROP_KEY_REPORT_COLUMN_COLLECTION = "reportColumnCollection";
-    private static final String PROP_KEY_REPORT_FILTER_COLLECTION = "reportFilterCollection";
+    public static final String PROPERTY_NAME = "name";
+    public static final String PROPERTY_DESCRIPTION = "description";
+    public static final String PROPERTY_IS_COUNT = "isCount";
+    public static final String PROPERTY_USER_ID = "userId";
+    public static final String PROPERTY_REPORT_COLUMN_COLLECTION = "reportColumnCollection";
+    public static final String PROPERTY_REPORT_FILTER_COLLECTION = "reportFilterCollection";
 
     private EntityWrapper entity;
 
@@ -41,7 +41,7 @@ public class ReportWrapper extends ModelWrapper<Report> {
     public void setName(String name) {
         String oldName = getName();
         wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange(PROP_KEY_NAME, oldName, name);
+        propertyChangeSupport.firePropertyChange(PROPERTY_NAME, oldName, name);
     }
 
     public String getDescription() {
@@ -51,7 +51,7 @@ public class ReportWrapper extends ModelWrapper<Report> {
     public void setDescription(String description) {
         String oldDescription = getDescription();
         wrappedObject.setDescription(description);
-        propertyChangeSupport.firePropertyChange(PROP_KEY_DESCRIPTION,
+        propertyChangeSupport.firePropertyChange(PROPERTY_DESCRIPTION,
             oldDescription, description);
     }
 
@@ -62,7 +62,7 @@ public class ReportWrapper extends ModelWrapper<Report> {
     public void setIsCount(Boolean isCount) {
         Boolean oldIsCount = getIsCount();
         wrappedObject.setIsCount(isCount);
-        propertyChangeSupport.firePropertyChange(PROP_KEY_IS_COUNT, oldIsCount,
+        propertyChangeSupport.firePropertyChange(PROPERTY_IS_COUNT, oldIsCount,
             isCount);
     }
 
@@ -73,14 +73,14 @@ public class ReportWrapper extends ModelWrapper<Report> {
     public void setUserId(Integer userId) {
         Integer oldUserId = getUserId();
         wrappedObject.setUserId(userId);
-        propertyChangeSupport.firePropertyChange(PROP_KEY_USER_ID, oldUserId,
+        propertyChangeSupport.firePropertyChange(PROPERTY_USER_ID, oldUserId,
             userId);
     }
 
     @SuppressWarnings("unchecked")
     public List<ReportColumn> getReportColumnCollection() {
         List<ReportColumn> columns = (List<ReportColumn>) propertiesMap
-            .get(PROP_KEY_REPORT_COLUMN_COLLECTION);
+            .get(PROPERTY_REPORT_COLUMN_COLLECTION);
 
         if (columns == null) {
             columns = new ArrayList<ReportColumn>();
@@ -98,7 +98,7 @@ public class ReportWrapper extends ModelWrapper<Report> {
                 }
             });
 
-            propertiesMap.put(PROP_KEY_REPORT_COLUMN_COLLECTION, columns);
+            propertiesMap.put(PROPERTY_REPORT_COLUMN_COLLECTION, columns);
         }
 
         return columns;
@@ -107,7 +107,7 @@ public class ReportWrapper extends ModelWrapper<Report> {
     @SuppressWarnings("unchecked")
     public List<ReportFilter> getReportFilterCollection() {
         List<ReportFilter> filters = (List<ReportFilter>) propertiesMap
-            .get(PROP_KEY_REPORT_FILTER_COLLECTION);
+            .get(PROPERTY_REPORT_FILTER_COLLECTION);
 
         if (filters == null) {
             filters = new ArrayList<ReportFilter>();
@@ -125,7 +125,7 @@ public class ReportWrapper extends ModelWrapper<Report> {
                 }
             });
 
-            propertiesMap.put(PROP_KEY_REPORT_FILTER_COLLECTION, filters);
+            propertiesMap.put(PROPERTY_REPORT_FILTER_COLLECTION, filters);
         }
 
         return filters;
@@ -177,9 +177,9 @@ public class ReportWrapper extends ModelWrapper<Report> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { PROP_KEY_NAME, PROP_KEY_DESCRIPTION,
-            PROP_KEY_IS_COUNT, PROP_KEY_USER_ID,
-            PROP_KEY_REPORT_COLUMN_COLLECTION,
-            PROP_KEY_REPORT_FILTER_COLLECTION };
+        return new String[] { PROPERTY_NAME, PROPERTY_DESCRIPTION,
+            PROPERTY_IS_COUNT, PROPERTY_USER_ID,
+            PROPERTY_REPORT_COLUMN_COLLECTION,
+            PROPERTY_REPORT_FILTER_COLLECTION };
     }
 }
