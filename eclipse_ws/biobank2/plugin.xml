@@ -184,17 +184,13 @@
             name="Patient Administration">
       </category>
       <command
-            id="edu.ualberta.med.biobank.commands.patients.openPatientForm"
-            name="Open Patient Form">
+            id="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
+            name="Sample Process">
          <commandParameter
-               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
-               name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
-               optional="true">
-         </commandParameter>
-         <commandParameter
-               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.viewId"
-               name="edu.ualberta.med.biobank.commands.patients.openPatientForm.viewId"
-               optional="true">
+               id="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
+               name="Process"
+               optional="false"
+               values="edu.ualberta.med.biobank.handlers.OpenSampleProcessParameters">
          </commandParameter>
       </command>
       <command
@@ -552,8 +548,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.OpenPatientFormHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm">
+            class="edu.ualberta.med.biobank.handlers.OpenSampleProcessFormHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm">
          <activeWhen>
             <and>
               <reference
@@ -1120,32 +1116,32 @@
                id="edu.ualberta.med.biobank.menu.linkAssign"
                label="Link / Assign">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
                   icon="icons/scanLink.png"
                   label="Scan Link"
                   style="push">
                <parameter
-                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     name="Process"
                      value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
                </parameter>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
                   icon="icons/scanAssign.png"
                   label="Scan Assign"
                   style="push">
                <parameter
-                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     name="Process"
                      value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
                </parameter>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
                   icon="icons/cabinetLinkAssign.png"
                   label="Cabinet Link/Assign"
                   style="push">
                <parameter
-                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     name="Process"
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
             </command>
@@ -1424,32 +1420,32 @@
                   tooltip="Delete Selected Item">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
                   icon="icons/scanLink.png"
                   label="Scan Link"
                   style="push">
                <parameter
-                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                      value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
                </parameter>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
                   icon="icons/scanAssign.png"
                   label="Scan Assign"
                   style="push">
                <parameter
-                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                      value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
                </parameter>
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+                  commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
                   icon="icons/cabinetLinkAssign.png"
                   label="Cabinet Link/Assign"
                   style="push">
                <parameter
-                     name="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+                     name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
             </command>
@@ -2218,29 +2214,29 @@
             sequence="M3+V">
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+            commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
             schemeId="biobank2.scheme"
             sequence="M2+M3+L">
          <parameter
-               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+               id="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
          </parameter>
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+            commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
             schemeId="biobank2.scheme"
             sequence="M2+M3+A">
          <parameter
-               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+               id="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
          </parameter>
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.patients.openPatientForm"
+            commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
             schemeId="biobank2.scheme"
             sequence="M2+M3+C">
          <parameter
-               id="edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId"
+               id="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
          </parameter>
       </key>
