@@ -95,7 +95,7 @@ public class SessionManager {
         rebuildSession();
         updateMenus();
 
-        if (sessionAdapter.getUser().isNeedToChangePassword()) {
+        if (sessionAdapter.getUser().passwordChangeRequired()) {
             ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
                 .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
             dlg.open();

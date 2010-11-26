@@ -29,8 +29,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ApplicationWorkbenchWindowAdvisor.class.getName());
 
-    private static final String MAIN_TITLE = "BioBank2";
-
     public ApplicationWorkbenchWindowAdvisor(
         IWorkbenchWindowConfigurer configurer) {
         super(configurer);
@@ -56,12 +54,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          * "SHOW_TEXT_ON_PERSPECTIVE_BAR", false);
          */
 
-        configurer.setTitle(MAIN_TITLE);
-        configurer.setShowProgressIndicator(true);
-
         IProduct product = Platform.getProduct();
-        getWindowConfigurer().setTitle(
-            product.getName() + " " + product.getDefiningBundle().getVersion());
+        configurer.setTitle(product.getName() + " "
+            + product.getDefiningBundle().getVersion());
+        configurer.setShowProgressIndicator(true);
     }
 
     @Override
@@ -97,10 +93,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null) {
                         if (sourceValue.equals(SessionState.LOGGED_IN))
-                            updatedTitle(SessionManager.getServer(),
+                            mainWindowUpdateTitle(SessionManager.getServer(),
                                 SessionManager.getUser().getLogin());
                         else if (sourceValue.equals(SessionState.LOGGED_OUT))
-                            resetTitle();
+                            mainWindowResetTitle();
                     }
                 }
 
@@ -111,17 +107,22 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
             });
     }
 
-    private void resetTitle() {
-        updatedTitle(null, null);
+    private void mainWindowResetTitle() {
+        mainWindowUpdateTitle(null, null);
     }
 
-    private void updatedTitle(String server, String username) {
+    private void mainWindowUpdateTitle(String server, String username) {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
         String oldTitle = configurer.getTitle();
-        String newTitle = MAIN_TITLE;
-        if (server != null && username != null) {
-            newTitle = MAIN_TITLE + " - " + server + " [" + username + "]";
+
+        IProduct product = Platform.getProduct();
+        String newTitle = product.getName() + " "
+            + product.getDefiningBundle().getVersion();
+
+        if ((server != null) && (username != null)) {
+            newTitle += " - " + server + " [" + username + "]";
         }
+
         if (!newTitle.equals(oldTitle)) {
             configurer.setTitle(newTitle);
         }

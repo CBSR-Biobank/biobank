@@ -403,7 +403,7 @@ public class BiobankApplicationServiceImpl extends
                     serverUser.setPassword(password);
                 }
 
-                if (user.isNeedToChangePassword()) {
+                if (user.passwordChangeRequired()) {
                     serverUser.setStartDate(new Date());
                 }
 
