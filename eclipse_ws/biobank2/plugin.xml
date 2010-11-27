@@ -36,35 +36,6 @@
       </product>
    </extension>
    <extension
-         point="org.eclipse.ui.activities">
-      <activity
-            description="Preferences from Eclipse Update UI"
-            id="edu.ualberta.med.biobank.activity.updateui"
-            name="Update Preferences">
-      </activity>
-      <activityPatternBinding
-            activityId="edu.ualberta.med.biobank.activity.updateui"
-            pattern="org\.eclipse\.update\.ui/org\.eclipse\.update\..*PreferencePage">
-      </activityPatternBinding>
-      <activity
-            description="Preferences from Eclipse IDE UI"
-            id="edu.ualberta.med.biobank.activity.eclipseide"
-            name="IDE General Preferences">
-      </activity>
-      <activityPatternBinding
-            activityId="edu.ualberta.med.biobank.activity.eclipseide"
-            pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.preferencePages\.Workbench">
-      </activityPatternBinding>
-      <activity
-            id="edu.ualberta.med.biobank.activity.neweditor"
-            name="Activity for New Editor action">
-      </activity>
-      <activityPatternBinding
-            activityId="edu.ualberta.med.biobank.activity.neweditor"
-            pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.window\.newEditor">
-      </activityPatternBinding>
-   </extension>
-   <extension
          point="org.eclipse.ui.perspectives">
       <perspective
             class="edu.ualberta.med.biobank.rcp.perspective.MainPerspective"
@@ -169,53 +140,49 @@
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.reports"
-            name="Reports">
+            name="Open Reports View">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.patientAdmin"
-            name="Patient administration">
+            name="Open Patients/Samples View">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.mainAdmin"
-            name="Main Administration">
+            name="Open Administration View">
       </command>
-      <category
-            id="edu.ualberta.med.biobank.category.patientsAdmin"
-            name="Patient Administration">
-      </category>
       <command
             id="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
-            name="Sample Process">
+            name="Sample Processing">
          <commandParameter
                id="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
-               name="Process"
+               name="Type"
                optional="false"
                values="edu.ualberta.med.biobank.handlers.OpenSampleProcessParameters">
          </commandParameter>
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.debug.cbsrConfig"
-            name="CBSR Configuration">
+            name="Create CBSR Configuration">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
-            name="CBSR Configuration with data">
+            name="Create CBSR Configuration with data">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.debug.calgaryConfig"
-            name="Calgary Configuration">
+            name="Create Calgary Configuration">
       </command>
        <command
             id="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
-            name="Add clinic shipment">
+            name="Add Clinic Shipment">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientAdd"
-            name="Add patient">
+            name="Add Patient">
       </command>
        <command
              id="edu.ualberta.med.biobank.commands.patients.patientMerge"
-             name="Merge patients">
+             name="Merge Patients">
        </command>
       <command
             id="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
@@ -223,7 +190,7 @@
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.shipmentAdmin"
-            name="Clinic Shipment administration">
+            name="Open Clinic Shipment View">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.reloadViewWithTree"
@@ -235,7 +202,7 @@
             name="Send Error Mail">
       </command>
       <command id="edu.ualberta.med.biobank.commands.deleteSelection"
-            name="Delete selected item">
+            name="Delete Selected Item">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.search"
@@ -255,7 +222,7 @@
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.logging"
-            name="Logging">
+            name="Open Logging View">
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.edit"
@@ -283,11 +250,11 @@
       </command>
       <command
             id="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
-            name="Dispatch Shipment Administration">
+            name="Open Dispatch Shipment View">
       </command>
        <command
             id="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
-            name="Add dispatch shipment">
+            name="Add Dispatch Shipment">
       </command>
        <command
              defaultHandler="edu.ualberta.med.biobank.handlers.ExportErrorsLogsHandler"
@@ -1063,7 +1030,35 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.deleteSelection"
                   icon="icons/delete.png"
-                  label="Delete select item"
+                  label="Delete Selected Item"
+                  style="push">
+            </command>
+         </menu>
+         <menu
+               id="edu.ualberta.med.biobank.menu.patients"
+               label="Patients">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
+                  icon="icons/patient_add.png"
+                  label="Add Patient"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+                  icon="icons/patient_merge.png"
+                  label="Merge Patients"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
+                  icon="icons/patientVisit_add.png"
+                  label="Add Patient Visit"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
                   style="push">
             </command>
          </menu>
@@ -1079,36 +1074,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.deleteSelection"
                   icon="icons/delete.png"
-                  label="Delete select item"
-                  style="push">
-            </command>
-         </menu>
-         <menu
-               id="edu.ualberta.med.biobank.menu.patients"
-               label="Patients">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
-                  icon="icons/patient_add.png"
-                  label="Add Patient"
-                  style="push">
-            </command>      
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
-                  icon="icons/patient_merge.png"
-                  label="Merge Patients"
-                  style="push">
-            </command>
-            
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
-                  icon="icons/patientVisit_add.png"
-                  label="Add Patient Visit"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete select item"
+                  label="Delete Selected Item"
                   style="push">
             </command>
          </menu>
@@ -1121,7 +1087,7 @@
                   label="Scan Link"
                   style="push">
                <parameter
-                     name="Process"
+                     name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                      value="edu.ualberta.med.biobank.forms.ScanLinkEntryForm">
                </parameter>
             </command>
@@ -1131,7 +1097,7 @@
                   label="Scan Assign"
                   style="push">
                <parameter
-                     name="Process"
+                     name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                      value="edu.ualberta.med.biobank.forms.ScanAssignEntryForm">
                </parameter>
             </command>
@@ -1141,7 +1107,7 @@
                   label="Cabinet Link/Assign"
                   style="push">
                <parameter
-                     name="Process"
+                     name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
             </command>
@@ -1156,16 +1122,16 @@
                   style="push">
             </command>
             <command
-               commandId="edu.ualberta.med.biobank.commands.patientAdmin"
-               icon="icons/patientPerspective.png"
-               label="Patients View"
-               style="push">
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
                   icon="icons/clinicShipment.png"
                   label="Clinic Shipment View"
                   style="push">
+            </command>
+            <command
+               commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+               icon="icons/patientPerspective.png"
+               label="Patients/Samples View"
+               style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
@@ -1298,38 +1264,38 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.mainAdmin"
                   icon="icons/mainPerspective.png"
-                  label="Administration View"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patientAdmin"
-                  icon="icons/patientPerspective.png"
-                  label="Patients View"
+                  label="Open Administration View"
                   style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
                   icon="icons/clinicShipment.png"
-                  label="Clinic Shipment View"
+                  label="Open Clinic Shipment View"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+                  icon="icons/patientPerspective.png"
+                  label="Open Patients View"
                   style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
                   icon="icons/dispatchShipment.png"
-                  label="Dispatch Shipment View"
+                  label="Open Dispatch Shipment View"
                   style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.reports"
                   icon="icons/reportsPerspective.png"
-                  label="Reports"
+                  label="Open Reports"
                   style="push"
                   tooltip="Reports">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.logging"
                   icon="icons/table_row_delete.png"
-                  label="Logging"
+                  label="Open Logging View"
                   style="push"
                   tooltip="Logging: search for specific information in stored logs">
             </command>
@@ -2162,41 +2128,59 @@
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
-      <key commandId="edu.ualberta.med.biobank.commands.mainAdmin"
-           schemeId="biobank2.scheme"
-           sequence="M1+M2+A">
+      <key
+            commandId="edu.ualberta.med.biobank.commands.mainAdmin"
+            contextId="not.edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M1+M2+A">
       </key>
-      <key commandId="edu.ualberta.med.biobank.commands.patientAdmin"
-           schemeId="biobank2.scheme"
-           sequence="M1+M2+P">
+      <key
+            commandId="edu.ualberta.med.biobank.commands.patientAdmin"
+            contextId="not.edu.ualberta.med.biobank.perspective.patients"
+            schemeId="biobank2.scheme"
+            sequence="M1+M2+P">
       </key>
-      <key commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
-           schemeId="biobank2.scheme"
-           sequence="M1+M2+S">
+      <key
+            commandId="edu.ualberta.med.biobank.commands.shipmentAdmin"
+            contextId="not.edu.ualberta.med.biobank.perspective.shipments"
+            schemeId="biobank2.scheme"
+            sequence="M1+M2+S">
       </key>
-      <key commandId="edu.ualberta.med.biobank.commands.reports"
-           schemeId="biobank2.scheme"
-           sequence="M1+M2+R">
+      <key
+            commandId="edu.ualberta.med.biobank.commands.reports"
+            contextId="not.edu.ualberta.med.biobank.perspective.reports"
+            schemeId="biobank2.scheme"
+            sequence="M1+M2+R">
       </key>
-      <key commandId="edu.ualberta.med.biobank.commands.login"
-           schemeId="biobank2.scheme"
-           sequence="M1+L">
+      <key
+            commandId="edu.ualberta.med.biobank.commands.login"
+            contextId="biobank2.context.loggedOut"
+            schemeId="biobank2.scheme"
+            sequence="M1+L">
       </key>
-      <key commandId="edu.ualberta.med.biobank.commands.logout"
-           schemeId="biobank2.scheme"
-           sequence="M1+M2+L">
+      <key
+            commandId="edu.ualberta.med.biobank.commands.logout"
+            contextId="biobank2.context.loggedIn"
+            schemeId="biobank2.scheme"
+            sequence="M1+M2+L">
       </key>
-      <key commandId="edu.ualberta.med.biobank.commands.siteAdd"
-           schemeId="biobank2.scheme"
-           sequence="M3+R">
+      <key
+            commandId="edu.ualberta.med.biobank.commands.siteAdd"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+R">
       </key>
-      <key commandId="edu.ualberta.med.biobank.commands.clinicAdd"
-           schemeId="biobank2.scheme"
-           sequence="M3+C">
+      <key
+            commandId="edu.ualberta.med.biobank.commands.clinicAdd"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+C">
       </key>
-      <key commandId="edu.ualberta.med.biobank.commands.studyAdd"
-           schemeId="biobank2.scheme"
-           sequence="M3+S">
+      <key
+            commandId="edu.ualberta.med.biobank.commands.studyAdd"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+S">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.quit"
@@ -2205,16 +2189,19 @@
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
+            contextId="edu.ualberta.med.biobank.perspective.patients"
             schemeId="biobank2.scheme"
             sequence="M3+P">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
+            contextId="edu.ualberta.med.biobank.perspective.patients"
             schemeId="biobank2.scheme"
             sequence="M3+V">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
+            contextId="edu.ualberta.med.biobank.perspective.patients"
             schemeId="biobank2.scheme"
             sequence="M2+M3+L">
          <parameter
@@ -2224,6 +2211,7 @@
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
+            contextId="edu.ualberta.med.biobank.perspective.patients"
             schemeId="biobank2.scheme"
             sequence="M2+M3+A">
          <parameter
@@ -2233,6 +2221,7 @@
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
+            contextId="edu.ualberta.med.biobank.perspective.patients"
             schemeId="biobank2.scheme"
             sequence="M2+M3+C">
          <parameter
@@ -2241,18 +2230,21 @@
          </parameter>
       </key>
       <key
-      		commandId="edu.ualberta.med.biobank.commands.reset"
-      		schemeId="biobank2.scheme"
-      		sequence="M1+R"/>
+            commandId="edu.ualberta.med.biobank.commands.reset"
+            contextId="biobank2.context.entryForm"
+            schemeId="biobank2.scheme"
+            sequence="M1+R"/>
       <key
             commandId="edu.ualberta.med.biobank.commands.confirm"
+            contextId="biobank2.context.entryForm"
             schemeId="biobank2.scheme"
             sequence="M1+S">
       </key>
       <key
-      		commandId="edu.ualberta.med.biobank.commands.cancel"
-      		schemeId="biobank2.scheme"
-      		sequence="M1+E"/>
+            commandId="edu.ualberta.med.biobank.commands.cancel"
+            contextId="biobank2.context.entryForm"
+            schemeId="biobank2.scheme"
+            sequence="M1+C"/>
       <key
             commandId="org.eclipse.ui.file.close"
             sequence="M1+W"
@@ -2275,23 +2267,109 @@
       </scheme>
       <key
             commandId="edu.ualberta.med.biobank.commands.logging"
+            contextId="not.edu.ualberta.med.biobank.perspective.logging"
             schemeId="biobank2.scheme"
             sequence="M1+M2+K">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.reloadViewForm"
+            contextId="biobank2.context.viewForm"
             schemeId="biobank2.scheme"
-            sequence="M1+T">
+            sequence="M1+R">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.edit"
+            contextId="biobank2.context.viewForm"
             schemeId="biobank2.scheme"
-            sequence="M1+D">
+            sequence="M1+E">
       </key>
       <key
             commandId="edu.ualberta.med.biobank.commands.dispatchShipmentAdmin"
+            contextId="not.edu.ualberta.med.biobank.perspective.dispatchShipments"
             schemeId="biobank2.scheme"
             sequence="M1+M2+D">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.containerTypeAdd"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+T">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.containerAdd"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+N">
+      </key>
+      <key
+            commandId="edu.ualberta.med.biobank.commands.editSampleTypes"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+L">
+      </key>    
+      <key
+            commandId="edu.ualberta.med.biobank.commands.editSourceVessels"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+V">
+      </key>    
+	  <key
+            commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+M">
+      </key> 
+	  <key
+            commandId="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+A">
+      </key>  
+	  <key
+            commandId="edu.ualberta.med.biobank.commands.changePassword"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+P">
+      </key>  
+	  <key
+            commandId="edu.ualberta.med.biobank.commands.editUsers"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+U">
+      </key>
+	  <key
+            commandId="edu.ualberta.med.biobank.commands.addUser"
+            contextId="edu.ualberta.med.biobank.perspective.main"
+            schemeId="biobank2.scheme"
+            sequence="M3+E">
+      </key>
+	  <key
+            commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+            contextId="edu.ualberta.med.biobank.perspective.patients"
+            schemeId="biobank2.scheme"
+            sequence="M3+M">
+      </key>      
+	  <key
+            commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+            schemeId="biobank2.scheme"
+            sequence="M3+Delete">
+      </key>   
+	  <key
+            commandId="edu.ualberta.med.biobank.commands.print"
+            schemeId="biobank2.scheme"
+            sequence="M1+P">
+      </key>    
+	  <key
+         commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
+         contextId="edu.ualberta.med.biobank.perspective.shipments"
+         schemeId="biobank2.scheme"
+         sequence="M3+S">
+      </key>    
+	  <key
+         commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
+         contextId="edu.ualberta.med.biobank.perspective.dispatchShipments"
+         schemeId="biobank2.scheme"
+         sequence="M3+D">
       </key>
    </extension>
     <extension
@@ -2630,5 +2708,72 @@
             properties="canDelete"
             type="edu.ualberta.med.biobank.treeview.AdapterBase">
       </propertyTester>
+   </extension>
+   <extension
+         point="org.eclipse.ui.contexts">
+      <context
+            id="edu.ualberta.med.biobank.perspective.main"
+            name="Administration">
+      </context>
+      <context
+            id="edu.ualberta.med.biobank.perspective.patients"
+            name="Patients View">
+      </context>
+      <context
+            id="edu.ualberta.med.biobank.perspective.shipments"
+            name="Shipments View">
+      </context>
+      <context
+            id="edu.ualberta.med.biobank.perspective.dispatchShipments"
+            name="Dispatches View">
+      </context>
+      <context
+            id="edu.ualberta.med.biobank.perspective.logging"
+            name="Logs View">
+      </context>
+      <context
+            id="edu.ualberta.med.biobank.perspective.reports"
+            name="Reports View">
+      </context>
+      <context
+            id="biobank2.context.entryForm"
+            name="Biobank Entry Form">
+      </context>
+      <context
+            id="biobank2.context.viewForm"
+            name="Biobank View Form">
+      </context>
+      <context
+            id="biobank2.context.loggedIn"
+            name="Logged In">
+      </context>
+      <context
+            id="biobank2.context.loggedOut"
+            name="Logged Out">
+      </context>
+      <context
+            id="not.edu.ualberta.med.biobank.perspective.main"
+            name="Not in Administration">
+      </context>
+      <context
+            id="not.edu.ualberta.med.biobank.perspective.patients"
+            name="Not in Patient">
+      </context>    
+      <context
+            id="not.edu.ualberta.med.biobank.perspective.shipments"
+            name="Not in Shipments">
+      </context>         
+      <context
+            id="not.edu.ualberta.med.biobank.perspective.dispatchShipments"
+            name="Not in Shipments">
+      </context>         
+	  <context
+            id="not.edu.ualberta.med.biobank.perspective.logging"
+            name="Not in Logging">
+      </context>  
+	  <context
+            id="not.edu.ualberta.med.biobank.perspective.reports"
+            name="Not in Repports">
+      </context>  
    </extension>
 </plugin>

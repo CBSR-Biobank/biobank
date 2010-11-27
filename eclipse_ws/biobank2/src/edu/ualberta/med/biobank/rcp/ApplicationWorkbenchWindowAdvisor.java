@@ -21,15 +21,21 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.DispatchShipmentAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.LoggingPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ShipmentAdministrationPerspective;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.utils.BindingContextHelper;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ApplicationWorkbenchWindowAdvisor.class.getName());
 
-    private static final String MAIN_TITLE = "BioBank2";
+    private static String MAIN_TITLE;
 
     public ApplicationWorkbenchWindowAdvisor(
         IWorkbenchWindowConfigurer configurer) {
@@ -55,13 +61,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          * "left"); PlatformUI.getPreferenceStore().setDefault(
          * "SHOW_TEXT_ON_PERSPECTIVE_BAR", false);
          */
-
-        configurer.setTitle(MAIN_TITLE);
-        configurer.setShowProgressIndicator(true);
-
         IProduct product = Platform.getProduct();
-        getWindowConfigurer().setTitle(
-            product.getName() + " " + product.getDefiningBundle().getVersion());
+        MAIN_TITLE = product.getName() + " "
+            + product.getDefiningBundle().getVersion();
+        configurer.setShowProgressIndicator(true);
     }
 
     @Override
@@ -86,6 +89,21 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         page.addPartListener(new BiobankPartListener());
         window.addPerspectiveListener(new BiobankPerspectiveListener());
 
+        // to activate correct key bindings
+        String currentPerspectiveId = window.getActivePage().getPerspective()
+            .getId();
+        activateIfNotInPerspective(currentPerspectiveId, MainPerspective.ID);
+        activateIfNotInPerspective(currentPerspectiveId,
+            PatientsAdministrationPerspective.ID);
+        activateIfNotInPerspective(currentPerspectiveId,
+            ShipmentAdministrationPerspective.ID);
+        activateIfNotInPerspective(currentPerspectiveId,
+            DispatchShipmentAdministrationPerspective.ID);
+        activateIfNotInPerspective(currentPerspectiveId, LoggingPerspective.ID);
+        activateIfNotInPerspective(currentPerspectiveId, ReportsPerspective.ID);
+
+        BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
+
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         SessionState sessionSourceProvider = (SessionState) service
@@ -109,6 +127,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     @SuppressWarnings("rawtypes") Map sourceValuesByName) {
                 }
             });
+
+        BindingContextHelper
+            .activateContextInWorkbench(SessionManager.BIOBANK2_CONTEXT_LOGGED_OUT);
+    }
+
+    private void activateIfNotInPerspective(String currentPerspectiveId,
+        String notId) {
+        if (currentPerspectiveId != notId)
+            BindingContextHelper.activateContextInWorkbench("not." + notId);
     }
 
     private void resetTitle() {

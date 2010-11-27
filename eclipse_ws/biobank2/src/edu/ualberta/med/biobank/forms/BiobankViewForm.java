@@ -14,6 +14,7 @@ import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
@@ -69,6 +70,9 @@ public abstract class BiobankViewForm extends BiobankFormBase {
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
         addToolbarButtons();
+        IContextService contextService = (IContextService) getSite()
+            .getService(IContextService.class);
+        contextService.activateContext("biobank2.context.viewForm");
     }
 
     @Override
