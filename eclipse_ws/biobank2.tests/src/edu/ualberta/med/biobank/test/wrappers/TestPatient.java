@@ -570,4 +570,88 @@ public class TestPatient extends TestDatabase {
         Assert.assertTrue(visits.contains(visit3));
 
     }
+
+    @Test
+    public void testMerge() throws Exception {
+        String name = "testMerge" + r.nextInt();
+        PatientWrapper patient = PatientHelper.addPatient(name + "_1", study);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
+
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addContacts(Arrays.asList(contact));
+        study.persist();
+
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0),
+            patient);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0),
+            patient2);
+
+        PatientVisitWrapper visit1 = PatientVisitHelper.addPatientVisit(
+            patient, shipment, Utils.getRandomDate(), Utils.getRandomDate());
+
+        PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
+            patient2, shipment2, Utils.getRandomDate(), Utils.getRandomDate());
+
+        Assert.assertEquals(patient, visit1.getPatient());
+        Assert.assertEquals(patient2, visit2.getPatient());
+
+        patient.merge(patient2);
+
+        patient.reload();
+        patient2.reload();
+        visit1.reload();
+        visit2.reload();
+        shipment.reload();
+        shipment2.reload();
+
+        Assert.assertEquals(patient, visit1.getPatient());
+        Assert.assertEquals(patient, visit2.getPatient());
+
+        Assert.assertTrue(shipment.getPatientCollection().contains(patient));
+    }
+
+    @Test
+    public void testMergeFail() throws Exception {
+        String name = "testMergeFail" + r.nextInt();
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addContacts(Arrays.asList(contact));
+        study.persist();
+
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
+        study2.addContacts(Arrays.asList(ContactHelper.addContact(clinic, name
+            + "_2")));
+        study2.persist();
+
+        PatientWrapper patient = PatientHelper.addPatient(name + "_1", study);
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
+
+        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0),
+            patient);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0),
+            patient2);
+
+        PatientVisitWrapper visit1 = PatientVisitHelper.addPatientVisit(
+            patient, shipment, Utils.getRandomDate(), Utils.getRandomDate());
+
+        PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
+            patient2, shipment2, Utils.getRandomDate(), Utils.getRandomDate());
+
+        Assert.assertEquals(patient, visit1.getPatient());
+        Assert.assertEquals(patient2, visit2.getPatient());
+
+        try {
+            patient.merge(patient2);
+            Assert
+                .fail("Should not be able to merge patients that are not in the same study");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
 }

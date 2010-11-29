@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -22,10 +21,8 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.AbstractInfoTableWidget;
@@ -223,60 +220,26 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     private void merge() {
-
-        List<PatientVisitWrapper> pvs = patient2.getPatientVisitCollection();
-
         try {
-            if (pvs != null)
-                for (PatientVisitWrapper pv : pvs) {
-                    ShipmentWrapper shipment = pv.getShipment();
-                    shipment.addPatients(Arrays
-                        .asList(new PatientWrapper[] { patient1Adapter
-                            .getWrapper() }));
-                    shipment.persist();
-
-                    pv.setPatient(patient1Adapter.getWrapper());
-                    pv.persist();
-
-                    patient2.reload();
-                    shipment.reload();
-                    shipment.removePatients(Arrays
-                        .asList(new PatientWrapper[] { patient2 }));
-                    shipment.persist();
-                }
-
-            patient2.reload();
-            patient2.delete();
-
-            Display.getDefault().syncExec(new Runnable() {
-                @Override
-                public void run() {
-                    PatientAdapter p = (PatientAdapter) SessionManager
-                        .searchNode(patient2);
-                    if (p != null) {
-                        p.getParent().removeChild(p);
-                    }
-                    patient1Adapter.rebuild();
-                    SessionManager.getCurrentAdapterViewWithTree()
-                        .getTreeViewer().refresh();
-                    closeEntryOpenView(false, true);
-                }
-            });
-            ((BiobankApplicationService) appService).logActivity("merge", null,
-                patient2.getPnumber(), null, null, patient2.getPnumber()
-                    + " --> " + patient1Adapter.getWrapper().getPnumber(),
-                "Patient");
-            ((BiobankApplicationService) appService).logActivity(
-                "merge",
-                null,
-                patient1Adapter.getWrapper().getPnumber(),
-                null,
-                null,
-                patient1Adapter.getWrapper().getPnumber() + " <-- "
-                    + patient2.getPnumber(), "Patient");
+            patient1.merge(patient2);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Merge failed.", e);
         }
+
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                PatientAdapter p = (PatientAdapter) SessionManager
+                    .searchNode(patient2);
+                if (p != null) {
+                    p.getParent().removeChild(p);
+                }
+                patient1Adapter.rebuild();
+                SessionManager.getCurrentAdapterViewWithTree().getTreeViewer()
+                    .refresh();
+                closeEntryOpenView(false, true);
+            }
+        });
     }
 
     @Override

@@ -9,6 +9,9 @@
     <arg value="-f"/>
   </exec>
 
+  <property name="server.version.num" value="1.3.1"/>
+  <property name="java.client.version.num" value="1.3.4.pre"/>
+
   <property environment="env" />
   <property name="host" value="aicml-med.cs.ualberta.ca" />
   <!--property name="${host}/" value="" /-->
@@ -204,7 +207,18 @@
     </pathconvert>
   </target>
   <!-- Eclipse -->
-  <target name="deploy-eclipse" depends="sdk-files"
+  <target name="java-client-manifest">
+    <manifest file="${eclipse.proj.dir}/META-INF/MANIFEST.MF" mode="update">
+      <attribute name="Bundle-Version" value="${java.client.version.num}"/>
+    </manifest>
+    <fixcrlf srcdir="${eclipse.proj.dir}/META-INF" eol="lf" eof="asis" encoding="ISO-8859-1">
+      <include name="**/*.MF" />
+    </fixcrlf>
+    <propertyfile file="eclipse_ws/biobank2/about.mappings">
+      <entry key="0" value="${java.client.version.num}"/>
+    </propertyfile>
+  </target>
+  <target name="deploy-eclipse" depends="sdk-files,java-client-manifest"
           description="deploys the caCORE SDK beans to the eclipse project">
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/system/lib"
@@ -309,11 +323,19 @@
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
+  <target name="server-manifest">
+    <manifest file="${eclipse.proj.dir.common}/META-INF/MANIFEST.MF" mode="update">
+      <attribute name="Bundle-Version" value="${server.version.num}"/>
+    </manifest>
+    <fixcrlf srcdir="${eclipse.proj.dir.common}/META-INF" eol="lf" eof="asis" encoding="ISO-8859-1">
+      <include name="**/*.MF" />
+    </fixcrlf>
+  </target>
   <target name="jboss.home.env">
     <fail unless="env.JBOSS_HOME" message="JBOSS_HOME environment variable not defined" />
   </target>
   <target name="deploy-jboss"
-          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostLocal"
+          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostLocal,server-manifest"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"

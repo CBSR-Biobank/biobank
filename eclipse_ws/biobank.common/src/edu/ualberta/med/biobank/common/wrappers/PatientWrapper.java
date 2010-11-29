@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.ShipmentPatient;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -364,10 +365,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private void checkNoMorePatientVisits() throws BiobankCheckException {
-        List<PatientVisitWrapper> patients = getPatientVisitCollection();
-        if (patients != null && patients.size() > 0) {
+        List<PatientVisitWrapper> pvs = getPatientVisitCollection();
+        if (pvs != null && pvs.size() > 0) {
             throw new BiobankCheckException(
-                "Visits are still linked to this patient. Delete them before attempting to remove the patient.");
+                "Visits are still linked to this patient."
+                    + " Delete them before attempting to remove the patient.");
         }
     }
 
@@ -502,5 +504,44 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             }
         }
         return false;
+    }
+
+    /**
+     * merge patient2 into this patient
+     */
+    public void merge(PatientWrapper patient2) throws Exception {
+        reload();
+        patient2.reload();
+        if (getStudy().equals(patient2.getStudy())) {
+            List<PatientVisitWrapper> pvs = patient2
+                .getPatientVisitCollection();
+            if (pvs != null)
+                for (PatientVisitWrapper pv : pvs) {
+                    ShipmentWrapper shipment = pv.getShipment();
+                    shipment.addPatients(Arrays.asList(this));
+                    shipment.persist();
+
+                    pv.setPatient(this);
+                    pv.persist();
+
+                    patient2.reload();
+                    shipment.reload();
+                    shipment.removePatients(Arrays.asList(patient2));
+                    shipment.persist();
+                }
+
+            patient2.reload();
+            patient2.delete();
+
+            ((BiobankApplicationService) appService).logActivity("merge", null,
+                patient2.getPnumber(), null, null, patient2.getPnumber()
+                    + " --> " + getPnumber(), "Patient");
+            ((BiobankApplicationService) appService).logActivity("merge", null,
+                getPnumber(), null, null,
+                getPnumber() + " <-- " + patient2.getPnumber(), "Patient");
+        } else {
+            throw new BiobankCheckException(
+                "Cannot merge patients from different studies.");
+        }
     }
 }

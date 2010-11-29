@@ -49,12 +49,14 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     @Override
     protected void makeActions(IWorkbenchWindow window) {
         createCustomAction(window, "Keyboard Shortcuts...",
-            "org.eclipse.ui.window.showKeyAssist", "shorcuts");
+            "org.eclipse.ui.window.showKeyAssist", "shorcuts",
+            "Show shorcuts for the current view");
 
         createCustomAction(window, "Send Error Mail", SEND_ERROR_EMAIL_ID,
-            "sendErrorMail");
-        createCustomAction(window, "Export Scanner Error Logs",
-            EXPORT_ERRORS_LOGS_ID, "exportErrorsLogs");
+            "sendErrorMail", "Report a problem to developpers");
+        createCustomAction(window, "Export Errors Logs", EXPORT_ERRORS_LOGS_ID,
+            "exportErrorsLogs",
+            "Export a zip with useful logs data for developers");
 
         createShowErrorLogsAction(window);
 
@@ -67,7 +69,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     }
 
     private void createCustomAction(IWorkbenchWindow window, String text,
-        final String commandId, String actionId) {
+        final String commandId, String actionId, String tooltip) {
         final IHandlerService handlerService = (IHandlerService) window
             .getService(IHandlerService.class);
         Action action = new Action(text) {
@@ -81,6 +83,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             }
         };
         action.setId(actionId);
+        action.setToolTipText(tooltip);
         register(action);
         helpMenuCustomActions.add(action);
     }
