@@ -209,6 +209,7 @@ public class CDateTime extends BaseCombo {
                     setActiveField(FIELD_NONE);
                     updateText();
                 }
+                getParent().layout(true);
                 break;
             case SWT.KeyDown:
                 handleKey(event);
@@ -1333,6 +1334,10 @@ public class CDateTime extends BaseCombo {
     @Override
     public void setOpen(boolean open) {
         setOpen(open, null);
+
+        if (!open) {
+            getParent().layout(true);
+        }
     }
 
     @Override
@@ -1671,13 +1676,31 @@ public class CDateTime extends BaseCombo {
             @Override
             public void run() {
                 if ((text != null) && (!text.isDisposed())) {
-                    text.getControl().removeListener(SWT.Verify, textListener);
+                    // this method can be run before listeners were added, which
+                    // causes this method to net add a listener. Make sure we're
+                    // listening before removing the listener and adding again
+                    Text textControl = text.getControl();
+                    boolean isListening = isListening(SWT.Verify, textListener,
+                        textControl);
+
+                    if (isListening) {
+                        textControl.removeListener(SWT.Verify, textListener);
+                    }
+
                     if (!string.equals(text.getText())) {
                         text.setText(string);
-                        CDateTime.this.getParent().layout(true);
+
+                        // if the picker is shown and the layout resizes, then
+                        // the picker is closed - avoid this
+                        if (picker == null) {
+                            getParent().layout(true);
+                        }
                     }
-                    text.getControl().setSelection(selStart, selEnd);
-                    text.getControl().addListener(SWT.Verify, textListener);
+                    textControl.setSelection(selStart, selEnd);
+
+                    if (isListening) {
+                        textControl.addListener(SWT.Verify, textListener);
+                    }
                 }
             }
         };
@@ -1687,6 +1710,16 @@ public class CDateTime extends BaseCombo {
         } else {
             getDisplay().syncExec(runnable);
         }
+    }
+
+    private static boolean isListening(int eventType, Object object,
+        Control control) {
+        for (Listener listener : control.getListeners(eventType)) {
+            if (listener == object) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -1703,62 +1736,62 @@ public class CDateTime extends BaseCombo {
         if (field.length == 0 || activeField == FIELD_NONE)
             return;
 
-        if (!hasSelection()) {
-            setSelection(calendar.getTime());
-            fireSelectionChanged();
-            fieldFirst();
-        }
-
         char c = e.character;
         if (((e.text.length() == 1) && String.valueOf(c).equals(e.text) && Character
-            .isDigit(c)) || (e.text.length() > 1)) {
-            if (e.text.length() == 1) {
-                if (editField == null) {
-                    int cf = getCalendarField();
-                    if (cf >= 0) {
-                        int digits;
-                        switch (cf) {
-                        case Calendar.YEAR:
-                            digits = 4;
-                            break;
-                        case Calendar.DAY_OF_YEAR:
-                            digits = 3;
-                            break;
-                        case Calendar.AM_PM:
-                        case Calendar.DAY_OF_WEEK:
-                        case Calendar.ERA:
-                            digits = 1;
-                            break;
-                        default:
-                            digits = 2;
-                        }
-                        editField = new EditField(digits, calendar.get(cf));
-                    } else {
-                        return;
+            .isDigit(c))) {
+            // display the date if the user starts entering digits (instead of
+            // leaving "<choose date>" displayed)
+            if (!hasSelection()) {
+                setSelection(calendar.getTime());
+                fireSelectionChanged();
+                fieldFirst();
+            }
+
+            if (editField == null) {
+                int cf = getCalendarField();
+                if (cf >= 0) {
+                    int digits;
+                    switch (cf) {
+                    case Calendar.YEAR:
+                        digits = 4;
+                        break;
+                    case Calendar.DAY_OF_YEAR:
+                        digits = 3;
+                        break;
+                    case Calendar.AM_PM:
+                    case Calendar.DAY_OF_WEEK:
+                    case Calendar.ERA:
+                        digits = 1;
+                        break;
+                    default:
+                        digits = 2;
                     }
+                    editField = new EditField(digits, calendar.get(cf));
+                } else {
+                    return;
                 }
-                if (editField.addChar(c)) {
-                    if (commitEditField()) {
-                        fieldNext();
-                    } else {
-                        editField = null;
-                        if (selection.length > 0) {
-                            selection[0] = calendar.getTime();
-                        }
-                        updateText();
+            }
+            if (editField.addChar(c)) {
+                if (commitEditField()) {
+                    fieldNext();
+                } else {
+                    editField = null;
+                    if (selection.length > 0) {
+                        selection[0] = calendar.getTime();
                     }
+                    updateText();
                 }
-                if (selection.length > 0) {
-                    selection[0] = calendar.getTime();
-                }
-                updatePicker();
-            } else {
-                try {
-                    setSelection(df.parse(e.text));
-                    fireSelectionChanged();
-                } catch (ParseException pe) {
-                    // do nothing
-                }
+            }
+            if (selection.length > 0) {
+                selection[0] = calendar.getTime();
+            }
+            updatePicker();
+        } else if (e.text.length() > 1) {
+            try {
+                setSelection(df.parse(e.text));
+                fireSelectionChanged();
+            } catch (ParseException pe) {
+                // do nothing
             }
         }
         updateText();

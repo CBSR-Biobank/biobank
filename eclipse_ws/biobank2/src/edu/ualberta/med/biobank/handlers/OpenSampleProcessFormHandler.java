@@ -26,9 +26,9 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
  * Open a form in patient administration like scan link, scan assign or cabinet
  * like/assign
  */
-public class OpenPatientFormHandler extends AbstractHandler implements IHandler {
+public class OpenSampleProcessFormHandler extends AbstractHandler implements IHandler {
 
-    private static final String EDITOR_ID_PARAM = "edu.ualberta.med.biobank.commands.patients.openPatientForm.editorId";
+    private static final String EDITOR_ID_PARAM = "edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

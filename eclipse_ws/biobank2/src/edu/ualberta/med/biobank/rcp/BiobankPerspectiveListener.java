@@ -5,9 +5,15 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PerspectiveAdapter;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.utils.BindingContextHelper;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 
 public class BiobankPerspectiveListener extends PerspectiveAdapter {
+
+    @Override
+    public void perspectiveOpened(IWorkbenchPage page,
+        IPerspectiveDescriptor perspective) {
+    }
 
     @Override
     public void perspectiveActivated(IWorkbenchPage page,
@@ -19,5 +25,16 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
             SessionManager.getInstance().getSiteCombo()
                 .updateStatusLineMessage(view.getSite());
         }
+        BindingContextHelper.deactivateContextInWorkbench("not."
+            + perspective.getId());
+        BindingContextHelper.activateContextInWorkbench(perspective.getId());
+    }
+
+    @Override
+    public void perspectiveDeactivated(IWorkbenchPage page,
+        IPerspectiveDescriptor perspective) {
+        BindingContextHelper.deactivateContextInWorkbench(perspective.getId());
+        BindingContextHelper.activateContextInWorkbench("not."
+            + perspective.getId());
     }
 }

@@ -314,6 +314,9 @@ public class PvSourceVesselDialog extends BiobankDialog {
             newPvSourceVessel.setPatientVisit(patientVisit);
             infotable.addPvSourceVessel(newPvSourceVessel);
             internalSourceVessel.reset();
+            quantityText.setText("");
+            timeDrawnWidget.setDate(null);
+            volumeText.setText("");
             sourceVesselsComboViewer.getCombo().deselectAll();
             sourceVesselsComboViewer.getCombo().setFocus();
             updateWidgetVisibilityAndValues();
