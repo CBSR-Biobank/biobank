@@ -1898,13 +1898,6 @@
             name="Reports Editor">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.AdvancedReportsEditor"
-            default="false"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.editors.AdvancedReportsEditor"
-            name="Advanced Reports Editor">
-      </editor>
-      <editor
             class="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
             default="false"
             id="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"

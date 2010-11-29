@@ -134,7 +134,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     private void activateIfNotInPerspective(String currentPerspectiveId,
         String notId) {
-        if (currentPerspectiveId != notId)
+        if (!currentPerspectiveId.equals(notId))
             BindingContextHelper.activateContextInWorkbench("not." + notId);
     }
 
