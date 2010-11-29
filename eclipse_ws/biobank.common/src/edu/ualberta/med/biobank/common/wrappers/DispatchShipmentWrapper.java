@@ -434,7 +434,8 @@ public class DispatchShipmentWrapper extends
                 + aliquot.getInventoryId()
                 + ": it has no position. A position should be first assigned.");
         }
-        if (!aliquot.getParent().getSite().equals(getSender())) {
+        if (aliquot.getParent() != null
+            && !aliquot.getParent().getSite().equals(getSender())) {
             return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
                 + " is currently assigned to site "
                 + aliquot.getParent().getSite().getNameShort()
