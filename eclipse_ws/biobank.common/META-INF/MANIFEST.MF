@@ -1,6 +1,6 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Biobank Commons
+Bundle-Name: BioBank2 Common
 Bundle-SymbolicName: biobank.common
 Bundle-Version: 1.1.5
 Bundle-ClassPath: conf/,
