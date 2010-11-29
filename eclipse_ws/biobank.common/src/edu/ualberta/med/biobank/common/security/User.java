@@ -89,7 +89,7 @@ public class User implements Serializable, NotAProxy {
         this.needToChangePassword = needToChangePassword;
     }
 
-    public boolean isNeedToChangePassword() {
+    public boolean passwordChangeRequired() {
         return needToChangePassword;
     }
 
@@ -108,7 +108,7 @@ public class User implements Serializable, NotAProxy {
         lastName = user.getLastName();
         password = user.getPassword();
         email = user.getEmail();
-        needToChangePassword = user.isNeedToChangePassword();
+        needToChangePassword = user.passwordChangeRequired();
         groups = new ArrayList<Group>(user.getGroups());
     }
 
