@@ -16,9 +16,11 @@ public class BindingContextHelper {
         IContextService contextService = (IContextService) PlatformUI
             .getWorkbench().getActiveWorkbenchWindow()
             .getService(IContextService.class);
-        IContextActivation activation = contextService
-            .activateContext(contextId);
-        contextActivations.put(contextId, activation);
+        if (contextService.getDefinedContextIds().contains(contextId)) {
+            IContextActivation activation = contextService
+                .activateContext(contextId);
+            contextActivations.put(contextId, activation);
+        }
     }
 
     public static void deactivateContextInWorkbench(String contextId) {
