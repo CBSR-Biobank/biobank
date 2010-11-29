@@ -43,6 +43,7 @@ import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.services.ISourceProviderService;
@@ -254,6 +255,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         super.createPartControl(parent);
         addToolbarButtons();
         bindChangeListener();
+
+        IContextService contextService = (IContextService) getSite()
+            .getService(IContextService.class);
+        contextService.activateContext("biobank2.context.entryForm");
     }
 
     abstract protected void saveForm() throws Exception;

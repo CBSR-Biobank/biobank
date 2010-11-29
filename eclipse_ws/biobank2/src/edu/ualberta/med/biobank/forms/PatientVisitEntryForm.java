@@ -342,7 +342,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
-        patientVisit.setPatient(patientAdapter.getWrapper());
+        if (patientAdapter != null)
+            patientVisit.setPatient(patientAdapter.getWrapper());
 
         patientVisit.addPvSourceVessels(pvSourceVesseltable
             .getAddedPvSourceVessels());
@@ -356,7 +357,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisit.persist();
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
-        patientAdapter.performExpand();
+        if (patientAdapter != null)
+            patientAdapter.performExpand();
     }
 
     private void savePvCustomInfo() throws Exception {
