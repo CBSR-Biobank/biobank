@@ -48,7 +48,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
     @Override
     protected void makeActions(IWorkbenchWindow window) {
-        createCustomAction(window, "Shortcuts...",
+        createCustomAction(window, "Keyboard Shortcuts...",
             "org.eclipse.ui.window.showKeyAssist", "shorcuts");
 
         createCustomAction(window, "Send Error Mail", SEND_ERROR_EMAIL_ID,
