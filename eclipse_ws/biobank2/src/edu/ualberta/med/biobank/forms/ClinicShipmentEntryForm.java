@@ -334,8 +334,9 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
             public void run() {
                 if (newShipment) {
                     if (shipmentAdapter.getWrapper().isReceivedToday()) {
-                        shipmentAdapter.getParent().removeChild(
-                            shipmentAdapter, false);
+                        if (shipmentAdapter.getParent() != null)
+                            shipmentAdapter.getParent().removeChild(
+                                shipmentAdapter, false);
                         ShipmentAdministrationView.getCurrent().reload();
                         if (PatientAdministrationView.getCurrent() != null) {
                             PatientAdministrationView.getCurrent().reload();
@@ -345,8 +346,9 @@ public class ClinicShipmentEntryForm extends BiobankEntryForm {
                     }
                 } else {
                     if (dateReceivedModified) {
-                        shipmentAdapter.getParent().removeChild(
-                            shipmentAdapter, false);
+                        if (shipmentAdapter.getParent() != null)
+                            shipmentAdapter.getParent().removeChild(
+                                shipmentAdapter, false);
                         ShipmentAdministrationView.getCurrent().reload();
                         if (PatientAdministrationView.getCurrent() != null) {
                             PatientAdministrationView.getCurrent().reload();
