@@ -84,20 +84,16 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings) {
         super(parent, collection, headings, null, 5);
+        addTableClickListener();
     }
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings, int rowsPerPage) {
         super(parent, collection, headings, null, rowsPerPage);
+        addTableClickListener();
     }
 
-    @Override
-    protected void init(List<T> collection) {
-        reloadData = true;
-
-        model = new ArrayList<BiobankCollectionModel>();
-        initModel(collection);
-
+    private void addTableClickListener() {
         tableViewer.addDoubleClickListener(new IDoubleClickListener() {
             @Override
             public void doubleClick(DoubleClickEvent event) {
@@ -106,6 +102,14 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                 }
             }
         });
+    }
+
+    @Override
+    protected void init(List<T> collection) {
+        reloadData = true;
+
+        model = new ArrayList<BiobankCollectionModel>();
+        initModel(collection);
     }
 
     @Override

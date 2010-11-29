@@ -501,7 +501,7 @@ public class ContainerViewForm extends BiobankViewForm {
         if (!form.isDisposed()) {
             container.reload();
             form.setText("Container " + container.getLabel() + " ("
-                + container.getContainerType().getName() + ")");
+                + container.getContainerType().getNameShort() + ")");
             if (container.getContainerType().getChildContainerTypeCollection()
                 .size() > 0)
                 refreshVis();
