@@ -399,7 +399,6 @@ public abstract class AdapterBase {
                         SessionManager.updateAdapterTreeNode(node);
                     }
                 }
-                notifyListeners();
                 SessionManager.refreshTreeNode(AdapterBase.this);
             }
         } catch (final RemoteAccessException exp) {
@@ -471,7 +470,6 @@ public abstract class AdapterBase {
                                 public void run() {
                                     SessionManager
                                         .refreshTreeNode(AdapterBase.this);
-                                    notifyListeners();
                                 }
                             });
                         }
