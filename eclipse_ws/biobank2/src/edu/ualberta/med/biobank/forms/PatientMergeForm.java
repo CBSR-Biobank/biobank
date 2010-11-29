@@ -183,55 +183,68 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     protected void populateFields(String pnumber) {
+        List<PatientVisitWrapper> newContents = new ArrayList<PatientVisitWrapper>();
         try {
             patient2 = PatientWrapper.getPatient(
                 SessionManager.getAppService(), pnumber);
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError("Error retrieving patient", e);
+            patient2VisitsTable.setCollection(newContents);
+            study2Text.setText("");
             return;
         }
         if (patient2 == null) {
             BioBankPlugin.openAsyncError("Invalid Patient Number",
                 "Cannot find a patient with that pnumber");
+            patient2VisitsTable.setCollection(newContents);
+            study2Text.setText("");
+            return;
+        }
+
+        if (patient2.equals(patient1Adapter.getWrapper())) {
+            BioBankPlugin.openAsyncError("Duplicate Patient Number",
+                "Cannot merge a patient with himself");
+            patient2VisitsTable.setCollection(newContents);
             return;
         }
 
         study2Text.setText(patient2.getStudy().getNameShort());
 
         if (!patient2.getStudy()
-            .equals(patient1Adapter.getWrapper().getStudy()))
+            .equals(patient1Adapter.getWrapper().getStudy())) {
+            patient2VisitsTable.setCollection(newContents);
             BioBankPlugin.openAsyncError("Invalid Patient Number",
                 "Patients from different studies cannot be merged");
-        else {
+        } else {
             patient2VisitsTable.setCollection(patient2
                 .getPatientVisitCollection());
-            patient2VisitsTable.layout();
             patientNotNullValue.setValue(Boolean.TRUE);
         }
     }
 
     private void merge() {
+
+        List<PatientVisitWrapper> pvs = patient2.getPatientVisitCollection();
+
         try {
-            patient1Adapter.getWrapper().addPatientVisits(
-                patient2.getPatientVisitCollection());
-            // FIXME: need to make sure this can be removed
-            // patient2Wrapper
-            // .setPatientVisitCollection(new ArrayList<PatientVisitWrapper>());
-            List<ShipmentWrapper> shipments = patient2.getShipmentCollection();
-            for (ShipmentWrapper shipment : shipments) {
-                List<PatientWrapper> patients = shipment.getPatientCollection();
-                for (PatientWrapper p : patients)
-                    if (p.equals(patient2)) {
-                        shipment.removePatients(Arrays
-                            .asList(new PatientWrapper[] { patient2 }));
-                        shipment.addPatients(Arrays
-                            .asList(new PatientWrapper[] { patient1Adapter
-                                .getWrapper() }));
-                        break;
-                    }
-                shipment.persist();
-            }
-            patient1Adapter.getWrapper().persist();
+            if (pvs != null)
+                for (PatientVisitWrapper pv : pvs) {
+                    ShipmentWrapper shipment = pv.getShipment();
+                    shipment.addPatients(Arrays
+                        .asList(new PatientWrapper[] { patient1Adapter
+                            .getWrapper() }));
+                    shipment.persist();
+
+                    pv.setPatient(patient1Adapter.getWrapper());
+                    pv.persist();
+
+                    patient2.reload();
+                    shipment.reload();
+                    shipment.removePatients(Arrays
+                        .asList(new PatientWrapper[] { patient2 }));
+                    shipment.persist();
+                }
+
             patient2.reload();
             patient2.delete();
 
@@ -243,6 +256,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                     if (p != null) {
                         p.getParent().removeChild(p);
                     }
+                    patient1Adapter.rebuild();
                     SessionManager.getCurrentAdapterViewWithTree()
                         .getTreeViewer().refresh();
                     closeEntryOpenView(false, true);
@@ -260,7 +274,6 @@ public class PatientMergeForm extends BiobankEntryForm {
                 null,
                 patient1Adapter.getWrapper().getPnumber() + " <-- "
                     + patient2.getPnumber(), "Patient");
-
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Merge failed.", e);
         }

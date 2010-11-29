@@ -29,6 +29,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
@@ -125,6 +126,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     private boolean isFakeScanLinkedOnly;
 
     private BasicSiteCombo siteCombo;
+    private Control nextFocusWidget;
 
     @Override
     protected void init() throws Exception {
@@ -282,6 +284,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     protected void validateValues() {
+        nextFocusWidget = null;
         modificationMode = true;
         try {
             if (productBarcodeValidator.validate(
@@ -299,10 +302,26 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 setCanLaunchScan(canLaunch);
             }
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Values validation", ex); //$NON-NLS-1$
+            BioBankPlugin.openError("Values validation", ex); //$NON-NLS-1$
             appendLogNLS("ScanAssign.activitylog.error", //$NON-NLS-1$
                 ex.getMessage());
+            if (ex.getMessage() != null
+                && ex.getMessage()
+                    .startsWith("Can't find container with label")) {
+                // FIXME: find a better way than that ? Add info inside the
+                // BiobankCheckException ?
+                nextFocusWidget = palletPositionText;
+            }
+
             setCanLaunchScan(false);
+        }
+        if (nextFocusWidget != null) {
+            Display.getDefault().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                    nextFocusWidget.setFocus();
+                }
+            });
         }
         modificationMode = false;
         validationMade.setValue(true);
@@ -346,6 +365,19 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             palletTypesViewer.setSelection(new StructuredSelection(
                 palletContainerTypes.get(0)));
         }
+        // palletTypesViewer.getControl().addFocusListener(new FocusAdapter() {
+        // @Override
+        // public void focusGained(FocusEvent e) {
+        // if (nextFocusWidget != null) {
+        // Display.getDefault().asyncExec(new Runnable() {
+        // @Override
+        // public void run() {
+        // // nextFocusWidget.forceFocus();
+        // }
+        // });
+        // }
+        // }
+        // });
     }
 
     /**
@@ -927,7 +959,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         sb.append(Messages.getFormattedString(
             "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
             posStr, cell.getValue(), aliquot.getSampleType().getName(), visit
-                .getPatient().getPnumber(), visit.getFormattedDateProcessed(),
+                .getPatient().getPnumber(), visit.getFormattedDateDrawn(),
             visit.getShipment().getClinic().getName()));
     }
 
@@ -1165,8 +1197,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 currentPalletWrapper.setProductBarcode(productBarcode);
             }
         } else {
-            BioBankPlugin.openAsyncError("Check position",
+            BioBankPlugin.openError("Check position",
                 "Found more than one pallet with position " + palletLabel);
+            nextFocusWidget = palletPositionText;
             return false;
         }
         ContainerTypeWrapper oldSelection = currentPalletWrapper
@@ -1203,10 +1236,11 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             return useNewProductBarcode;
         } else {
             // Position already use with a different barcode
-            BioBankPlugin.openAsyncError(Messages
+            BioBankPlugin.openError(Messages
                 .getString("ScanAssign.dialog.positionUsed.error.title"), //$NON-NLS-1$
                 Messages.getFormattedString(
                     "ScanAssign.dialog.positionUsed.error.msg", barcode)); //$NON-NLS-1$
+            nextFocusWidget = palletPositionText;
             return false;
         }
     }

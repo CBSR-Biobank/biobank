@@ -58,5 +58,4 @@ public class BiobankPartListener implements IPartListener {
             ((AbstractViewWithAdapterTree) part).opened();
         }
     }
-
 }

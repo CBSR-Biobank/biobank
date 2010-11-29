@@ -71,6 +71,19 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     @Override
+    public boolean isDeletable() {
+        List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
+        try {
+            sites = SiteWrapper.getSites(SessionManager.getAppService());
+        } catch (Exception e1) {
+            BioBankPlugin.openAsyncError("Failed to retrieve sites", e1);
+        }
+        return sites.contains(getWrapper().getSender())
+            && getWrapper().canDelete(SessionManager.getUser())
+            && getWrapper().isInCreationState();
+    }
+
+    @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addViewMenu(menu, "Dispatch");
         List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
@@ -80,17 +93,8 @@ public class DispatchAdapter extends AdapterBase {
             BioBankPlugin.openAsyncError("Failed to retrieve sites", e1);
         }
         try {
-            if (sites.contains(getWrapper().getSender())
-                && getWrapper().canDelete(SessionManager.getUser())
-                && getWrapper().isInCreationState()) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Delete Dispatch");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        delete();
-                    }
-                });
+            if (isDeletable()) {
+                addDeleteMenu(menu, "Dispatch");
             }
             if (sites.contains(getWrapper().getSender())
                 && getWrapper().canUpdate(SessionManager.getUser())

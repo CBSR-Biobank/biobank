@@ -117,4 +117,14 @@ public class PatientAdministrationView extends
         return currentInstance;
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    protected String getTreeTextToolTip() {
+        return "Enter a patient number and hit enter";
+    }
+
 }

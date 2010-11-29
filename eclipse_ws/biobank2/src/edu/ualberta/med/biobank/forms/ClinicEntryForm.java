@@ -158,7 +158,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         clinic.addContacts(contactEntryWidget.getAddedOrModifedContacts());
         clinic.removeContacts(contactEntryWidget.getDeletedContacts());
         clinic.persist();
-        clinicAdapter.getParent().performExpand();
+        if (clinicAdapter.getParent() != null)
+            clinicAdapter.getParent().performExpand();
     }
 
     @Override

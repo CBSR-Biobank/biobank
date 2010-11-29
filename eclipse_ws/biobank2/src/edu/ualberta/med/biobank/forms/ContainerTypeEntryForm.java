@@ -453,11 +453,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void showContainersOrSamples() {
-        boolean containsSamples = containerType.getSampleTypeCollection() != null
+        hasSamples = containerType.getSampleTypeCollection() != null
             && containerType.getSampleTypeCollection().size() > 0;
-        showSamples(containsSamples);
-        hasSamplesRadio.setSelection(containsSamples);
-        hasContainersRadio.setSelection(!containsSamples);
+        showSamples(hasSamples);
+        hasSamplesRadio.setSelection(hasSamples);
+        hasContainersRadio.setSelection(!hasSamples);
     }
 
     private void setLabelingScheme() {

@@ -41,14 +41,16 @@
 #
 ################################################################################
 
-$NSIS_PROGRAM = "c:/Program\\ Files\\ \\(x86\\)/nsis/makensis";
+# fix backslashes
+($NSIS_PATH = "$ENV{'PROGRAMFILES'}/nsis") =~ s|\\|\/|;
+
+$NSIS_PROGRAM = "$NSIS_PATH/makensis";
 
 $VERSION = "";
 $BIOBANK_FOLDER = "";
 $EXPORT_DIR = "";
 $DLL_DIR = "";
 $NSIS_DIR = "";
-
 
 
 if($#ARGV == 1){
@@ -59,7 +61,7 @@ if($#ARGV == 1){
         $NSIS_DIR =~ s/\/$//;
 }
 else{
-        print "Usuage: createInstaller.pl exportDir nsisDir\n";
+        print "Usage: createInstaller.pl EXPORT_DIR NSIS_DIR\n";
         exit 0;
 }
 print "\n";
@@ -99,7 +101,7 @@ print "Copying the exported biobank folder...\n";
 `cp -R $NSIS_DIR tmp/nsis`;
 -d "tmp/nsis" or die "could not create nsis directory";
 
-open(FH, "tmp/nsis/Biobank.nsi") or die "failed to open tmp/nsis/Biobank.nsi";
+open(FH, "tmp/nsis/BioBank2.nsi") or die "failed to open tmp/nsis/Biobank.nsi";
 open(FHA, ">tmp/nsis/BiobankTMP.nsi") or die "failed to create tmp/nsis/BiobankTMP.nsi";
 while($line = <FH>){
         if($line =~ m/define VERSION_STR/ ){
@@ -113,7 +115,7 @@ close(FH);
 -e "tmp/nsis/BiobankTMP.nsi" or die "could not create customized nsis script";
 
 print "Compiling nsis script...\n";
-`$NSIS_PROGRAM tmp/nsis/BiobankTMP.nsi`;
+`\"$NSIS_PROGRAM\" tmp/nsis/BiobankTMP.nsi`;
 -e "tmp/BioBank2Installer-${VERSION}.exe" or die "nsis could not create installer";
 
 print "Moving installer...\n";

@@ -63,8 +63,10 @@ public abstract class AbstractAdministrationView extends
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
         treeText.setLayoutData(gd);
+        treeText.setToolTipText(getTreeTextToolTip());
 
         adaptersTree = new AdapterTreeWidget(parent, false);
+        getSite().setSelectionProvider(adaptersTree.getTreeViewer());
         gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
         gd.verticalAlignment = SWT.FILL;
@@ -75,7 +77,6 @@ public abstract class AbstractAdministrationView extends
         rootNode = new RootNode();
         rootNode.setTreeViewer(adaptersTree.getTreeViewer());
         adaptersTree.getTreeViewer().setInput(rootNode);
-        getSite().setSelectionProvider(adaptersTree.getTreeViewer());
         adaptersTree.getTreeViewer().expandAll();
 
         // listen to login state
@@ -105,6 +106,8 @@ public abstract class AbstractAdministrationView extends
             });
 
     }
+
+    protected abstract String getTreeTextToolTip();
 
     protected void createTreeTextOptions(
         @SuppressWarnings("unused") Composite parent) {

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -185,10 +186,31 @@ public class ContainerEntryForm extends BiobankEntryForm {
         else
             siteCombo.setSelection(new StructuredSelection(
                 ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
-
     }
 
-    private void createContainerTypesSection(Composite client) {
+    private void createContainerTypesSection(Composite client) throws Exception {
+        List<ContainerTypeWrapper> containerTypes;
+        if (!container.hasChildren()) {
+            if (!container.hasParent()) {
+                containerTypes = ContainerTypeWrapper
+                    .getTopContainerTypesInSite(appService, siteCombo.getSite());
+            } else {
+                containerTypes = container.getParent().getContainerType()
+                    .getChildContainerTypeCollection();
+            }
+
+            if (currentContainerType == null) {
+                if (containerTypes.size() == 1) {
+                    currentContainerType = containerTypes.get(0);
+                    setDirty(true);
+                }
+            }
+        } else {
+            containerTypes = Arrays
+                .asList(new ContainerTypeWrapper[] { container
+                    .getContainerType() });
+            currentContainerType = containerTypes.get(0);
+        }
 
         containerTypeComboViewer = createComboViewer(client, "Container Type",
             containerTypes, currentContainerType, MSG_CONTAINER_TYPE_EMPTY,

@@ -123,7 +123,9 @@ public class AdapterTreeWidget extends Composite {
                 AbstractViewWithAdapterTree view = SessionManager
                     .getCurrentAdapterViewWithTree();
                 view.setFocus();
-                treeViewer.getTree().setFocus();
+                // make sure the view is activated when the user click in the
+                // tree (to update the icons) :
+                view.activate();
             }
         });
 

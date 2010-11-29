@@ -237,4 +237,14 @@ public class ShipmentAdministrationView extends
         return null;
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    protected String getTreeTextToolTip() {
+        return "Enter a shipment waybill and hit enter";
+    }
+
 }

@@ -206,7 +206,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             });
         shipmentsComboViewer
             .addSelectionChangedListener(new ISelectionChangedListener() {
-
                 @Override
                 public void selectionChanged(SelectionChangedEvent event) {
                     site.setText(((ShipmentWrapper) ((StructuredSelection) shipmentsComboViewer
@@ -214,6 +213,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                         .getNameShort());
                 }
             });
+
+        setFirstControl(shipmentsComboViewer.getControl());
+        shipmentsComboViewer.getControl().setToolTipText(
+            "Only administrators can see more than 7 days.");
 
         final Button shipmentsListCheck = toolkit.createButton(composite,
             "Last 7 days", SWT.CHECK);
@@ -231,6 +234,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 shipmentsComboViewer.setSelection(currentSelection);
             }
         });
+        shipmentsListCheck
+            .setToolTipText("Only administrators have access to this option.");
+        shipmentsListCheck.setEnabled(SessionManager.getUser()
+            .isSiteAdministrator(SessionManager.getCurrentSite()));
     }
 
     private ShipmentWrapper initShipmentsCollections() {
@@ -349,7 +356,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
-        patientVisit.setPatient(patientAdapter.getWrapper());
+        if (patientAdapter != null)
+            patientVisit.setPatient(patientAdapter.getWrapper());
 
         patientVisit.addPvSourceVessels(pvSourceVesseltable
             .getAddedPvSourceVessels());
@@ -363,7 +371,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisit.persist();
         PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
             .getParent();
-        patientAdapter.performExpand();
+        if (patientAdapter != null)
+            patientAdapter.performExpand();
     }
 
     private void savePvCustomInfo() throws Exception {

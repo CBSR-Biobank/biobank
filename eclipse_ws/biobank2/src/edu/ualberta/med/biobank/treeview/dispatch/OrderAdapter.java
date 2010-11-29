@@ -50,6 +50,14 @@ public class OrderAdapter extends AdapterBase {
     }
 
     @Override
+    public boolean isDeletable() {
+        SiteWrapper currentSite = SessionManager.getCurrentSite();
+        return SessionManager.getUser().canUpdateSite(currentSite)
+            && currentSite.equals(getWrapper().getSender())
+            && getWrapper().isInCreationState() && super.internalIsDeletable();
+    }
+
+    @Override
     protected String getLabelInternal() {
         DispatchWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "Dispatch is null");
@@ -72,6 +80,7 @@ public class OrderAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+<<<<<<< HEAD:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/dispatch/OrderAdapter.java
         addViewMenu(menu, "Dispatch");
         List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
         try {
@@ -93,6 +102,13 @@ public class OrderAdapter extends AdapterBase {
                 });
             }
             if (sites.contains(getWrapper().getSender())
+=======
+        addViewMenu(menu, "Dispatch Shipment");
+        addDeleteMenu(menu, "Dispatch");
+        SiteWrapper currentSite = SessionManager.getCurrentSite();
+        if (SessionManager.getUser().canUpdateSite(currentSite)) {
+            if (currentSite.equals(getWrapper().getSender())
+>>>>>>> release_v1.3.1:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/dispatch/DispatchShipmentAdapter.java
                 && getWrapper().canUpdate(SessionManager.getUser())
                 && getWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -127,6 +143,11 @@ public class OrderAdapter extends AdapterBase {
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error checking permissions", e);
         }
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return "Are you sure you want to delete this dispatch?";
     }
 
     public void doReceive() {

@@ -234,4 +234,14 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
         rootNode.removeAll();
     }
 
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    protected String getTreeTextToolTip() {
+        return "Enter a dispatch waybill and hit enter";
+    }
+
 }

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -28,12 +27,17 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
+import edu.ualberta.med.biobank.utils.BindingContextHelper;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.DispatchAdministrationView;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
+
+    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank2.context.loggedOut";
+
+    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank2.context.loggedIn";
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SessionManager.class.getName());
@@ -85,11 +89,16 @@ public class SessionManager {
         rebuiltDispatch();
         updateMenus();
 
-        if (sessionAdapter.getUser().isNeedToChangePassword()) {
+        if (sessionAdapter.getUser().passwordChangeRequired()) {
             ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
                 .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
             dlg.open();
         }
+
+        BindingContextHelper
+            .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
+        BindingContextHelper
+            .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
     }
 
     private void rebuiltDispatch() {
@@ -105,6 +114,10 @@ public class SessionManager {
         sessionAdapter = null;
         updateMenus();
         ServiceConnection.logout(appService);
+        BindingContextHelper
+            .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
+        BindingContextHelper
+            .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
     }
 
     public void updateSession() {
@@ -130,14 +143,6 @@ public class SessionManager {
             .getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BioBankPlugin.getDefault()
             .isDebugging());
-
-        int menusize = window.getShell().getMenuBar().getItemCount();
-        MenuItem help = window.getShell().getMenuBar().getItem(menusize - 1);
-        MenuItem[] items = help.getMenu().getItems();
-        for (MenuItem item : items) {
-            item.setEnabled(sessionAdapter != null);
-        }
-
     }
 
     public SessionAdapter getSession() {
@@ -196,7 +201,7 @@ public class SessionManager {
 
     public static AbstractViewWithAdapterTree getCurrentAdapterViewWithTree() {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
-        if (workbench != null) {
+        if (workbench != null && !workbench.isClosing()) {
             workbenchWindow = workbench.getActiveWorkbenchWindow();
             if (workbenchWindow != null) {
                 IWorkbenchPage page = workbenchWindow.getActivePage();

@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import edu.ualberta.med.biobank.wizards.SelectPatientVisitWizard;
 
 public class AliquotEntryForm extends BiobankEntryForm {
@@ -93,6 +94,10 @@ public class AliquotEntryForm extends BiobankEntryForm {
                 }
             }
         }
+        if (aliquot.getSampleType() != null
+            && !sampleTypes.contains(aliquot.getSampleType())) {
+            sampleTypes.add(aliquot.getSampleType());
+        }
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, aliquot.getSiteString());
@@ -144,7 +149,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
         Control w = widgetCreator.createBoundWidget(c, BiobankText.class,
             SWT.READ_ONLY, null, BeansObservables.observeValue(aliquot,
                 "patientVisit.patient.pnumber"), null);
-        w.setBackground(READ_ONLY_TEXT_BGR);
+        w.setBackground(WidgetCreator.READ_ONLY_TEXT_BGR);
 
         Button editPatientButton = new Button(c, SWT.NONE);
         editPatientButton.setText("Change Patient");

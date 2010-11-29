@@ -147,12 +147,10 @@ public class SiteViewForm extends AddressViewFormCommon {
                 }
             }, ContainerTypeWrapper.class);
 
-        containerTypesTable = new ContainerTypeInfoTable(section,
-            site.getContainerTypeCollection());
+        containerTypesTable = new ContainerTypeInfoTable(section, siteAdapter);
         containerTypesTable.adaptToToolkit(toolkit, true);
 
-        containerTypesTable
-            .addClickListener(collectionDoubleClickListener);
+        containerTypesTable.addClickListener(collectionDoubleClickListener);
         section.setClient(containerTypesTable);
     }
 
@@ -166,13 +164,11 @@ public class SiteViewForm extends AddressViewFormCommon {
             }
         }, ContainerWrapper.class);
 
-        topContainersTable = new ContainerInfoTable(section, siteAdapter
-            .getWrapper().getTopContainerCollection());
+        topContainersTable = new ContainerInfoTable(section, siteAdapter);
         topContainersTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(topContainersTable);
 
-        topContainersTable
-            .addClickListener(collectionDoubleClickListener);
+        topContainersTable.addClickListener(collectionDoubleClickListener);
         section.setClient(topContainersTable);
     }
 

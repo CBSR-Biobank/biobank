@@ -5,16 +5,21 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudySourceVesselInfoTable;
@@ -101,6 +106,29 @@ public class StudyViewForm extends BiobankViewForm {
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
 
+        contactsTable.addClickListener(new IDoubleClickListener() {
+            @Override
+            public void doubleClick(DoubleClickEvent event) {
+                Object selection = event.getSelection();
+                if (selection instanceof InfoTableSelection) {
+                    Object obj = ((InfoTableSelection) selection).getObject();
+                    if (obj instanceof ClinicWrapper) {
+                        ClinicWrapper c = (ClinicWrapper) obj;
+                        DoubleClickEvent newEvent = new DoubleClickEvent(
+                            (Viewer) event.getSource(), new InfoTableSelection(
+                                c));
+                        collectionDoubleClickListener.doubleClick(newEvent);
+                    } else {
+                        Assert.isTrue(false,
+                            "invalid InfoTableSelection class:"
+                                + obj.getClass().getName());
+                    }
+                } else {
+                    Assert.isTrue(false, "invalid class for event selection:"
+                        + event.getClass().getName());
+                }
+            }
+        });
     }
 
     private void setStudySectionValues() throws Exception {

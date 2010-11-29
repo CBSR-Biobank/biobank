@@ -62,8 +62,7 @@ public class PatientAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Patient");
         addViewMenu(menu, "Patient");
-        addDeleteMenu(menu, "Patient",
-            "Are you sure you want to delete this patient?");
+        addDeleteMenu(menu, "Patient");
 
         if (isEditable()
             && SessionManager.canCreate(PatientVisitWrapper.class, null)) {
@@ -121,5 +120,15 @@ public class PatientAdapter extends AdapterBase {
     @Override
     public String getViewFormId() {
         return PatientViewForm.ID;
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return "Are you sure you want to delete this patient?";
+    }
+
+    @Override
+    public boolean isDeletable() {
+        return internalIsDeletable();
     }
 }

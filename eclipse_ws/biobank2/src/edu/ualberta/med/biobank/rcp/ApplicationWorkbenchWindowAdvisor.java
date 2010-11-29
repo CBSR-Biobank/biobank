@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.rcp;
 
 import java.util.Map;
 
+import org.eclipse.core.runtime.IProduct;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IStatusLineManager;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.ISourceProviderListener;
@@ -19,15 +21,16 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
+import edu.ualberta.med.biobank.utils.BindingContextHelper;
 
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ApplicationWorkbenchWindowAdvisor.class.getName());
-
-    private static final String MAIN_TITLE = "BioBank2";
 
     public ApplicationWorkbenchWindowAdvisor(
         IWorkbenchWindowConfigurer configurer) {
@@ -53,8 +56,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          * "left"); PlatformUI.getPreferenceStore().setDefault(
          * "SHOW_TEXT_ON_PERSPECTIVE_BAR", false);
          */
-
-        configurer.setTitle(MAIN_TITLE);
+        IProduct product = Platform.getProduct();
+        configurer.setTitle(product.getName() + " "
+            + product.getDefiningBundle().getVersion());
         configurer.setShowProgressIndicator(true);
     }
 
@@ -80,6 +84,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         page.addPartListener(new BiobankPartListener());
         window.addPerspectiveListener(new BiobankPerspectiveListener());
 
+        // to activate correct key bindings
+        String currentPerspectiveId = window.getActivePage().getPerspective()
+            .getId();
+        activateIfNotInPerspective(currentPerspectiveId, MainPerspective.ID);
+        activateIfNotInPerspective(currentPerspectiveId,
+            ProcessingPerspective.ID);
+        activateIfNotInPerspective(currentPerspectiveId, ReportsPerspective.ID);
+
+        BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
+
         ISourceProviderService service = (ISourceProviderService) window
             .getService(ISourceProviderService.class);
         SessionState sessionSourceProvider = (SessionState) service
@@ -91,10 +105,10 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null) {
                         if (sourceValue.equals(SessionState.LOGGED_IN))
-                            updatedTitle(SessionManager.getServer(),
+                            mainWindowUpdateTitle(SessionManager.getServer(),
                                 SessionManager.getUser().getLogin());
                         else if (sourceValue.equals(SessionState.LOGGED_OUT))
-                            resetTitle();
+                            mainWindowResetTitle();
                     }
                 }
 
@@ -103,19 +117,33 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     @SuppressWarnings("rawtypes") Map sourceValuesByName) {
                 }
             });
+
+        BindingContextHelper
+            .activateContextInWorkbench(SessionManager.BIOBANK2_CONTEXT_LOGGED_OUT);
     }
 
-    private void resetTitle() {
-        updatedTitle(null, null);
+    private void activateIfNotInPerspective(String currentPerspectiveId,
+        String notId) {
+        if (!currentPerspectiveId.equals(notId))
+            BindingContextHelper.activateContextInWorkbench("not." + notId);
     }
 
-    private void updatedTitle(String server, String username) {
+    private void mainWindowResetTitle() {
+        mainWindowUpdateTitle(null, null);
+    }
+
+    private void mainWindowUpdateTitle(String server, String username) {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
         String oldTitle = configurer.getTitle();
-        String newTitle = MAIN_TITLE;
-        if (server != null && username != null) {
-            newTitle = MAIN_TITLE + " - " + server + " [" + username + "]";
+
+        IProduct product = Platform.getProduct();
+        String newTitle = product.getName() + " "
+            + product.getDefiningBundle().getVersion();
+
+        if ((server != null) && (username != null)) {
+            newTitle += " - " + server + " [" + username + "]";
         }
+
         if (!newTitle.equals(oldTitle)) {
             configurer.setTitle(newTitle);
         }

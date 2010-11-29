@@ -165,4 +165,15 @@ public class OrderAdministrationView extends AbstractAdministrationView {
         return currentInstance;
     }
 
+    @Override
+    protected String getTreeTextToolTip() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
+    }
+
 }

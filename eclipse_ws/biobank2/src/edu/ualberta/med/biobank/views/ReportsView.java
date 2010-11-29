@@ -122,6 +122,7 @@ public class ReportsView extends ViewPart {
         sampleTypeTree.expandAll();
         containerTree.setInput(containerRoot);
         containerTree.expandAll();
+
         /*
          * List<Class<?>> advancedObjs = SearchUtils.getSearchableObjs(); for
          * (Class<?> obj : advancedObjs) { AdvancedReportTreeNode child = new

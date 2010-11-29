@@ -278,11 +278,8 @@ public class LoginDialog extends TitleAreaDialog {
 
     @Override
     protected void okPressed() {
-        @SuppressWarnings("unused")
-        URL url = null;
-
         try {
-            url = new URL("http://" + serverWidget.getText());
+            new URL("http://" + serverWidget.getText());
         } catch (MalformedURLException e) {
             MessageDialog.openError(getShell(), "Invalid Server URL",
                 "Please enter a valid server URL.");
@@ -290,6 +287,8 @@ public class LoginDialog extends TitleAreaDialog {
         }
 
         if (!BioBankPlugin.getDefault().isDebugging()) {
+            // until further notice, we still want to be able to specify the
+            // port, even in non debug mode
             // if (url.getPort() != -1) {
             // MessageDialog
             // .openError(getShell(), "Invalid Server URL",
