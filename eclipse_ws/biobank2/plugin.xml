@@ -2348,9 +2348,10 @@
             sequence="M3+Delete">
       </key>   
 	  <key
-            commandId="edu.ualberta.med.biobank.commands.print"
-            schemeId="biobank2.scheme"
-            sequence="M1+P">
+         commandId="edu.ualberta.med.biobank.commands.print"
+         contextId="edu.ualberta.med.biobank.perspective.aliquotsManagement"
+         schemeId="biobank2.scheme"
+         sequence="M1+P">
       </key>    
 	  <key
          commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
@@ -2767,6 +2768,10 @@
 	  <context
             id="not.edu.ualberta.med.biobank.perspective.reports"
             name="Not in Repports">
-      </context>  
+      </context>
+   <context
+         id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
+         name="Samples Processing View">
+   </context>  
    </extension>
 </plugin>
