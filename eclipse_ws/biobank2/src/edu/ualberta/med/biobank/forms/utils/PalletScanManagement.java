@@ -82,8 +82,11 @@ public class PalletScanManagement {
                     cells = PalletCell.convertArray(scanCells);
                     successfulScansCount++;
                 } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Scan error", //$NON-NLS-1$
-                        ex, "You can still define barcodes one  by one.");
+                    BioBankPlugin
+                        .openAsyncError(
+                            "Scan error", //$NON-NLS-1$
+                            ex,
+                            "Barcodes can still be scanned with the handheld 2D scanner.");
                 }
             }
         } else {

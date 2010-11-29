@@ -1,12 +1,19 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.MenuItem;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
+import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ContainerTypeInfoTable extends
@@ -33,9 +40,12 @@ public class ContainerTypeInfoTable extends
     private static final String[] HEADINGS = new String[] { "Name",
         "Short Name", "Capacity", "Status", "In Use", "Temperature" };
 
-    public ContainerTypeInfoTable(Composite parent,
-        List<ContainerTypeWrapper> collection) {
-        super(parent, collection, HEADINGS, 10);
+    private SiteAdapter siteAdapter;
+
+    public ContainerTypeInfoTable(Composite parent, SiteAdapter site) {
+        super(parent, site.getWrapper().getContainerTypeCollection(), HEADINGS,
+            10);
+        siteAdapter = site;
     }
 
     @Override
@@ -112,5 +122,31 @@ public class ContainerTypeInfoTable extends
     @Override
     protected BiobankTableSorter getComparator() {
         return null;
+    }
+
+    @Override
+    public void addClickListener(IDoubleClickListener listener) {
+        doubleClickListeners.add(listener);
+        MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
+        mi.setText("Edit");
+        mi.addSelectionListener(new SelectionListener() {
+
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                ModelWrapper<?> selection = ContainerTypeInfoTable.this
+                    .getSelection();
+                if (selection != null) {
+                    AdapterBase adapter = AdapterFactory.getAdapter(selection);
+                    adapter.setParent(siteAdapter.getContainerTypesGroupNode());
+                    adapter.openEntryForm();
+                }
+            }
+
+            @Override
+            public void widgetDefaultSelected(SelectionEvent e) {
+                // TODO Auto-generated method stub
+
+            }
+        });
     }
 }
