@@ -246,5 +246,4 @@ public class ShipmentAdministrationView extends
     protected String getTreeTextToolTip() {
         return "Enter a shipment waybill and hit enter";
     }
-
 }

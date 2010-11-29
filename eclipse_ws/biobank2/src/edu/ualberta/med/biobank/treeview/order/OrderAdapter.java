@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview.dispatch;
+package edu.ualberta.med.biobank.treeview.order;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -29,9 +29,9 @@ import edu.ualberta.med.biobank.forms.DispatchViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.DispatchAdministrationView;
 
-public class DispatchAdapter extends AdapterBase {
+public class OrderAdapter extends AdapterBase {
 
-    public DispatchAdapter(AdapterBase parent, DispatchWrapper ship) {
+    public OrderAdapter(AdapterBase parent, DispatchWrapper ship) {
         super(parent, ship);
     }
 
@@ -132,11 +132,6 @@ public class DispatchAdapter extends AdapterBase {
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error checking permissions", e);
         }
-    }
-
-    @Override
-    protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this dispatch?";
     }
 
     public void doReceive() {

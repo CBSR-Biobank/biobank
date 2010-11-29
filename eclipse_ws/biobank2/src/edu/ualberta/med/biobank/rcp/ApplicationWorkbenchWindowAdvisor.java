@@ -60,6 +60,9 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         configurer.setTitle(product.getName() + " "
             + product.getDefiningBundle().getVersion());
         configurer.setShowProgressIndicator(true);
+
+        getWindowConfigurer().setTitle(
+            product.getName() + " " + product.getDefiningBundle().getVersion());
     }
 
     @Override

@@ -235,13 +235,13 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    public String getId() {
-        return ID;
+    protected String getTreeTextToolTip() {
+        return "Enter a dispatch waybill and hit enter";
     }
 
     @Override
-    protected String getTreeTextToolTip() {
-        return "Enter a dispatch waybill and hit enter";
+    public String getId() {
+        return ID;
     }
 
 }
