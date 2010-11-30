@@ -82,6 +82,7 @@ public enum OrderTableGroup {
         return null;
     }
 
+    @SuppressWarnings("unused")
     public static List<OrderTableGroup> getGroupsForShipment(
         DispatchWrapper ship) {
         List<OrderTableGroup> groups = new ArrayList<OrderTableGroup>();

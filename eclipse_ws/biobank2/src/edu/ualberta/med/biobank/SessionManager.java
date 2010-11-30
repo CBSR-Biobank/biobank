@@ -293,13 +293,11 @@ public class SessionManager {
 
     @Deprecated
     public boolean isAllSitesSelected() {
-        // TODO Auto-generated method stub
         return false;
     }
 
     @Deprecated
     public static SiteWrapper getCurrentSite() {
-        // TODO Auto-generated method stub
         return null;
     }
 }

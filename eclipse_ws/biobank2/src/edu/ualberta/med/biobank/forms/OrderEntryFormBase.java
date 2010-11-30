@@ -18,12 +18,12 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.treeview.order.OrderAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.OrderAliquotsTreeTable;
 
 public class OrderEntryFormBase extends BiobankFormBase {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.OrderEntryFormBase";
-    private OrderAliquotsTreeTable aliquotsTree;
+
+    // private OrderAliquotsTreeTable aliquotsTree;
 
     @Override
     protected void createFormContent() throws Exception {
@@ -69,7 +69,7 @@ public class OrderEntryFormBase extends BiobankFormBase {
         Composite c = new Composite(s, SWT.NONE);
         c.setLayout(new GridLayout());
         createAliquotsSelectionActions(c, false);
-        aliquotsTree = new OrderAliquotsTreeTable(c, null, true, true);
+        // aliquotsTree = new OrderAliquotsTreeTable(c, null, true, true);
 
         s.setClient(c);
 
@@ -117,6 +117,7 @@ public class OrderEntryFormBase extends BiobankFormBase {
         return new AliquotInfo(dsa.getAliquot(), ResType.OK);
     }
 
+    @SuppressWarnings("unused")
     protected void createAliquotsSelectionActions(Composite composite,
         boolean setAsFirstControl) {
         Composite addComposite = toolkit.createComposite(composite);

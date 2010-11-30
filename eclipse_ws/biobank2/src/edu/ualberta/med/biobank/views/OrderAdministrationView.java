@@ -136,7 +136,7 @@ public class OrderAdministrationView extends AbstractAdministrationView {
         }
     }
 
-    protected List<DispatchWrapper> search() throws Exception {
+    protected List<DispatchWrapper> search() {
         if (radioOrderNumber.getSelection()) {
             return null;
         }
