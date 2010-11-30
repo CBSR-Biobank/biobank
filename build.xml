@@ -708,4 +708,12 @@
     <echo message="test report: file://${test.output}/html/junit-noframes.html" />
     <echo message="coverage report: file://${converage.output}/index.html" />
   </target>
+
+  <target name="product">
+    <java classpath="${env.ECLIPSE_HOME}/plugins/org.eclipse.equinox.launcher_1.1.0.v20100507.jar" classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
+      <arg line="-application org.eclipse.ant.core.antRunner"/>
+      <arg line="-buildfile ${env.ECLIPSE_HOME}/plugins/org.eclipse.pde.build_3.6.0.v20100603/scripts/productBuild/productBuild.xml"/>
+      <arg line="-Dbuilder=${basedir}/product/"/>
+    </java>
+  </target>
 </project>
