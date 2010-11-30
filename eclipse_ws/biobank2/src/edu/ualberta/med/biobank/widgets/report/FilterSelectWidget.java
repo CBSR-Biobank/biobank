@@ -35,7 +35,9 @@ public class FilterSelectWidget extends Composite {
             new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent arg0) {
-                    createContainer();
+                    if (!isDisposed()) {
+                        createContainer();
+                    }
                 }
             });
     }
@@ -94,6 +96,7 @@ public class FilterSelectWidget extends Composite {
     public FilterRow addFilterRow(EntityFilter entityFilter) {
         FilterRow filterRow = null;
         if (!filterRowMap.containsKey(entityFilter)) {
+            showContainer(true);
             filterRow = new FilterRow(this, container, SWT.NONE, entityFilter);
             filterRowMap.put(entityFilter, filterRow);
         }
@@ -105,6 +108,10 @@ public class FilterSelectWidget extends Composite {
         if (filterRow != null) {
             filterRowMap.remove(entityFilter);
             filterRow.dispose();
+
+            if (filterRowMap.isEmpty()) {
+                showContainer(false);
+            }
         }
     }
 
@@ -114,10 +121,12 @@ public class FilterSelectWidget extends Composite {
         layout.verticalSpacing = 0;
         layout.marginWidth = 0;
         layout.marginHeight = 0;
+        layout.marginBottom = 15;
         setLayout(layout);
 
         GridData layoutData = new GridData();
         layoutData.grabExcessHorizontalSpace = true;
+        layoutData.minimumHeight = 0;
         setLayoutData(layoutData);
     }
 
@@ -143,7 +152,12 @@ public class FilterSelectWidget extends Composite {
 
         GridData layoutData = new GridData();
         layoutData.grabExcessHorizontalSpace = true;
+        layoutData.minimumHeight = 0;
+        layoutData.horizontalIndent = 0;
+        layoutData.verticalIndent = 0;
         container.setLayoutData(layoutData);
+
+        showContainer(false);
 
         Collection<ReportFilter> reportFilters = report
             .getReportFilterCollection();
@@ -151,6 +165,16 @@ public class FilterSelectWidget extends Composite {
         for (ReportFilter reportFilter : reportFilters) {
             addFilterRow(reportFilter);
         }
+    }
+
+    private void showContainer(boolean isShown) {
+        if (isShown == container.getVisible()) {
+            return;
+        }
+
+        GridData layoutData = (GridData) container.getLayoutData();
+        layoutData.exclude = !isShown;
+        container.setVisible(isShown);
     }
 
     private FilterRow addFilterRow(ReportFilter reportFilter) {

@@ -57,7 +57,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         }
     };
 
-    private FilterSelectWidget filters;
+    private FilterSelectWidget filtersWidget;
     private ReportAdapter reportAdapter;
     private ReportWrapper report;
 
@@ -72,7 +72,7 @@ public class ReportEntryForm extends BiobankEntryForm {
             public void run() {
                 // pull the ReportFilter-s from the GUI before saving
                 report.getWrappedObject().setReportFilterCollection(
-                    filters.getReportFilters());
+                    filtersWidget.getReportFilters());
             }
         });
 
@@ -165,7 +165,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                 System.out.println("12312123");
                 try {
                     report.getWrappedObject().setReportFilterCollection(
-                        filters.getReportFilters());
+                        filtersWidget.getReportFilters());
 
                     List<Object> results = SessionManager.getAppService()
                         .runReport(report.getWrappedObject());
@@ -192,22 +192,22 @@ public class ReportEntryForm extends BiobankEntryForm {
         filtersSection = createSection("Filters");
 
         Composite container = toolkit.createComposite(filtersSection, SWT.NONE);
-        GridLayout layout = new GridLayout(2, false);
-        layout.horizontalSpacing = 10;
+        GridLayout layout = new GridLayout(1, false);
+        layout.horizontalSpacing = 0;
         layout.verticalSpacing = 0;
         container.setLayout(layout);
         container.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(container);
 
-        Collection<EntityFilter> sortedEntityFilters = getSortedEntityFilters(
-            report, COMPARE_FILTERS_BY_NAME);
+        createFilterCombo(container);
 
-        filters = new FilterSelectWidget(container, SWT.NONE, report);
-        filters
+        filtersWidget = new FilterSelectWidget(container, SWT.NONE, report);
+        filtersWidget
             .addFilterChangedListener(new ChangeListener<FilterChangeEvent>() {
                 @Override
                 public void handleEvent(FilterChangeEvent event) {
                     setDirty(true);
+                    form.reflow(true);
                     form.layout(true, true);
 
                     EntityFilter entityFilter = event.getEntityFilter();
@@ -219,13 +219,18 @@ public class ReportEntryForm extends BiobankEntryForm {
                 }
             });
 
-        createFilterCombo(container, sortedEntityFilters);
+        Collection<EntityFilter> entityFilters = getSortedEntityFilters(report,
+            COMPARE_FILTERS_BY_NAME);
+        for (EntityFilter entityFilter : entityFilters) {
+            if (filtersWidget.getFilterRow(entityFilter) == null) {
+                filterCombo.add(entityFilter);
+            }
+        }
 
         filtersSection.setClient(container);
     }
 
-    private void createFilterCombo(Composite parent,
-        Collection<EntityFilter> entityFilters) {
+    private void createFilterCombo(Composite parent) {
 
         // TODO: should put combo "above" filters, not to their right, so if
         // filters expand, then the combo can go ontop, otherwise float top
@@ -241,12 +246,13 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         GridData layoutData = new GridData();
         layoutData.verticalAlignment = SWT.TOP;
+        layoutData.horizontalAlignment = SWT.RIGHT;
         container.setLayoutData(layoutData);
 
         Label label = new Label(container, SWT.NONE);
         label.setText("Add filter:");
 
-        filterCombo = new ComboViewer(container, SWT.NONE);
+        filterCombo = new ComboViewer(container, SWT.READ_ONLY);
         filterCombo.setSorter(new ViewerSorter());
         filterCombo.setLabelProvider(new LabelProvider() {
             @Override
@@ -257,11 +263,6 @@ public class ReportEntryForm extends BiobankEntryForm {
                 return "";
             }
         });
-        for (EntityFilter entityFilter : entityFilters) {
-            if (filters.getFilterRow(entityFilter) == null) {
-                filterCombo.add(entityFilter);
-            }
-        }
 
         filterCombo
             .addPostSelectionChangedListener(new ISelectionChangedListener() {
@@ -272,7 +273,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                     if (selection instanceof EntityFilter) {
                         EntityFilter entityFilter = (EntityFilter) selection;
                         filterCombo.remove(entityFilter);
-                        filters.addFilterRow(entityFilter);
+                        filtersWidget.addFilterRow(entityFilter);
 
                         setDirty(true);
                         form.layout(true, true);

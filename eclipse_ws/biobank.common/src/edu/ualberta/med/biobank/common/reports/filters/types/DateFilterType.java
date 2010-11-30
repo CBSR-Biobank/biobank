@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.reports.filters.types;
 
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Collection;
@@ -24,13 +25,18 @@ public class DateFilterType implements FilterType {
         FilterOperator op, List<String> values) {
 
         String sqlDateValue = values.isEmpty() ? null : values.get(0);
+        Date date = null;
+        try {
+            date = SQL_DATE_FORMAT.parse(sqlDateValue);
+        } catch (ParseException e) {
+        }
 
         switch (op) {
         case ON_OR_AFTER:
-            criteria.add(Restrictions.ge(aliasedProperty, sqlDateValue));
+            criteria.add(Restrictions.ge(aliasedProperty, date));
             break;
         case ON_OR_BEFORE:
-            criteria.add(Restrictions.le(aliasedProperty, sqlDateValue));
+            criteria.add(Restrictions.le(aliasedProperty, date));
             break;
         case THIS_DAY:
         case THIS_WEEK:
@@ -86,7 +92,8 @@ public class DateFilterType implements FilterType {
     @Override
     public Collection<FilterOperator> getOperators() {
         return Arrays.asList(FilterOperator.ON_OR_BEFORE,
-            FilterOperator.ON_OR_AFTER, FilterOperator.THIS_DAY,
+            FilterOperator.ON_OR_AFTER, FilterOperator.BETWEEN,
+            FilterOperator.NOT_BETWEEN, FilterOperator.THIS_DAY,
             FilterOperator.THIS_WEEK, FilterOperator.THIS_MONTH,
             FilterOperator.THIS_YEAR, FilterOperator.SAME_DAY_AS,
             FilterOperator.SAME_WEEK_AS, FilterOperator.SAME_MONTH_AS,

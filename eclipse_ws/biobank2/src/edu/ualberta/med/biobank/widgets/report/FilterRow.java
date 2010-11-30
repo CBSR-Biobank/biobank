@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.widgets.report;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
 
@@ -18,15 +18,13 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Text;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
@@ -39,7 +37,6 @@ import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
-import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 class FilterRow extends Composite {
@@ -48,9 +45,11 @@ class FilterRow extends Composite {
     private final FilterSelectWidget filtersWidget;
     private final EntityFilter filter;
     private Composite container;
+    private Composite inputContainer;
     private Button checkbox;
     private ComboViewer operators;
-    private ValueAccessor valueAccessor;
+    private FilterValueWidget filterValueWidget;
+    private Collection<String> suggestions;
 
     public FilterRow(FilterSelectWidget filters, Composite parent, int style,
         EntityFilter filter) {
@@ -63,7 +62,7 @@ class FilterRow extends Composite {
         createContainer();
         createCheckbox();
         createOperators();
-        createInputs(null);
+        createInputs();
     }
 
     public FilterOperator getOperator() {
@@ -79,11 +78,16 @@ class FilterRow extends Composite {
     }
 
     public Collection<ReportFilterValue> getValues() {
-        return valueAccessor.getValues();
+        if (filterValueWidget != null) {
+            return filterValueWidget.getValues();
+        }
+        return Arrays.asList();
     }
 
     public void setValues(Collection<ReportFilterValue> values) {
-        valueAccessor.setValues(values);
+        if (filterValueWidget != null) {
+            filterValueWidget.setValues(values);
+        }
     }
 
     private void init() {
@@ -101,20 +105,27 @@ class FilterRow extends Composite {
 
     private void createContainer() {
         container = new Composite(this, SWT.NONE);
-        GridLayout layout = new GridLayout(4, false);
+        GridLayout layout = new GridLayout(3, false);
         layout.horizontalSpacing = 5;
         layout.verticalSpacing = 0;
         layout.marginWidth = 0;
         layout.marginHeight = 2;
         container.setLayout(layout);
         GridData layoutData = new GridData();
+        layoutData.grabExcessHorizontalSpace = true;
+        layoutData.verticalAlignment = SWT.TOP;
         container.setLayoutData(layoutData);
     }
 
     private void createCheckbox() {
+        // TODO: replace with label that checks box so can wrap label text
         checkbox = new Button(container, SWT.CHECK);
         GridData layoutData = new GridData();
+        layoutData.widthHint = 225;
+        layoutData.minimumWidth = 225;
         layoutData.grabExcessHorizontalSpace = true;
+        layoutData.verticalAlignment = SWT.TOP;
+        layoutData.verticalIndent = 3;
         checkbox.setLayoutData(layoutData);
 
         checkbox.setText(filter.getName());
@@ -133,7 +144,14 @@ class FilterRow extends Composite {
     }
 
     private void createOperators() {
-        operators = new ComboViewer(container, SWT.NONE);
+        operators = new ComboViewer(container, SWT.READ_ONLY);
+
+        Control control = operators.getControl();
+
+        GridData layoutData = new GridData();
+        layoutData.verticalAlignment = SWT.TOP;
+        control.setLayoutData(layoutData);
+
         operators.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -158,11 +176,7 @@ class FilterRow extends Composite {
         operators.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
-                FilterOperator oldOp = getSelectedFilterOperator(operators
-                    .getSelection());
-                // TODO: in the future may need to re-call createInputs
-                // when the chosen operator changes
-
+                createInputs();
                 filtersWidget.notifyListeners(new FilterChangeEvent(filter));
             }
         });
@@ -179,128 +193,113 @@ class FilterRow extends Composite {
         return null;
     }
 
-    private void createInputs(FilterOperator oldOp) {
-        FilterOperator op = getOperator();
+    private void disposeInputContainer() {
+        if (inputContainer != null && !inputContainer.isDisposed()) {
+            inputContainer.dispose();
+        }
+    }
+
+    private void createInputContainer() {
+        inputContainer = new Composite(container, SWT.NONE);
+        GridLayout layout = new GridLayout(2, false);
+        layout.horizontalSpacing = 5;
+        layout.verticalSpacing = 0;
+        layout.marginWidth = 0;
+        layout.marginHeight = 0;
+        inputContainer.setLayout(layout);
+        GridData layoutData = new GridData();
+        layoutData.grabExcessHorizontalSpace = true;
+        layoutData.verticalAlignment = SWT.TOP;
+        inputContainer.setLayoutData(layoutData);
+    }
+
+    private FilterValueWidget createSimpleFilterValueWidget() {
+        FilterValueWidget result = null;
+        boolean isDateProperty = "Date".equals(filter.getEntityProperty()
+            .getPropertyType().getName());
+
+        if (suggestions != null) {
+            ComboFilterValueWidget combo;
+            combo = new ComboFilterValueWidget(inputContainer);
+            combo.getComboViewer().add(suggestions.toArray());
+            result = combo;
+        } else if (isDateProperty) {
+            result = new DateTimeFilterValueWidget(inputContainer);
+        } else {
+            result = new TextFilterValueWidget(inputContainer);
+        }
+
+        return result;
+    }
+
+    private FilterValueWidget createFilterValueWidget() {
+        FilterValueWidget result = null;
 
         // TODO: for now, use comma-delimited values. In the future can
         // create and use a set-widget (see Nebula's TableCombo for a
         // candidate).
 
-        // TODO: some operators may require NO VALUES/ ARGUMENTS!!
+        result = createSimpleFilterValueWidget();
 
-        // TODO: I don't like that I have to compare to seemingly
-        // arbitrary strings
-        String propertyTypeName = filter.getEntityProperty().getPropertyType()
-            .getName();
-
-        if ("Date".equals(propertyTypeName)) {
-            final DateTimeWidget dateTimeWidget = new DateTimeWidget(container,
-                SWT.DATE | SWT.TIME, null);
-            GridData dateTimeWidgetLayoutData = new GridData();
-            dateTimeWidgetLayoutData.grabExcessHorizontalSpace = true;
-            dateTimeWidget.setLayoutData(dateTimeWidgetLayoutData);
-            dateTimeWidget.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    filtersWidget
-                        .notifyListeners(new FilterChangeEvent(filter));
-                }
-            });
-
-            valueAccessor = new ValueAccessor() {
-                @Override
-                public Collection<ReportFilterValue> getValues() {
-                    if (!dateTimeWidget.isDisposed()
-                        && dateTimeWidget.getDate() != null) {
-                        String dateString = SQL_DATE_FORMAT
-                            .format(dateTimeWidget.getDate());
-
-                        ReportFilterValue value = new ReportFilterValue();
-                        value.setPosition(0);
-                        value.setValue(dateString);
-                        return Arrays.asList(value);
-                    }
-                    return new ArrayList<ReportFilterValue>();
-                }
-
-                @Override
-                public void setValues(Collection<ReportFilterValue> values) {
-                    if (dateTimeWidget.isDisposed()) {
-                        return;
-                    }
-
-                    for (ReportFilterValue value : values) {
-                        try {
-                            Date date = SQL_DATE_FORMAT.parse(value.getValue());
-                            dateTimeWidget.setDate(date);
-                        } catch (ParseException e) {
-                            // TODO: show appropriate message?
-                        }
-                        break;
-                    }
-                }
-            };
-        } else {
-            final Text text = new Text(container, SWT.BORDER);
-
-            text.addModifyListener(new ModifyListener() {
-                @Override
-                public void modifyText(ModifyEvent e) {
-                    filtersWidget
-                        .notifyListeners(new FilterChangeEvent(filter));
-                }
-            });
-
-            GridData layoutData = new GridData();
-            layoutData.widthHint = 150;
-            text.setLayoutData(layoutData);
-
-            valueAccessor = new ValueAccessor() {
-                @Override
-                public Collection<ReportFilterValue> getValues() {
-                    Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
-                    if (!text.isDisposed()) {
-                        String[] rawValues = text.getText().split(",");
-                        int position = 0;
-                        for (String rawValue : rawValues) {
-                            ReportFilterValue value = new ReportFilterValue();
-                            value.setPosition(position);
-                            value.setValue(rawValue.trim());
-                            values.add(value);
-                            position++;
-                        }
-                    }
-                    return values;
-                }
-
-                @Override
-                public void setValues(Collection<ReportFilterValue> values) {
-                    if (!text.isDisposed()) {
-                        final String delimiter = ", ";
-                        StringBuilder builder = new StringBuilder();
-                        for (ReportFilterValue value : values) {
-                            builder.append(value.getValue());
-                            builder.append(delimiter);
-                        }
-                        builder.delete(builder.length() - delimiter.length()
-                            - 1, builder.length());
-                        text.setText(builder.toString());
-                    }
-                }
-            };
-
-            // auto-suggest
-            Button button = new Button(container, SWT.NONE);
-            // TODO: replace with icon?
-            button.setText("Suggest");
-            button.addListener(SWT.Selection, new Listener() {
-                @Override
-                public void handleEvent(Event event) {
-                    Collection<String> suggestions = autoSuggest();
-                    System.out.println(Arrays.toString(suggestions.toArray()));
-                }
-            });
+        FilterOperator op = getOperator();
+        if (EnumSet.of(FilterOperator.BETWEEN, FilterOperator.NOT_BETWEEN)
+            .contains(op)) {
+            result = new BetweenFilterValueWidget(inputContainer, result,
+                createSimpleFilterValueWidget());
         }
+
+        // if (op.isSetOperator()) {
+        // result = new SetFilterValueWidget(inputContainer, result);
+        // }
+
+        return result;
+    }
+
+    private void createInputs() {
+        Collection<ReportFilterValue> oldValues = getValues();
+
+        disposeInputContainer();
+        createInputContainer();
+
+        filterValueWidget = null;
+
+        FilterOperator op = getOperator();
+
+        if (!op.isValueRequired()) {
+            return;
+        }
+
+        filterValueWidget = createFilterValueWidget();
+
+        Control control = filterValueWidget.getControl();
+        if (control != null) {
+            GridData layoutData = new GridData();
+            layoutData.grabExcessHorizontalSpace = true;
+            control.setLayoutData(layoutData);
+        }
+
+        // try to reset the old values
+        setValues(oldValues);
+
+        // auto-suggest
+        createAutoSuggest(inputContainer);
+    }
+
+    private void createAutoSuggest(Composite parent) {
+        Button button = new Button(parent, SWT.NONE);
+        GridData layoutData = new GridData();
+        layoutData.verticalAlignment = SWT.TOP;
+        button.setLayoutData(layoutData);
+
+        // TODO: replace with icon?
+        button.setText("Suggest");
+        button.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                autoSuggest();
+                filtersWidget.notifyListeners(new FilterChangeEvent(filter));
+            }
+        });
     }
 
     private Report getAutoSuggestReport() {
@@ -330,8 +329,7 @@ class FilterRow extends Composite {
         return report;
     }
 
-    private Collection<String> autoSuggest() {
-
+    private void autoSuggest() {
         Report report = getAutoSuggestReport();
 
         List<Object> results = null;
@@ -349,14 +347,21 @@ class FilterRow extends Composite {
         for (Object result : results) {
             if (result instanceof Object[]) {
                 Object[] row = (Object[]) result;
-                if (row.length > 0 && row[0] instanceof String) {
-                    suggestions.add((String) row[0]);
+                if (row.length > 0 && row[0] != null) {
+                    Object o = row[0];
+                    if (o instanceof Date) {
+                        suggestions.add(SQL_DATE_FORMAT.format((Date) o));
+                    } else {
+                        suggestions.add(row[0].toString());
+                    }
                 }
             }
         }
 
         Collections.sort(suggestions);
 
-        return suggestions;
+        this.suggestions = suggestions;
+
+        createInputs();
     }
 }
