@@ -244,7 +244,7 @@
             name="Add User">
       </command>
        <command
-            id="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
+            id="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
             name="Add dispatch">
       </command>
       <command
@@ -252,7 +252,7 @@
             name="Open Dispatch Shipment View">
       </command>
        <command
-            id="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
+            id="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
             name="Add Dispatch Shipment">
       </command>
        <command
@@ -816,7 +816,7 @@
       </handler>
       <handler
             class="edu.ualberta.med.biobank.handlers.DispatchAddHandler"
-            commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd">
+            commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd">
          <activeWhen>
             <and>
               <reference
@@ -956,26 +956,14 @@
                   label="Add Shipment"
                   style="push">
             </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete Selected Item"
-                  style="push">
-            </command>
-         </menu>
-         <menu
-               id="edu.ualberta.med.biobank.menu.patients"
-               label="Patients">
+            <separator
+                  name="biobank2.separator1"
+                  visible="true">
+            </separator>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
                   icon="icons/patient_add.png"
                   label="Add Patient"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
-                  icon="icons/patient_merge.png"
-                  label="Merge Patients"
                   style="push">
             </command>
             <command
@@ -985,35 +973,9 @@
                   style="push">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete Selected Item"
-                  style="push">
-            </command>
-         </menu>
-         <menu
-               id="edu.ualberta.med.biobank.menu.dispatch"
-               label="Dispatch Shipments">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
-                  icon="icons/dispatch_add.png"
-                  label="Add Dispatch"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete Selected Item"
-                  style="push">
-            </command>
-            <separator
-                  name="biobank2.separator2"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
-                  icon="icons/shipment_add.png"
-                  label="Add Shipment"
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+                  icon="icons/patient_merge.png"
+                  label="Merge Patients"
                   style="push">
             </command>
             <separator
@@ -1021,9 +983,19 @@
                   visible="true">
             </separator>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
+                  commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
                   icon="icons/dispatch_add.png"
                   label="Add Dispatch"
+                  style="push">
+            </command>
+            <separator
+                  name="biobank2.separator2"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
                   style="push">
             </command>
          </menu>
@@ -1421,7 +1393,7 @@
          <toolbar
                id="edu.ualberta.med.biobank.views.DispatchAdministrationView">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
+                  commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
                   icon="icons/dispatch_add.png"
                   label="Add Dispatch"
                   style="push">
@@ -2276,7 +2248,7 @@
          sequence="M3+S">
       </key>    
 	  <key
-         commandId="edu.ualberta.med.biobank.commands.dispatch.shipmentAdd"
+         commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
          contextId="edu.ualberta.med.biobank.perspective.processing"
          schemeId="biobank2.scheme"
          sequence="M3+D">
@@ -2331,13 +2303,6 @@
             provider="edu.ualberta.med.biobank.sourceproviders.DebugState">
          <variable
                name="edu.ualberta.med.biobank.sourceprovider.debugState"
-               priorityLevel="workbench">
-         </variable>
-      </sourceProvider>
-      <sourceProvider
-            provider="edu.ualberta.med.biobank.sourceproviders.SiteSelectionState">
-         <variable
-               name="edu.ualberta.med.biobank.sourceprovider.siteSelectionId"
                priorityLevel="workbench">
          </variable>
       </sourceProvider>
