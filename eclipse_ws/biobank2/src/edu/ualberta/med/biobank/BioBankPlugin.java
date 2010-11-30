@@ -53,6 +53,7 @@ import edu.ualberta.med.biobank.treeview.order.ShippedOrderNode;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
+import edu.ualberta.med.biobank.views.DispatchSiteAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -184,6 +185,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
         classToImageKey.put(DispatchAdapter.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT);
+        classToImageKey.put(DispatchSiteAdapter.class.getName(),
+            BioBankPlugin.IMG_SITE);
         classToImageKey.put(NewOrderNode.class.getName(),
             BioBankPlugin.IMG_ORDER);
         classToImageKey.put(ProcessingOrderNode.class.getName(),

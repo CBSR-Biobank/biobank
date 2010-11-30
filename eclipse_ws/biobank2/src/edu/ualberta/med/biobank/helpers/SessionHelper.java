@@ -69,7 +69,6 @@ public class SessionHelper implements Runnable {
             }
             String clientVersion = Platform.getProduct().getDefiningBundle()
                 .getVersion().toString();
-            clientVersion = "1.5.0";
             appService.checkVersion(clientVersion);
             siteWrappers = SiteWrapper.getSites(appService);
             user = appService.getCurrentUser();

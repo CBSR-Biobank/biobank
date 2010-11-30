@@ -48,7 +48,6 @@ public class DispatchSiteAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Site");
     }
 
     @Override
@@ -94,6 +93,18 @@ public class DispatchSiteAdapter extends AdapterBase {
     @Override
     public String getViewFormId() {
         return SiteViewForm.ID;
+    }
+
+    @Override
+    public void rebuild() {
+        for (AdapterBase adaper : getChildren()) {
+            adaper.rebuild();
+        }
+    }
+
+    @Override
+    public void performDoubleClick() {
+
     }
 
 }

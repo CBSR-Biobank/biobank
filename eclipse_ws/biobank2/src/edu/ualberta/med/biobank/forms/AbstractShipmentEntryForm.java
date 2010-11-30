@@ -108,11 +108,7 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         dispatch.persist();
-        // adapter.getParent().performExpand();
-        // FIXME: Would prefer to use this call, but in cases of errors
-        // sometimes tree structure can change
-        // This reload call results in more searches when interacting with the
-        // form (tree becomes out of sync with adapters in forms)
+
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
