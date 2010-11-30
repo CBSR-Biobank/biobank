@@ -12,6 +12,13 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 
+/**
+ * Decorates two <code>FilterValueWidget</code>-s to provide between x and y
+ * functionality.
+ * 
+ * @author jferland
+ * 
+ */
 public class BetweenFilterValueWidget implements FilterValueWidget {
     private final Composite container;
     private final FilterValueWidget minValueWidget;
@@ -103,7 +110,7 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
         labelLayoutData.verticalIndent = 0;
 
         Label label = new Label(container, SWT.NONE);
-        label.setText("and");
+        label.setText("and ");
         label.setLayoutData(labelLayoutData);
 
         Control maxControl = maxValueWidget.getControl();

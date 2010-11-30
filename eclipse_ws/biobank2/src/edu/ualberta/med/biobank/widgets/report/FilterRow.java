@@ -248,9 +248,9 @@ class FilterRow extends Composite {
                 createSimpleFilterValueWidget());
         }
 
-        // if (op.isSetOperator()) {
-        // result = new SetFilterValueWidget(inputContainer, result);
-        // }
+        if (op.isSetOperator()) {
+            result = new SetFilterValueWidget(inputContainer, result);
+        }
 
         return result;
     }
@@ -270,12 +270,16 @@ class FilterRow extends Composite {
         }
 
         filterValueWidget = createFilterValueWidget();
+        filterValueWidget.addChangeListener(new ChangeListener<Object>() {
+            @Override
+            public void handleEvent(Object event) {
+                filtersWidget.notifyListeners(new FilterChangeEvent(filter));
+            }
+        });
 
         Control control = filterValueWidget.getControl();
         if (control != null) {
-            GridData layoutData = new GridData();
-            layoutData.grabExcessHorizontalSpace = true;
-            control.setLayoutData(layoutData);
+            control.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         }
 
         // try to reset the old values
