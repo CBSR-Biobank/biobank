@@ -47,6 +47,16 @@ public class TestDispatchShipment extends TestDatabase {
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         StudyWrapper study = StudyHelper.addStudy(name);
+
+        SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
+        List<StudyWrapper> allStudies = Arrays.asList(study);
+
+        for (SiteWrapper site : allSites) {
+            site.addStudies(allStudies);
+            site.persist();
+            site.reload();
+        }
+
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
@@ -69,6 +79,16 @@ public class TestDispatchShipment extends TestDatabase {
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         StudyWrapper study = StudyHelper.addStudy(name);
+
+        SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
+        List<StudyWrapper> allStudies = Arrays.asList(study);
+
+        for (SiteWrapper site : allSites) {
+            site.addStudies(allStudies);
+            site.persist();
+            site.reload();
+        }
+
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
@@ -94,6 +114,16 @@ public class TestDispatchShipment extends TestDatabase {
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         StudyWrapper study = StudyHelper.addStudy(name);
+
+        SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
+        List<StudyWrapper> allStudies = Arrays.asList(study);
+
+        for (SiteWrapper site : allSites) {
+            site.addStudies(allStudies);
+            site.persist();
+            site.reload();
+        }
+
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.newShipment(
@@ -122,6 +152,16 @@ public class TestDispatchShipment extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy(name);
         StudyWrapper study2 = StudyHelper.addStudy(name + "_study2");
+        List<StudyWrapper> allStudies = Arrays.asList(study, study2);
+
+        SiteWrapper[] allSites = new SiteWrapper[] { senderSite, senderSite2,
+            receiverSite, receiverSite2 };
+
+        for (SiteWrapper site : allSites) {
+            site.addStudies(allStudies);
+            site.persist();
+            site.reload();
+        }
 
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite,
             receiverSite2);
@@ -213,6 +253,16 @@ public class TestDispatchShipment extends TestDatabase {
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         StudyWrapper study = StudyHelper.addStudy(name);
+
+        SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
+        List<StudyWrapper> allStudies = Arrays.asList(study);
+
+        for (SiteWrapper site : allSites) {
+            site.addStudies(allStudies);
+            site.persist();
+            site.reload();
+        }
+
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         ShippingMethodWrapper method = ShippingMethodWrapper
@@ -241,6 +291,16 @@ public class TestDispatchShipment extends TestDatabase {
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         StudyWrapper study = StudyHelper.addStudy(name);
+
+        SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
+        List<StudyWrapper> allStudies = Arrays.asList(study);
+
+        for (SiteWrapper site : allSites) {
+            site.addStudies(allStudies);
+            site.persist();
+            site.reload();
+        }
+
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         ShippingMethodWrapper method = ShippingMethodWrapper
@@ -268,6 +328,16 @@ public class TestDispatchShipment extends TestDatabase {
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         StudyWrapper study = StudyHelper.addStudy(name);
+
+        SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
+        List<StudyWrapper> allStudies = Arrays.asList(study);
+
+        for (SiteWrapper site : allSites) {
+            site.addStudies(allStudies);
+            site.persist();
+            site.reload();
+        }
+
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
             senderSite, receiverSite, study, ShippingMethodWrapper
@@ -291,11 +361,21 @@ public class TestDispatchShipment extends TestDatabase {
     }
 
     @Test
-    public void testDetlete() throws Exception {
+    public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         StudyWrapper study = StudyHelper.addStudy(name);
+
+        SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
+        List<StudyWrapper> allStudies = Arrays.asList(study);
+
+        for (SiteWrapper site : allSites) {
+            site.addStudies(allStudies);
+            site.persist();
+            site.reload();
+        }
+
         DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchShipmentWrapper shipment = DispatchShipmentHelper.addShipment(
             senderSite, receiverSite, study, ShippingMethodWrapper
