@@ -67,13 +67,17 @@ public class BiobankApplicationServiceImpl extends
 
     private static final String ALL_SITES_PG_ID = "11";
 
+    private static final String SERVER_VERSION_PROP_FILE = "version.properties";
+
+    private static final String SERVER_VERSION_PROP_KEY = "server.version";
+
     private static Properties props;
 
     static {
         props = new Properties();
         try {
             props.load(BiobankApplicationServiceImpl.class
-                .getResourceAsStream("version.properties"));
+                .getResourceAsStream(SERVER_VERSION_PROP_FILE));
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
@@ -541,8 +545,28 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public void checkVersion(String version) throws ApplicationException {
-        if (!props.containsKey(version))
+    public void checkVersion(String clientVersion) throws ApplicationException {
+        if (clientVersion == null) {
+            log.error("client does not have a version");
+            throw new VersionIncompatibilityException(
+                "Client authentication failed. Your version is not compatible with the server and must be upgraded.");
+        }
+
+        String serverVersion = props.getProperty(SERVER_VERSION_PROP_KEY);
+        if (serverVersion == null) {
+            log.error("server does not have a version");
+            throw new VersionIncompatibilityException(
+                "Client authentication failed. The server version is not compatible with your client.");
+        }
+
+        log.info("check version: server_version/" + serverVersion
+            + " client_version/" + clientVersion);
+
+        String[] serverVersionArr = serverVersion.split("\\.");
+        String[] clientVersionArr = clientVersion.split("\\.");
+
+        if (!serverVersionArr[0].equals(clientVersionArr[0])
+            || !serverVersionArr[1].equals(clientVersionArr[1]))
             throw new VersionIncompatibilityException(
                 "Client authentication failed. Your version is not compatible with the server and must be upgraded.");
     }

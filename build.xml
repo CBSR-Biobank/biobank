@@ -330,6 +330,9 @@
     <fixcrlf srcdir="${eclipse.proj.dir.common}/META-INF" eol="lf" eof="asis" encoding="ISO-8859-1">
       <include name="**/*.MF" />
     </fixcrlf>
+    <propertyfile file="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/server/applicationservice/version.properties">
+      <entry key="server.version" value="${server.version.num}"/>
+    </propertyfile>
   </target>
   <target name="jboss.home.env">
     <fail unless="env.JBOSS_HOME" message="JBOSS_HOME environment variable not defined" />
