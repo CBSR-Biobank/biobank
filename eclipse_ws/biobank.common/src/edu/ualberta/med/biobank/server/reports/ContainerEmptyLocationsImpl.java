@@ -15,16 +15,14 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ContainerEmptyLocationsImpl extends AbstractReport {
 
-    private static final String QUERY =
-        "select c.container from "
-            + ContainerPath.class.getName()
-            + " c, "
-            + ContainerPath.class.getName()
-            + " parent where parent.id in ("
-            + CONTAINER_LIST
-            + ") and (c.path LIKE parent.path || '/%' OR c.id=parent.id) and c.container.label LIKE ?||'%' and c.container.containerType.sampleTypeCollection.size > 0 "
-            + "and (c.container.containerType.capacity.rowCapacity * c.container.containerType.capacity.colCapacity) > c.container.aliquotPositionCollection.size and c.container.site "
-            + SITE_OPERATOR + SITE_ID;
+    private static final String QUERY = "select c.container from "
+        + ContainerPath.class.getName()
+        + " c, "
+        + ContainerPath.class.getName()
+        + " parent where parent.id in ("
+        + CONTAINER_LIST
+        + ") and (c.path LIKE parent.path || '/%' OR c.id=parent.id) and c.container.label LIKE ?||'%' and c.container.containerType.sampleTypeCollection.size > 0 "
+        + "and (c.container.containerType.capacity.rowCapacity * c.container.containerType.capacity.colCapacity) > c.container.aliquotPositionCollection.size";
 
     public ContainerEmptyLocationsImpl(BiobankReport report) {
         super(QUERY, report);
@@ -35,8 +33,8 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
         List<Object> results) {
         List<Object> processedResults = new ArrayList<Object>();
         for (Object c : results) {
-            ContainerWrapper container =
-                new ContainerWrapper(appService, (Container) c);
+            ContainerWrapper container = new ContainerWrapper(appService,
+                (Container) c);
             try {
                 container.reload();
             } catch (Exception e) {

@@ -14,9 +14,7 @@ public class ContainerCapacityImpl extends AbstractReport {
         + " c where c.path=substr(path.path, 1, locate('/', path.path)-1)), "
         + "sum(path.container.containerType.capacity.rowCapacity * path.container.containerType.capacity.colCapacity), sum(path.container.aliquotPositionCollection.size) from "
         + ContainerPath.class.getName()
-        + " path where path.container.containerType.sampleTypeCollection.size > 0 and path.container.site "
-        + SITE_OPERATOR
-        + SITE_ID
+        + " path where path.container.containerType.sampleTypeCollection.size > 0 "
         + " group by substr(path.path, 1, locate('/', path.path)-1)";
 
     public ContainerCapacityImpl(BiobankReport report) {
