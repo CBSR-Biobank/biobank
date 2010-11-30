@@ -42,3 +42,5 @@ runtime-biobank2.biobank2
 runtime-biobank2.product/
 runtime-biobank2.product1/
 schema/schema-export.sql
+product/buildDirectory
+product/output.txt

@@ -27,7 +27,7 @@
          </property>
          <property
                name="aboutText"
-               value="BioBank2 Java Client&#x0A;Version {0}&#x0A;&#x0A;Devoped for the Canadian BioSample Repository by AICML .&#x0A;&#x0A;Canadian BioSample Repository: http://www.biosample.ca&#x0A;AICML: http://aicml.cs.ualberta.ca">
+               value="BioBank2 Java Client&#x0A;Version {0}&#x0A;&#x0A;Developed for the Canadian BioSample Repository by AICML .&#x0A;&#x0A;Canadian BioSample Repository: http://www.biosample.ca&#x0A;AICML: http://aicml.cs.ualberta.ca">
          </property>
          <property
                name="aboutImage"
@@ -2574,5 +2574,71 @@
          id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
          name="Samples Processing View">
    </context>  
+   </extension>
+    <extension
+         point="org.eclipse.ui.installationPages">
+          <page
+            name="%installedSoftwarePage"
+            class="org.eclipse.equinox.p2.ui.InstalledSoftwarePage"
+            id="10.edu.ualberta.med.biobank.InstalledSoftwarePage">
+          </page>
+          <page
+            name="%installHistoryPage"
+            class="org.eclipse.equinox.p2.ui.RevertProfilePage"
+            id="11.edu.ualberta.med.biobank.RevertProfilePage">
+          </page>
+          
+      </extension>
+       <extension
+         point="org.eclipse.ui.commands">
+      <command
+            name="%Update.command"
+            id="edu.ualberta.med.biobank.command.update">
+      </command>
+      <command
+            name="%Install.command"
+            id="edu.ualberta.med.biobank.command.install">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            commandId="edu.ualberta.med.biobank.command.update"
+            class="edu.ualberta.med.biobank.p2.UpdateHandler">
+      </handler>
+      <handler
+            commandId="edu.ualberta.med.biobank.command.install"
+            class="edu.ualberta.med.biobank.p2.InstallNewSoftwareHandler">
+      </handler>
+   </extension>
+     <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:help?after=additions">
+            <command
+                  commandId="edu.ualberta.med.biobank.command.update"
+            	  mnemonic="%Update.command.mnemonic"
+                  id="edu.ualberta.med.biobank.menu.update">
+            </command>
+            <separator
+                  name="edu.ualberta.med.biobank.menu.update.separator"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="org.eclipse.ui.help.aboutAction"
+                  label="%About.command"
+                  mnemonic="%About.command.mnemonic"
+                  style="push">
+            </command>
+                        
+      </menuContribution>
+      <menuContribution
+            locationURI="menu:help?after=edu.ualberta.med.biobank.menu.update">
+            <command
+                  commandId="edu.ualberta.med.biobank.command.install"
+            	  mnemonic="%Install.command.mnemonic"
+                  id="edu.ualberta.med.biobank.menu.install">
+            </command>
+      </menuContribution>
    </extension>
 </plugin>

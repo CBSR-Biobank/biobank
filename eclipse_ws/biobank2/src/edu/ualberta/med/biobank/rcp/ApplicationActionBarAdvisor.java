@@ -38,8 +38,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     public static final String SEND_ERROR_EMAIL_ID = "edu.ualberta.med.biobank.commands.sendErrorMail";
     public static final String EXPORT_ERRORS_LOGS_ID = "edu.ualberta.med.biobank.commands.exportErrorsLogs";
 
-    private IWorkbenchAction aboutAction;
-
     private IWorkbenchAction resetPerspectiveAction;
 
     public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
@@ -59,10 +57,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
             "Export a zip with useful logs data for developers");
 
         createShowErrorLogsAction(window);
-
-        // about action
-        aboutAction = ActionFactory.ABOUT.create(window);
-        register(aboutAction);
 
         resetPerspectiveAction = ActionFactory.RESET_PERSPECTIVE.create(window);
         register(resetPerspectiveAction);
@@ -140,6 +134,5 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
         }
         helpMenu.add(resetPerspectiveAction);
         helpMenu.add(new Separator());
-        helpMenu.add(aboutAction);
     }
 }
