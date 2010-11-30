@@ -5,6 +5,7 @@ import java.net.URI;
 import java.util.Collection;
 
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
+import org.eclipse.core.runtime.Platform;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -66,8 +67,10 @@ public class SessionHelper implements Runnable {
                 appService = ServiceConnection.getAppService(serverUrl,
                     userName, password);
             }
-            appService.checkVersion(BioBankPlugin.getDefault().getBundle()
-                .getVersion().toString());
+            String clientVersion = Platform.getProduct().getDefiningBundle()
+                .getVersion().toString();
+            clientVersion = "1.5.0";
+            appService.checkVersion(clientVersion);
             siteWrappers = SiteWrapper.getSites(appService);
             user = appService.getCurrentUser();
         } catch (ApplicationException exp) {

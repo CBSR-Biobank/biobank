@@ -104,14 +104,19 @@ public class SessionManager {
     private void rebuiltDispatch() {
         DispatchAdministrationView view = DispatchAdministrationView
             .getCurrent();
-        if (view != null)
-            view.createNodes();
+        if (view == null)
+            return;
+        view.createNodes();
     }
 
     public void deleteSession() throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
         rootNode.removeChild(sessionAdapter);
-        DispatchAdministrationView.getCurrent().clear();
+        DispatchAdministrationView view = DispatchAdministrationView
+            .getCurrent();
+        if (view != null) {
+            view.clear();
+        }
         sessionAdapter = null;
         updateMenus();
         ServiceConnection.logout(appService);
