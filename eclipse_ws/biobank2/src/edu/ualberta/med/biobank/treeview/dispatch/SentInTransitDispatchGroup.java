@@ -16,6 +16,6 @@ public class SentInTransitDispatchGroup extends AbstractDispatchGroup {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return SiteWrapper.getInTransitReceiveDispatchCollection(site);
+        return SiteWrapper.getInTransitSentDispatchCollection(site);
     }
 }

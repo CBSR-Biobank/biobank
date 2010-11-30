@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 
 import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
@@ -72,31 +70,30 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
-        try {
-            sites = SiteWrapper.getSites(SessionManager.getAppService());
-        } catch (Exception e1) {
-            BioBankPlugin.openAsyncError("Failed to retrieve sites", e1);
-        }
-        return sites.contains(getWrapper().getSender())
-            && getWrapper().canDelete(SessionManager.getUser())
-            && getWrapper().isInCreationState();
+        if (getSiteParent() != null)
+            return getSiteParent().equals(getWrapper().getSender())
+                && getWrapper().canDelete(SessionManager.getUser())
+                && getWrapper().isInCreationState();
+        else
+            return false;
+    }
+
+    private SiteWrapper getSiteParent() {
+        if (getParent().getParent().getParent() != null)
+            return (SiteWrapper) getParent().getParent().getParent()
+                .getModelObject();
+        return null;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        SiteWrapper siteParent = getSiteParent();
         addViewMenu(menu, "Dispatch");
-        List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
-        try {
-            sites = SiteWrapper.getSites(SessionManager.getAppService());
-        } catch (Exception e1) {
-            BioBankPlugin.openAsyncError("Failed to retrieve sites", e1);
-        }
         try {
             if (isDeletable()) {
                 addDeleteMenu(menu, "Dispatch");
             }
-            if (sites.contains(getWrapper().getSender())
+            if (siteParent.equals(getWrapper().getSender())
                 && getWrapper().canUpdate(SessionManager.getUser())
                 && getWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -108,7 +105,8 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
             }
-            if (getWrapper().isInTransitState()
+            if (siteParent.equals(getWrapper().getReceiver())
+                && getWrapper().isInTransitState()
                 && getWrapper().canBeReceivedBy(SessionManager.getUser())) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText("Receive");

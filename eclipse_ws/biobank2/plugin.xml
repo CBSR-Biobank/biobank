@@ -979,7 +979,7 @@
                   style="push">
             </command>
             <separator
-                  name="biobank2.separator1"
+                  name="biobank2.separator3"
                   visible="true">
             </separator>
             <command
@@ -1047,18 +1047,6 @@
                icon="icons/patientPerspective.png"
                label="Processing View"
                style="push">
-            </command>
-            <command
-               commandId="edu.ualberta.med.biobank.commands.patientAdmin"
-               icon="icons/patientPerspective.png"
-               label="Patients/Samples View"
-               style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatchAdmin"
-                  icon="icons/dispatch.png"
-                  label="Dispatch Shipment View"
-                  style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.reports"
