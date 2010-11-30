@@ -104,7 +104,8 @@ public class SessionManager {
     private void rebuiltDispatch() {
         DispatchAdministrationView view = DispatchAdministrationView
             .getCurrent();
-        view.createNodes();
+        if (view != null)
+            view.createNodes();
     }
 
     public void deleteSession() throws Exception {
