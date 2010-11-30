@@ -14,7 +14,10 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.server.applicationservice.VersionIncompatibilityException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ClientVersionInvalidException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionInvalidException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionNewerException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionOlderException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionHelper implements Runnable {
@@ -69,16 +72,21 @@ public class SessionHelper implements Runnable {
             }
             String clientVersion = Platform.getProduct().getDefiningBundle()
                 .getVersion().toString();
-            clientVersion = "1.5.0";
+            clientVersion = "1.3.0";
             appService.checkVersion(clientVersion);
             siteWrappers = SiteWrapper.getSites(appService);
             user = appService.getCurrentUser();
         } catch (ApplicationException exp) {
-            if (exp instanceof VersionIncompatibilityException) {
-                if (BioBankPlugin
-                    .openConfirm(
-                        "Update required",
-                        "Your client is not compatible with this server. Would you like to download the latest version?")) {
+            if (exp instanceof ServerVersionInvalidException) {
+                BioBankPlugin
+                    .openInformation(
+                        "Server Version Error",
+                        "The server you are connecting to does not have a version. Cannot authenticate.");
+                logger.error("Error while logging to application", exp);
+            } else if (exp instanceof ServerVersionNewerException) {
+                if (BioBankPlugin.openConfirm("Server Version Error",
+                    "Cannot connect to this server because the Java Client version is too old.\n"
+                        + "Would you like to download the latest version?")) {
                     try {
                         Desktop.getDesktop().browse(new URI(DOWNLOAD_URL));
                     } catch (Exception e1) {
@@ -86,6 +94,16 @@ public class SessionHelper implements Runnable {
                     }
                     logger.error("Error while logging to application", exp);
                 }
+            } else if (exp instanceof ServerVersionOlderException) {
+                BioBankPlugin
+                    .openInformation("Server Version Error",
+                        "Cannot connect to this server because the Java Client version is too new.");
+                logger.error("Error while logging to application", exp);
+            } else if (exp instanceof ClientVersionInvalidException) {
+                BioBankPlugin
+                    .openInformation("Client Version Error",
+                        "Cannot connect to this server because the Java Client version is invalid.");
+                logger.error("Error while logging to application", exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
                 BioBankPlugin
