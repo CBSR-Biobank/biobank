@@ -124,7 +124,7 @@ public class FilterSelectWidget extends Composite {
         layout.marginBottom = 15;
         setLayout(layout);
 
-        GridData layoutData = new GridData();
+        GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.minimumHeight = 0;
         setLayoutData(layoutData);
@@ -150,7 +150,7 @@ public class FilterSelectWidget extends Composite {
         layout.marginHeight = 0;
         container.setLayout(layout);
 
-        GridData layoutData = new GridData();
+        GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.minimumHeight = 0;
         layoutData.horizontalIndent = 0;

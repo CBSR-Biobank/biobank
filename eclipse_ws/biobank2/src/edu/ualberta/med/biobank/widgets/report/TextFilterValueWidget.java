@@ -17,15 +17,16 @@ public class TextFilterValueWidget implements FilterValueWidget {
 
     public TextFilterValueWidget(Composite parent) {
         text = new Text(parent, SWT.BORDER);
+        text.setToolTipText("For string values, use '%' as a wildcard character");
     }
 
     @Override
     public Collection<ReportFilterValue> getValues() {
         Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
-        if (!text.isDisposed()) {
+        if (!text.isDisposed() && text.getText() != null) {
             ReportFilterValue value = new ReportFilterValue();
             value.setPosition(0);
-            value.setValue(text.getText());
+            value.setValue(text.getText().trim());
             values.add(value);
         }
         return values;
@@ -34,6 +35,7 @@ public class TextFilterValueWidget implements FilterValueWidget {
     @Override
     public void setValues(Collection<ReportFilterValue> values) {
         if (!text.isDisposed()) {
+            text.setText("");
             for (ReportFilterValue value : values) {
                 text.setText(value.getValue());
                 break;

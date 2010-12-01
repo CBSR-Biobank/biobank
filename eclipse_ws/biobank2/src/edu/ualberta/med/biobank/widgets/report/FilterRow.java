@@ -18,6 +18,7 @@ import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -26,6 +27,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
@@ -46,7 +48,7 @@ class FilterRow extends Composite {
     private final EntityFilter filter;
     private Composite container;
     private Composite inputContainer;
-    private Button checkbox;
+    private Button checkbox, autoButton;
     private ComboViewer operators;
     private FilterValueWidget filterValueWidget;
     private Collection<String> suggestions;
@@ -79,9 +81,9 @@ class FilterRow extends Composite {
 
     public Collection<ReportFilterValue> getValues() {
         if (filterValueWidget != null) {
-            return filterValueWidget.getValues();
+            return new HashSet<ReportFilterValue>(filterValueWidget.getValues());
         }
-        return Arrays.asList();
+        return new HashSet<ReportFilterValue>();
     }
 
     public void setValues(Collection<ReportFilterValue> values) {
@@ -98,7 +100,7 @@ class FilterRow extends Composite {
         layout.marginHeight = 0;
         setLayout(layout);
 
-        GridData layoutData = new GridData();
+        GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
         layoutData.grabExcessHorizontalSpace = true;
         setLayoutData(layoutData);
     }
@@ -111,7 +113,7 @@ class FilterRow extends Composite {
         layout.marginWidth = 0;
         layout.marginHeight = 2;
         container.setLayout(layout);
-        GridData layoutData = new GridData();
+        GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.verticalAlignment = SWT.TOP;
         container.setLayoutData(layoutData);
@@ -123,7 +125,6 @@ class FilterRow extends Composite {
         GridData layoutData = new GridData();
         layoutData.widthHint = 225;
         layoutData.minimumWidth = 225;
-        layoutData.grabExcessHorizontalSpace = true;
         layoutData.verticalAlignment = SWT.TOP;
         layoutData.verticalIndent = 3;
         checkbox.setLayoutData(layoutData);
@@ -207,7 +208,7 @@ class FilterRow extends Composite {
         layout.marginWidth = 0;
         layout.marginHeight = 0;
         inputContainer.setLayout(layout);
-        GridData layoutData = new GridData();
+        GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
         layoutData.grabExcessHorizontalSpace = true;
         layoutData.verticalAlignment = SWT.TOP;
         inputContainer.setLayoutData(layoutData);
@@ -239,17 +240,28 @@ class FilterRow extends Composite {
         // create and use a set-widget (see Nebula's TableCombo for a
         // candidate).
 
-        result = createSimpleFilterValueWidget();
-
         FilterOperator op = getOperator();
-        if (EnumSet.of(FilterOperator.BETWEEN, FilterOperator.NOT_BETWEEN)
-            .contains(op)) {
-            result = new BetweenFilterValueWidget(inputContainer, result,
-                createSimpleFilterValueWidget());
-        }
 
-        if (op.isSetOperator()) {
-            result = new SetFilterValueWidget(inputContainer, result);
+        if (op.isValueRequired()) {
+            result = createSimpleFilterValueWidget();
+
+            if (EnumSet.of(FilterOperator.BETWEEN, FilterOperator.NOT_BETWEEN)
+                .contains(op)) {
+                result = new BetweenFilterValueWidget(inputContainer, result,
+                    createSimpleFilterValueWidget());
+            }
+
+            if (op.isSetOperator()) {
+                SetFilterValueWidget set;
+                set = new SetFilterValueWidget(inputContainer, result);
+
+                if (filterValueWidget == null) {
+                    // first time the widget is created, go into ViewMode
+                    set.setMode(SetFilterValueWidget.Mode.ViewMode);
+                }
+
+                result = set;
+            }
         }
 
         return result;
@@ -261,15 +273,12 @@ class FilterRow extends Composite {
         disposeInputContainer();
         createInputContainer();
 
-        filterValueWidget = null;
+        filterValueWidget = createFilterValueWidget();
 
-        FilterOperator op = getOperator();
-
-        if (!op.isValueRequired()) {
+        if (filterValueWidget == null) {
             return;
         }
 
-        filterValueWidget = createFilterValueWidget();
         filterValueWidget.addChangeListener(new ChangeListener<Object>() {
             @Override
             public void handleEvent(Object event) {
@@ -279,7 +288,9 @@ class FilterRow extends Composite {
 
         Control control = filterValueWidget.getControl();
         if (control != null) {
-            control.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+            GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
+            layoutData.grabExcessHorizontalSpace = true;
+            control.setLayoutData(layoutData);
         }
 
         // try to reset the old values
@@ -290,18 +301,30 @@ class FilterRow extends Composite {
     }
 
     private void createAutoSuggest(Composite parent) {
-        Button button = new Button(parent, SWT.NONE);
+        autoButton = new Button(parent, SWT.NONE);
         GridData layoutData = new GridData();
         layoutData.verticalAlignment = SWT.TOP;
-        button.setLayoutData(layoutData);
+        autoButton.setLayoutData(layoutData);
 
-        // TODO: replace with icon?
-        button.setText("Suggest");
-        button.addListener(SWT.Selection, new Listener() {
+        autoButton.setToolTipText("Suggest possible values");
+        autoButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_WAND));
+        autoButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                autoSuggest();
-                filtersWidget.notifyListeners(new FilterChangeEvent(filter));
+
+                autoButton.setEnabled(false);
+
+                BusyIndicator.showWhile(autoButton.getDisplay(),
+                    new Runnable() {
+                        @Override
+                        public void run() {
+                            autoSuggest();
+                            autoButton.setEnabled(true);
+                            filtersWidget
+                                .notifyListeners(new FilterChangeEvent(filter));
+                        }
+                    });
             }
         });
     }
@@ -343,8 +366,11 @@ class FilterRow extends Composite {
             // TODO: display monitor when loading suggestions
             results = SessionManager.getAppService().runReport(report);
         } catch (ApplicationException e) {
-            // TODO: appropriate error message
-            e.printStackTrace();
+            BioBankPlugin
+                .openError(
+                    "There are either too many possible suggestions to display or it is taking too long to find suggestions.",
+                    e);
+            return;
         }
 
         List<String> suggestions = new ArrayList<String>();

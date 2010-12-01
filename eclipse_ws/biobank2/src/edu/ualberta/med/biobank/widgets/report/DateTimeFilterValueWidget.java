@@ -41,15 +41,18 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
 
     @Override
     public void setValues(Collection<ReportFilterValue> values) {
-        for (ReportFilterValue value : values) {
-            if (!dateTime.isDisposed() && value != null) {
-                try {
-                    Date date = SQL_DATE_FORMAT.parse(value.getValue());
-                    dateTime.setDate(date);
-                } catch (ParseException e) {
+        if (!dateTime.isDisposed()) {
+            dateTime.setDate(null);
+            for (ReportFilterValue value : values) {
+                if (!dateTime.isDisposed() && value != null) {
+                    try {
+                        Date date = SQL_DATE_FORMAT.parse(value.getValue());
+                        dateTime.setDate(date);
+                    } catch (ParseException e) {
+                    }
                 }
+                break;
             }
-            break;
         }
     }
 
