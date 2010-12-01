@@ -710,10 +710,20 @@
   </target>
 
   <target name="product">
-    <java classpath="${env.ECLIPSE_HOME}/plugins/org.eclipse.equinox.launcher_1.1.0.v20100507.jar" classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
+  	 <property name="product.dir" location="${basedir}/product" />
+    <java classpath="${env.ECLIPSE_HOME}/plugins/org.eclipse.equinox.launcher_1.1.0.v20100507.jar" 
+    	classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
       <arg line="-application org.eclipse.ant.core.antRunner"/>
       <arg line="-buildfile ${env.ECLIPSE_HOME}/plugins/org.eclipse.pde.build_3.6.0.v20100603/scripts/productBuild/productBuild.xml"/>
-      <arg line="-Dbuilder=${basedir}/product/"/>
+      <arg line="-Dbuilder=${product.dir}"/>
+      <!-- projectsPath is used in product/customTarget.xml -->    	
+      <arg line="-DprojectsPath=${eclipse.workspace.dir}"/>
+      <!-- instead of fixed paths in product/build.properties: -->
+      <arg line="-Dproduct=${eclipse.proj.dir}/biobank2.product"/>
+      <arg line="-DbuildDirectory=${product.dir}/buildDirectory"/>
+      <arg line="-DbaseLocation=${env.ECLIPSE_HOME}"/>
+      <arg line="-Djava.client.version.num=${java.client.version.num}"/>
     </java>
   </target>
+
 </project>

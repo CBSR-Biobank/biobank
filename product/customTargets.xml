@@ -64,8 +64,6 @@
 	<!-- Steps to do before setup -->
 	<!-- ===================================================================== -->
 	<target name="preSetup">
-		<property name="projectsPath" value="/home/delphine/projects/biobank2/eclipse_ws/"/>
-		    			
 		<delete dir="${buildDirectory}"/>
 				
 		<copy todir="${buildDirectory}/plugins/biobank2">
@@ -79,6 +77,10 @@
 		<copy todir="${buildDirectory}/plugins/biobank.common">
 			<fileset dir="${projectsPath}/biobank.common"/>
 		</copy>  	
+
+		<copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
+			<fileset dir="${projectsPath}/sampleProcessingRobot"/>
+		</copy>  
 
 		<copy todir="${buildDirectory}/features/biobank2.feature.core">
 			<fileset dir="${projectsPath}/biobank2.feature.core"/>
