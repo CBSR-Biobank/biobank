@@ -233,7 +233,7 @@ class FilterRow extends Composite {
         return result;
     }
 
-    private FilterValueWidget createFilterValueWidget() {
+    private FilterValueWidget createFilterValueWidget(boolean isEditMode) {
         FilterValueWidget result = null;
 
         // TODO: for now, use comma-delimited values. In the future can
@@ -255,9 +255,9 @@ class FilterRow extends Composite {
                 SetFilterValueWidget set;
                 set = new SetFilterValueWidget(inputContainer, result);
 
-                if (filterValueWidget == null) {
+                if (isEditMode) {
                     // first time the widget is created, go into ViewMode
-                    set.setMode(SetFilterValueWidget.Mode.ViewMode);
+                    set.setMode(SetFilterValueWidget.Mode.EditMode);
                 }
 
                 result = set;
@@ -268,12 +268,16 @@ class FilterRow extends Composite {
     }
 
     private void createInputs() {
+        createInputs(false);
+    }
+
+    private void createInputs(boolean isEditMode) {
         Collection<ReportFilterValue> oldValues = getValues();
 
         disposeInputContainer();
         createInputContainer();
 
-        filterValueWidget = createFilterValueWidget();
+        filterValueWidget = createFilterValueWidget(isEditMode);
 
         if (filterValueWidget == null) {
             return;
@@ -392,6 +396,6 @@ class FilterRow extends Composite {
 
         this.suggestions = suggestions;
 
-        createInputs();
+        createInputs(true);
     }
 }

@@ -152,7 +152,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
         setGridData(viewModeControls);
         setGridData(editModeControls);
 
-        setMode(Mode.EditMode);
+        setMode(Mode.ViewMode);
     }
 
     public Mode getMode() {
@@ -191,6 +191,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
         ListViewer listViewer = editModeControls.getListViewer();
         listViewer.remove(getValues().toArray());
         listViewer.add(values.toArray());
+
+        viewModeControls.updateViewText();
     }
 
     @Override
