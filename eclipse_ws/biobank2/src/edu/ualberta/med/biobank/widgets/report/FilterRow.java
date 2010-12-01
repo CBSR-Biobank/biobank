@@ -284,6 +284,7 @@ class FilterRow extends Composite {
         filterValueWidget = createFilterValueWidget(isEditMode);
 
         if (filterValueWidget == null) {
+            disposeInputContainer();
             return;
         }
 
