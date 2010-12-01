@@ -74,7 +74,7 @@ public class SampleTypePvCountTest extends AbstractReportTest {
             allAliquots, PredicateUtil.andPredicate(
                 ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER,
                 aliquotStudyNameShortLike(studyNameShort),
-                aliquotSite(isInSite(), getSiteId())));
+                aliquotSite(isInSite(), getSiteId()), ALIQUOT_HAS_POSITION));
 
         Map<List<Object>, Long> groupedData = MapperUtil.map(filteredAliquots,
             GROUP_BY_PV_AND_SAMPLE_TYPE);

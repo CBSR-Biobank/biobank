@@ -35,12 +35,10 @@ public class AliquotsByPalletTest extends AbstractReportTest {
         final String topContainers = getReport().getContainerList();
 
         Collection<AliquotWrapper> allAliquots = getAliquots();
-        @SuppressWarnings("unchecked")
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 aliquotInContainerLabelled(containerLabel),
-                aliquotTopContainerIdIn(topContainers),
-                aliquotSite(isInSite(), getSiteId())));
+                aliquotTopContainerIdIn(topContainers)));
 
         List<Object> expectedResults = new ArrayList<Object>();
 
