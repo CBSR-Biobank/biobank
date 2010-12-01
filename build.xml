@@ -627,6 +627,7 @@
           <exclude name="**/TestCommon.java" />
           <exclude name="**/TestDatabase.java" />
           <exclude name="**/TestFunctionalities.java" />
+          <exclude name="**/TestReportsOnExistingData.java" />
           <exclude name="**/AllTests.java" />
         </fileset>
         <formatter type="xml" />
