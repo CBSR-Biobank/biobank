@@ -252,7 +252,11 @@ public class ReportEntryForm extends BiobankEntryForm {
         Label label = new Label(container, SWT.NONE);
         label.setText("Add filter:");
 
+        GridData comboLayoutData = new GridData();
+        comboLayoutData.widthHint = 200;
+
         filterCombo = new ComboViewer(container, SWT.READ_ONLY);
+        filterCombo.getControl().setLayoutData(comboLayoutData);
         filterCombo.setSorter(new ViewerSorter());
         filterCombo.setLabelProvider(new LabelProvider() {
             @Override

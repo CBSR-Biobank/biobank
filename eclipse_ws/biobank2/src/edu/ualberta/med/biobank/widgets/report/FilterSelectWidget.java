@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.model.ReportFilter;
 
 public class FilterSelectWidget extends Composite {
     private final ReportWrapper report;
-    private final Map<EntityFilter, FilterRow> filterRowMap = new LinkedHashMap<EntityFilter, FilterRow>();
+    private final Map<Integer, FilterRow> filterRowMap = new LinkedHashMap<Integer, FilterRow>();
     private final Collection<ChangeListener<FilterChangeEvent>> listeners = new ArrayList<ChangeListener<FilterChangeEvent>>();
     private Composite container;
 
@@ -50,9 +50,8 @@ public class FilterSelectWidget extends Composite {
         Collection<ReportFilter> rfs = new HashSet<ReportFilter>();
 
         int filterPosition = 0;
-        for (Map.Entry<EntityFilter, FilterRow> entry : filterRowMap.entrySet()) {
-            EntityFilter entityFilter = entry.getKey();
-            FilterRow filterRow = entry.getValue();
+        for (FilterRow filterRow : filterRowMap.values()) {
+            EntityFilter entityFilter = filterRow.getEntityFilter();
 
             ReportFilter reportFilter = new ReportFilter();
             reportFilter.setPosition(filterPosition);
@@ -90,23 +89,25 @@ public class FilterSelectWidget extends Composite {
     }
 
     public FilterRow getFilterRow(EntityFilter entityFilter) {
-        return filterRowMap.get(entityFilter);
+        return filterRowMap.get(entityFilter.getId());
     }
 
     public FilterRow addFilterRow(EntityFilter entityFilter) {
         FilterRow filterRow = null;
-        if (!filterRowMap.containsKey(entityFilter)) {
+        Integer id = entityFilter.getId();
+        if (!filterRowMap.containsKey(id)) {
             showContainer(true);
             filterRow = new FilterRow(this, container, SWT.NONE, entityFilter);
-            filterRowMap.put(entityFilter, filterRow);
+            filterRowMap.put(id, filterRow);
         }
         return filterRow;
     }
 
     void removeFilterRow(EntityFilter entityFilter) {
-        FilterRow filterRow = filterRowMap.get(entityFilter);
+        Integer id = entityFilter.getId();
+        FilterRow filterRow = filterRowMap.get(id);
         if (filterRow != null) {
-            filterRowMap.remove(entityFilter);
+            filterRowMap.remove(id);
             filterRow.dispose();
 
             if (filterRowMap.isEmpty()) {

@@ -92,6 +92,10 @@ class FilterRow extends Composite {
         }
     }
 
+    public EntityFilter getEntityFilter() {
+        return filter;
+    }
+
     private void init() {
         GridLayout layout = new GridLayout(1, false);
         layout.horizontalSpacing = 0;
