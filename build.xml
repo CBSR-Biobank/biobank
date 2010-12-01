@@ -600,13 +600,14 @@
       </fileset>
     </copy>
     <javac srcdir="${eclipse.proj.dir.common}/src"
-           destdir="${dest.dir.classes}" debug="true" debuglevel="lines,source">
+           destdir="${dest.dir.classes}" debug="true" debuglevel="lines,source"
+           includeantruntime="false">
       <classpath refid="common.lib.class.path" />
     </javac>
   </target>
   <target name="tests-compile" depends="common-compile">
     <javac srcdir="${eclipse.proj.dir.junit}/src" destdir="${dest.dir.classes}"
-           debug="true" debuglevel="lines,source">
+           debug="true" debuglevel="lines,source" includeantruntime="false">
       <classpath refid="common.class.path" />
       <classpath refid="junit.class.path" />
     </javac>
