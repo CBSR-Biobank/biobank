@@ -1680,7 +1680,7 @@ public class TestContainer extends TestDatabase {
      * @throws Exception
      */
     @Test
-    public void testMoveRenamingSubbChildren() throws Exception {
+    public void testMoveRenamingSubChildren() throws Exception {
         ContainerWrapper top = containerMap.get("Top");
 
         ContainerWrapper child =
