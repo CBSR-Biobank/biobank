@@ -29,7 +29,7 @@ public class DateTimeWidget extends BiobankWidget {
     private Listener dataEntryModifyListener = new Listener() {
         @Override
         public void handleEvent(Event event) {
-            if (event.type == SWT.Modify) {
+            if (event.type == SWT.Modify || event.type == SWT.Selection) {
                 fireModifyListeners();
             }
         }
@@ -64,6 +64,7 @@ public class DateTimeWidget extends BiobankWidget {
             dateEntry.setPattern(DateFormatter.DATE_FORMAT);
 
         dateEntry.addListener(SWT.Modify, dataEntryModifyListener);
+        dateEntry.addListener(SWT.Selection, dataEntryModifyListener);
 
         gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
