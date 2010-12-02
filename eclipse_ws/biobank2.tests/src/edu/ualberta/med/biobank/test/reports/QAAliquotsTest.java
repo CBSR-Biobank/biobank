@@ -81,7 +81,6 @@ public class QAAliquotsTest extends AbstractReportTest {
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 aliquotPvProcessedBetween(after, before),
-                aliquotSite(isInSite(), getSiteId()),
                 aliquotTopContainerIdIn(topContainerIdList),
                 aliquotSampleTypeNameShortLike(sampleTypeNameShort)));
 
