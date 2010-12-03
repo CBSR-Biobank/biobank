@@ -155,8 +155,11 @@ public class ReportEntryForm extends BiobankEntryForm {
             public void handleEvent(Event event) {
                 System.out.println("12312123");
                 try {
+                    // update the model before running
                     report.getWrappedObject().setReportFilterCollection(
                         filtersWidget.getReportFilters());
+                    report.getWrappedObject().setReportColumnCollection(
+                        columnsWidget.getReportColumnCollection());
 
                     List<Object> results = SessionManager.getAppService()
                         .runReport(report.getWrappedObject());

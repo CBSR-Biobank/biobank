@@ -9,16 +9,20 @@ import java.util.List;
 import java.util.Set;
 
 import org.hibernate.Criteria;
+import org.hibernate.Hibernate;
 import org.hibernate.Session;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.type.Type;
 
+import edu.ualberta.med.biobank.common.reports.ReportsUtil;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityFilter;
+import edu.ualberta.med.biobank.model.PropertyModifier;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
@@ -26,6 +30,7 @@ import edu.ualberta.med.biobank.model.ReportFilter;
 public class ReportRunner {
     private static final String PROPERTY_DELIMITER = ".";
     private static final String ALIAS_DELIMITER = "-";
+    private static final String PROPERTY_VALUE_TOKEN = "{value}";
     private static final String MODIFIED_PROPERTY_ALIAS = "_modifiedPropertyAlias";
     private static final Comparator<ReportColumn> COMPARE_REPORT_COLUMN_POSITION = new Comparator<ReportColumn>() {
         @Override
@@ -82,35 +87,32 @@ public class ReportRunner {
         ProjectionList pList = Projections.projectionList();
 
         int colNum = 1;
-        for (ReportColumn col : getOrderedReportColumns()) {
-            String path = col.getEntityColumn().getEntityProperty()
+        for (ReportColumn reportColumn : getOrderedReportColumns()) {
+            String path = reportColumn.getEntityColumn().getEntityProperty()
                 .getProperty();
             String aliasedProperty = getAliasedProperty(path);
 
             Projection projection = null;
-            if (col.getPropertyModifier() != null) {
-                // // TODO: resupport property modifiers.
-                //
-                // String sqlColumn = ReportsUtil.getSqlColumn(criteria,
-                // aliasedProperty);
-                // String modifiedProperty =
-                // col.getPropertyModifier().modifyPath(
-                // sqlColumn);
-                //
-                // Messages.format(col.getPropertyModifier(), arg1)
-                //
-                // String sqlAlias = MODIFIED_PROPERTY_ALIAS + colNum;
-                //
-                // if (report.getIsCount()) {
-                // projection = Projections.sqlGroupProjection(
-                // modifiedProperty + " as " + sqlAlias, sqlAlias,
-                // new String[] { sqlAlias },
-                // new Type[] { Hibernate.STRING });
-                // } else {
-                // projection = Projections.sqlProjection(modifiedProperty
-                // + " as " + sqlAlias, new String[] { sqlAlias },
-                // new Type[] { Hibernate.STRING });
-                // }
+            PropertyModifier propertyModifier = reportColumn
+                .getPropertyModifier();
+            if (propertyModifier != null) {
+                String sqlColumn = ReportsUtil.getSqlColumn(criteria,
+                    aliasedProperty);
+                String modifier = propertyModifier.getPropertyModifier();
+                String modifiedProperty = modifier.replace(
+                    PROPERTY_VALUE_TOKEN, sqlColumn);
+                String sqlAlias = MODIFIED_PROPERTY_ALIAS + colNum;
+
+                if (report.getIsCount()) {
+                    projection = Projections.sqlGroupProjection(
+                        modifiedProperty + " as " + sqlAlias, sqlAlias,
+                        new String[] { sqlAlias },
+                        new Type[] { Hibernate.STRING });
+                } else {
+                    projection = Projections.sqlProjection(modifiedProperty
+                        + " as " + sqlAlias, new String[] { sqlAlias },
+                        new Type[] { Hibernate.STRING });
+                }
             } else {
                 if (report.getIsCount()) {
                     projection = Projections.groupProperty(aliasedProperty);
