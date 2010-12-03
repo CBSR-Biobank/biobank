@@ -48,6 +48,7 @@ public class ReportEntryForm extends BiobankEntryForm {
     };
 
     private FilterSelectWidget filtersWidget;
+    private ColumnSelectWidget columnsWidget;
     private ReportAdapter reportAdapter;
     private ReportWrapper report;
 
@@ -60,17 +61,17 @@ public class ReportEntryForm extends BiobankEntryForm {
         form.getDisplay().syncExec(new Runnable() {
             @Override
             public void run() {
-                // pull the ReportFilter-s from the GUI before saving
+                // update the model before saving
                 report.getWrappedObject().setReportFilterCollection(
                     filtersWidget.getReportFilters());
+                report.getWrappedObject().setReportColumnCollection(
+                    columnsWidget.getReportColumnCollection());
             }
         });
 
         report.persist();
         reportAdapter.getParent().performExpand();
     }
-
-    // TODO: arrange methods from most to least accessible
 
     @Override
     protected String getOkMessage() {
@@ -221,10 +222,6 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private void createFilterCombo(Composite parent) {
-
-        // TODO: should put combo "above" filters, not to their right, so if
-        // filters expand, then the combo can go ontop, otherwise float top
-        // right (think css "float: right").
         Composite container = toolkit.createComposite(parent);
 
         GridLayout layout = new GridLayout(2, false);
@@ -300,11 +297,13 @@ public class ReportEntryForm extends BiobankEntryForm {
             "Show count\r\n(for displayed columns)", null, report, "isCount",
             null);
 
+        GridData layoutData = new GridData();
+        layoutData.widthHint = 225;
         Label columnsLabel = new Label(options, SWT.NONE);
         columnsLabel.setText("Columns:");
+        columnsLabel.setLayoutData(layoutData);
 
-        ColumnSelectWidget csw = new ColumnSelectWidget(options, SWT.NONE,
-            report);
+        columnsWidget = new ColumnSelectWidget(options, SWT.NONE, report);
 
         section.setClient(options);
     }

@@ -4,8 +4,12 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
 import org.eclipse.jface.viewers.ISelection;
@@ -27,6 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeItem;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
@@ -40,8 +45,14 @@ public class ColumnSelectWidget extends Composite {
     private static final LabelProvider DISPLAYED_COLUMNS_LABEL_PROVIDER = new DisplayedColumnsLabelProvider();
     private static final LabelProvider AVAILABLE_COLUMNS_LABEL_PROVIDER = new AvailableColumnsLabelProvider();
     private static final ITreeContentProvider AVAILABLE_COLUMNS_TREE_CONTENT_PROVIDER = new AvailableColumnsTreeContentProvider();
-    private static final Object AVAILABLE_COLUMNS_ROOT_OBJECT = new String(
-        "root");
+    private static final Object AVAILABLE_COLUMNS_ROOT_OBJECT = "root";
+    private static final Comparator<ReportColumnWrapper> REPORT_COLUMN_WRAPER_COMPARTOR = new Comparator<ReportColumnWrapper>() {
+        @Override
+        public int compare(ReportColumnWrapper rcw1, ReportColumnWrapper rcw2) {
+            return rcw1.getReportColumn().getPosition()
+                .compareTo(rcw2.getReportColumn().getPosition());
+        }
+    };
 
     // @see
     // http://blog.subshell.com/devblog/2010/09/eclipse-rcp-using-a-tableviewer-with-comboboxes.html
@@ -70,6 +81,16 @@ public class ColumnSelectWidget extends Composite {
                     }
                 }
             });
+    }
+
+    public Collection<ReportColumn> getReportColumnCollection() {
+        Collection<ReportColumn> result = new ArrayList<ReportColumn>();
+
+        for (ReportColumnWrapper wrapper : getDisplayedColumns()) {
+            result.add(wrapper.getReportColumn());
+        }
+
+        return result;
     }
 
     private void init() {
@@ -203,6 +224,101 @@ public class ColumnSelectWidget extends Composite {
 
         upButton = createButton(subContainer, BioBankPlugin.IMG_UP);
         downButton = createButton(subContainer, BioBankPlugin.IMG_DOWN);
+
+        upButton.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                moveDisplayedColumns(-1);
+            }
+        });
+
+        downButton.addListener(SWT.Selection, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                moveDisplayedColumns(1);
+            }
+        });
+    }
+
+    private List<ReportColumnWrapper> getSelectedDisplayColumns() {
+        List<ReportColumnWrapper> selected = new ArrayList<ReportColumnWrapper>();
+
+        ISelection selection = displayed.getSelection();
+        if (selection instanceof IStructuredSelection) {
+            IStructuredSelection structuredSelection = (IStructuredSelection) selection;
+            Iterator<?> it = structuredSelection.iterator();
+            while (it.hasNext()) {
+                Object o = it.next();
+                if (o instanceof ReportColumnWrapper) {
+                    selected.add((ReportColumnWrapper) o);
+                }
+            }
+        }
+
+        Collections.sort(selected, REPORT_COLUMN_WRAPER_COMPARTOR);
+
+        return selected;
+    }
+
+    private List<ReportColumnWrapper> getDisplayedColumns() {
+        List<ReportColumnWrapper> displayedColumns = new ArrayList<ReportColumnWrapper>();
+        int numItems = displayed.getTable().getItemCount();
+        for (int i = 0; i < numItems; i++) {
+            ReportColumnWrapper wrapper = (ReportColumnWrapper) displayed
+                .getElementAt(i);
+            displayedColumns.add(wrapper);
+        }
+
+        Collections.sort(displayedColumns, REPORT_COLUMN_WRAPER_COMPARTOR);
+
+        return displayedColumns;
+    }
+
+    private void moveDisplayedColumns(int reqDisp) {
+        List<ReportColumnWrapper> selected = getSelectedDisplayColumns();
+        List<ReportColumnWrapper> all = getDisplayedColumns();
+
+        if (reqDisp == 0 || selected.isEmpty()) {
+            return;
+        }
+
+        int numItems = all.size();
+        int numSelected = selected.size();
+
+        ReportColumnWrapper[] newPositions = new ReportColumnWrapper[numItems];
+
+        // give the selected items first priority
+        for (int i = 0; i < numSelected; i++) {
+            int oldPosition = selected.get(i).getReportColumn().getPosition();
+            int newPosition = 0;
+            if (reqDisp > 0) {
+                // moving down
+                newPosition = Math.min(oldPosition + reqDisp, numItems
+                    - numSelected + i);
+            } else {
+                // moving up
+                newPosition = Math.max(oldPosition + reqDisp, i);
+            }
+
+            newPositions[newPosition] = selected.get(i);
+        }
+
+        // put the remaining items in the remaining slots and set positions
+        Queue<ReportColumnWrapper> queue = new LinkedList<ReportColumnWrapper>();
+        queue.addAll(all);
+        queue.removeAll(selected);
+        for (int i = 0; i < numItems; i++) {
+            if (newPositions[i] == null) {
+                newPositions[i] = queue.remove();
+            }
+
+            // set the new position
+            newPositions[i].getReportColumn().setPosition(i);
+        }
+
+        // refresh display
+        displayed.setInput(all.toArray());
+        displayed.refresh(true, true);
     }
 
     private static Button createButton(Composite parent, String imageName) {
@@ -269,6 +385,15 @@ public class ColumnSelectWidget extends Composite {
         return null;
     }
 
+    private static Object getElement(TableViewer tableViewer, Object needle) {
+        for (TableItem item : tableViewer.getTable().getItems()) {
+            if (needle.equals(item.getData())) {
+                return item.getData();
+            }
+        }
+        return null;
+    }
+
     private void displayColumn(ReportColumn reportColumn) {
         removeAvailable(reportColumn.getEntityColumn());
         addDisplayed(reportColumn);
@@ -316,7 +441,12 @@ public class ColumnSelectWidget extends Composite {
     private void addDisplayed(ReportColumn reportColumn) {
         int position = displayed.getTable().getItemCount();
         reportColumn.setPosition(position);
-        displayed.add(new ReportColumnWrapper(reportColumn));
+        ReportColumnWrapper wrapper = new ReportColumnWrapper(reportColumn);
+
+        Object o = getElement(displayed, wrapper);
+        if (o == null) {
+            displayed.add(wrapper);
+        }
     }
 
     private void addDisplayed(EntityColumn entityColumn) {
@@ -326,13 +456,37 @@ public class ColumnSelectWidget extends Composite {
     }
 
     private void removeDisplayed(ReportColumnWrapper reportColumnWrapper) {
-        displayed.remove(reportColumnWrapper);
+        int index = getElementIndex(displayed, reportColumnWrapper);
+
+        if (index != -1) {
+            displayed.remove(reportColumnWrapper);
+
+            // update position of following items
+            TableItem[] items = displayed.getTable().getItems();
+            int numItems = items.length;
+            for (int i = index; i < numItems; i++) {
+                ((ReportColumnWrapper) items[i].getData()).getReportColumn()
+                    .setPosition(i);
+            }
+        }
     }
 
-    private static class ReportColumnWrapper {
+    private static int getElementIndex(TableViewer tableViewer, Object needle) {
+        TableItem[] items = tableViewer.getTable().getItems();
+        int numItems = items.length;
+        for (int i = 0; i < numItems; i++) {
+            if (needle.equals(items[i].getData())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private static class ReportColumnWrapper extends EntityColumnWrapper {
         private final ReportColumn reportColumn;
 
         public ReportColumnWrapper(ReportColumn reportColumn) {
+            super(reportColumn.getEntityColumn());
             this.reportColumn = reportColumn;
         }
 
@@ -369,6 +523,11 @@ public class ColumnSelectWidget extends Composite {
                 }
             }
             return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return entityColumnId != null ? entityColumnId.hashCode() : 0;
         }
 
         private Collection<PropertyModifierWrapper> getModifiers(
