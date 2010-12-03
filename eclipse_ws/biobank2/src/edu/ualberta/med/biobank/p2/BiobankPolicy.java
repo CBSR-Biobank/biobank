@@ -31,8 +31,6 @@ public class BiobankPolicy extends Policy {
             .getPreferenceStore();
         setRepositoriesVisible(prefs
             .getBoolean(PreferenceConstants.REPOSITORIES_VISIBLE));
-        System.out.println("**************"
-            + prefs.getBoolean(PreferenceConstants.REPOSITORIES_VISIBLE));
         setRestartPolicy(prefs.getInt(PreferenceConstants.RESTART_POLICY));
         setShowLatestVersionsOnly(prefs
             .getBoolean(PreferenceConstants.SHOW_LATEST_VERSION_ONLY));

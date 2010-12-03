@@ -36,6 +36,7 @@
   <property name="schema.dir" location="schema" />
   <property name="security.dir" location="security" />
   <property name="secu-log.dir" location="security-logs" />
+  <property name="product.dir" location="${basedir}/product" />
   <property name="database.host" value="localhost" />
   <property name="database.name" value="biobank2" />
   <property name="database.username" value="dummy" />
@@ -712,20 +713,81 @@
   </target>
 
   <target name="product">
-  	 <property name="product.dir" location="${basedir}/product" />
+  	<property name="buildDirectory" value="${product.dir}/buildDirectory"/> 
+	<delete dir="${buildDirectory}"/>			
+	<copy todir="${buildDirectory}/plugins/biobank2">
+		<fileset dir="${eclipse.workspace.dir}/biobank2"/>
+	</copy>			  	
+	<copy todir="${buildDirectory}/plugins/scannerConfig">
+		<fileset dir="${eclipse.workspace.dir}/scannerConfig"/>
+	</copy>			  	
+	<copy todir="${buildDirectory}/plugins/biobank.common">
+		<fileset dir="${eclipse.workspace.dir}/biobank.common"/>
+	</copy>
+	<copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
+		<fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot"/>
+	</copy>  
+	<copy todir="${buildDirectory}/features/biobank2.feature.core">
+		<fileset dir="${eclipse.workspace.dir}/biobank2.feature.core"/>
+	</copy>
+	<copy todir="${buildDirectory}/features/biobank2.feature.platform">
+		<fileset dir="${eclipse.workspace.dir}/biobank2.feature.platform"/>
+	</copy>
     <java classpath="${env.ECLIPSE_HOME}/plugins/org.eclipse.equinox.launcher_1.1.0.v20100507.jar" 
     	classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
       <arg line="-application org.eclipse.ant.core.antRunner"/>
       <arg line="-buildfile ${env.ECLIPSE_HOME}/plugins/org.eclipse.pde.build_3.6.0.v20100603/scripts/productBuild/productBuild.xml"/>
       <arg line="-Dbuilder=${product.dir}"/>
-      <!-- projectsPath is used in product/customTarget.xml -->    	
-      <arg line="-DprojectsPath=${eclipse.workspace.dir}"/>
+      <!-- product.dir is used in product/customTarget.xml -->
+      <arg line="-Dproduct.dir=${product.dir}"/>
       <!-- instead of fixed paths in product/build.properties: -->
       <arg line="-Dproduct=${eclipse.proj.dir}/biobank2.product"/>
       <arg line="-DbuildDirectory=${product.dir}/buildDirectory"/>
       <arg line="-DbaseLocation=${env.ECLIPSE_HOME}"/>
       <arg line="-Djava.client.version.num=${java.client.version.num}"/>
     </java>
+  	<antcall target="updateSiteMetadata" />
+  	</target>
+  	
+  	<target name="updateSiteMetadata">
+  	  <property name="updateSiteFolder" value="${product.dir}/buildDirectory/updateSite"/>
+      <copy todir="${updateSiteFolder}/features/">
+  	    <fileset dir="${buildDirectory}/buildRepo/features/">
+  	  	  <include name="biobank2.feature.core_*.jar"/>
+  	  	</fileset>
+  	  </copy>
+  	  <copy todir="${updateSiteFolder}/plugins/">
+  	    <fileset dir="${buildDirectory}/buildRepo/plugins/">
+  	  	  <include name="biobank2_*.jar"/>
+  	  	  <include name="scannerConfig_*.jar"/>
+  	  	  <include name="biobank.common_*.jar"/>
+  	  	  <include name="sampleProcessingRobot_*.jar"/>
+  	  	</fileset>
+  	  </copy>
+  	  <fileset id="featureJar.id" dir="${updateSiteFolder}/features/" includes="biobank2.feature.core_*.jar" />
+  	  <property name="featureJar" refid="featureJar.id"/>
+  	  <taskdef resource="net/sf/antcontrib/antcontrib.properties">
+  	    <classpath>
+  	  	  <pathelement location="${product.dir}/ant-contrib/ant-contrib-1.0b3.jar"/>
+  	  	</classpath>
+  	  </taskdef>
+  	  <propertyregex property="featureVersion" input="${featureJar}" 
+  	    regexp="biobank2.feature.core_(.*)\.jar"
+  	  	select="\1" casesensitive="true" />
+  	  <copy file="${product.dir}/site.xml" tofile="${updateSiteFolder}/site.xml" />
+  	  <replace file="${updateSiteFolder}/site.xml" token="@VERSION@" value="${featureVersion}"/>
+  		
+	  <java classpath="${env.ECLIPSE_HOME}/plugins/org.eclipse.equinox.launcher_1.1.0.v20100507.jar" 
+	    	classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
+	 	<arg line="-application org.eclipse.equinox.p2.publisher.UpdateSitePublisher"/>
+	 	<arg line="-source ${updateSiteFolder}"/>
+	 	<arg line="-compress"/>
+	 	<arg line="-publishArtifacts"/>
+	 	<arg line="-consoleLog"/>
+	 	<arg line="-artifactRepository file:${updateSiteFolder}"/>
+	 	<arg line="-metadataRepository file:${updateSiteFolder}"/>
+	 </java>
   </target>
+	 
 
 </project>
