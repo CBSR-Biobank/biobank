@@ -126,8 +126,28 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
+    public void testGetStudyCollectionSorted() throws Exception {
+        String name = "testGetStudyCollectionSorted" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyHelper.addStudies(name, r.nextInt(15) + 5);
+
+        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
+        site.addStudies(studies);
+        site.persist();
+        site.reload();
+
+        List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
+        Assert.assertTrue(studiesSorted.size() > 1);
+        for (int i = 0, n = studiesSorted.size() - 1; i < n; i++) {
+            StudyWrapper study1 = studiesSorted.get(i);
+            StudyWrapper study2 = studiesSorted.get(i + 1);
+            Assert.assertTrue(study1.compareTo(study2) <= 0);
+        }
+    }
+
+    @Test
     public void testNonAssocStudies() throws Exception {
-        String name = "testGetStudyCollection" + r.nextInt();
+        String name = "testNonAssocStudies" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
         try {
@@ -167,26 +187,6 @@ public class TestSite extends TestDatabase {
         siteNonAssocStudies = site.getStudiesNotAssoc();
 
         Assert.assertEquals(0, siteNonAssocStudies.size());
-    }
-
-    @Test
-    public void testGetStudyCollectionSorted() throws Exception {
-        String name = "testGetStudyCollectionSorted" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyHelper.addStudies(name, r.nextInt(15) + 5);
-
-        List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
-        site.addStudies(studies);
-        site.persist();
-        site.reload();
-
-        List<StudyWrapper> studiesSorted = site.getStudyCollection(true);
-        Assert.assertTrue(studiesSorted.size() > 1);
-        for (int i = 0, n = studiesSorted.size() - 1; i < n; i++) {
-            StudyWrapper study1 = studiesSorted.get(i);
-            StudyWrapper study2 = studiesSorted.get(i + 1);
-            Assert.assertTrue(study1.compareTo(study2) <= 0);
-        }
     }
 
     @Test
@@ -866,7 +866,8 @@ public class TestSite extends TestDatabase {
         srcSite.persist();
         srcSite.reload();
 
-        List<StudyWrapper> siteDispatchStudies = srcSite.getDispatchStudiesAsSender();
+        List<StudyWrapper> siteDispatchStudies = srcSite
+            .getDispatchStudiesAsSender();
         Assert.assertNotNull(siteDispatchStudies);
         Assert.assertEquals(studies.size(), siteDispatchStudies.size());
         Assert.assertTrue(siteDispatchStudies.containsAll(studies));

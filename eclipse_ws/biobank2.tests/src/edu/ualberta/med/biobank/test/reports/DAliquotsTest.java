@@ -66,12 +66,10 @@ public class DAliquotsTest extends AbstractReportTest {
         Date before = (Date) getReport().getParams().get(1);
 
         Collection<AliquotWrapper> allAliquots = getAliquots();
-        @SuppressWarnings("unchecked")
         Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 AbstractReportTest.aliquotLinkedBetween(after, before),
-                aliquotTopContainerIdIn(topContainerIdList),
-                aliquotSite(isInSite(), getSiteId())));
+                aliquotTopContainerIdIn(topContainerIdList)));
 
         List<Object> expectedResults = new ArrayList<Object>();
 
