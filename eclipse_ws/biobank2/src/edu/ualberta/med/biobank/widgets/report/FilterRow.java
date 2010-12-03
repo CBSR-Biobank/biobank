@@ -278,6 +278,11 @@ class FilterRow extends Composite {
     private void createInputs(boolean isEditMode) {
         Collection<ReportFilterValue> oldValues = getValues();
 
+        // remember current setting, if possible
+        if (!isEditMode && filterValueWidget instanceof SetFilterValueWidget) {
+            isEditMode = ((SetFilterValueWidget) filterValueWidget).getMode() == SetFilterValueWidget.Mode.EditMode;
+        }
+
         disposeInputContainer();
         createInputContainer();
 

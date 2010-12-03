@@ -5,12 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -30,15 +25,10 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
-import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
-import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
-import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
 import edu.ualberta.med.biobank.widgets.report.ChangeListener;
 import edu.ualberta.med.biobank.widgets.report.ColumnSelectWidget;
 import edu.ualberta.med.biobank.widgets.report.FilterChangeEvent;
@@ -313,52 +303,9 @@ public class ReportEntryForm extends BiobankEntryForm {
         Label columnsLabel = new Label(options, SWT.NONE);
         columnsLabel.setText("Columns:");
 
-        // TODO: support reseting to original columns.
-
-        // TODO: support re-ordering
-        final MultiSelectWidget columns = new MultiSelectWidget(options,
-            SWT.NONE, "Displayed Columns", "Available Columns", 75);
-
-        final Map<Integer, EntityColumn> entityColumnMap = new HashMap<Integer, EntityColumn>();
-        final LinkedHashMap<Integer, String> columnNameMap = new LinkedHashMap<Integer, String>();
-
-        for (EntityColumn entityCol : report.getEntityColumnCollection()) {
-            entityColumnMap.put(entityCol.getId(), entityCol);
-            columnNameMap.put(entityCol.getId(), entityCol.getName());
-        }
-
-        final List<Integer> selectedColumns = new ArrayList<Integer>();
-        for (ReportColumn reportCol : report.getReportColumnCollection()) {
-            selectedColumns.add(reportCol.getEntityColumn().getId());
-        }
-
-        columns.setSelections(columnNameMap, selectedColumns);
-        columns
-            .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
-                @Override
-                public void selectionChanged(MultiSelectEvent event) {
-                    Set<ReportColumn> cols = new HashSet<ReportColumn>();
-
-                    int position = 0;
-                    for (Integer columnId : columns.getSelected()) {
-                        ReportColumn col = new ReportColumn();
-                        col.setEntityColumn(entityColumnMap.get(columnId));
-                        col.setPosition(position);
-
-                        cols.add(col);
-                        position++;
-                    }
-
-                    report.getWrappedObject().setReportColumnCollection(cols);
-                    ReportEntryForm.this.setDirty(true);
-                }
-            });
-
-        section.setClient(options);
-
-        Label tmp = new Label(options, SWT.NONE);
-        Label tmp2 = new Label(options, SWT.NONE);
         ColumnSelectWidget csw = new ColumnSelectWidget(options, SWT.NONE,
             report);
+
+        section.setClient(options);
     }
 }

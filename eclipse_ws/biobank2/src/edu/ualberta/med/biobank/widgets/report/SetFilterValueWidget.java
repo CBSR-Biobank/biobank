@@ -336,15 +336,29 @@ public class SetFilterValueWidget implements FilterValueWidget {
             addButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
-                    // only add values not already in the list
-                    Collection<ReportFilterValue> newValues = minus(
-                        filterValueWidget.getValues(), getValues(), COMPARER);
-                    listViewer.add(newValues.toArray());
-                    filterValueWidget
-                        .setValues(new ArrayList<ReportFilterValue>());
-                    SetFilterValueWidget.this.notifyListeners(null);
+                    addValues();
+                    filterValueWidget.getControl().setFocus();
                 }
             });
+
+            filterValueWidget.getControl().addListener(SWT.KeyUp,
+                new Listener() {
+                    @Override
+                    public void handleEvent(Event event) {
+                        if (event.keyCode == SWT.CR) {
+                            addValues();
+                        }
+                    }
+                });
+        }
+
+        private void addValues() {
+            // only add values not already in the list
+            Collection<ReportFilterValue> newValues = minus(
+                filterValueWidget.getValues(), getValues(), COMPARER);
+            listViewer.add(newValues.toArray());
+            filterValueWidget.setValues(new ArrayList<ReportFilterValue>());
+            SetFilterValueWidget.this.notifyListeners(null);
         }
 
         private void createListViewer() {
@@ -360,6 +374,16 @@ public class SetFilterValueWidget implements FilterValueWidget {
             listViewer.setComparer(COMPARER);
             listViewer.setLabelProvider(LABEL_PROVIDER);
             listViewer.setComparator(COMPARATOR);
+
+            listViewer.getList().addListener(SWT.KeyUp, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    if (event.keyCode == SWT.DEL) {
+                        removeValues();
+                    }
+                }
+            });
+
         }
 
         private void createRemoveButton() {
@@ -370,10 +394,14 @@ public class SetFilterValueWidget implements FilterValueWidget {
             removeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
-                    listViewer.remove(getSelectedValues().toArray());
-                    SetFilterValueWidget.this.notifyListeners(null);
+                    removeValues();
                 }
             });
+        }
+
+        private void removeValues() {
+            listViewer.remove(getSelectedValues().toArray());
+            SetFilterValueWidget.this.notifyListeners(null);
         }
 
         private void createViewModeButton() {

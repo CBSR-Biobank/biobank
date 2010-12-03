@@ -35,34 +35,7 @@ public class ComboFilterValueWidget implements FilterValueWidget {
         combo
             .setToolTipText("Select or enter a value to add to the list below");
 
-        combo.addFocusListener(new FocusListener() {
-            @Override
-            public void focusGained(FocusEvent e) {
-                if (combo.getText().equals(DEFAULT_TEXT)) {
-                    combo.setText("");
-                    isShowingDefaultText = false;
-                }
-            }
-
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (combo.getText().isEmpty()) {
-                    combo.setText(DEFAULT_TEXT);
-                    isShowingDefaultText = true;
-                }
-            }
-        });
-
-        combo.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                isShowingDefaultText = false;
-                if (combo.getText().isEmpty() && !combo.isFocusControl()) {
-                    combo.setText(DEFAULT_TEXT);
-                    isShowingDefaultText = true;
-                }
-            }
-        });
+        addListeners();
     }
 
     @Override
@@ -121,5 +94,38 @@ public class ComboFilterValueWidget implements FilterValueWidget {
 
     public ComboViewer getComboViewer() {
         return comboViewer;
+    }
+
+    private void addListeners() {
+        final Combo combo = comboViewer.getCombo();
+
+        combo.addFocusListener(new FocusListener() {
+            @Override
+            public void focusGained(FocusEvent e) {
+                if (combo.getText().equals(DEFAULT_TEXT)) {
+                    combo.setText("");
+                    isShowingDefaultText = false;
+                }
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                if (combo.getText().isEmpty()) {
+                    combo.setText(DEFAULT_TEXT);
+                    isShowingDefaultText = true;
+                }
+            }
+        });
+
+        combo.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                isShowingDefaultText = false;
+                if (combo.getText().isEmpty() && !combo.isFocusControl()) {
+                    combo.setText(DEFAULT_TEXT);
+                    isShowingDefaultText = true;
+                }
+            }
+        });
     }
 }
