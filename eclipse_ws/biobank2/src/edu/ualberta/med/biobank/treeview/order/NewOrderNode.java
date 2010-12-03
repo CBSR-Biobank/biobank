@@ -41,7 +41,7 @@ public class NewOrderNode extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        return new OrderAdapter(this, (DispatchWrapper) child);
+        return new OrderAdapter(this, (OrderWrapper) child);
     }
 
     @Override

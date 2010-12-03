@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
@@ -12,6 +13,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -37,8 +39,12 @@ public class BasicSiteCombo extends ComboViewer {
         });
         setContentProvider(new ArrayContentProvider());
         try {
-            List<SiteWrapper> sites = SiteWrapper.getSites(appService);
-            setInput(sites);
+            List<SiteWrapper> allSites = SiteWrapper.getSites(appService);
+            List<SiteWrapper> updateSites = new ArrayList<SiteWrapper>();
+            for (SiteWrapper site : allSites)
+                if (site.canUpdate(SessionManager.getUser()))
+                    updateSites.add(site);
+            setInput(updateSites);
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Failed to load sites", e1);
         }

@@ -92,10 +92,11 @@ public class SessionHelper implements Runnable {
                         "Login Failed",
                         "Bad credentials. Warning: You will be locked out after 3 failed login attempts.");
                 return;
+            } else if (exp.getCause() != null
+                && exp.getCause() instanceof RemoteAccessException) {
+                BioBankPlugin.openAsyncError("Login Failed",
+                    "Error contacting server.");
             }
-        } catch (RemoteAccessException exp) {
-            BioBankPlugin.openAsyncError(
-                "Login Failed - Remote Access Exception", exp);
         } catch (Exception exp) {
             BioBankPlugin.openAsyncError("Login Failed", exp);
         }
