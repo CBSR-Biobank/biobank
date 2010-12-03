@@ -2,21 +2,19 @@ package edu.ualberta.med.biobank.widgets.report;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ArrayContentProvider;
-import org.eclipse.jface.viewers.CellEditor;
-import org.eclipse.jface.viewers.ColumnViewer;
-import org.eclipse.jface.viewers.ColumnWeightData;
-import org.eclipse.jface.viewers.ComboBoxViewerCellEditor;
-import org.eclipse.jface.viewers.EditingSupport;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
-import org.eclipse.jface.viewers.TableLayout;
 import org.eclipse.jface.viewers.TableViewer;
-import org.eclipse.jface.viewers.TableViewerColumn;
+import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.swt.SWT;
@@ -29,26 +27,29 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TreeItem;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityColumn;
-import edu.ualberta.med.biobank.model.EntityProperty;
-import edu.ualberta.med.biobank.model.PropertyType;
+import edu.ualberta.med.biobank.model.PropertyModifier;
 import edu.ualberta.med.biobank.model.ReportColumn;
 
 public class ColumnSelectWidget extends Composite {
-    private static final ViewerSorter REPORT_COLUMN_VIEWER_SORTER = new ReportColumnViewerSorter();
-    private static final LabelProvider ENTITY_COLUMN_LABEL_PROVIDER = new EntityColumnLabelProvider();
-    private static final LabelProvider REPORT_COLUMN_LABEL_PROVIDER = new ReportColumnLabelProvider();
+    private static final ViewerSorter DISPLAYED_COLUMNS_VIEWER_SORTER = new DisplayedColumnsViewerSorter();
+    private static final LabelProvider DISPLAYED_COLUMNS_LABEL_PROVIDER = new DisplayedColumnsLabelProvider();
+    private static final LabelProvider AVAILABLE_COLUMNS_LABEL_PROVIDER = new AvailableColumnsLabelProvider();
+    private static final ITreeContentProvider AVAILABLE_COLUMNS_TREE_CONTENT_PROVIDER = new AvailableColumnsTreeContentProvider();
+    private static final Object AVAILABLE_COLUMNS_ROOT_OBJECT = new String(
+        "root");
 
     // @see
     // http://blog.subshell.com/devblog/2010/09/eclipse-rcp-using-a-tableviewer-with-comboboxes.html
 
     private final ReportWrapper report;
     private Composite container;
-    private TableViewer available, displayed;
+    private TreeViewer available;
+    private TableViewer displayed;
     private Button leftButton, rightButton, upButton, downButton;
 
     public ColumnSelectWidget(Composite parent, int style, ReportWrapper report) {
@@ -115,10 +116,24 @@ public class ColumnSelectWidget extends Composite {
     }
 
     private void createAvailableTable() {
-        available = createTableViewer(container, "Available Columns");
+        Composite subContainer = new Composite(container, SWT.NONE);
+        subContainer.setLayout(new GridLayout(1, false));
+        subContainer
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
+        createLabel(subContainer, "Available Columns");
+
+        available = new TreeViewer(subContainer, SWT.MULTI | SWT.READ_ONLY
+            | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
+
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        layoutData.heightHint = available.getTree().getItemHeight() * 4;
+        layoutData.widthHint = 180;
+        available.getControl().setLayoutData(layoutData);
         available.setSorter(new ViewerSorter());
-        available.setLabelProvider(ENTITY_COLUMN_LABEL_PROVIDER);
+        available.setLabelProvider(AVAILABLE_COLUMNS_LABEL_PROVIDER);
+        available.setContentProvider(AVAILABLE_COLUMNS_TREE_CONTENT_PROVIDER);
+        available.setInput(AVAILABLE_COLUMNS_ROOT_OBJECT);
 
         for (EntityColumn entityColumn : report.getEntityColumnCollection()) {
             addAvailable(entityColumn);
@@ -126,26 +141,24 @@ public class ColumnSelectWidget extends Composite {
     }
 
     private void createDisplayedTable() {
-        displayed = createTableViewer(container, "Displayed Columns");
+        Composite subContainer = new Composite(container, SWT.NONE);
+        subContainer.setLayout(new GridLayout(1, false));
+        subContainer
+            .setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        Table table = displayed.getTable();
+        createLabel(subContainer, "Displayed Columns");
 
-        TableLayout tableLayout = new TableLayout();
-        tableLayout.addColumnData(new ColumnWeightData(1));
+        displayed = new TableViewer(subContainer, SWT.MULTI | SWT.READ_ONLY
+            | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
-        table.setLinesVisible(false);
-        table.setLayout(tableLayout);
-
-        TableViewerColumn editColumn = new TableViewerColumn(displayed,
-            SWT.NONE);
-
-        ColumnViewer viewer = editColumn.getViewer();
-        EditingSupport editingSupport = new ComboEditingSupport(viewer);
-        editColumn.setEditingSupport(editingSupport);
+        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
+        layoutData.heightHint = displayed.getTable().getItemHeight() * 4;
+        layoutData.widthHint = 180;
+        displayed.getControl().setLayoutData(layoutData);
 
         displayed.setContentProvider(new ArrayContentProvider());
-        displayed.setSorter(REPORT_COLUMN_VIEWER_SORTER);
-        displayed.setLabelProvider(REPORT_COLUMN_LABEL_PROVIDER);
+        displayed.setSorter(DISPLAYED_COLUMNS_VIEWER_SORTER);
+        displayed.setLabelProvider(DISPLAYED_COLUMNS_LABEL_PROVIDER);
 
         for (ReportColumn reportColumn : report.getReportColumnCollection()) {
             displayColumn(reportColumn);
@@ -192,27 +205,6 @@ public class ColumnSelectWidget extends Composite {
         downButton = createButton(subContainer, BioBankPlugin.IMG_DOWN);
     }
 
-    private static TableViewer createTableViewer(Composite parent,
-        String labelText) {
-        Composite container = new Composite(parent, SWT.NONE);
-        container.setLayout(new GridLayout(1, false));
-        container.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-        createLabel(container, labelText);
-
-        // TODO: pass in SWT.FULL_SELECTION?
-        TableViewer tableViewer = new TableViewer(container, SWT.FULL_SELECTION
-            | SWT.MULTI | SWT.READ_ONLY | SWT.BORDER | SWT.H_SCROLL
-            | SWT.V_SCROLL);
-
-        GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        layoutData.heightHint = tableViewer.getTable().getItemHeight() * 4;
-        layoutData.widthHint = 180;
-        tableViewer.getTable().setLayoutData(layoutData);
-
-        return tableViewer;
-    }
-
     private static Button createButton(Composite parent, String imageName) {
         Button button = new Button(parent, SWT.PUSH);
         button.setImage(BioBankPlugin.getDefault().getImageRegistry()
@@ -234,9 +226,14 @@ public class ColumnSelectWidget extends Composite {
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
             Iterator<?> it = structuredSelection.iterator();
             while (it.hasNext()) {
-                EntityColumnWrapper entityColumnWrapper = (EntityColumnWrapper) it
-                    .next();
-                displayColumn(entityColumnWrapper);
+                Object o = it.next();
+                if (o instanceof EntityColumnWrapper) {
+                    EntityColumnWrapper entityColumnWrapper = (EntityColumnWrapper) o;
+                    displayColumn(entityColumnWrapper);
+                } else if (o instanceof PropertyModifierWrapper) {
+                    PropertyModifierWrapper propertyModifierWrapper = (PropertyModifierWrapper) o;
+                    displayColumn(propertyModifierWrapper);
+                }
             }
         }
     }
@@ -263,14 +260,13 @@ public class ColumnSelectWidget extends Composite {
         }
     }
 
-    private static int getElementIndex(TableViewer tableViewer, Object needle) {
-        int numItems = tableViewer.getTable().getItemCount();
-        for (int i = 0; i < numItems; i++) {
-            if (needle.equals(tableViewer.getElementAt(i))) {
-                return i;
+    private static Object getElement(TreeViewer treeViewer, Object needle) {
+        for (TreeItem item : treeViewer.getTree().getItems()) {
+            if (needle.equals(item.getData())) {
+                return item.getData();
             }
         }
-        return -1;
+        return null;
     }
 
     private void displayColumn(ReportColumn reportColumn) {
@@ -284,6 +280,19 @@ public class ColumnSelectWidget extends Composite {
         addDisplayed(entityColumn);
     }
 
+    private void displayColumn(PropertyModifierWrapper propertyModifierWrapper) {
+        EntityColumn entityColumn = propertyModifierWrapper
+            .getEntityColumnWrapper().getEntityColumn();
+        removeAvailable(entityColumn);
+
+        ReportColumn reportColumn = new ReportColumn();
+        reportColumn.setEntityColumn(entityColumn);
+        reportColumn.setPropertyModifier(propertyModifierWrapper
+            .getPropertyModifier());
+
+        addDisplayed(reportColumn);
+    }
+
     private void removeColumn(ReportColumnWrapper reportColumnWrapper) {
         removeDisplayed(reportColumnWrapper);
         addAvailable(reportColumnWrapper.getReportColumn().getEntityColumn());
@@ -294,9 +303,9 @@ public class ColumnSelectWidget extends Composite {
             entityColumn);
 
         // only add an available EntityColumn if it doesn't already exist
-        int index = getElementIndex(available, entityColumnWrapper);
-        if (index == -1) {
-            available.add(entityColumnWrapper);
+        Object o = getElement(available, entityColumnWrapper);
+        if (o == null) {
+            available.add(AVAILABLE_COLUMNS_ROOT_OBJECT, entityColumnWrapper);
         }
     }
 
@@ -335,14 +344,20 @@ public class ColumnSelectWidget extends Composite {
     private static class EntityColumnWrapper {
         private final EntityColumn entityColumn;
         private final Integer entityColumnId;
+        private final Collection<PropertyModifierWrapper> modifiers;
 
         public EntityColumnWrapper(EntityColumn entityColumn) {
             this.entityColumn = entityColumn;
             this.entityColumnId = entityColumn.getId();
+            this.modifiers = getModifiers(entityColumn);
         }
 
         public EntityColumn getEntityColumn() {
             return entityColumn;
+        }
+
+        public Collection<PropertyModifierWrapper> getPropertyModifierCollection() {
+            return modifiers;
         }
 
         @Override
@@ -355,9 +370,42 @@ public class ColumnSelectWidget extends Composite {
             }
             return false;
         }
+
+        private Collection<PropertyModifierWrapper> getModifiers(
+            EntityColumn entityColumn) {
+            List<PropertyModifierWrapper> result = new ArrayList<PropertyModifierWrapper>();
+
+            for (PropertyModifier modifier : entityColumn.getEntityProperty()
+                .getPropertyType().getPropertyModifierCollection()) {
+                PropertyModifierWrapper wrapper = new PropertyModifierWrapper(
+                    this, modifier);
+                result.add(wrapper);
+            }
+
+            return result;
+        }
     }
 
-    private static class ReportColumnViewerSorter extends ViewerSorter {
+    private static class PropertyModifierWrapper {
+        private final PropertyModifier propertyModifier;
+        private final EntityColumnWrapper entityColumnWrapper;
+
+        public PropertyModifierWrapper(EntityColumnWrapper entityColumnWrapper,
+            PropertyModifier propertyModifier) {
+            this.propertyModifier = propertyModifier;
+            this.entityColumnWrapper = entityColumnWrapper;
+        }
+
+        public PropertyModifier getPropertyModifier() {
+            return propertyModifier;
+        }
+
+        public EntityColumnWrapper getEntityColumnWrapper() {
+            return entityColumnWrapper;
+        }
+    }
+
+    private static class DisplayedColumnsViewerSorter extends ViewerSorter {
         @Override
         public int compare(Viewer viewer, Object o1, Object o2) {
             ReportColumn rc1 = ((ReportColumnWrapper) o1).getReportColumn();
@@ -367,36 +415,68 @@ public class ColumnSelectWidget extends Composite {
         }
     }
 
-    private static class EntityColumnLabelProvider extends LabelProvider {
+    private static class AvailableColumnsLabelProvider extends LabelProvider {
         @Override
         public String getText(Object element) {
             if (element instanceof EntityColumnWrapper) {
                 return ((EntityColumnWrapper) element).getEntityColumn()
                     .getName();
+            } else if (element instanceof PropertyModifierWrapper) {
+                return ((PropertyModifierWrapper) element)
+                    .getPropertyModifier().getName();
             }
             return "";
         }
     }
 
-    private static class ReportColumnLabelProvider extends LabelProvider
-        implements ITableLabelProvider {
+    private static class AvailableColumnsTreeContentProvider implements
+        ITreeContentProvider {
         @Override
-        public String getText(Object element) {
-            if (element instanceof ReportColumnWrapper) {
-                ReportColumn reportColumn = ((ReportColumnWrapper) element)
-                    .getReportColumn();
-                String text = reportColumn.getEntityColumn().getName();
-
-                if (reportColumn.getPropertyModifier() != null) {
-                    text += " (" + reportColumn.getPropertyModifier().getName()
-                        + ")";
-                }
-
-                return text;
-            }
-            return "";
+        public void dispose() {
         }
 
+        @Override
+        public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
+        }
+
+        @Override
+        public Object[] getElements(Object inputElement) {
+            if (AVAILABLE_COLUMNS_ROOT_OBJECT.equals(inputElement)) {
+                return new Object[] {};
+            }
+            return null;
+        }
+
+        @Override
+        public Object[] getChildren(Object parentElement) {
+            if (parentElement instanceof EntityColumnWrapper) {
+                EntityColumnWrapper wrapper = (EntityColumnWrapper) parentElement;
+                return wrapper.getPropertyModifierCollection().toArray();
+            }
+            return null;
+        }
+
+        @Override
+        public Object getParent(Object element) {
+            if (element instanceof PropertyModifierWrapper) {
+                PropertyModifierWrapper wrapper = (PropertyModifierWrapper) element;
+                return wrapper.getEntityColumnWrapper();
+            }
+            return null;
+        }
+
+        @Override
+        public boolean hasChildren(Object element) {
+            if (element instanceof EntityColumnWrapper) {
+                EntityColumnWrapper wrapper = (EntityColumnWrapper) element;
+                return !wrapper.getPropertyModifierCollection().isEmpty();
+            }
+            return false;
+        }
+    }
+
+    private static class DisplayedColumnsLabelProvider extends LabelProvider
+        implements ITableLabelProvider {
         @Override
         public Image getColumnImage(Object element, int columnIndex) {
             return null;
@@ -410,76 +490,13 @@ public class ColumnSelectWidget extends Composite {
 
                 String text = reportColumn.getEntityColumn().getName();
                 if (reportColumn.getPropertyModifier() != null) {
-                    text += ", " + reportColumn.getPropertyModifier().getName();
+                    text += " (" + reportColumn.getPropertyModifier().getName()
+                        + ")";
                 }
                 return text;
 
             }
             return null;
         }
-    }
-
-    public static class ComboEditingSupport extends EditingSupport {
-        private ComboEditingSupport(ColumnViewer viewer) {
-            super(viewer);
-        }
-
-        private ComboBoxViewerCellEditor createCellEditor() {
-            ComboBoxViewerCellEditor cellEditor = new ComboBoxViewerCellEditor(
-                (Composite) getViewer().getControl(), SWT.READ_ONLY);
-            cellEditor.setLabelProvider(new LabelProvider());
-            cellEditor.setContenProvider(new ArrayContentProvider());
-            return cellEditor;
-        }
-
-        @Override
-        protected CellEditor getCellEditor(Object element) {
-            if (element instanceof ReportColumnWrapper) {
-                ReportColumnWrapper wrapper = (ReportColumnWrapper) element;
-
-                ReportColumn reportColumn = wrapper.getReportColumn();
-                EntityColumn entityColumn = reportColumn.getEntityColumn();
-                EntityProperty entityProperty = entityColumn
-                    .getEntityProperty();
-                PropertyType propertyType = entityProperty.getPropertyType();
-
-                // TODO: extract "Date" to somewhere?
-                if (propertyType.getName().equals("Date")) {
-                    ComboBoxViewerCellEditor cellEditor = createCellEditor();
-                    cellEditor.setInput(new String[] { "Date Drawn", "b" });
-
-                    return cellEditor;
-                }
-            }
-            return null;
-        }
-
-        @Override
-        protected boolean canEdit(Object element) {
-            return true;
-        }
-
-        @Override
-        protected Object getValue(Object element) {
-            if (element instanceof ReportColumnWrapper) {
-                ReportColumnWrapper wrapper = (ReportColumnWrapper) element;
-                return wrapper.getReportColumn().getEntityColumn().getName();
-            }
-            return null;
-        }
-
-        @Override
-        protected void setValue(Object element, Object value) {
-            // if (element instanceof ReportColumnWrapper && value instanceof
-            // Value) {
-            // ExampleData data = (ExampleData) element;
-            // Value newValue = (Value) value;
-            // /* only set new value if it differs from old one */
-            // if (!data.getData().equals(newValue)) {
-            // data.setData(newValue);
-            // }
-            // }
-        }
-
     }
 }
