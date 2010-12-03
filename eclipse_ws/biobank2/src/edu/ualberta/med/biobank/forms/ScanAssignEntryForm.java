@@ -123,6 +123,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private Control nextFocusWidget;
 
+    private boolean saveEvenIfMissing;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -570,12 +572,24 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
-        if (isFakeScanLinkedOnly) {
-            return PalletCell.getRandomAliquotsNotAssigned(appService,
+        if (currentPalletWrapper != null) {
+            Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
+            for (RowColPos pos : currentPalletWrapper.getAliquots().keySet()) {
+                if (pos.row != 0 && pos.col != 2) {
+                    palletScanned.put(pos, new PalletCell(new ScanCell(pos.row,
+                        pos.col, currentPalletWrapper.getAliquots().get(pos)
+                            .getInventoryId())));
+                }
+            }
+            return palletScanned;
+        } else {
+            if (isFakeScanLinkedOnly) {
+                return PalletCell.getRandomAliquotsNotAssigned(appService,
+                    SessionManager.getCurrentSite().getId());
+            }
+            return PalletCell.getRandomAliquotsAlreadyAssigned(appService,
                 SessionManager.getCurrentSite().getId());
         }
-        return PalletCell.getRandomAliquotsAlreadyAssigned(appService,
-            SessionManager.getCurrentSite().getId());
     }
 
     /**
@@ -881,8 +895,13 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     @Override
+    protected void doBeforeSave() throws Exception {
+        saveEvenIfMissing = saveEvenIfAliquotsMissing();
+    }
+
+    @Override
     protected void saveForm() throws Exception {
-        if (saveEvenIfAliquotsMissing()) {
+        if (saveEvenIfMissing) {
             if (containerToRemove != null) {
                 containerToRemove.delete();
             }
