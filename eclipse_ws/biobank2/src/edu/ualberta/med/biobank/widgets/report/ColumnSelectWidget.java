@@ -164,7 +164,7 @@ public class ColumnSelectWidget extends Composite {
             | SWT.BORDER | SWT.H_SCROLL | SWT.V_SCROLL);
 
         GridData layoutData = new GridData(SWT.FILL, SWT.FILL, true, true);
-        layoutData.heightHint = available.getTree().getItemHeight() * 4;
+        layoutData.heightHint = available.getTree().getItemHeight() * 4 + 2;
         layoutData.widthHint = 180;
         available.getControl().setLayoutData(layoutData);
         available.setSorter(new ViewerSorter());

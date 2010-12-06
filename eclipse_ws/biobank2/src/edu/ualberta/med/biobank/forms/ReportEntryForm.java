@@ -61,6 +61,8 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     private Section filtersSection;
 
+    private Button generateButton;
+
     @Override
     protected void saveForm() throws Exception {
         form.getDisplay().syncExec(new Runnable() {
@@ -160,9 +162,9 @@ public class ReportEntryForm extends BiobankEntryForm {
         container.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(container);
 
-        Button runReport = new Button(container, SWT.NONE);
-        runReport.setText("Run Report");
-        runReport.addListener(SWT.Selection, new Listener() {
+        generateButton = new Button(container, SWT.NONE);
+        generateButton.setText("Generate");
+        generateButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
                 System.out.println("12312123");
