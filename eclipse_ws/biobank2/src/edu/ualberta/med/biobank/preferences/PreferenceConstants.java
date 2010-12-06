@@ -5,6 +5,8 @@ package edu.ualberta.med.biobank.preferences;
  */
 public class PreferenceConstants {
 
+    public static final String GENERAL_SHOW_VERSION = "general.showVersion";
+
     public static final String GENERAL_CONFIRM = "general.confirm";
 
     public static final String GENERAL_CANCEL = "general.cancel";

@@ -475,6 +475,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
         }
     }
 
+    public boolean windowTitleShowVersionEnabled() {
+        return getPreferenceStore().getBoolean(
+            PreferenceConstants.GENERAL_SHOW_VERSION);
+    }
+
     public boolean isCancelBarcode(String code) {
         return getPreferenceStore().getString(
             PreferenceConstants.GENERAL_CANCEL).equals(code);
