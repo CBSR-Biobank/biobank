@@ -14,6 +14,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class OrderWrapper extends ModelWrapper<Order> {
 
+    @SuppressWarnings("unused")
     private boolean stateModified = false;
 
     public OrderWrapper(WritableApplicationService appService) {

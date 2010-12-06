@@ -89,6 +89,7 @@ public class OrderAdapter extends AdapterBase {
         openViewForm();
     }
 
+    @SuppressWarnings("unused")
     private void setOrderAsCreation() {
         getWrapper().setInCreationState();
         persistOrder();
