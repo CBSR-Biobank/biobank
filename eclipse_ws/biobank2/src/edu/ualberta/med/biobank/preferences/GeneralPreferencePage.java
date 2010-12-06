@@ -42,7 +42,6 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         showHeapFieldEditor.getDescriptionControl(getFieldEditorParent())
             .setToolTipText(
                 WorkbenchMessages.WorkbenchPreference_HeapStatusButtonToolTip);
-        // showHeapFieldEditor.setPreferenceStore(PlatformUI.getPreferenceStore());
         addField(showHeapFieldEditor);
     }
 
