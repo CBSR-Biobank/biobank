@@ -11,23 +11,23 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.util.OrderState;
+import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
 import edu.ualberta.med.biobank.treeview.order.OrderAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.OrderAliquotsTreeTable;
 
 public class OrderEntryFormBase extends BiobankFormBase {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.OrderEntryFormBase";
+    private OrderWrapper order;
+    private OrderAliquotsTreeTable aliquotsTree;
 
     // private OrderAliquotsTreeTable aliquotsTree;
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Order placed on " + "2010-04-07" + " from "
+        form.setText("Order placed on " + order.getSubmitted()
             + "KDCS Research Group");
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -46,75 +46,49 @@ public class OrderEntryFormBase extends BiobankFormBase {
 
         BiobankText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Study");
-        setTextValue(studyLabel, "KDCS");
+        setTextValue(studyLabel, order.getStudy());
 
-        BiobankText senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Research Group");
-        setTextValue(senderLabel, "KDCS Research Group");
-        BiobankText receiverLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Receiver");
-        setTextValue(receiverLabel, "CBSR");
-        BiobankText departedLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Order Placed");
-        setTextValue(departedLabel, "2010-04-07");
-        BiobankText shippingMethodLabel = createReadOnlyLabelledField(client,
+        BiobankText researchGroupLabel = createReadOnlyLabelledField(client,
+            SWT.NONE, "Research Group");
+        setTextValue(researchGroupLabel, order.getStudy().getResearchGroup()
+            .getNameShort());
+        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Site");
+        setTextValue(siteLabel, order.getSite().getNameShort());
+        BiobankText submittedLabel = createReadOnlyLabelledField(client,
+            SWT.NONE, "Order Submitted");
+        setTextValue(submittedLabel, order.getSubmitted());
+        BiobankText orderNumberLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Order Number");
-        setTextValue(shippingMethodLabel, "123532132");
-        BiobankText dateReceivedLabel = createReadOnlyLabelledField(client,
+        setTextValue(orderNumberLabel, order.getId());
+        BiobankText acceptedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date received");
-        setTextValue(dateReceivedLabel, "2010-04-09");
+        setTextValue(acceptedLabel, order.getAccepted());
         createReadOnlyLabelledField(client, SWT.NONE, "Comments");
         Section s = createSection("Aliquots");
 
         Composite c = new Composite(s, SWT.NONE);
         c.setLayout(new GridLayout());
         createAliquotsSelectionActions(c, false);
-        // aliquotsTree = new OrderAliquotsTreeTable(c, null, true, true);
+        aliquotsTree = new OrderAliquotsTreeTable(c, null, true, true);
 
         s.setClient(c);
 
         Button button = new Button(c, SWT.PUSH);
-        button.setText("Action Button");
-    }
+        Integer orderState = ((OrderWrapper) adapter.getModelObject())
+            .getState();
+        if (orderState.equals(OrderState.APPROVED))
+            button.setText("Accept Order");
+        else if (orderState.equals(OrderState.ACCEPTED))
+            button.setText("Mark as filled");
+        else if (orderState.equals(OrderState.FILLED))
+            button.setText("Mark as shipped");
+        else if (orderState.equals(OrderState.SHIPPED))
+            button.setText("Close");
+        else
+            BioBankPlugin.openAsyncError("Invalid State",
+                "This state does not belong in the client");
 
-    public enum ResType {
-        OK, NOT_IN_SHIPMENT, NOT_IN_DB, DUPLICATE, RECEIVED, EXTRA;
-    }
-
-    public static class AliquotInfo {
-        public AliquotWrapper aliquot;
-        public ResType type;
-
-        public AliquotInfo(AliquotWrapper aliquot, ResType type) {
-            this.aliquot = aliquot;
-            this.type = type;
-        }
-    }
-
-    public static AliquotInfo getInfoForInventoryId(DispatchWrapper shipment,
-        String inventoryId) {
-        DispatchAliquotWrapper dsa = shipment.getDispatchAliquot(inventoryId);
-        if (dsa == null) {
-            // aliquot not in shipment. Check if exists in DB:
-            AliquotWrapper aliquot = null;
-            try {
-                aliquot = AliquotWrapper.getAliquot(shipment.getAppService(),
-                    inventoryId, SessionManager.getUser());
-            } catch (Exception ae) {
-                BioBankPlugin.openAsyncError("Error retrieving aliquot", ae);
-            }
-            if (aliquot == null) {
-                return new AliquotInfo(null, ResType.NOT_IN_DB);
-            }
-            return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
-        }
-        if (DispatchAliquotState.RECEIVED_STATE.isEquals(dsa.getState())) {
-            return new AliquotInfo(dsa.getAliquot(), ResType.RECEIVED);
-        }
-        if (DispatchAliquotState.EXTRA.isEquals(dsa.getState())) {
-            return new AliquotInfo(dsa.getAliquot(), ResType.EXTRA);
-        }
-        return new AliquotInfo(dsa.getAliquot(), ResType.OK);
     }
 
     @SuppressWarnings("unused")
@@ -153,7 +127,7 @@ public class OrderEntryFormBase extends BiobankFormBase {
         Assert.isTrue((adapter instanceof OrderAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
-
+        this.order = (OrderWrapper) adapter.getModelObject();
         setPartName("New Order");
     }
 }

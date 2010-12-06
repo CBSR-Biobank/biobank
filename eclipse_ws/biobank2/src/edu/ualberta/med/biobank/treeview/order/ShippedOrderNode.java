@@ -1,8 +1,6 @@
 package edu.ualberta.med.biobank.treeview.order;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
@@ -15,13 +13,17 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ShippedOrderNode extends AdapterBase {
 
-    public ShippedOrderNode(AdapterBase parent, int id) {
+    private SiteWrapper site;
+
+    public ShippedOrderNode(AdapterBase parent, int id, SiteWrapper site) {
         super(parent, id, "Shipped", true, false);
+        this.site = site;
     }
 
     @Override
@@ -61,14 +63,7 @@ public class ShippedOrderNode extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        StudyWrapper s = new StudyWrapper(SessionManager.getAppService());
-        s.setNameShort("HEART");
-        DispatchWrapper fake = new DispatchWrapper(
-            SessionManager.getAppService());
-        fake.setStudy(s);
-        List<DispatchWrapper> list = new ArrayList<DispatchWrapper>();
-        list.add(fake);
-        return list;
+        return site.getOrderCollection();
     }
 
     @Override

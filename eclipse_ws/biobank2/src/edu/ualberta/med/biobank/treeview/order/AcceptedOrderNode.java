@@ -1,23 +1,29 @@
 package edu.ualberta.med.biobank.treeview.order;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class NewOrderNode extends AdapterBase {
+public class AcceptedOrderNode extends AdapterBase {
 
-    public NewOrderNode(AdapterBase parent, int id) {
-        super(parent, id, "New", true, false);
+    private SiteWrapper site;
+
+    public AcceptedOrderNode(AdapterBase parent, int id, SiteWrapper site) {
+        super(parent, id, "Accepted", true, false);
+        this.site = site;
     }
 
     @Override
@@ -32,6 +38,16 @@ public class NewOrderNode extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
+        if (SessionManager.canCreate(DispatchWrapper.class, null)) {
+            MenuItem mi = new MenuItem(menu, SWT.PUSH);
+            mi.setText("Add Order");
+            mi.addSelectionListener(new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent event) {
+                    // addDispatch();
+                }
+            });
+        }
     }
 
     @Override
@@ -47,14 +63,7 @@ public class NewOrderNode extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        StudyWrapper s = new StudyWrapper(SessionManager.getAppService());
-        s.setNameShort("BBPSP");
-        DispatchWrapper fake = new DispatchWrapper(
-            SessionManager.getAppService());
-        fake.setStudy(s);
-        List<DispatchWrapper> list = new ArrayList<DispatchWrapper>();
-        list.add(fake);
-        return list;
+        return site.getOrderCollection();
     }
 
     @Override

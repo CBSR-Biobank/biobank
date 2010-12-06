@@ -12,6 +12,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.OrderEntryFormBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -67,13 +68,13 @@ public class OrderAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
     }
 
-    public void doProcess() {
-        setOrderAsProcessing();
+    public void doAccept() {
+        setOrderAsAccepted();
         openEntryForm();
     }
 
-    private void setOrderAsProcessing() {
-        getWrapper().setInProcessingState();
+    private void setOrderAsAccepted() {
+        getWrapper().setInAcceptedState();
         persistOrder();
     }
 
@@ -89,8 +90,8 @@ public class OrderAdapter extends AdapterBase {
         openViewForm();
     }
 
-    private void setOrderAsCreation() {
-        getWrapper().setInCreationState();
+    private void setOrderAsNew() {
+        getWrapper().setInNewState();
         persistOrder();
     }
 

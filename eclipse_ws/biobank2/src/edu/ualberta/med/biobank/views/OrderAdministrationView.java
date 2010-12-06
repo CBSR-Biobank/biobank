@@ -13,40 +13,19 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.dispatch.DispatchSearchedNode;
-import edu.ualberta.med.biobank.treeview.dispatch.InCreationDispatchGroup;
-import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchGroup;
-import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchGroup;
-import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchGroup;
-import edu.ualberta.med.biobank.treeview.order.FilledOrderNode;
-import edu.ualberta.med.biobank.treeview.order.NewOrderNode;
-import edu.ualberta.med.biobank.treeview.order.ProcessingOrderNode;
-import edu.ualberta.med.biobank.treeview.order.ShippedOrderNode;
+import edu.ualberta.med.biobank.treeview.order.OrderSearchedNode;
 
 public class OrderAdministrationView extends AbstractAdministrationView {
 
     public static final String ID = "edu.ualberta.med.biobank.views.OrderAdminView";
 
-    public InCreationDispatchGroup creationNode;
-
-    public SentInTransitDispatchGroup sentTransitNode;
-
-    public ReceivingInTransitDispatchGroup receivedTransitNode;
-
-    public ReceivingNoErrorsDispatchGroup receivingNode;
-
-    private DispatchSearchedNode searchedNode;
-
-    private NewOrderNode newOrderNode;
-
-    private ProcessingOrderNode processingNode;
-
     private Button radioOrderNumber;
 
-    private FilledOrderNode filledOrderNode;
+    private List<SiteWrapper> siteNodes;
 
-    private ShippedOrderNode shippedOrderNode;
+    private OrderSearchedNode searchedNode;
 
     private static OrderAdministrationView currentInstance;
 
@@ -58,30 +37,26 @@ public class OrderAdministrationView extends AbstractAdministrationView {
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
-        createNodes();
     }
 
-    private void createNodes() {
+    public void createNodes() {
+        try {
+            siteNodes = SiteWrapper.getSites(SessionManager.getAppService());
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Failed to load sites", e);
+        }
+        if (siteNodes != null) {
+            for (SiteWrapper site : siteNodes) {
+                OrderSiteAdapter siteAdapter = new OrderSiteAdapter(rootNode,
+                    site);
+                siteAdapter.setParent(rootNode);
+                rootNode.addChild(siteAdapter);
+            }
 
-        newOrderNode = new NewOrderNode(rootNode, 0);
-        newOrderNode.setParent(rootNode);
-        rootNode.addChild(newOrderNode);
-
-        processingNode = new ProcessingOrderNode(rootNode, 1);
-        processingNode.setParent(rootNode);
-        rootNode.addChild(processingNode);
-
-        filledOrderNode = new FilledOrderNode(rootNode, 2);
-        filledOrderNode.setParent(rootNode);
-        rootNode.addChild(filledOrderNode);
-
-        shippedOrderNode = new ShippedOrderNode(rootNode, 3);
-        shippedOrderNode.setParent(rootNode);
-        rootNode.addChild(shippedOrderNode);
-
-        searchedNode = new DispatchSearchedNode(rootNode, 4);
-        searchedNode.setParent(rootNode);
-        rootNode.addChild(searchedNode);
+            searchedNode = new OrderSearchedNode(rootNode, 2);
+            searchedNode.setParent(rootNode);
+            rootNode.addChild(searchedNode);
+        }
     }
 
     @Override

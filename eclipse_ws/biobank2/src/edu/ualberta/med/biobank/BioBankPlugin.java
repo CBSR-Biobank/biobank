@@ -46,14 +46,15 @@ import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchGrou
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchGroup;
+import edu.ualberta.med.biobank.treeview.order.AcceptedOrderNode;
+import edu.ualberta.med.biobank.treeview.order.ApprovedOrderNode;
 import edu.ualberta.med.biobank.treeview.order.FilledOrderNode;
-import edu.ualberta.med.biobank.treeview.order.NewOrderNode;
-import edu.ualberta.med.biobank.treeview.order.ProcessingOrderNode;
 import edu.ualberta.med.biobank.treeview.order.ShippedOrderNode;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.views.DispatchSiteAdapter;
+import edu.ualberta.med.biobank.views.OrderSiteAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -187,9 +188,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_DISPATCH_SHIPMENT);
         classToImageKey.put(DispatchSiteAdapter.class.getName(),
             BioBankPlugin.IMG_SITE);
-        classToImageKey.put(NewOrderNode.class.getName(),
+        classToImageKey.put(OrderSiteAdapter.class.getName(),
+            BioBankPlugin.IMG_SITE);
+        classToImageKey.put(ApprovedOrderNode.class.getName(),
             BioBankPlugin.IMG_ORDER);
-        classToImageKey.put(ProcessingOrderNode.class.getName(),
+        classToImageKey.put(AcceptedOrderNode.class.getName(),
             BioBankPlugin.IMG_ORDER_EDIT);
         classToImageKey.put(ShippedOrderNode.class.getName(),
             BioBankPlugin.IMG_ORDER_SHIPPED);

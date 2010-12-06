@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -21,6 +22,7 @@ import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchInfo;
+import edu.ualberta.med.biobank.model.Order;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -50,7 +52,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "sitePvAttrCollection", "street1", "street2", "city", "province",
             "postalCode", "sentDispatchCollection", "sentDispatchCollection",
             "notificationCollection", "srcDispatchInfoCollection",
-            "studyCollection" };
+            "studyCollection", "orderCollection" };
     }
 
     public String getName() {
@@ -267,6 +269,30 @@ public class SiteWrapper extends ModelWrapper<Site> {
                     + getName()
                     + ". All defined children (shipments, container types, and containers) must be removed first.");
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<OrderWrapper> getOrderCollection() {
+        OrderWrapper order = new OrderWrapper(appService, new Order());
+        order.setInApprovedState();
+        order.setWaybill("testwaybill");
+        order.setSite(this);
+        order.setSubmitted(new Date());
+        order.setStudy(getStudyCollection().get(0));
+        List<OrderWrapper> orderList = new ArrayList<OrderWrapper>();
+        orderList.add(order);
+        return orderList;
+
+        /*
+         * List<OrderWrapper> orderCollection = (List<OrderWrapper>)
+         * propertiesMap .get("orderCollection"); if (orderCollection == null) {
+         * Collection<Order> children = wrappedObject.getOrderCollection(); if
+         * (children != null) { orderCollection = new ArrayList<OrderWrapper>();
+         * for (Order order : children) { orderCollection.add(new
+         * OrderWrapper(appService, order)); }
+         * propertiesMap.put("orderCollection", orderCollection); } } return
+         * orderCollection;
+         */
     }
 
     @SuppressWarnings("unchecked")
