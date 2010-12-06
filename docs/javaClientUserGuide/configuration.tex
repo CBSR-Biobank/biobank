@@ -1,7 +1,79 @@
 \chapter{Configuration}
+\section{General}
 \section{Issue Tracker}
 \section{Link \ Assign}
-\section{Scanner Configuration}
+\section{Scanning and Decoding}
+The items on this preferences page allow the user to specify the scanning and
+decoding parameters used to decode 2D barcodes on aliquot tubes.
+\begin{center}
+\begin{tabular}{|l|p{5in}|}
+  \hline
+  \textbf{Select Scanner} & Used to select the scanner that will be used to scan
+    96 well pallets.\\
+  \hline
+  \textbf{Driver Type} & The type of driver that was selected when the \emph{Select
+    Scanner} button was pressed. Normally, the application will attempt to
+    determine the driver type as soon as the user makes the selection, but
+    sometimes the application does not select the correct type. Use the
+    checkboxes here to override what the application selected.\\
+  \hline
+  \textbf{DPI} & The \emph{Dots per Inch} to scan images at. For best results use
+    600 DPI.\\
+  \hline
+  \textbf{Brightness} & The brightness setting to be used when scanning
+    images. This parameter does not work on Hewlett-Packard scanners when using
+    the WIA based driver.\\
+  \hline
+  \textbf{Contrast} & The contrast setting to be used when scanning
+    images. This parameter does not work on Hewlett-Packard scanners when using
+    the WIA based driver.\\
+  \hline
+\end{tabular}
+\end{center}
+\subsection{Decoding Parameters}
+
+\begin{center}
+\begin{tabular}{|l|p{4in}|}
+  \hline
+  \textbf{Decode Library Debug Level} & The decoding software library can
+  output debugging information to a log file. When this value is zero there is
+  no debugging information stored in the log file. Possible values are 0
+  through 9. The higher the value the more detailed the debugging information.\\
+  \hline
+
+  \textbf{Decode Edge Threshold} & Set the minimum edge threshold as a
+  percentage of maximum. For example, an edge between a pure white and pure
+  black pixel would have an intensity of 100.  Edges with intensities below the
+  indicated threshold will be ignored by the decoding process. Lowering the
+  threshold will increase the amount of work to be done, but may be necessary
+  for low contrast or blurry images. The default and recommended value is
+  \emph{5}.\\
+
+  \hline
+
+  \textbf{Decode Square Deviation} & Maximum deviation (in degrees) from
+  squareness between adjacent barcode sides. The default and recommended value
+  is \emph{N=15} and is meant for scanned images. Barcode regions found with
+  corners \emph{<(90-N)} or \emph{>(90+N)} will be ignored by the decoder.\\
+
+  \hline
+  \textbf{Decode Corrections} &  The number of corrections to make while
+  decoding. The defaut and recommended value is 10.\\
+  \hline
+  \textbf{Decode Scan Gap} & The scan grid gap size in inches. The
+  default and recommended value is \emph{0.085}.\\
+  \hline
+  \textbf{Decode Cell Distance} & The distance in inches between tubes.The
+  default and recommended value is \emph{0.345} for NUNC pallets.\\
+  \hline
+\end{tabular}
+\end{center}
+
 \subsection{Decoding Profiles}
 \subsection{Plate Positions}
+In order to decode the 2D barcodes on the aliquot tubes, the plate scanning
+regions must be configured in the preferences. You must first select the
+scanning parameters and then define the regions that will contain the pallets
+on the scanner.
+\subsection{Plate Barcodes}
 \section{Servers}
