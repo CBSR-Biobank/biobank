@@ -750,19 +750,13 @@
   	</target>
   	
   	<target name="updateSiteMetadata">
-  	  <property name="updateSiteFolder" value="${product.dir}/buildDirectory/updateSite"/>
+  	  <property name="buildDirectory" value="${product.dir}/buildDirectory"/> 
+  	  <property name="updateSiteFolder" value="${buildDirectory}/updateSite"/>
       <copy todir="${updateSiteFolder}/features/">
-  	    <fileset dir="${buildDirectory}/buildRepo/features/">
-  	  	  <include name="biobank2.feature.core_*.jar"/>
-  	  	</fileset>
+  	    <fileset dir="${buildDirectory}/buildRepo/features/"/>
   	  </copy>
   	  <copy todir="${updateSiteFolder}/plugins/">
-  	    <fileset dir="${buildDirectory}/buildRepo/plugins/">
-  	  	  <include name="biobank2_*.jar"/>
-  	  	  <include name="scannerConfig_*.jar"/>
-  	  	  <include name="biobank.common_*.jar"/>
-  	  	  <include name="sampleProcessingRobot_*.jar"/>
-  	  	</fileset>
+  	    <fileset dir="${buildDirectory}/buildRepo/plugins/"/>
   	  </copy>
   	  <fileset id="featureJar.id" dir="${updateSiteFolder}/features/" includes="biobank2.feature.core_*.jar" />
   	  <property name="featureJar" refid="featureJar.id"/>
