@@ -78,7 +78,6 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          */
         configurer.setShowProgressIndicator(true);
         getWindowConfigurer().setTitle(getWindowTitle());
-
     }
 
     @Override
