@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.report.ChangeListener;
+import edu.ualberta.med.biobank.widgets.report.ColumnChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.ColumnSelectWidget;
 import edu.ualberta.med.biobank.widgets.report.FilterChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.FilterSelectWidget;
@@ -208,8 +209,11 @@ public class ReportEntryForm extends BiobankEntryForm {
             .addFilterChangedListener(new ChangeListener<FilterChangeEvent>() {
                 @Override
                 public void handleEvent(FilterChangeEvent event) {
-                    setDirty(true);
-                    form.reflow(true);
+                    if (event.isDataChange()) {
+                        setDirty(true);
+                    }
+
+                    book.reflow(true);
                     form.layout(true, true);
 
                     EntityFilter entityFilter = event.getEntityFilter();
@@ -296,7 +300,6 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     private void createOptionsSection() {
         Section section = createSection("Options");
-
         Composite options = toolkit.createComposite(section);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -315,6 +318,15 @@ public class ReportEntryForm extends BiobankEntryForm {
         columnsLabel.setLayoutData(layoutData);
 
         columnsWidget = new ColumnSelectWidget(options, SWT.NONE, report);
+        columnsWidget
+            .addColumnChangeListener(new ChangeListener<ColumnChangeEvent>() {
+                @Override
+                public void handleEvent(ColumnChangeEvent event) {
+                    setDirty(true);
+                    form.reflow(true);
+                    form.layout(true, true);
+                }
+            });
 
         section.setClient(options);
     }

@@ -82,12 +82,6 @@ public class FilterSelectWidget extends Composite {
         listeners.remove(listener);
     }
 
-    public void notifyListeners(FilterChangeEvent event) {
-        for (ChangeListener<FilterChangeEvent> listener : listeners) {
-            listener.handleEvent(event);
-        }
-    }
-
     public FilterRow getFilterRow(EntityFilter entityFilter) {
         return filterRowMap.get(entityFilter.getId());
     }
@@ -101,6 +95,12 @@ public class FilterSelectWidget extends Composite {
             filterRowMap.put(id, filterRow);
         }
         return filterRow;
+    }
+
+    void notifyListeners(FilterChangeEvent event) {
+        for (ChangeListener<FilterChangeEvent> listener : listeners) {
+            listener.handleEvent(event);
+        }
     }
 
     void removeFilterRow(EntityFilter entityFilter) {

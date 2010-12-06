@@ -78,7 +78,8 @@ public class ComboFilterValueWidget implements FilterValueWidget {
     }
 
     @Override
-    public void addChangeListener(final ChangeListener<Object> changeListener) {
+    public void addChangeListener(
+        final ChangeListener<ChangeEvent> changeListener) {
         comboViewer.getCombo().addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -90,6 +91,11 @@ public class ComboFilterValueWidget implements FilterValueWidget {
     @Override
     public Control getControl() {
         return comboViewer.getControl();
+    }
+
+    @Override
+    public boolean isValid(ReportFilterValue value) {
+        return value.getValue() != null;
     }
 
     public ComboViewer getComboViewer() {

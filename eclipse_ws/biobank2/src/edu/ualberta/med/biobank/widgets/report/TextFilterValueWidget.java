@@ -44,7 +44,8 @@ public class TextFilterValueWidget implements FilterValueWidget {
     }
 
     @Override
-    public void addChangeListener(final ChangeListener<Object> changeListener) {
+    public void addChangeListener(
+        final ChangeListener<ChangeEvent> changeListener) {
         text.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -56,5 +57,10 @@ public class TextFilterValueWidget implements FilterValueWidget {
     @Override
     public Control getControl() {
         return text;
+    }
+
+    @Override
+    public boolean isValid(ReportFilterValue value) {
+        return value.getValue() != null;
     }
 }

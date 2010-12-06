@@ -11,7 +11,9 @@ interface FilterValueWidget {
 
     public void setValues(Collection<ReportFilterValue> values);
 
-    public void addChangeListener(ChangeListener<Object> changeListener);
+    public void addChangeListener(ChangeListener<ChangeEvent> changeListener);
 
     public Control getControl();
+
+    public boolean isValid(ReportFilterValue value);
 }

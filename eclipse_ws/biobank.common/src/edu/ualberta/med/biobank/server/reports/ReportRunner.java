@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.reports;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -20,12 +21,12 @@ import edu.ualberta.med.biobank.common.reports.ReportsUtil;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
-import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.PropertyModifier;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
+import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class ReportRunner {
     private static final String PROPERTY_DELIMITER = ".";
@@ -61,6 +62,10 @@ public class ReportRunner {
     }
 
     public List<?> run() {
+        if (criteria == null) {
+            return Arrays.asList();
+        }
+
         return criteria.list();
     }
 
@@ -79,6 +84,11 @@ public class ReportRunner {
     }
 
     private Criteria createCriteria() {
+        if (!report.getIsCount()
+            && report.getReportColumnCollection().isEmpty()) {
+            return null;
+        }
+
         Criteria criteria = session.createCriteria(report.getEntity()
             .getClassName());
 
@@ -141,13 +151,13 @@ public class ReportRunner {
                 String propertyPath = filter.getEntityProperty().getProperty();
                 String aliasedProperty = getAliasedProperty(propertyPath);
 
-                Collection<String> rfvCollection = ReportWrapper
-                    .getFilterValueStrings(reportFilter);
+                Collection<ReportFilterValue> rfvCollection = reportFilter
+                    .getReportFilterValueCollection();
 
                 filterType
                     .addCriteria(criteria, aliasedProperty, FilterOperator
                         .getFilterOperator(reportFilter.getOperator()),
-                        new ArrayList<String>(rfvCollection));
+                        new ArrayList<ReportFilterValue>(rfvCollection));
             }
         }
 

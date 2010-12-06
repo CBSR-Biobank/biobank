@@ -135,7 +135,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
         };
     };
 
-    private final Collection<ChangeListener<Object>> listeners = new ArrayList<ChangeListener<Object>>();
+    private final Collection<ChangeListener<ChangeEvent>> listeners = new ArrayList<ChangeListener<ChangeEvent>>();
     private final Composite container;
     private final ViewModeControls viewModeControls;
     private final EditModeControls editModeControls;
@@ -190,25 +190,37 @@ public class SetFilterValueWidget implements FilterValueWidget {
     public void setValues(Collection<ReportFilterValue> values) {
         ListViewer listViewer = editModeControls.getListViewer();
         listViewer.remove(getValues().toArray());
-        listViewer.add(values.toArray());
+
+        Collection<ReportFilterValue> validValues = new ArrayList<ReportFilterValue>();
+        for (ReportFilterValue value : values) {
+            if (isValid(value)) {
+                validValues.add(value);
+            }
+        }
+        listViewer.add(validValues.toArray());
 
         viewModeControls.updateViewText();
     }
 
     @Override
-    public void addChangeListener(ChangeListener<Object> changeListener) {
+    public void addChangeListener(ChangeListener<ChangeEvent> changeListener) {
         listeners.add(changeListener);
     }
 
-    private void notifyListeners(Object o) {
-        for (ChangeListener<Object> listener : listeners) {
-            listener.handleEvent(o);
+    private void notifyListeners(ChangeEvent event) {
+        for (ChangeListener<ChangeEvent> listener : listeners) {
+            listener.handleEvent(event);
         }
     }
 
     @Override
     public Control getControl() {
         return container;
+    }
+
+    @Override
+    public boolean isValid(ReportFilterValue value) {
+        return editModeControls.getFilterValueWidget().isValid(value);
     }
 
     private static boolean isControlVisible(Control control) {
@@ -294,11 +306,9 @@ public class SetFilterValueWidget implements FilterValueWidget {
             editModeButton.addListener(SWT.Selection, new Listener() {
                 @Override
                 public void handleEvent(Event event) {
-                    // TODO: only send an SWT.Resize event so only resizing is
-                    // done and the state of the form is not set to dirty. Use
-                    // SWT.Resize and SWT.Modify?
                     setMode(Mode.EditMode);
-                    SetFilterValueWidget.this.notifyListeners(null);
+                    SetFilterValueWidget.this.notifyListeners(new ChangeEvent(
+                        false));
                 }
             });
         }
@@ -326,6 +336,10 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         public ListViewer getListViewer() {
             return listViewer;
+        }
+
+        public FilterValueWidget getFilterValueWidget() {
+            return filterValueWidget;
         }
 
         private void createAddButton() {
@@ -413,7 +427,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
                 @Override
                 public void handleEvent(Event event) {
                     setMode(Mode.ViewMode);
-                    SetFilterValueWidget.this.notifyListeners(null);
+                    SetFilterValueWidget.this.notifyListeners(new ChangeEvent(
+                        false));
                 }
             });
         }

@@ -57,7 +57,8 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
     }
 
     @Override
-    public void addChangeListener(final ChangeListener<Object> changeListener) {
+    public void addChangeListener(
+        final ChangeListener<ChangeEvent> changeListener) {
         dateTime.addModifyListener(new ModifyListener() {
             @Override
             public void modifyText(ModifyEvent e) {
@@ -69,5 +70,10 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
     @Override
     public Control getControl() {
         return dateTime;
+    }
+
+    @Override
+    public boolean isValid(ReportFilterValue value) {
+        return value.getValue() != null;
     }
 }

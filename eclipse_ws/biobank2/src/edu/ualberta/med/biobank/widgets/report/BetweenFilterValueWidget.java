@@ -65,17 +65,18 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
     }
 
     @Override
-    public void addChangeListener(final ChangeListener<Object> changeListener) {
-        minValueWidget.addChangeListener(new ChangeListener<Object>() {
+    public void addChangeListener(
+        final ChangeListener<ChangeEvent> changeListener) {
+        minValueWidget.addChangeListener(new ChangeListener<ChangeEvent>() {
             @Override
-            public void handleEvent(Object event) {
+            public void handleEvent(ChangeEvent event) {
                 changeListener.handleEvent(event);
             }
         });
 
-        maxValueWidget.addChangeListener(new ChangeListener<Object>() {
+        maxValueWidget.addChangeListener(new ChangeListener<ChangeEvent>() {
             @Override
-            public void handleEvent(Object event) {
+            public void handleEvent(ChangeEvent event) {
                 changeListener.handleEvent(event);
             }
         });
@@ -84,6 +85,11 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
     @Override
     public Control getControl() {
         return container;
+    }
+
+    @Override
+    public boolean isValid(ReportFilterValue value) {
+        return value.getValue() != null && value.getSecondValue() != null;
     }
 
     private Composite createControls(Composite parent) {

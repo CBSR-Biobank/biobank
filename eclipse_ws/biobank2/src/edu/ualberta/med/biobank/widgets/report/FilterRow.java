@@ -143,7 +143,7 @@ class FilterRow extends Composite {
                     filtersWidget.removeFilterRow(filter);
                 }
                 filtersWidget.notifyListeners(new FilterChangeEvent(filter,
-                    isChecked));
+                    isChecked, true));
             }
         });
     }
@@ -240,10 +240,6 @@ class FilterRow extends Composite {
     private FilterValueWidget createFilterValueWidget(boolean isEditMode) {
         FilterValueWidget result = null;
 
-        // TODO: for now, use comma-delimited values. In the future can
-        // create and use a set-widget (see Nebula's TableCombo for a
-        // candidate).
-
         FilterOperator op = getOperator();
 
         if (op.isValueRequired()) {
@@ -293,10 +289,14 @@ class FilterRow extends Composite {
             return;
         }
 
-        filterValueWidget.addChangeListener(new ChangeListener<Object>() {
+        filterValueWidget.addChangeListener(new ChangeListener<ChangeEvent>() {
             @Override
-            public void handleEvent(Object event) {
-                filtersWidget.notifyListeners(new FilterChangeEvent(filter));
+            public void handleEvent(ChangeEvent event) {
+                boolean isDataChange = event == null ? true : event
+                    .isDataChange();
+
+                filtersWidget.notifyListeners(new FilterChangeEvent(filter,
+                    true, isDataChange));
             }
         });
 

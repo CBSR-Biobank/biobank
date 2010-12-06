@@ -54,10 +54,8 @@ public class ColumnSelectWidget extends Composite {
         }
     };
 
-    // @see
-    // http://blog.subshell.com/devblog/2010/09/eclipse-rcp-using-a-tableviewer-with-comboboxes.html
-
     private final ReportWrapper report;
+    private final Collection<ChangeListener<ColumnChangeEvent>> listeners = new ArrayList<ChangeListener<ColumnChangeEvent>>();
     private Composite container;
     private TreeViewer available;
     private TableViewer displayed;
@@ -91,6 +89,24 @@ public class ColumnSelectWidget extends Composite {
         }
 
         return result;
+    }
+
+    public void addColumnChangeListener(
+        ChangeListener<ColumnChangeEvent> listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+
+    public void removeColumnChangeListener(
+        ChangeListener<ColumnChangeEvent> listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyListeners(ColumnChangeEvent event) {
+        for (ChangeListener<ColumnChangeEvent> listener : listeners) {
+            listener.handleEvent(event);
+        }
     }
 
     private void init() {
@@ -395,7 +411,8 @@ public class ColumnSelectWidget extends Composite {
     }
 
     private void displayColumn(ReportColumn reportColumn) {
-        removeAvailable(reportColumn.getEntityColumn());
+        EntityColumn entityColumn = reportColumn.getEntityColumn();
+        removeAvailable(entityColumn);
         addDisplayed(reportColumn);
     }
 
@@ -446,6 +463,9 @@ public class ColumnSelectWidget extends Composite {
         Object o = getElement(displayed, wrapper);
         if (o == null) {
             displayed.add(wrapper);
+
+            EntityColumn entityColumn = reportColumn.getEntityColumn();
+            notifyListeners(new ColumnChangeEvent(entityColumn));
         }
     }
 
@@ -468,6 +488,9 @@ public class ColumnSelectWidget extends Composite {
                 ((ReportColumnWrapper) items[i].getData()).getReportColumn()
                     .setPosition(i);
             }
+
+            EntityColumn entityColumn = reportColumnWrapper.getEntityColumn();
+            notifyListeners(new ColumnChangeEvent(entityColumn));
         }
     }
 

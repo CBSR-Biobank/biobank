@@ -13,15 +13,19 @@ public enum FilterOperator {
     // catastrophe (at least if the id value is altered).
 
     // Shared operators
-    BETWEEN(1),
-    NOT_BETWEEN(2),
+    BETWEEN(1, false, true),
+    NOT_BETWEEN(2, false, true),
     IN(3),
     NOT_IN(4),
+    BETWEEN_ANY(5),
+    NOT_BETWEEN_ANY(6),
 
     // String operators
-    MATCHES(101),
-    DOES_NOT_MATCH(102),
+    MATCHES(101, false, true),
+    DOES_NOT_MATCH(102, false, true),
     MATCHES_ALL(103),
+    MATCHES_ANY(104),
+    DOES_NOT_MATCH_ANY(105),
 
     // Number operators
     LESS_THAN(201, false, true),

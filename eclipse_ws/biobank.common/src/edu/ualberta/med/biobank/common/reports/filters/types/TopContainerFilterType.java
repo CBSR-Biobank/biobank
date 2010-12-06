@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.reports.filters.types;
 
 import java.text.MessageFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -12,6 +13,7 @@ import org.hibernate.criterion.Restrictions;
 import edu.ualberta.med.biobank.common.reports.ReportsUtil;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
+import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class TopContainerFilterType implements FilterType {
     // TODO: is it any better to write this in HQL and convert it to SQL?
@@ -19,9 +21,14 @@ public class TopContainerFilterType implements FilterType {
 
     @Override
     public void addCriteria(Criteria criteria, String aliasedProperty,
-        FilterOperator op, List<String> values) {
+        FilterOperator op, List<ReportFilterValue> values) {
         if (values != null && values.size() > 0) {
-            String idList = StringUtils.join(values.toArray(), ",");
+            Collection<String> stringValues = new ArrayList<String>();
+            for (ReportFilterValue value : values) {
+                stringValues.add(value.getValue());
+            }
+
+            String idList = StringUtils.join(stringValues.toArray(), ",");
             String sqlProperty = ReportsUtil.getSqlColumn(criteria,
                 aliasedProperty);
             String setOp = op == FilterOperator.IN ? "in" : "not in";

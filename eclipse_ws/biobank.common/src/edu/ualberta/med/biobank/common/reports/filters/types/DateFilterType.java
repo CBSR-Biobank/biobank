@@ -8,11 +8,14 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
 import edu.ualberta.med.biobank.common.reports.ReportsUtil;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
+import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class DateFilterType implements FilterType {
     private static final String DATE_TOKEN = "{date}";
@@ -20,22 +23,72 @@ public class DateFilterType implements FilterType {
     private static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat(
         "yyyy-MM-dd HH:mm:ss");
 
+    private static Date getDateFromString(String string) {
+        try {
+            return SQL_DATE_FORMAT.parse(string);
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("cannot parse date string '"
+                + string + "'");
+        }
+    }
+
+    private static Criterion between(String property, ReportFilterValue value) {
+        Date minDate = getDateFromString(value.getValue());
+        Date maxDate = getDateFromString(value.getSecondValue());
+
+        return Restrictions.between(property, minDate, maxDate);
+    }
+
+    private static Date getDate(ReportFilterValue value) {
+        return getDateFromString(value.getValue());
+    }
+
     @Override
     public void addCriteria(Criteria criteria, String aliasedProperty,
-        FilterOperator op, List<String> values) {
+        FilterOperator op, List<ReportFilterValue> values) {
 
-        String sqlDateValue = values.isEmpty() ? null : values.get(0);
-        Date date = null;
-        try {
-            date = SQL_DATE_FORMAT.parse(sqlDateValue);
-        } catch (ParseException e) {
-        }
+        String sqlDateValue = null;
+        Date date;
 
         switch (op) {
+        case BETWEEN:
+            FilterTypeUtil.checkValues(values, 1, 1);
+            for (ReportFilterValue value : values) {
+                criteria.add(between(aliasedProperty, value));
+                break;
+            }
+            break;
+        case BETWEEN_ANY: {
+            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
+            Disjunction or = Restrictions.disjunction();
+            for (ReportFilterValue value : values) {
+                or.add(between(aliasedProperty, value));
+                break;
+            }
+            criteria.add(or);
+        }
+            break;
+        case NOT_BETWEEN:
+            FilterTypeUtil.checkValues(values, 1, 1);
+            for (ReportFilterValue value : values) {
+                criteria.add(Restrictions.not(between(aliasedProperty, value)));
+                break;
+            }
+            break;
+        case NOT_BETWEEN_ANY:
+            FilterTypeUtil.checkValues(values, 1, 1);
+            for (ReportFilterValue value : values) {
+                criteria.add(Restrictions.not(between(aliasedProperty, value)));
+            }
+            break;
         case ON_OR_AFTER:
+            FilterTypeUtil.checkValues(values, 1, 1);
+            date = getDate(values.get(0));
             criteria.add(Restrictions.ge(aliasedProperty, date));
             break;
         case ON_OR_BEFORE:
+            FilterTypeUtil.checkValues(values, 1, 1);
+            date = getDate(values.get(0));
             criteria.add(Restrictions.le(aliasedProperty, date));
             break;
         case THIS_DAY:
@@ -47,6 +100,11 @@ public class DateFilterType implements FilterType {
         case SAME_WEEK_AS:
         case SAME_MONTH_AS:
         case SAME_YEAR_AS: {
+            if (sqlDateValue == null) {
+                FilterTypeUtil.checkValues(values, 1, 1);
+                sqlDateValue = values.get(0).getValue();
+            }
+
             String sqlProperty = ReportsUtil.getSqlColumn(criteria,
                 aliasedProperty);
             String modifier = null;
@@ -92,11 +150,12 @@ public class DateFilterType implements FilterType {
     @Override
     public Collection<FilterOperator> getOperators() {
         return Arrays.asList(FilterOperator.ON_OR_BEFORE,
-            FilterOperator.ON_OR_AFTER, FilterOperator.BETWEEN,
-            FilterOperator.NOT_BETWEEN, FilterOperator.THIS_DAY,
+            FilterOperator.ON_OR_AFTER, FilterOperator.THIS_DAY,
             FilterOperator.THIS_WEEK, FilterOperator.THIS_MONTH,
             FilterOperator.THIS_YEAR, FilterOperator.SAME_DAY_AS,
             FilterOperator.SAME_WEEK_AS, FilterOperator.SAME_MONTH_AS,
-            FilterOperator.SAME_YEAR_AS);
+            FilterOperator.SAME_YEAR_AS, FilterOperator.BETWEEN,
+            FilterOperator.BETWEEN_ANY, FilterOperator.NOT_BETWEEN,
+            FilterOperator.NOT_BETWEEN_ANY);
     }
 }
