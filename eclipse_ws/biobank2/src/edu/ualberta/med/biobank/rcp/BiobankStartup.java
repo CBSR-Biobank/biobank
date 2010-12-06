@@ -56,7 +56,6 @@ public class BiobankStartup implements IStartup {
                     manifestVersion);
                 properties.store(new FileOutputStream(fileAbout), null);
             }
-
             final IWorkbench workbench = PlatformUI.getWorkbench();
             workbench.getDisplay().asyncExec(new Runnable() {
                 @Override
@@ -81,7 +80,6 @@ public class BiobankStartup implements IStartup {
                                 window.getShell());
                             dlg2.open();
                         }
-
                         LoginDialog dlg = new LoginDialog(window.getShell());
                         dlg.open();
                     }

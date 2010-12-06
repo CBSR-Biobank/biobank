@@ -1,0 +1,3 @@
+# can fetch from cvs, url, ... see eclipse help on this file
+feature@biobank2.feature.platform=
+feature@biobank2.feature.core=
