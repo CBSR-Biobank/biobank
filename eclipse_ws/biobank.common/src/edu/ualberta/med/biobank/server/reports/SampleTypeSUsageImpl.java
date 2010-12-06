@@ -32,11 +32,9 @@ public class SampleTypeSUsageImpl extends AbstractReport {
         throws ApplicationException {
         List<Object> results = new ArrayList<Object>();
         List<Object> parameters = report.getParams();
-        HQLCriteria c1 = new HQLCriteria(QUERY1.replaceAll(
-            SITE_ID_SEARCH_STRING, report.getSiteId().toString()), parameters);
+        HQLCriteria c1 = new HQLCriteria(QUERY1, parameters);
         results = ((ListProxy) appService.query(c1)).getListChunk();
-        HQLCriteria c2 = new HQLCriteria(QUERY2.replaceAll(
-            SITE_ID_SEARCH_STRING, report.getSiteId().toString()), parameters);
+        HQLCriteria c2 = new HQLCriteria(QUERY2, parameters);
         results.addAll(specialPostProcess(appService.query(c2)));
         return results;
     }

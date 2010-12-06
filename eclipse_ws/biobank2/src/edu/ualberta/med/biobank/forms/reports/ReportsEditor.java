@@ -214,6 +214,11 @@ public abstract class ReportsEditor extends BiobankFormBase implements
     }
 
     private void generate() {
+        try {
+            initReport();
+        } catch (Exception e1) {
+            BioBankPlugin.openAsyncError("Failed to load parameters", e1);
+        }
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
         try {
