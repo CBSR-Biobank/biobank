@@ -1,4 +1,20 @@
 \chapter{Configuration}
+The configuration options for the Java Client can be found by selecting
+\texttt{Configuration -> Preferences} from the main menu.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/preferences_dialog} }
+      \caption{Configuration preferences dialog box.}
+      \label{fig:preferences_dialog}
+    \end{figure}
+Different configurations pages can be selected by clicking on a node on the
+tree on the left hand side of the dialog box. The \texttt{filter text} box can
+be used to quickly find a configuration page by typing the name of the page in
+whole or in part.
+
+The following sections discuss each configuration page in detail.
+\section{Automatic Updates}
 \section{General}
 \section{Issue Tracker}
 \section{Link \ Assign}
@@ -71,9 +87,48 @@ decoding parameters used to decode 2D barcodes on aliquot tubes.
 
 \subsection{Decoding Profiles}
 \subsection{Plate Positions}
-In order to decode the 2D barcodes on the aliquot tubes, the plate scanning
-regions must be configured in the preferences. You must first select the
-scanning parameters and then define the regions that will contain the pallets
-on the scanner.
+To define a pallet scanning region do the following:
+\begin{enumerate}
+  \item On the preferences dialog window, if there is a "plus" symbol next to
+    the \emph{Scanning and Decoding} node, press it to expand the sub
+    tree.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/plate1_definition} }
+      \caption{Configuring a plate position.}
+      \label{fig:plate1_definition}
+    \end{figure}
+  \item Place a pallet that contains tubes on the flatbed scanner. Ensure the
+    top edge of the pallet is touching the top of the scanning region, and the right
+    edge of the pallet is touching the right margin. Ensure the 12 columns
+    are vertical and the 8 rows are horizontal.
+  \item Select the plate region you are going to define.  If it is the first
+    select \emph{Plate 1 Position}.
+  \item Click on the "Enable" box.
+  \item Press the "Scan" button. The scanner will now scan the entire
+    flatbed. You will see something similar to Figure \ref{fig:sample_flatbed_scan}.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/sample_flatbed_scan} }
+      \caption{Sample flatbed scan.}
+      \label{fig:sample_flatbed_scan}
+    \end{figure}
+  \item Once the scan is done, you are presented with an image that contains
+    the entire flatbed and super imposed on it is a grid with 8 rows and 12
+    columns. The cell colored in cyan should correspond to tube in row A and
+    column 1.
+  \item Under orientation select "Landscape".
+  \item You can adjust the size of the grid using the mouse. If you move the
+    mouse to one of the corners or one of the edges you can resize the grid by
+    holding down the left button on the mouse. The whole grid can be moved by
+    pressing the left mouse button while hovering inside the grid.
+  \item Once the grid cells are aligned with each tube press the "OK"
+    button. Use the wheel on the mouse to make the cells smaller or bigger.
+  \item Repeat from step 2 to define any more pallet scanning regions.
+  \item Usually only one pallet scanning region is required for normal
+    operation of the software.
+\end{enumerate}
 \subsection{Plate Barcodes}
 \section{Servers}
