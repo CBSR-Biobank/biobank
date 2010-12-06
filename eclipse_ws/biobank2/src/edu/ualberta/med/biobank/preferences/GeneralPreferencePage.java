@@ -26,7 +26,8 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
         enabledFieldEditor = new BooleanFieldEditor(
             PreferenceConstants.GENERAL_SHOW_VERSION,
-            "Show Version in Main Window Title", getFieldEditorParent());
+            "Show software version in main window title",
+            getFieldEditorParent());
         addField(enabledFieldEditor);
     }
 
