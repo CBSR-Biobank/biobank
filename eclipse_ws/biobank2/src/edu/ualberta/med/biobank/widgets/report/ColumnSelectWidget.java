@@ -83,7 +83,7 @@ public class ColumnSelectWidget extends Composite {
             });
     }
 
-    public Collection<ReportColumn> getReportColumnCollection() {
+    public Collection<ReportColumn> getReportColumns() {
         Collection<ReportColumn> result = new ArrayList<ReportColumn>();
 
         for (ReportColumnWrapper wrapper : getDisplayedColumns()) {

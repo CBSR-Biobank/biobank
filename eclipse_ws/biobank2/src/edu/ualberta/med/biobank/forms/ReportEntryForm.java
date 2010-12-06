@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -26,6 +28,8 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityFilter;
+import edu.ualberta.med.biobank.model.ReportColumn;
+import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -62,15 +66,22 @@ public class ReportEntryForm extends BiobankEntryForm {
             @Override
             public void run() {
                 // update the model before saving
-                report.getWrappedObject().setReportFilterCollection(
-                    filtersWidget.getReportFilters());
-                report.getWrappedObject().setReportColumnCollection(
-                    columnsWidget.getReportColumnCollection());
+                updateReport();
             }
         });
 
         report.persist();
         reportAdapter.getParent().performExpand();
+    }
+
+    private void updateReport() {
+        Set<ReportFilter> reportFilters = new HashSet<ReportFilter>();
+        reportFilters.addAll(filtersWidget.getReportFilters());
+        report.getWrappedObject().setReportFilterCollection(reportFilters);
+
+        Set<ReportColumn> reportColumns = new HashSet<ReportColumn>();
+        reportColumns.addAll(columnsWidget.getReportColumns());
+        report.getWrappedObject().setReportColumnCollection(reportColumns);
     }
 
     @Override
@@ -156,10 +167,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                 System.out.println("12312123");
                 try {
                     // update the model before running
-                    report.getWrappedObject().setReportFilterCollection(
-                        filtersWidget.getReportFilters());
-                    report.getWrappedObject().setReportColumnCollection(
-                        columnsWidget.getReportColumnCollection());
+                    updateReport();
 
                     List<Object> results = SessionManager.getAppService()
                         .runReport(report.getWrappedObject());
