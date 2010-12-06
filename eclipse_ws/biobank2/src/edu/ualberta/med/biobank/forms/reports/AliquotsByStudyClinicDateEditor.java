@@ -64,8 +64,9 @@ public class AliquotsByStudyClinicDateEditor extends ReportsEditor {
     @Override
     protected void initReport() {
         List<Object> params = new ArrayList<Object>();
-        params.add(((IStructuredSelection) dateRangeCombo.getSelection())
-            .getFirstElement().toString());
+        report
+            .setGroupBy(((IStructuredSelection) dateRangeCombo.getSelection())
+                .getFirstElement().toString());
         report.setContainerList(ReportsEditor
             .containerIdsToString(topContainers.getSelectedContainerIds()));
         params.add(ReportsEditor.processDate(start.getDate(), true));

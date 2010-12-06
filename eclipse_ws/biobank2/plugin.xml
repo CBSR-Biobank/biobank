@@ -2245,6 +2245,11 @@
     <extension
          point="org.eclipse.ui.preferencePages">
       <page
+            class="edu.ualberta.med.biobank.preferences.GeneralPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.general"
+            name="General">
+      </page>
+      <page
           category="Scanner"
             class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
             id="edu.ualberta.med.biobank.preferences.plateBarcodes"
@@ -2640,5 +2645,26 @@
                   id="edu.ualberta.med.biobank.menu.install">
             </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.activities">
+      <activity
+            description="Preferences from Eclipse Update UI"
+            id="edu.ualberta.med.biobank.activity.updateui"
+            name="Update Preferences">
+      </activity>
+      <activityPatternBinding
+            activityId="edu.ualberta.med.biobank.activity.updateui"
+            pattern="org\.eclipse\.update\.ui/org\.eclipse\.update\..*PreferencePage">
+      </activityPatternBinding>
+      <activity
+            description="Preferences from Eclipse IDE UI"
+            id="edu.ualberta.med.biobank.activity.eclipseide"
+            name="IDE General Preferences">
+      </activity>
+      <activityPatternBinding
+            activityId="edu.ualberta.med.biobank.activity.eclipseide"
+            pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.preferencePages\.Workbench">
+      </activityPatternBinding>
    </extension>
 </plugin>

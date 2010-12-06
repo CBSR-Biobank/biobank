@@ -1,42 +1,30 @@
 package edu.ualberta.med.biobank.treeview.order;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
-import java.util.List;
 
 import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
-import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
-import edu.ualberta.med.biobank.forms.DispatchViewForm;
+import edu.ualberta.med.biobank.forms.OrderEntryFormBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.views.DispatchAdministrationView;
+import edu.ualberta.med.biobank.views.OrderAdministrationView;
 
 public class OrderAdapter extends AdapterBase {
 
-    public OrderAdapter(AdapterBase parent, DispatchWrapper ship) {
+    public OrderAdapter(AdapterBase parent, OrderWrapper ship) {
         super(parent, ship);
     }
 
-    public DispatchWrapper getWrapper() {
-        return (DispatchWrapper) modelObject;
+    public OrderWrapper getWrapper() {
+        return (OrderWrapper) modelObject;
     }
 
     @Override
@@ -44,15 +32,15 @@ public class OrderAdapter extends AdapterBase {
         boolean editable = super.isEditable();
         if (getWrapper() != null) {
             return editable
-                && (getWrapper().isNew() || !getWrapper().isInTransitState());
+                && (getWrapper().isNew() || !getWrapper().isInCreationState());
         }
         return editable;
     }
 
     @Override
     protected String getLabelInternal() {
-        DispatchWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment, "Dispatch is null");
+        OrderWrapper shipment = getWrapper();
+        Assert.isNotNull(shipment, "Order is null");
         String label = new String();
         StudyWrapper study = shipment.getStudy();
 
@@ -60,115 +48,54 @@ public class OrderAdapter extends AdapterBase {
             label += study.getNameShort() + " - ";
         }
 
-        label += shipment.getFormattedDeparted();
+        label += shipment.getDateCreated();
         return label;
 
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Dispatch");
+        return getTooltipText("Order");
     }
 
     @Override
     public boolean isDeletable() {
-        List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
-        try {
-            sites = SiteWrapper.getSites(SessionManager.getAppService());
-        } catch (Exception e1) {
-            BioBankPlugin.openAsyncError("Failed to retrieve sites", e1);
-        }
-        return sites.contains(getWrapper().getSender())
-            && getWrapper().canDelete(SessionManager.getUser())
-            && getWrapper().isInCreationState();
+        return false;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Dispatch");
-        List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
-        try {
-            sites = SiteWrapper.getSites(SessionManager.getAppService());
-        } catch (Exception e1) {
-            BioBankPlugin.openAsyncError("Failed to retrieve sites", e1);
-        }
-        try {
-            if (isDeletable()) {
-                addDeleteMenu(menu, "Dispatch");
-            }
-            if (sites.contains(getWrapper().getSender())
-                && getWrapper().canUpdate(SessionManager.getUser())
-                && getWrapper().isInTransitState()) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Move to Creation");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        setDispatchAsCreation();
-                    }
-                });
-            }
-            if (getWrapper().isInTransitState()
-                && getWrapper().canBeReceivedBy(SessionManager.getUser())) {
-                MenuItem mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Receive");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doReceive();
-                    }
-                });
-                mi = new MenuItem(menu, SWT.PUSH);
-                mi.setText("Receive and Process");
-                mi.addSelectionListener(new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent event) {
-                        doReceiveAndProcess();
-                    }
-                });
-            } else if (getWrapper().canUpdate(SessionManager.getUser())) {
-                addEditMenu(menu, "Dispatch");
-            }
-        } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error checking permissions", e);
-        }
     }
 
-    public void doReceive() {
-        setDispatchAsReceived();
-        openViewForm();
-    }
-
-    public void doReceiveAndProcess() {
-        setDispatchAsReceived();
+    public void doProcess() {
+        setOrderAsProcessing();
         openEntryForm();
+    }
+
+    private void setOrderAsProcessing() {
+        getWrapper().setInProcessingState();
+        persistOrder();
     }
 
     public void doClose() {
         getWrapper().setInCloseState();
-        persistDispatch();
+        persistOrder();
         openViewForm();
     }
 
     public void doSetAsLost() {
         getWrapper().setInLostState();
-        persistDispatch();
+        persistOrder();
         openViewForm();
     }
 
-    private void setDispatchAsReceived() {
-        getWrapper().setDateReceived(new Date());
-        getWrapper().setInReceivedState();
-        persistDispatch();
-    }
-
-    private void setDispatchAsCreation() {
+    @SuppressWarnings("unused")
+    private void setOrderAsCreation() {
         getWrapper().setInCreationState();
-        getWrapper().setDeparted(null);
-        persistDispatch();
+        persistOrder();
     }
 
-    private void persistDispatch() {
+    private void persistOrder() {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
@@ -180,7 +107,7 @@ public class OrderAdapter extends AdapterBase {
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Save error", ex);
         }
-        DispatchAdministrationView.getCurrent().reload();
+        OrderAdministrationView.getCurrent().reload();
     }
 
     @Override
@@ -206,14 +133,12 @@ public class OrderAdapter extends AdapterBase {
 
     @Override
     public String getViewFormId() {
-        return DispatchViewForm.ID;
+        return OrderEntryFormBase.ID;
     }
 
     @Override
     public String getEntryFormId() {
-        if (getWrapper().isInCreationState())
-            return DispatchSendingEntryForm.ID;
-        return DispatchReceivingEntryForm.ID;
+        return OrderEntryFormBase.ID;
     }
 
 }

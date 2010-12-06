@@ -21,6 +21,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Table;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -80,6 +81,8 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
     protected ListenerList deleteItemListeners = new ListenerList();
 
     protected ListenerList doubleClickListeners = new ListenerList();
+
+    private MenuItem mi;
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings) {
@@ -233,6 +236,15 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                     @Override
                     public void run() {
                         if (!table.isDisposed()) {
+                            if (mi != null) {
+                                ModelWrapper<?> anyOb = (ModelWrapper<?>) getCollection()
+                                    .get(0);
+                                if (anyOb != null)
+                                    mi.setEnabled(anyOb
+                                        .canUpdate(SessionManager.getUser()));
+                                else
+                                    mi.setEnabled(false);
+                            }
                             viewer.refresh(item, false);
                         }
                     }
@@ -281,7 +293,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
-        MenuItem mi = new MenuItem(getMenu(), SWT.PUSH);
+        mi = new MenuItem(getMenu(), SWT.PUSH);
         mi.setText("Edit");
         mi.addSelectionListener(new SelectionListener() {
 

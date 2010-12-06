@@ -36,7 +36,8 @@ public class ContainerEmptyLocationsEditor extends ReportsEditor {
     protected void initReport() {
         List<Object> params = new ArrayList<Object>();
         params.add(containerLabel.getText());
-        params.add(topContainers.getSelectedContainerIds());
+        report.setContainerList(ReportsEditor
+            .containerIdsToString(topContainers.getSelectedContainerIds()));
         report.setParams(params);
     }
 

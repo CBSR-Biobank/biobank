@@ -5,6 +5,8 @@ import java.util.Map;
 import org.eclipse.core.runtime.IProduct;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.action.IStatusLineManager;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbench;
@@ -18,6 +20,7 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.eclipse.ui.services.ISourceProviderService;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
@@ -32,15 +35,32 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ApplicationWorkbenchWindowAdvisor.class.getName());
 
+    private IPropertyChangeListener propertyListener;
+
+    private String server = null;
+
+    private String username = null;
+
     public ApplicationWorkbenchWindowAdvisor(
         IWorkbenchWindowConfigurer configurer) {
         super(configurer);
+        addScannerPreferencesPropertyListener();
     }
 
     @Override
     public ActionBarAdvisor createActionBarAdvisor(
         IActionBarConfigurer configurer) {
         return new ApplicationActionBarAdvisor(configurer);
+    }
+
+    private String getWindowTitle() {
+        IProduct product = Platform.getProduct();
+        String windowTitle = product.getName();
+
+        if (BioBankPlugin.getDefault().windowTitleShowVersionEnabled()) {
+            windowTitle += " " + product.getDefiningBundle().getVersion();
+        }
+        return windowTitle;
     }
 
     @Override
@@ -56,13 +76,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
          * "left"); PlatformUI.getPreferenceStore().setDefault(
          * "SHOW_TEXT_ON_PERSPECTIVE_BAR", false);
          */
-        IProduct product = Platform.getProduct();
-        configurer.setTitle(product.getName() + " "
-            + product.getDefiningBundle().getVersion());
         configurer.setShowProgressIndicator(true);
-
-        getWindowConfigurer().setTitle(
-            product.getName() + " " + product.getDefiningBundle().getVersion());
+        getWindowConfigurer().setTitle(getWindowTitle());
     }
 
     @Override
@@ -136,12 +151,15 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
     }
 
     private void mainWindowUpdateTitle(String server, String username) {
+        this.server = server;
+        this.username = username;
+        mainWindowUpdateTitle();
+    }
+
+    private void mainWindowUpdateTitle() {
         IWorkbenchWindowConfigurer configurer = getWindowConfigurer();
         String oldTitle = configurer.getTitle();
-
-        IProduct product = Platform.getProduct();
-        String newTitle = product.getName() + " "
-            + product.getDefiningBundle().getVersion();
+        String newTitle = getWindowTitle();
 
         if ((server != null) && (username != null)) {
             newTitle += " - " + server + " [" + username + "]";
@@ -150,5 +168,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         if (!newTitle.equals(oldTitle)) {
             configurer.setTitle(newTitle);
         }
+    }
+
+    private void addScannerPreferencesPropertyListener() {
+        propertyListener = new IPropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent event) {
+                mainWindowUpdateTitle();
+            }
+        };
+        BioBankPlugin.getDefault().getPreferenceStore()
+            .addPropertyChangeListener(propertyListener);
+
     }
 }

@@ -57,17 +57,18 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Failed to load sites", e);
         }
+        if (siteNodes != null) {
+            for (SiteWrapper site : siteNodes) {
+                DispatchSiteAdapter siteAdapter = new DispatchSiteAdapter(
+                    rootNode, site);
+                siteAdapter.setParent(rootNode);
+                rootNode.addChild(siteAdapter);
+            }
 
-        for (SiteWrapper site : siteNodes) {
-            DispatchSiteAdapter siteAdapter = new DispatchSiteAdapter(rootNode,
-                site);
-            siteAdapter.setParent(rootNode);
-            rootNode.addChild(siteAdapter);
+            searchedNode = new DispatchSearchedNode(rootNode, 2);
+            searchedNode.setParent(rootNode);
+            rootNode.addChild(searchedNode);
         }
-
-        searchedNode = new DispatchSearchedNode(rootNode, 2);
-        searchedNode.setParent(rootNode);
-        rootNode.addChild(searchedNode);
     }
 
     @Override

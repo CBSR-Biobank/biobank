@@ -16,7 +16,9 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceRegistration;
@@ -62,6 +64,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings("restriction")
 public class BioBankPlugin extends AbstractUIPlugin {
 
     public static final String PLUGIN_ID = "biobank2";
@@ -483,6 +486,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
         }
     }
 
+    public boolean windowTitleShowVersionEnabled() {
+        return getPreferenceStore().getBoolean(
+            PreferenceConstants.GENERAL_SHOW_VERSION);
+    }
+
     public boolean isCancelBarcode(String code) {
         return getPreferenceStore().getString(
             PreferenceConstants.GENERAL_CANCEL).equals(code);
@@ -613,6 +621,20 @@ public class BioBankPlugin extends AbstractUIPlugin {
     private void registerP2Policy(BundleContext context) {
         policyRegistration = context.registerService(Policy.class.getName(),
             new BiobankPolicy(), null);
+    }
+
+    /**
+     * Show or hide the heap status based on selection.
+     * 
+     * @param selection
+     */
+    public void updateHeapStatus(boolean selection) {
+        for (IWorkbenchWindow window : PlatformUI.getWorkbench()
+            .getWorkbenchWindows()) {
+            if (window instanceof WorkbenchWindow) {
+                ((WorkbenchWindow) window).showHeapStatus(selection);
+            }
+        }
     }
 
 }
