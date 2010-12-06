@@ -11,6 +11,12 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
+/**
+ * Not used at the moment. Only here for an example.
+ * 
+ * Similar to Eclipse Preferences for XML.
+ * 
+ */
 public class DefaultTopPreferencePage extends PreferencePage implements
     IWorkbenchPreferencePage {
     private Composite createComposite(Composite parent, int numColumns) {

@@ -9,18 +9,23 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.p2.BiobankPolicy;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
@@ -60,6 +65,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings("restriction")
 public class BioBankPlugin extends AbstractUIPlugin {
 
     public static final String PLUGIN_ID = "biobank2";
@@ -217,6 +223,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     // The shared instance
     private static BioBankPlugin plugin;
 
+    private ServiceRegistration policyRegistration;
+
     /**
      * The constructor
      */
@@ -235,6 +243,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         super.start(context);
         plugin = this;
         SessionManager.getInstance();
+        registerP2Policy(context);
     }
 
     @Override
@@ -337,6 +346,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     @Override
     public void stop(BundleContext context) throws Exception {
         plugin = null;
+        policyRegistration.unregister();
+        policyRegistration = null;
         super.stop(context);
     }
 
@@ -478,6 +489,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
         }
     }
 
+    public boolean windowTitleShowVersionEnabled() {
+        return getPreferenceStore().getBoolean(
+            PreferenceConstants.GENERAL_SHOW_VERSION);
+    }
+
     public boolean isCancelBarcode(String code) {
         return getPreferenceStore().getString(
             PreferenceConstants.GENERAL_CANCEL).equals(code);
@@ -603,6 +619,25 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
         classToImageKey.put(typeName, imageKey);
         return BioBankPlugin.getDefault().getImageRegistry().get(imageKey);
+    }
+
+    private void registerP2Policy(BundleContext context) {
+        policyRegistration = context.registerService(Policy.class.getName(),
+            new BiobankPolicy(), null);
+    }
+
+    /**
+     * Show or hide the heap status based on selection.
+     * 
+     * @param selection
+     */
+    public void updateHeapStatus(boolean selection) {
+        for (IWorkbenchWindow window : PlatformUI.getWorkbench()
+            .getWorkbenchWindows()) {
+            if (window instanceof WorkbenchWindow) {
+                ((WorkbenchWindow) window).showHeapStatus(selection);
+            }
+        }
     }
 
 }
