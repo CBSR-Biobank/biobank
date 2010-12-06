@@ -25,11 +25,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.ReportListProxy;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityFilter;
+import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -38,7 +40,6 @@ import edu.ualberta.med.biobank.widgets.report.ColumnChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.ColumnSelectWidget;
 import edu.ualberta.med.biobank.widgets.report.FilterChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.FilterSelectWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ReportEntryForm extends BiobankEntryForm {
     // TODO: put this somewhere so it can be shared
@@ -167,28 +168,36 @@ public class ReportEntryForm extends BiobankEntryForm {
         generateButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                System.out.println("12312123");
-                try {
-                    // update the model before running
-                    updateReport();
+                // update the model before running
+                updateReport();
 
-                    List<Object> results = SessionManager.getAppService()
-                        .runReport(report.getWrappedObject());
+                Report rawReport = report.getWrappedObject();
+                ReportListProxy results = new ReportListProxy(
+                    (BiobankApplicationService) appService, rawReport);
 
-                    for (Object o : results) {
-                        if (o instanceof Object[]) {
-                            Object[] row = (Object[]) o;
-                            System.out.println(Arrays.toString(row));
-                        } else {
-                            System.out.println(o);
-                        }
+                for (Object o : results) {
+                    if (o instanceof Object[]) {
+                        Object[] row = (Object[]) o;
+                        System.out.println(Arrays.toString(row));
+                    } else {
+                        System.out.println(o);
                     }
-
-                    System.out.println(results.size());
-
-                } catch (ApplicationException e) {
-                    e.printStackTrace();
+                    break;
                 }
+
+                System.out.println(results.size());
+
+                // try {
+                //
+                // //
+                // // List<Object> results = SessionManager.getAppService()
+                // // .runReport(rawReport, );
+                //
+                //
+                //
+                // } catch (ApplicationException e) {
+                // e.printStackTrace();
+                // }
             }
         });
     }

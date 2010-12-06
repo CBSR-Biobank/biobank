@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.server.orm;
 
-import edu.ualberta.med.biobank.model.Report;
+import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import edu.ualberta.med.biobank.server.reports.ReportRunner;
 import gov.nih.nci.system.dao.DAOException;
@@ -34,12 +34,12 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
     @Override
     public Response query(Request request) throws DAOException {
         Object obj = request.getRequest();
-        if (obj instanceof Report) {
+        if (obj instanceof ReportData) {
             Response rsp = new Response();
-            Report report = (Report) obj;
+            ReportData data = (ReportData) obj;
 
-            ReportRunner reportRunner = new ReportRunner(getSession(), report);
-            List results = reportRunner.run();
+            ReportRunner reportRunner = new ReportRunner(getSession(), data);
+            List<?> results = reportRunner.run();
 
             rsp.setResponse(results);
 

@@ -50,5 +50,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public void unlockUser(String userName) throws ApplicationException;
 
-    public List<Object> runReport(Report report) throws ApplicationException;
+    public List<Object> runReport(Report report, int maxResults, int firstRow,
+        int timeout) throws ApplicationException;
 }

@@ -27,6 +27,7 @@ import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
+import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 
 public class ReportRunner {
     private static final String PROPERTY_DELIMITER = ".";
@@ -44,13 +45,18 @@ public class ReportRunner {
     private final Report report;
     private final Criteria criteria;
 
-    public ReportRunner(Session session, Report report) {
+    public ReportRunner(Session session, ReportData data) {
         this.session = session;
-        this.report = report;
+        this.report = data.getReport();
 
         criteria = createCriteria();
 
-        criteria.setMaxResults(100);
+        criteria.setMaxResults(data.getMaxResults());
+        criteria.setFirstResult(data.getFirstRow());
+
+        if (data.getTimeout() > 0) {
+            criteria.setTimeout(data.getTimeout());
+        }
     }
 
     public void setMaxResults(int maxResults) {

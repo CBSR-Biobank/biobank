@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
 import edu.ualberta.med.biobank.common.util.ReportOption;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -50,7 +50,7 @@ public abstract class QueryObject {
         List<Object> params) throws ApplicationException, BiobankCheckException {
         HQLCriteria c = new HQLCriteria(queryString);
         c.setParameters(params);
-        return new BiobankListProxy(appService, c);
+        return new HQLCriteriaListProxy(appService, c);
     }
 
     protected List<Object> preProcess(List<Object> params) {

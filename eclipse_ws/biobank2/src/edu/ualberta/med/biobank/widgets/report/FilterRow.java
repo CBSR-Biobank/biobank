@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
+import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
@@ -42,6 +43,9 @@ import edu.ualberta.med.biobank.model.ReportFilterValue;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 class FilterRow extends Composite {
+    // TODO: make configurable?
+    private static final int MAX_QUERY_TIME = 3;
+    private static final int MAX_SUGGESTIONS = 51;
     private static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat(
         "yyyy-MM-dd HH:mm:ss");
     private final FilterSelectWidget filtersWidget;
@@ -375,15 +379,18 @@ class FilterRow extends Composite {
 
         List<Object> results = null;
         try {
-            // TODO: set max query results
-            // TODO: set max query time
-            // TODO: display monitor when loading suggestions
-            results = SessionManager.getAppService().runReport(report);
+            results = SessionManager.getAppService().runReport(report,
+                MAX_SUGGESTIONS, 0, MAX_QUERY_TIME);
+
+            if (results instanceof AbstractBiobankListProxy
+                && ((AbstractBiobankListProxy) results).getRealSize() >= MAX_SUGGESTIONS) {
+                BioBankPlugin
+                    .openError("Cannot Suggest Options",
+                        "There are either too many possible suggestions to display.");
+            }
         } catch (ApplicationException e) {
-            BioBankPlugin
-                .openError(
-                    "There are either too many possible suggestions to display or it is taking too long to find suggestions.",
-                    e);
+            BioBankPlugin.openError("Cannot Suggest Options",
+                "It is taking too long to find suggestions.");
             return;
         }
 

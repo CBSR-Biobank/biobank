@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
-import edu.ualberta.med.biobank.common.util.ReportListProxy;
+import edu.ualberta.med.biobank.common.util.PostProcessListProxy;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -66,7 +66,7 @@ public class AbstractReport {
         queryString = queryString.replaceAll(CONTAINER_LIST_SEARCH_STRING,
             report.getContainerList());
         HQLCriteria criteria = new HQLCriteria(queryString, report.getParams());
-        return new ReportListProxy(appService, criteria, getRowPostProcess());
+        return new PostProcessListProxy(appService, criteria, getRowPostProcess());
     }
 
     /**

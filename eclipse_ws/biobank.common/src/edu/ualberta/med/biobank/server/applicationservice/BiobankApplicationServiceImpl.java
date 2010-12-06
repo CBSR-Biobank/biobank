@@ -240,8 +240,15 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<Object> runReport(Report report) throws ApplicationException {
-        return this.privateQuery(report, Report.class.getName());
+    public List<Object> runReport(Report report, int maxResults, int firstRow,
+        int timeout) throws ApplicationException {
+
+        ReportData reportData = new ReportData(report);
+        reportData.setMaxResults(maxResults);
+        reportData.setFirstRow(firstRow);
+        reportData.setTimeout(timeout);
+
+        return this.privateQuery(reportData, Report.class.getName());
     }
 
     @Override
