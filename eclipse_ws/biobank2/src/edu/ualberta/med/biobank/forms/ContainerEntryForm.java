@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -62,7 +61,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private boolean newName;
 
-    private BasicSiteCombo siteCombo;
+    private ComboViewer siteCombo;
 
     protected List<ContainerTypeWrapper> containerTypes;
 
@@ -102,7 +101,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
         createButtonsSection();
     }
 
-    @SuppressWarnings("unchecked")
     private void createContainerSection() throws Exception {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -111,8 +109,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        widgetCreator.createLabel(client, "Repository Site");
-        siteCombo = new BasicSiteCombo(client, appService);
+        siteCombo = createSiteSelectionCombo(client, appService,
+            container.getSite(), true);
         if (!container.isNew()) {
             List<SiteWrapper> input = new ArrayList<SiteWrapper>();
             input.add(container.getSite());
@@ -122,11 +120,12 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
+                SiteWrapper selectedSite = getSelectedSite(siteCombo);
                 if (!container.hasParent()) {
                     try {
                         containerTypes = ContainerTypeWrapper
                             .getTopContainerTypesInSite(appService,
-                                siteCombo.getSite());
+                                selectedSite);
                     } catch (ApplicationException e) {
                     }
                 } else {
@@ -139,8 +138,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 if (container.isNew())
                     adapter.setParent(((SiteAdapter) SessionManager
                         .getCurrentAdapterViewWithTree().searchNode(
-                            siteCombo.getSite())).getContainersGroupNode());
-                container.setSite(siteCombo.getSite());
+                            selectedSite)).getContainersGroupNode());
+                container.setSite(selectedSite);
             }
         });
 
@@ -180,20 +179,22 @@ public class ContainerEntryForm extends BiobankEntryForm {
             "Comments", null, container, "comment", null);
 
         createContainerTypesSection(client);
-        if (!container.isNew())
-            siteCombo
-                .setSelection(new StructuredSelection(container.getSite()));
-        else
-            siteCombo.setSelection(new StructuredSelection(
-                ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
+
+        SiteWrapper currentSite = container.getSite();
+        if (currentSite != null)
+            siteCombo.setSelection(new StructuredSelection(currentSite));
     }
 
     private void createContainerTypesSection(Composite client) throws Exception {
         List<ContainerTypeWrapper> containerTypes;
         if (!container.hasChildren()) {
             if (!container.hasParent()) {
-                containerTypes = ContainerTypeWrapper
-                    .getTopContainerTypesInSite(appService, siteCombo.getSite());
+                SiteWrapper currentSite = container.getSite();
+                if (currentSite == null)
+                    containerTypes = new ArrayList<ContainerTypeWrapper>();
+                else
+                    containerTypes = ContainerTypeWrapper
+                        .getTopContainerTypesInSite(appService, currentSite);
             } else {
                 containerTypes = container.getParent().getContainerType()
                     .getChildContainerTypeCollection();
