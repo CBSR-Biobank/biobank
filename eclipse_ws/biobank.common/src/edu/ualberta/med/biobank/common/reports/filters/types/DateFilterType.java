@@ -51,6 +51,10 @@ public class DateFilterType implements FilterType {
         Date date;
 
         switch (op) {
+        case IS_NOT_SET:
+            FilterTypeUtil.checkValues(values, 0, 0);
+            criteria.add(Restrictions.isNull(aliasedProperty));
+            break;
         case BETWEEN:
             FilterTypeUtil.checkValues(values, 1, 1);
             for (ReportFilterValue value : values) {
@@ -151,12 +155,12 @@ public class DateFilterType implements FilterType {
     @Override
     public Collection<FilterOperator> getOperators() {
         return Arrays.asList(FilterOperator.ON_OR_BEFORE,
-            FilterOperator.ON_OR_AFTER, FilterOperator.THIS_DAY,
-            FilterOperator.THIS_WEEK, FilterOperator.THIS_MONTH,
-            FilterOperator.THIS_YEAR, FilterOperator.SAME_DAY_AS,
-            FilterOperator.SAME_WEEK_AS, FilterOperator.SAME_MONTH_AS,
-            FilterOperator.SAME_YEAR_AS, FilterOperator.BETWEEN,
-            FilterOperator.BETWEEN_ANY, FilterOperator.NOT_BETWEEN,
-            FilterOperator.NOT_BETWEEN_ANY);
+            FilterOperator.ON_OR_AFTER, FilterOperator.IS_NOT_SET,
+            FilterOperator.THIS_DAY, FilterOperator.THIS_WEEK,
+            FilterOperator.THIS_MONTH, FilterOperator.THIS_YEAR,
+            FilterOperator.SAME_DAY_AS, FilterOperator.SAME_WEEK_AS,
+            FilterOperator.SAME_MONTH_AS, FilterOperator.SAME_YEAR_AS,
+            FilterOperator.BETWEEN, FilterOperator.BETWEEN_ANY,
+            FilterOperator.NOT_BETWEEN, FilterOperator.NOT_BETWEEN_ANY);
     }
 }

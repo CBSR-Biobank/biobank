@@ -34,6 +34,10 @@ public class NumberFilterType implements FilterType {
         FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
 
         switch (op) {
+        case IS_NOT_SET:
+            FilterTypeUtil.checkValues(values, 0, 0);
+            criteria.add(Restrictions.isNull(aliasedProperty));
+            break;
         case BETWEEN: {
             FilterTypeUtil.checkValues(values, 1, 1);
             for (ReportFilterValue value : values) {
@@ -43,6 +47,7 @@ public class NumberFilterType implements FilterType {
         }
             break;
         case BETWEEN_ANY: {
+            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = Restrictions.disjunction();
             for (ReportFilterValue value : values) {
                 or.add(between(aliasedProperty, value));
@@ -57,6 +62,7 @@ public class NumberFilterType implements FilterType {
             }
             break;
         case NOT_BETWEEN_ANY:
+            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             for (ReportFilterValue value : values) {
                 criteria.add(Restrictions.not(between(aliasedProperty, value)));
             }
@@ -88,8 +94,8 @@ public class NumberFilterType implements FilterType {
     public Collection<FilterOperator> getOperators() {
         return Arrays.asList(FilterOperator.LESS_THAN,
             FilterOperator.LESS_THAN_OR_EQUAL_TO, FilterOperator.GREATER_THAN,
-            FilterOperator.GREATER_THAN_OR_EQUAL_TO, FilterOperator.BETWEEN,
-            FilterOperator.BETWEEN_ANY, FilterOperator.NOT_BETWEEN,
-            FilterOperator.NOT_BETWEEN_ANY);
+            FilterOperator.GREATER_THAN_OR_EQUAL_TO, FilterOperator.IS_NOT_SET,
+            FilterOperator.BETWEEN, FilterOperator.BETWEEN_ANY,
+            FilterOperator.NOT_BETWEEN, FilterOperator.NOT_BETWEEN_ANY);
     }
 }

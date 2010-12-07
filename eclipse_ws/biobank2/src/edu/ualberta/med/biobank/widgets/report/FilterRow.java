@@ -32,7 +32,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
-import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
@@ -45,7 +44,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 class FilterRow extends Composite {
     // TODO: make configurable?
     private static final int MAX_QUERY_TIME = 3;
-    private static final int MAX_SUGGESTIONS = 51;
+    private static final int MAX_SUGGESTIONS = 100;
     private static final SimpleDateFormat SQL_DATE_FORMAT = new SimpleDateFormat(
         "yyyy-MM-dd HH:mm:ss");
     private final FilterSelectWidget filtersWidget;
@@ -337,10 +336,12 @@ class FilterRow extends Composite {
                     new Runnable() {
                         @Override
                         public void run() {
-                            autoSuggest();
+                            if (autoSuggest()) {
+                                filtersWidget
+                                    .notifyListeners(new FilterChangeEvent(
+                                        filter));
+                            }
                             autoButton.setEnabled(true);
-                            filtersWidget
-                                .notifyListeners(new FilterChangeEvent(filter));
                         }
                     });
             }
@@ -374,7 +375,7 @@ class FilterRow extends Composite {
         return report;
     }
 
-    private void autoSuggest() {
+    private boolean autoSuggest() {
         Report report = getAutoSuggestReport();
 
         List<Object> results = null;
@@ -382,16 +383,15 @@ class FilterRow extends Composite {
             results = SessionManager.getAppService().runReport(report,
                 MAX_SUGGESTIONS, 0, MAX_QUERY_TIME);
 
-            if (results instanceof AbstractBiobankListProxy
-                && ((AbstractBiobankListProxy) results).getRealSize() >= MAX_SUGGESTIONS) {
-                BioBankPlugin
-                    .openError("Cannot Suggest Options",
-                        "There are either too many possible suggestions to display.");
+            if (results.size() >= MAX_SUGGESTIONS) {
+                BioBankPlugin.openError("Cannot Suggest Options",
+                    "There are too many possible suggestions to display.");
+                return false;
             }
         } catch (ApplicationException e) {
             BioBankPlugin.openError("Cannot Suggest Options",
                 "It is taking too long to find suggestions.");
-            return;
+            return false;
         }
 
         List<String> suggestions = new ArrayList<String>();
@@ -414,5 +414,7 @@ class FilterRow extends Composite {
         this.suggestions = suggestions;
 
         createInputs(true);
+
+        return true;
     }
 }

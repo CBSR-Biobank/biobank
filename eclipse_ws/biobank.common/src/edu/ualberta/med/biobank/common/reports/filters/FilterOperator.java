@@ -19,6 +19,7 @@ public enum FilterOperator {
     NOT_IN(4),
     BETWEEN_ANY(5),
     NOT_BETWEEN_ANY(6),
+    IS_NOT_SET(7, false, false),
 
     // String operators
     MATCHES(101, false, true),

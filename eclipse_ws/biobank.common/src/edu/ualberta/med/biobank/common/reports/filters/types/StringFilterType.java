@@ -17,10 +17,11 @@ public class StringFilterType implements FilterType {
     public void addCriteria(Criteria criteria, String aliasedProperty,
         FilterOperator op, List<ReportFilterValue> values) {
 
-        FilterTypeUtil
-            .checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
-
         switch (op) {
+        case IS_NOT_SET:
+            FilterTypeUtil.checkValues(values, 0, 0);
+            criteria.add(Restrictions.isNull(aliasedProperty));
+            break;
         case MATCHES:
             FilterTypeUtil.checkValues(values, 1, 1);
             for (ReportFilterValue value : values) {
@@ -30,6 +31,7 @@ public class StringFilterType implements FilterType {
             }
             break;
         case MATCHES_ANY: {
+            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = Restrictions.disjunction();
             for (ReportFilterValue value : values) {
                 or.add(Restrictions.like(aliasedProperty, value.getValue()));
@@ -38,6 +40,7 @@ public class StringFilterType implements FilterType {
         }
             break;
         case MATCHES_ALL:
+            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             for (ReportFilterValue value : values) {
                 criteria.add(Restrictions.like(aliasedProperty,
                     value.getValue()));
@@ -52,6 +55,7 @@ public class StringFilterType implements FilterType {
             }
             break;
         case DOES_NOT_MATCH_ANY:
+            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             for (ReportFilterValue value : values) {
                 criteria.add(Restrictions.not(Restrictions.like(
                     aliasedProperty, value.getValue())));
@@ -64,6 +68,7 @@ public class StringFilterType implements FilterType {
     public Collection<FilterOperator> getOperators() {
         return Arrays.asList(FilterOperator.MATCHES,
             FilterOperator.MATCHES_ANY, FilterOperator.MATCHES_ALL,
-            FilterOperator.DOES_NOT_MATCH, FilterOperator.DOES_NOT_MATCH_ANY);
+            FilterOperator.IS_NOT_SET, FilterOperator.DOES_NOT_MATCH,
+            FilterOperator.DOES_NOT_MATCH_ANY);
     }
 }
