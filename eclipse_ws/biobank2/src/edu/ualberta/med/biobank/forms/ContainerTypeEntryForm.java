@@ -36,7 +36,6 @@ import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -88,7 +87,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private Button hasSamplesRadio;
 
-    private BasicSiteCombo siteCombo;
+    private ComboViewer siteCombo;
 
     public ContainerTypeEntryForm() {
         super();
@@ -119,7 +118,6 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         setPartName(tabName);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Container Type Information");
@@ -129,12 +127,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         createContainerTypeSection();
         createContainsSection();
 
-        if (!containerType.isNew())
+        if (containerType.getSite() != null)
             siteCombo.setSelection(new StructuredSelection(containerType
                 .getSite()));
-        else
-            siteCombo.setSelection(new StructuredSelection(
-                ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
     }
 
     protected void createContainerTypeSection() throws ApplicationException {
@@ -145,28 +140,30 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        widgetCreator.createLabel(client, "Repository Site");
-        siteCombo = new BasicSiteCombo(client, appService);
+        siteCombo = createSiteSelectionCombo(client, appService,
+            containerType.getSite(), true);
         siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
                 availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
-                for (ContainerTypeWrapper type : siteCombo.getSite()
+                SiteWrapper selectedSite = getSelectedSite(siteCombo);
+                for (ContainerTypeWrapper type : selectedSite
                     .getContainerTypeCollection()) {
                     if (type.getTopLevel().equals(Boolean.FALSE)) {
                         availSubContainerTypes.add(type);
                     }
                 }
-                containerType.setSite(siteCombo.getSite());
+                containerType.setSite(selectedSite);
                 setChildContainerTypeSelection();
                 setDirty(true);
             }
         });
 
-        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null, containerType, "name",
-            new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME)));
+        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE, "Name",
+            null, containerType, "name", new NonEmptyStringValidator(
+                MSG_NO_CONTAINER_TYPE_NAME));
+
+        setFirstControl(siteCombo.getCombo());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             "Short Name", null, containerType, "nameShort",
@@ -360,7 +357,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             public void run() {
                 adapter.setParent(((SiteAdapter) SessionManager
                     .getCurrentAdapterViewWithTree().searchNode(
-                        siteCombo.getSite())).getContainerTypesGroupNode());
+                        getSelectedSite(siteCombo)))
+                    .getContainerTypesGroupNode());
                 SessionManager.getCurrentAdapterViewWithTree().reload();
                 adapter.getParent().performExpand();
             }
@@ -444,7 +442,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-
+        setSelectedSite(siteCombo, containerType.getSite());
+        if (containerType.getTopLevel() == null) {
+            containerType.setTopLevel(false);
+        }
         setChildContainerTypeSelection();
         setSampleTypesSelection();
         showContainersOrSamples();
