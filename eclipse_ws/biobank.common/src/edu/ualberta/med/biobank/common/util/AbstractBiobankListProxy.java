@@ -47,7 +47,7 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
         this.realSize = -1;
     }
 
-    public abstract List<Object> getChunk(Integer firstRow)
+    protected abstract List<Object> getChunk(Integer firstRow)
         throws ApplicationException;
 
     @Override

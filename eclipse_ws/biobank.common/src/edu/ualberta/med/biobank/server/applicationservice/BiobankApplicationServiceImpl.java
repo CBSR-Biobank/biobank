@@ -25,6 +25,8 @@ import gov.nih.nci.security.dao.SearchCriteria;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
+import gov.nih.nci.system.dao.Request;
+import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
@@ -248,7 +250,17 @@ public class BiobankApplicationServiceImpl extends
         reportData.setFirstRow(firstRow);
         reportData.setTimeout(timeout);
 
-        return this.privateQuery(reportData, Report.class.getName());
+        Request request = new Request(reportData);
+        request.setIsCount(Boolean.FALSE);
+        request.setFirstRow(0);
+        request.setDomainObjectName(Report.class.getName());
+
+        Response response = query(request);
+
+        @SuppressWarnings("unchecked")
+        List<Object> results = (List<Object>) response.getResponse();
+
+        return results;
     }
 
     @Override

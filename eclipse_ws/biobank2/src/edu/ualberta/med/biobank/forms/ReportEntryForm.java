@@ -1,13 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
@@ -30,11 +27,11 @@ import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
-import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 import edu.ualberta.med.biobank.widgets.report.ChangeListener;
 import edu.ualberta.med.biobank.widgets.report.ColumnChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.ColumnSelectWidget;
@@ -64,6 +61,9 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     private Button generateButton;
 
+    private Composite resultsContainer;
+    private ReportTableWidget<Object> resultsTable;
+
     @Override
     protected void saveForm() throws Exception {
         form.getDisplay().syncExec(new Runnable() {
@@ -79,13 +79,8 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private void updateReport() {
-        Set<ReportFilter> reportFilters = new HashSet<ReportFilter>();
-        reportFilters.addAll(filtersWidget.getReportFilters());
-        report.getWrappedObject().setReportFilterCollection(reportFilters);
-
-        Set<ReportColumn> reportColumns = new HashSet<ReportColumn>();
-        reportColumns.addAll(columnsWidget.getReportColumns());
-        report.getWrappedObject().setReportColumnCollection(reportColumns);
+        report.setReportFilterCollection(filtersWidget.getReportFilters());
+        report.setReportColumnCollection(columnsWidget.getReportColumns());
     }
 
     @Override
@@ -134,7 +129,14 @@ public class ReportEntryForm extends BiobankEntryForm {
 
         createRunButtons();
 
-        // TODO: createResultsArea();
+        createResultsArea();
+    }
+
+    private void createResultsArea() {
+        resultsContainer = toolkit.createComposite(page);
+        GridLayout layout = new GridLayout(1, false);
+        resultsContainer.setLayout(layout);
+        resultsContainer.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
     }
 
     private void createProperties() {
@@ -175,31 +177,42 @@ public class ReportEntryForm extends BiobankEntryForm {
                 ReportListProxy results = new ReportListProxy(
                     (BiobankApplicationService) appService, rawReport);
 
-                for (Object o : results) {
-                    if (o instanceof Object[]) {
-                        Object[] row = (Object[]) o;
-                        System.out.println(Arrays.toString(row));
-                    } else {
-                        System.out.println(o);
-                    }
-                    break;
+                if (resultsTable != null && !resultsTable.isDisposed()) {
+                    resultsTable.dispose();
                 }
 
-                System.out.println(results.size());
+                resultsTable = new ReportTableWidget<Object>(resultsContainer,
+                    results, getHeaders());
 
-                // try {
-                //
-                // //
-                // // List<Object> results = SessionManager.getAppService()
-                // // .runReport(rawReport, );
-                //
-                //
-                //
-                // } catch (ApplicationException e) {
-                // e.printStackTrace();
-                // }
+                book.reflow(true);
+                form.layout(true, true);
             }
         });
+    }
+
+    private String[] getHeaders() {
+        Report rawReport = report.getWrappedObject();
+        // TODO: hash underneath so not sorted ;p
+        Collection<ReportColumn> reportColumns = report
+            .getReportColumnCollection();
+
+        int numHeaders = reportColumns.size();
+        numHeaders += report.getIsCount() ? 1 : 0;
+
+        String[] headers = new String[numHeaders];
+
+        int i = 0;
+
+        for (ReportColumn reportColumn : reportColumns) {
+            headers[i] = ColumnSelectWidget.getColumnName(reportColumn);
+            i++;
+        }
+
+        if (report.getIsCount()) {
+            headers[i] = report.getEntity().getName() + " Count";
+        }
+
+        return headers;
     }
 
     private void createFiltersSection() {
@@ -334,7 +347,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                 @Override
                 public void handleEvent(ColumnChangeEvent event) {
                     setDirty(true);
-                    form.reflow(true);
+                    book.reflow(true);
                     form.layout(true, true);
                 }
             });

@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.EntityColumn;
@@ -77,8 +79,8 @@ public class ReportWrapper extends ModelWrapper<Report> {
             userId);
     }
 
-    @SuppressWarnings("unchecked")
     public List<ReportColumn> getReportColumnCollection() {
+        @SuppressWarnings("unchecked")
         List<ReportColumn> columns = (List<ReportColumn>) propertiesMap
             .get(PROPERTY_REPORT_COLUMN_COLLECTION);
 
@@ -104,8 +106,21 @@ public class ReportWrapper extends ModelWrapper<Report> {
         return columns;
     }
 
-    @SuppressWarnings("unchecked")
+    public void setReportColumnCollection(Collection<ReportColumn> reportColumns) {
+        Collection<ReportColumn> oldReportColumns = wrappedObject
+            .getReportColumnCollection();
+
+        Set<ReportColumn> newReportColumns = new HashSet<ReportColumn>();
+        newReportColumns.addAll(reportColumns);
+
+        wrappedObject.setReportColumnCollection(newReportColumns);
+        propertiesMap.remove(PROPERTY_REPORT_COLUMN_COLLECTION);
+        propertyChangeSupport.firePropertyChange(
+            PROPERTY_REPORT_COLUMN_COLLECTION, oldReportColumns, reportColumns);
+    }
+
     public List<ReportFilter> getReportFilterCollection() {
+        @SuppressWarnings("unchecked")
         List<ReportFilter> filters = (List<ReportFilter>) propertiesMap
             .get(PROPERTY_REPORT_FILTER_COLLECTION);
 
@@ -129,6 +144,19 @@ public class ReportWrapper extends ModelWrapper<Report> {
         }
 
         return filters;
+    }
+
+    public void setReportFilterCollection(Collection<ReportFilter> reportFilters) {
+        Collection<ReportFilter> oldReportFilters = wrappedObject
+            .getReportFilterCollection();
+
+        Set<ReportFilter> newReportFilters = new HashSet<ReportFilter>();
+        newReportFilters.addAll(reportFilters);
+
+        wrappedObject.setReportFilterCollection(newReportFilters);
+        propertiesMap.remove(PROPERTY_REPORT_FILTER_COLLECTION);
+        propertyChangeSupport.firePropertyChange(
+            PROPERTY_REPORT_FILTER_COLLECTION, oldReportFilters, reportFilters);
     }
 
     public static Collection<String> getFilterValueStrings(

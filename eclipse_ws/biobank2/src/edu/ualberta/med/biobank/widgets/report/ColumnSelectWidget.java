@@ -669,16 +669,18 @@ public class ColumnSelectWidget extends Composite {
             if (element instanceof ReportColumnWrapper) {
                 ReportColumn reportColumn = ((ReportColumnWrapper) element)
                     .getReportColumn();
-
-                String text = reportColumn.getEntityColumn().getName();
-                if (reportColumn.getPropertyModifier() != null) {
-                    text += " (" + reportColumn.getPropertyModifier().getName()
-                        + ")";
-                }
-                return text;
+                return getColumnName(reportColumn);
 
             }
             return null;
         }
+    }
+
+    public static String getColumnName(ReportColumn reportColumn) {
+        String text = reportColumn.getEntityColumn().getName();
+        if (reportColumn.getPropertyModifier() != null) {
+            text += " (" + reportColumn.getPropertyModifier().getName() + ")";
+        }
+        return text;
     }
 }
