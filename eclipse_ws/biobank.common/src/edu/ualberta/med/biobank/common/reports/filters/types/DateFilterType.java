@@ -101,6 +101,7 @@ public class DateFilterType implements FilterType {
         case SAME_MONTH_AS:
         case SAME_YEAR_AS: {
             if (sqlDateValue == null) {
+                // TODO: wrong! Need to accept sets of same X as Y!
                 FilterTypeUtil.checkValues(values, 1, 1);
                 sqlDateValue = values.get(0).getValue();
             }

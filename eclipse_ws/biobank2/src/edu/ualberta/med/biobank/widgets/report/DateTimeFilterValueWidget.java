@@ -44,7 +44,7 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
         if (!dateTime.isDisposed()) {
             dateTime.setDate(null);
             for (ReportFilterValue value : values) {
-                if (!dateTime.isDisposed() && value != null) {
+                if (value != null && value.getValue() != null) {
                     try {
                         Date date = SQL_DATE_FORMAT.parse(value.getValue());
                         dateTime.setDate(date);

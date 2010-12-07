@@ -181,8 +181,11 @@ public class FilterSelectWidget extends Composite {
     private FilterRow addFilterRow(ReportFilter reportFilter) {
         FilterRow filterRow = addFilterRow(reportFilter.getEntityFilter());
         if (filterRow != null) {
-            filterRow.setValues(reportFilter.getReportFilterValueCollection());
+            // it's important to set the operator before setting the values so
+            // that if the values do not apply to the default operator they will
+            // not be lost
             filterRow.setOperatorId(reportFilter.getOperator());
+            filterRow.setValues(reportFilter.getReportFilterValueCollection());
         }
         return filterRow;
     }

@@ -249,7 +249,8 @@ class FilterRow extends Composite {
         if (op.isValueRequired()) {
             result = createSimpleFilterValueWidget();
 
-            if (EnumSet.of(FilterOperator.BETWEEN, FilterOperator.NOT_BETWEEN)
+            if (EnumSet.of(FilterOperator.BETWEEN, FilterOperator.BETWEEN_ANY,
+                FilterOperator.NOT_BETWEEN, FilterOperator.NOT_BETWEEN_ANY)
                 .contains(op)) {
                 result = new BetweenFilterValueWidget(inputContainer, result,
                     createSimpleFilterValueWidget());
@@ -260,7 +261,6 @@ class FilterRow extends Composite {
                 set = new SetFilterValueWidget(inputContainer, result);
 
                 if (isEditMode) {
-                    // first time the widget is created, go into ViewMode
                     set.setMode(SetFilterValueWidget.Mode.EditMode);
                 }
 
