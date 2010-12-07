@@ -10,6 +10,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -123,5 +124,11 @@ public class DateTimeWidget extends BiobankWidget {
 
     public void addSelectionListener(SelectionListener listener) {
         dateEntry.addSelectionListener(listener);
+    }
+
+    @Override
+    public void setBackground(Color color) {
+        super.setBackground(color);
+        dateEntry.setBackground(color);
     }
 }
