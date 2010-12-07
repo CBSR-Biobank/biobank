@@ -5,13 +5,18 @@
 \usepackage{color}
 \usepackage{graphicx}
 \usepackage{float}
+\usepackage{multirow}
 
 \oddsidemargin  0.0in
 \evensidemargin 0.0in
 \textwidth      6.75in
 \headheight     0.0in
 \topmargin      0.0in
-\textheight=9.0in
+\textheight     9.0in
+\setlength{\marginparwidth}{0.8in}
+\let\oldmarginpar\marginpar
+\renewcommand\marginpar[1]{\-\oldmarginpar[\raggedleft\footnotesize #1]%
+{\raggedright\footnotesize #1}}
 
 \begin{document}
 \frontmatter
@@ -21,6 +26,8 @@
 \maketitle
 \clearpage
 \tableofcontents
+\clearpage
+\listoffigures
 \clearpage
 
 \mainmatter
