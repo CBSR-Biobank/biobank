@@ -23,16 +23,16 @@ download them, and how to notify the user when they are found.
 
 \section{General}
 The settings on this page are general to the application.
-\begin{itemize}
-  \item The Java Client's software version can be displayed in the window's
-    title bar by checking this box.\textit{Note that this option is only
-      required by technicians when they are testing new versions of the
-      software}.
-  \item The \emph{heap status} can be displayed in the main window by checking
-    this box. The heap status gives an indication of the memory used by the
-    application. \textit{This option is in place for the sofware designers and
-      is not required for normal use}.
-\end{itemize}
+\begin{description}
+  \item[Show software version in main window title] the Java Client's software
+    version can be displayed in the window's title bar by checking this
+    box.\textit{Note that this option is only required by technicians when they
+      are testing new versions of the software}.
+  \item[Show heap status] the \emph{heap status} can be displayed in the main
+    window by checking this box. The heap status gives an indication of the
+    memory used by the application. \textit{This option is in place for the
+      sofware designers and is not required for normal use}.
+\end{description}
 
 \section{Issue Tracker}
 The application has the capability of sending \emph{Problem Report} emails to
@@ -41,100 +41,96 @@ the software design team\footnote{\texttt{Help -> Send Error Email} from the
 aid team in resolving potential problems. The settings on this page are the
 settings used to send the emails to the team.
 
-\textit{User should not modify these settings unless requested to by the software
+\begin{description}
+  \item[Tracker email] The email address to send problem reports to.
+  \item[SMTP server] The SMTP mail server to use when sending emails.
+  \item[SMPT server port] The SMTP server port.
+  \item[SMTP server username] The user name to use with the SMTP server.
+  \item[SMPT server password] The password to use with the SMTP server.
+\end{description}
+\textit{Users should not modify these settings unless requested to by the software
   design team}.
-\begin{center}
-\begin{tabular}{|l|p{3.5in}|}
-  \hline
-  \textbf{Tracker email} & The email address to send problem reports to.\\
-  \hline
-  \textbf{SMTP server} & The SMTP mail server to use when sending emails.\\
-  \hline
-  \textbf{SMPT server port} & The SMTP server port.\\
-  \hline
-  \textbf{SMTP server username} & The user name to use with the SMTP server.\\
-  \hline
-  \textbf{SMPT server passowrd} & The password to use with the SMTP server.\\
-  \hline
-\end{tabular}
-\end{center}
-
 
 \section{Link \ Assign}
 These settings are used when scanning and decoding pallets and linking them to
 patients or container locations.
-
-To speed up processing of samples a handheld barcode scanner can be used to
-quickly enter information into the application.
+\marginpar{\color{red}{There should  be an appendix with instructions on how to create
+  these barcodes.}}
+\begin{description}
+  \item[Confirm Barcode and Cancel Barcode] To speed up
+    processing of samples, a handheld barcode scanner can be used to quickly
+    enter information into the application. Barcodes with the corresponding
+    words can be printed and then scanned when required by the application (See
+    sections \ref{sec:scan_link}, \ref{sec:scan_assign} and
+    \ref{sec:cabinet_scan_link_assign}). The \textbf{Confirm Barcode} and
+    \textbf{Cancel Barcode} settings contain the text encoded into these
+    barcodes when they were created.
+  \item [Save activity logs into a file and Path for activity logs files] When
+    processing patients, the actions taken by the user can be logged and saved
+    to files on disc. This section allows the user to activate saving this
+    logging to disc and specify the path on disc where the files are will be
+    saved.
+  \item[\textbf{Ask to print activity log}] When a scan link or scan assign
+    session is over the user can be prompted to print the activity logs. This
+    setting enables or disables the prompting.
+\end{description}
 
 \section{Scanning and Decoding}
 The settings on this page allow the user to specify the scanning and
 decoding parameters used when decoding pallet images.
-\begin{center}
-\begin{tabular}{|l|p{5in}|}
-  \hline
-  \textbf{Select Scanner} & Used to select the scanner that will be used to scan
-    96 well pallets.\\
-  \hline
-  \textbf{Driver Type} & The type of driver that was selected when the \emph{Select
+\begin{description}
+  \item[Select Scanner]
+ Used to select the scanner that will be used to scan
+    96 well pallets.
+  \item[Driver Type] The type of driver that was selected when the \emph{Select
     Scanner} button was pressed. Normally, the application will attempt to
     determine the driver type as soon as the user makes the selection, but
     sometimes the application does not select the correct type. Use the
-    checkboxes here to override what the application selected.\\
-  \hline
-  \textbf{DPI} & The \emph{Dots per Inch} to scan images at. For best results use
-    600 DPI.\\
-  \hline
-  \textbf{Brightness} & The brightness setting to be used when scanning
+    checkboxes here to override what the application selected.
+  \item[DPI] The \emph{Dots per Inch} used by the scanner for scanning
+    images. For best results use 600 DPI.
+  \item[Brightness] The brightness setting to be used when scanning
     images. This parameter does not work on Hewlett-Packard scanners when using
-    the WIA based driver.\\
-  \hline
-  \textbf{Contrast} & The contrast setting to be used when scanning
+    the WIA based driver.
+  \item[Contrast] The contrast setting to be used when scanning
     images. This parameter does not work on Hewlett-Packard scanners when using
-    the WIA based driver.\\
-  \hline
-\end{tabular}
-\end{center}
+    the WIA based driver.
+\end{description}
+
 \subsection{Decoding Parameters}
-
-\begin{center}
-\begin{tabular}{|l|p{4in}|}
-  \hline
-  \textbf{Decode Library Debug Level} & The decoding software library can
-  output debugging information to a log file. When this value is zero there is
-  no debugging information stored in the log file. Possible values are 0
-  through 9. The higher the value the more detailed the debugging information.\\
-  \hline
-
-  \textbf{Decode Edge Threshold} & Set the minimum edge threshold as a
-  percentage of maximum. For example, an edge between a pure white and pure
-  black pixel would have an intensity of 100.  Edges with intensities below the
-  indicated threshold will be ignored by the decoding process. Lowering the
-  threshold will increase the amount of work to be done, but may be necessary
-  for low contrast or blurry images. The default and recommended value is
-  \emph{5}.\\
-
-  \hline
-
-  \textbf{Decode Square Deviation} & Maximum deviation (in degrees) from
-  squareness between adjacent barcode sides. The default and recommended value
-  is \emph{N=15} and is meant for scanned images. Barcode regions found with
-  corners \emph{<(90-N)} or \emph{>(90+N)} will be ignored by the decoder.\\
-
-  \hline
-  \textbf{Decode Corrections} &  The number of corrections to make while
-  decoding. The defaut and recommended value is 10.\\
-  \hline
-  \textbf{Decode Scan Gap} & The scan grid gap size in inches. The
-  default and recommended value is \emph{0.085}.\\
-  \hline
-  \textbf{Decode Cell Distance} & The distance in inches between tubes.The
-  default and recommended value is \emph{0.345} for NUNC pallets.\\
-  \hline
-\end{tabular}
-\end{center}
+These settings control how the software decodes the sample tubes with
+DataMatrix 2D barcodes.
+\begin{description}
+  \item[Decode Library Debug Level] The decoding software library can output
+    debugging information to a log file. When this value is zero there is no
+    debugging information stored in the log file. Possible values are 0 through
+    9. The higher the value the more detailed the debugging information.
+  \item[Decode Edge Threshold] Set the minimum edge threshold as a percentage
+    of maximum. For example, an edge between a pure white and pure black pixel
+    would have an intensity of 100.  Edges with intensities below the indicated
+    threshold will be ignored by the decoding process. Lowering the threshold
+    will increase the amount of work to be done, but may be necessary for low
+    contrast or blurry images. The default and recommended value is \emph{5}.
+  \item[Decode Square Deviation] Maximum deviation (in degrees) from squareness
+    between adjacent barcode sides. The default and recommended value is
+    \emph{N=15} and is meant for scanned images. Barcode regions found with
+    corners \emph{<(90-N)} or \emph{>(90+N)} will be ignored by the decoder.
+  \item[Decode Corrections] The number of corrections to make while
+    decoding. The defaut and recommended value is 10.
+  \item[Decode Scan Gap] The scan grid gap size in inches. The default and
+    recommended value is \emph{0.085}.
+  \item[Decode Cell Distance] The distance in inches between tubes.The default
+    and recommended value is \emph{0.345} for NUNC pallets.
+\end{descriptioin}
 
 \subsection{Decoding Profiles}
+This page allows the user to define \emph{Decoding Profiles}. These profiles
+allow the user define a sub set of tubes to decoded when an image of a pallet
+is scanned. Scannig profiles can be used during scan link and scan assign (see
+sections \ref{sec:scan_link} and \ref{sec:scan_assign}).
+
+For example: the user may wish to only decode every other row
+
 \subsection{Plate Positions}
 To define a pallet scanning region do the following:
 \begin{enumerate}
