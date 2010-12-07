@@ -31,7 +31,7 @@ The settings on this page are general to the application.
   \item[Show heap status] the \emph{heap status} can be displayed in the main
     window by checking this box. The heap status gives an indication of the
     memory used by the application. \textit{This option is in place for the
-      sofware designers and is not required for normal use}.
+      software designers and is not required for normal use}.
 \end{description}
 
 \section{Issue Tracker}
@@ -44,9 +44,9 @@ settings used to send the emails to the team.
 \begin{description}
   \item[Tracker email] The email address to send problem reports to.
   \item[SMTP server] The SMTP mail server to use when sending emails.
-  \item[SMPT server port] The SMTP server port.
+  \item[SMTP server port] The SMTP server port.
   \item[SMTP server username] The user name to use with the SMTP server.
-  \item[SMPT server password] The password to use with the SMTP server.
+  \item[SMTP server password] The password to use with the SMTP server.
 \end{description}
 \textit{Users should not modify these settings unless requested to by the software
   design team}.
@@ -82,11 +82,11 @@ decoding parameters used when decoding pallet images.
   \item[Select Scanner]
  Used to select the scanner that will be used to scan
     96 well pallets.
-  \item[Driver Type] The type of driver that was selected when the \emph{Select
+  \item[Driver Type] The type of driver that was selected when the \fbox{Select
     Scanner} button was pressed. Normally, the application will attempt to
     determine the driver type as soon as the user makes the selection, but
     sometimes the application does not select the correct type. Use the
-    checkboxes here to override what the application selected.
+    check boxes here to override what the application selected.
   \item[DPI] The \emph{Dots per Inch} used by the scanner for scanning
     images. For best results use 600 DPI.
   \item[Brightness] The brightness setting to be used when scanning
@@ -116,20 +116,33 @@ DataMatrix 2D barcodes.
     \emph{N=15} and is meant for scanned images. Barcode regions found with
     corners \emph{<(90-N)} or \emph{>(90+N)} will be ignored by the decoder.
   \item[Decode Corrections] The number of corrections to make while
-    decoding. The defaut and recommended value is 10.
+    decoding. The default and recommended value is 10.
   \item[Decode Scan Gap] The scan grid gap size in inches. The default and
     recommended value is \emph{0.085}.
   \item[Decode Cell Distance] The distance in inches between tubes.The default
     and recommended value is \emph{0.345} for NUNC pallets.
-\end{descriptioin}
+\end{description}
 
 \subsection{Decoding Profiles}
 This page allows the user to define \emph{Decoding Profiles}. These profiles
 allow the user define a sub set of tubes to decoded when an image of a pallet
-is scanned. Scannig profiles can be used during scan link and scan assign (see
+is scanned. Scanning profiles can be used during scan link and scan assign (see
 sections \ref{sec:scan_link} and \ref{sec:scan_assign}).
 
-For example: the user may wish to only decode every other row
+For example: the user may wish to only decode every other row on a pallet. Once
+the profile is created is can be used at scan link and scan assign time and
+only the cells activated in the profile will be decode. If 2D barcodes are
+found in the cells not active in the profile, the user will be given a warning
+message.
+
+To create a new profile follow these instructions:
+\begin{enumerate}
+  \item Press the \fbox{Add...} button. A dialog box pops up requesting a name
+    for the new profile. Enter an appropriate name and press the \fbox{OK}
+    button.
+  \item Now select each cell that should be part of the profile. When done
+    selecting cells press the \fbox{Apply} button.
+\end{enumerate}
 
 \subsection{Plate Positions}
 To define a pallet scanning region do the following:
@@ -151,7 +164,7 @@ To define a pallet scanning region do the following:
   \item Select the plate region you are going to define.  If it is the first
     select \emph{Plate 1 Position}.
   \item Click on the "Enable" box.
-  \item Press the "Scan" button. Now wait for the scanner to scan the entire
+  \item Press the \fbox{Scan} button. Now wait for the scanner to scan the entire
     flatbed.
     \begin{figure}[H]
       \centering
@@ -163,14 +176,14 @@ To define a pallet scanning region do the following:
   \item Once the scan is done, You will see something similar to Figure
     \ref{fig:sample_flatbed_scan}. The image shown on the right hand side is
     the image taken by the scanner and superimposed is a grid with 8 rows and
-    12 columns. The cell colored in cyan should correspond to tube in row A and
+    12 columns. The cell coloured in cyan should correspond to tube in row A and
     column 1.
   \item Under orientation select "Landscape".
   \item You can adjust the size of the grid using the mouse. If you move the
     mouse to one of the corners or one of the edges you can resize the grid by
     holding down the left button on the mouse. The whole grid can be moved by
     pressing the left mouse button while hovering inside the grid.
-  \item Once the grid cells are aligned with each tube press the "OK" button
+  \item Once the grid cells are aligned with each tube press the \fbox{OK} button
     (see Figure \ref{fig:plate1_grid_ready}). The wheel on the mouse can be
     used to make the cells smaller or bigger.
     \begin{figure}[H]
@@ -202,4 +215,24 @@ orientation when looking down at the scanner's flatbed.
 To test if your configuration will yield valid decodes use the
 \texttt{Scanner -> Decode Plate} from the main menu.
 \subsection{Plate Barcodes}
+To speed up processing of samples, a handheld barcode scanner can be used to
+quickly enter information into the application. Barcodes with the corresponding
+words can be printed and then scanned when required by the application (See
+sections \ref{sec:scan_link} and \ref{sec:scan_assign}). The \textbf{Plate
+  \emph{x} barcode} settings contain the text encoded into these barcodes when
+they were created.
+
 \section{Servers}
+This page contains a list of BioBank2 servers that the Java Client connects to
+on a regular basis. This list is used in the login dialog box to aid the user
+to quickly select a server. New servers can be added to this list by pressing
+the \fbox{New} button. Only the domain name or IP address for the server is
+required.
+
+Previously entered servers can also be edited with the \fbox{Edit} button if a
+spelling mistake was made.
+
+The order in the list can be rearranged with the \fbox{Up} and \fbox{Down}
+buttons to put more frequently accessed servers at the beggining of the list.
+
+
