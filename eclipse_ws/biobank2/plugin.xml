@@ -194,7 +194,7 @@
       <command
             defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMailHandler"
             id="edu.ualberta.med.biobank.commands.sendErrorMail"
-            name="Send Error Mail">
+            name="Send Error Email">
       </command>
       <command id="edu.ualberta.med.biobank.commands.deleteSelection"
             name="Delete Selected Item">

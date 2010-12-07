@@ -1,5 +1,5 @@
 \chapter{Configuration}
-The configuration options for the Java Client can be found by selecting
+The configuration settings for the Java Client can be found by selecting
 \texttt{Configuration -> Preferences} from the main menu.
     \begin{figure}[H]
       \centering
@@ -8,19 +8,68 @@ The configuration options for the Java Client can be found by selecting
       \caption{Configuration preferences dialog box.}
       \label{fig:preferences_dialog}
     \end{figure}
-Different configurations pages can be selected by clicking on a node on the
+A configuration page can be selected by clicking on a node on the
 tree on the left hand side of the dialog box. The \texttt{filter text} box can
 be used to quickly find a configuration page by typing the name of the page in
 whole or in part.
 
-The following sections discuss each configuration page in detail.
+The following sections discuss the configuration pages in detail.
+
 \section{Automatic Updates}
+The Java Client has the capability of detecting when a new version of the
+software has been made available by the software design team. The settings on
+this page allow the user to specify when updates will be searched for, when to
+download them, and how to notify the user when they are found.
+
 \section{General}
+The settings on this page are general to the application.
+\begin{itemize}
+  \item The Java Client's software version can be displayed in the window's
+    title bar by checking this box.\textit{Note that this option is only
+      required by technicians when they are testing new versions of the
+      software}.
+  \item The \emph{heap status} can be displayed in the main window by checking
+    this box. The heap status gives an indication of the memory used by the
+    application. \textit{This option is in place for the sofware designers and
+      is not required for normal use}.
+\end{itemize}
+
 \section{Issue Tracker}
+The application has the capability of sending \emph{Problem Report} emails to
+the software design team\footnote{\texttt{Help -> Send Error Email} from the
+  main menu}. The error emails have application state information attached to
+aid team in resolving potential problems. The settings on this page are the
+settings used to send the emails to the team.
+
+\textit{User should not modify these settings unless requested to by the software
+  design team}.
+\begin{center}
+\begin{tabular}{|l|p{3.5in}|}
+  \hline
+  \textbf{Tracker email} & The email address to send problem reports to.\\
+  \hline
+  \textbf{SMTP server} & The SMTP mail server to use when sending emails.\\
+  \hline
+  \textbf{SMPT server port} & The SMTP server port.\\
+  \hline
+  \textbf{SMTP server username} & The user name to use with the SMTP server.\\
+  \hline
+  \textbf{SMPT server passowrd} & The password to use with the SMTP server.\\
+  \hline
+\end{tabular}
+\end{center}
+
+
 \section{Link \ Assign}
+These settings are used when scanning and decoding pallets and linking them to
+patients or container locations.
+
+To speed up processing of samples a handheld barcode scanner can be used to
+quickly enter information into the application.
+
 \section{Scanning and Decoding}
-The items on this preferences page allow the user to specify the scanning and
-decoding parameters used to decode 2D barcodes on aliquot tubes.
+The settings on this page allow the user to specify the scanning and
+decoding parameters used when decoding pallet images.
 \begin{center}
 \begin{tabular}{|l|p{5in}|}
   \hline
@@ -106,8 +155,8 @@ To define a pallet scanning region do the following:
   \item Select the plate region you are going to define.  If it is the first
     select \emph{Plate 1 Position}.
   \item Click on the "Enable" box.
-  \item Press the "Scan" button. The scanner will now scan the entire
-    flatbed. You will see something similar to Figure \ref{fig:sample_flatbed_scan}.
+  \item Press the "Scan" button. Now wait for the scanner to scan the entire
+    flatbed.
     \begin{figure}[H]
       \centering
       \scalebox{0.5}
@@ -115,20 +164,46 @@ To define a pallet scanning region do the following:
       \caption{Sample flatbed scan.}
       \label{fig:sample_flatbed_scan}
     \end{figure}
-  \item Once the scan is done, you are presented with an image that contains
-    the entire flatbed and super imposed on it is a grid with 8 rows and 12
-    columns. The cell colored in cyan should correspond to tube in row A and
+  \item Once the scan is done, You will see something similar to Figure
+    \ref{fig:sample_flatbed_scan}. The image shown on the right hand side is
+    the image taken by the scanner and superimposed is a grid with 8 rows and
+    12 columns. The cell colored in cyan should correspond to tube in row A and
     column 1.
   \item Under orientation select "Landscape".
   \item You can adjust the size of the grid using the mouse. If you move the
     mouse to one of the corners or one of the edges you can resize the grid by
     holding down the left button on the mouse. The whole grid can be moved by
     pressing the left mouse button while hovering inside the grid.
-  \item Once the grid cells are aligned with each tube press the "OK"
-    button. Use the wheel on the mouse to make the cells smaller or bigger.
+  \item Once the grid cells are aligned with each tube press the "OK" button
+    (see Figure \ref{fig:plate1_grid_ready}). The wheel on the mouse can be
+    used to make the cells smaller or bigger.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/plate1_grid_ready} }
+      \caption{Grid aligned with tubes.}
+      \label{fig:plate1_grid_ready}
+    \end{figure}
   \item Repeat from step 2 to define any more pallet scanning regions.
   \item Usually only one pallet scanning region is required for normal
     operation of the software.
 \end{enumerate}
+Figure \ref{fig:plate2_grid_ready} shows an example of how \emph{Plate 2} can
+be defined. Here Plate 2 is touching the top and the left margin of
+the of the flatbed region. The plate on the left of the image is where Plate 1
+is defined.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/plate2_grid_ready} }
+      \caption{Plate 2 grid aligned with tubes.}
+      \label{fig:plate2_grid_ready}
+    \end{figure}
+Note that cell A1 should be at the \emph{Top Left} when configuring a plate in
+\textbf{Landscape} orientation and \emph{Top Right} when in \textbf{Portrait}
+orientation when looking down at the scanner's flatbed.
+
+To test if your configuration will yield valid decodes use the
+\texttt{Scanner -> Decode Plate} from the main menu.
 \subsection{Plate Barcodes}
 \section{Servers}
