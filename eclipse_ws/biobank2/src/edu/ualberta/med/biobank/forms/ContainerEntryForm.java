@@ -6,8 +6,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -110,38 +108,37 @@ public class ContainerEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         siteCombo = createSiteSelectionCombo(client, appService,
-            container.getSite(), true);
+            container.getSite(), true, new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    SiteWrapper selectedSite = getSelectedSite(siteCombo);
+                    if (!container.hasParent()) {
+                        try {
+                            containerTypes = ContainerTypeWrapper
+                                .getTopContainerTypesInSite(appService,
+                                    selectedSite);
+                        } catch (ApplicationException e) {
+                        }
+                    } else {
+                        containerTypes = container.getParent()
+                            .getContainerType()
+                            .getChildContainerTypeCollection();
+                    }
+                    currentContainerType = null;
+                    setDirty(true);
+                    containerTypeComboViewer.setInput(containerTypes);
+                    if (container.isNew())
+                        adapter.setParent(((SiteAdapter) SessionManager
+                            .getCurrentAdapterViewWithTree().searchNode(
+                                selectedSite)).getContainersGroupNode());
+                    container.setSite(selectedSite);
+                }
+            });
         if (!container.isNew()) {
             List<SiteWrapper> input = new ArrayList<SiteWrapper>();
             input.add(container.getSite());
             siteCombo.setInput(input);
         }
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                SiteWrapper selectedSite = getSelectedSite(siteCombo);
-                if (!container.hasParent()) {
-                    try {
-                        containerTypes = ContainerTypeWrapper
-                            .getTopContainerTypesInSite(appService,
-                                selectedSite);
-                    } catch (ApplicationException e) {
-                    }
-                } else {
-                    containerTypes = container.getParent().getContainerType()
-                        .getChildContainerTypeCollection();
-                }
-                currentContainerType = null;
-                setDirty(true);
-                containerTypeComboViewer.setInput(containerTypes);
-                if (container.isNew())
-                    adapter.setParent(((SiteAdapter) SessionManager
-                        .getCurrentAdapterViewWithTree().searchNode(
-                            selectedSite)).getContainersGroupNode());
-                container.setSite(selectedSite);
-            }
-        });
 
         if ((container.isNew() && container.getParent() == null)
             || (container.getContainerType() != null && Boolean.TRUE

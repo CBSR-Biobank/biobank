@@ -55,6 +55,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -462,7 +463,7 @@ public abstract class BiobankFormBase extends EditorPart implements
 
     public ComboViewer createSiteSelectionCombo(Composite parent,
         WritableApplicationService appService, SiteWrapper selection,
-        boolean canUpdateOnly) {
+        boolean canUpdateOnly, ComboSelectionUpdate csu) {
         List<SiteWrapper> allSites = null;
         List<SiteWrapper> updateSites = null;
         try {
@@ -477,7 +478,7 @@ public abstract class BiobankFormBase extends EditorPart implements
         }
         ComboViewer cv = widgetCreator.createComboViewer(parent,
             "Repository Site", canUpdateOnly ? updateSites : allSites,
-            selection);
+            selection, "A site should be selected", true, null, csu);
         cv.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object e) {

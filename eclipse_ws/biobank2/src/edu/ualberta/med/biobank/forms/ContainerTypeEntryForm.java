@@ -10,8 +10,6 @@ import java.util.Map;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -141,23 +139,22 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         siteCombo = createSiteSelectionCombo(client, appService,
-            containerType.getSite(), true);
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
-                SiteWrapper selectedSite = getSelectedSite(siteCombo);
-                for (ContainerTypeWrapper type : selectedSite
-                    .getContainerTypeCollection()) {
-                    if (type.getTopLevel().equals(Boolean.FALSE)) {
-                        availSubContainerTypes.add(type);
+            containerType.getSite(), true, new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
+                    SiteWrapper selectedSite = getSelectedSite(siteCombo);
+                    for (ContainerTypeWrapper type : selectedSite
+                        .getContainerTypeCollection()) {
+                        if (type.getTopLevel().equals(Boolean.FALSE)) {
+                            availSubContainerTypes.add(type);
+                        }
                     }
+                    containerType.setSite(selectedSite);
+                    setChildContainerTypeSelection();
+                    setDirty(true);
                 }
-                containerType.setSite(selectedSite);
-                setChildContainerTypeSelection();
-                setDirty(true);
-            }
-        });
+            });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE, "Name",
             null, containerType, "name", new NonEmptyStringValidator(

@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StackLayout;
@@ -46,7 +45,6 @@ import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
@@ -98,7 +96,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private ScrolledComposite containersScroll;
 
-    private BasicSiteCombo siteCombo;
     private ArrayList<SampleTypeWrapper> preSelectedSampleTypes;
 
     @Override
@@ -275,15 +272,18 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void initAuthorizedSampleTypeList() throws ApplicationException {
-        authorizedSampleTypes = SampleTypeWrapper.getSampleTypeForPallet96(
-            appService, siteCombo.getSite());
-        if (authorizedSampleTypes.size() == 0) {
-            BioBankPlugin
-                .openAsyncError(
-                    Messages
-                        .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
-                    Messages
-                        .getFormattedString("ScanLink.dialog.sampleTypesError.msg")); //$NON-NLS-1$
+        SiteWrapper currentSite = getCurrentSite();
+        if (currentSite != null) {
+            authorizedSampleTypes = SampleTypeWrapper.getSampleTypeForPallet96(
+                appService, currentSite);
+            if (authorizedSampleTypes.size() == 0) {
+                BioBankPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
+                        Messages
+                            .getFormattedString("ScanLink.dialog.sampleTypesError.msg")); //$NON-NLS-1$
+            }
         }
     }
 
@@ -368,7 +368,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void createFieldsComposite() throws Exception {
         Composite leftSideComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -390,25 +389,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
-        widgetCreator.createLabel(fieldsComposite, "Site");
-        siteCombo = new BasicSiteCombo(fieldsComposite, appService);
-        siteCombo.setSelection(new StructuredSelection(
-            ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                linkFormPatientManagement.setSite(siteCombo.getSite());
-                linkFormPatientManagement.setVisitsList();
-            }
-        });
+        createSiteCombo(fieldsComposite, true);
 
-        GridData gds = new GridData();
-        gds.horizontalSpan = 2;
-        gds.horizontalAlignment = SWT.FILL;
-        siteCombo.getCombo().setLayoutData(gds);
-        setFirstControl(siteCombo.getControl());
-
-        linkFormPatientManagement.setSite(siteCombo.getSite());
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
         linkFormPatientManagement.createVisitWidgets(fieldsComposite);
 
@@ -488,7 +470,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
         try {
             return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                appService, siteCombo.getSite().getId());
+                appService, getCurrentSite().getId());
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }
@@ -757,4 +739,13 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     protected boolean fieldsValid() {
         return isPlateValid() && linkFormPatientManagement.fieldsValid();
     }
+
+    @Override
+    protected void siteComboSelectionChanged(SiteWrapper currentSelection)
+        throws Exception {
+        linkFormPatientManagement.setSite(currentSelection);
+        linkFormPatientManagement.setVisitsList();
+        initAuthorizedSampleTypeList();
+    }
+
 }

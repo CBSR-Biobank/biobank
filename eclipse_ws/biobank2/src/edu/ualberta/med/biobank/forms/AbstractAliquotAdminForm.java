@@ -13,19 +13,25 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.KeyListener;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
 
@@ -55,6 +61,9 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         }
     };
 
+    private ComboViewer siteCombo;
+    private static SiteWrapper siteSession;
+
     @Override
     protected void init() throws Exception {
         if (activityLogger == null) {
@@ -82,6 +91,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     }
 
     public boolean onClose() {
+        siteSession = getCurrentSite();
         if (finished) {
             if (!printed && appender.getLogsList().size() > 0) {
                 if (BioBankPlugin.isAskPrintActivityLog()) {
@@ -168,6 +178,36 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
 
     public void setAfterKeyCancel() {
         afterKeyCancel = true;
+    }
+
+    protected void createSiteCombo(Composite parent, boolean firstControl) {
+        siteCombo = createSiteSelectionCombo(parent, appService, siteSession,
+            true, new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    try {
+                        siteComboSelectionChanged((SiteWrapper) selectedObject);
+                    } catch (Exception ex) {
+                        BioBankPlugin.openAsyncError(
+                            "Selection modification error", ex);
+                    }
+
+                }
+            });
+        if (((GridLayout) parent.getLayout()).numColumns == 3) {
+            GridData gd = (GridData) siteCombo.getControl().getLayoutData();
+            gd.horizontalSpan = 2;
+        }
+        if (firstControl) {
+            setFirstControl(siteCombo.getControl());
+        }
+    }
+
+    protected abstract void siteComboSelectionChanged(
+        SiteWrapper currentSelection) throws Exception;
+
+    protected SiteWrapper getCurrentSite() {
+        return getSelectedSite(siteCombo);
     }
 
 }
