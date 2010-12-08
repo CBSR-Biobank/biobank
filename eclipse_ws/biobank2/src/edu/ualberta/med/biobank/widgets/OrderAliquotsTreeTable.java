@@ -35,6 +35,7 @@ import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.OrderTableGroup;
 
@@ -45,7 +46,7 @@ public class OrderAliquotsTreeTable extends BiobankWidget {
     private int fakeMaxCount;
 
     public OrderAliquotsTreeTable(Composite parent,
-        final DispatchWrapper shipment, final boolean editAliquotsState,
+        final OrderWrapper shipment, final boolean editAliquotsState,
         final boolean editAliquotsComment) {
         super(parent, SWT.NONE);
 

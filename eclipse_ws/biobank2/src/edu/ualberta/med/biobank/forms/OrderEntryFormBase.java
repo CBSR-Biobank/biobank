@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.OrderState;
 import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
 import edu.ualberta.med.biobank.treeview.order.OrderAdapter;
@@ -57,7 +58,8 @@ public class OrderEntryFormBase extends BiobankFormBase {
         setTextValue(siteLabel, order.getSite().getNameShort());
         BiobankText submittedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Order Submitted");
-        setTextValue(submittedLabel, order.getSubmitted());
+        setTextValue(submittedLabel,
+            DateFormatter.formatAsDate(order.getSubmitted()));
         BiobankText orderNumberLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Order Number");
         setTextValue(orderNumberLabel, order.getId());

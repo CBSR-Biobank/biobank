@@ -7,11 +7,12 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.OrderAliquotState;
 import edu.ualberta.med.biobank.common.util.OrderState;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Order;
+import edu.ualberta.med.biobank.model.OrderAliquot;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -19,15 +20,21 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class OrderWrapper extends ModelWrapper<Order> {
 
+    private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedDispatchAliquotCollection";
+
+    private static final String PROCESSED_ALIQUOTS_KEY = "receivedDispatchAliquots";
+
+    private static final String MISSING_ALIQUOTS_KEY = "missingDispatchAliquots";
+
+    private static final String ALL_ALIQUOTS_KEY = "aliquotCollection";
+
     private boolean stateModified = false;
     private AddressWrapper address;
-    private SiteWrapper site;
 
     public OrderWrapper(WritableApplicationService appService) {
         super(appService);
         this.address = new AddressWrapper(appService,
             wrappedObject.getAddress());
-        this.site = new SiteWrapper(appService, wrappedObject.getSite());
     }
 
     public OrderWrapper(WritableApplicationService appService, Order order) {
@@ -36,8 +43,8 @@ public class OrderWrapper extends ModelWrapper<Order> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        // TODO Auto-generated method stub
-        return null;
+        return new String[] { "id", "submitted", "accepted", "shipped",
+            "waybill", "state" };
     }
 
     @Override
@@ -219,32 +226,74 @@ public class OrderWrapper extends ModelWrapper<Order> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<AliquotWrapper> getAliquotCollection(boolean sort) {
-        List<AliquotWrapper> aliquotCollection = (List<AliquotWrapper>) propertiesMap
-            .get("aliquotCollection");
-        if (aliquotCollection == null) {
-            Collection<Aliquot> children = wrappedObject.getAliquotCollection();
+    public List<OrderAliquotWrapper> getOrderAliquotCollection(boolean sort) {
+        List<OrderAliquotWrapper> orderAliquotCollection = (List<OrderAliquotWrapper>) propertiesMap
+            .get("orderAliquotCollection");
+        if (orderAliquotCollection == null) {
+            Collection<OrderAliquot> children = wrappedObject
+                .getOrderAliquotCollection();
             if (children != null) {
-                aliquotCollection = new ArrayList<AliquotWrapper>();
-                for (Aliquot aliquot : children) {
-                    aliquotCollection.add(new AliquotWrapper(appService,
-                        aliquot));
+                orderAliquotCollection = new ArrayList<OrderAliquotWrapper>();
+                for (OrderAliquot aliquot : children) {
+                    orderAliquotCollection.add(new OrderAliquotWrapper(
+                        appService, aliquot));
                 }
-                propertiesMap.put("aliquotCollection", aliquotCollection);
+                propertiesMap.put("orderAliquotCollection",
+                    orderAliquotCollection);
             }
+            if ((orderAliquotCollection != null) && sort)
+                Collections.sort(orderAliquotCollection);
         }
-        if ((aliquotCollection != null) && sort)
-            Collections.sort(aliquotCollection);
-        return aliquotCollection;
+        return orderAliquotCollection;
     }
 
-    private void setAliquotCollection(Collection<Aliquot> allAliquotObjects,
-        List<AliquotWrapper> allAliquotWrappers) {
-        Collection<Aliquot> oldAliquots = wrappedObject.getAliquotCollection();
-        wrappedObject.setAliquotCollection(allAliquotObjects);
-        propertyChangeSupport.firePropertyChange("alliquotCollection",
+    private void setOrderAliquotCollection(
+        Collection<OrderAliquot> allAliquotObjects,
+        List<OrderAliquotWrapper> allAliquotWrappers) {
+        Collection<OrderAliquot> oldAliquots = wrappedObject
+            .getOrderAliquotCollection();
+        wrappedObject.setOrderAliquotCollection(allAliquotObjects);
+        propertyChangeSupport.firePropertyChange("orderAliquotCollection",
             oldAliquots, allAliquotObjects);
-        propertiesMap.put("aliquotCollection", allAliquotWrappers);
+        propertiesMap.put("orderAliquotCollection", allAliquotWrappers);
+    }
+
+    public List<OrderAliquotWrapper> getNonProcessedOrderAliquotCollection() {
+        return getOrderAliquotCollectionWithState(NON_PROCESSED_ALIQUOTS_KEY,
+            true, OrderAliquotState.NONPROCESSED_STATE);
+    }
+
+    public List<OrderAliquotWrapper> getProcessedOrderAliquotCollection() {
+        return getOrderAliquotCollectionWithState(PROCESSED_ALIQUOTS_KEY, true,
+            OrderAliquotState.PROCESSED_STATE);
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<OrderAliquotWrapper> getOrderAliquotCollectionWithState(
+        String mapKey, boolean sort, OrderAliquotState... states) {
+        List<OrderAliquotWrapper> dsaCollection = (List<OrderAliquotWrapper>) propertiesMap
+            .get(mapKey);
+        if (dsaCollection == null) {
+            Collection<OrderAliquotWrapper> children = getOrderAliquotCollection(sort);
+            if (children != null) {
+                dsaCollection = new ArrayList<OrderAliquotWrapper>();
+                for (OrderAliquotWrapper dsa : children) {
+                    boolean hasState = false;
+                    for (OrderAliquotState state : states) {
+                        if (state.isEquals(dsa.getState())) {
+                            hasState = true;
+                            break;
+                        }
+                    }
+                    if (hasState)
+                        dsaCollection.add(dsa);
+                }
+                propertiesMap.put(mapKey, dsaCollection);
+            }
+        }
+        if ((dsaCollection != null) && sort)
+            Collections.sort(dsaCollection);
+        return dsaCollection;
     }
 
 }

@@ -3,56 +3,21 @@ package edu.ualberta.med.biobank.forms.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
+import edu.ualberta.med.biobank.common.wrappers.OrderAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
 
 public enum OrderTableGroup {
-    ADDED("Added") {
+    PROCESSED("Processed") {
         @Override
-        public List<AliquotWrapper> getChildren(DispatchWrapper shipment) {
-            try {
-                return PatientWrapper
-                    .getPatient(SessionManager.getAppService(), "1923")
-                    .getPatientVisitCollection().get(0).getAliquotCollection()
-                    .subList(0, 5);
-            } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return null;
-            }
+        public List<OrderAliquotWrapper> getChildren(OrderWrapper order) {
+            return order.getProcessedOrderAliquotCollection();
         }
     },
     NON_PROCESSED("Non Processed") {
         @Override
-        public List<AliquotWrapper> getChildren(DispatchWrapper shipment) {
-            try {
-                return PatientWrapper
-                    .getPatient(SessionManager.getAppService(), "1923")
-                    .getPatientVisitCollection().get(0).getAliquotCollection()
-                    .subList(3, 52);
-            } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return null;
-            }
-        }
-    },
-    CLAIMED("Claimed") {
-        @Override
-        public List<AliquotWrapper> getChildren(DispatchWrapper shipment) {
-            try {
-                return PatientWrapper
-                    .getPatient(SessionManager.getAppService(), "1923")
-                    .getPatientVisitCollection().get(0).getAliquotCollection()
-                    .subList(5, 15);
-            } catch (ApplicationException e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-                return null;
-            }
+        public List<OrderAliquotWrapper> getChildren(OrderWrapper order) {
+            return order.getNonProcessedOrderAliquotCollection();
         }
     };
 
@@ -67,11 +32,11 @@ public enum OrderTableGroup {
         return label;
     }
 
-    public String getTitle(DispatchWrapper ship) {
-        return label + " (" + getChildren(ship).size() + ")";
+    public String getTitle(OrderWrapper order) {
+        return label + " (" + getChildren(order).size() + ")";
     }
 
-    public abstract List<AliquotWrapper> getChildren(DispatchWrapper shipment);
+    public abstract List<OrderAliquotWrapper> getChildren(OrderWrapper shipment);
 
     public static Object findParent(AliquotWrapper dsa) {
         for (OrderTableGroup tg : values()) {
@@ -83,11 +48,9 @@ public enum OrderTableGroup {
     }
 
     @SuppressWarnings("unused")
-    public static List<OrderTableGroup> getGroupsForShipment(
-        DispatchWrapper ship) {
+    public static List<OrderTableGroup> getGroupsForShipment(OrderWrapper ship) {
         List<OrderTableGroup> groups = new ArrayList<OrderTableGroup>();
-        groups.add(CLAIMED);
-        groups.add(ADDED);
+        groups.add(PROCESSED);
         groups.add(NON_PROCESSED);
         return groups;
     }

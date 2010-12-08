@@ -84,8 +84,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     protected ListenerList doubleClickListeners = new ListenerList();
 
-    private MenuItem mi;
-
     private MenuItem editItem;
 
     public InfoTableWidget(Composite parent, List<T> collection,

@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Order;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -271,14 +272,24 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<OrderWrapper> getOrderCollection() {
         OrderWrapper order = new OrderWrapper(appService, new Order());
         order.setInApprovedState();
         order.setWaybill("testwaybill");
         order.setSite(this);
         order.setSubmitted(new Date());
-        order.setStudy(getStudyCollection().get(0));
+        StudyWrapper study = getStudyCollection().get(0);
+        ResearchGroupWrapper rg = new ResearchGroupWrapper(appService,
+            new ResearchGroup());
+        rg.setNameShort("testRG");
+        study.setResearchGroup(rg);
+        order.setStudy(study);
+        try {
+            order.persist();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
         List<OrderWrapper> orderList = new ArrayList<OrderWrapper>();
         orderList.add(order);
         return orderList;
