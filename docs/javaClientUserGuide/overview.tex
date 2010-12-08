@@ -1,9 +1,45 @@
 \chapter{Overview}
+The BioBank2 Java Client is designed to be a client application that connects
+to a server which provides services for storing inventory information for
+biological samples. More than one client can connect to the server at the same
+time. The client is a software application that runs on Microsoft Windows and
+Linux\footnote{The scanner cannot be used when using the application on Linux.}. The client
+software is a Java application and requires that a Java JRE or JDK be installed
+on the computer. The installation program for the client installs a Java JRE if
+it is not already present on the computer.
+
+When running on Microsoft Windows, the client can connect to scanners use either
+TWAIN\footnote{\url{http://en.wikipedia.org/wiki/TWAIN}} or
+WIA\footnote{\url{http://en.wikipedia.org/wiki/Windows_Image_Acquisition}}
+drivers. Most scanners available on the market provide these
+drivers. Therefore, most scanners work with the client software.
+
+Figure \ref{fig:main_window} shows the application's main window and highlights
+different some of its components.
     \begin{figure}[H]
       \centering
-      \scalebox{0.5}
+      \scalebox{0.4}
       { \includegraphics*{screenshots/overview/main_window} }
       \caption{The Java Client's main window.}
       \label{fig:main_window}
     \end{figure}
+\begin{description}
+  \item[Main Menu] The main menu allows the user access to the different
+    functions provided by the software (see section \ref{sec:main_menu} for a
+    description of the menu items). The application also has an icon based
+    toolbar to access commonly used functions.
+  \item[Toolbar Icons] The icon buttons in the toolbar allow quick access to
+    often used menu items. Using the mouse, the user can hover over the icon
+    button and after 2 seconds a tooltip is displayed describing what the
+    button is for and if applicable the keyboard shortcut. Note that there is
+    an icon toolbar under the Main Menu and another grouped with the tree view.
+  \item[Tree View] The tree view shown here is for the \emph{Administration
+    View}. The application has multiple views and are described in section
+    \ref{sec:application_views}.
+\end{description}
+
+\section{Main Menu}
+\label{sec:main_menu}
+
 \section{Views}
+\label{sec:application_views}
