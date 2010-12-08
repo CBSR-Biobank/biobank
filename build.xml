@@ -712,7 +712,13 @@
     <echo message="coverage report: file://${converage.output}/index.html" />
   </target>
 
-  <target name="product">
+	
+  <target name="eclipse.home.env">
+	<fail unless="env.ECLIPSE_HOME" message="ECLIPSE_HOME environment variable not defined. It should define a path to an eclipse installation containing the Delta Pack." />
+  </target>
+		
+	
+  <target name="product" depends="eclipse.home.env">
   	<property name="buildDirectory" value="${product.dir}/buildDirectory"/> 
 	<delete dir="${buildDirectory}"/>			
 	<copy todir="${buildDirectory}/plugins/biobank2">
@@ -736,7 +742,7 @@
     <java classpath="${env.ECLIPSE_HOME}/plugins/org.eclipse.equinox.launcher_1.1.0.v20100507.jar" 
     	classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
       <arg line="-application org.eclipse.ant.core.antRunner"/>
-      <arg line="-buildfile ${env.ECLIPSE_HOME}/plugins/org.eclipse.pde.build_3.6.0.v20100603/scripts/productBuild/productBuild.xml"/>
+      <arg line="-buildfile ${env.ECLIPSE_HOME}/plugins/org.eclipse.pde.build_3.6.1.R36x_v20100823/scripts/productBuild/productBuild.xml"/>
       <arg line="-Dbuilder=${product.dir}"/>
       <!-- product.dir is used in product/customTarget.xml -->
       <arg line="-Dproduct.dir=${product.dir}"/>
@@ -748,8 +754,8 @@
     </java>
   	<antcall target="updateSiteMetadata" />
   	</target>
-  	
-  	<target name="updateSiteMetadata">
+	 
+  	<target name="updateSiteMetadata" depends="eclipse.home.env">
   	  <property name="buildDirectory" value="${product.dir}/buildDirectory"/> 
   	  <property name="updateSiteFolder" value="${buildDirectory}/updateSite"/>
       <copy todir="${updateSiteFolder}/features/">
