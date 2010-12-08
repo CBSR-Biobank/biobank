@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.rcp;
 
+import org.eclipse.jface.preference.PreferenceManager;
 import org.eclipse.ui.IPerspectiveDescriptor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
@@ -62,4 +63,21 @@ public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor {
         }
         return true;
     }
+
+    @Override
+    public void postStartup() {
+        PreferenceManager pm = PlatformUI.getWorkbench().getPreferenceManager();
+        // a 'Hidden General' preference page is added in the plugin.xml with id
+        // 'org.eclipse.ui.preferencePages.Workbench'
+        // It will prevent the security preference page warning about its
+        // missing category
+        pm.remove("org.eclipse.equinox.security.ui.category");
+        pm.remove("org.eclipse.ui.preferencePages.Workbench");
+        // this preference page is deactivated because it send a warning about
+        // its missing parent. We have our own preference page definition that
+        // is using the exact same
+        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdatesPreferencePage");
+        pm.remove("org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage");
+    }
+
 }

@@ -2282,6 +2282,21 @@
             id="edu.ualberta.med.biobank.preferences.gereral"
             name="Servers">
       </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.GeneralPreferencePage"
+            id="org.eclipse.ui.preferencePages.Workbench"
+            name="Hidden General (for others pages references)">
+      </page>
+      <page
+            class="org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdatesPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.automaticUpdates"
+            name="Automatic Update">
+      </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.DefaultTopPreferencePage"
+            id="org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage"
+            name="Hidden Install/Update">
+      </page>
    </extension>
    <extension
          point="org.eclipse.ui.services">
@@ -2645,26 +2660,5 @@
                   id="edu.ualberta.med.biobank.menu.install">
             </command>
       </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.activities">
-      <activity
-            description="Preferences from Eclipse Update UI"
-            id="edu.ualberta.med.biobank.activity.updateui"
-            name="Update Preferences">
-      </activity>
-      <activityPatternBinding
-            activityId="edu.ualberta.med.biobank.activity.updateui"
-            pattern="org\.eclipse\.update\.ui/org\.eclipse\.update\..*PreferencePage">
-      </activityPatternBinding>
-      <activity
-            description="Preferences from Eclipse IDE UI"
-            id="edu.ualberta.med.biobank.activity.eclipseide"
-            name="IDE General Preferences">
-      </activity>
-      <activityPatternBinding
-            activityId="edu.ualberta.med.biobank.activity.eclipseide"
-            pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.preferencePages\.Workbench">
-      </activityPatternBinding>
    </extension>
 </plugin>
