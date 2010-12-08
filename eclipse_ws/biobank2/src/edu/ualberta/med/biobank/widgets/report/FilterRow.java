@@ -323,7 +323,8 @@ class FilterRow extends Composite {
         layoutData.verticalAlignment = SWT.TOP;
         autoButton.setLayoutData(layoutData);
 
-        autoButton.setToolTipText("Suggest possible values");
+        autoButton
+            .setToolTipText("Suggest possible values (considers other filters)");
         autoButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
             .get(BioBankPlugin.IMG_WAND));
         autoButton.addListener(SWT.Selection, new Listener() {
@@ -354,9 +355,21 @@ class FilterRow extends Composite {
 
         Collection<ReportFilter> reportFilters = new HashSet<ReportFilter>();
         for (ReportFilter filter : filtersWidget.getReportFilters()) {
-            if (!filter.getEntityFilter().equals(this.filter)) {
-                reportFilters.add(filter);
+            if (filter.getEntityFilter().equals(this.filter)) {
+                // do not include the filter we're finding suggestions for
+                continue;
             }
+
+            FilterOperator op = FilterOperator.getFilterOperator(filter
+                .getOperator());
+
+            if (op.isValueRequired()
+                && (filter.getReportFilterValueCollection() == null || filter
+                    .getReportFilterValueCollection().isEmpty())) {
+                // do not consider filters that require a value, yet none is set
+                continue;
+            }
+            reportFilters.add(filter);
         }
 
         ReportColumn rc = new ReportColumn();
@@ -378,6 +391,7 @@ class FilterRow extends Composite {
     private boolean autoSuggest() {
         Report report = getAutoSuggestReport();
 
+        long start = System.currentTimeMillis();
         List<Object> results = null;
         try {
             results = SessionManager.getAppService().runReport(report,
@@ -389,8 +403,15 @@ class FilterRow extends Composite {
                 return false;
             }
         } catch (ApplicationException e) {
-            BioBankPlugin.openError("Cannot Suggest Options",
-                "It is taking too long to find suggestions.");
+            long end = System.currentTimeMillis();
+
+            if ((end - start) / 1000 >= MAX_QUERY_TIME) {
+                BioBankPlugin.openError("Cannot Suggest Options",
+                    "It is taking too long to find suggestions.");
+            } else {
+                BioBankPlugin.openError("Cannot Suggest Options",
+                    "There was a problem trying to find suggestions.");
+            }
             return false;
         }
 
@@ -398,18 +419,26 @@ class FilterRow extends Composite {
         for (Object result : results) {
             if (result instanceof Object[]) {
                 Object[] row = (Object[]) result;
-                if (row.length > 0 && row[0] != null) {
-                    Object o = row[0];
+                if (row.length > 1 && row[1] != null) {
+                    Object o = row[1];
                     if (o instanceof Date) {
                         suggestions.add(SQL_DATE_FORMAT.format((Date) o));
                     } else {
-                        suggestions.add(row[0].toString());
+                        suggestions.add(o.toString());
                     }
                 }
             }
         }
 
         Collections.sort(suggestions);
+
+        if (suggestions.isEmpty()) {
+            BioBankPlugin.openError("Cannot Suggest Options",
+                "There are no possible values to suggest.");
+
+            // forget old suggestions, if any
+            suggestions = null;
+        }
 
         this.suggestions = suggestions;
 

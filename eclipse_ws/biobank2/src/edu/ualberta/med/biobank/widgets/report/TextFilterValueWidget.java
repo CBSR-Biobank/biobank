@@ -24,10 +24,13 @@ public class TextFilterValueWidget implements FilterValueWidget {
     public Collection<ReportFilterValue> getValues() {
         Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
         if (!text.isDisposed() && text.getText() != null) {
-            ReportFilterValue value = new ReportFilterValue();
-            value.setPosition(0);
-            value.setValue(text.getText().trim());
-            values.add(value);
+            String string = text.getText().trim();
+            if (!string.isEmpty()) {
+                ReportFilterValue value = new ReportFilterValue();
+                value.setPosition(0);
+                value.setValue(string);
+                values.add(value);
+            }
         }
         return values;
     }
@@ -61,6 +64,7 @@ public class TextFilterValueWidget implements FilterValueWidget {
 
     @Override
     public boolean isValid(ReportFilterValue value) {
-        return value.getValue() != null;
+        return value.getValue() != null && !value.getValue().isEmpty()
+            && value.getSecondValue() == null;
     }
 }

@@ -30,6 +30,7 @@ import edu.ualberta.med.biobank.model.ReportFilterValue;
 import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 
 public class ReportRunner {
+    private static final String ID_COLUMN_NAME = "id";
     private static final String PROPERTY_DELIMITER = ".";
     private static final String ALIAS_DELIMITER = "-";
     private static final String PROPERTY_VALUE_TOKEN = "{value}";
@@ -102,6 +103,16 @@ public class ReportRunner {
 
         ProjectionList pList = Projections.projectionList();
 
+        if (!report.getIsCount()) {
+            pList.add(Projections.property(ID_COLUMN_NAME));
+        } else {
+            // need to provide an alias for the column to be included in the
+            // results
+            pList.add(Projections.sqlProjection("NULL as null_value_",
+                new String[] { "null_value_" },
+                new Type[] { Hibernate.INTEGER }));
+        }
+
         int colNum = 1;
         for (ReportColumn reportColumn : getOrderedReportColumns()) {
             String path = reportColumn.getEntityColumn().getEntityProperty()
@@ -142,7 +153,7 @@ public class ReportRunner {
         }
 
         if (report.getIsCount()) {
-            pList.add(Projections.countDistinct("id"));
+            pList.add(Projections.countDistinct(ID_COLUMN_NAME));
         }
 
         criteria.setProjection(pList);

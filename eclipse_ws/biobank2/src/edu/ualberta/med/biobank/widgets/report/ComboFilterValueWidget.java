@@ -3,12 +3,10 @@ package edu.ualberta.med.biobank.widgets.report;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -47,7 +45,7 @@ public class ComboFilterValueWidget implements FilterValueWidget {
             int position = 0;
             while (it.hasNext()) {
                 String suggestion = (String) it.next();
-                if (suggestion != null) {
+                if (suggestion != null && !suggestion.isEmpty()) {
                     ReportFilterValue value = new ReportFilterValue();
                     value.setPosition(position);
                     value.setValue(suggestion);
@@ -60,21 +58,23 @@ public class ComboFilterValueWidget implements FilterValueWidget {
         }
         if (values.isEmpty() && !comboViewer.getCombo().isDisposed()
             && !isShowingDefaultText) {
-            ReportFilterValue value = new ReportFilterValue();
-            value.setValue(comboViewer.getCombo().getText().trim());
-            value.setPosition(0);
-            values.add(value);
+            String text = comboViewer.getCombo().getText().trim();
+            if (!text.isEmpty()) {
+                ReportFilterValue value = new ReportFilterValue();
+                value.setValue(text);
+                value.setPosition(0);
+                values.add(value);
+            }
         }
         return values;
     }
 
     @Override
     public void setValues(Collection<ReportFilterValue> values) {
-        List<String> stringValues = new ArrayList<String>();
         for (ReportFilterValue value : values) {
-            stringValues.add(value.getValue());
+            comboViewer.getCombo().setText(value.getValue());
+            break;
         }
-        comboViewer.setSelection(new StructuredSelection(stringValues));
     }
 
     @Override
@@ -95,7 +95,8 @@ public class ComboFilterValueWidget implements FilterValueWidget {
 
     @Override
     public boolean isValid(ReportFilterValue value) {
-        return value.getValue() != null;
+        return value.getValue() != null && !value.getValue().isEmpty()
+            && value.getSecondValue() == null;
     }
 
     public ComboViewer getComboViewer() {

@@ -30,11 +30,13 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
         if (!dateTime.isDisposed() && dateTime.getDate() != null) {
             String dateString = SQL_DATE_FORMAT.format(dateTime.getDate());
 
-            ReportFilterValue value = new ReportFilterValue();
-            value.setPosition(0);
-            value.setValue(dateString);
+            if (!dateString.isEmpty()) {
+                ReportFilterValue value = new ReportFilterValue();
+                value.setPosition(0);
+                value.setValue(dateString);
 
-            return Arrays.asList(value);
+                return Arrays.asList(value);
+            }
         }
         return new ArrayList<ReportFilterValue>();
     }
@@ -74,6 +76,7 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
 
     @Override
     public boolean isValid(ReportFilterValue value) {
-        return value.getValue() != null;
+        return value.getValue() != null && !value.getValue().isEmpty()
+            && value.getSecondValue() == null;
     }
 }

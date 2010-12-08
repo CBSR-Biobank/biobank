@@ -89,7 +89,9 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
 
     @Override
     public boolean isValid(ReportFilterValue value) {
-        return value.getValue() != null && value.getSecondValue() != null;
+        return value.getValue() != null && !value.getValue().isEmpty()
+            && value.getSecondValue() != null
+            && !value.getSecondValue().isEmpty();
     }
 
     private Composite createControls(Composite parent) {

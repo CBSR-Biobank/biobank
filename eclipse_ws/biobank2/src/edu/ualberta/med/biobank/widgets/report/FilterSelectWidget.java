@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -13,13 +14,16 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.ReportFilter;
+import edu.ualberta.med.biobank.model.ReportFilterValue;
 
 public class FilterSelectWidget extends Composite {
     private final ReportWrapper report;
     private final Map<Integer, FilterRow> filterRowMap = new LinkedHashMap<Integer, FilterRow>();
+    private final Map<Integer, FilterData> previousDataMap = new HashMap<Integer, FilterData>();
     private final Collection<ChangeListener<FilterChangeEvent>> listeners = new ArrayList<ChangeListener<FilterChangeEvent>>();
     private Composite container;
 
@@ -34,7 +38,7 @@ public class FilterSelectWidget extends Composite {
             ReportWrapper.PROPERTY_REPORT_COLUMN_COLLECTION,
             new PropertyChangeListener() {
                 @Override
-                public void propertyChange(PropertyChangeEvent arg0) {
+                public void propertyChange(PropertyChangeEvent event) {
                     if (!isDisposed()) {
                         createContainer();
                     }
@@ -93,6 +97,7 @@ public class FilterSelectWidget extends Composite {
             showContainer(true);
             filterRow = new FilterRow(this, container, SWT.NONE, entityFilter);
             filterRowMap.put(id, filterRow);
+            recall(filterRow);
         }
         return filterRow;
     }
@@ -107,6 +112,7 @@ public class FilterSelectWidget extends Composite {
         Integer id = entityFilter.getId();
         FilterRow filterRow = filterRowMap.get(id);
         if (filterRow != null) {
+            remember(filterRow);
             filterRowMap.remove(id);
             filterRow.dispose();
 
@@ -188,5 +194,26 @@ public class FilterSelectWidget extends Composite {
             filterRow.setValues(reportFilter.getReportFilterValueCollection());
         }
         return filterRow;
+    }
+
+    private static class FilterData {
+        public Collection<ReportFilterValue> values;
+        public FilterOperator op;
+    }
+
+    private void remember(FilterRow filterRow) {
+        FilterData data = new FilterData();
+        data.op = filterRow.getOperator();
+        data.values = filterRow.getValues();
+        previousDataMap.put(filterRow.getEntityFilter().getId(), data);
+    }
+
+    private void recall(FilterRow filterRow) {
+        Integer id = filterRow.getEntityFilter().getId();
+        FilterData data = previousDataMap.get(id);
+        if (data != null) {
+            filterRow.setOperator(data.op);
+            filterRow.setValues(data.values);
+        }
     }
 }

@@ -43,10 +43,10 @@ public enum FilterOperator {
     THIS_MONTH(323, false, false),
     THIS_YEAR(324, false, false),
 
-    SAME_DAY_AS(341),
-    SAME_WEEK_AS(342),
-    SAME_MONTH_AS(343),
-    SAME_YEAR_AS(344),
+    SAME_DAY_AS_ANY(341),
+    SAME_WEEK_AS_ANY(342),
+    SAME_MONTH_AS_ANY(343),
+    SAME_YEAR_AS_ANY(344),
 
     // Custom filter operators
     IS_NOT_IN_A_CONTAINER(401, false, false);

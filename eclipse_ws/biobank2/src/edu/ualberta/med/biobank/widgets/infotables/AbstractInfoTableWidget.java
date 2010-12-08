@@ -231,39 +231,44 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
     }
 
     public void setCollection(final List<T> collection, final T selection) {
-        if ((collection == null)
-            || ((backgroundThread != null) && backgroundThread.isAlive())) {
-            return;
-        } else if (this.collection != collection || size != collection.size()) {
-            this.collection = collection;
-            init(collection);
-            setPaginationParams(collection);
-        }
-
-        if (paginationRequired) {
-            showPaginationWidget();
-            setPageLabelText();
-            enablePaginationWidget(false);
-        } else if (paginationWidget != null)
-            paginationWidget.setVisible(false);
-
-        final Display display = getTableViewer().getTable().getDisplay();
-        resizeTable();
-        backgroundThread = new Thread() {
-            @Override
-            public void run() {
-                tableLoader(collection, selection);
-                if (autoSizeColumns) {
-                    display.syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            autoSizeColumns();
-                        }
-                    });
-                }
+        try {
+            if ((collection == null)
+                || ((backgroundThread != null) && backgroundThread.isAlive())) {
+                return;
+            } else if (this.collection != collection
+                || size != collection.size()) {
+                this.collection = collection;
+                init(collection);
+                setPaginationParams(collection);
             }
-        };
-        backgroundThread.start();
+
+            if (paginationRequired) {
+                showPaginationWidget();
+                setPageLabelText();
+                enablePaginationWidget(false);
+            } else if (paginationWidget != null)
+                paginationWidget.setVisible(false);
+
+            final Display display = getTableViewer().getTable().getDisplay();
+            resizeTable();
+            backgroundThread = new Thread() {
+                @Override
+                public void run() {
+                    tableLoader(collection, selection);
+                    if (autoSizeColumns) {
+                        display.syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                autoSizeColumns();
+                            }
+                        });
+                    }
+                }
+            };
+            backgroundThread.start();
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Cannot Load Table Data", e);
+        }
 
         layout(true, true);
     }
@@ -355,8 +360,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         paginationWidget.setLayout(new GridLayout(5, false));
 
         firstButton = new Button(paginationWidget, SWT.NONE);
-        firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_RESULTSET_FIRST));
+        firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_RESULTSET_FIRST));
         firstButton.setToolTipText("First page");
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -366,8 +371,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         });
 
         prevButton = new Button(paginationWidget, SWT.NONE);
-        prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_RESULTSET_PREV));
+        prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_RESULTSET_PREV));
         prevButton.setToolTipText("Previous page");
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -379,8 +384,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         pageLabel = new Label(paginationWidget, SWT.NONE);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
-        nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_RESULTSET_NEXT));
+        nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_RESULTSET_NEXT));
         nextButton.setToolTipText("Next page");
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -390,8 +395,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         });
 
         lastButton = new Button(paginationWidget, SWT.NONE);
-        lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry().get(
-            BioBankPlugin.IMG_RESULTSET_LAST));
+        lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            .get(BioBankPlugin.IMG_RESULTSET_LAST));
         lastButton.setToolTipText("Last page");
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override

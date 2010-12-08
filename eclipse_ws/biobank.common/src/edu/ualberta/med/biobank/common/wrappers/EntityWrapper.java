@@ -31,6 +31,10 @@ public class EntityWrapper extends ModelWrapper<Entity> {
         super(appService, entity);
     }
 
+    public String getClassName() {
+        return wrappedObject.getClassName();
+    }
+
     public Collection<EntityProperty> getEntityPropertyCollection() {
         if (properties == null) {
             Collection<EntityProperty> properties = new ArrayList<EntityProperty>();

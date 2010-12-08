@@ -1,12 +1,18 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
+import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -17,21 +23,25 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
+import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
+import edu.ualberta.med.biobank.widgets.infotables.ReportResultsTableWidget;
 import edu.ualberta.med.biobank.widgets.report.ChangeListener;
 import edu.ualberta.med.biobank.widgets.report.ColumnChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.ColumnSelectWidget;
@@ -62,7 +72,6 @@ public class ReportEntryForm extends BiobankEntryForm {
     private Button generateButton;
 
     private Composite resultsContainer;
-    private ReportTableWidget<Object> resultsTable;
 
     @Override
     protected void saveForm() throws Exception {
@@ -79,8 +88,14 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private void updateReport() {
-        report.setReportFilterCollection(filtersWidget.getReportFilters());
-        report.setReportColumnCollection(columnsWidget.getReportColumns());
+        // don't set through the wrappers because we don't want to alert
+        // anything listening to the wrapper (for example, the
+        // FilterSelectWidget and the ColumnSelectWidget).
+        Report nakedReport = report.getWrappedObject();
+        nakedReport.setReportColumnCollection(new HashSet<ReportColumn>(
+            columnsWidget.getReportColumns()));
+        nakedReport.setReportFilterCollection(new HashSet<ReportFilter>(
+            filtersWidget.getReportFilters()));
     }
 
     @Override
@@ -173,21 +188,65 @@ public class ReportEntryForm extends BiobankEntryForm {
                 // update the model before running
                 updateReport();
 
+                for (Control control : resultsContainer.getChildren()) {
+                    if (!control.isDisposed()) {
+                        control.dispose();
+                    }
+                }
+
                 Report rawReport = report.getWrappedObject();
                 ReportListProxy results = new ReportListProxy(
                     (BiobankApplicationService) appService, rawReport);
 
-                if (resultsTable != null && !resultsTable.isDisposed()) {
-                    resultsTable.dispose();
-                }
+                ReportResultsTableWidget<Object> resultsTable = new ReportResultsTableWidget<Object>(
+                    resultsContainer, results, getHeaders());
 
-                resultsTable = new ReportTableWidget<Object>(resultsContainer,
-                    results, getHeaders());
+                if (!report.getIsCount()) {
+                    resultsTable
+                        .addDoubleClickListener(new IDoubleClickListener() {
+                            @Override
+                            public void doubleClick(DoubleClickEvent event) {
+                                ISelection selection = event.getSelection();
+                                openViewForm(selection);
+                            }
+                        });
+                }
 
                 book.reflow(true);
                 form.layout(true, true);
             }
         });
+    }
+
+    private void openViewForm(ISelection selection) {
+        if (selection instanceof IStructuredSelection) {
+            Object o = ((IStructuredSelection) selection).getFirstElement();
+            if (o instanceof Object[]) {
+                Object[] row = (Object[]) o;
+                if (row.length > 0 && row[0] instanceof Integer) {
+                    Integer id = (Integer) row[0];
+                    String entityClassName = report.getEntity().getClassName();
+
+                    try {
+                        Class<?> entityKlazz = Class.forName(entityClassName);
+
+                        Constructor<?> constructor = entityKlazz
+                            .getConstructor();
+                        Object instance = constructor.newInstance();
+                        Method setIdMethod = entityKlazz.getMethod("setId",
+                            Integer.class);
+                        setIdMethod.invoke(instance, id);
+
+                        ModelWrapper<?> wrapper = ModelWrapper.wrapObject(
+                            appService, instance);
+
+                        SessionManager.openViewForm(wrapper);
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
     private String[] getHeaders() {
