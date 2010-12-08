@@ -9,7 +9,8 @@ The configuration settings for the Java Client can be found by selecting
       \label{fig:preferences_dialog}
     \end{figure}
 A configuration page can be selected by clicking on a node on the
-tree on the left hand side of the dialog box. The \texttt{filter text} box can
+tree on the left hand side of the dialog box. The \texttt{filter text} box, see
+arrow labelled \emph{1} in figure \ref{fig:preferences_dialog}, can
 be used to quickly find a configuration page by typing the name of the page in
 whole or in part.
 
@@ -23,6 +24,13 @@ download them, and how to notify the user when they are found.
 
 \section{General}
 The settings on this page are general to the application.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/prefs_general} }
+      \caption{General preferences.}
+      \label{fig:prefs_general}
+    \end{figure}
 \begin{description}
   \item[Show software version in main window title] the Java Client's software
     version can be displayed in the window's title bar by checking this
@@ -40,7 +48,13 @@ the software design team\footnote{\texttt{Help -> Send Error Email} from the
   main menu}. The error emails have application state information attached to
 aid team in resolving potential problems. The settings on this page are the
 settings used to send the emails to the team.
-
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/prefs_issue_tracker} }
+      \caption{Issue tracker preferences.}
+      \label{fig:prefs_issue_tracker}
+    \end{figure}
 \begin{description}
   \item[Tracker email] The email address to send problem reports to.
   \item[SMTP server] The SMTP mail server to use when sending emails.
@@ -56,6 +70,13 @@ These settings are used when scanning and decoding pallets and linking them to
 patients or container locations.
 \marginpar{\color{red}{There should  be an appendix with instructions on how to create
   these barcodes.}}
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/prefs_link_assign} }
+      \caption{Scan link / Assign preferences.}
+      \label{fig:prefs_link_assign}
+    \end{figure}
 \begin{description}
   \item[Confirm Barcode and Cancel Barcode] To speed up
     processing of samples, a handheld barcode scanner can be used to quickly
@@ -78,15 +99,29 @@ patients or container locations.
 \section{Scanning and Decoding}
 The settings on this page allow the user to specify the scanning and
 decoding parameters used when decoding pallet images.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/prefs_scanning_and_decoding} }
+      \caption{Scanning and Decoding preferences.}
+      \label{fig:prefs_scanning_and_decoding}
+    \end{figure}
 \begin{description}
-  \item[Select Scanner]
- Used to select the scanner that will be used to scan
-    96 well pallets.
+  \item[Select Scanner] This button is used to select the scanner that will be
+    used to scan 96 well pallets. The dialog box shown in figure
+    \ref{fig:prefs_select_source} is shown when the button is pressed.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/prefs_select_source} }
+      \caption{Selecting a scanning source.}
+      \label{fig:prefs_select_source}
+    \end{figure}
   \item[Driver Type] The type of driver that was selected when the \fbox{Select
     Scanner} button was pressed. Normally, the application will attempt to
     determine the driver type as soon as the user makes the selection, but
-    sometimes the application does not select the correct type. Use the
-    check boxes here to override what the application selected.
+    sometimes the application does not select the correct type. Use the check
+    boxes here to override what the application selected.
   \item[DPI] The \emph{Dots per Inch} used by the scanner for scanning
     images. For best results use 600 DPI.
   \item[Brightness] The brightness setting to be used when scanning
@@ -98,8 +133,18 @@ decoding parameters used when decoding pallet images.
 \end{description}
 
 \subsection{Decoding Parameters}
-These settings control how the software decodes the sample tubes with
+On the preferences dialog window, if there is a "plus" symbol next to the
+\emph{Scanning and Decoding} node, press it to expand the sub tree.
+
+These settings control how the software decodes the sample tubes imprinted with
 DataMatrix 2D barcodes.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/configuration/prefs_decoding_parms} }
+      \caption{Decoding preferences.}
+      \label{fig:prefs_decoding_parms}
+    \end{figure}
 \begin{description}
   \item[Decode Library Debug Level] The decoding software library can output
     debugging information to a log file. When this value is zero there is no
@@ -124,11 +169,20 @@ DataMatrix 2D barcodes.
 \end{description}
 
 \subsection{Decoding Profiles}
+On the preferences dialog window, if there is a "plus" symbol next to the
+\emph{Scanning and Decoding} node, press it to expand the sub tree.
+
 This page allows the user to define \emph{Decoding Profiles}. These profiles
 allow the user define a sub set of tubes to decoded when an image of a pallet
 is scanned. Scanning profiles can be used during scan link and scan assign (see
 sections \ref{sec:scan_link} and \ref{sec:scan_assign}).
-
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.45}
+      { \includegraphics*{screenshots/configuration/prefs_decoding_profiles} }
+      \caption{Decoding profiles preferences.}
+      \label{fig:prefs_decoding_profiles}
+    \end{figure}
 For example: the user may wish to only decode every other row on a pallet. Once
 the profile is created it can be used at scan link and scan assign time and
 only the cells activated in the profile will be decoded. If 2D barcodes are
@@ -140,16 +194,14 @@ To create a new profile follow these instructions:
   \item Press the \fbox{Add...} button. A dialog box pops up requesting a name
     for the new profile. Enter an appropriate name and press the \fbox{OK}
     button.
-  \item Now select each cell that should be part of the profile. When done
+  \item Now select each cell that should be part of the profile (see cells with
+    a checkmark in Figure \ref{fig:prefs_decoding_profiles}). When done
     selecting cells press the \fbox{Apply} button.
 \end{enumerate}
 
 \subsection{Plate Positions}
-To define a pallet scanning region do the following:
-\begin{enumerate}
-  \item On the preferences dialog window, if there is a "plus" symbol next to
-    the \emph{Scanning and Decoding} node, press it to expand the sub
-    tree.
+On the preferences dialog window, if there is a "plus" symbol next to the
+\emph{Scanning and Decoding} node, press it to expand the sub tree.
     \begin{figure}[H]
       \centering
       \scalebox{0.5}
@@ -157,6 +209,9 @@ To define a pallet scanning region do the following:
       \caption{Configuring a plate position.}
       \label{fig:plate1_definition}
     \end{figure}
+
+To define a pallet scanning region do the following:
+\begin{enumerate}
   \item Place a pallet that contains tubes on the flatbed scanner. Ensure the
     top edge of the pallet is touching the top of the scanning region, and the right
     edge of the pallet is touching the right margin. Ensure the 12 columns
@@ -185,7 +240,8 @@ To define a pallet scanning region do the following:
     pressing the left mouse button while hovering inside the grid.
   \item Once the grid cells are aligned with each tube press the \fbox{OK} button
     (see Figure \ref{fig:plate1_grid_ready}). The wheel on the mouse can be
-    used to make the cells smaller or bigger.
+    used to make the cells smaller or bigger (this is referred to as the
+    \emph{Cell Gap}).
     \begin{figure}[H]
       \centering
       \scalebox{0.5}
@@ -221,6 +277,13 @@ words can be printed and then scanned when required by the application (See
 sections \ref{sec:scan_link} and \ref{sec:scan_assign}). The \textbf{Plate
   \emph{x} barcode} settings contain the text encoded into these barcodes when
 they were created.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.45}
+      { \includegraphics*{screenshots/configuration/prefs_plate_barcodes} }
+      \caption{Plate barcode preferences.}
+      \label{fig:prefs_plate_barcodes}
+    \end{figure}
 
 \section{Servers}
 This page contains a list of BioBank2 servers that the Java Client connects to
@@ -228,6 +291,13 @@ on a regular basis. This list is used in the login dialog box to aid the user
 to quickly select a server. New servers can be added to this list by pressing
 the \fbox{New} button. Only the domain name or IP address for the server is
 required.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.45}
+      { \includegraphics*{screenshots/configuration/prefs_servers} }
+      \caption{Server preferences.}
+      \label{fig:prefs_servers}
+    \end{figure}
 
 Previously entered servers can also be edited with the \fbox{Edit} button if a
 spelling mistake was made.
