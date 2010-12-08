@@ -979,29 +979,9 @@
                   style="push">
             </command>
             <separator
-                  name="biobank2.separator3"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
-                  icon="icons/dispatch_add.png"
-                  label="Add Dispatch"
-                  style="push">
-            </command>
-            <separator
                   name="biobank2.separator2"
                   visible="true">
             </separator>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete Selected Item"
-                  style="push">
-            </command>
-         </menu>
-         <menu
-               id="edu.ualberta.med.biobank.menu.linkAssign"
-               label="Link / Assign">
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
                   icon="icons/scanLink.png"
@@ -1031,6 +1011,26 @@
                      name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
+            </command>
+            <separator
+                  name="biobank2.separator4"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
+                  icon="icons/dispatch_add.png"
+                  label="Add Dispatch"
+                  style="push">
+            </command>
+            <separator
+                  name="biobank2.separator3"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
+                  style="push">
             </command>
          </menu>
          <menu
