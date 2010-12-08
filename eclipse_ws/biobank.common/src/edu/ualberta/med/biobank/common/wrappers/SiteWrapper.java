@@ -17,12 +17,14 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchInfo;
-import edu.ualberta.med.biobank.model.Order;
+import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.RequestAliquot;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
@@ -53,7 +55,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "sitePvAttrCollection", "street1", "street2", "city", "province",
             "postalCode", "sentDispatchCollection", "sentDispatchCollection",
             "notificationCollection", "srcDispatchInfoCollection",
-            "studyCollection", "orderCollection" };
+            "studyCollection", "requestCollection" };
     }
 
     public String getName() {
@@ -272,27 +274,55 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    public List<OrderWrapper> getOrderCollection() {
-        OrderWrapper order = new OrderWrapper(appService, new Order());
-        order.setInApprovedState();
-        order.setWaybill("testwaybill");
-        order.setSite(this);
-        order.setSubmitted(new Date());
+    public List<RequestWrapper> getRequestCollection() {
+        RequestWrapper request = new RequestWrapper(appService, new Request());
+        request.setInApprovedState();
+        request.setWaybill("testwaybill");
+        request.setSite(this);
+        request.setSubmitted(new Date());
         StudyWrapper study = getStudyCollection().get(0);
         ResearchGroupWrapper rg = new ResearchGroupWrapper(appService,
             new ResearchGroup());
         rg.setNameShort("testRG");
         study.setResearchGroup(rg);
-        order.setStudy(study);
+        request.setStudy(study);
+        Address address = new Address();
+        address.setId(4);
+        request.setAddress(address);
+        List<Aliquot> aliquots = null;
         try {
-            order.persist();
+            aliquots = appService.query(new HQLCriteria(
+                "select * from aliquot limit 50"));
+        } catch (ApplicationException e1) {
+            // TODO Auto-generated catch block
+            e1.printStackTrace();
+        }
+        List<RequestAliquot> rAliquots = new ArrayList<RequestAliquot>();
+        for (Aliquot a : aliquots) {
+            RequestAliquot r = new RequestAliquot();
+            r.setAliquot(a);
+            if (a.getId() % 2 == 0)
+                r.setClaimedBy("me");
+            r.setRequest(request.getWrappedObject());
+            if (a.getId() % 3 == 0)
+                r.setState(2);
+            else
+                r.setState(3);
+            rAliquots.add(r);
+        }
+        List<RequestAliquotWrapper> wrappers = new ArrayList<RequestAliquotWrapper>();
+        for (RequestAliquot a : rAliquots)
+            wrappers.add(new RequestAliquotWrapper(appService, a));
+        request.setRequestAliquotCollection(rAliquots, wrappers);
+        try {
+            request.persist();
         } catch (Exception e) {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-        List<OrderWrapper> orderList = new ArrayList<OrderWrapper>();
-        orderList.add(order);
-        return orderList;
+        List<RequestWrapper> requestList = new ArrayList<RequestWrapper>();
+        requestList.add(request);
+        return requestList;
 
         /*
          * List<OrderWrapper> orderCollection = (List<OrderWrapper>)

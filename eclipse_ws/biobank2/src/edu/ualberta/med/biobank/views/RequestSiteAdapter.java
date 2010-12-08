@@ -11,36 +11,36 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.order.AcceptedOrderNode;
-import edu.ualberta.med.biobank.treeview.order.ApprovedOrderNode;
-import edu.ualberta.med.biobank.treeview.order.FilledOrderNode;
-import edu.ualberta.med.biobank.treeview.order.ShippedOrderNode;
+import edu.ualberta.med.biobank.treeview.request.AcceptedRequestNode;
+import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
+import edu.ualberta.med.biobank.treeview.request.FilledRequestNode;
+import edu.ualberta.med.biobank.treeview.request.ShippedRequestNode;
 
-public class OrderSiteAdapter extends AdapterBase {
+public class RequestSiteAdapter extends AdapterBase {
 
-    private ApprovedOrderNode approvedOrderNode;
-    private AcceptedOrderNode acceptedNode;
-    private FilledOrderNode filledOrderNode;
-    private ShippedOrderNode shippedOrderNode;
+    private ApprovedRequestNode approvedNode;
+    private AcceptedRequestNode acceptedNode;
+    private FilledRequestNode filledNode;
+    private ShippedRequestNode shippedNode;
 
-    public OrderSiteAdapter(AdapterBase parent, SiteWrapper site) {
+    public RequestSiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site, false);
 
-        approvedOrderNode = new ApprovedOrderNode(this, 0, site);
-        approvedOrderNode.setParent(this);
-        this.addChild(approvedOrderNode);
+        approvedNode = new ApprovedRequestNode(this, 0, site);
+        approvedNode.setParent(this);
+        this.addChild(approvedNode);
 
-        acceptedNode = new AcceptedOrderNode(this, 1, site);
+        acceptedNode = new AcceptedRequestNode(this, 1, site);
         acceptedNode.setParent(this);
         this.addChild(acceptedNode);
 
-        filledOrderNode = new FilledOrderNode(this, 2, site);
-        filledOrderNode.setParent(this);
-        this.addChild(filledOrderNode);
+        filledNode = new FilledRequestNode(this, 2, site);
+        filledNode.setParent(this);
+        this.addChild(filledNode);
 
-        shippedOrderNode = new ShippedOrderNode(this, 3, site);
-        shippedOrderNode.setParent(this);
-        this.addChild(shippedOrderNode);
+        shippedNode = new ShippedRequestNode(this, 3, site);
+        shippedNode.setParent(this);
+        this.addChild(shippedNode);
 
     }
 

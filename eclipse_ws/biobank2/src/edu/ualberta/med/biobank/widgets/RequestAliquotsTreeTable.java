@@ -35,18 +35,18 @@ import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
-import edu.ualberta.med.biobank.forms.utils.OrderTableGroup;
+import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
 
-public class OrderAliquotsTreeTable extends BiobankWidget {
+public class RequestAliquotsTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
     private DispatchWrapper shipment;
     private int fakeMaxCount;
 
-    public OrderAliquotsTreeTable(Composite parent,
-        final OrderWrapper shipment, final boolean editAliquotsState,
+    public RequestAliquotsTreeTable(Composite parent,
+        final RequestWrapper shipment, final boolean editAliquotsState,
         final boolean editAliquotsComment) {
         super(parent, SWT.NONE);
 
@@ -90,13 +90,13 @@ public class OrderAliquotsTreeTable extends BiobankWidget {
 
             @Override
             public Object[] getElements(Object inputElement) {
-                return OrderTableGroup.getGroupsForShipment(shipment).toArray();
+                return RequestTableGroup.getGroupsForShipment(shipment).toArray();
             }
 
             @Override
             public Object[] getChildren(Object parentElement) {
-                if (parentElement instanceof OrderTableGroup)
-                    return ((OrderTableGroup) parentElement).getChildren(
+                if (parentElement instanceof RequestTableGroup)
+                    return ((RequestTableGroup) parentElement).getChildren(
                         shipment).toArray();
                 return null;
             }
@@ -104,13 +104,13 @@ public class OrderAliquotsTreeTable extends BiobankWidget {
             @Override
             public Object getParent(Object element) {
                 if (element instanceof DispatchAliquotWrapper)
-                    return OrderTableGroup.findParent((AliquotWrapper) element);
+                    return RequestTableGroup.findParent((AliquotWrapper) element);
                 return null;
             }
 
             @Override
             public boolean hasChildren(Object element) {
-                return element instanceof OrderTableGroup;
+                return element instanceof RequestTableGroup;
             }
         };
         tv.setContentProvider(contentProvider);
@@ -119,9 +119,9 @@ public class OrderAliquotsTreeTable extends BiobankWidget {
         final BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                if (element instanceof OrderTableGroup) {
+                if (element instanceof RequestTableGroup) {
                     if (columnIndex == 0)
-                        return ((OrderTableGroup) element).getTitle(shipment);
+                        return ((RequestTableGroup) element).getTitle(shipment);
                     return "";
                 }
                 if (element instanceof AliquotWrapper && columnIndex == 3) {

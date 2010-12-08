@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.utils.BindingContextHelper;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.views.DispatchAdministrationView;
-import edu.ualberta.med.biobank.views.OrderAdministrationView;
+import edu.ualberta.med.biobank.views.RequestAdministrationView;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -88,7 +88,7 @@ public class SessionManager {
 
         rebuildSession();
         rebuiltDispatch();
-        rebuildOrder();
+        rebuildRequest();
         updateMenus();
 
         if (sessionAdapter.getUser().passwordChangeRequired()) {
@@ -103,8 +103,8 @@ public class SessionManager {
             .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
     }
 
-    private void rebuildOrder() {
-        OrderAdministrationView view = OrderAdministrationView.getCurrent();
+    private void rebuildRequest() {
+        RequestAdministrationView view = RequestAdministrationView.getCurrent();
         if (view == null)
             return;
         view.createNodes();

@@ -15,21 +15,21 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.order.OrderSearchedNode;
+import edu.ualberta.med.biobank.treeview.request.RequestSearchedNode;
 
-public class OrderAdministrationView extends AbstractAdministrationView {
+public class RequestAdministrationView extends AbstractAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.OrderAdminView";
+    public static final String ID = "edu.ualberta.med.biobank.views.RequestAdminView";
 
-    private Button radioOrderNumber;
+    private Button radioRequestNumber;
 
     private List<SiteWrapper> siteNodes;
 
-    private OrderSearchedNode searchedNode;
+    private RequestSearchedNode searchedNode;
 
-    private static OrderAdministrationView currentInstance;
+    private static RequestAdministrationView currentInstance;
 
-    public OrderAdministrationView() {
+    public RequestAdministrationView() {
         currentInstance = this;
         SessionManager.addView(ID, this);
     }
@@ -47,13 +47,13 @@ public class OrderAdministrationView extends AbstractAdministrationView {
         }
         if (siteNodes != null) {
             for (SiteWrapper site : siteNodes) {
-                OrderSiteAdapter siteAdapter = new OrderSiteAdapter(rootNode,
-                    site);
+                RequestSiteAdapter siteAdapter = new RequestSiteAdapter(
+                    rootNode, site);
                 siteAdapter.setParent(rootNode);
                 rootNode.addChild(siteAdapter);
             }
 
-            searchedNode = new OrderSearchedNode(rootNode, 2);
+            searchedNode = new RequestSearchedNode(rootNode, 2);
             searchedNode.setParent(rootNode);
             rootNode.addChild(searchedNode);
         }
@@ -68,13 +68,13 @@ public class OrderAdministrationView extends AbstractAdministrationView {
         layout.verticalSpacing = 0;
         composite.setLayout(layout);
 
-        radioOrderNumber = new Button(composite, SWT.RADIO);
-        radioOrderNumber.setText("Order Number");
-        radioOrderNumber.setSelection(true);
-        radioOrderNumber.addSelectionListener(new SelectionAdapter() {
+        radioRequestNumber = new Button(composite, SWT.RADIO);
+        radioRequestNumber.setText("Request Number");
+        radioRequestNumber.setSelection(true);
+        radioRequestNumber.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                if (radioOrderNumber.getSelection()) {
+                if (radioRequestNumber.getSelection()) {
                     // showTextOnly(true);
                 }
             }
@@ -99,7 +99,7 @@ public class OrderAdministrationView extends AbstractAdministrationView {
             List<? extends ModelWrapper<?>> searchedObject = search();
             if (searchedObject == null || searchedObject.size() == 0) {
                 String msg = "No Dispatch found";
-                if (radioOrderNumber.getSelection())
+                if (radioRequestNumber.getSelection())
                     msg += " for waybill " + treeText.getText();
                 BioBankPlugin.openMessage("Dispatch not found", msg);
             } else {
@@ -112,7 +112,7 @@ public class OrderAdministrationView extends AbstractAdministrationView {
     }
 
     protected List<DispatchWrapper> search() {
-        if (radioOrderNumber.getSelection()) {
+        if (radioRequestNumber.getSelection()) {
             return null;
         }
         return null;
@@ -136,7 +136,7 @@ public class OrderAdministrationView extends AbstractAdministrationView {
         }
     }
 
-    public static OrderAdministrationView getCurrent() {
+    public static RequestAdministrationView getCurrent() {
         return currentInstance;
     }
 

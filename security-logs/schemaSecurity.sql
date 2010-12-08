@@ -139,7 +139,7 @@ CREATE TABLE `csm_pg_pe` (
   KEY `idx_PROTECTION_GROUP_ID` (`PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PROTECTION_ELEMENT_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_GROUP_PROTECTION_ELEMENT` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1089 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1090 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -278,7 +278,7 @@ CREATE TABLE `csm_protection_element` (
   UNIQUE KEY `UQ_PE_PE_NAME_ATTRIBUTE_VALUE_APP_ID` (`OBJECT_ID`,`ATTRIBUTE`,`ATTRIBUTE_VALUE`,`APPLICATION_ID`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_PE_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=173 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=174 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -325,8 +325,8 @@ INSERT INTO `csm_protection_element` VALUES (150,'edu.ualberta.med.biobank.model
 INSERT INTO `csm_protection_element` VALUES (151,'edu.ualberta.med.biobank.model.DispatchAliquot','edu.ualberta.med.biobank.model.DispatchAliquot','edu.ualberta.med.biobank.model.DispatchAliquot','','','',2,'2010-09-30');
 INSERT INTO `csm_protection_element` VALUES (169,'edu.ualberta.med.biobank.model.Researcher','','edu.ualberta.med.biobank.model.Researcher','','','',2,'2010-12-07');
 INSERT INTO `csm_protection_element` VALUES (170,'edu.ualberta.med.biobank.model.ResearchGroup','','edu.ualberta.med.biobank.model.ResearchGroup','','','',2,'2010-12-07');
-INSERT INTO `csm_protection_element` VALUES (171,'edu.ualberta.med.biobank.model.Order','','edu.ualberta.med.biobank.model.Order','','','',2,'2010-12-07');
-INSERT INTO `csm_protection_element` VALUES (172,'edu.ualberta.med.biobank.model.OrderAliquot','','edu.ualberta.med.biobank.model.OrderAliquot','','','',2,'2010-12-07');
+INSERT INTO `csm_protection_element` VALUES (171,'edu.ualberta.med.biobank.model.Request','','edu.ualberta.med.biobank.model.Request','','','',2,'2010-12-08');
+INSERT INTO `csm_protection_element` VALUES (172,'edu.ualberta.med.biobank.model.RequestAliquot','','edu.ualberta.med.biobank.model.RequestAliquot','','','',2,'2010-12-08');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -351,7 +351,7 @@ CREATE TABLE `csm_protection_group` (
   KEY `idx_PARENT_PROTECTION_GROUP_ID` (`PARENT_PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PG_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_GROUP` FOREIGN KEY (`PARENT_PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=63 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=64 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -360,7 +360,7 @@ CREATE TABLE `csm_protection_group` (
 
 LOCK TABLES `csm_protection_group` WRITE;
 /*!40000 ALTER TABLE `csm_protection_group` DISABLE KEYS */;
-INSERT INTO `csm_protection_group` VALUES (1,'All Objects','Contains Protection Element of each model object, except Site',2,0,'2010-12-07',NULL);
+INSERT INTO `csm_protection_group` VALUES (1,'All Objects','Contains Protection Element of each model object, except Site',2,0,'2010-12-08',NULL);
 INSERT INTO `csm_protection_group` VALUES (11,'All Existing Sites','** DO NOT REMOVE ** Is parent of all sites protection elements + the Site class itself',2,0,'2010-10-20',NULL);
 INSERT INTO `csm_protection_group` VALUES (45,'Site Administration Features','** DO NOT RENAME **\r\nContains protection elements (or protection groups children) that need privileges to manage the internal features of a site - will be available only to sites the user can update',2,0,'2010-10-20',NULL);
 INSERT INTO `csm_protection_group` VALUES (46,'Clinic Shipments Feature','Represents the clinic shipments feature + contains the protection elements that need specific privileges to create/update/delete clinic shipments - will be available only to sites the user can update',2,0,'2010-10-20',45);
@@ -622,4 +622,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2010-12-07 11:39:41
+-- Dump completed on 2010-12-08 14:26:38

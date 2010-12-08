@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview.order;
+package edu.ualberta.med.biobank.treeview.request;
 
 import java.util.Collection;
 
@@ -13,16 +13,16 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class FilledOrderNode extends AdapterBase {
+public class ShippedRequestNode extends AdapterBase {
 
     private SiteWrapper site;
 
-    public FilledOrderNode(AdapterBase parent, int id, SiteWrapper site) {
-        super(parent, id, "Filled", true, false);
+    public ShippedRequestNode(AdapterBase parent, int id, SiteWrapper site) {
+        super(parent, id, "Shipped", true, false);
         this.site = site;
     }
 
@@ -57,13 +57,13 @@ public class FilledOrderNode extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        return new OrderAdapter(this, (OrderWrapper) child);
+        return new RequestAdapter(this, (RequestWrapper) child);
     }
 
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return site.getOrderCollection();
+        return site.getRequestCollection();
     }
 
     @Override

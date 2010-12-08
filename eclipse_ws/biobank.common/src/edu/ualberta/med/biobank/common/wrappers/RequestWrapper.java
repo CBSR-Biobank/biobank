@@ -7,18 +7,18 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.OrderAliquotState;
-import edu.ualberta.med.biobank.common.util.OrderState;
+import edu.ualberta.med.biobank.common.util.RequestAliquotState;
+import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Order;
-import edu.ualberta.med.biobank.model.OrderAliquot;
+import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.RequestAliquot;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class OrderWrapper extends ModelWrapper<Order> {
+public class RequestWrapper extends ModelWrapper<Request> {
 
     private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedDispatchAliquotCollection";
 
@@ -31,14 +31,14 @@ public class OrderWrapper extends ModelWrapper<Order> {
     private boolean stateModified = false;
     private AddressWrapper address;
 
-    public OrderWrapper(WritableApplicationService appService) {
+    public RequestWrapper(WritableApplicationService appService) {
         super(appService);
         this.address = new AddressWrapper(appService,
             wrappedObject.getAddress());
     }
 
-    public OrderWrapper(WritableApplicationService appService, Order order) {
-        super(appService, order);
+    public RequestWrapper(WritableApplicationService appService, Request request) {
+        super(appService, request);
     }
 
     @Override
@@ -48,8 +48,8 @@ public class OrderWrapper extends ModelWrapper<Order> {
     }
 
     @Override
-    public Class<Order> getWrappedClass() {
-        return Order.class;
+    public Class<Request> getWrappedClass() {
+        return Request.class;
     }
 
     @Override
@@ -118,10 +118,10 @@ public class OrderWrapper extends ModelWrapper<Order> {
     }
 
     public void setInCloseState() {
-        setState(OrderState.CLOSED);
+        setState(RequestState.CLOSED);
     }
 
-    private void setState(OrderState state) {
+    private void setState(RequestState state) {
         Integer oldState = wrappedObject.getState();
         wrappedObject.setState(state.getId());
         stateModified = oldState == null || state == null
@@ -129,19 +129,19 @@ public class OrderWrapper extends ModelWrapper<Order> {
     }
 
     public void setInLostState() {
-        setState(OrderState.LOST);
+        setState(RequestState.LOST);
     }
 
     public void setInApprovedState() {
-        setState(OrderState.APPROVED);
+        setState(RequestState.APPROVED);
     }
 
     public void setInNewState() {
-        setState(OrderState.NEW);
+        setState(RequestState.NEW);
     }
 
     public void setInAcceptedState() {
-        setState(OrderState.ACCEPTED);
+        setState(RequestState.ACCEPTED);
     }
 
     public Date getSubmitted() {
@@ -184,7 +184,7 @@ public class OrderWrapper extends ModelWrapper<Order> {
         wrappedObject.setState(state);
     }
 
-    private AddressWrapper getAddress() {
+    public AddressWrapper getAddress() {
         if (address == null) {
             Address a = wrappedObject.getAddress();
             if (a == null)
@@ -194,7 +194,7 @@ public class OrderWrapper extends ModelWrapper<Order> {
         return address;
     }
 
-    private void setAddress(Address address) {
+    public void setAddress(Address address) {
         if (address == null)
             this.address = null;
         else
@@ -226,60 +226,60 @@ public class OrderWrapper extends ModelWrapper<Order> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<OrderAliquotWrapper> getOrderAliquotCollection(boolean sort) {
-        List<OrderAliquotWrapper> orderAliquotCollection = (List<OrderAliquotWrapper>) propertiesMap
-            .get("orderAliquotCollection");
-        if (orderAliquotCollection == null) {
-            Collection<OrderAliquot> children = wrappedObject
-                .getOrderAliquotCollection();
+    public List<RequestAliquotWrapper> getRequestAliquotCollection(boolean sort) {
+        List<RequestAliquotWrapper> requestAliquotCollection = (List<RequestAliquotWrapper>) propertiesMap
+            .get("requestAliquotCollection");
+        if (requestAliquotCollection == null) {
+            Collection<RequestAliquot> children = wrappedObject
+                .getRequestAliquotCollection();
             if (children != null) {
-                orderAliquotCollection = new ArrayList<OrderAliquotWrapper>();
-                for (OrderAliquot aliquot : children) {
-                    orderAliquotCollection.add(new OrderAliquotWrapper(
+                requestAliquotCollection = new ArrayList<RequestAliquotWrapper>();
+                for (RequestAliquot aliquot : children) {
+                    requestAliquotCollection.add(new RequestAliquotWrapper(
                         appService, aliquot));
                 }
-                propertiesMap.put("orderAliquotCollection",
-                    orderAliquotCollection);
+                propertiesMap.put("requestAliquotCollection",
+                    requestAliquotCollection);
             }
-            if ((orderAliquotCollection != null) && sort)
-                Collections.sort(orderAliquotCollection);
+            if ((requestAliquotCollection != null) && sort)
+                Collections.sort(requestAliquotCollection);
         }
-        return orderAliquotCollection;
+        return requestAliquotCollection;
     }
 
-    private void setOrderAliquotCollection(
-        Collection<OrderAliquot> allAliquotObjects,
-        List<OrderAliquotWrapper> allAliquotWrappers) {
-        Collection<OrderAliquot> oldAliquots = wrappedObject
-            .getOrderAliquotCollection();
-        wrappedObject.setOrderAliquotCollection(allAliquotObjects);
-        propertyChangeSupport.firePropertyChange("orderAliquotCollection",
+    public void setRequestAliquotCollection(
+        Collection<RequestAliquot> allAliquotObjects,
+        List<RequestAliquotWrapper> allAliquotWrappers) {
+        Collection<RequestAliquot> oldAliquots = wrappedObject
+            .getRequestAliquotCollection();
+        wrappedObject.setRequestAliquotCollection(allAliquotObjects);
+        propertyChangeSupport.firePropertyChange("requestAliquotCollection",
             oldAliquots, allAliquotObjects);
-        propertiesMap.put("orderAliquotCollection", allAliquotWrappers);
+        propertiesMap.put("requestAliquotCollection", allAliquotWrappers);
     }
 
-    public List<OrderAliquotWrapper> getNonProcessedOrderAliquotCollection() {
-        return getOrderAliquotCollectionWithState(NON_PROCESSED_ALIQUOTS_KEY,
-            true, OrderAliquotState.NONPROCESSED_STATE);
+    public List<RequestAliquotWrapper> getNonProcessedRequestAliquotCollection() {
+        return getRequestAliquotCollectionWithState(NON_PROCESSED_ALIQUOTS_KEY,
+            true, RequestAliquotState.NONPROCESSED_STATE);
     }
 
-    public List<OrderAliquotWrapper> getProcessedOrderAliquotCollection() {
-        return getOrderAliquotCollectionWithState(PROCESSED_ALIQUOTS_KEY, true,
-            OrderAliquotState.PROCESSED_STATE);
+    public List<RequestAliquotWrapper> getProcessedRequestAliquotCollection() {
+        return getRequestAliquotCollectionWithState(PROCESSED_ALIQUOTS_KEY,
+            true, RequestAliquotState.PROCESSED_STATE);
     }
 
     @SuppressWarnings("unchecked")
-    private List<OrderAliquotWrapper> getOrderAliquotCollectionWithState(
-        String mapKey, boolean sort, OrderAliquotState... states) {
-        List<OrderAliquotWrapper> dsaCollection = (List<OrderAliquotWrapper>) propertiesMap
+    private List<RequestAliquotWrapper> getRequestAliquotCollectionWithState(
+        String mapKey, boolean sort, RequestAliquotState... states) {
+        List<RequestAliquotWrapper> dsaCollection = (List<RequestAliquotWrapper>) propertiesMap
             .get(mapKey);
         if (dsaCollection == null) {
-            Collection<OrderAliquotWrapper> children = getOrderAliquotCollection(sort);
+            Collection<RequestAliquotWrapper> children = getRequestAliquotCollection(sort);
             if (children != null) {
-                dsaCollection = new ArrayList<OrderAliquotWrapper>();
-                for (OrderAliquotWrapper dsa : children) {
+                dsaCollection = new ArrayList<RequestAliquotWrapper>();
+                for (RequestAliquotWrapper dsa : children) {
                     boolean hasState = false;
-                    for (OrderAliquotState state : states) {
+                    for (RequestAliquotState state : states) {
                         if (state.isEquals(dsa.getState())) {
                             hasState = true;
                             break;

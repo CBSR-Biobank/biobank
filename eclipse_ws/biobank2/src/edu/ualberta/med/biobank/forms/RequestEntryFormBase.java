@@ -12,23 +12,23 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.util.OrderState;
-import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
-import edu.ualberta.med.biobank.treeview.order.OrderAdapter;
+import edu.ualberta.med.biobank.common.util.RequestState;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.OrderAliquotsTreeTable;
+import edu.ualberta.med.biobank.widgets.RequestAliquotsTreeTable;
 
-public class OrderEntryFormBase extends BiobankFormBase {
+public class RequestEntryFormBase extends BiobankFormBase {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.OrderEntryFormBase";
-    private OrderWrapper order;
-    private OrderAliquotsTreeTable aliquotsTree;
+    public static final String ID = "edu.ualberta.med.biobank.forms.RequestEntryFormBase";
+    private RequestWrapper request;
+    private RequestAliquotsTreeTable aliquotsTree;
 
     // private OrderAliquotsTreeTable aliquotsTree;
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Order placed on " + order.getSubmitted()
+        form.setText("Order placed on " + request.getSubmitted()
             + "KDCS Research Group");
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -47,45 +47,45 @@ public class OrderEntryFormBase extends BiobankFormBase {
 
         BiobankText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Study");
-        setTextValue(studyLabel, order.getStudy());
+        setTextValue(studyLabel, request.getStudy());
 
         BiobankText researchGroupLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Research Group");
-        setTextValue(researchGroupLabel, order.getStudy().getResearchGroup()
+        setTextValue(researchGroupLabel, request.getStudy().getResearchGroup()
             .getNameShort());
         BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Site");
-        setTextValue(siteLabel, order.getSite().getNameShort());
+        setTextValue(siteLabel, request.getSite().getNameShort());
         BiobankText submittedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Order Submitted");
         setTextValue(submittedLabel,
-            DateFormatter.formatAsDate(order.getSubmitted()));
+            DateFormatter.formatAsDate(request.getSubmitted()));
         BiobankText orderNumberLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Order Number");
-        setTextValue(orderNumberLabel, order.getId());
+        setTextValue(orderNumberLabel, request.getId());
         BiobankText acceptedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date received");
-        setTextValue(acceptedLabel, order.getAccepted());
+        setTextValue(acceptedLabel, request.getAccepted());
         createReadOnlyLabelledField(client, SWT.NONE, "Comments");
         Section s = createSection("Aliquots");
 
         Composite c = new Composite(s, SWT.NONE);
         c.setLayout(new GridLayout());
         createAliquotsSelectionActions(c, false);
-        aliquotsTree = new OrderAliquotsTreeTable(c, null, true, true);
+        aliquotsTree = new RequestAliquotsTreeTable(c, request, true, true);
 
         s.setClient(c);
 
         Button button = new Button(c, SWT.PUSH);
-        Integer orderState = ((OrderWrapper) adapter.getModelObject())
+        Integer orderState = ((RequestWrapper) adapter.getModelObject())
             .getState();
-        if (orderState.equals(OrderState.APPROVED))
+        if (orderState.equals(RequestState.APPROVED))
             button.setText("Accept Order");
-        else if (orderState.equals(OrderState.ACCEPTED))
+        else if (orderState.equals(RequestState.ACCEPTED))
             button.setText("Mark as filled");
-        else if (orderState.equals(OrderState.FILLED))
+        else if (orderState.equals(RequestState.FILLED))
             button.setText("Mark as shipped");
-        else if (orderState.equals(OrderState.SHIPPED))
+        else if (orderState.equals(RequestState.SHIPPED))
             button.setText("Close");
         else
             BioBankPlugin.openAsyncError("Invalid State",
@@ -126,10 +126,10 @@ public class OrderEntryFormBase extends BiobankFormBase {
     @Override
     protected void init() throws Exception {
         Assert.isNotNull(adapter, "Adapter should be no null");
-        Assert.isTrue((adapter instanceof OrderAdapter),
+        Assert.isTrue((adapter instanceof RequestAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
-        this.order = (OrderWrapper) adapter.getModelObject();
+        this.request = (RequestWrapper) adapter.getModelObject();
         setPartName("New Order");
     }
 }

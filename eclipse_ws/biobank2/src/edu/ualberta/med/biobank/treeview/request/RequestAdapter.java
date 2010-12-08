@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview.order;
+package edu.ualberta.med.biobank.treeview.request;
 
 import java.util.Collection;
 
@@ -12,20 +12,20 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.OrderWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.OrderEntryFormBase;
+import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.views.OrderAdministrationView;
+import edu.ualberta.med.biobank.views.RequestAdministrationView;
 
-public class OrderAdapter extends AdapterBase {
+public class RequestAdapter extends AdapterBase {
 
-    public OrderAdapter(AdapterBase parent, OrderWrapper ship) {
+    public RequestAdapter(AdapterBase parent, RequestWrapper ship) {
         super(parent, ship);
     }
 
-    public OrderWrapper getWrapper() {
-        return (OrderWrapper) modelObject;
+    public RequestWrapper getWrapper() {
+        return (RequestWrapper) modelObject;
     }
 
     @Override
@@ -40,8 +40,8 @@ public class OrderAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        OrderWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment, "Order is null");
+        RequestWrapper shipment = getWrapper();
+        Assert.isNotNull(shipment, "Request is null");
         String label = new String();
         StudyWrapper study = shipment.getStudy();
 
@@ -56,7 +56,7 @@ public class OrderAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Order");
+        return getTooltipText("Request");
     }
 
     @Override
@@ -69,33 +69,33 @@ public class OrderAdapter extends AdapterBase {
     }
 
     public void doAccept() {
-        setOrderAsAccepted();
+        setRequestAsAccepted();
         openEntryForm();
     }
 
-    private void setOrderAsAccepted() {
+    private void setRequestAsAccepted() {
         getWrapper().setInAcceptedState();
-        persistOrder();
+        persistRequest();
     }
 
     public void doClose() {
         getWrapper().setInCloseState();
-        persistOrder();
+        persistRequest();
         openViewForm();
     }
 
     public void doSetAsLost() {
         getWrapper().setInLostState();
-        persistOrder();
+        persistRequest();
         openViewForm();
     }
 
-    private void setOrderAsNew() {
+    private void setRequestAsNew() {
         getWrapper().setInNewState();
-        persistOrder();
+        persistRequest();
     }
 
-    private void persistOrder() {
+    private void persistRequest() {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
@@ -107,7 +107,7 @@ public class OrderAdapter extends AdapterBase {
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Save error", ex);
         }
-        OrderAdministrationView.getCurrent().reload();
+        RequestAdministrationView.getCurrent().reload();
     }
 
     @Override
@@ -133,12 +133,12 @@ public class OrderAdapter extends AdapterBase {
 
     @Override
     public String getViewFormId() {
-        return OrderEntryFormBase.ID;
+        return RequestEntryFormBase.ID;
     }
 
     @Override
     public String getEntryFormId() {
-        return OrderEntryFormBase.ID;
+        return RequestEntryFormBase.ID;
     }
 
 }

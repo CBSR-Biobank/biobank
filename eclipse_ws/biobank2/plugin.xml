@@ -261,8 +261,8 @@
              name="Export Errors Logs">
        </command>
        <command
-             id="edu.ualberta.med.biobank.commands.orders.processOrder"
-             name="Process Order">
+             id="edu.ualberta.med.biobank.commands.requests.processRequest"
+             name="Process Request">
        </command>
    </extension>
    <extension
@@ -1408,11 +1408,11 @@
             </command>
          </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.views.OrderAdminView">
+               id="edu.ualberta.med.biobank.views.RequestAdminView">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.orders.processOrder"
-                  icon="icons/order_edit.png"
-                  label="Process Order"
+                  commandId="edu.ualberta.med.biobank.commands.requests.processRequest"
+                  icon="icons/request_edit.png"
+                  label="Process Request"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -1564,7 +1564,7 @@
          </view>
          <view
                closeable="false"
-               id="edu.ualberta.med.biobank.views.OrderAdminView"
+               id="edu.ualberta.med.biobank.views.RequestAdminView"
                minimized="false"
                moveable="false"
                ratio="0.20"
@@ -2007,11 +2007,11 @@
       name="Dispatch Sending Entry">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.OrderEntryFormBase"
+      class="edu.ualberta.med.biobank.forms.RequestEntryFormBase"
       default="false"
-      icon="icons/order.png"
-      id="edu.ualberta.med.biobank.forms.OrderEntryFormBase"
-      name="Order Receiving Form">
+      icon="icons/request.png"
+      id="edu.ualberta.med.biobank.forms.RequestEntryFormBase"
+      name="Request Receiving Form">
 </editor>
    </extension>
    <extension
@@ -2363,10 +2363,10 @@
       </view>
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.OrderAdministrationView"
-            icon="icons/order.png"
-            id="edu.ualberta.med.biobank.views.OrderAdminView"
-            name="Orders"
+            class="edu.ualberta.med.biobank.views.RequestAdministrationView"
+            icon="icons/request.png"
+            id="edu.ualberta.med.biobank.views.RequestAdminView"
+            name="Requests"
             restorable="true">
       </view>
    </extension>

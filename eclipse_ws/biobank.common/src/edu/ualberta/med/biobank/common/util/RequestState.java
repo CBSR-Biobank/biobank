@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.util;
 
-public enum OrderState {
+public enum RequestState {
     NEW(0, "New"), SUBMITTED(1, "Submitted"), APPROVED(2, "Approved"),
     ACCEPTED(3, "Accepted"), FILLED(4, "Filled"), SHIPPED(5, "Shipped"),
     CLOSED(6, "Closed"), LOST(7, "Lost");
@@ -8,15 +8,15 @@ public enum OrderState {
     private Integer id;
     private String label;
 
-    private OrderState(Integer id, String label) {
+    private RequestState(Integer id, String label) {
         this.id = id;
         this.label = label;
     }
 
-    public static OrderState getState(Integer state) {
+    public static RequestState getState(Integer state) {
         if (state == null)
             return NEW;
-        for (OrderState dss : values()) {
+        for (RequestState dss : values()) {
             if (dss.getId().equals(state))
                 return dss;
         }

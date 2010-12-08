@@ -1,32 +1,32 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.OrderAliquotState;
+import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.Order;
-import edu.ualberta.med.biobank.model.OrderAliquot;
+import edu.ualberta.med.biobank.model.Request;
+import edu.ualberta.med.biobank.model.RequestAliquot;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class OrderAliquotWrapper extends ModelWrapper<OrderAliquot> {
+public class RequestAliquotWrapper extends ModelWrapper<RequestAliquot> {
 
-    public OrderAliquotWrapper(WritableApplicationService appService) {
+    public RequestAliquotWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
-    public OrderAliquotWrapper(WritableApplicationService appService,
-        OrderAliquot dsa) {
+    public RequestAliquotWrapper(WritableApplicationService appService,
+        RequestAliquot dsa) {
         super(appService, dsa);
     }
 
     @Override
     protected String[] getPropertyChangeNames() {
-        return new String[] { "order", "aliquot", "state", "claimedBy" };
+        return new String[] { "request", "aliquot", "state", "claimedBy" };
     }
 
     @Override
-    public Class<OrderAliquot> getWrappedClass() {
-        return OrderAliquot.class;
+    public Class<RequestAliquot> getWrappedClass() {
+        return RequestAliquot.class;
     }
 
     @Override
@@ -63,26 +63,26 @@ public class OrderAliquotWrapper extends ModelWrapper<OrderAliquot> {
             newAliquot);
     }
 
-    public OrderWrapper getOrder() {
-        OrderWrapper ship = (OrderWrapper) propertiesMap.get("order");
+    public RequestWrapper getRequest() {
+        RequestWrapper ship = (RequestWrapper) propertiesMap.get("request");
         if (ship == null) {
-            Order o = wrappedObject.getOrder();
+            Request o = wrappedObject.getRequest();
             if (o != null) {
-                ship = new OrderWrapper(appService, o);
+                ship = new RequestWrapper(appService, o);
             }
         }
         return ship;
     }
 
-    public void setOrder(OrderWrapper ship) {
-        propertiesMap.put("order", ship);
-        Order oldShip = wrappedObject.getOrder();
-        Order newShip = null;
+    public void setRequest(RequestWrapper ship) {
+        propertiesMap.put("request", ship);
+        Request oldShip = wrappedObject.getRequest();
+        Request newShip = null;
         if (ship != null) {
             newShip = ship.getWrappedObject();
         }
-        wrappedObject.setOrder(newShip);
-        propertyChangeSupport.firePropertyChange("order", oldShip, newShip);
+        wrappedObject.setRequest(newShip);
+        propertyChangeSupport.firePropertyChange("request", oldShip, newShip);
     }
 
     public Integer getState() {
@@ -107,22 +107,22 @@ public class OrderAliquotWrapper extends ModelWrapper<OrderAliquot> {
     }
 
     @Override
-    public int compareTo(ModelWrapper<OrderAliquot> object) {
-        if (object instanceof OrderAliquotWrapper) {
-            OrderAliquotWrapper dsa = (OrderAliquotWrapper) object;
+    public int compareTo(ModelWrapper<RequestAliquot> object) {
+        if (object instanceof RequestAliquotWrapper) {
+            RequestAliquotWrapper dsa = (RequestAliquotWrapper) object;
             return getAliquot().compareTo(dsa.getAliquot());
         }
         return super.compareTo(object);
     }
 
     public String getStateDescription() {
-        return OrderAliquotState.getState(getState()).getLabel();
+        return RequestAliquotState.getState(getState()).getLabel();
     }
 
     @Override
     public boolean equals(Object object) {
-        if (object instanceof OrderAliquotWrapper && object != null) {
-            OrderAliquotWrapper dsa = (OrderAliquotWrapper) object;
+        if (object instanceof RequestAliquotWrapper && object != null) {
+            RequestAliquotWrapper dsa = (RequestAliquotWrapper) object;
             if (isNew() && dsa.isNew()) {
                 return getAliquot() != null && dsa.getAliquot() != null
                     && getAliquot().equals(dsa.getAliquot())
