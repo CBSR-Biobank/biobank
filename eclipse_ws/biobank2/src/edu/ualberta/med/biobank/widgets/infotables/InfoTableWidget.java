@@ -13,6 +13,8 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MenuAdapter;
+import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -82,7 +84,7 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     protected ListenerList doubleClickListeners = new ListenerList();
 
-    private MenuItem mi;
+    private MenuItem editItem;
 
     public InfoTableWidget(Composite parent, List<T> collection,
         String[] headings) {
@@ -103,6 +105,17 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                 if (doubleClickListeners.size() > 0) {
                     InfoTableWidget.this.doubleClick();
                 }
+            }
+        });
+        menu.addMenuListener(new MenuAdapter() {
+
+            @Override
+            public void menuShown(MenuEvent e) {
+                if (getSelection() instanceof ModelWrapper<?>)
+                    editItem.setEnabled(((ModelWrapper<?>) getSelection())
+                        .canUpdate(SessionManager.getUser()));
+                else
+                    editItem.setEnabled(false);
             }
         });
     }
@@ -236,15 +249,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                     @Override
                     public void run() {
                         if (!table.isDisposed()) {
-                            if (mi != null) {
-                                ModelWrapper<?> anyOb = (ModelWrapper<?>) getCollection()
-                                    .get(0);
-                                if (anyOb != null)
-                                    mi.setEnabled(anyOb
-                                        .canUpdate(SessionManager.getUser()));
-                                else
-                                    mi.setEnabled(false);
-                            }
                             viewer.refresh(item, false);
                         }
                     }
@@ -264,7 +268,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
                         if (paginationRequired) {
                             enablePaginationWidget(true);
                         }
-
                         if (selectedItem != null) {
                             tableViewer.setSelection(new StructuredSelection(
                                 selectedItem));
@@ -293,9 +296,9 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
     public void addClickListener(IDoubleClickListener listener) {
         doubleClickListeners.add(listener);
-        mi = new MenuItem(getMenu(), SWT.PUSH);
-        mi.setText("Edit");
-        mi.addSelectionListener(new SelectionListener() {
+        editItem = new MenuItem(getMenu(), SWT.PUSH);
+        editItem.setText("Edit");
+        editItem.addSelectionListener(new SelectionListener() {
 
             @Override
             public void widgetSelected(SelectionEvent e) {

@@ -1,8 +1,5 @@
 package edu.ualberta.med.biobank.preferences;
 
-import java.io.File;
-
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -22,12 +19,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE, true);
 
-        String path = Platform.getInstallLocation().getURL().getPath()
-            + File.separator + "activityLogs";
-        File file = new File(path);
-        if (!file.exists()) {
-            file.mkdir();
-        }
         store.setDefault(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, "");
         store.setDefault(
             PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_ASK_PRINT, true);
