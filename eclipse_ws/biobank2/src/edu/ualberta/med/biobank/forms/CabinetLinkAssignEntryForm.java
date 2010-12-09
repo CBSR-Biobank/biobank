@@ -456,6 +456,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected void initContainersFromPosition() {
         try {
+            bin = null;
+            drawer = null;
+            cabinet = null;
             String fullLabel = newCabinetPositionText.getText();
             List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
             int removeSize = 2;
@@ -853,43 +856,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             SWT.DEFAULT, SWT.DEFAULT));
     }
 
-    protected void initParentContainersFromPosition(String positionString)
-        throws Exception {
-        bin = null;
-        String binLabel = positionString.substring(0, 6);
-        appendLogNLS("Cabinet.activitylog.checkingParent", binLabel, //$NON-NLS-1$ 
-            aliquot.getSampleType().getName());
-        List<ContainerWrapper> containers = ContainerWrapper
-            .getContainersHoldingSampleType(appService, getCurrentSite(),
-                binLabel, aliquot.getSampleType());
-        if (containers.size() == 1) {
-            bin = containers.get(0);
-            drawer = bin.getParent();
-            cabinet = drawer.getParent();
-        } else if (containers.size() == 0) {
-            containers = ContainerWrapper.getContainersInSite(appService,
-                getCurrentSite(), binLabel);
-            String errorMsg = null;
-            if (containers.size() > 0) {
-                errorMsg = Messages.getFormattedString(
-                    "Cabinet.activitylog.checkParent.error.type", binLabel, //$NON-NLS-1$
-                    aliquot.getSampleType().getName());
-            } else {
-                errorMsg = Messages.getFormattedString(
-                    "Cabinet.activitylog.checkParent.error.found", binLabel); //$NON-NLS-1$
-            }
-            if (errorMsg != null) {
-                BioBankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
-                appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
-                focusControlInError(newCabinetPositionText);
-            }
-            return;
-        } else {
-            throw new Exception("More than one container found for " + binLabel //$NON-NLS-1$
-                + " --- should do something"); //$NON-NLS-1$
-        }
-    }
-
     @Override
     public void reset() throws Exception {
         aliquot.reset(); // reset internal values
@@ -991,12 +957,19 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     @Override
-    protected void siteComboSelectionChanged(SiteWrapper currentSelection) {
+    protected void siteComboSelectionChanged(SiteWrapper currentSelection)
+        throws Exception {
         linkFormPatientManagement.setSite(currentSelection);
         linkFormPatientManagement.setVisitsList();
-        // FIXME:cant remember what i was doing here?
-        // String text = newCabinetPosition.getText();
-        // newCabinetPosition.setText("");
-        // newCabinetPosition.notifyListeners();
+        if (viewerSampleTypes != null) {
+            initCabinetContainerTypesList();
+            viewerSampleTypes.setInput(null);
+            aliquot.setSampleType(null);
+            if (newCabinetPositionValidator.validate(
+                newCabinetPositionText.getText()).equals(Status.OK_STATUS)) {
+                initContainersFromPosition();
+                setTypeCombosLists();
+            }
+        }
     }
 }
