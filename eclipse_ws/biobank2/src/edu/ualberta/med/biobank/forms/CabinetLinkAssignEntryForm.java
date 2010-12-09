@@ -204,6 +204,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         containersScroll.setMinSize(clientInsideGridScroll.computeSize(
             SWT.DEFAULT, SWT.DEFAULT));
+        displayPositions(false);
     }
 
     private void createFieldsSection() throws ApplicationException {
@@ -831,6 +832,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     private void displayPositions(boolean show) {
+        widgetCreator.showWidget(cabinetWidget, show);
+        widgetCreator.showWidget(cabinetLabel, show);
+        widgetCreator.showWidget(drawerWidget, show);
+        widgetCreator.showWidget(drawerLabel, show);
         if (show) {
             cabinetWidget.setContainerType(cabinet.getContainerType());
             cabinetWidget.setSelection(drawer.getPosition());
@@ -839,10 +844,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
         } else {
-            cabinetWidget.setSelection(null);
-            cabinetLabel.setText("Cabinet"); //$NON-NLS-1$
-            drawerWidget.setSelection(null);
-            drawerLabel.setText("Drawer"); //$NON-NLS-1$
+            // cabinetWidget.setSelection(null);
+            //            cabinetLabel.setText("Cabinet"); //$NON-NLS-1$
+            // drawerWidget.setSelection(null);
+            //            drawerLabel.setText("Drawer"); //$NON-NLS-1$
         }
         page.layout(true, true);
         book.reflow(true);
