@@ -843,11 +843,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             drawerWidget.setContainer(drawer);
             drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
-        } else {
-            // cabinetWidget.setSelection(null);
-            //            cabinetLabel.setText("Cabinet"); //$NON-NLS-1$
-            // drawerWidget.setSelection(null);
-            //            drawerLabel.setText("Drawer"); //$NON-NLS-1$
         }
         page.layout(true, true);
         book.reflow(true);
