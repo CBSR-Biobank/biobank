@@ -1239,15 +1239,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             BioBankPlugin.openAsyncError("Error retrieving container types", e);
         }
         if (palletTypesViewer != null) {
-            StructuredSelection oldPalletType = (StructuredSelection) palletTypesViewer
-                .getSelection();
             palletTypesViewer.setInput(palletContainerTypes);
             palletTypesViewer.getCombo().deselectAll();
             if (palletContainerTypes.size() == 1) {
-                palletTypesViewer.getCombo().select(0);
+                palletTypesViewer.setSelection(new StructuredSelection(
+                    palletContainerTypes.get(0)));
             }
-            if (oldPalletType.getFirstElement() == null)
-                validateValues();
         }
     }
 

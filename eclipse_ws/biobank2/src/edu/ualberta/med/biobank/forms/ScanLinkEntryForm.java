@@ -339,6 +339,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         layout.horizontalSpacing = 10;
         typesSelectionPerRowComposite.setLayout(layout);
         toolkit.paintBordersFor(typesSelectionPerRowComposite);
+        GridData gd = new GridData();
+        gd.widthHint = 500;
+        typesSelectionPerRowComposite.setLayoutData(gd);
 
         sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
         SampleTypeSelectionWidget precedent = null;
@@ -528,7 +531,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     private void setTypeCombosLists(Map<Integer, Integer> typesRows) {
         List<SampleTypeWrapper> studiesSampleTypes = null;
         if (isFirstSuccessfulScan()) {
-            // already done at first successful scan
+            // done at first successful scan
             studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
             for (SampleStorageWrapper ss : linkFormPatientManagement
                 .getCurrentPatient().getStudy().getSampleStorageCollection()) {
