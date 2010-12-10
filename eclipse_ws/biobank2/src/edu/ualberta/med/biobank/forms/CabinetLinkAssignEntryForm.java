@@ -468,7 +468,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     - removeSize);
                 labelsTested.add(binLabel);
                 for (ContainerWrapper cont : ContainerWrapper
-                    .getContainersInSite(appService, getCurrentSite(), binLabel)) {
+                    .getContainersInSite(appService,
+                        siteCombo.getSelectedSite(), binLabel)) {
                     boolean canContainSamples = cont.getContainerType()
                         .getSampleTypeCollection() != null
                         && cont.getContainerType().getSampleTypeCollection()
@@ -607,12 +608,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     private void initCabinetContainerTypesList() throws ApplicationException {
-        if (getCurrentSite() == null)
+        if (siteCombo.getSelectedSite() == null)
             cabinetContainerTypes = new ArrayList<ContainerTypeWrapper>();
         else {
             cabinetContainerTypes = ContainerTypeWrapper
-                .getContainerTypesInSite(appService, getCurrentSite(),
-                    cabinetNameContains, false);
+                .getContainerTypesInSite(appService,
+                    siteCombo.getSelectedSite(), cabinetNameContains, false);
             if (cabinetContainerTypes.size() == 0)
                 BioBankPlugin.openAsyncError(Messages
                     .getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
@@ -626,8 +627,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         throws ApplicationException {
         if (cabinetSampleTypes == null) {
             cabinetSampleTypes = SampleTypeWrapper
-                .getSampleTypeForContainerTypes(appService, getCurrentSite(),
-                    cabinetNameContains);
+                .getSampleTypeForContainerTypes(appService,
+                    siteCombo.getSelectedSite(), cabinetNameContains);
         }
         return cabinetSampleTypes;
     }

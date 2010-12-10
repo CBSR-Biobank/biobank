@@ -272,7 +272,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void initAuthorizedSampleTypeList() throws ApplicationException {
-        SiteWrapper currentSite = getCurrentSite();
+        SiteWrapper currentSite = siteCombo.getSelectedSite();
         if (currentSite != null) {
             authorizedSampleTypes = SampleTypeWrapper.getSampleTypeForPallet96(
                 appService, currentSite);
@@ -473,7 +473,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
         try {
             return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                appService, getCurrentSite().getId());
+                appService, siteCombo.getSelectedSite().getId());
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }

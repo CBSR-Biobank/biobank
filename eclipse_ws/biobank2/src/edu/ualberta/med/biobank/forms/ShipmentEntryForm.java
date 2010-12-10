@@ -2,13 +2,10 @@ package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -24,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -58,8 +54,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private ComboViewer clinicsComboViewer;
 
     private ComboViewer shippingMethodComboViewer;
-
-    private SiteWrapper site;
 
     private ShipmentPatientsWidget shipmentPatientsWidget;
 
@@ -95,7 +89,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         shipmentAdapter = (ShipmentAdapter) adapter;
         shipment = shipmentAdapter.getWrapper();
-        site = shipment.getSite();
         try {
             shipment.reload();
         } catch (Exception e) {
@@ -121,7 +114,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         createPatientsSection();
     }
 
-    @SuppressWarnings("unchecked")
     private void createMainSection() throws ApplicationException {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -130,21 +122,17 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        widgetCreator.createLabel(client, "Site");
-        siteCombo = new BasicSiteCombo(client, appService);
-
-        setFirstControl(siteCombo.getCombo());
-
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                shipment.setSite(siteCombo.getSite());
-                if (clinicsComboViewer != null)
-                    clinicsComboViewer.setInput(siteCombo.getSite()
-                        .getWorkingClinicCollection());
-            }
-        });
+        siteCombo = createBasicSiteCombo(client, true,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    shipment.setSite(siteCombo.getSelectedSite());
+                    if (clinicsComboViewer != null)
+                        clinicsComboViewer.setInput(siteCombo.getSelectedSite()
+                            .getWorkingClinicCollection());
+                }
+            });
+        setFirstControl(siteCombo);
 
         ClinicWrapper selectedClinic = null;
         if (shipment.isNew()) {
@@ -178,11 +166,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 clinicLabel.setText(shipment.getClinic().getName());
             }
         }
-        if (shipment.isNew())
-            siteCombo.setSelection(new StructuredSelection(
-                ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
-        else
-            siteCombo.setSelection(new StructuredSelection(site));
+        siteCombo.setSelectedSite(shipment.getSite(), true);
 
         waybillLabel = widgetCreator.createLabel(client, "Waybill");
         waybillLabel.setLayoutData(new GridData(

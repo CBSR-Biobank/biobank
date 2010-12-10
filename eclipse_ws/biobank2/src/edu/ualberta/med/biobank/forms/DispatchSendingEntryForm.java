@@ -9,8 +9,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -82,38 +80,36 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        widgetCreator.createLabel(client, "Sender Site");
-        siteCombo = new BasicSiteCombo(client, appService);
-
-        setFirstControl(siteCombo.getCombo());
-
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                dispatch.setSender(siteCombo.getSite());
-                List<StudyWrapper> studies = siteCombo.getSite()
-                    .getDispatchStudiesAsSender();
-                studyComboViewer.setInput(studies);
-                if (dispatch.getStudy() != null) {
-                    // will trigger the listener and set the value :
-                    studyComboViewer.setSelection(new StructuredSelection(
-                        dispatch.getStudy()));
-                } else if (studies.size() > 0)
-                    studyComboViewer.setSelection(new StructuredSelection(
-                        studies.get(0)));
-            }
-
-        });
+        siteCombo = createBasicSiteCombo(client, true,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    SiteWrapper currentSite = siteCombo.getSelectedSite();
+                    dispatch.setSender(currentSite);
+                    List<StudyWrapper> studies = currentSite
+                        .getDispatchStudiesAsSender();
+                    if ((studies == null) || (studies.size() == 0)) {
+                        BioBankPlugin.openAsyncError(
+                            "Sender Site Error",
+                            "Site "
+                                + currentSite.getNameShort()
+                                + " does not have any dispatch studies associated with it.\n");
+                    }
+                    studyComboViewer.setInput(studies);
+                    if (dispatch.getStudy() != null) {
+                        // will trigger the listener and set the value :
+                        studyComboViewer.setSelection(new StructuredSelection(
+                            dispatch.getStudy()));
+                    } else if (studies.size() == 1)
+                        studyComboViewer.setSelection(new StructuredSelection(
+                            studies.get(0)));
+                }
+            });
+        setFirstControl(siteCombo);
 
         createStudyAndReceiverCombos(client);
 
-        if (!dispatch.isNew())
-            siteCombo
-                .setSelection(new StructuredSelection(dispatch.getSender()));
-        else
-            siteCombo.setSelection(new StructuredSelection(((List<?>) siteCombo
-                .getInput()).get(0)));
+        siteCombo.setSelectedSite(dispatch.getSender(), true);
 
         if (!dispatch.isNew() && !dispatch.isInCreationState()) {
             ShippingMethodWrapper selectedShippingMethod = dispatch
@@ -151,9 +147,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                 SWT.NONE, "Receiver Site");
             setTextValue(receiverLabel, dispatch.getReceiver().getNameShort());
         } else {
-            List<StudyWrapper> possibleStudies = new ArrayList<StudyWrapper>();
-            studyComboViewer = createComboViewer(client, "Study",
-                possibleStudies, study, "Dispatch must have a receiving site",
+            studyComboViewer = createComboViewer(client, "Study", null, study,
+                "Dispatch must have a receiving site",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
@@ -162,7 +157,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                             try {
                                 List<SiteWrapper> possibleDestSites;
                                 if (study != null)
-                                    possibleDestSites = siteCombo.getSite()
+                                    possibleDestSites = siteCombo
+                                        .getSelectedSite()
                                         .getStudyDispachSites(study);
                                 else
                                     possibleDestSites = new ArrayList<SiteWrapper>();
@@ -260,7 +256,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     protected void openScanDialog() {
         DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, siteCombo.getSite());
+            dispatch, siteCombo.getSelectedSite());
         dialog.open();
         setDirty(true); // FIXME need to do this better !
         reloadAliquots();
@@ -320,7 +316,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        dispatch.setSender(siteCombo.getSite());
+        dispatch.setSender(siteCombo.getSelectedSite());
         if (studyComboViewer != null) {
             StudyWrapper study = dispatch.getStudy();
             if (study != null) {

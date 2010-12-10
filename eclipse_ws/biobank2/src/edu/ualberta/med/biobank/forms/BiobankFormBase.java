@@ -46,16 +46,13 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -459,50 +456,6 @@ public abstract class BiobankFormBase extends EditorPart implements
         return widgetCreator.createDateTimeWidget(client, nameLabel, date,
             createBeansObservable(bean, propertyName), validator, typeShown,
             null);
-    }
-
-    public ComboViewer createSiteSelectionCombo(Composite parent,
-        WritableApplicationService appService, SiteWrapper selection,
-        boolean canUpdateOnly, ComboSelectionUpdate csu) {
-        List<SiteWrapper> allSites = null;
-        List<SiteWrapper> updateSites = null;
-        try {
-            allSites = SiteWrapper.getSites(appService);
-            updateSites = new ArrayList<SiteWrapper>();
-            if (canUpdateOnly)
-                for (SiteWrapper site : allSites)
-                    if (site.canUpdate(SessionManager.getUser()))
-                        updateSites.add(site);
-        } catch (Exception e1) {
-            BioBankPlugin.openAsyncError("Failed to load sites", e1);
-        }
-        ComboViewer cv = widgetCreator.createComboViewer(parent,
-            "Repository Site", canUpdateOnly ? updateSites : allSites,
-            selection, "A site should be selected", true, null, csu);
-        cv.setLabelProvider(new BiobankLabelProvider() {
-            @Override
-            public String getText(Object e) {
-                return ((SiteWrapper) e).getNameShort();
-            }
-        });
-        return cv;
-    }
-
-    public SiteWrapper getSelectedSite(ComboViewer siteCombo) {
-        if (siteCombo != null && siteCombo.getSelection() != null) {
-            return (SiteWrapper) ((StructuredSelection) siteCombo
-                .getSelection()).getFirstElement();
-        }
-        return null;
-    }
-
-    public void setSelectedSite(ComboViewer siteCombo, SiteWrapper site) {
-        if (siteCombo != null) {
-            if (site == null)
-                siteCombo.getCombo().deselectAll();
-            else
-                siteCombo.setSelection(new StructuredSelection(site));
-        }
     }
 
     // implementation of ISelectionProvider

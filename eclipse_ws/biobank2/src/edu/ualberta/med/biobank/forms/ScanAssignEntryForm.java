@@ -345,7 +345,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private List<ContainerTypeWrapper> getPalletContainerTypes()
         throws ApplicationException {
-        SiteWrapper site = getCurrentSite();
+        SiteWrapper site = siteCombo.getSelectedSite();
         if (site != null) {
             List<ContainerTypeWrapper> palletContainerTypes = ContainerTypeWrapper
                 .getContainerTypesPallet96(appService, site);
@@ -491,7 +491,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private boolean getExistingPalletFromProductBarcode() throws Exception {
         palletFoundWithProductBarcode = ContainerWrapper
-            .getContainerWithProductBarcodeInSite(appService, getCurrentSite(),
+            .getContainerWithProductBarcodeInSite(appService,
+                siteCombo.getSelectedSite(),
                 currentPalletWrapper.getProductBarcode());
         if (palletFoundWithProductBarcode == null) {
             // no pallet found with this barcode
@@ -545,7 +546,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                 .getSelection()).getFirstElement());
         isFakeScanLinkedOnly = fakeScanLinkedOnlyButton != null
             && fakeScanLinkedOnlyButton.getSelection();
-        currentSiteSelected = getCurrentSite();
+        currentSiteSelected = siteCombo.getSelectedSite();
     }
 
     @Override
@@ -736,7 +737,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
      */
     private void processCellWithPreviousPosition(PalletCell scanCell,
         String positionString, AliquotWrapper foundAliquot) {
-        if (foundAliquot.getParent().getSite().equals(getCurrentSite())) {
+        if (foundAliquot.getParent().getSite()
+            .equals(siteCombo.getSelectedSite())) {
             if (foundAliquot.getParent().equals(currentPalletWrapper)) {
                 // same pallet
                 RowColPos rcp = new RowColPos(scanCell.getRow(),
@@ -1011,7 +1013,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             currentPalletWrapper.reset();
             currentPalletWrapper.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            currentPalletWrapper.setSite(getCurrentSite());
+            currentPalletWrapper.setSite(siteCombo.getSelectedSite());
         } catch (Exception e) {
             logger.error("Error while reseting pallet values", e); //$NON-NLS-1$
         }

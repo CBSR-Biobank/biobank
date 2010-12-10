@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
@@ -11,6 +12,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -73,14 +75,19 @@ public class MoveAliquotsToDialog extends BiobankDialog {
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
         Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(1, false));
+        contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+
+        Label label = widgetCreator.createLabel(contents, "Repository Site");
+        siteCombo = new BasicSiteCombo(contents, widgetCreator,
+            SessionManager.getAppService(), label, true, null);
 
         List<SampleTypeWrapper> typesFromOlContainer = oldContainer
             .getContainerType().getSampleTypeCollection();
-        List<ContainerWrapper> conts = ContainerWrapper
-            .getEmptyContainersHoldingSampleType(
-                SessionManager.getAppService(), siteCombo.getSite(),
+        List<ContainerWrapper> conts = new ArrayList<ContainerWrapper>();
+        if (siteCombo.getSelectedSite() != null)
+            conts = ContainerWrapper.getEmptyContainersHoldingSampleType(
+                SessionManager.getAppService(), siteCombo.getSelectedSite(),
                 typesFromOlContainer, oldContainer.getRowCapacity(),
                 oldContainer.getColCapacity());
 
@@ -110,8 +117,6 @@ public class MoveAliquotsToDialog extends BiobankDialog {
                 }
             }
         };
-
-        siteCombo = new BasicSiteCombo(contents, SessionManager.getAppService());
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.FILL,
             "New Container Label", null, containerLabelPojo, "label", validator);
