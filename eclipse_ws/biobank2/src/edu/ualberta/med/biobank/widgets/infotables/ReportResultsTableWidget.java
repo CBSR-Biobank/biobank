@@ -4,21 +4,21 @@ import java.util.List;
 
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.TableColumn;
 
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
-    private String[] headings;
-
     public ReportResultsTableWidget(Composite parent, List<T> collection,
         String[] headings) {
         this(parent, collection, headings, 24);
-        this.headings = headings;
     }
 
     public ReportResultsTableWidget(Composite parent, List<T> collection,
         String[] headings, int rowsPerPage) {
         super(parent, collection, headings, rowsPerPage);
+
+        disableColumnMoving();
     }
 
     @Override
@@ -34,10 +34,11 @@ public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
                     columnIndex++;
 
                     if (columnIndex < row.length) {
-                        if (row[columnIndex] == null)
+                        Object cell = row[columnIndex];
+                        if (cell == null) {
                             return "";
-                        else {
-                            return row[columnIndex].toString();
+                        } else {
+                            return cell.toString();
                         }
                     }
                 }
@@ -57,5 +58,11 @@ public class ReportResultsTableWidget<T> extends ReportTableWidget<T> {
     @Override
     protected boolean isEditMode() {
         return false;
+    }
+
+    private void disableColumnMoving() {
+        for (TableColumn tableColumn : tableViewer.getTable().getColumns()) {
+            tableColumn.setMoveable(false);
+        }
     }
 }

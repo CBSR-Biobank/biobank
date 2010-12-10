@@ -15,11 +15,13 @@ public enum FilterOperator {
     // Shared operators
     BETWEEN(1, false, true),
     NOT_BETWEEN(2, false, true),
-    IN(3),
-    NOT_IN(4),
+    IS_IN(3),
+    IS_NOT_IN(4),
     BETWEEN_ANY(5),
     NOT_BETWEEN_ANY(6),
     IS_NOT_SET(7, false, false),
+    EQUALS(8, false, true),
+    DOES_NOT_EQUAL(8, false, true),
 
     // String operators
     MATCHES(101, false, true),

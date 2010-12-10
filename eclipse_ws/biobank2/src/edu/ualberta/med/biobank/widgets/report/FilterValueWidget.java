@@ -16,4 +16,6 @@ interface FilterValueWidget {
     public Control getControl();
 
     public boolean isValid(ReportFilterValue value);
+
+    public String toString(ReportFilterValue value);
 }

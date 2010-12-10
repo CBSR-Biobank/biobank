@@ -30,8 +30,6 @@ public class ComboFilterValueWidget implements FilterValueWidget {
 
         isShowingDefaultText = true;
         combo.setText(DEFAULT_TEXT);
-        combo
-            .setToolTipText("Select or enter a value to add to the list below");
 
         addListeners();
     }
@@ -44,11 +42,11 @@ public class ComboFilterValueWidget implements FilterValueWidget {
             Iterator<?> it = ((IStructuredSelection) selection).iterator();
             int position = 0;
             while (it.hasNext()) {
-                String suggestion = (String) it.next();
-                if (suggestion != null && !suggestion.isEmpty()) {
+                String selectedText = (String) it.next();
+                if (selectedText != null && !selectedText.isEmpty()) {
                     ReportFilterValue value = new ReportFilterValue();
                     value.setPosition(position);
-                    value.setValue(suggestion);
+                    value.setValue(selectedText);
 
                     values.add(value);
 
@@ -71,9 +69,15 @@ public class ComboFilterValueWidget implements FilterValueWidget {
 
     @Override
     public void setValues(Collection<ReportFilterValue> values) {
-        for (ReportFilterValue value : values) {
-            comboViewer.getCombo().setText(value.getValue());
-            break;
+        Combo combo = comboViewer.getCombo();
+        if (!combo.isDisposed()) {
+            combo.setText("");
+            for (ReportFilterValue value : values) {
+                if (value != null && value.getValue() != null) {
+                    combo.setText(value.getValue());
+                }
+                break;
+            }
         }
     }
 
@@ -97,6 +101,11 @@ public class ComboFilterValueWidget implements FilterValueWidget {
     public boolean isValid(ReportFilterValue value) {
         return value.getValue() != null && !value.getValue().isEmpty()
             && value.getSecondValue() == null;
+    }
+
+    @Override
+    public String toString(ReportFilterValue value) {
+        return value.getValue();
     }
 
     public ComboViewer getComboViewer() {

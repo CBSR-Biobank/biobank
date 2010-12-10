@@ -116,24 +116,6 @@ public class SetFilterValueWidget implements FilterValueWidget {
             return cmp;
         }
     };
-    private static final LabelProvider LABEL_PROVIDER = new LabelProvider() {
-        @Override
-        public String getText(Object element) {
-            if (element instanceof ReportFilterValue) {
-                ReportFilterValue value = ((ReportFilterValue) element);
-
-                if (value.getValue() != null) {
-                    if (value.getSecondValue() != null) {
-                        return "\"" + value.getValue() + "\" and \""
-                            + value.getSecondValue() + "\"";
-                    } else {
-                        return value.getValue();
-                    }
-                }
-            }
-            return "";
-        };
-    };
 
     private final Collection<ChangeListener<ChangeEvent>> listeners = new ArrayList<ChangeListener<ChangeEvent>>();
     private final Composite container;
@@ -223,6 +205,11 @@ public class SetFilterValueWidget implements FilterValueWidget {
         return editModeControls.getFilterValueWidget().isValid(value);
     }
 
+    @Override
+    public String toString(ReportFilterValue value) {
+        return editModeControls.getFilterValueWidget().toString(value);
+    }
+
     private static boolean isControlVisible(Control control) {
         return control.getVisible();
     }
@@ -287,7 +274,7 @@ public class SetFilterValueWidget implements FilterValueWidget {
         public void updateViewText() {
             List<String> strings = new ArrayList<String>();
             for (ReportFilterValue value : getValues()) {
-                strings.add(LABEL_PROVIDER.getText(value));
+                strings.add(SetFilterValueWidget.this.toString(value));
             }
             String list = StringUtils.join(strings, ", ");
 
@@ -386,7 +373,16 @@ public class SetFilterValueWidget implements FilterValueWidget {
             listViewer.getControl().setLayoutData(layoutData);
 
             listViewer.setComparer(COMPARER);
-            listViewer.setLabelProvider(LABEL_PROVIDER);
+            listViewer.setLabelProvider(new LabelProvider() {
+                @Override
+                public String getText(Object element) {
+                    if (element instanceof ReportFilterValue) {
+                        ReportFilterValue value = ((ReportFilterValue) element);
+                        return SetFilterValueWidget.this.toString(value);
+                    }
+                    return "";
+                }
+            });
             listViewer.setComparator(COMPARATOR);
 
             listViewer.getList().addListener(SWT.KeyUp, new Listener() {

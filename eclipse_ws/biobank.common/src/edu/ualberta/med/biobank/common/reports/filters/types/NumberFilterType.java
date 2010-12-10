@@ -31,9 +31,39 @@ public class NumberFilterType implements FilterType {
     public void addCriteria(Criteria criteria, String aliasedProperty,
         FilterOperator op, List<ReportFilterValue> values) {
 
-        FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
-
         switch (op) {
+        case EQUALS:
+            FilterTypeUtil.checkValues(values, 1, 1);
+            for (ReportFilterValue value : values) {
+                criteria
+                    .add(Restrictions.eq(aliasedProperty, getNumber(value)));
+                break;
+            }
+            break;
+        case DOES_NOT_EQUAL:
+            FilterTypeUtil.checkValues(values, 1, 1);
+            for (ReportFilterValue value : values) {
+                criteria
+                    .add(Restrictions.ne(aliasedProperty, getNumber(value)));
+                break;
+            }
+            break;
+        case IS_IN: {
+            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
+            Disjunction or = Restrictions.disjunction();
+            for (ReportFilterValue value : values) {
+                or.add(Restrictions.eq(aliasedProperty, getNumber(value)));
+            }
+            criteria.add(or);
+        }
+            break;
+        case IS_NOT_IN:
+            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
+            for (ReportFilterValue value : values) {
+                criteria
+                    .add(Restrictions.ne(aliasedProperty, getNumber(value)));
+            }
+            break;
         case IS_NOT_SET:
             FilterTypeUtil.checkValues(values, 0, 0);
             criteria.add(Restrictions.isNull(aliasedProperty));
@@ -92,7 +122,8 @@ public class NumberFilterType implements FilterType {
 
     @Override
     public Collection<FilterOperator> getOperators() {
-        return Arrays.asList(FilterOperator.LESS_THAN,
+        return Arrays.asList(FilterOperator.EQUALS, FilterOperator.DOES_NOT_EQUAL,
+            FilterOperator.IS_IN, FilterOperator.IS_NOT_IN, FilterOperator.LESS_THAN,
             FilterOperator.LESS_THAN_OR_EQUAL_TO, FilterOperator.GREATER_THAN,
             FilterOperator.GREATER_THAN_OR_EQUAL_TO, FilterOperator.IS_NOT_SET,
             FilterOperator.BETWEEN, FilterOperator.BETWEEN_ANY,

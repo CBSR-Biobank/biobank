@@ -40,7 +40,9 @@ public class TextFilterValueWidget implements FilterValueWidget {
         if (!text.isDisposed()) {
             text.setText("");
             for (ReportFilterValue value : values) {
-                text.setText(value.getValue());
+                if (value != null && value.getValue() != null) {
+                    text.setText(value.getValue());
+                }
                 break;
             }
         }
@@ -66,5 +68,10 @@ public class TextFilterValueWidget implements FilterValueWidget {
     public boolean isValid(ReportFilterValue value) {
         return value.getValue() != null && !value.getValue().isEmpty()
             && value.getSecondValue() == null;
+    }
+
+    @Override
+    public String toString(ReportFilterValue value) {
+        return value.getValue();
     }
 }

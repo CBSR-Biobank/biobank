@@ -79,4 +79,9 @@ public class DateTimeFilterValueWidget implements FilterValueWidget {
         return value.getValue() != null && !value.getValue().isEmpty()
             && value.getSecondValue() == null;
     }
+
+    @Override
+    public String toString(ReportFilterValue value) {
+        return value.getValue();
+    }
 }

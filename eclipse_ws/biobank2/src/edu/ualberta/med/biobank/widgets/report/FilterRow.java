@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
@@ -32,6 +33,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.FilterTypes;
+import edu.ualberta.med.biobank.common.reports.filters.SelectableFilterType;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
@@ -226,7 +228,40 @@ class FilterRow extends Composite {
         boolean isDateProperty = "Date".equals(filter.getEntityProperty()
             .getPropertyType().getName());
 
-        if (suggestions != null) {
+        Integer filterTypeId = filter.getFilterType();
+        FilterType filterType = FilterTypes.getFilterType(filterTypeId);
+        if (filterType instanceof SelectableFilterType) {
+            SelectableFilterType selectable = (SelectableFilterType) filterType;
+            SelectFilterValueWidget widget;
+
+            widget = new SelectFilterValueWidget(inputContainer);
+
+            // TODO: cache options?
+            Map<String, String> options;
+            options = selectable.getOptions(SessionManager.getAppService());
+
+            if (suggestions != null) {
+                // only include options that are in the suggestions
+                Collection<String> toRemove = new ArrayList<String>();
+                for (Map.Entry<String, String> entry : options.entrySet()) {
+                    String key = entry.getKey();
+                    if (!suggestions.contains(key)) {
+                        toRemove.add(key);
+                    }
+                }
+
+                if (!toRemove.isEmpty()) {
+                    // TODO: ask before removing?
+                    options.keySet().removeAll(toRemove);
+                    filtersWidget
+                        .notifyListeners(new FilterChangeEvent(filter));
+                }
+            }
+
+            widget.setOptions(options);
+
+            result = widget;
+        } else if (suggestions != null) {
             ComboFilterValueWidget combo;
             combo = new ComboFilterValueWidget(inputContainer);
             combo.getComboViewer().add(suggestions.toArray());
@@ -340,7 +375,7 @@ class FilterRow extends Composite {
                             if (autoSuggest()) {
                                 filtersWidget
                                     .notifyListeners(new FilterChangeEvent(
-                                        filter));
+                                        filter, true, false));
                             }
                             autoButton.setEnabled(true);
                         }

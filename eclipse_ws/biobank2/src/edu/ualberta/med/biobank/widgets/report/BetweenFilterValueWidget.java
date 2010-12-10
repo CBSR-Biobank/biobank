@@ -94,6 +94,12 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
             && !value.getSecondValue().isEmpty();
     }
 
+    @Override
+    public String toString(ReportFilterValue value) {
+        return "\"" + value.getValue() + "\" and \"" + value.getSecondValue()
+            + "\"";
+    }
+
     private Composite createControls(Composite parent) {
         Composite container = new Composite(parent, SWT.NONE);
 
@@ -104,7 +110,7 @@ public class BetweenFilterValueWidget implements FilterValueWidget {
         layout.marginWidth = 0;
         container.setLayout(layout);
 
-        GridData layoutData = new GridData();
+        GridData layoutData = new GridData(GridData.FILL_HORIZONTAL);
         layoutData.horizontalIndent = 0;
         layoutData.verticalIndent = 0;
         layoutData.grabExcessHorizontalSpace = true;

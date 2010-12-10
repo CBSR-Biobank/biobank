@@ -194,6 +194,8 @@ public class ReportEntryForm extends BiobankEntryForm {
                     }
                 }
 
+                // TODO: push getHeaders, openViewForm, etc. into
+                // ReportResultsTableWidget class
                 Report rawReport = report.getWrappedObject();
                 ReportListProxy results = new ReportListProxy(
                     (BiobankApplicationService) appService, rawReport);
@@ -250,10 +252,16 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private String[] getHeaders() {
-        Report rawReport = report.getWrappedObject();
-        // TODO: hash underneath so not sorted ;p
-        Collection<ReportColumn> reportColumns = report
-            .getReportColumnCollection();
+        Report nakedReport = report.getWrappedObject();
+        List<ReportColumn> reportColumns = new ArrayList<ReportColumn>(
+            nakedReport.getReportColumnCollection());
+
+        Collections.sort(reportColumns, new Comparator<ReportColumn>() {
+            @Override
+            public int compare(ReportColumn lhs, ReportColumn rhs) {
+                return lhs.getPosition() - rhs.getPosition();
+            }
+        });
 
         int numHeaders = reportColumns.size();
         numHeaders += report.getIsCount() ? 1 : 0;
