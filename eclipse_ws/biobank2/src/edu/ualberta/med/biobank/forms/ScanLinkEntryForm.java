@@ -98,6 +98,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private ArrayList<SampleTypeWrapper> preSelectedSampleTypes;
 
+    private SiteWrapper currentSelectedSite;
+
     @Override
     protected void init() throws Exception {
         super.init();
@@ -460,6 +462,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     protected void beforeScanThreadStart() {
         isFakeScanRandom = fakeScanRandom != null
             && fakeScanRandom.getSelection();
+        currentSelectedSite = siteCombo.getSelectedSite();
         preSelectedSampleTypes = new ArrayList<SampleTypeWrapper>();
         for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
             preSelectedSampleTypes.add(stw.getSelection());
@@ -473,7 +476,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
         try {
             return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                appService, siteCombo.getSelectedSite().getId());
+                appService, currentSelectedSite.getId());
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }
@@ -588,7 +591,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     appendLogNLS("ScanLink.activitylog.aliquot.existsError",
                         palletPosition, value, foundAliquot.getPatientVisit()
                             .getFormattedDateProcessed(), foundAliquot
-                            .getPatientVisit().getPatient().getPnumber());
+                            .getPatientVisit().getPatient().getPnumber(),
+                        foundAliquot.getPatientVisit().getShipment().getSite()
+                            .getNameShort());
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);
                     if (independantProcess) {
@@ -623,6 +628,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
         List<AliquotWrapper> newAliquots = new ArrayList<AliquotWrapper>();
+        SiteWrapper site = patientVisit.getShipment().getSite();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
                 && cell.getStatus() == CellStatus.TYPE) {
@@ -636,9 +642,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 sb.append(Messages.getFormattedString(
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),
-                    patientVisit.getFormattedDateDrawn(), patientVisit
-                        .getShipment().getClinic().getName(), cell.getType()
-                        .getName()));
+                    site.getNameShort(), patientVisit.getFormattedDateDrawn(),
+                    patientVisit.getShipment().getClinic().getName(), cell
+                        .getType().getName()));
                 nber++;
             }
         }
@@ -646,7 +652,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         patientVisit.persist();
         appendLog(sb.toString());
         appendLogNLS("ScanLink.activitylog.save.summary", nber, patientVisit
-            .getPatient().getPnumber(), patientVisit.getFormattedDateDrawn(),
+            .getPatient().getPnumber(), site.getNameShort(),
+            patientVisit.getFormattedDateDrawn(),
             patientVisit.getFormattedDateProcessed()); //$NON-NLS-1$
         setFinished(false);
     }
