@@ -210,4 +210,12 @@ public class ReportWrapper extends ModelWrapper<Report> {
             PROPERTY_REPORT_COLUMN_COLLECTION,
             PROPERTY_REPORT_FILTER_COLLECTION };
     }
+
+    @Override
+    public int compareTo(ModelWrapper<Report> o) {
+        if (o instanceof ReportWrapper) {
+            return getName().compareTo(((ReportWrapper) o).getName());
+        }
+        return 0;
+    }
 }
