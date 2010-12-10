@@ -268,8 +268,8 @@
       </command>
       <command
             categoryId="biobank2.command.category.server"
-            id="edu.ualberta.med.biobank.commands.changePassword"
-            name="Change Password">
+            id="edu.ualberta.med.biobank.commands.addUser"
+            name="Add User">
       </command>
       <command
             categoryId="biobank2.command.category.server"
@@ -278,8 +278,8 @@
       </command>
       <command
             categoryId="biobank2.command.category.server"
-            id="edu.ualberta.med.biobank.commands.addUser"
-            name="Add User">
+            id="edu.ualberta.med.biobank.commands.changePassword"
+            name="Change Password">
       </command>
        <command
              categoryId="org.eclipse.ui.category.edit"

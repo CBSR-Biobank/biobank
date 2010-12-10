@@ -24,6 +24,9 @@ different some of its components.
       \label{fig:main_window}
     \end{figure}
 \begin{description}
+  \item[Window Title Bar] The title bar shows the connection information when
+    connected to a BioBank2 server. The domain name or IP address of the server
+    is displayed and in square brackets the user name that was used to log in.
   \item[Main Menu] The main menu allows the user access to the different
     functions provided by the software (see section \ref{sec:main_menu} for a
     description of the menu items). The application also has an icon based
@@ -48,9 +51,9 @@ different some of its components.
 \section{Main Menu}
 \label{sec:main_menu}
 
-\subsection{Server}
-The child menu items of the \emph{Server} main menu item allow the user to
-login or logout from a server and to quit the application.
+\subsection{Server Menu}
+The \emph{Server} main menu item allows the user to login or logout from a
+server and to quit the application.
     \begin{figure}[H]
       \centering
       \scalebox{0.5}
@@ -58,21 +61,44 @@ login or logout from a server and to quit the application.
       \caption{Server menu.}
       \label{fig:main_menu_server}
     \end{figure}
+The items unser the \emph{Server} main menu item are as follows:
 \begin{description}
-  \item[Login] This menu item allows the user to login to a BioBank2 server. On
-    startup and when logged out this menu item is enabled. When logged into a
-    server this menu item is disabled. Also, the \mbox{\fbox{Ctrl} + \fbox{L}}
-    keyboard short cut can be used to perform this function.
+  \item[Login] Allows the user to login to a BioBank2 server. On startup and
+    when logged out this menu item is enabled. When logged into a server this
+    menu item is disabled. Also, the \mbox{\fbox{Ctrl} + \fbox{L}} keyboard
+    short cut can be used to perform this function.
+  \item[Logout] Allows the user to log out and close the connection to a
+    BioBank2 server. On startup this menu item is disabled. The item is enabled
+    only when the user has succesfully logged in to a BioBank2 server. Also,
+    the \mbox{\fbox{Ctrl} + \fbox{Shift} + \fbox{L}} keyboard short cut can be
+    used to perform this function.
+  \item[Quit] Shuts down the application. Also, the \mbox{\fbox{Ctrl} +
+    \fbox{Q}} keyboard short cut can be used to perform this function.
 \end{description}
 
-\subsection{Administration}
-\subsection{Processing}
-\subsection{View}
-\subsection{Print}
-\subsection{Scanner}
-\subsection{Search}
-\subsection{Configuration}
-\subsection{Help}
+\subsection{Administration Menu}
+The \emph{Administration} main menu item allows the user to perform
+administration tasks such as: add repository sites, clinics, studies, container
+types and containers. Global information such as Sample Types, Source Vessels,
+Shipping methods can also be edited. Adding, Editing users and changing user
+passwords is also available.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/overview/main_menu_administration} }
+      \caption{Administration menu.}
+      \label{fig:main_menu_administration}
+    \end{figure}
+\begin{description}
+  \item[]
+\end{description}
+\subsection{Processing Menu}
+\subsection{View Menu}
+\subsection{Print Menu}
+\subsection{Scanner Menu}
+\subsection{Search Menu}
+\subsection{Configuration Menu}
+\subsection{Help Menu}
 
 \section{Views}
 \label{sec:application_views}
