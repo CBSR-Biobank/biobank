@@ -459,6 +459,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             bin = null;
             drawer = null;
             cabinet = null;
+            SiteWrapper currentSite = siteCombo.getSelectedSite();
             String fullLabel = newCabinetPositionText.getText();
             List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
             int removeSize = 2;
@@ -468,8 +469,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     - removeSize);
                 labelsTested.add(binLabel);
                 for (ContainerWrapper cont : ContainerWrapper
-                    .getContainersInSite(appService,
-                        siteCombo.getSelectedSite(), binLabel)) {
+                    .getContainersInSite(appService, currentSite, binLabel)) {
                     boolean canContainSamples = cont.getContainerType()
                         .getSampleTypeCollection() != null
                         && cont.getContainerType().getSampleTypeCollection()
@@ -497,7 +497,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             } else if (cabinetContainers.size() == 0) {
                 String errorMsg = Messages
                     .getFormattedString(
-                        "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested)); //$NON-NLS-1$
+                        "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested), currentSite.getNameShort()); //$NON-NLS-1$
                 BioBankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
                 viewerSampleTypes.getCombo().setEnabled(false);

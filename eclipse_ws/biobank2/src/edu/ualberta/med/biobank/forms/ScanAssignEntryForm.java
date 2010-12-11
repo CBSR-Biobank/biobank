@@ -1047,7 +1047,8 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             appendLogNLS(
                 "ScanAssign.activitylog.pallet.checkLabelForProductBarcode", //$NON-NLS-1$
                 currentPalletWrapper.getLabel(),
-                palletFoundWithProductBarcode.getProductBarcode());
+                palletFoundWithProductBarcode.getProductBarcode(),
+                currentPalletWrapper.getSite().getNameShort());
             // need to compare with this value, in case the container has
             // been copied to the current pallet
             if (palletFoundWithProductBarcodeLabel.equals(currentPalletWrapper
