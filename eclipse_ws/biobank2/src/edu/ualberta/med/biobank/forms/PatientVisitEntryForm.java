@@ -185,10 +185,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    updateShipmentCombo();
+                    if (shipmentsComboViewer != null)
+                        updateShipmentCombo();
                 }
             });
         setFirstControl(siteCombo);
+        siteCombo.setSelectedSite(null, true);
 
         createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
             .getStudy().getName());

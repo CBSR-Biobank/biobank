@@ -68,14 +68,6 @@ public class BasicSiteCombo extends BiobankWidget {
         }
     }
 
-    // public void setEnabled(boolean b) {
-    // getCombo().setEnabled(b);
-    // }
-    //
-    // public boolean isEnabled() {
-    // return getCombo().isEnabled();
-    // }
-
     public void setSitesList(List<SiteWrapper> sites) {
         comboViewer.setInput(sites);
     }
