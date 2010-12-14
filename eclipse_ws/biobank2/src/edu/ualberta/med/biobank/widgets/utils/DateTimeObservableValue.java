@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.widgets;
+package edu.ualberta.med.biobank.widgets.utils;
 
 import java.util.Date;
 
@@ -6,6 +6,8 @@ import org.eclipse.core.databinding.observable.Diffs;
 import org.eclipse.core.databinding.observable.value.AbstractObservableValue;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
+
+import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class DateTimeObservableValue extends AbstractObservableValue {
 
