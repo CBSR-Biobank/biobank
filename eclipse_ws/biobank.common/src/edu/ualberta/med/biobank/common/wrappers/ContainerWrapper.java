@@ -383,7 +383,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             typesString = typesString.replaceFirst(" or", "");
             throw new BiobankCheckException("Can't find container with label "
                 + parentContainerLabel + " holding containers of types "
-                + typesString);
+                + typesString + " and in site " + getSite().getNameShort());
         }
         if (possibleParents.size() > 1) {
             throw new BiobankCheckException(

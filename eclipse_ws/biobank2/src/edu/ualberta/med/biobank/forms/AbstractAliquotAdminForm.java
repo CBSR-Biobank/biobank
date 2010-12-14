@@ -13,7 +13,6 @@ import org.apache.log4j.FileAppender;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.eclipse.jface.dialogs.MessageDialog;
-import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
@@ -31,6 +30,7 @@ import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
@@ -60,8 +60,8 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
             afterInitialization = false;
         }
     };
+    protected BasicSiteCombo siteCombo;
 
-    private ComboViewer siteCombo;
     private static SiteWrapper siteSession;
 
     @Override
@@ -91,7 +91,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     }
 
     public boolean onClose() {
-        siteSession = getCurrentSite();
+        siteSession = siteCombo.getSelectedSite();
         if (finished) {
             if (!printed && appender.getLogsList().size() > 0) {
                 if (BioBankPlugin.isAskPrintActivityLog()) {
@@ -181,8 +181,8 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     }
 
     protected void createSiteCombo(Composite parent, boolean firstControl) {
-        siteCombo = createSiteSelectionCombo(parent, appService, siteSession,
-            true, new ComboSelectionUpdate() {
+        siteCombo = createBasicSiteCombo(parent, true,
+            new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     try {
@@ -194,20 +194,17 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
 
                 }
             });
-        if (((GridLayout) parent.getLayout()).numColumns == 3) {
-            GridData gd = (GridData) siteCombo.getControl().getLayoutData();
-            gd.horizontalSpan = 2;
-        }
+        siteCombo.setSelectedSite(siteSession, true);
         if (firstControl) {
-            setFirstControl(siteCombo.getControl());
+            setFirstControl(siteCombo);
+        }
+        if (((GridLayout) parent.getLayout()).numColumns == 3) {
+            GridData gd = (GridData) siteCombo.getLayoutData();
+            gd.horizontalSpan = 2;
         }
     }
 
     protected abstract void siteComboSelectionChanged(
         SiteWrapper currentSelection) throws Exception;
-
-    protected SiteWrapper getCurrentSite() {
-        return getSelectedSite(siteCombo);
-    }
 
 }

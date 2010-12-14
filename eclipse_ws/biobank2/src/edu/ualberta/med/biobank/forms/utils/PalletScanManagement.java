@@ -91,6 +91,7 @@ public class PalletScanManagement {
             }
         } else {
             cells = getFakeScanCells();
+            successfulScansCount++;
         }
         beforeScanMerge();
         if (cells == null) {
