@@ -1132,7 +1132,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"
-                  label="Search View"
+                  label="Search Panel"
                   style="push">
             </command>
          </menu>
