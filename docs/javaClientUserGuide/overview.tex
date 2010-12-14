@@ -125,6 +125,7 @@ preferences (see section \ref{sec:scanning_and_decoding}).
 \end{description}
 
 \subsection{Search Menu}
+The only item under this menu is the \textbf{Search Panel}.
     \begin{figure}[H]
       \centering
       \scalebox{0.5}
@@ -132,9 +133,68 @@ preferences (see section \ref{sec:scanning_and_decoding}).
       \caption{Search menu.}
       \label{fig:main_menu_search}
     \end{figure}
+Figure \ref{fig:search_panel} shows the search panel in the Adminstration
+view. It is also available in the processing view.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/overview/search_panel} }
+      \caption{Search panel.}
+      \label{fig:search_panel}
+    \end{figure}
+The search panel allows the user to search for any of the following:
+\begin{description}
+  \item[An inventory ID] each aliquot has a unique identifier referred to as
+    the inventory ID. This is the decoded value of the 2D barcode for NUNC
+    tubes, the 1D barcode for hair and FTA aliquots, and the 1D barcode for
+    Axygen tubes.
+  \item[An aliquot Position] each aliquot is stored in a unique position. For
+    NUNC tubes it is the well position pre appended with the pallet's labe.
+  \item[Non-active aliquots] Aliquots that have been removed from the inventory
+    are assigned a \emph{Non Active} activity status. When this search is used
+    the list of all aliquots marked as non active is returned.
+  \item[A container label] Each container in the inventory has a position
+    label. The label uses the labeling scheme defined by the parent label.
+  \item[A container's product barcode] Each container in the system has a
+    unique product barcode.
+  \item[A worksheet] Each patient visit has a unique corresponding worksheet in
+    paper form. A patient visit can be searched for using this ID.
+\end{description}
+When an item is searched for the application will: inform you how many items
+were found if there are more than one, or open up a form displaying the
+information for the item. If more than one item is found then a form is opened
+up for each item.
+
+Fox example when searching for an inventory id the \emph{Aliquot View Form} is
+displayed for the aliquot. When searching for a container label, the
+\emph{Container view form} is displayed.
 
 \subsection{Configuration Menu}
+This menu only contains the preferences item. See Chapter
+\ref{chap:configuration} for more details.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/overview/main_menu_configuration} }
+      \caption{Configuration menu.}
+      \label{fig:main_menu_configuration}
+    \end{figure}
+
 \subsection{Help Menu}
+The help menu provides access to several functions.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/overview/main_menu_help} }
+      \caption{Help menu.}
+      \label{fig:main_menu_help}
+    \end{figure}
 
 \section{Views}
 \label{sec:application_views}
+
+\subsection{Adminsitration View}
+
+\subsection{Processing View}
+
+\subsection{Reports View}
