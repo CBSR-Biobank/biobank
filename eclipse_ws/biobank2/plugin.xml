@@ -974,21 +974,21 @@
                       style="push">
                 </command>
                 <command
-                      commandId="edu.ualberta.med.biobank.commands.changePassword"
-                      id="edu.ualberta.med.biobank.menu.changePassword"
-                      label="Change Password"
+                      commandId="edu.ualberta.med.biobank.commands.addUser"
+                      id="edu.ualberta.med.biobank.menu.addUser"
+                      label="Add User"
                       style="push">
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editUsers"
                       id="edu.ualberta.med.biobank.menu.editUsers"
-                      label="Edit Users"
+                      label="Edit User"
                       style="push">
                 </command>
                 <command
-                      commandId="edu.ualberta.med.biobank.commands.addUser"
-                      id="edu.ualberta.med.biobank.menu.addUser"
-                      label="Add User"
+                      commandId="edu.ualberta.med.biobank.commands.changePassword"
+                      id="edu.ualberta.med.biobank.menu.changePassword"
+                      label="Change Password"
                       style="push">
                 </command>
          </menu>
@@ -1132,7 +1132,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"
-                  label="Search View"
+                  label="Search Panel"
                   style="push">
             </command>
          </menu>
@@ -1268,7 +1268,7 @@
                   icon="icons/search.png"
                   label="Search"
                   style="push"
-                  tooltip="Search">
+                  tooltip="Search Panel">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.logging"
@@ -1377,7 +1377,7 @@
                   icon="icons/search.png"
                   label="Search"
                   style="push"
-                  tooltip="Search">
+                  tooltip="Search Panel">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
