@@ -974,21 +974,21 @@
                       style="push">
                 </command>
                 <command
-                      commandId="edu.ualberta.med.biobank.commands.changePassword"
-                      id="edu.ualberta.med.biobank.menu.changePassword"
-                      label="Change Password"
+                      commandId="edu.ualberta.med.biobank.commands.addUser"
+                      id="edu.ualberta.med.biobank.menu.addUser"
+                      label="Add User"
                       style="push">
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editUsers"
                       id="edu.ualberta.med.biobank.menu.editUsers"
-                      label="Edit Users"
+                      label="Edit User"
                       style="push">
                 </command>
                 <command
-                      commandId="edu.ualberta.med.biobank.commands.addUser"
-                      id="edu.ualberta.med.biobank.menu.addUser"
-                      label="Add User"
+                      commandId="edu.ualberta.med.biobank.commands.changePassword"
+                      id="edu.ualberta.med.biobank.menu.changePassword"
+                      label="Change Password"
                       style="push">
                 </command>
          </menu>
