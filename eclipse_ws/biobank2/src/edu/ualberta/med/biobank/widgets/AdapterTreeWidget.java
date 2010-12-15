@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -16,6 +17,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -165,6 +167,24 @@ public class AdapterTreeWidget extends Composite {
                 return 0;
             }
         });
+
+        treeViewer.getTree().addListener(SWT.MouseMove, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                String tooltip = null;
+                ViewerCell cell = treeViewer
+                    .getCell(new Point(event.x, event.y));
+                if (cell != null) {
+                    Object element = cell.getElement();
+                    if (element != null) {
+                        tooltip = ((AdapterBase) element).getTooltipText();
+                    }
+                }
+                treeViewer.getTree().setToolTipText(tooltip);
+            }
+
+        });
+
     }
 
     public TreeViewer getTreeViewer() {
