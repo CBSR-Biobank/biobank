@@ -50,8 +50,12 @@ public enum FilterOperator {
     SAME_MONTH_AS_ANY(343),
     SAME_YEAR_AS_ANY(344),
 
+    // Boolean operators
+    YES(401, false, false),
+    NO(402, false, false),
+
     // Custom filter operators
-    IS_NOT_IN_A_CONTAINER(401, false, false);
+    IS_NOT_IN_A_CONTAINER(1001, false, false);
 
     private final int id;
     private final boolean isSetOperator;

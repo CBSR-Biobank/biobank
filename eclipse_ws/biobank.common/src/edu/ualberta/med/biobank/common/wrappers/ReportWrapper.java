@@ -22,6 +22,7 @@ public class ReportWrapper extends ModelWrapper<Report> {
     public static final String PROPERTY_NAME = "name";
     public static final String PROPERTY_DESCRIPTION = "description";
     public static final String PROPERTY_IS_COUNT = "isCount";
+    public static final String PROPERTY_IS_PUBLIC = "isPublic";
     public static final String PROPERTY_USER_ID = "userId";
     public static final String PROPERTY_REPORT_COLUMN_COLLECTION = "reportColumnCollection";
     public static final String PROPERTY_REPORT_FILTER_COLLECTION = "reportFilterCollection";
@@ -34,6 +35,49 @@ public class ReportWrapper extends ModelWrapper<Report> {
 
     public ReportWrapper(WritableApplicationService appService) {
         super(appService);
+    }
+
+    public ReportWrapper(ReportWrapper report) {
+        super(report.getAppService());
+
+        setName(report.getName());
+        setDescription(report.getDescription());
+        setIsCount(report.getIsCount());
+        setIsPublic(report.getIsPublic());
+
+        wrappedObject.setEntity(report.getWrappedObject().getEntity());
+        wrappedObject.setUserId(report.getWrappedObject().getUserId());
+
+        Collection<ReportColumn> reportColumns = new ArrayList<ReportColumn>();
+        for (ReportColumn column : report.getReportColumnCollection()) {
+            ReportColumn columnCopy = new ReportColumn();
+            columnCopy.setEntityColumn(column.getEntityColumn());
+            columnCopy.setPosition(column.getPosition());
+            columnCopy.setPropertyModifier(column.getPropertyModifier());
+
+            reportColumns.add(columnCopy);
+        }
+        setReportColumnCollection(reportColumns);
+
+        Collection<ReportFilter> reportFilters = new ArrayList<ReportFilter>();
+        for (ReportFilter filter : report.getReportFilterCollection()) {
+            ReportFilter filterCopy = new ReportFilter();
+            filterCopy.setEntityFilter(filter.getEntityFilter());
+            filterCopy.setOperator(filter.getOperator());
+            filterCopy.setPosition(filter.getPosition());
+
+            Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
+            for (ReportFilterValue value : filter
+                .getReportFilterValueCollection()) {
+                ReportFilterValue valueCopy = new ReportFilterValue();
+                valueCopy.setPosition(value.getPosition());
+                valueCopy.setValue(value.getValue());
+                valueCopy.setSecondValue(value.getSecondValue());
+            }
+            filterCopy.setReportFilterValueCollection(values);
+
+            reportFilters.add(filterCopy);
+        }
     }
 
     public String getName() {
@@ -58,7 +102,8 @@ public class ReportWrapper extends ModelWrapper<Report> {
     }
 
     public Boolean getIsCount() {
-        return wrappedObject.getIsCount();
+        Boolean bool = wrappedObject.getIsCount();
+        return bool != null ? bool : false;
     }
 
     public void setIsCount(Boolean isCount) {
@@ -66,6 +111,18 @@ public class ReportWrapper extends ModelWrapper<Report> {
         wrappedObject.setIsCount(isCount);
         propertyChangeSupport.firePropertyChange(PROPERTY_IS_COUNT, oldIsCount,
             isCount);
+    }
+
+    public Boolean getIsPublic() {
+        Boolean bool = wrappedObject.getIsPublic();
+        return bool != null ? bool : false;
+    }
+
+    public void setIsPublic(Boolean isPublic) {
+        Boolean oldIsPublic = getIsPublic();
+        wrappedObject.setIsPublic(isPublic);
+        propertyChangeSupport.firePropertyChange(PROPERTY_IS_PUBLIC,
+            oldIsPublic, isPublic);
     }
 
     public Integer getUserId() {
@@ -206,7 +263,7 @@ public class ReportWrapper extends ModelWrapper<Report> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { PROPERTY_NAME, PROPERTY_DESCRIPTION,
-            PROPERTY_IS_COUNT, PROPERTY_USER_ID,
+            PROPERTY_IS_COUNT, PROPERTY_IS_PUBLIC, PROPERTY_USER_ID,
             PROPERTY_REPORT_COLUMN_COLLECTION,
             PROPERTY_REPORT_FILTER_COLLECTION };
     }

@@ -5,10 +5,12 @@ import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.common.reports.ReportsUtil;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
@@ -40,13 +42,15 @@ public class NumberFilterType implements FilterType {
                 break;
             }
             break;
-        case DOES_NOT_EQUAL:
+        case DOES_NOT_EQUAL: {
             FilterTypeUtil.checkValues(values, 1, 1);
+            Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             for (ReportFilterValue value : values) {
-                criteria
-                    .add(Restrictions.ne(aliasedProperty, getNumber(value)));
+                or.add(Restrictions.ne(aliasedProperty, getNumber(value)));
                 break;
             }
+            criteria.add(or);
+        }
             break;
         case IS_IN: {
             FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
@@ -57,16 +61,20 @@ public class NumberFilterType implements FilterType {
             criteria.add(or);
         }
             break;
-        case IS_NOT_IN:
+        case IS_NOT_IN: {
             FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
+            Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
+            Conjunction and = Restrictions.conjunction();
             for (ReportFilterValue value : values) {
-                criteria
-                    .add(Restrictions.ne(aliasedProperty, getNumber(value)));
+                and.add(Restrictions.ne(aliasedProperty, getNumber(value)));
             }
+            or.add(and);
+            criteria.add(or);
+        }
             break;
         case IS_NOT_SET:
             FilterTypeUtil.checkValues(values, 0, 0);
-            criteria.add(Restrictions.isNull(aliasedProperty));
+            criteria.add(ReportsUtil.isNotSet(aliasedProperty));
             break;
         case BETWEEN: {
             FilterTypeUtil.checkValues(values, 1, 1);
@@ -84,18 +92,26 @@ public class NumberFilterType implements FilterType {
             }
             criteria.add(or);
         }
-        case NOT_BETWEEN:
+        case NOT_BETWEEN: {
             FilterTypeUtil.checkValues(values, 1, 1);
+            Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             for (ReportFilterValue value : values) {
-                criteria.add(Restrictions.not(between(aliasedProperty, value)));
+                or.add(Restrictions.not(between(aliasedProperty, value)));
                 break;
             }
+            criteria.add(or);
+        }
             break;
-        case NOT_BETWEEN_ANY:
+        case NOT_BETWEEN_ANY: {
             FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
+            Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
+            Conjunction and = Restrictions.conjunction();
             for (ReportFilterValue value : values) {
-                criteria.add(Restrictions.not(between(aliasedProperty, value)));
+                and.add(Restrictions.not(between(aliasedProperty, value)));
             }
+            or.add(and);
+            criteria.add(or);
+        }
             break;
         case LESS_THAN:
             FilterTypeUtil.checkValues(values, 1, 1);
@@ -122,8 +138,9 @@ public class NumberFilterType implements FilterType {
 
     @Override
     public Collection<FilterOperator> getOperators() {
-        return Arrays.asList(FilterOperator.EQUALS, FilterOperator.DOES_NOT_EQUAL,
-            FilterOperator.IS_IN, FilterOperator.IS_NOT_IN, FilterOperator.LESS_THAN,
+        return Arrays.asList(FilterOperator.EQUALS,
+            FilterOperator.DOES_NOT_EQUAL, FilterOperator.IS_IN,
+            FilterOperator.IS_NOT_IN, FilterOperator.LESS_THAN,
             FilterOperator.LESS_THAN_OR_EQUAL_TO, FilterOperator.GREATER_THAN,
             FilterOperator.GREATER_THAN_OR_EQUAL_TO, FilterOperator.IS_NOT_SET,
             FilterOperator.BETWEEN, FilterOperator.BETWEEN_ANY,

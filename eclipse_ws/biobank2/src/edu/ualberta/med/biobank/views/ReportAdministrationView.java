@@ -5,13 +5,14 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.rcp.perspective.ReportAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.report.AbstractReportGroup;
 import edu.ualberta.med.biobank.treeview.report.PrivateReportsGroup;
+import edu.ualberta.med.biobank.treeview.report.SharedReportsGroup;
 
 public class ReportAdministrationView extends AbstractAdministrationView {
     public static final String ID = "edu.ualberta.med.biobank.views.ReportAdministrationView";
 
     private static ReportAdministrationView currentView;
-    private PrivateReportsGroup privateReportsGroup;
 
     public ReportAdministrationView() {
         currentView = this;
@@ -42,9 +43,14 @@ public class ReportAdministrationView extends AbstractAdministrationView {
 
     private void createNodes() {
         if (SessionManager.getInstance().isConnected()) {
-            privateReportsGroup = new PrivateReportsGroup(rootNode, 0);
-            privateReportsGroup.setParent(rootNode);
-            rootNode.addChild(privateReportsGroup);
+            AbstractReportGroup adapter = new PrivateReportsGroup(rootNode, 0);
+            adapter.setParent(rootNode);
+            adapter.setModifiable(true);
+            rootNode.addChild(adapter);
+
+            adapter = new SharedReportsGroup(rootNode, 1);
+            adapter.setParent(rootNode);
+            rootNode.addChild(adapter);
         }
     }
 

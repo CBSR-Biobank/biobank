@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.reports.filters;
 
+import edu.ualberta.med.biobank.common.reports.filters.types.BooleanFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.DateFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.NumberFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.StringFilterType;
@@ -19,7 +20,8 @@ public enum FilterTypes {
     STRING(1, new StringFilterType()),
     NUMBER(2, new NumberFilterType()),
     DATE(3, new DateFilterType()),
-    TOP_CONTAINER(4, new TopContainerFilterType());
+    TOP_CONTAINER(4, new TopContainerFilterType()),
+    BOOLEAN(5, new BooleanFilterType());
 
     private final int id;
     private final FilterType filterType;

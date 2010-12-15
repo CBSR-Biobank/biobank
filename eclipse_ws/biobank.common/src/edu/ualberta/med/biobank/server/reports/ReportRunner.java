@@ -52,20 +52,14 @@ public class ReportRunner {
 
         criteria = createCriteria();
 
-        criteria.setMaxResults(data.getMaxResults());
-        criteria.setFirstResult(data.getFirstRow());
+        if (criteria != null) {
+            criteria.setMaxResults(data.getMaxResults());
+            criteria.setFirstResult(data.getFirstRow());
 
-        if (data.getTimeout() > 0) {
-            criteria.setTimeout(data.getTimeout());
+            if (data.getTimeout() > 0) {
+                criteria.setTimeout(data.getTimeout());
+            }
         }
-    }
-
-    public void setMaxResults(int maxResults) {
-        criteria.setMaxResults(maxResults);
-    }
-
-    public void setTimeout(int timeoutInSeconds) {
-        criteria.setTimeout(timeoutInSeconds);
     }
 
     public List<?> run() {
@@ -90,9 +84,13 @@ public class ReportRunner {
         return orderedCols;
     }
 
+    private boolean isCount() {
+        Boolean isCount = report.getIsCount();
+        return isCount == null ? false : isCount;
+    }
+
     private Criteria createCriteria() {
-        if (!report.getIsCount()
-            && report.getReportColumnCollection().isEmpty()) {
+        if (!isCount() && report.getReportColumnCollection().isEmpty()) {
             return null;
         }
 
@@ -103,7 +101,7 @@ public class ReportRunner {
 
         ProjectionList pList = Projections.projectionList();
 
-        if (!report.getIsCount()) {
+        if (!isCount()) {
             pList.add(Projections.property(ID_COLUMN_NAME));
         } else {
             // need to provide an alias for the column to be included in the
@@ -130,7 +128,7 @@ public class ReportRunner {
                     PROPERTY_VALUE_TOKEN, sqlColumn);
                 String sqlAlias = MODIFIED_PROPERTY_ALIAS + colNum;
 
-                if (report.getIsCount()) {
+                if (isCount()) {
                     projection = Projections.sqlGroupProjection(
                         modifiedProperty + " as " + sqlAlias, sqlAlias,
                         new String[] { sqlAlias },
@@ -141,7 +139,7 @@ public class ReportRunner {
                         new Type[] { Hibernate.STRING });
                 }
             } else {
-                if (report.getIsCount()) {
+                if (isCount()) {
                     projection = Projections.groupProperty(aliasedProperty);
                 } else {
                     projection = Projections.property(aliasedProperty);
@@ -152,7 +150,7 @@ public class ReportRunner {
             colNum++;
         }
 
-        if (report.getIsCount()) {
+        if (isCount()) {
             pList.add(Projections.countDistinct(ID_COLUMN_NAME));
         }
 
@@ -208,8 +206,18 @@ public class ReportRunner {
         String parentProperty = getParentProperty(property);
         while (parentProperty != null) {
             if (!createdProperties.contains(parentProperty)) {
+                int joinType = Criteria.INNER_JOIN;
+
+                // TODO: do not hardcode "aliquotPosition.", read a list or
+                // config from somewhere. This is necessary because some
+                // aliquots legitimately do not have a position in a container
+                if (parentProperty.equals("aliquotPosition")
+                    || parentProperty.startsWith("aliquotPosition.")) {
+                    joinType = Criteria.LEFT_JOIN;
+                }
+
                 criteria.createCriteria(parentProperty,
-                    getPropertyAlias(parentProperty));
+                    getPropertyAlias(parentProperty), joinType);
                 createdProperties.add(parentProperty);
             }
             parentProperty = getParentProperty(parentProperty);

@@ -8,6 +8,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
@@ -28,9 +29,10 @@ public class DateFilterType implements FilterType {
         FilterOperator op, List<ReportFilterValue> values) {
 
         switch (op) {
-        case IS_NOT_SET:
+        case IS_NOT_SET: {
             FilterTypeUtil.checkValues(values, 0, 0);
-            criteria.add(Restrictions.isNull(aliasedProperty));
+            criteria.add(ReportsUtil.isNotSet(aliasedProperty));
+        }
             break;
         case BETWEEN:
             FilterTypeUtil.checkValues(values, 1, 1);
@@ -48,18 +50,27 @@ public class DateFilterType implements FilterType {
             criteria.add(or);
         }
             break;
-        case NOT_BETWEEN:
+        case NOT_BETWEEN: {
+            FilterTypeUtil.checkValues(values, 1, 1);
+            Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             FilterTypeUtil.checkValues(values, 1, 1);
             for (ReportFilterValue value : values) {
-                criteria.add(Restrictions.not(between(aliasedProperty, value)));
+                or.add(Restrictions.not(between(aliasedProperty, value)));
                 break;
             }
+            criteria.add(or);
+        }
             break;
-        case NOT_BETWEEN_ANY:
-            FilterTypeUtil.checkValues(values, 1, 1);
+        case NOT_BETWEEN_ANY: {
+            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
+            Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
+            Conjunction and = Restrictions.conjunction();
             for (ReportFilterValue value : values) {
-                criteria.add(Restrictions.not(between(aliasedProperty, value)));
+                and.add(Restrictions.not(between(aliasedProperty, value)));
             }
+            or.add(and);
+            criteria.add(or);
+        }
             break;
         case ON_OR_AFTER: {
             FilterTypeUtil.checkValues(values, 1, 1);

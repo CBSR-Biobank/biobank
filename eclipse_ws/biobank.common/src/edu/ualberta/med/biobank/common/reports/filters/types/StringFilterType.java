@@ -5,9 +5,11 @@ import java.util.Collection;
 import java.util.List;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Conjunction;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.common.reports.ReportsUtil;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
@@ -18,9 +20,10 @@ public class StringFilterType implements FilterType {
         FilterOperator op, List<ReportFilterValue> values) {
 
         switch (op) {
-        case IS_NOT_SET:
+        case IS_NOT_SET: {
             FilterTypeUtil.checkValues(values, 0, 0);
-            criteria.add(Restrictions.isNull(aliasedProperty));
+            criteria.add(ReportsUtil.isNotSet(aliasedProperty));
+        }
             break;
         case MATCHES:
             FilterTypeUtil.checkValues(values, 1, 1);
@@ -46,20 +49,28 @@ public class StringFilterType implements FilterType {
                     value.getValue()));
             }
             break;
-        case DOES_NOT_MATCH:
+        case DOES_NOT_MATCH: {
             FilterTypeUtil.checkValues(values, 1, 1);
+            Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             for (ReportFilterValue value : values) {
-                criteria.add(Restrictions.not(Restrictions.like(
-                    aliasedProperty, value.getValue())));
+                or.add(Restrictions.not(Restrictions.like(aliasedProperty,
+                    value.getValue())));
                 break;
             }
+            criteria.add(or);
+        }
             break;
-        case DOES_NOT_MATCH_ANY:
+        case DOES_NOT_MATCH_ANY: {
             FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
+            Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
+            Conjunction and = Restrictions.conjunction();
             for (ReportFilterValue value : values) {
-                criteria.add(Restrictions.not(Restrictions.like(
-                    aliasedProperty, value.getValue())));
+                and.add(Restrictions.not(Restrictions.like(aliasedProperty,
+                    value.getValue())));
             }
+            or.add(and);
+            criteria.add(or);
+        }
             break;
         }
     }

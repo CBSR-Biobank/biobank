@@ -8,8 +8,10 @@ import java.util.List;
 import java.util.Map;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
 
+import edu.ualberta.med.biobank.common.reports.ReportsUtil;
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
 import edu.ualberta.med.biobank.common.reports.filters.SelectableFilterType;
@@ -46,8 +48,12 @@ public class TopContainerFilterType implements FilterType, SelectableFilterType 
                     intValues.toArray()));
                 break;
             case IS_NOT_IN:
-                criteria.add(Restrictions.not(Restrictions.in(aliasedProperty,
+                // TODO: use left join because not in includes Aliquot-s without
+                // any container.
+                Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
+                or.add(Restrictions.not(Restrictions.in(aliasedProperty,
                     intValues.toArray())));
+                criteria.add(or);
                 break;
             }
         }

@@ -10,6 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
+// TODO: delete AbstractReportsGroup
 public abstract class AbstractReportsGroup extends AdapterBase {
     public AbstractReportsGroup(AdapterBase parent, int id, String name) {
         super(parent, id, name, true, true);

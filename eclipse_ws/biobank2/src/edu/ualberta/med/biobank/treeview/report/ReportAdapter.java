@@ -3,9 +3,14 @@ package edu.ualberta.med.biobank.treeview.report;
 import java.util.Collection;
 
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
+import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
@@ -39,7 +44,40 @@ public class ReportAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        // TODO Auto-generated method stub
+        MenuItem mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Copy");
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                copyReport();
+            }
+        });
+
+        mi = new MenuItem(menu, SWT.PUSH);
+        mi.setText("Delete");
+        mi.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent event) {
+                boolean delete = BioBankPlugin.openConfirm("Delete Report",
+                    "Are you sure you want to delete the report named '"
+                        + ((ReportWrapper) modelObject).getName()
+                        + "'? This action cannot be undone.");
+                if (delete) {
+                    try {
+                        modelObject.delete();
+                        parent.removeChild(ReportAdapter.this);
+                    } catch (Exception e) {
+                    }
+                }
+            }
+        });
+    }
+
+    private void copyReport() {
+        ReportWrapper report = new ReportWrapper((ReportWrapper) modelObject);
+        report.setName(report.getName() + " Copy");
+        ReportAdapter reportAdapter = new ReportAdapter(this.parent, report);
+        reportAdapter.openEntryForm();
     }
 
     @Override

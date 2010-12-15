@@ -3,6 +3,9 @@ package edu.ualberta.med.biobank.common.reports;
 import java.util.Iterator;
 
 import org.hibernate.Criteria;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.Disjunction;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.engine.SessionFactoryImplementor;
 import org.hibernate.engine.SessionImplementor;
 import org.hibernate.impl.CriteriaImpl;
@@ -12,16 +15,45 @@ public class ReportsUtil {
     // TODO: share this? get from elsewhere?
     private static final String PROPERTY_DELIMITER = ".";
 
-    public static String getSqlColumn(Criteria criteria, String aliasedProperty) {
+    public static String getId(String aliasedPropertyString) {
+        AliasedProperty aliasedProperty = getAliasedProperty(aliasedPropertyString);
+        return aliasedProperty.alias + PROPERTY_DELIMITER + "id";
+    }
+
+    public static Disjunction idIsNullOr(String aliasedProperty) {
+        Disjunction or = Restrictions.disjunction();
+        or.add(Restrictions.isNull(getId(aliasedProperty)));
+        return or;
+    }
+
+    public static Criterion isNotSet(String aliasedProperty) {
+        Disjunction or = Restrictions.disjunction();
+        or.add(Restrictions.isNull(getId(aliasedProperty)));
+        or.add(Restrictions.isNull(aliasedProperty));
+        return or;
+    }
+
+    private static AliasedProperty getAliasedProperty(String aliasedProperty) {
+        int lastDelimiter = aliasedProperty.lastIndexOf(PROPERTY_DELIMITER);
+        if (lastDelimiter != -1) {
+            String alias = aliasedProperty.substring(0, lastDelimiter);
+            String propertyName = aliasedProperty.substring(lastDelimiter + 1);
+            return new AliasedProperty(alias, propertyName);
+        }
+        return null;
+    }
+
+    public static String getSqlColumn(Criteria criteria,
+        String aliasedPropertyString) {
         CriteriaQueryTranslator translator = getCriteriaQueryTranslator(criteria);
 
         String alias = null;
-        String propertyName = aliasedProperty;
+        String propertyName = aliasedPropertyString;
 
-        int lastDelimiter = aliasedProperty.lastIndexOf(PROPERTY_DELIMITER);
-        if (lastDelimiter != -1) {
-            alias = aliasedProperty.substring(0, lastDelimiter);
-            propertyName = aliasedProperty.substring(lastDelimiter + 1);
+        AliasedProperty aliasedProperty = getAliasedProperty(aliasedPropertyString);
+        if (aliasedProperty != null) {
+            alias = aliasedProperty.alias;
+            propertyName = aliasedProperty.property;
         }
 
         Criteria aliasCriteria = criteria;
@@ -54,5 +86,15 @@ public class ReportsUtil {
             }
         }
         return null;
+    }
+
+    private static class AliasedProperty {
+        public final String alias;
+        public final String property;
+
+        public AliasedProperty(String alias, String property) {
+            this.alias = alias;
+            this.property = property;
+        }
     }
 }
