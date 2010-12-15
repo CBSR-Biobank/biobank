@@ -111,11 +111,13 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
             @Override
             public void menuShown(MenuEvent e) {
-                if (getSelection() instanceof ModelWrapper<?>)
-                    editItem.setEnabled(((ModelWrapper<?>) getSelection())
-                        .canUpdate(SessionManager.getUser()));
-                else
-                    editItem.setEnabled(false);
+                if (editItem != null) {
+                    if (getSelection() instanceof ModelWrapper<?>)
+                        editItem.setEnabled(((ModelWrapper<?>) getSelection())
+                            .canUpdate(SessionManager.getUser()));
+                    else
+                        editItem.setEnabled(false);
+                }
             }
         });
     }

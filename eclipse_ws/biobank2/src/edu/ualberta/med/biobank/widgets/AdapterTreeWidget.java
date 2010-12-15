@@ -32,6 +32,7 @@ import edu.ualberta.med.biobank.treeview.util.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.util.NodeLabelProvider;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
+import edu.ualberta.med.biobank.widgets.utils.TreeFilter;
 
 public class AdapterTreeWidget extends Composite {
 
