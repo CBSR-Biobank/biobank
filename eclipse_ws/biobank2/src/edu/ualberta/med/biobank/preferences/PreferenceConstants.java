@@ -13,6 +13,7 @@ public class PreferenceConstants {
 
     public static final String SCANNER_DPI = "scanner.dpi";
 
+    @Deprecated
     public static final String[] SCANNER_PLATE_BARCODES = {
         "scanner.plate.barcode.1", "scanner.plate.barcode.2",
         "scanner.plate.barcode.3", "scanner.plate.barcode.4",
