@@ -190,7 +190,9 @@ public class FilterSelectWidget extends Composite {
             // it's important to set the operator before setting the values so
             // that if the values do not apply to the default operator they will
             // not be lost
-            filterRow.setOperatorId(reportFilter.getOperator());
+            if (reportFilter.getOperator() != null) {
+                filterRow.setOperatorId(reportFilter.getOperator());
+            }
             filterRow.setValues(reportFilter.getReportFilterValueCollection());
         }
         return filterRow;

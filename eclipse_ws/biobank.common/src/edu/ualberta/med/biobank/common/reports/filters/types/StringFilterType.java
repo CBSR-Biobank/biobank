@@ -26,7 +26,7 @@ public class StringFilterType implements FilterType {
         }
             break;
         case MATCHES:
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             for (ReportFilterValue value : values) {
                 criteria.add(Restrictions.like(aliasedProperty,
                     value.getValue()));
@@ -34,7 +34,6 @@ public class StringFilterType implements FilterType {
             }
             break;
         case MATCHES_ANY: {
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = Restrictions.disjunction();
             for (ReportFilterValue value : values) {
                 or.add(Restrictions.like(aliasedProperty, value.getValue()));
@@ -43,14 +42,13 @@ public class StringFilterType implements FilterType {
         }
             break;
         case MATCHES_ALL:
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             for (ReportFilterValue value : values) {
                 criteria.add(Restrictions.like(aliasedProperty,
                     value.getValue()));
             }
             break;
         case DOES_NOT_MATCH: {
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             for (ReportFilterValue value : values) {
                 or.add(Restrictions.not(Restrictions.like(aliasedProperty,
@@ -61,7 +59,6 @@ public class StringFilterType implements FilterType {
         }
             break;
         case DOES_NOT_MATCH_ANY: {
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             Conjunction and = Restrictions.conjunction();
             for (ReportFilterValue value : values) {

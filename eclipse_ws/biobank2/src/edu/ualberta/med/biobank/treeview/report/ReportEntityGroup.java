@@ -115,13 +115,16 @@ public class ReportEntityGroup extends AdapterBase {
     }
 
     private void openNewReport() {
-        ReportWrapper report = new ReportWrapper(SessionManager.getAppService());
+        if (SessionManager.getInstance().isConnected()) {
+            ReportWrapper report = new ReportWrapper(
+                SessionManager.getAppService());
 
-        Report rawReport = report.getWrappedObject();
-        rawReport.setUserId(SessionManager.getUser().getId().intValue());
-        rawReport.setEntity(entity);
+            Report rawReport = report.getWrappedObject();
+            rawReport.setUserId(SessionManager.getUser().getId().intValue());
+            rawReport.setEntity(entity);
 
-        ReportAdapter reportAdapter = new ReportAdapter(this, report);
-        reportAdapter.openEntryForm();
+            ReportAdapter reportAdapter = new ReportAdapter(this, report);
+            reportAdapter.openEntryForm();
+        }
     }
 }

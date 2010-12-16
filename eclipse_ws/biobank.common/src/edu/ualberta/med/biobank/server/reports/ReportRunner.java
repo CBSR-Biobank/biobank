@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -15,6 +16,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Projection;
 import org.hibernate.criterion.ProjectionList;
 import org.hibernate.criterion.Projections;
+import org.hibernate.impl.CriteriaImpl;
 import org.hibernate.type.Type;
 
 import edu.ualberta.med.biobank.common.reports.ReportsUtil;
@@ -169,10 +171,15 @@ public class ReportRunner {
                 Collection<ReportFilterValue> rfvCollection = reportFilter
                     .getReportFilterValueCollection();
 
-                filterType
-                    .addCriteria(criteria, aliasedProperty, FilterOperator
-                        .getFilterOperator(reportFilter.getOperator()),
-                        new ArrayList<ReportFilterValue>(rfvCollection));
+                FilterOperator op = null;
+
+                if (reportFilter.getOperator() != null) {
+                    op = FilterOperator.getFilterOperator(reportFilter
+                        .getOperator());
+                }
+
+                filterType.addCriteria(criteria, aliasedProperty, op,
+                    new ArrayList<ReportFilterValue>(rfvCollection));
             }
         }
 
@@ -199,6 +206,28 @@ public class ReportRunner {
                 createAssociations(criteria, property, createdPoperties);
             }
         }
+    }
+
+    public static void createAssociations(Criteria criteria, String property) {
+        Set<String> createdProperties = getCreatedAssociations(criteria);
+
+        createAssociations(criteria, property, createdProperties);
+    }
+
+    private static Set<String> getCreatedAssociations(Criteria criteria) {
+        Set<String> createdProperties = new HashSet<String>();
+
+        @SuppressWarnings("rawtypes")
+        Iterator subcriterias = ((CriteriaImpl) criteria).iterateSubcriteria();
+        while (subcriterias.hasNext()) {
+            Criteria subcriteria = (Criteria) subcriterias.next();
+            String property = getProperty(subcriteria.getAlias());
+            if (property != null) {
+                createdProperties.add(property);
+            }
+        }
+
+        return createdProperties;
     }
 
     private static void createAssociations(Criteria criteria, String property,
@@ -229,7 +258,21 @@ public class ReportRunner {
             ALIAS_DELIMITER);
     }
 
-    private static String getParentProperty(String property) {
+    public static String getProperty(String parentProperty,
+        String... childProperties) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append(parentProperty);
+
+        for (String childProperty : childProperties) {
+            sb.append(PROPERTY_DELIMITER);
+            sb.append(childProperty);
+        }
+
+        return sb.toString();
+    }
+
+    public static String getParentProperty(String property) {
         String parentPath = null;
         int lastDelimiter = property.lastIndexOf(PROPERTY_DELIMITER);
         if (lastDelimiter != -1) {
@@ -238,7 +281,12 @@ public class ReportRunner {
         return parentPath;
     }
 
-    private static String getAliasedProperty(String property) {
+    public static String getProperty(String alias) {
+        return alias == null ? null : alias.replace(ALIAS_DELIMITER,
+            PROPERTY_DELIMITER);
+    }
+
+    public static String getAliasedProperty(String property) {
         int lastDelimiter = property.lastIndexOf(PROPERTY_DELIMITER);
         if (lastDelimiter != -1) {
             String parentProperty = property.substring(0, lastDelimiter);

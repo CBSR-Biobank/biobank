@@ -11,6 +11,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
@@ -74,10 +75,17 @@ public class ReportAdapter extends AdapterBase {
     }
 
     private void copyReport() {
-        ReportWrapper report = new ReportWrapper((ReportWrapper) modelObject);
-        report.setName(report.getName() + " Copy");
-        ReportAdapter reportAdapter = new ReportAdapter(this.parent, report);
-        reportAdapter.openEntryForm();
+        if (SessionManager.getInstance().isConnected()) {
+            ReportWrapper report = new ReportWrapper(
+                (ReportWrapper) modelObject);
+            report.setName(report.getName() + " Copy");
+
+            int userId = SessionManager.getUser().getId().intValue();
+            report.setUserId(userId);
+
+            ReportAdapter reportAdapter = new ReportAdapter(this.parent, report);
+            reportAdapter.openEntryForm();
+        }
     }
 
     @Override

@@ -35,7 +35,7 @@ public class NumberFilterType implements FilterType {
 
         switch (op) {
         case EQUALS:
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             for (ReportFilterValue value : values) {
                 criteria
                     .add(Restrictions.eq(aliasedProperty, getNumber(value)));
@@ -43,7 +43,7 @@ public class NumberFilterType implements FilterType {
             }
             break;
         case DOES_NOT_EQUAL: {
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             for (ReportFilterValue value : values) {
                 or.add(Restrictions.ne(aliasedProperty, getNumber(value)));
@@ -53,7 +53,6 @@ public class NumberFilterType implements FilterType {
         }
             break;
         case IS_IN: {
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = Restrictions.disjunction();
             for (ReportFilterValue value : values) {
                 or.add(Restrictions.eq(aliasedProperty, getNumber(value)));
@@ -62,7 +61,6 @@ public class NumberFilterType implements FilterType {
         }
             break;
         case IS_NOT_IN: {
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             Conjunction and = Restrictions.conjunction();
             for (ReportFilterValue value : values) {
@@ -77,7 +75,7 @@ public class NumberFilterType implements FilterType {
             criteria.add(ReportsUtil.isNotSet(aliasedProperty));
             break;
         case BETWEEN: {
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             for (ReportFilterValue value : values) {
                 criteria.add(between(aliasedProperty, value));
                 break;
@@ -85,7 +83,6 @@ public class NumberFilterType implements FilterType {
         }
             break;
         case BETWEEN_ANY: {
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = Restrictions.disjunction();
             for (ReportFilterValue value : values) {
                 or.add(between(aliasedProperty, value));
@@ -93,7 +90,7 @@ public class NumberFilterType implements FilterType {
             criteria.add(or);
         }
         case NOT_BETWEEN: {
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             for (ReportFilterValue value : values) {
                 or.add(Restrictions.not(between(aliasedProperty, value)));
@@ -103,7 +100,6 @@ public class NumberFilterType implements FilterType {
         }
             break;
         case NOT_BETWEEN_ANY: {
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             Conjunction and = Restrictions.conjunction();
             for (ReportFilterValue value : values) {
@@ -114,22 +110,22 @@ public class NumberFilterType implements FilterType {
         }
             break;
         case LESS_THAN:
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             criteria.add(Restrictions.lt(aliasedProperty,
                 getNumber(values.get(0))));
             break;
         case LESS_THAN_OR_EQUAL_TO:
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             criteria.add(Restrictions.le(aliasedProperty,
                 getNumber(values.get(0))));
             break;
         case GREATER_THAN:
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             criteria.add(Restrictions.gt(aliasedProperty,
                 getNumber(values.get(0))));
             break;
         case GREATER_THAN_OR_EQUAL_TO:
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             criteria.add(Restrictions.ge(aliasedProperty,
                 getNumber(values.get(0))));
             break;

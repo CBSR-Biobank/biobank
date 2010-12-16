@@ -81,7 +81,9 @@ class FilterRow extends Composite {
     }
 
     public void setOperator(FilterOperator op) {
-        operators.setSelection(new StructuredSelection(op), true);
+        if (op != null) {
+            operators.setSelection(new StructuredSelection(op), true);
+        }
     }
 
     public Collection<ReportFilterValue> getValues() {
@@ -190,6 +192,11 @@ class FilterRow extends Composite {
                 filtersWidget.notifyListeners(new FilterChangeEvent(filter));
             }
         });
+
+        if (ops.isEmpty()) {
+            operators.getControl().setVisible(false);
+            ((GridData) operators.getControl().getLayoutData()).exclude = true;
+        }
     }
 
     private FilterOperator getSelectedFilterOperator(ISelection selection) {
@@ -280,7 +287,7 @@ class FilterRow extends Composite {
 
         FilterOperator op = getOperator();
 
-        if (op.isValueRequired()) {
+        if (op != null && op.isValueRequired()) {
             result = createSimpleFilterValueWidget();
 
             if (EnumSet.of(FilterOperator.BETWEEN, FilterOperator.BETWEEN_ANY,

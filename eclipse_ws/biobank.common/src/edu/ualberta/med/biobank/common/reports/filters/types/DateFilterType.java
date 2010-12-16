@@ -35,14 +35,13 @@ public class DateFilterType implements FilterType {
         }
             break;
         case BETWEEN:
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             for (ReportFilterValue value : values) {
                 criteria.add(between(aliasedProperty, value));
                 break;
             }
             break;
         case BETWEEN_ANY: {
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = Restrictions.disjunction();
             for (ReportFilterValue value : values) {
                 or.add(between(aliasedProperty, value));
@@ -51,7 +50,7 @@ public class DateFilterType implements FilterType {
         }
             break;
         case NOT_BETWEEN: {
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             FilterTypeUtil.checkValues(values, 1, 1);
             for (ReportFilterValue value : values) {
@@ -62,7 +61,6 @@ public class DateFilterType implements FilterType {
         }
             break;
         case NOT_BETWEEN_ANY: {
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
             Conjunction and = Restrictions.conjunction();
             for (ReportFilterValue value : values) {
@@ -73,13 +71,13 @@ public class DateFilterType implements FilterType {
         }
             break;
         case ON_OR_AFTER: {
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             Date date = getDate(values.get(0));
             criteria.add(Restrictions.ge(aliasedProperty, date));
         }
             break;
         case ON_OR_BEFORE: {
-            FilterTypeUtil.checkValues(values, 1, 1);
+            FilterTypeUtil.checkValues(values, 0, 1);
             Date date = getDate(values.get(0));
             criteria.add(Restrictions.le(aliasedProperty, date));
         }
@@ -101,7 +99,6 @@ public class DateFilterType implements FilterType {
         case SAME_WEEK_AS_ANY:
         case SAME_MONTH_AS_ANY:
         case SAME_YEAR_AS_ANY: {
-            FilterTypeUtil.checkValues(values, 1, FilterTypeUtil.NOT_BOUND);
             Disjunction or = Restrictions.disjunction();
             for (ReportFilterValue value : values) {
                 String dateString = value.getValue();
