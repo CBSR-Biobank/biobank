@@ -57,7 +57,7 @@ public class BasicSiteCombo extends BiobankWidget {
             if (canUpdateOnly) {
                 List<SiteWrapper> updateSites = new ArrayList<SiteWrapper>();
                 for (SiteWrapper site : allSites)
-                    if (site.canUpdate(SessionManager.getUser()))
+                    if (SessionManager.getUser().canUpdateSite(site))
                         updateSites.add(site);
                 comboViewer.setInput(updateSites);
             } else {
@@ -101,6 +101,12 @@ public class BasicSiteCombo extends BiobankWidget {
         if (comboViewer.getCombo().getItemCount() > 0)
             return (SiteWrapper) comboViewer.getElementAt(0);
         return null;
+    }
+
+    @Override
+    public void setEnabled(boolean enabled) {
+        super.setEnabled(enabled);
+        comboViewer.getControl().setEnabled(enabled);
     }
 
 }

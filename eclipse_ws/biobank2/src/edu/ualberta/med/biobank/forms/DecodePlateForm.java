@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,8 +26,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class DecodePlateForm extends PlateForm {
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.DecodePlateForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm";
 
     private ScanPalletWidget spw;
 
@@ -61,8 +61,8 @@ public class DecodePlateForm extends PlateForm {
         gd.grabExcessHorizontalSpace = true;
         plateSelectionWidget.setLayoutData(gd);
 
-        scanButton =
-            toolkit.createButton(page, "Scan && Decode Plate", SWT.PUSH);
+        scanButton = toolkit.createButton(page, "Scan && Decode Plate",
+            SWT.PUSH);
         scanButton
             .setLayoutData(new GridData(SWT.CENTER, SWT.TOP, false, false));
         scanButton.addSelectionListener(new SelectionAdapter() {
@@ -72,7 +72,8 @@ public class DecodePlateForm extends PlateForm {
             }
         });
 
-        spw = new ScanPalletWidget(page);
+        spw = new ScanPalletWidget(page, Arrays.asList(CellStatus.EMPTY,
+            CellStatus.FILLED));
         spw.setVisible(true);
         toolkit.adapt(spw);
 
@@ -171,8 +172,9 @@ public class DecodePlateForm extends PlateForm {
      */
     private void processCellStatus(PalletCell cell) {
         if (cell != null) {
-            cell.setStatus((cell.getValue() != null) ? CellStatus.NEW
+            cell.setStatus((cell.getValue() != null) ? CellStatus.FILLED
                 : CellStatus.EMPTY);
+            cell.setTitle(cell.getValue());
         }
     }
 

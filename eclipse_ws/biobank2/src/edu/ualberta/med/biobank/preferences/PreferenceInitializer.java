@@ -27,11 +27,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS,
             "cabinet");
 
-        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
-            store.setDefault(PreferenceConstants.SCANNER_PLATE_BARCODES[i],
-                "PLATE" + (i + 1));
-        }
-
         store.setDefault(PreferenceConstants.ISSUE_TRACKER_EMAIL,
             "biobank@cs.ualberta.ca");
         store.setDefault(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER,

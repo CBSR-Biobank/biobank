@@ -2295,12 +2295,6 @@
             name="General">
       </page>
       <page
-          category="Scanner"
-            class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.plateBarcodes"
-            name="Plate Barcodes">
-      </page>
-      <page
             class="edu.ualberta.med.biobank.preferences.LinkAssignPreferencePage"
             id="edu.ualberta.med.biobank.preferences.linkAssign"
             name="Link / Assign">

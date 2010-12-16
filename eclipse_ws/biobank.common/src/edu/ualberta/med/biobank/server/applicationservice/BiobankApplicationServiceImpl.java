@@ -638,4 +638,9 @@ public class BiobankApplicationServiceImpl extends
             }
         }
     }
+
+    @Override
+    public String getServerVersion() {
+        return props.getProperty(SERVER_VERSION_PROP_KEY);
+    }
 }

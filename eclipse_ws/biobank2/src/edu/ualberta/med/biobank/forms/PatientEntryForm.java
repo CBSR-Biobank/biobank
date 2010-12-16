@@ -11,12 +11,14 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
@@ -126,6 +128,15 @@ public class PatientEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         patientAdapter.getWrapper().persist();
+        // to update patient view:
+        Display.getDefault().syncExec(new Runnable() {
+            @Override
+            public void run() {
+                if (PatientAdministrationView.getCurrent() != null) {
+                    PatientAdministrationView.getCurrent().reload();
+                }
+            }
+        });
     }
 
     @Override

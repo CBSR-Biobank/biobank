@@ -50,4 +50,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void unlockUser(String userName) throws ApplicationException;
 
     public void checkVersion(String clientVersion) throws ApplicationException;
+
+    public String getServerVersion();
 }
