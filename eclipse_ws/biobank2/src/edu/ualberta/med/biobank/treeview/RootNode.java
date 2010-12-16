@@ -5,6 +5,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
@@ -48,7 +49,7 @@ public class RootNode extends AdapterBase {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 

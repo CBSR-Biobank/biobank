@@ -29,6 +29,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -350,12 +351,16 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                adapter.setParent(((SiteAdapter) SessionManager
-                    .getCurrentAdapterViewWithTree().searchNode(
-                        siteCombo.getSelectedSite()))
-                    .getContainerTypesGroupNode());
-                SessionManager.getCurrentAdapterViewWithTree().reload();
-                adapter.getParent().performExpand();
+                SiteAdapter siteAdapter = (SiteAdapter) SessionManager
+                    .searchFirstNode(siteCombo.getSelectedSite());
+                AdapterBase parent = null;
+                if (siteAdapter != null) {
+                    parent = siteAdapter.getContainerTypesGroupNode();
+                }
+                adapter.setParent(parent);
+                SessionManager.updateAdapterTreeNode(adapter);
+                // SessionManager.getCurrentAdapterViewWithTree().reload();
+                // adapter.getParent().performExpand();
             }
         });
 

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
@@ -87,7 +88,7 @@ public class IncomingNode extends AdapterBase {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 

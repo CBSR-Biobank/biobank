@@ -28,7 +28,7 @@ public class PatientAdministrationView extends
 
     public PatientAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(ID, this);
+        SessionManager.addView(this);
     }
 
     @Override
@@ -47,8 +47,11 @@ public class PatientAdministrationView extends
     public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
         if (wrapper instanceof PatientWrapper) {
             PatientWrapper patient = (PatientWrapper) wrapper;
-            StudyWithPatientAdapter studyAdapter = (StudyWithPatientAdapter) parentNode
+            List<AdapterBase> res = parentNode
                 .search(patient.getStudy());
+            StudyWithPatientAdapter studyAdapter = null;
+            if (res.size() > 0)
+                studyAdapter = (StudyWithPatientAdapter) res.get(0);
             if (studyAdapter == null) {
                 studyAdapter = new StudyWithPatientAdapter(parentNode,
                     patient.getStudy());

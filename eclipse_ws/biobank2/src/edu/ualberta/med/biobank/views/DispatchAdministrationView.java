@@ -43,7 +43,7 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
 
     public DispatchAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(ID, this);
+        SessionManager.addView(this);
     }
 
     @Override
@@ -206,16 +206,16 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
     protected void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            AdapterBase node = rootNode.search(searchedObject);
-            if (node == null) {
+            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
+            if (nodeRes == null) {
                 searchedNode.addSearchObject(searchedObject);
                 searchedNode.performExpand();
-                node = searchedNode.search(searchedObject);
+                nodeRes = searchedNode.search(searchedObject);
             }
-            if (node != null) {
-                setSelectedNode(node);
+            if (nodeRes != null) {
+                setSelectedNode(nodeRes.get(0));
                 if (doubleClick) {
-                    node.performDoubleClick();
+                    nodeRes.get(0).performDoubleClick();
                 }
             }
         }

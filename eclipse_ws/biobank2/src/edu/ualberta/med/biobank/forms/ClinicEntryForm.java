@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -158,8 +159,7 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         clinic.addContacts(contactEntryWidget.getAddedOrModifedContacts());
         clinic.removeContacts(contactEntryWidget.getDeletedContacts());
         clinic.persist();
-        if (clinicAdapter.getParent() != null)
-            clinicAdapter.getParent().performExpand();
+        SessionManager.updateAllSimilarNodes(clinicAdapter, true);
     }
 
     @Override

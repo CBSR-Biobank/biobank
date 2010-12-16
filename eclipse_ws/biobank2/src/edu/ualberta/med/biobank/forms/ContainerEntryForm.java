@@ -230,10 +230,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (container.hasChildren() || container.hasAliquots()) {
             containerTypeComboViewer.getCombo().setEnabled(false);
         }
-        // if (containerTypes.size() == 1) {
-        // containerTypeComboViewer.setSelection(new StructuredSelection(
-        // containerTypes.get(0)));
-        // }
     }
 
     private void createButtonsSection() {

@@ -123,7 +123,7 @@ public abstract class AbstractTodayNode extends AdapterBase {
         throws ApplicationException;
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 }

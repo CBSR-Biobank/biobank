@@ -61,19 +61,19 @@ public abstract class AbstractTodaySearchAdministrationView extends
     protected void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            AdapterBase node = todayNode.search(searchedObject);
-            if (node == null) {
-                node = searchedNode.search(searchedObject);
-                if (node == null) {
+            List<AdapterBase> nodeRes = todayNode.search(searchedObject);
+            if (nodeRes == null) {
+                nodeRes = searchedNode.search(searchedObject);
+                if (nodeRes == null) {
                     searchedNode.addSearchObject(searchedObject);
                     searchedNode.performExpand();
-                    node = searchedNode.search(searchedObject);
+                    nodeRes = searchedNode.search(searchedObject);
                 }
             }
-            if (node != null) {
-                setSelectedNode(node);
+            if (nodeRes != null) {
+                setSelectedNode(nodeRes.get(0));
                 if (doubleClick) {
-                    node.performDoubleClick();
+                    nodeRes.get(0).performDoubleClick();
                 }
             }
         }

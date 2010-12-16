@@ -49,7 +49,7 @@ public class ShipmentAdministrationView extends
 
     public ShipmentAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(ID, this);
+        SessionManager.addView(this);
     }
 
     @Override
@@ -157,8 +157,11 @@ public class ShipmentAdministrationView extends
             AdapterBase topNode = parentNode;
             if (parentNode.equals(searchedNode) && !radioWaybill.getSelection()) {
                 Date date = dateReceivedWidget.getDate();
-                AdapterBase dateNode = parentNode.search(date);
-                if (dateNode == null) {
+                List<AdapterBase> dateNodeRes = parentNode.search(date);
+                AdapterBase dateNode = null;
+                if (dateNodeRes.size() > 0)
+                    dateNode = dateNodeRes.get(0);
+                else {
                     dateNode = new DateNode(parentNode,
                         dateReceivedWidget.getDate());
                     parentNode.addChild(dateNode);

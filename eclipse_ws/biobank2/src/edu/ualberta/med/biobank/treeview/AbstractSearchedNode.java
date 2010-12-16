@@ -141,7 +141,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         ModelWrapper<?> child);
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 }

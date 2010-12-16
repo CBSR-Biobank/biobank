@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -36,7 +38,7 @@ public abstract class AbstractViewWithAdapterTree extends
     }
 
     @Override
-    public AdapterBase searchNode(ModelWrapper<?> wrapper) {
+    public List<AdapterBase> searchNode(ModelWrapper<?> wrapper) {
         return rootNode.search(wrapper);
     }
 

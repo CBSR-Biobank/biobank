@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -13,11 +14,8 @@ public class StudyWithPatientAdapter extends StudyAdapter {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
-        if (searchedObject instanceof PatientWrapper) {
-            return getChild((ModelWrapper<?>) searchedObject, true);
-        }
-        return searchChildren(searchedObject);
+    public List<AdapterBase> search(Object searchedObject) {
+        return findChildFromClass(searchedObject, PatientWrapper.class);
     }
 
 }
