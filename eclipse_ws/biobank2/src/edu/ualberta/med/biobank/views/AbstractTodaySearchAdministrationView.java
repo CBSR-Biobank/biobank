@@ -62,15 +62,15 @@ public abstract class AbstractTodaySearchAdministrationView extends
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
             List<AdapterBase> nodeRes = todayNode.search(searchedObject);
-            if (nodeRes == null) {
+            if (nodeRes.size() == 0) {
                 nodeRes = searchedNode.search(searchedObject);
-                if (nodeRes == null) {
+                if (nodeRes.size() == 0) {
                     searchedNode.addSearchObject(searchedObject);
                     searchedNode.performExpand();
                     nodeRes = searchedNode.search(searchedObject);
                 }
             }
-            if (nodeRes != null) {
+            if (nodeRes.size() > 0) {
                 setSelectedNode(nodeRes.get(0));
                 if (doubleClick) {
                     nodeRes.get(0).performDoubleClick();

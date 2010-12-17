@@ -207,12 +207,12 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
             List<AdapterBase> nodeRes = rootNode.search(searchedObject);
-            if (nodeRes == null) {
+            if (nodeRes.size() == 0) {
                 searchedNode.addSearchObject(searchedObject);
                 searchedNode.performExpand();
                 nodeRes = searchedNode.search(searchedObject);
             }
-            if (nodeRes != null) {
+            if (nodeRes.size() > 0) {
                 setSelectedNode(nodeRes.get(0));
                 if (doubleClick) {
                     nodeRes.get(0).performDoubleClick();

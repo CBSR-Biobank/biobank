@@ -296,27 +296,41 @@ public class SessionManager {
     }
 
     /**
-     * do an update on node holding the same wrapper than the given adapter. If
-     * canRest = true, then the node found will be reloaded from the database
-     * (might not want that if the object could be open in an entry form).
+     * do an update on node holding the same wrapper than the given adapter.
+     * 
+     * @param canRest if true, then the node found will be reloaded from the
+     *            database (might not want that if the object could be open in
+     *            an entry form).
+     * @param expandParent if true will expand the parent node of 'adapter'
+     * 
      */
     public static void updateAllSimilarNodes(final AdapterBase adapter,
         final boolean canReset) {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                List<AdapterBase> res = searchNodes(adapter.getModelObject());
-                final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
-                if (view != null) {
-                    for (AdapterBase ab : res) {
-                        if (canReset)
-                            try {
-                                ab.resetObject();
-                            } catch (Exception ex) {
-                                logger.error("Problem reseting object", ex);
-                            }
-                        view.getTreeViewer().update(ab, null);
+                try {
+                    // add to add the correct node if it is a new adapter:
+                    AdapterBase parent = adapter.getParent();
+                    if (parent != null)
+                        parent.addChild(adapter);
+                    List<AdapterBase> res = searchNodes(adapter
+                        .getModelObject());
+                    final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+                    if (view != null) {
+                        for (AdapterBase ab : res) {
+                            if (canReset)
+                                try {
+                                    if (ab != adapter)
+                                        ab.resetObject();
+                                } catch (Exception ex) {
+                                    logger.error("Problem reseting object", ex);
+                                }
+                            view.getTreeViewer().update(ab, null);
+                        }
                     }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
                 }
             }
         });

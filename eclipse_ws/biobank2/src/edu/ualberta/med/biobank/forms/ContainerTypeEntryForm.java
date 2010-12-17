@@ -18,7 +18,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -29,7 +28,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -144,6 +142,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 public void doSelection(Object selectedObject) {
                     availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
                     SiteWrapper selectedSite = siteCombo.getSelectedSite();
+                    adapter.setParent(((SiteAdapter) SessionManager
+                        .searchFirstNode(selectedSite))
+                        .getContainerTypesGroupNode());
                     for (ContainerTypeWrapper type : selectedSite
                         .getContainerTypeCollection()) {
                         if (type.getTopLevel().equals(Boolean.FALSE)) {
@@ -346,23 +347,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         setSampleTypes();
         setChildContainerTypes();
-        // associate the storage type to it's site
         containerType.persist();
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                SiteAdapter siteAdapter = (SiteAdapter) SessionManager
-                    .searchFirstNode(siteCombo.getSelectedSite());
-                AdapterBase parent = null;
-                if (siteAdapter != null) {
-                    parent = siteAdapter.getContainerTypesGroupNode();
-                }
-                adapter.setParent(parent);
-                SessionManager.updateAdapterTreeNode(adapter);
-                // SessionManager.getCurrentAdapterViewWithTree().reload();
-                // adapter.getParent().performExpand();
-            }
-        });
+        SessionManager.updateAllSimilarNodes(containerTypeAdapter, true);
 
     }
 

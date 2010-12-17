@@ -168,18 +168,25 @@ public class ShipmentAdministrationView extends
                 }
                 topNode = dateNode;
             }
-            ClinicWithShipmentAdapter clinicAdapter = (ClinicWithShipmentAdapter) topNode
-                .search(shipment.getClinic());
-            if (clinicAdapter == null) {
+            List<AdapterBase> clinicAdapterList = topNode.search(shipment
+                .getClinic());
+            ClinicWithShipmentAdapter clinicAdapter = null;
+            if (clinicAdapterList.size() > 0)
+                clinicAdapter = (ClinicWithShipmentAdapter) clinicAdapterList
+                    .get(0);
+            else {
                 clinicAdapter = new ClinicWithShipmentAdapter(topNode,
                     shipment.getClinic());
                 clinicAdapter.setEditable(false);
                 clinicAdapter.setLoadChildrenInBackground(false);
                 topNode.addChild(clinicAdapter);
             }
-            ShipmentAdapter shipmentAdapter = (ShipmentAdapter) clinicAdapter
+            ShipmentAdapter shipmentAdapter = null;
+            List<AdapterBase> shipmentAdapterList = clinicAdapter
                 .search(shipment);
-            if (shipmentAdapter == null) {
+            if (shipmentAdapterList.size() > 0)
+                shipmentAdapter = (ShipmentAdapter) shipmentAdapterList.get(0);
+            else {
                 shipmentAdapter = new ShipmentAdapter(clinicAdapter, shipment);
                 clinicAdapter.addChild(shipmentAdapter);
             }

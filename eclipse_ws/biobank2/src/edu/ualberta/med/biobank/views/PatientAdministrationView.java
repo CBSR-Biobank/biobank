@@ -47,8 +47,7 @@ public class PatientAdministrationView extends
     public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
         if (wrapper instanceof PatientWrapper) {
             PatientWrapper patient = (PatientWrapper) wrapper;
-            List<AdapterBase> res = parentNode
-                .search(patient.getStudy());
+            List<AdapterBase> res = parentNode.search(patient.getStudy());
             StudyWithPatientAdapter studyAdapter = null;
             if (res.size() > 0)
                 studyAdapter = (StudyWithPatientAdapter) res.get(0);
@@ -59,9 +58,11 @@ public class PatientAdministrationView extends
                 studyAdapter.setLoadChildrenInBackground(false);
                 parentNode.addChild(studyAdapter);
             }
-            PatientAdapter patientAdapter = (PatientAdapter) studyAdapter
-                .search(patient);
-            if (patientAdapter == null) {
+            List<AdapterBase> patientAdapterList = studyAdapter.search(patient);
+            PatientAdapter patientAdapter = null;
+            if (patientAdapterList.size() > 0)
+                patientAdapter = (PatientAdapter) patientAdapterList.get(0);
+            else {
                 patientAdapter = new PatientAdapter(studyAdapter, patient);
                 studyAdapter.addChild(patientAdapter);
             }

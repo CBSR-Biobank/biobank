@@ -131,8 +131,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                     if (container.isNew())
                         adapter.setParent(((SiteAdapter) SessionManager
-                            .getCurrentAdapterViewWithTree().searchNode(
-                                selectedSite)).getContainersGroupNode());
+                            .searchFirstNode(selectedSite))
+                            .getContainersGroupNode());
                     container.setSite(selectedSite);
                 }
             });
@@ -277,13 +277,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                 });
             } else {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        containerAdapter.getParent().addChild(containerAdapter);
-                        containerAdapter.getParent().performExpand();
-                    }
-                });
+                SessionManager.updateAllSimilarNodes(containerAdapter, true);
             }
         } else {
             setDirty(true);
