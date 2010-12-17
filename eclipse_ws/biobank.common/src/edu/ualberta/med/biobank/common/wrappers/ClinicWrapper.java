@@ -15,9 +15,9 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -389,8 +389,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             if (children != null) {
                 shipmentCollection = new ArrayList<ShipmentWrapper>();
                 for (Shipment s : children) {
-                    shipmentCollection.add(new ShipmentWrapper(
-                        appService, s));
+                    shipmentCollection.add(new ShipmentWrapper(appService, s));
                 }
                 propertiesMap.put("shipmentCollection", shipmentCollection);
             } else
@@ -472,8 +471,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      * Search for a shipment in the clinic with the given date received and
      * patient number.
      */
-    public ShipmentWrapper getShipment(Date dateReceived,
-        String patientNumber) {
+    public ShipmentWrapper getShipment(Date dateReceived, String patientNumber) {
         List<ShipmentWrapper> shipments = getShipmentCollection();
         if (shipments != null)
             for (ShipmentWrapper ship : shipments)
@@ -542,10 +540,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
         if (pvCollection == null) {
             pvCollection = new ArrayList<PatientVisitWrapper>();
-            HQLCriteria c = new HQLCriteria(
-                "select distinct pv from "
-                    + PatientVisit.class.getName()
-                    + " as pv where shipmentPatient.shipment.clinic.id = ?",
+            HQLCriteria c = new HQLCriteria("select distinct pv from "
+                + PatientVisit.class.getName()
+                + " as pv where shipmentPatient.shipment.clinic.id = ?",
                 Arrays.asList(new Object[] { getId() }));
             List<PatientVisit> collection = appService.query(c);
             for (PatientVisit pv : collection) {
@@ -566,10 +563,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     public static List<ClinicWrapper> getAllClinics(
         WritableApplicationService appService) throws ApplicationException {
-        List<Clinic> clinics = new ArrayList<Clinic>();
         List<ClinicWrapper> wrappers = new ArrayList<ClinicWrapper>();
         HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName());
-        clinics = appService.query(c);
+        List<Clinic> clinics = appService.query(c);
         for (Clinic clinic : clinics)
             wrappers.add(new ClinicWrapper(appService, clinic));
         return wrappers;

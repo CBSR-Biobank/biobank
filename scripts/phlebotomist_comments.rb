@@ -29,7 +29,10 @@ BBPDB_QUERY_END
     rowsUpdated = 0
     getDbConnection("biobank2", 'localhost')
     visits.each_key do |id|
-      res = @dbh.query("SELECT * FROM patient_visit join patient on patient.id=patient_visit.patient_id where patient_visit.id=#{id}")
+      res = @dbh.query("SELECT * FROM patient_visit
+join clinic_shipment_patient on clinic_shipment_patient.id=patient_visit.clinic_shipment_patient_id
+join patient on patient.id=clinic_shipment_patient.patient_id
+where patient_visit.id=#{id}")
       if ((@dbh.affected_rows < 1) || (@dbh.affected_rows > 1))
         raise "patient visit id is invalid: #{id}"
       end

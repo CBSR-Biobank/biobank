@@ -645,8 +645,8 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     private void setState(DispatchState state) {
         Integer oldState = wrappedObject.getState();
         wrappedObject.setState(state.getId());
-        stateModified = oldState == null || state == null
-            || !oldState.equals(state);
+        stateModified = ((oldState == null) || (state == null) || !oldState
+            .equals(state.getId()));
     }
 
     public void setInCreationState() {
