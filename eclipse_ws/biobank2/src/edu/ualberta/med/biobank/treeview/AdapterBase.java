@@ -694,6 +694,7 @@ public abstract class AdapterBase {
 
     protected boolean internalIsDeletable() {
         return editable && modelObject != null
+            && SessionManager.getInstance().isConnected()
             && modelObject.canDelete(SessionManager.getUser());
     }
 

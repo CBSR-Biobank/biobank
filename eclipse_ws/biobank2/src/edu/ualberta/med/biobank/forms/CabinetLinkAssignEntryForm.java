@@ -12,9 +12,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.custom.ScrolledComposite;
@@ -55,7 +52,6 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.CabinetInventoryIDValidator;
 import edu.ualberta.med.biobank.validators.StringLengthValidator;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
@@ -135,8 +131,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private Composite clientInsideGridScroll;
 
-    private BasicSiteCombo siteCombo;
-
     @Override
     protected void init() throws Exception {
         super.init();
@@ -170,7 +164,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         setAliquotMode(AliquotMode.NEW_ALIQUOT);
     }
 
-    private void createLocationSection() throws ApplicationException {
+    private void createLocationSection() {
         containersScroll = new ScrolledComposite(page, SWT.H_SCROLL);
         containersScroll.setExpandHorizontal(true);
         containersScroll.setExpandVertical(true);
@@ -187,18 +181,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         cabinetLabel = toolkit.createLabel(clientInsideGridScroll, "Cabinet"); //$NON-NLS-1$
         drawerLabel = toolkit.createLabel(clientInsideGridScroll, "Drawer"); //$NON-NLS-1$
 
-        List<ContainerTypeWrapper> types = ContainerTypeWrapper
-            .getContainerTypesInSite(appService, siteCombo.getSite(),
-                cabinetNameContains, false);
         ContainerTypeWrapper cabinetType = null;
         ContainerTypeWrapper drawerType = null;
-        if (types.size() == 0) {
-            BioBankPlugin.openAsyncError(
-                Messages.getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
-                Messages.getFormattedString("Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
-                    cabinetNameContains));
-        } else {
-            cabinetType = types.get(0);
+        if (cabinetContainerTypes.size() > 0) {
+            cabinetType = cabinetContainerTypes.get(0);
             List<ContainerTypeWrapper> children = cabinetType
                 .getChildContainerTypeCollection();
             if (children.size() > 0) {
@@ -218,9 +204,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         containersScroll.setMinSize(clientInsideGridScroll.computeSize(
             SWT.DEFAULT, SWT.DEFAULT));
+        displayPositions(false);
     }
 
-    @SuppressWarnings("unchecked")
     private void createFieldsSection() throws ApplicationException {
         Composite fieldsComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(3, false);
@@ -260,30 +246,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             }
         });
 
-        widgetCreator.createLabel(fieldsComposite, "Site");
-        siteCombo = new BasicSiteCombo(fieldsComposite, appService);
-        siteCombo.setSelection(new StructuredSelection(
-            ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
-        GridData gds = new GridData();
-        gds.horizontalSpan = 2;
-        gds.horizontalAlignment = SWT.FILL;
-        siteCombo.getCombo().setLayoutData(gds);
-        setFirstControl(siteCombo.getControl());
-
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                linkFormPatientManagement.setSite(siteCombo.getSite());
-                linkFormPatientManagement.setVisitsList();
-                // FIXME:cant remember what i was doing here?
-                // String text = newCabinetPosition.getText();
-                // newCabinetPosition.setText("");
-                // newCabinetPosition.notifyListeners();
-            }
-        });
+        createSiteCombo(fieldsComposite, true);
 
         // Patient number + visits list
-        linkFormPatientManagement.setSite(siteCombo.getSite());
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
         linkFormPatientManagement
             .setPatientTextCallback(new PatientTextCallback() {
@@ -491,6 +456,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     protected void initContainersFromPosition() {
         try {
+            bin = null;
+            drawer = null;
+            cabinet = null;
+            SiteWrapper currentSite = siteCombo.getSelectedSite();
             String fullLabel = newCabinetPositionText.getText();
             List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
             int removeSize = 2;
@@ -500,8 +469,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     - removeSize);
                 labelsTested.add(binLabel);
                 for (ContainerWrapper cont : ContainerWrapper
-                    .getContainersInSite(appService, siteCombo.getSite(),
-                        binLabel)) {
+                    .getContainersInSite(appService, currentSite, binLabel)) {
                     boolean canContainSamples = cont.getContainerType()
                         .getSampleTypeCollection() != null
                         && cont.getContainerType().getSampleTypeCollection()
@@ -529,7 +497,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             } else if (cabinetContainers.size() == 0) {
                 String errorMsg = Messages
                     .getFormattedString(
-                        "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested)); //$NON-NLS-1$
+                        "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested), currentSite.getNameShort()); //$NON-NLS-1$
                 BioBankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
                 viewerSampleTypes.getCombo().setEnabled(false);
@@ -640,8 +608,19 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     private void initCabinetContainerTypesList() throws ApplicationException {
-        cabinetContainerTypes = ContainerTypeWrapper.getContainerTypesInSite(
-            appService, siteCombo.getSite(), cabinetNameContains, false);
+        if (siteCombo.getSelectedSite() == null)
+            cabinetContainerTypes = new ArrayList<ContainerTypeWrapper>();
+        else {
+            cabinetContainerTypes = ContainerTypeWrapper
+                .getContainerTypesInSite(appService,
+                    siteCombo.getSelectedSite(), cabinetNameContains, false);
+            if (cabinetContainerTypes.size() == 0)
+                BioBankPlugin.openAsyncError(Messages
+                    .getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
+                    Messages.getFormattedString(
+                        "Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
+                        cabinetNameContains));
+        }
     }
 
     private List<SampleTypeWrapper> getCabinetSampleTypes()
@@ -649,7 +628,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         if (cabinetSampleTypes == null) {
             cabinetSampleTypes = SampleTypeWrapper
                 .getSampleTypeForContainerTypes(appService,
-                    siteCombo.getSite(), cabinetNameContains);
+                    siteCombo.getSelectedSite(), cabinetNameContains);
         }
         return cabinetSampleTypes;
     }
@@ -857,6 +836,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     private void displayPositions(boolean show) {
+        widgetCreator.showWidget(cabinetWidget, show);
+        widgetCreator.showWidget(cabinetLabel, show);
+        widgetCreator.showWidget(drawerWidget, show);
+        widgetCreator.showWidget(drawerLabel, show);
         if (show) {
             cabinetWidget.setContainerType(cabinet.getContainerType());
             cabinetWidget.setSelection(drawer.getPosition());
@@ -864,11 +847,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             drawerWidget.setContainer(drawer);
             drawerWidget.setSelection(bin.getPosition());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
-        } else {
-            cabinetWidget.setSelection(null);
-            cabinetLabel.setText("Cabinet"); //$NON-NLS-1$
-            drawerWidget.setSelection(null);
-            drawerLabel.setText("Drawer"); //$NON-NLS-1$
         }
         page.layout(true, true);
         book.reflow(true);
@@ -877,43 +855,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         // way to do it...
         containersScroll.setMinSize(clientInsideGridScroll.computeSize(
             SWT.DEFAULT, SWT.DEFAULT));
-    }
-
-    protected void initParentContainersFromPosition(String positionString)
-        throws Exception {
-        bin = null;
-        String binLabel = positionString.substring(0, 6);
-        appendLogNLS("Cabinet.activitylog.checkingParent", binLabel, //$NON-NLS-1$ 
-            aliquot.getSampleType().getName());
-        List<ContainerWrapper> containers = ContainerWrapper
-            .getContainersHoldingSampleType(appService, siteCombo.getSite(),
-                binLabel, aliquot.getSampleType());
-        if (containers.size() == 1) {
-            bin = containers.get(0);
-            drawer = bin.getParent();
-            cabinet = drawer.getParent();
-        } else if (containers.size() == 0) {
-            containers = ContainerWrapper.getContainersInSite(appService,
-                siteCombo.getSite(), binLabel);
-            String errorMsg = null;
-            if (containers.size() > 0) {
-                errorMsg = Messages.getFormattedString(
-                    "Cabinet.activitylog.checkParent.error.type", binLabel, //$NON-NLS-1$
-                    aliquot.getSampleType().getName());
-            } else {
-                errorMsg = Messages.getFormattedString(
-                    "Cabinet.activitylog.checkParent.error.found", binLabel); //$NON-NLS-1$
-            }
-            if (errorMsg != null) {
-                BioBankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
-                appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
-                focusControlInError(newCabinetPositionText);
-            }
-            return;
-        } else {
-            throw new Exception("More than one container found for " + binLabel //$NON-NLS-1$
-                + " --- should do something"); //$NON-NLS-1$
-        }
     }
 
     @Override
@@ -1014,5 +955,22 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     public boolean onClose() {
         linkFormPatientManagement.onClose();
         return super.onClose();
+    }
+
+    @Override
+    protected void siteComboSelectionChanged(SiteWrapper currentSelection)
+        throws Exception {
+        linkFormPatientManagement.setSite(currentSelection);
+        linkFormPatientManagement.setVisitsList();
+        if (viewerSampleTypes != null) {
+            initCabinetContainerTypesList();
+            viewerSampleTypes.setInput(null);
+            aliquot.setSampleType(null);
+            if (newCabinetPositionValidator.validate(
+                newCabinetPositionText.getText()).equals(Status.OK_STATUS)) {
+                initContainersFromPosition();
+                setTypeCombosLists();
+            }
+        }
     }
 }

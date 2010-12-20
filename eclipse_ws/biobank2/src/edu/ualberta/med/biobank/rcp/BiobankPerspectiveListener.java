@@ -25,8 +25,6 @@ public class BiobankPerspectiveListener extends PerspectiveAdapter {
         if (view != null && !perspective.getId().equals(MainPerspective.ID)
             && !perspective.getId().equals(ReportsPerspective.ID)) {
             view.reload();
-            // SessionManager.getInstance().getSiteCombo()
-            // .updateStatusLineMessage(view.getSite());
         }
         BindingContextHelper.deactivateContextInWorkbench("not."
             + perspective.getId());

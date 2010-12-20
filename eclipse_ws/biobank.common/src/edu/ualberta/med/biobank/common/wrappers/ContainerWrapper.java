@@ -383,7 +383,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             typesString = typesString.replaceFirst(" or", "");
             throw new BiobankCheckException("Can't find container with label "
                 + parentContainerLabel + " holding containers of types "
-                + typesString);
+                + typesString + " and in site "
+                + (getSite() == null ? "'none'" : getSite().getNameShort()));
         }
         if (possibleParents.size() > 1) {
             throw new BiobankCheckException(
@@ -840,6 +841,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public static List<ContainerWrapper> getContainersHoldingContainerTypes(
         WritableApplicationService appService, String label, SiteWrapper site,
         List<ContainerTypeWrapper> types) throws ApplicationException {
+        if (site == null)
+            return new ArrayList<ContainerWrapper>();
         String typeIds = "";
         for (ContainerTypeWrapper type : types) {
             typeIds += "," + type.getId();

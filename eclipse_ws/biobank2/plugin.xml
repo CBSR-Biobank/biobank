@@ -64,80 +64,99 @@
    <extension
          point="org.eclipse.ui.commands">
       <command
+            categoryId="biobank2.command.category.server"
             id="edu.ualberta.med.biobank.commands.login"
             name="Login">
       </command>
       <command
+            categoryId="biobank2.command.category.server"
             id="edu.ualberta.med.biobank.commands.logout"
             name="Logout">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.file"
             defaultHandler="edu.ualberta.med.biobank.handlers.QuitHandler"
             id="edu.ualberta.med.biobank.commands.quit"
             name="Quit">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.reset"
             name="Reset">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.cancel"
             name="Cancel">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.confirm"
             name="Confirm">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.siteAdd"
             name="Add Repository Site">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.studyAdd"
             name="Add Study">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.clinicAdd"
             name="Add Clinic">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.containerTypeAdd"
             name="Add Container Type">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.containerAdd"
             name="Add Container">
       </command>
       <command
-      		id="edu.ualberta.med.biobank.commands.editSampleTypes"
-      		name="Edit Sample Types">
+            categoryId="org.eclipse.ui.category.edit"
+            id="edu.ualberta.med.biobank.commands.editSampleTypes"
+            name="Edit Sample Types">
       		</command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.editSourceVessels"
             name="Edit Source Vessels">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.editShippingMethods"
             name="Edit Shipping Methods">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.reports"
             name="Reports Administration">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.processingAdmin"
             name="Processing Administration">
             name="Open Reports View">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.patientAdmin"
             name="Open Patients/Samples View">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.mainAdmin"
             name="Open Administration View">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
             name="Sample Processing">
          <commandParameter
@@ -160,50 +179,62 @@
             name="Create Calgary Configuration">
       </command>
        <command
-            id="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
-            name="Add shipment">
+             categoryId="org.eclipse.ui.category.edit"
+             id="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
+             name="Add shipment">
       </command>
        <command
-            id="edu.ualberta.med.biobank.commands.shipments.shipmentDelete"
-            name="Delete shipment">
+             categoryId="org.eclipse.ui.category.edit"
+             id="edu.ualberta.med.biobank.commands.shipments.shipmentDelete"
+             name="Delete shipment">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.patients.patientAdd"
             name="Add Patient">
       </command>
        <command
+             categoryId="org.eclipse.ui.category.edit"
              id="edu.ualberta.med.biobank.commands.patients.patientMerge"
              name="Merge Patients">
        </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
             name="Add Patient Visit">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.patients.patientVisitDelete"
             name="Delete Patient Visit">
      </command>
      <command
-            id="edu.ualberta.med.biobank.commands.shipmentAdmin"
-            name="Open Clinic Shipment View">
+           categoryId="org.eclipse.ui.category.window"
+           id="edu.ualberta.med.biobank.commands.shipmentAdmin"
+           name="Open Shipment View">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.reloadViewWithTree"
             name="Reload">
       </command>
       <command
             defaultHandler="edu.ualberta.med.biobank.handlers.SendErrorMailHandler"
             id="edu.ualberta.med.biobank.commands.sendErrorMail"
-            name="Send Error Mail">
+            name="Send Error Email">
       </command>
-      <command id="edu.ualberta.med.biobank.commands.deleteSelection"
+      <command
+            categoryId="org.eclipse.ui.category.edit"
+            id="edu.ualberta.med.biobank.commands.deleteSelection"
             name="Delete Selected Item">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.file"
             id="edu.ualberta.med.biobank.commands.search"
             name="Search">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.file"
             id="edu.ualberta.med.biobank.commands.print"
             name="Print">
       </command>
@@ -216,44 +247,54 @@
             name="Scan Plate">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.logging"
             name="Open Logging View">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.edit"
             name="Edit">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.reloadViewForm"
             name="Reload">
 	  </command>
 	  <command
-            id="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
-            name="Edit Activity Status">
+         categoryId="org.eclipse.ui.category.edit"
+         id="edu.ualberta.med.biobank.commands.editActivityStatusMethods"
+         name="Edit Activity Status">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.changePassword"
-            name="Change Password">
+            categoryId="biobank2.command.category.server"
+            id="edu.ualberta.med.biobank.commands.addUser"
+            name="Add User">
       </command>
       <command
+            categoryId="biobank2.command.category.server"
             id="edu.ualberta.med.biobank.commands.editUsers"
             name="Edit Users">
       </command>
       <command
-            id="edu.ualberta.med.biobank.commands.addUser"
-            name="Add User">
+            categoryId="biobank2.command.category.server"
+            id="edu.ualberta.med.biobank.commands.changePassword"
+            name="Change Password">
       </command>
        <command
-            id="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
-            name="Add dispatch">
+             categoryId="org.eclipse.ui.category.edit"
+             id="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
+             name="Add dispatch">
       </command>
       <command
+            categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.dispatchAdmin"
             name="Open Dispatch Shipment View">
       </command>
        <command
-            id="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
-            name="Add Dispatch Shipment">
+             categoryId="org.eclipse.ui.category.edit"
+             id="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
+             name="Add Dispatch Shipment">
       </command>
        <command
              defaultHandler="edu.ualberta.med.biobank.handlers.ExportErrorsLogsHandler"
@@ -264,6 +305,10 @@
              id="edu.ualberta.med.biobank.commands.requests.processRequest"
              name="Process Request">
        </command>
+       <category
+             id="biobank2.command.category.server"
+             name="Server">
+       </category>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -929,21 +974,21 @@
                       style="push">
                 </command>
                 <command
-                      commandId="edu.ualberta.med.biobank.commands.changePassword"
-                      id="edu.ualberta.med.biobank.menu.changePassword"
-                      label="Change Password"
+                      commandId="edu.ualberta.med.biobank.commands.addUser"
+                      id="edu.ualberta.med.biobank.menu.addUser"
+                      label="Add User"
                       style="push">
                 </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editUsers"
                       id="edu.ualberta.med.biobank.menu.editUsers"
-                      label="Edit Users"
+                      label="Edit User"
                       style="push">
                 </command>
                 <command
-                      commandId="edu.ualberta.med.biobank.commands.addUser"
-                      id="edu.ualberta.med.biobank.menu.addUser"
-                      label="Add User"
+                      commandId="edu.ualberta.med.biobank.commands.changePassword"
+                      id="edu.ualberta.med.biobank.menu.changePassword"
+                      label="Change Password"
                       style="push">
                 </command>
          </menu>
@@ -979,29 +1024,9 @@
                   style="push">
             </command>
             <separator
-                  name="biobank2.separator3"
-                  visible="true">
-            </separator>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
-                  icon="icons/dispatch_add.png"
-                  label="Add Dispatch"
-                  style="push">
-            </command>
-            <separator
                   name="biobank2.separator2"
                   visible="true">
             </separator>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete Selected Item"
-                  style="push">
-            </command>
-         </menu>
-         <menu
-               id="edu.ualberta.med.biobank.menu.linkAssign"
-               label="Link / Assign">
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
                   icon="icons/scanLink.png"
@@ -1031,6 +1056,26 @@
                      name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
                      value="edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm">
                </parameter>
+            </command>
+            <separator
+                  name="biobank2.separator4"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
+                  icon="icons/dispatch_add.png"
+                  label="Add Dispatch"
+                  style="push">
+            </command>
+            <separator
+                  name="biobank2.separator3"
+                  visible="true">
+            </separator>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
+                  style="push">
             </command>
          </menu>
          <menu
@@ -1087,7 +1132,7 @@
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"
-                  label="Search View"
+                  label="Search Panel"
                   style="push">
             </command>
          </menu>
@@ -1223,7 +1268,7 @@
                   icon="icons/search.png"
                   label="Search"
                   style="push"
-                  tooltip="Search">
+                  tooltip="Search Panel">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.logging"
@@ -1332,7 +1377,7 @@
                   icon="icons/search.png"
                   label="Search"
                   style="push"
-                  tooltip="Search">
+                  tooltip="Search Panel">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
@@ -2106,7 +2151,7 @@
             commandId="edu.ualberta.med.biobank.commands.cancel"
             contextId="biobank2.context.entryForm"
             schemeId="biobank2.scheme"
-            sequence="M1+C"/>
+            sequence="M1+Z"/>
       <key
             commandId="org.eclipse.ui.file.close"
             sequence="M1+W"
@@ -2231,12 +2276,6 @@
             name="General">
       </page>
       <page
-          category="Scanner"
-            class="edu.ualberta.med.biobank.preferences.ScannerPreferencePage"
-            id="edu.ualberta.med.biobank.preferences.plateBarcodes"
-            name="Plate Barcodes">
-      </page>
-      <page
             class="edu.ualberta.med.biobank.preferences.LinkAssignPreferencePage"
             id="edu.ualberta.med.biobank.preferences.linkAssign"
             name="Link / Assign">
@@ -2262,6 +2301,28 @@
             class="edu.ualberta.med.biobank.preferences.ServerPreferencePage"
             id="edu.ualberta.med.biobank.preferences.gereral"
             name="Servers">
+      </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.GeneralPreferencePage"
+            id="org.eclipse.ui.preferencePages.Workbench"
+            name="Hidden General (for others pages references)">
+      </page>
+      <page
+            category="edu.ualberta.med.biobank.preferences.general"
+            class="org.eclipse.equinox.internal.p2.ui.sdk.scheduler.AutomaticUpdatesPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.automaticUpdates"
+            name="Automatic Update">
+      </page>
+      <page
+            class="edu.ualberta.med.biobank.preferences.DefaultTopPreferencePage"
+            id="org.eclipse.equinox.internal.p2.ui.sdk.ProvisioningPreferencePage"
+            name="Hidden Install/Update">
+      </page>
+      <page
+            category="edu.ualberta.med.biobank.preferences.general"
+            class="org.eclipse.ui.internal.keys.KeysPreferencePage"
+            id="edu.ualberta.med.biobank.preferences.keys"
+            name="Keys">
       </page>
    </extension>
    <extension
@@ -2626,26 +2687,5 @@
                   id="edu.ualberta.med.biobank.menu.install">
             </command>
       </menuContribution>
-   </extension>
-   <extension
-         point="org.eclipse.ui.activities">
-      <activity
-            description="Preferences from Eclipse Update UI"
-            id="edu.ualberta.med.biobank.activity.updateui"
-            name="Update Preferences">
-      </activity>
-      <activityPatternBinding
-            activityId="edu.ualberta.med.biobank.activity.updateui"
-            pattern="org\.eclipse\.update\.ui/org\.eclipse\.update\..*PreferencePage">
-      </activityPatternBinding>
-      <activity
-            description="Preferences from Eclipse IDE UI"
-            id="edu.ualberta.med.biobank.activity.eclipseide"
-            name="IDE General Preferences">
-      </activity>
-      <activityPatternBinding
-            activityId="edu.ualberta.med.biobank.activity.eclipseide"
-            pattern="org\.eclipse\.ui\.ide/org\.eclipse\.ui\.preferencePages\.Workbench">
-      </activityPatternBinding>
    </extension>
 </plugin>

@@ -1007,6 +1007,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return clinics.size();
     }
 
+    /**
+     * Only webadministrator can update the site object itself. To check if a
+     * user can modify data inside a site, use user.canUpdateSite method
+     */
     @Override
     public boolean canUpdate(User user) {
         return user.isWebsiteAdministrator();

@@ -8,7 +8,6 @@ import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.events.KeyAdapter;
@@ -20,6 +19,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -29,11 +29,11 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.utils.SearchType;
 import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 public class SearchView extends ViewPart {
 
@@ -45,10 +45,13 @@ public class SearchView extends ViewPart {
 
     private Button searchButton;
 
+    private WidgetCreator widgetCreator;
+
     protected static boolean loggedIn;
 
     @Override
     public void createPartControl(Composite parent) {
+        widgetCreator = new WidgetCreator(null);
         parent.setLayout(new GridLayout(2, false));
 
         IWorkbenchWindow window = PlatformUI.getWorkbench()
@@ -77,12 +80,15 @@ public class SearchView extends ViewPart {
                 }
             });
 
-        siteCombo = new BasicSiteCombo(parent, null);
-        GridData gds = new GridData();
-        gds.horizontalSpan = 2;
-        gds.horizontalAlignment = SWT.FILL;
-        gds.grabExcessHorizontalSpace = true;
-        siteCombo.getCombo().setLayoutData(gds);
+        Label label = widgetCreator.createLabel(parent, "Repository Site");
+        siteCombo = new BasicSiteCombo(parent, widgetCreator, null, label,
+            false, null);
+        // FIXME arrange site combo
+        // GridData gds = new GridData();
+        // gds.horizontalSpan = 2;
+        // gds.horizontalAlignment = SWT.FILL;
+        // gds.grabExcessHorizontalSpace = true;
+        // siteCombo.getCombo().setLayoutData(gds);
 
         searchTypeCombo = new ComboViewer(parent);
         searchTypeCombo.setContentProvider(new ArrayContentProvider());
@@ -158,7 +164,7 @@ public class SearchView extends ViewPart {
                     .getSelection()).getFirstElement();
                 try {
                     List<? extends ModelWrapper<?>> res = type.search(
-                        searchString, siteCombo.getSite());
+                        searchString, siteCombo.getSelectedSite());
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {
@@ -172,7 +178,6 @@ public class SearchView extends ViewPart {
         });
     }
 
-    @SuppressWarnings("unchecked")
     public void setEnabled() {
         if (!searchText.isDisposed()) {
             searchText.setEnabled(loggedIn);
@@ -181,8 +186,7 @@ public class SearchView extends ViewPart {
             searchButton.setEnabled(loggedIn);
             if (loggedIn) {
                 siteCombo.init(SessionManager.getAppService());
-                siteCombo.setSelection(new StructuredSelection(
-                    ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
+                siteCombo.setSelectedSite(siteCombo.getFirstSite(), true);
             }
         }
     }

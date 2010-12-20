@@ -145,7 +145,8 @@ public class LinkFormPatientManagement {
                     if (pv != null) {
                         aliquotAdminForm.appendLogNLS(
                             "linkAssign.activitylog.visit.selection", pv //$NON-NLS-1$
-                                .getFormattedDateDrawn(),
+                                .getShipment().getSite().getNameShort(),
+                            pv.getFormattedDateDrawn(),
                             pv.getFormattedDateProcessed(), pv.getShipment()
                                 .getClinic().getName());
                     }
@@ -211,37 +212,40 @@ public class LinkFormPatientManagement {
     }
 
     protected void setVisitsList() {
-        if (currentPatient != null) {
-            // show visits list
-            List<PatientVisitWrapper> collection = null;
-            if (visitsListCheck.getSelection()) {
-                try {
-                    collection = currentPatient.getLast7DaysPatientVisits(site);
-                } catch (ApplicationException e) {
-                    BioBankPlugin.openAsyncError("Visits problem",
-                        "Problem getting last 7 days visits. All visits will "
-                            + "be displayed into the list");
-                    aliquotAdminForm.getErrorLogger().error(
-                        "Last 7 days visits error", e);
+        if (viewerVisits != null) {
+            if (currentPatient != null) {
+                // show visits list
+                List<PatientVisitWrapper> collection = null;
+                if (visitsListCheck.getSelection()) {
+                    try {
+                        collection = currentPatient
+                            .getLast7DaysPatientVisits(site);
+                    } catch (ApplicationException e) {
+                        BioBankPlugin.openAsyncError("Visits problem",
+                            "Problem getting last 7 days visits. All visits will "
+                                + "be displayed into the list");
+                        aliquotAdminForm.getErrorLogger().error(
+                            "Last 7 days visits error", e);
+                    }
                 }
-            }
-            if (collection == null) {
-                collection = currentPatient.getPatientVisitCollection(true,
-                    false, site);
-            }
-            viewerVisits.setInput(collection);
-            viewerVisits.getCombo().setFocus();
-            if (collection != null && collection.size() == 1) {
-                viewerVisits.setSelection(new StructuredSelection(collection
-                    .get(0)));
+                if (collection == null) {
+                    collection = currentPatient.getPatientVisitCollection(true,
+                        false, site);
+                }
+                viewerVisits.setInput(collection);
+                viewerVisits.getCombo().setFocus();
+                if (collection != null && collection.size() == 1) {
+                    viewerVisits.setSelection(new StructuredSelection(
+                        collection.get(0)));
+                } else {
+                    viewerVisits.getCombo().deselectAll();
+                }
             } else {
-                viewerVisits.getCombo().deselectAll();
+                viewerVisits.setInput(null);
             }
-        } else {
-            viewerVisits.setInput(null);
-        }
-        if (visitText != null) {
-            visitText.setText("");
+            if (visitText != null) {
+                visitText.setText("");
+            }
         }
     }
 

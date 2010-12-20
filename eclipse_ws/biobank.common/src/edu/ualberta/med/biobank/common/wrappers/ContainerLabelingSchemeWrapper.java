@@ -362,9 +362,13 @@ public class ContainerLabelingSchemeWrapper extends
         int pos = index1 * CBSR_LABELLING_PATTERN.length() + index2;
 
         if (pos >= rowCap * colCap) {
-            throw new Exception("Address  " + label + " does not exist in "
-                + containerTypeName + ". Max row: " + rowCap + " Max col: "
-                + colCap);
+            String maxValue = ContainerLabelingSchemeWrapper
+                .rowColToCbsrTwoChar(new RowColPos(rowCap - 1, colCap - 1),
+                    rowCap, colCap);
+            throw new Exception("Address  " + label + " does not exist"
+                + (containerTypeName == null ? "" : " in " + containerTypeName)
+                + ". Max value is " + maxValue + ". (Max row: " + rowCap
+                + ". Max col: " + colCap + ".)");
         }
         RowColPos rowColPos = new RowColPos();
         rowColPos.row = pos % rowCap;

@@ -19,7 +19,7 @@ public class MoveContainerDialog extends BiobankDialog {
     private ContainerWrapper srcContainer;
     private ContainerWrapper dstContainer;
 
-    private String newLabel;
+    private String newLabel = "";
 
     public MoveContainerDialog(Shell parent, ContainerWrapper srcContainer,
         ContainerWrapper dstContainer) {

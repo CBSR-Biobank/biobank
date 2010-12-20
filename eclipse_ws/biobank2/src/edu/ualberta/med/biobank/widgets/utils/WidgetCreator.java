@@ -54,7 +54,6 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
-import edu.ualberta.med.biobank.widgets.DateTimeObservableValue;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class WidgetCreator {
@@ -690,7 +689,9 @@ public class WidgetCreator {
 
     public void showWidget(Control widget, boolean show) {
         widget.setVisible(show);
-        ((GridData) widget.getLayoutData()).exclude = !show;
+        GridData gd = (GridData) widget.getLayoutData();
+        if (gd != null)
+            gd.exclude = !show;
     }
 
     public void showWidget(Control widget) {

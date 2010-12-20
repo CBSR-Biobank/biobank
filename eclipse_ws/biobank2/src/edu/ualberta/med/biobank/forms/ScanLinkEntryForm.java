@@ -12,7 +12,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StackLayout;
@@ -46,7 +45,6 @@ import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.SampleTypeSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
@@ -98,8 +96,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
 
     private ScrolledComposite containersScroll;
 
-    private BasicSiteCombo siteCombo;
     private ArrayList<SampleTypeWrapper> preSelectedSampleTypes;
+
+    private SiteWrapper currentSelectedSite;
 
     @Override
     protected void init() throws Exception {
@@ -275,15 +274,18 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     }
 
     private void initAuthorizedSampleTypeList() throws ApplicationException {
-        authorizedSampleTypes = SampleTypeWrapper.getSampleTypeForPallet96(
-            appService, siteCombo.getSite());
-        if (authorizedSampleTypes.size() == 0) {
-            BioBankPlugin
-                .openAsyncError(
-                    Messages
-                        .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
-                    Messages
-                        .getFormattedString("ScanLink.dialog.sampleTypesError.msg")); //$NON-NLS-1$
+        SiteWrapper currentSite = siteCombo.getSelectedSite();
+        if (currentSite != null) {
+            authorizedSampleTypes = SampleTypeWrapper.getSampleTypeForPallet96(
+                appService, currentSite);
+            if (authorizedSampleTypes.size() == 0) {
+                BioBankPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
+                        Messages
+                            .getFormattedString("ScanLink.dialog.sampleTypesError.msg")); //$NON-NLS-1$
+            }
         }
     }
 
@@ -339,6 +341,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         layout.horizontalSpacing = 10;
         typesSelectionPerRowComposite.setLayout(layout);
         toolkit.paintBordersFor(typesSelectionPerRowComposite);
+        GridData gd = new GridData();
+        gd.widthHint = 500;
+        typesSelectionPerRowComposite.setLayoutData(gd);
 
         sampleTypeWidgets = new ArrayList<SampleTypeSelectionWidget>();
         SampleTypeSelectionWidget precedent = null;
@@ -368,7 +373,6 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
     }
 
-    @SuppressWarnings("unchecked")
     private void createFieldsComposite() throws Exception {
         Composite leftSideComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -390,25 +394,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
-        widgetCreator.createLabel(fieldsComposite, "Site");
-        siteCombo = new BasicSiteCombo(fieldsComposite, appService);
-        siteCombo.setSelection(new StructuredSelection(
-            ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                linkFormPatientManagement.setSite(siteCombo.getSite());
-                linkFormPatientManagement.setVisitsList();
-            }
-        });
+        createSiteCombo(fieldsComposite, true);
 
-        GridData gds = new GridData();
-        gds.horizontalSpan = 2;
-        gds.horizontalAlignment = SWT.FILL;
-        siteCombo.getCombo().setLayoutData(gds);
-        setFirstControl(siteCombo.getControl());
-
-        linkFormPatientManagement.setSite(siteCombo.getSite());
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
         linkFormPatientManagement.createVisitWidgets(fieldsComposite);
 
@@ -475,6 +462,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     protected void beforeScanThreadStart() {
         isFakeScanRandom = fakeScanRandom != null
             && fakeScanRandom.getSelection();
+        currentSelectedSite = siteCombo.getSelectedSite();
         preSelectedSampleTypes = new ArrayList<SampleTypeWrapper>();
         for (SampleTypeSelectionWidget stw : sampleTypeWidgets) {
             preSelectedSampleTypes.add(stw.getSelection());
@@ -488,7 +476,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         }
         try {
             return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                appService, siteCombo.getSite().getId());
+                appService, currentSelectedSite.getId());
         } catch (Exception ex) {
             BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }
@@ -546,7 +534,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     private void setTypeCombosLists(Map<Integer, Integer> typesRows) {
         List<SampleTypeWrapper> studiesSampleTypes = null;
         if (isFirstSuccessfulScan()) {
-            // already done at first successful scan
+            // done at first successful scan
             studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
             for (SampleStorageWrapper ss : linkFormPatientManagement
                 .getCurrentPatient().getStudy().getSampleStorageCollection()) {
@@ -603,7 +591,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     appendLogNLS("ScanLink.activitylog.aliquot.existsError",
                         palletPosition, value, foundAliquot.getPatientVisit()
                             .getFormattedDateProcessed(), foundAliquot
-                            .getPatientVisit().getPatient().getPnumber());
+                            .getPatientVisit().getPatient().getPnumber(),
+                        foundAliquot.getPatientVisit().getShipment().getSite()
+                            .getNameShort());
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);
                     if (independantProcess) {
@@ -638,6 +628,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
         List<AliquotWrapper> newAliquots = new ArrayList<AliquotWrapper>();
+        SiteWrapper site = patientVisit.getShipment().getSite();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
                 && cell.getStatus() == CellStatus.TYPE) {
@@ -651,9 +642,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 sb.append(Messages.getFormattedString(
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),
-                    patientVisit.getFormattedDateDrawn(), patientVisit
-                        .getShipment().getClinic().getName(), cell.getType()
-                        .getName()));
+                    site.getNameShort(), patientVisit.getFormattedDateDrawn(),
+                    patientVisit.getShipment().getClinic().getName(), cell
+                        .getType().getName()));
                 nber++;
             }
         }
@@ -661,7 +652,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         patientVisit.persist();
         appendLog(sb.toString());
         appendLogNLS("ScanLink.activitylog.save.summary", nber, patientVisit
-            .getPatient().getPnumber(), patientVisit.getFormattedDateDrawn(),
+            .getPatient().getPnumber(), site.getNameShort(),
+            patientVisit.getFormattedDateDrawn(),
             patientVisit.getFormattedDateProcessed()); //$NON-NLS-1$
         setFinished(false);
     }
@@ -757,4 +749,13 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     protected boolean fieldsValid() {
         return isPlateValid() && linkFormPatientManagement.fieldsValid();
     }
+
+    @Override
+    protected void siteComboSelectionChanged(SiteWrapper currentSelection)
+        throws Exception {
+        linkFormPatientManagement.setSite(currentSelection);
+        linkFormPatientManagement.setVisitsList();
+        initAuthorizedSampleTypeList();
+    }
+
 }

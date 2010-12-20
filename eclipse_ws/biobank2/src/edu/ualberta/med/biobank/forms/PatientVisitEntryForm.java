@@ -10,8 +10,6 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -87,11 +85,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget dateDrawnWidget;
 
-    private BasicSiteCombo siteCombo;
-
     private Button shipmentsListCheck;
 
     protected ShipmentWrapper shipmentToBeSaved;
+
+    private BasicSiteCombo siteCombo;
 
     @Override
     public void init() {
@@ -147,7 +145,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             true, false, SessionManager.getUser());
         List<ShipmentWrapper> allSiteShipments = new ArrayList<ShipmentWrapper>();
         for (ShipmentWrapper ship : allShipments)
-            if (ship.getSite().equals(siteCombo.getSite()))
+            if (ship.getSite().equals(siteCombo.getSelectedSite()))
                 allSiteShipments.add(ship);
         return allSiteShipments;
     }
@@ -182,8 +180,17 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        widgetCreator.createLabel(client, "Site");
-        siteCombo = new BasicSiteCombo(client, appService);
+
+        siteCombo = createBasicSiteCombo(client, true,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    if (shipmentsComboViewer != null)
+                        updateShipmentCombo();
+                }
+            });
+        setFirstControl(siteCombo);
+        siteCombo.setSelectedSite(null, true);
 
         createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
             .getStudy().getName());
@@ -193,19 +200,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         createShipmentsCombo(client);
 
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                updateShipmentCombo();
-            }
-
-        });
         if (!patientVisit.isNew()) {
             List<SiteWrapper> input = new ArrayList<SiteWrapper>();
             input.add(patientVisit.getShipment().getSite());
-            siteCombo.setInput(input);
-            siteCombo.setSelection(new StructuredSelection(patientVisit
-                .getShipment().getSite()));
+            siteCombo.setSitesList(input);
+            siteCombo.setSelectedSite(patientVisit.getShipment().getSite(),
+                false);
         }
 
         if (patientVisit.getDateProcessed() == null) {
@@ -270,7 +270,6 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
                 }
             });
 
-        setFirstControl(shipmentsComboViewer.getControl());
         shipmentsComboViewer.getControl().setToolTipText(
             "Only administrators can see more than 7 days.");
 
@@ -286,7 +285,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         shipmentsListCheck
             .setToolTipText("Only administrators have access to this option.");
         shipmentsListCheck.setEnabled(SessionManager.getUser()
-            .isSiteAdministrator(siteCombo.getSite()));
+            .isSiteAdministrator(siteCombo.getSelectedSite()));
 
         updateShipmentCombo();
 

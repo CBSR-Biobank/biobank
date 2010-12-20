@@ -1,13 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.ISelectionChangedListener;
-import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -50,8 +47,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private BiobankText tempWidget;
 
-    private ContainerTypeWrapper currentContainerType;
-
     private ComboViewer containerTypeComboViewer;
 
     private String oldContainerLabel;
@@ -62,9 +57,9 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
     private boolean newName;
 
-    private BasicSiteCombo siteCombo;
-
     protected List<ContainerTypeWrapper> containerTypes;
+
+    private BasicSiteCombo siteCombo;
 
     @Override
     public void init() throws Exception {
@@ -96,13 +91,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Container");
 
-        currentContainerType = container.getContainerType();
         page.setLayout(new GridLayout(1, false));
         createContainerSection();
         createButtonsSection();
     }
 
-    @SuppressWarnings("unchecked")
     private void createContainerSection() throws Exception {
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -111,38 +104,45 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        widgetCreator.createLabel(client, "Repository Site");
-        siteCombo = new BasicSiteCombo(client, appService);
+        siteCombo = createBasicSiteCombo(client, true,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    SiteWrapper selectedSite = siteCombo.getSelectedSite();
+                    if (!container.hasParent()) {
+                        try {
+                            containerTypes = ContainerTypeWrapper
+                                .getTopContainerTypesInSite(appService,
+                                    selectedSite);
+                        } catch (ApplicationException e) {
+                        }
+                    } else {
+                        containerTypes = container.getParent()
+                            .getContainerType()
+                            .getChildContainerTypeCollection();
+                    }
+                    setDirty(true);
+                    if (containerTypeComboViewer != null) {
+                        containerTypeComboViewer.setInput(containerTypes);
+                        if (container.getContainerType() != null)
+                            containerTypeComboViewer
+                                .setSelection(new StructuredSelection(container
+                                    .getContainerType()));
+                    }
+                    if (container.isNew())
+                        adapter.setParent(((SiteAdapter) SessionManager
+                            .getCurrentAdapterViewWithTree().searchNode(
+                                selectedSite)).getContainersGroupNode());
+                    container.setSite(selectedSite);
+                }
+            });
+        setFirstControl(siteCombo);
         if (!container.isNew()) {
             List<SiteWrapper> input = new ArrayList<SiteWrapper>();
             input.add(container.getSite());
-            siteCombo.setInput(input);
+            siteCombo.setSitesList(input);
         }
-        siteCombo.addSelectionChangedListener(new ISelectionChangedListener() {
-
-            @Override
-            public void selectionChanged(SelectionChangedEvent event) {
-                if (!container.hasParent()) {
-                    try {
-                        containerTypes = ContainerTypeWrapper
-                            .getTopContainerTypesInSite(appService,
-                                siteCombo.getSite());
-                    } catch (ApplicationException e) {
-                    }
-                } else {
-                    containerTypes = container.getParent().getContainerType()
-                        .getChildContainerTypeCollection();
-                }
-                currentContainerType = null;
-                setDirty(true);
-                containerTypeComboViewer.setInput(containerTypes);
-                if (container.isNew())
-                    adapter.setParent(((SiteAdapter) SessionManager
-                        .getCurrentAdapterViewWithTree().searchNode(
-                            siteCombo.getSite())).getContainersGroupNode());
-                container.setSite(siteCombo.getSite());
-            }
-        });
+        siteCombo.setSelectedSite(container.getSite(), true);
 
         if ((container.isNew() && container.getParent() == null)
             || (container.getContainerType() != null && Boolean.TRUE
@@ -180,40 +180,27 @@ public class ContainerEntryForm extends BiobankEntryForm {
             "Comments", null, container, "comment", null);
 
         createContainerTypesSection(client);
-        if (!container.isNew())
-            siteCombo
-                .setSelection(new StructuredSelection(container.getSite()));
-        else
-            siteCombo.setSelection(new StructuredSelection(
-                ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
+
+        siteCombo.setSelectedSite(container.getSite(), true);
     }
 
     private void createContainerTypesSection(Composite client) throws Exception {
         List<ContainerTypeWrapper> containerTypes;
-        if (!container.hasChildren()) {
-            if (!container.hasParent()) {
+        ContainerTypeWrapper currentType = container.getContainerType();
+        if (!container.hasParent()) {
+            SiteWrapper currentSite = container.getSite();
+            if (currentSite == null)
+                containerTypes = new ArrayList<ContainerTypeWrapper>();
+            else
                 containerTypes = ContainerTypeWrapper
-                    .getTopContainerTypesInSite(appService, siteCombo.getSite());
-            } else {
-                containerTypes = container.getParent().getContainerType()
-                    .getChildContainerTypeCollection();
-            }
-
-            if (currentContainerType == null) {
-                if (containerTypes.size() == 1) {
-                    currentContainerType = containerTypes.get(0);
-                    setDirty(true);
-                }
-            }
+                    .getTopContainerTypesInSite(appService, currentSite);
         } else {
-            containerTypes = Arrays
-                .asList(new ContainerTypeWrapper[] { container
-                    .getContainerType() });
-            currentContainerType = containerTypes.get(0);
+            containerTypes = container.getParent().getContainerType()
+                .getChildContainerTypeCollection();
         }
 
         containerTypeComboViewer = createComboViewer(client, "Container Type",
-            containerTypes, currentContainerType, MSG_CONTAINER_TYPE_EMPTY,
+            containerTypes, currentType, MSG_CONTAINER_TYPE_EMPTY,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -240,10 +227,13 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (container.hasParent())
             tempWidget.setEnabled(false);
 
-        if (currentContainerType != null) {
-            containerTypeComboViewer.setSelection(new StructuredSelection(
-                currentContainerType));
+        if (container.hasChildren() || container.hasAliquots()) {
+            containerTypeComboViewer.getCombo().setEnabled(false);
         }
+        // if (containerTypes.size() == 1) {
+        // containerTypeComboViewer.setSelection(new StructuredSelection(
+        // containerTypes.get(0)));
+        // }
     }
 
     private void createButtonsSection() {
@@ -309,23 +299,17 @@ public class ContainerEntryForm extends BiobankEntryForm {
         return ContainerViewForm.ID;
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public void reset() throws Exception {
         super.reset();
-        if (!container.isNew())
-            siteCombo
-                .setSelection(new StructuredSelection(container.getSite()));
-        else
-            siteCombo.setSelection(new StructuredSelection(
-                ((List<SiteWrapper>) siteCombo.getInput()).get(0)));
-        currentContainerType = container.getContainerType();
-        if (currentContainerType != null) {
-            containerTypeComboViewer.setSelection(new StructuredSelection(
-                currentContainerType));
-        } else if (containerTypeComboViewer.getCombo().getItemCount() > 1) {
-            containerTypeComboViewer.getCombo().deselectAll();
-        }
+        siteCombo.setSelectedSite(container.getSite(), true);
+        // currentContainerType = container.getContainerType();
+        // if (currentContainerType != null) {
+        // containerTypeComboViewer.setSelection(new StructuredSelection(
+        // currentContainerType));
+        // } else if (containerTypeComboViewer.getCombo().getItemCount() > 1) {
+        // containerTypeComboViewer.getCombo().deselectAll();
+        // }
         ActivityStatusWrapper activity = container.getActivityStatus();
         if (activity != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(

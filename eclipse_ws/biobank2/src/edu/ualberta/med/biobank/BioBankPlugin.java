@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
@@ -508,29 +507,12 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public int getPlateNumber(String barcode) {
-        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
-            if (isRealScanEnabled()
-                && !ScannerConfigPlugin.getDefault().getPlateEnabled(i + 1))
-                continue;
-
-            String pref = getPreferenceStore().getString(
-                PreferenceConstants.SCANNER_PLATE_BARCODES[i]);
-            Assert.isTrue(!pref.isEmpty(), "preference not assigned");
-            if (pref.equals(barcode)) {
-                return i + 1;
-            }
-        }
-        return -1;
+        return ScannerConfigPlugin.getDefault().getPlateNumber(barcode,
+            isRealScanEnabled());
     }
 
     public static int getPlatesEnabledCount() {
-        int count = 0;
-        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
-            if (!isRealScanEnabled()
-                || ScannerConfigPlugin.getDefault().getPlateEnabled(i + 1))
-                count++;
-        }
-        return count;
+        return ScannerConfigPlugin.getPlatesEnabledCount(isRealScanEnabled());
     }
 
     public boolean isValidPlateBarcode(String value) {

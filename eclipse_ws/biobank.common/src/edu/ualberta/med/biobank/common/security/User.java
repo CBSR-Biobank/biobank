@@ -140,6 +140,9 @@ public class User implements Serializable, NotAProxy {
         return false;
     }
 
+    /**
+     * Use to check if a user can modify objects inside a site
+     */
     public boolean canUpdateSite(SiteWrapper site) {
         Integer id = null;
         if (site != null)
@@ -147,7 +150,12 @@ public class User implements Serializable, NotAProxy {
         return canUpdateSite(id);
     }
 
+    /**
+     * Use to check if a user can modify objects inside a site
+     */
     public boolean canUpdateSite(Integer siteId) {
+        if (siteId == null)
+            return false;
         return hasPrivilegeOnObject(Privilege.UPDATE, Site.class.getName(),
             siteId);
     }

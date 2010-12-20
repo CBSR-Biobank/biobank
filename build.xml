@@ -712,7 +712,13 @@
     <echo message="coverage report: file://${converage.output}/index.html" />
   </target>
 
-  <target name="product">
+	
+  <target name="eclipse.home.env">
+	<fail unless="env.ECLIPSE_HOME" message="ECLIPSE_HOME environment variable not defined. It should define a path to an eclipse installation containing the Delta Pack." />
+  </target>
+		
+	
+  <target name="product" depends="eclipse.home.env">
   	<property name="buildDirectory" value="${product.dir}/buildDirectory"/> 
 	<delete dir="${buildDirectory}"/>			
 	<copy todir="${buildDirectory}/plugins/biobank2">
@@ -733,10 +739,17 @@
 	<copy todir="${buildDirectory}/features/biobank2.feature.platform">
 		<fileset dir="${eclipse.workspace.dir}/biobank2.feature.platform"/>
 	</copy>
-    <java classpath="${env.ECLIPSE_HOME}/plugins/org.eclipse.equinox.launcher_1.1.0.v20100507.jar" 
+  	<!-- get current org.eclipse.equinox.launcher jar. If find more than one, will use the last one in the list (should be the last version)-->
+  	<fileset id="launcher.id.all" dir="${env.ECLIPSE_HOME}/plugins/" includes="org.eclipse.equinox.launcher_*.jar" />
+  	<last id="launcher.id" count="1"><fileset refid="launcher.id.all" /></last>
+  	<!-- get current org.eclipse.pde.build folder. If find more than one, will use the last one in the list (should be the last version) -->
+  	<fileset id="pde.build.id.all" dir="${env.ECLIPSE_HOME}/plugins/" includes="org.eclipse.pde.build_*/scripts/productBuild/productBuild.xml"/>
+  	<last id="pde.build.id" count="1"><fileset refid="pde.build.id.all" /></last>
+  	<!-- launch product creation -->
+    <java classpath="${toString:launcher.id}" 
     	classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
       <arg line="-application org.eclipse.ant.core.antRunner"/>
-      <arg line="-buildfile ${env.ECLIPSE_HOME}/plugins/org.eclipse.pde.build_3.6.0.v20100603/scripts/productBuild/productBuild.xml"/>
+      <arg line="-buildfile ${toString:pde.build.id}"/>
       <arg line="-Dbuilder=${product.dir}"/>
       <!-- product.dir is used in product/customTarget.xml -->
       <arg line="-Dproduct.dir=${product.dir}"/>
@@ -748,8 +761,8 @@
     </java>
   	<antcall target="updateSiteMetadata" />
   	</target>
-  	
-  	<target name="updateSiteMetadata">
+	
+  	<target name="updateSiteMetadata" depends="eclipse.home.env">
   	  <property name="buildDirectory" value="${product.dir}/buildDirectory"/> 
   	  <property name="updateSiteFolder" value="${buildDirectory}/updateSite"/>
       <copy todir="${updateSiteFolder}/features/">
@@ -771,7 +784,11 @@
   	  <copy file="${product.dir}/site.xml" tofile="${updateSiteFolder}/site.xml" />
   	  <replace file="${updateSiteFolder}/site.xml" token="@VERSION@" value="${featureVersion}"/>
   		
-	  <java classpath="${env.ECLIPSE_HOME}/plugins/org.eclipse.equinox.launcher_1.1.0.v20100507.jar" 
+  		
+  	  <!-- get current org.eclipse.equinox.launcher jar. If find more than one, will use the last one in the list (should be the last version)-->
+  	  <fileset id="launcher.id.all" dir="${env.ECLIPSE_HOME}/plugins/" includes="org.eclipse.equinox.launcher_*.jar" />
+  	  <last id="launcher.id" count="1"><fileset refid="launcher.id.all" /></last>
+	  <java classpath="${toString:launcher.id}" 
 	    	classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
 	 	<arg line="-application org.eclipse.equinox.p2.publisher.UpdateSitePublisher"/>
 	 	<arg line="-source ${updateSiteFolder}"/>
