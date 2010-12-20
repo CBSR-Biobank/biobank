@@ -274,7 +274,18 @@ class FilterRow extends Composite {
             combo.getComboViewer().add(suggestions.toArray());
             result = combo;
         } else if (isDateProperty) {
-            result = new DateTimeFilterValueWidget(inputContainer);
+            FilterOperator op = getOperator();
+
+            int style = SWT.DATE;
+            if (op != null
+                && !EnumSet.of(FilterOperator.SAME_DAY_AS_ANY,
+                    FilterOperator.SAME_WEEK_AS_ANY,
+                    FilterOperator.SAME_MONTH_AS_ANY,
+                    FilterOperator.SAME_YEAR_AS_ANY).contains(op)) {
+                style |= SWT.TIME;
+            }
+
+            result = new DateTimeFilterValueWidget(inputContainer, style);
         } else {
             result = new TextFilterValueWidget(inputContainer);
         }
