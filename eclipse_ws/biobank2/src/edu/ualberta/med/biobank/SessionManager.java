@@ -42,8 +42,6 @@ public class SessionManager {
 
     private static SessionManager instance = null;
 
-    private SessionsView view;
-
     private SessionAdapter sessionAdapter;
 
     private RootNode rootNode;
@@ -70,7 +68,6 @@ public class SessionManager {
     }
 
     public void setSessionsView(SessionsView view) {
-        this.view = view;
         addView(view);
         updateMenus();
     }

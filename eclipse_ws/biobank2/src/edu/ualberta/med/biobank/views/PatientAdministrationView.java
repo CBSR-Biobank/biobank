@@ -3,14 +3,10 @@ package edu.ualberta.med.biobank.views;
 import java.util.Arrays;
 import java.util.List;
 
-import org.eclipse.swt.widgets.Display;
-
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
-import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -44,8 +40,8 @@ public class PatientAdministrationView extends
         return null;
     }
 
-    @Override
-    public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
+    public static AdapterBase addToNode(AdapterBase parentNode,
+        ModelWrapper<?> wrapper) {
         if (wrapper instanceof PatientWrapper) {
             PatientWrapper patient = (PatientWrapper) wrapper;
             List<AdapterBase> res = parentNode.search(patient.getStudy());
@@ -80,33 +76,18 @@ public class PatientAdministrationView extends
             PatientWrapper patient = new PatientWrapper(
                 SessionManager.getAppService());
             patient.setPnumber(text);
-            openNewPatientForm(patient);
+            PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
+            adapter.openEntryForm();
         }
     }
 
-    public void openNewPatientForm(final PatientWrapper patient) {
-        patient.addWrapperListener(new WrapperListenerAdapter() {
-            @Override
-            public void inserted(WrapperEvent event) {
-                Display.getDefault().syncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        showSearchedObjectsInTree(Arrays.asList(patient), true);
-                    }
-                });
-            }
-        });
-        PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
-        adapter.openEntryForm();
-    }
-
     @Override
-    protected AbstractTodayNode getTodayNode() {
+    protected AbstractTodayNode createTodayNode() {
         return new PatientTodayNode(rootNode, 0);
     }
 
     @Override
-    protected AbstractSearchedNode getSearchedNode() {
+    protected AbstractSearchedNode createSearchedNode() {
         return new PatientSearchedNode(rootNode, 1);
     }
 
@@ -122,6 +103,11 @@ public class PatientAdministrationView extends
         return currentInstance;
     }
 
+    public static void reloadCurrent() {
+        if (currentInstance != null)
+            currentInstance.reload();
+    }
+
     @Override
     public String getId() {
         return ID;
@@ -135,6 +121,13 @@ public class PatientAdministrationView extends
     @Override
     protected String getString() {
         return toString();
+    }
+
+    public static void showPatient(PatientWrapper patient) {
+        if (currentInstance != null) {
+            currentInstance.showSearchedObjectsInTree(Arrays.asList(patient),
+                false);
+        }
     }
 
 }

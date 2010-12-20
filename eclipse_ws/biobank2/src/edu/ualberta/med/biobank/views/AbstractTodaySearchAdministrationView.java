@@ -23,21 +23,26 @@ public abstract class AbstractTodaySearchAdministrationView extends
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 
-        todayNode = getTodayNode();
+        todayNode = createTodayNode();
         todayNode.setParent(rootNode);
         rootNode.addChild(todayNode);
 
-        searchedNode = getSearchedNode();
+        searchedNode = createSearchedNode();
         searchedNode.setParent(rootNode);
         rootNode.addChild(searchedNode);
     }
 
-    protected abstract AbstractTodayNode getTodayNode();
+    protected abstract AbstractTodayNode createTodayNode();
 
-    protected abstract AbstractSearchedNode getSearchedNode();
+    protected abstract AbstractSearchedNode createSearchedNode();
 
-    public abstract AdapterBase addToNode(AdapterBase parentNode,
-        ModelWrapper<?> wrapper);
+    public AbstractTodayNode getTodayNode() {
+        return todayNode;
+    }
+
+    public AbstractSearchedNode getSearchedNode() {
+        return searchedNode;
+    }
 
     @Override
     protected void internalSearch() {
@@ -93,4 +98,5 @@ public abstract class AbstractTodaySearchAdministrationView extends
         todayNode.removeAll();
         searchedNode.clear();
     }
+
 }

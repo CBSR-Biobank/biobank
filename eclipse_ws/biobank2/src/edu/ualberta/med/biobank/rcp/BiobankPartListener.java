@@ -59,7 +59,8 @@ public class BiobankPartListener implements IPartListener {
 
     @Override
     public void partOpened(IWorkbenchPart part) {
-        if (part instanceof AbstractViewWithAdapterTree) {
+        if (part instanceof AbstractViewWithAdapterTree
+            && SessionManager.getInstance().isConnected()) {
             ((AbstractViewWithAdapterTree) part).opened();
         }
     }

@@ -45,6 +45,6 @@ public class PatientSearchedNode extends AbstractSearchedNode {
 
     @Override
     protected void addNode(ModelWrapper<?> wrapper) {
-        PatientAdministrationView.getCurrent().addToNode(this, wrapper);
+        PatientAdministrationView.addToNode(this, wrapper);
     }
 }

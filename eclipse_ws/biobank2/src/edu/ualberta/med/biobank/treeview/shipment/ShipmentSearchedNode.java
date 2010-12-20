@@ -46,6 +46,6 @@ public class ShipmentSearchedNode extends AbstractSearchedNode {
 
     @Override
     protected void addNode(ModelWrapper<?> wrapper) {
-        ShipmentAdministrationView.getCurrent().addToNode(this, wrapper);
+        ShipmentAdministrationView.addToNode(this, wrapper);
     }
 }

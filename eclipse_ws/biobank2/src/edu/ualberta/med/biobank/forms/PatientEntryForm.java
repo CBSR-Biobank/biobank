@@ -132,9 +132,9 @@ public class PatientEntryForm extends BiobankEntryForm {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                if (PatientAdministrationView.getCurrent() != null) {
-                    PatientAdministrationView.getCurrent().reload();
-                }
+                PatientAdministrationView.reloadCurrent();
+                PatientAdministrationView.showPatient(patientAdapter
+                    .getWrapper());
             }
         });
     }

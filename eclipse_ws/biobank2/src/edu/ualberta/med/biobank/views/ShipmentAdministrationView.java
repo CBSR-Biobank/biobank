@@ -149,21 +149,22 @@ public class ShipmentAdministrationView extends
         return null;
     }
 
-    @Override
-    public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
-        if (wrapper instanceof ShipmentWrapper) {
+    public static AdapterBase addToNode(AdapterBase parentNode,
+        ModelWrapper<?> wrapper) {
+        if (currentInstance != null && wrapper instanceof ShipmentWrapper) {
             ShipmentWrapper shipment = (ShipmentWrapper) wrapper;
 
             AdapterBase topNode = parentNode;
-            if (parentNode.equals(searchedNode) && !radioWaybill.getSelection()) {
-                Date date = dateReceivedWidget.getDate();
+            if (parentNode.equals(currentInstance.searchedNode)
+                && !currentInstance.radioWaybill.getSelection()) {
+                Date date = currentInstance.dateReceivedWidget.getDate();
                 List<AdapterBase> dateNodeRes = parentNode.search(date);
                 AdapterBase dateNode = null;
                 if (dateNodeRes.size() > 0)
                     dateNode = dateNodeRes.get(0);
                 else {
                     dateNode = new DateNode(parentNode,
-                        dateReceivedWidget.getDate());
+                        currentInstance.dateReceivedWidget.getDate());
                     parentNode.addChild(dateNode);
                 }
                 topNode = dateNode;
@@ -219,12 +220,12 @@ public class ShipmentAdministrationView extends
     }
 
     @Override
-    protected AbstractTodayNode getTodayNode() {
+    protected AbstractTodayNode createTodayNode() {
         return new ShipmentTodayNode(rootNode, 0);
     }
 
     @Override
-    protected AbstractSearchedNode getSearchedNode() {
+    protected AbstractSearchedNode createSearchedNode() {
         return new ShipmentSearchedNode(rootNode, 1);
     }
 
@@ -237,6 +238,11 @@ public class ShipmentAdministrationView extends
 
     public static ShipmentAdministrationView getCurrent() {
         return currentInstance;
+    }
+
+    public static void reloadCurrent() {
+        if (currentInstance != null)
+            currentInstance.reload();
     }
 
     public static ShipmentAdapter getCurrentShipment() {

@@ -93,11 +93,9 @@ public abstract class AbstractTodayNode extends AdapterBase {
                 assert wrapper instanceof PatientWrapper
                     || wrapper instanceof ShipmentWrapper;
                 if (wrapper instanceof PatientWrapper) {
-                    PatientAdministrationView.getCurrent().addToNode(this,
-                        wrapper);
+                    PatientAdministrationView.addToNode(this, wrapper);
                 } else if (wrapper instanceof ShipmentWrapper) {
-                    ShipmentAdministrationView.getCurrent().addToNode(this,
-                        wrapper);
+                    ShipmentAdministrationView.addToNode(this, wrapper);
                 }
             }
 

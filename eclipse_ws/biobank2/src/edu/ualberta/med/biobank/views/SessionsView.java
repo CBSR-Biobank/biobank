@@ -28,6 +28,11 @@ public class SessionsView extends AbstractViewWithAdapterTree {
         if (rootNode.hasChildren()) {
             getTreeViewer().expandToLevel(3);
         }
+        // will refresh and expand sites if open application on another view
+        getTreeViewer().refresh();
+        SessionAdapter session = (SessionAdapter) rootNode.getChild(0);
+        if (session != null)
+            session.getSitesGroupNode().performExpand();
     }
 
     @Override
