@@ -17,6 +17,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
@@ -355,29 +356,47 @@ public class ColumnSelectWidget extends Composite {
 
     private void displayColumns(ISelection selection) {
         if (selection instanceof IStructuredSelection) {
+            List<ReportColumnWrapper> toSelect = new ArrayList<ReportColumnWrapper>();
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
             Iterator<?> it = structuredSelection.iterator();
             while (it.hasNext()) {
                 Object o = it.next();
+                ReportColumnWrapper wrapper = null;
                 if (o instanceof EntityColumnWrapper) {
                     EntityColumnWrapper entityColumnWrapper = (EntityColumnWrapper) o;
-                    displayColumn(entityColumnWrapper);
+                    wrapper = displayColumn(entityColumnWrapper);
                 } else if (o instanceof PropertyModifierWrapper) {
                     PropertyModifierWrapper propertyModifierWrapper = (PropertyModifierWrapper) o;
-                    displayColumn(propertyModifierWrapper);
+                    wrapper = displayColumn(propertyModifierWrapper);
                 }
+
+                if (wrapper != null) {
+                    toSelect.add(wrapper);
+                }
+            }
+
+            // select what was just added to the display column list
+            if (!toSelect.isEmpty()) {
+                displayed.setSelection(new StructuredSelection(toSelect), true);
             }
         }
     }
 
     private void removeColumns(ISelection selection) {
         if (selection instanceof IStructuredSelection) {
+            List<EntityColumnWrapper> toSelect = new ArrayList<EntityColumnWrapper>();
             IStructuredSelection structuredSelection = (IStructuredSelection) selection;
             Iterator<?> it = structuredSelection.iterator();
             while (it.hasNext()) {
                 ReportColumnWrapper reportColumnWrapper = (ReportColumnWrapper) it
                     .next();
-                removeColumn(reportColumnWrapper);
+                EntityColumnWrapper wrapper = removeColumn(reportColumnWrapper);
+                toSelect.add(wrapper);
+            }
+
+            // select what was just added to the available column list
+            if (!toSelect.isEmpty()) {
+                available.setSelection(new StructuredSelection(toSelect), true);
             }
         }
     }
@@ -410,19 +429,21 @@ public class ColumnSelectWidget extends Composite {
         return null;
     }
 
-    private void displayColumn(ReportColumn reportColumn) {
+    private ReportColumnWrapper displayColumn(ReportColumn reportColumn) {
         EntityColumn entityColumn = reportColumn.getEntityColumn();
         removeAvailable(entityColumn);
-        addDisplayed(reportColumn);
+        return addDisplayed(reportColumn);
     }
 
-    private void displayColumn(EntityColumnWrapper entityColumnWrapper) {
+    private ReportColumnWrapper displayColumn(
+        EntityColumnWrapper entityColumnWrapper) {
         EntityColumn entityColumn = entityColumnWrapper.getEntityColumn();
         removeAvailable(entityColumn);
-        addDisplayed(entityColumn);
+        return addDisplayed(entityColumn);
     }
 
-    private void displayColumn(PropertyModifierWrapper propertyModifierWrapper) {
+    private ReportColumnWrapper displayColumn(
+        PropertyModifierWrapper propertyModifierWrapper) {
         EntityColumn entityColumn = propertyModifierWrapper
             .getEntityColumnWrapper().getEntityColumn();
         removeAvailable(entityColumn);
@@ -432,15 +453,17 @@ public class ColumnSelectWidget extends Composite {
         reportColumn.setPropertyModifier(propertyModifierWrapper
             .getPropertyModifier());
 
-        addDisplayed(reportColumn);
+        return addDisplayed(reportColumn);
     }
 
-    private void removeColumn(ReportColumnWrapper reportColumnWrapper) {
+    private EntityColumnWrapper removeColumn(
+        ReportColumnWrapper reportColumnWrapper) {
         removeDisplayed(reportColumnWrapper);
-        addAvailable(reportColumnWrapper.getReportColumn().getEntityColumn());
+        return addAvailable(reportColumnWrapper.getReportColumn()
+            .getEntityColumn());
     }
 
-    private void addAvailable(EntityColumn entityColumn) {
+    private EntityColumnWrapper addAvailable(EntityColumn entityColumn) {
         EntityColumnWrapper entityColumnWrapper = new EntityColumnWrapper(
             entityColumn);
 
@@ -448,14 +471,18 @@ public class ColumnSelectWidget extends Composite {
         Object o = getElement(available, entityColumnWrapper);
         if (o == null) {
             available.add(AVAILABLE_COLUMNS_ROOT_OBJECT, entityColumnWrapper);
+
+            return entityColumnWrapper;
         }
+
+        return (EntityColumnWrapper) o;
     }
 
     private void removeAvailable(EntityColumn entityColumn) {
         available.remove(new EntityColumnWrapper(entityColumn));
     }
 
-    private void addDisplayed(ReportColumn reportColumn) {
+    private ReportColumnWrapper addDisplayed(ReportColumn reportColumn) {
         int position = displayed.getTable().getItemCount();
         reportColumn.setPosition(position);
         ReportColumnWrapper wrapper = new ReportColumnWrapper(reportColumn);
@@ -466,13 +493,17 @@ public class ColumnSelectWidget extends Composite {
 
             EntityColumn entityColumn = reportColumn.getEntityColumn();
             notifyListeners(new ColumnChangeEvent(entityColumn));
+
+            return wrapper;
         }
+
+        return (ReportColumnWrapper) o;
     }
 
-    private void addDisplayed(EntityColumn entityColumn) {
+    private ReportColumnWrapper addDisplayed(EntityColumn entityColumn) {
         ReportColumn reportColumn = new ReportColumn();
         reportColumn.setEntityColumn(entityColumn);
-        addDisplayed(reportColumn);
+        return addDisplayed(reportColumn);
     }
 
     private void removeDisplayed(ReportColumnWrapper reportColumnWrapper) {
