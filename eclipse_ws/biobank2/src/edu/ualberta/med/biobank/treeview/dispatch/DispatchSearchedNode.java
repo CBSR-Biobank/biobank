@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.dispatch;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -38,11 +37,8 @@ public class DispatchSearchedNode extends AbstractSearchedNode {
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
-        if (searchedObject instanceof Date) {
-            Date date = (Date) searchedObject;
-            return Arrays.asList(getChild((int) date.getTime()));
-        } else
-            return findChildFromClass(searchedObject, DispatchWrapper.class);
+        return findChildFromClass(searchedObject, Date.class,
+            DispatchWrapper.class);
     }
 
     @Override

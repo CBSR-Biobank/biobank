@@ -27,6 +27,7 @@ public class PatientAdministrationView extends
     private static PatientAdministrationView currentInstance;
 
     public PatientAdministrationView() {
+        super();
         currentInstance = this;
         SessionManager.addView(this);
     }
@@ -129,6 +130,11 @@ public class PatientAdministrationView extends
     @Override
     protected String getTreeTextToolTip() {
         return "Enter a patient number and hit enter";
+    }
+
+    @Override
+    protected String getString() {
+        return toString();
     }
 
 }

@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.utils.BindingContextHelper;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
-import edu.ualberta.med.biobank.views.DispatchAdministrationView;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -84,8 +83,6 @@ public class SessionManager {
             serverName, user);
         rootNode.addChild(sessionAdapter);
 
-        rebuildSession();
-        rebuiltDispatch();
         updateMenus();
 
         if (sessionAdapter.getUser().passwordChangeRequired()) {
@@ -94,31 +91,20 @@ public class SessionManager {
             dlg.open();
         }
 
+        // for key binding contexts:
         BindingContextHelper
             .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
         BindingContextHelper
             .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
     }
 
-    private void rebuiltDispatch() {
-        DispatchAdministrationView view = DispatchAdministrationView
-            .getCurrent();
-        if (view == null)
-            return;
-        view.createNodes();
-    }
-
     public void deleteSession() throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
-        rootNode.removeChild(sessionAdapter);
-        DispatchAdministrationView view = DispatchAdministrationView
-            .getCurrent();
-        if (view != null) {
-            view.clear();
-        }
         sessionAdapter = null;
         updateMenus();
         ServiceConnection.logout(appService);
+
+        // for key binding contexts:
         BindingContextHelper
             .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
         BindingContextHelper
@@ -232,16 +218,6 @@ public class SessionManager {
     public static void addView(AbstractViewWithAdapterTree view) {
         getInstance().possibleViewMap.put(view.getId(), view);
         getInstance().currentAdministrationViewId = view.getId();
-    }
-
-    public void rebuildSession() {
-        SessionAdapter session = SessionManager.getInstance().getSession();
-        if (session != null) {
-            session.rebuild();
-        }
-        if (view != null) {
-            getSession().getSitesGroupNode().performExpand();
-        }
     }
 
     public static User getUser() {

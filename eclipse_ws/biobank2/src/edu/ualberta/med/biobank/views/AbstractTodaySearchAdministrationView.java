@@ -17,6 +17,8 @@ public abstract class AbstractTodaySearchAdministrationView extends
 
     protected AbstractSearchedNode searchedNode;
 
+    protected abstract String getString();
+
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
@@ -86,4 +88,9 @@ public abstract class AbstractTodaySearchAdministrationView extends
         super.reload();
     }
 
+    @Override
+    public void clear() {
+        todayNode.removeAll();
+        searchedNode.clear();
+    }
 }

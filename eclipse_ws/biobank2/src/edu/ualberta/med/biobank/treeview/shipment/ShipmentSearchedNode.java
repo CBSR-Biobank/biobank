@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.shipment;
 
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -41,11 +40,8 @@ public class ShipmentSearchedNode extends AbstractSearchedNode {
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
-        if (searchedObject instanceof Date) {
-            Date date = (Date) searchedObject;
-            return Arrays.asList(getChild((int) date.getTime()));
-        } else
-            return findChildFromClass(searchedObject, ClinicWrapper.class);
+        return findChildFromClass(searchedObject, Date.class,
+            ClinicWrapper.class);
     }
 
     @Override

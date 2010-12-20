@@ -225,10 +225,6 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
         return currentInstance;
     }
 
-    public void clear() {
-        rootNode.removeAll();
-    }
-
     @Override
     protected String getTreeTextToolTip() {
         return "Enter a dispatch waybill and hit enter";

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.treeview;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -646,14 +647,22 @@ public abstract class AdapterBase {
     }
 
     protected List<AdapterBase> findChildFromClass(Object searchedObject,
-        Class<?> clazz) {
-        if (clazz.isAssignableFrom(searchedObject.getClass())) {
-            List<AdapterBase> res = new ArrayList<AdapterBase>();
-            AdapterBase child = getChild((ModelWrapper<?>) searchedObject, true);
-            if (child != null) {
-                res.add(child);
+        Class<?>... clazzList) {
+        for (Class<?> clazz : clazzList) {
+            if (clazz.isAssignableFrom(searchedObject.getClass())) {
+                List<AdapterBase> res = new ArrayList<AdapterBase>();
+                AdapterBase child = null;
+                if (ModelWrapper.class.isAssignableFrom(clazz))
+                    child = getChild((ModelWrapper<?>) searchedObject, true);
+                else if (Date.class.isAssignableFrom(clazz))
+                    child = getChild((int) ((Date) searchedObject).getTime());
+                else if (Integer.class.isAssignableFrom(clazz))
+                    child = getChild((Integer) searchedObject);
+                if (child != null) {
+                    res.add(child);
+                }
+                return res;
             }
-            return res;
         }
         return searchChildren(searchedObject);
     }

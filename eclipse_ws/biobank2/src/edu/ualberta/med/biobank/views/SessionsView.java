@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 
 /**
@@ -31,7 +32,11 @@ public class SessionsView extends AbstractViewWithAdapterTree {
 
     @Override
     public void reload() {
-        SessionManager.getInstance().rebuildSession();
+        SessionAdapter session = (SessionAdapter) rootNode.getChild(0);
+        if (session != null) {
+            session.rebuild();
+            session.getSitesGroupNode().performExpand();
+        }
     }
 
     @Override
