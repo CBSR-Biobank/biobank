@@ -14,7 +14,6 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
@@ -25,8 +24,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AbstractSearchedNode.class.getName());
 
-    private List<ModelWrapper<?>> searchedObjects =
-        new ArrayList<ModelWrapper<?>>();
+    private List<ModelWrapper<?>> searchedObjects = new ArrayList<ModelWrapper<?>>();
 
     private boolean keepDirectLeafChild;
 
@@ -51,52 +49,49 @@ public abstract class AbstractSearchedNode extends AdapterBase {
 
     @Override
     public void performExpand() {
-        if (!SessionManager.getInstance().isAllSitesSelected()) {
-            try {
-                for (AdapterBase child : getChildren()) {
-                    ModelWrapper<?> childWrapper = child.getModelObject();
-                    if (childWrapper != null) {
-                        childWrapper.reload();
-                    }
-                    List<AdapterBase> subChildren =
-                        new ArrayList<AdapterBase>(child.getChildren());
-                    for (AdapterBase subChild : subChildren) {
-                        ModelWrapper<?> subChildWrapper =
-                            subChild.getModelObject();
-                        subChildWrapper.reload();
-                        if (!searchedObjects.contains(subChildWrapper)
-                            || !isParentTo(childWrapper, subChildWrapper)) {
-                            subChild.getParent().removeChild(subChild);
-                        }
+        try {
+            for (AdapterBase child : getChildren()) {
+                ModelWrapper<?> childWrapper = child.getModelObject();
+                if (childWrapper != null) {
+                    childWrapper.reload();
+                }
+                List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
+                    child.getChildren());
+                for (AdapterBase subChild : subChildren) {
+                    ModelWrapper<?> subChildWrapper = subChild.getModelObject();
+                    subChildWrapper.reload();
+                    if (!searchedObjects.contains(subChildWrapper)
+                        || !isParentTo(childWrapper, subChildWrapper)) {
+                        subChild.getParent().removeChild(subChild);
                     }
                 }
-
-                // add searched objects is not yet there
-                for (final ModelWrapper<?> wrapper : searchedObjects) {
-                    wrapper.addWrapperListener(new WrapperListenerAdapter() {
-                        @Override
-                        public void deleted(WrapperEvent event) {
-                            searchedObjects.remove(wrapper);
-                        }
-                    });
-                    addNode(wrapper);
-                }
-
-                if (!keepDirectLeafChild) {
-                    // remove sub children without any children
-                    List<AdapterBase> children =
-                        new ArrayList<AdapterBase>(getChildren());
-                    for (AdapterBase child : children) {
-                        if (child.getChildren().size() == 0) {
-                            removeChild(child);
-                        }
-                    }
-                }
-            } catch (final RemoteAccessException exp) {
-                BioBankPlugin.openRemoteAccessErrorMessage(exp);
-            } catch (Exception e) {
-                logger.error("Error while refreshing searched elements", e);
             }
+
+            // add searched objects is not yet there
+            for (final ModelWrapper<?> wrapper : searchedObjects) {
+                wrapper.addWrapperListener(new WrapperListenerAdapter() {
+                    @Override
+                    public void deleted(WrapperEvent event) {
+                        searchedObjects.remove(wrapper);
+                    }
+                });
+                addNode(wrapper);
+            }
+
+            if (!keepDirectLeafChild) {
+                // remove sub children without any children
+                List<AdapterBase> children = new ArrayList<AdapterBase>(
+                    getChildren());
+                for (AdapterBase child : children) {
+                    if (child.getChildren().size() == 0) {
+                        removeChild(child);
+                    }
+                }
+            }
+        } catch (final RemoteAccessException exp) {
+            BioBankPlugin.openRemoteAccessErrorMessage(exp);
+        } catch (Exception e) {
+            logger.error("Error while refreshing searched elements", e);
         }
     }
 

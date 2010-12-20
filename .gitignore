@@ -11,10 +11,10 @@ eclipse_ws/biobank.common/conf/*.xml
 eclipse_ws/biobank.common/lib/*.jar
 eclipse_ws/biobank.common/lib/client/*.jar
 eclipse_ws/biobank.common/lib/server/*.jar
-eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/test
-eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/test
+eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/test/
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/VarCharLengths.java
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/VarCharLengths.properties
+eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/version.properties
 eclipse_ws/biobank2.importer/bin
 eclipse_ws/biobank2.importer/conf
 eclipse_ws/biobank2.importer/lib/*
@@ -29,10 +29,13 @@ eclipse_ws/biobank2/bin
 eclipse_ws/biobank2/conf
 eclipse_ws/biobank2/lib/*.jar
 eclipse_ws/biobank2/log
+eclipse_ws/biobank2/about.mappings
 eclipse_ws/biobank2/scanlib.*
+eclipse_ws/biobank2/about.mappings
 eclipse_ws/biobank2/src/edu/ualberta/med/biobank/test
 eclipse_ws/biobank2.ws-client/bin
 eclipse_ws/biobank2.ws-client/lib/*.jar
+eclipse_ws/biobank2/dmscanlib.txt
 log/
 model/*.png
 model/biobank2.uml~
@@ -42,3 +45,5 @@ runtime-biobank2.biobank2
 runtime-biobank2.product/
 runtime-biobank2.product1/
 schema/schema-export.sql
+product/buildDirectory
+product/output.txt

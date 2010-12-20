@@ -355,16 +355,10 @@ public abstract class AdapterBase {
             @Override
             public void run() {
                 loadChildren(true);
-                try {
-                    loadChildrenSemaphore.acquire();
-                } catch (InterruptedException e) {
-                    BioBankPlugin.openAsyncError("Child expand failed", e);
-                }
                 RootNode root = getRootNode();
                 if (root != null) {
                     root.expandChild(AdapterBase.this);
                 }
-                loadChildrenSemaphore.release();
             }
         });
     }
@@ -399,7 +393,6 @@ public abstract class AdapterBase {
                         SessionManager.updateAdapterTreeNode(node);
                     }
                 }
-                notifyListeners();
                 SessionManager.refreshTreeNode(AdapterBase.this);
             }
         } catch (final RemoteAccessException exp) {
@@ -458,7 +451,7 @@ public abstract class AdapterBase {
                                 Assert.isNotNull(node);
                                 node.setModelObject(child);
                                 final AdapterBase nodeToUpdate = node;
-                                Display.getDefault().asyncExec(new Runnable() {
+                                Display.getDefault().syncExec(new Runnable() {
                                     @Override
                                     public void run() {
                                         SessionManager
@@ -471,7 +464,6 @@ public abstract class AdapterBase {
                                 public void run() {
                                     SessionManager
                                         .refreshTreeNode(AdapterBase.this);
-                                    notifyListeners();
                                 }
                             });
                         }
@@ -527,15 +519,14 @@ public abstract class AdapterBase {
         });
     }
 
-    protected void addDeleteMenu(Menu menu, String objectName,
-        final String question) {
+    protected void addDeleteMenu(Menu menu, String objectName) {
         if (isDeletable()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Delete " + objectName);
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    delete(question);
+                    deleteWithConfirm();
                 }
             });
         }
@@ -666,14 +657,15 @@ public abstract class AdapterBase {
         }
     }
 
-    public void delete() {
-        delete(null);
-    }
-
-    public void delete(String message) {
+    public void deleteWithConfirm() {
+        String msg = getConfirmDeleteMessage();
+        if (msg == null) {
+            throw new RuntimeException("adapter has no confirm delete msg: "
+                + getClass().getName());
+        }
         boolean doDelete = true;
-        if (message != null)
-            doDelete = BioBankPlugin.openConfirm("Confirm Delete", message);
+        if (msg != null)
+            doDelete = BioBankPlugin.openConfirm("Confirm Delete", msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -695,22 +687,15 @@ public abstract class AdapterBase {
         }
     }
 
-    public void deleteWithConfirm() {
-        String msg = getConfirmDeleteMessage();
-        if (msg == null) {
-            throw new RuntimeException("adapter has no confirm delete msg: "
-                + getClass().getName());
-        }
-        delete(msg);
-    }
-
     public boolean isDeletable() {
         // should override it to activate deletion
         return false;
     }
 
     protected boolean internalIsDeletable() {
-        return editable && modelObject.canDelete(SessionManager.getUser());
+        return editable && modelObject != null
+            && SessionManager.getInstance().isConnected()
+            && modelObject.canDelete(SessionManager.getUser());
     }
 
     public boolean isEditable() {

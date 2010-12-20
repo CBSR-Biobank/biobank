@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
@@ -47,9 +46,9 @@ public class DispatchViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchViewForm";
 
-    private DispatchAdapter shipmentAdapter;
+    private DispatchAdapter dispatchAdapter;
 
-    private DispatchWrapper shipment;
+    private DispatchWrapper dispatch;
 
     private BiobankText studyLabel;
 
@@ -79,47 +78,47 @@ public class DispatchViewForm extends BiobankViewForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        shipmentAdapter = (DispatchAdapter) adapter;
-        shipment = (DispatchWrapper) adapter.getModelObject();
-        retrieveShipment();
+        dispatchAdapter = (DispatchAdapter) adapter;
+        dispatch = (DispatchWrapper) adapter.getModelObject();
+        retrieveDispatch();
         setPartName("Dispatch");
     }
 
-    private void retrieveShipment() {
+    private void retrieveDispatch() {
         try {
-            shipment.reload();
+            dispatch.reload();
         } catch (Exception ex) {
             logger.error(
-                "Error while retrieving shipment " + shipment.getWaybill(), ex);
+                "Error while retrieving shipment " + dispatch.getWaybill(), ex);
         }
     }
 
     @Override
     public void reload() throws Exception {
-        retrieveShipment();
-        setPartName("Dispatch sent on " + shipment.getDeparted());
-        setShipmentValues();
+        retrieveDispatch();
+        setPartName("Dispatch sent on " + dispatch.getDeparted());
+        setDispatchValues();
         aliquotsTree.refresh();
     }
 
     @Override
     protected void createFormContent() throws Exception {
         String dateString = "";
-        if (shipment.getDeparted() != null) {
-            dateString = " on " + shipment.getFormattedDeparted();
+        if (dispatch.getDeparted() != null) {
+            dateString = " on " + dispatch.getFormattedDeparted();
         }
         canSeeEverything = true;
-        if (shipment.getSender() == null) {
+        if (dispatch.getSender() == null) {
             canSeeEverything = false;
             BioBankPlugin
                 .openAsyncError(
                     "Access Denied",
                     "It seems you don't have access to the sender site. Please see administrator to resolve this problem.");
         } else {
-            form.setText("Shipment sent" + dateString + " from "
-                + shipment.getSender().getNameShort());
+            form.setText("Dispatch sent" + dateString + " from "
+                + dispatch.getSender().getNameShort());
         }
-        if (shipment.getReceiver() == null) {
+        if (dispatch.getReceiver() == null) {
             canSeeEverything = false;
             BioBankPlugin
                 .openAsyncError(
@@ -135,16 +134,15 @@ public class DispatchViewForm extends BiobankViewForm {
             createTreeTableSection();
         }
 
-        setShipmentValues();
+        setDispatchValues();
 
         if (canSeeEverything) {
             User user = SessionManager.getUser();
-            SiteWrapper currentSite = SessionManager.getCurrentSite();
-            if (shipment.canBeSentBy(user, currentSite))
+            if (dispatch.canBeSentBy(user))
                 createSendButton();
-            else if (shipment.canBeReceivedBy(user, currentSite))
+            else if (dispatch.canBeReceivedBy(user))
                 createReceiveButtons();
-            else if (shipment.canBeClosedBy(user, currentSite))
+            else if (dispatch.canBeClosedBy(user))
                 createCloseButton();
         }
     }
@@ -157,19 +155,19 @@ public class DispatchViewForm extends BiobankViewForm {
     }
 
     private void createTreeTableSection() {
-        if (shipment.isInCreationState()) {
+        if (dispatch.isInCreationState()) {
             Composite parent = createSectionWithClient("Aliquot added");
             aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(
-                parent, shipment, false) {
+                parent, dispatch, false) {
                 @Override
                 public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
-                    return shipment.getNonProcessedDispatchAliquotCollection();
+                    return dispatch.getNonProcessedDispatchAliquotCollection();
                 }
 
             };
             aliquotsNonProcessedTable.adaptToToolkit(toolkit, true);
             aliquotsNonProcessedTable
-                .addDoubleClickListener(new IDoubleClickListener() {
+                .addClickListener(new IDoubleClickListener() {
                     @Override
                     public void doubleClick(DoubleClickEvent event) {
                         Object selection = event.getSelection();
@@ -191,7 +189,7 @@ public class DispatchViewForm extends BiobankViewForm {
                     }
                 });
         } else {
-            aliquotsTree = new DispatchAliquotsTreeTable(page, shipment, false,
+            aliquotsTree = new DispatchAliquotsTreeTable(page, dispatch, false,
                 false);
         }
     }
@@ -204,7 +202,7 @@ public class DispatchViewForm extends BiobankViewForm {
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                shipmentAdapter.doReceive();
+                dispatchAdapter.doReceive();
             }
         });
 
@@ -213,7 +211,7 @@ public class DispatchViewForm extends BiobankViewForm {
         sendProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                shipmentAdapter.doReceiveAndProcess();
+                dispatchAdapter.doReceiveAndProcess();
             }
         });
 
@@ -222,7 +220,7 @@ public class DispatchViewForm extends BiobankViewForm {
         lostProcessButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                shipmentAdapter.doSetAsLost();
+                dispatchAdapter.doSetAsLost();
             }
         });
     }
@@ -234,7 +232,7 @@ public class DispatchViewForm extends BiobankViewForm {
         sendButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                shipmentAdapter.doClose();
+                dispatchAdapter.doClose();
             }
         });
     }
@@ -245,7 +243,7 @@ public class DispatchViewForm extends BiobankViewForm {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 if (new SendDispatchDialog(Display.getDefault()
-                    .getActiveShell(), shipment).open() == Dialog.OK) {
+                    .getActiveShell(), dispatch).open() == Dialog.OK) {
                     IRunnableContext context = new ProgressMonitorDialog(
                         Display.getDefault().getActiveShell());
                     try {
@@ -254,9 +252,9 @@ public class DispatchViewForm extends BiobankViewForm {
                             public void run(final IProgressMonitor monitor) {
                                 monitor.beginTask("Saving...",
                                     IProgressMonitor.UNKNOWN);
-                                shipment.setInTransitState();
+                                dispatch.setInTransitState();
                                 try {
-                                    shipment.persist();
+                                    dispatch.persist();
                                 } catch (final RemoteConnectFailureException exp) {
                                     BioBankPlugin
                                         .openRemoteConnectErrorMessage(exp);
@@ -281,7 +279,7 @@ public class DispatchViewForm extends BiobankViewForm {
                         BioBankPlugin.openAsyncError("Save error", e1);
                     }
                     DispatchAdministrationView.getCurrent().reload();
-                    shipmentAdapter.openViewForm();
+                    dispatchAdapter.openViewForm();
                 }
             }
         });
@@ -296,10 +294,10 @@ public class DispatchViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         String stateMessage = null;
-        if (shipment.isInLostState())
-            stateMessage = " Shipment Lost ";
-        else if (shipment.isInClosedState())
-            stateMessage = " Shipment Closed ";
+        if (dispatch.isInLostState())
+            stateMessage = " Dispatch Lost ";
+        else if (dispatch.isInClosedState())
+            stateMessage = " Dispatch Closed ";
         if (stateMessage != null) {
             Label label = widgetCreator.createLabel(client, stateMessage,
                 SWT.CENTER, false);
@@ -318,7 +316,7 @@ public class DispatchViewForm extends BiobankViewForm {
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
         receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Receiver");
-        if (!shipment.isInCreationState()) {
+        if (!dispatch.isInCreationState()) {
             departedLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 "Departed");
             shippingMethodLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -326,7 +324,7 @@ public class DispatchViewForm extends BiobankViewForm {
             waybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 "Waybill");
         }
-        if (shipment.hasBeenReceived()) {
+        if (dispatch.hasBeenReceived()) {
             dateReceivedLabel = createReadOnlyLabelledField(client, SWT.NONE,
                 "Date received");
         }
@@ -334,25 +332,25 @@ public class DispatchViewForm extends BiobankViewForm {
             "Comments");
     }
 
-    private void setShipmentValues() {
-        setTextValue(studyLabel, shipment.getStudy().getName());
+    private void setDispatchValues() {
+        setTextValue(studyLabel, dispatch.getStudy().getName());
         setTextValue(senderLabel,
-            shipment.getSender() == null ? " ACCESS DENIED" : shipment
+            dispatch.getSender() == null ? " ACCESS DENIED" : dispatch
                 .getSender().getName());
         setTextValue(receiverLabel,
-            shipment.getReceiver() == null ? "ACCESS DENIED" : shipment
+            dispatch.getReceiver() == null ? "ACCESS DENIED" : dispatch
                 .getReceiver().getName());
         if (departedLabel != null)
-            setTextValue(departedLabel, shipment.getFormattedDeparted());
+            setTextValue(departedLabel, dispatch.getFormattedDeparted());
         if (shippingMethodLabel != null)
             setTextValue(shippingMethodLabel,
-                shipment.getShippingMethod() == null ? "" : shipment
+                dispatch.getShippingMethod() == null ? "" : dispatch
                     .getShippingMethod().getName());
         if (waybillLabel != null)
-            setTextValue(waybillLabel, shipment.getWaybill());
+            setTextValue(waybillLabel, dispatch.getWaybill());
         if (dateReceivedLabel != null)
-            setTextValue(dateReceivedLabel, shipment.getFormattedDateReceived());
-        setTextValue(commentLabel, shipment.getComment());
+            setTextValue(dateReceivedLabel, dispatch.getFormattedDateReceived());
+        setTextValue(commentLabel, dispatch.getComment());
     }
 
 }

@@ -12,9 +12,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
 import edu.ualberta.med.biobank.views.DispatchAdministrationView;
@@ -27,9 +25,7 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AbstractShipmentEntryForm.class.getName());
 
-    protected SiteWrapper site;
-
-    protected DispatchWrapper shipment;
+    protected DispatchWrapper dispatch;
 
     protected BiobankEntryFormWidgetListener biobankListener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -46,11 +42,7 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        shipment = (DispatchWrapper) adapter.getModelObject();
-        site = SessionManager.getCurrentSite();
-        if (shipment.isNew()) {
-            shipment.setSender(site);
-        }
+        dispatch = (DispatchWrapper) adapter.getModelObject();
         retrieveShipment();
 
         setPartName(getTextForPartName());
@@ -58,10 +50,10 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
 
     private void retrieveShipment() {
         try {
-            shipment.reload();
+            dispatch.reload();
         } catch (Exception ex) {
             logger.error(
-                "Error while retrieving shipment " + shipment.getWaybill(), ex);
+                "Error while retrieving shipment " + dispatch.getWaybill(), ex);
         }
     }
 
@@ -115,12 +107,8 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        shipment.persist();
-        // adapter.getParent().performExpand();
-        // FIXME: Would prefer to use this call, but in cases of errors
-        // sometimes tree structure can change
-        // This reload call results in more searches when interacting with the
-        // form (tree becomes out of sync with adapters in forms)
+        dispatch.persist();
+
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {

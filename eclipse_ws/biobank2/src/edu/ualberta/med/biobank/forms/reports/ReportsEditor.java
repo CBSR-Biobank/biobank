@@ -215,6 +215,11 @@ public abstract class ReportsEditor extends BiobankFormBase implements
     }
 
     private void generate() {
+        try {
+            initReport();
+        } catch (Exception e1) {
+            BioBankPlugin.openAsyncError("Failed to load parameters", e1);
+        }
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
         try {
@@ -237,12 +242,6 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                             throws ApplicationException {
                             return report.generate(SessionManager
                                 .getAppService());
-                            // TODO: FIXME
-                            /*
-                             * if (report instanceof QueryObject) { return
-                             * ((QueryObject) report).generate(
-                             * SessionManager.getAppService(), params); }
-                             */
                         }
                     };
                     monitor.beginTask("Generating Report...",

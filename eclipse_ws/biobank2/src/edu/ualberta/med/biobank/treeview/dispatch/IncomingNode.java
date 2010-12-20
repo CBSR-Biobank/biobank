@@ -7,6 +7,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class IncomingNode extends AdapterBase {
@@ -15,17 +16,18 @@ public class IncomingNode extends AdapterBase {
     private ReceivingNoErrorsDispatchGroup receivingNode;
     private ReceivingWithErrorsDispatchGroup receivingWithErrorsNode;
 
-    public IncomingNode(AdapterBase parent, int id) {
+    public IncomingNode(AdapterBase parent, int id, SiteWrapper site) {
         super(parent, id, "Incoming", true, false);
-        receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0);
+        receivedTransitNode = new ReceivingInTransitDispatchGroup(this, 0, site);
         receivedTransitNode.setParent(this);
         addChild(receivedTransitNode);
 
-        receivingNode = new ReceivingNoErrorsDispatchGroup(this, 1);
+        receivingNode = new ReceivingNoErrorsDispatchGroup(this, 1, site);
         receivingNode.setParent(this);
         addChild(receivingNode);
 
-        receivingWithErrorsNode = new ReceivingWithErrorsDispatchGroup(this, 2);
+        receivingWithErrorsNode = new ReceivingWithErrorsDispatchGroup(this, 2,
+            site);
         receivingWithErrorsNode.setParent(this);
         addChild(receivingWithErrorsNode);
 

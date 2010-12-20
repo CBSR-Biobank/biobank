@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.ShipmentPatient;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -128,11 +129,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public List<PatientVisitWrapper> getPatientVisitCollection() {
-        return getPatientVisitCollection(true, false);
+        return getPatientVisitCollection(true, false, null);
     }
 
     public List<PatientVisitWrapper> getPatientVisitCollection(boolean sort,
-        final boolean ascending) {
+        final boolean ascending, SiteWrapper site) {
         // TODO: gee, I hope that when you modify this collection it isn't meant
         // to modify the internals of the PatientWrapper object. Ask Delphine.
         List<PatientVisitWrapper> patientVisitCollection = null;
@@ -140,7 +141,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         if (csps != null && csps.size() > 0) {
             patientVisitCollection = new ArrayList<PatientVisitWrapper>();
             for (ShipmentPatientWrapper csp : csps) {
-                patientVisitCollection.addAll(csp.getPatientVisitCollection());
+                if (site == null || (csp.getShipment().getSite().equals(site)))
+                    patientVisitCollection.addAll(csp
+                        .getPatientVisitCollection());
             }
         }
         if (sort && patientVisitCollection != null) {
@@ -299,7 +302,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         if (csps != null) {
             for (ShipmentPatientWrapper csp : csps) {
                 ShipmentWrapper ship = csp.getShipment();
-                if (user == null || user.canUpdateSite(ship.getSite())) {
+                if (user != null && user.canUpdateSite(ship.getSite())) {
                     shipmentCollection.add(ship);
                 }
             }
@@ -362,10 +365,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private void checkNoMorePatientVisits() throws BiobankCheckException {
-        List<PatientVisitWrapper> patients = getPatientVisitCollection();
-        if (patients != null && patients.size() > 0) {
+        List<PatientVisitWrapper> pvs = getPatientVisitCollection();
+        if (pvs != null && pvs.size() > 0) {
             throw new BiobankCheckException(
-                "Visits are still linked to this patient. Delete them before attempting to remove the patient.");
+                "Visits are still linked to this patient."
+                    + " Delete them before attempting to remove the patient.");
         }
     }
 
@@ -417,8 +421,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public static List<PatientWrapper> getPatientsInTodayShipments(
-        WritableApplicationService appService, SiteWrapper site)
-        throws ApplicationException {
+        WritableApplicationService appService) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // yesterday midnight
         cal.set(Calendar.AM_PM, Calendar.AM);
@@ -432,9 +435,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         HQLCriteria criteria = new HQLCriteria("select p from "
             + Patient.class.getName()
             + " as p join p.shipmentPatientCollection as csps"
-            + " join csps.shipment as ships" + " where ships.site.id = ?"
+            + " join csps.shipment as ships" + " where ships.site is not null"
             + " and ships.dateReceived >= ? and ships.dateReceived <= ?",
-            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+            Arrays.asList(new Object[] { startDate, endDate }));
         List<Patient> res = appService.query(criteria);
         List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
         for (Patient p : res) {
@@ -443,7 +446,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patients;
     }
 
-    public List<PatientVisitWrapper> getLast7DaysPatientVisits()
+    public List<PatientVisitWrapper> getLast7DaysPatientVisits(SiteWrapper site)
         throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // today midnight
@@ -461,8 +464,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                 + Patient.class.getName()
                 + " as p join p.shipmentPatientCollection as csps"
                 + " join csps.patientVisitCollection as visits"
-                + " where p.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
-            Arrays.asList(new Object[] { getId(), startDate, endDate }));
+                + " where p.id = ? and csps.shipment.site.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
+            Arrays.asList(new Object[] { getId(), site.getId(), startDate,
+                endDate }));
         List<PatientVisit> res = appService.query(criteria);
         List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
         for (PatientVisit v : res) {
@@ -500,5 +504,44 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             }
         }
         return false;
+    }
+
+    /**
+     * merge patient2 into this patient
+     */
+    public void merge(PatientWrapper patient2) throws Exception {
+        reload();
+        patient2.reload();
+        if (getStudy().equals(patient2.getStudy())) {
+            List<PatientVisitWrapper> pvs = patient2
+                .getPatientVisitCollection();
+            if (pvs != null)
+                for (PatientVisitWrapper pv : pvs) {
+                    ShipmentWrapper shipment = pv.getShipment();
+                    shipment.addPatients(Arrays.asList(this));
+                    shipment.persist();
+
+                    pv.setPatient(this);
+                    pv.persist();
+
+                    patient2.reload();
+                    shipment.reload();
+                    shipment.removePatients(Arrays.asList(patient2));
+                    shipment.persist();
+                }
+
+            patient2.reload();
+            patient2.delete();
+
+            ((BiobankApplicationService) appService).logActivity("merge", null,
+                patient2.getPnumber(), null, null, patient2.getPnumber()
+                    + " --> " + getPnumber(), "Patient");
+            ((BiobankApplicationService) appService).logActivity("merge", null,
+                getPnumber(), null, null,
+                getPnumber() + " <-- " + patient2.getPnumber(), "Patient");
+        } else {
+            throw new BiobankCheckException(
+                "Cannot merge patients from different studies.");
+        }
     }
 }

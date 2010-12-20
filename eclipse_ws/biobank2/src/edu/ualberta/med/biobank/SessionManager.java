@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.IViewPart;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.rcp.SiteCombo;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
@@ -27,13 +26,19 @@ import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
+import edu.ualberta.med.biobank.utils.BindingContextHelper;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
+import edu.ualberta.med.biobank.views.DispatchAdministrationView;
+import edu.ualberta.med.biobank.views.RequestAdministrationView;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class SessionManager {
+
+    public static final String BIOBANK2_CONTEXT_LOGGED_OUT = "biobank2.context.loggedOut";
+
+    public static final String BIOBANK2_CONTEXT_LOGGED_IN = "biobank2.context.loggedIn";
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SessionManager.class.getName());
@@ -48,10 +53,6 @@ public class SessionManager {
 
     private RootNode rootNode;
 
-    private SiteCombo siteCombo;
-
-    private SiteManager siteManager;
-
     /**
      * Map a perspective ID to a AbstractViewWithTree instance visible when the
      * perspective is set
@@ -62,7 +63,6 @@ public class SessionManager {
         super();
         rootNode = new RootNode();
         possibleViewMap = new HashMap<String, AbstractViewWithAdapterTree>();
-        siteManager = new SiteManager();
     }
 
     public static SessionManager getInstance() {
@@ -86,29 +86,53 @@ public class SessionManager {
             serverName, user);
         rootNode.addChild(sessionAdapter);
 
-        siteManager.init(appService, serverName);
-        Assert.isNotNull(siteCombo, "site combo is null");
-        siteManager.setSiteCombo(siteCombo);
-        siteManager.selectCurrentSite(serverName, sites);
-        siteManager.updateSites(sites);
-
         rebuildSession();
+        rebuiltDispatch();
+        rebuildRequest();
         updateMenus();
 
-        if (sessionAdapter.getUser().isNeedToChangePassword()) {
+        if (sessionAdapter.getUser().passwordChangeRequired()) {
             ChangePasswordDialog dlg = new ChangePasswordDialog(PlatformUI
                 .getWorkbench().getActiveWorkbenchWindow().getShell(), true);
             dlg.open();
         }
+
+        BindingContextHelper
+            .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
+        BindingContextHelper
+            .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
+    }
+
+    private void rebuildRequest() {
+        RequestAdministrationView view = RequestAdministrationView.getCurrent();
+        if (view == null)
+            return;
+        view.createNodes();
+    }
+
+    private void rebuiltDispatch() {
+        DispatchAdministrationView view = DispatchAdministrationView
+            .getCurrent();
+        if (view == null)
+            return;
+        view.createNodes();
     }
 
     public void deleteSession() throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
-        siteManager.setEnabled(false);
         rootNode.removeChild(sessionAdapter);
+        DispatchAdministrationView view = DispatchAdministrationView
+            .getCurrent();
+        if (view != null) {
+            view.clear();
+        }
         sessionAdapter = null;
         updateMenus();
         ServiceConnection.logout(appService);
+        BindingContextHelper
+            .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
+        BindingContextHelper
+            .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
     }
 
     public void updateSession() {
@@ -134,14 +158,6 @@ public class SessionManager {
             .getSourceProvider(DebugState.SESSION_STATE);
         debugStateSourceProvider.setState(BioBankPlugin.getDefault()
             .isDebugging());
-
-        int menusize = window.getShell().getMenuBar().getItemCount();
-        MenuItem help = window.getShell().getMenuBar().getItem(menusize - 1);
-        MenuItem[] items = help.getMenu().getItems();
-        for (MenuItem item : items) {
-            item.setEnabled(sessionAdapter != null);
-        }
-
     }
 
     public SessionAdapter getSession() {
@@ -200,12 +216,13 @@ public class SessionManager {
 
     public static AbstractViewWithAdapterTree getCurrentAdapterViewWithTree() {
         IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
-        if (workbench != null) {
+        if (workbench != null && !workbench.isClosing()) {
             workbenchWindow = workbench.getActiveWorkbenchWindow();
             if (workbenchWindow != null) {
-                IWorkbenchPage activePage = workbenchWindow.getActivePage();
-                return getInstance().possibleViewMap.get(activePage
-                    .getPerspective().getId());
+                IWorkbenchPage page = workbenchWindow.getActivePage();
+                for (IViewPart view : getInstance().possibleViewMap.values())
+                    if (page.isPartVisible(view))
+                        return (AbstractViewWithAdapterTree) view;
             }
         }
         return null;
@@ -223,43 +240,6 @@ public class SessionManager {
         return rootNode;
     }
 
-    public static SiteWrapper getCurrentSite() {
-        return getInstance().siteManager.getCurrentSite();
-    }
-
-    public void setSiteManagerEnabled(boolean enable) {
-        Assert.isNotNull(siteManager, "site manager is null");
-        siteManager.setEnabled(enable);
-    }
-
-    public void lockSite() {
-        Assert.isNotNull(siteManager, "site manager is null");
-        siteManager.lockSite();
-    }
-
-    public void unlockSite() {
-        Assert.isNotNull(siteManager, "site manager is null");
-        siteManager.unlockSite();
-    }
-
-    public boolean isAllSitesSelected() {
-        Assert.isNotNull(siteManager, "site manager is null");
-        return siteManager.isAllSitesSelected();
-    }
-
-    public void setSiteCombo(SiteCombo siteCombo) {
-        this.siteCombo = siteCombo;
-    }
-
-    public SiteCombo getSiteCombo() {
-        return this.siteCombo;
-    }
-
-    public void updateSites() {
-        Assert.isNotNull(siteManager, "site manager is null");
-        siteManager.updateSites();
-    }
-
     public static void addView(String perspectiveId,
         AbstractViewWithAdapterTree view) {
         getInstance().possibleViewMap.put(perspectiveId, view);
@@ -271,15 +251,6 @@ public class SessionManager {
             session.rebuild();
         }
         if (view != null) {
-            if (!isAllSitesSelected()) {
-                SiteAdapter site = (SiteAdapter) getSession()
-                    .getSitesGroupNode().search(getCurrentSite());
-                if (site != null) {
-                    site.performExpand();
-                    return;
-                }
-            }
-            // if allsite selected or can't find the site node
             getSession().getSitesGroupNode().performExpand();
         }
     }
@@ -331,7 +302,17 @@ public class SessionManager {
 
     public static void log(String action, String details, String type)
         throws Exception {
-        getAppService().logActivity(action, getCurrentSite().getNameShort(),
-            null, null, null, details, type);
+        getAppService().logActivity(action, null, null, null, null, details,
+            type);
+    }
+
+    @Deprecated
+    public boolean isAllSitesSelected() {
+        return false;
+    }
+
+    @Deprecated
+    public static SiteWrapper getCurrentSite() {
+        return null;
     }
 }

@@ -28,13 +28,6 @@ public class ChangePasswordDialog extends TitleAreaDialog {
 
     public ChangePasswordDialog(Shell parentShell) {
         super(parentShell);
-
-        GridLayout gl = new GridLayout(3, true);
-
-        parentShell.setLayout(gl);
-
-        Label lbl = new Label(parentShell, SWT.NONE);
-        lbl.setText("Change Password");
     }
 
     public ChangePasswordDialog(Shell parentShell, boolean forceChange) {

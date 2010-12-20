@@ -86,6 +86,9 @@ public class SessionAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
+        if (appService != null) {
+            return "Current server version: " + appService.getServerVersion();
+        }
         return "";
     }
 
@@ -193,4 +196,5 @@ public class SessionAdapter extends AdapterBase {
             g.addClinic();
         }
     }
+
 }

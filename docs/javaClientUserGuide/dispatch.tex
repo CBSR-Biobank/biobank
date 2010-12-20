@@ -1,0 +1,136 @@
+\chapter{Dispatch}
+The \emph{Dispatch} feature is used to record the shipping of a set of patient
+sample aliquots between two repository sites where all patients and aliquots
+belong to a single study.  Aliquots from multiple patients may be included in a
+dispatch.
+
+To use the dispatch feature in BioBank2 the two sites and the study involved
+must first be configured (see section \ref{sec:config_send} for instructions).
+
+Prior to sending a dispatch, the administrator of the sending site must create
+a \emph{dispatch entry} that records the aliquots that are part of the
+shipment. After the entry is created and the dispatch is ready to be sent, the
+administrator must mark the entry as Sent. At this point BioBank2 displays the
+dispatch entry as In Transit (see section \ref{sec:dispatch_send}).
+
+Sites that wish to send dispatches can only send aliquots that have been scan
+assigned to container positions. Aliquots without a position are not allowed in
+a dispatch.
+
+When receiving a dispatch, a technician with the appropriate role must Receive
+and Process the dispatch entry in BioBank2. Only entries marked as In Transit
+can be received and processed. A technician has the option of only marking an
+entry as received and then process it at a later time. Processing of a dispatch
+entry involves confirming that the aliquots recorded as sent are actually
+received. See section \ref{sec:dispatch_receive} for instructions.  The
+following errors can happen when sending a dispatch:
+\begin{itemize}
+  \item The shipment never arrives at the destination site.
+  \item One or more aliquots marked as sent are not actually received at the
+    receiving site,
+  \item One or more aliquots never marked as sent are received at the receiving
+    site.
+\end{itemize}
+Please see sections \ref{sec:dispatch_not_arrive},
+\ref{sec:dispatch_missing_aliquots} and \ref{sec:dispatch_extra_aliquots} for
+instructions on how to deal with these cases.  If a repository site no longer
+sends dispatches, the instructions to remove the dispatch information is given
+in section \ref{sec:config_send_remove}.
+\section{Configure a Site for Sending Dispatches}
+\label{sec:config_send}
+\begin{enumerate}
+  \item Log into the BioBank2 Java Client as a user in the Website
+    Administrator group.
+  \item From the Administration view, edit the site that is to send dispatches.
+  \item \label{add_dispatch} Click on Add Dispatch Relation (see Figure
+    \ref{fig:dispatch_add_configuration}).
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/dispatch/add_config} }
+      \caption{Configuring a site for sending dispatches.}
+      \label{fig:dispatch_add_configuration}
+    \end{figure}
+  \item From the dialog box the pops up, select the study associated with the
+    site and the destination site for the shipments (see Figure
+    \ref{fig:dispatch_add_config_dest_site}) and press the \emph{OK}
+    button. Use the button with an arrow pointing to the right to move a site
+    from the \emph{Available Sites} box to the \emph{Selected Destination Sites}
+    box.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/dispatch/add_config_dest_site} }
+      \caption{Configuring the destination site for dispatches.}
+      \label{fig:dispatch_add_config_dest_site}
+    \end{figure}
+  \item If there are more studies that dispatch from this site go to step \ref{add_dispatch}.
+\end{enumerate}
+\section{Remove Dispatch Configuration for a Site}
+\label{sec:config_send_remove}
+\begin{enumerate}
+  \item Log into the BioBank2 Java Client as a user in the Website
+    Administrator group.
+  \item From the Administration tree view, right click on the site that will no longer send
+    dispatches and select \emph{Edit Site}.
+  \item In the entry form that opens up, right click on the study / site you
+    wish to remove the configuration for and select \emph{Delete}.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/dispatch/del_config} }
+      \caption{Removing dispatch configuration for a site.}
+      \label{fig:dispatch_del_config}
+    \end{figure}
+\end{enumerate}
+\section{Sending a Dispatch}
+\label{sec:dispatch_send}
+\begin{enumerate}
+  \item Log into the BioBank2 Java Client as a user in the Website
+    Administrator group ({\color{red} which user groups should be allowed to
+      create dispatches?}).
+  \item In the \emph{Working Site} pull down, select the site that is to send the
+    dispatch.
+  \item Using the main menu or the toolbar icon select \emph{Dispatch} view.
+  \item Select \emph{Add Dispatch} from the \emph{Dispatch Shipments} sub menu
+    or from the toolbar icon.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/dispatch/add} }
+      \caption{Creating a new dispatch.}
+      \label{fig:dispatch_add}
+    \end{figure}
+  \item Select the study and receiver site the dispatch aliquots are for. If
+    there is a single study and / or a single receiver site they will be
+    already selected.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.5}
+      { \includegraphics*{screenshots/dispatch/add_entry} }
+      \caption{Selecting study and site when creating a dispatch.}
+      \label{fig:dispatch_add_entry}
+    \end{figure}
+  \item Press the \emph{open scan dialog} button to scan assign aliquots into
+    the dispatch and the following dialog box is displayed.
+    \begin{figure}[H]
+      \centering
+      \scalebox{0.35}
+      { \includegraphics*{screenshots/dispatch/add_entry_scan} }
+      \caption{Scanning aliquots into a dispatch.}
+      \label{fig:dispatch_add_entry_scan}
+    \end{figure}
+  \item Enter the pallet's product barcode or click the \emph{new
+    pallet}\footnote{The new pallet check box is used when aliquots are moved
+    from their original pallet to a new pallet to be used for the actual shipping.} check
+    box, then the plate number for where the pallet has been placed on the
+    flatbed scanner and then press the Launch Scan button.
+\end{enumerate}
+\section{Receiving a Dispatch}
+\label{sec:dispatch_receive}
+\section{Dispatch Never Arrives at Destination Site}
+\label{sec:dispatch_not_arrive}
+\section{Dispatches with Missing Aliquots}
+\label{sec:dispatch_missing_aliquots}
+\section{Dispatch with Extra Aliquots}
+\label{sec:dispatch_extra_aliquots}

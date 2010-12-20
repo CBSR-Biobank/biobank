@@ -34,8 +34,6 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ContainerAdapter extends AdapterBase {
 
-    private final String DEL_CONFIRM_MSG = "Are you sure you want to delete this container?";
-
     public ContainerAdapter(AdapterBase parent, ContainerWrapper container) {
         super(parent, container);
         if (container != null) {
@@ -85,7 +83,7 @@ public class ContainerAdapter extends AdapterBase {
         addViewMenu(menu, "Container");
 
         Boolean topLevel = getContainer().getContainerType().getTopLevel();
-        if (topLevel == null || !topLevel) {
+        if (isEditable() && (topLevel == null || !topLevel)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Move Container");
             mi.addSelectionListener(new SelectionAdapter() {
@@ -96,7 +94,7 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        if (getContainer().hasAliquots()) {
+        if (isEditable() && getContainer().hasAliquots()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Move All Aliquots To");
             mi.addSelectionListener(new SelectionAdapter() {
@@ -107,7 +105,7 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        addDeleteMenu(menu, "Container", DEL_CONFIRM_MSG);
+        addDeleteMenu(menu, "Container");
     }
 
     public void moveAliquots() {
@@ -157,7 +155,7 @@ public class ContainerAdapter extends AdapterBase {
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return DEL_CONFIRM_MSG;
+        return "Are you sure you want to delete this container?";
     }
 
     @Override

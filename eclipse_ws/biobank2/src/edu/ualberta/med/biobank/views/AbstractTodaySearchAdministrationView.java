@@ -5,7 +5,6 @@ import java.util.List;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
@@ -85,16 +84,6 @@ public abstract class AbstractTodaySearchAdministrationView extends
         todayNode.performExpand();
         searchedNode.performExpand();
         super.reload();
-    }
-
-    @Override
-    public void siteChanged(Object sourceValue) {
-        todayNode.removeAll();
-        searchedNode.removeAll();
-        if (sourceValue != null
-            && !SessionManager.getInstance().isAllSitesSelected()) {
-            reload();
-        }
     }
 
 }

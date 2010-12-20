@@ -207,6 +207,8 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
         reloadCollection(selectedPvSourceVessels);
         addedPvSourceVessels = new ArrayList<PvSourceVesselWrapper>();
         removedPvSourceVessels = new ArrayList<PvSourceVesselWrapper>();
+
+        sourceVesselsAdded.setValue(selectedPvSourceVessels.size() > 0);
     }
 
     public List<PvSourceVesselWrapper> getAddedPvSourceVessels() {

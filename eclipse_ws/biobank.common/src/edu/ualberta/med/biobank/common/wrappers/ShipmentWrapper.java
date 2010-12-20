@@ -503,12 +503,13 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
     /**
      * Search for shipments in the site with the given waybill
      */
-    public static List<ShipmentWrapper> getShipmentsInSite(
-        WritableApplicationService appService, String waybill, SiteWrapper site)
+    public static List<ShipmentWrapper> getShipmentsInSites(
+        WritableApplicationService appService, String waybill)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
-            + Shipment.class.getName() + " where site.id = ? and waybill = ?",
-            Arrays.asList(new Object[] { site.getId(), waybill }));
+            + Shipment.class.getName()
+            + " where site is not null and waybill = ?",
+            Arrays.asList(new Object[] { waybill }));
         List<Shipment> shipments = appService.query(criteria);
         List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
         for (Shipment s : shipments) {
@@ -521,9 +522,9 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
      * Search for shipments in the site with the given date received. Don't use
      * hour and minute.
      */
-    public static List<ShipmentWrapper> getShipmentsInSite(
-        WritableApplicationService appService, Date dateReceived,
-        SiteWrapper site) throws ApplicationException {
+    public static List<ShipmentWrapper> getShipmentsInSites(
+        WritableApplicationService appService, Date dateReceived)
+        throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // date at 0:0am
         cal.setTime(dateReceived);
@@ -535,10 +536,11 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
         // date at 0:0pm
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Shipment.class.getName()
-            + " where site.id = ? and dateReceived >= ? and dateReceived <= ?",
-            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Shipment.class.getName()
+                + " where site is not null and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { startDate, endDate }));
         List<Shipment> shipments = appService.query(criteria);
         List<ShipmentWrapper> wrappers = new ArrayList<ShipmentWrapper>();
         for (Shipment s : shipments) {
@@ -565,8 +567,7 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
     }
 
     public static List<ShipmentWrapper> getTodayShipments(
-        WritableApplicationService appService, SiteWrapper site)
-        throws ApplicationException {
+        WritableApplicationService appService) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // yesterday midnight
         cal.set(Calendar.AM_PM, Calendar.AM);
@@ -577,10 +578,11 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
         // today midnight
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Shipment.class.getName()
-            + " where site.id = ? and dateReceived >= ? and dateReceived <= ?",
-            Arrays.asList(new Object[] { site.getId(), startDate, endDate }));
+        HQLCriteria criteria = new HQLCriteria(
+            "from "
+                + Shipment.class.getName()
+                + " where site is not null and dateReceived >= ? and dateReceived <= ?",
+            Arrays.asList(new Object[] { startDate, endDate }));
         List<Shipment> res = appService.query(criteria);
         List<ShipmentWrapper> ships = new ArrayList<ShipmentWrapper>();
         for (Shipment s : res) {

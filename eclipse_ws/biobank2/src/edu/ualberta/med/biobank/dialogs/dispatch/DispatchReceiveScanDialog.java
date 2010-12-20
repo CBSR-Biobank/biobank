@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -37,8 +38,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     private int errors;
 
     public DispatchReceiveScanDialog(Shell parentShell,
-        final DispatchWrapper currentShipment) {
-        super(parentShell, currentShipment);
+        final DispatchWrapper currentShipment, SiteWrapper currentSite) {
+        super(parentShell, currentShipment, currentSite);
     }
 
     @Override
@@ -102,7 +103,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     }
 
     @Override
-    protected void processScanResult(IProgressMonitor monitor) throws Exception {
+    protected void processScanResult(IProgressMonitor monitor, SiteWrapper site)
+        throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             processCells(cells.keySet(), monitor);
@@ -140,12 +142,13 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                 public void run() {
                     BioBankPlugin
                         .openInformation(
-                            "Not in shipment aliquots",
+                            "Not in dispatch aliquots",
                             "Some of the aliquots in this pallet were not supposed"
                                 + " to be in this shipment. They will be added to the"
                                 + " extra-pending list.");
                     try {
-                        currentShipment.addExtraAliquots(extraAliquots, false);
+                        ((DispatchWrapper) currentShipment).addExtraAliquots(
+                            extraAliquots, false);
                     } catch (Exception e) {
                         BioBankPlugin.openAsyncError("Error flagging aliquots",
                             e);
@@ -180,7 +183,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             }
         }
         try {
-            currentShipment.receiveAliquots(aliquots);
+            ((DispatchWrapper) currentShipment).receiveAliquots(aliquots);
             redrawPallet();
             pendingAliquotsNumber = 0;
             setOkButtonEnabled(true);
@@ -206,9 +209,9 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        if (currentShipment.getAliquotCollection().size() > 0) {
+        if (((DispatchWrapper) currentShipment).getAliquotCollection().size() > 0) {
             int i = 0;
-            for (DispatchAliquotWrapper dsa : currentShipment
+            for (DispatchAliquotWrapper dsa : ((DispatchWrapper) currentShipment)
                 .getDispatchAliquotCollection()) {
                 int row = i / 12;
                 int col = i % 12;

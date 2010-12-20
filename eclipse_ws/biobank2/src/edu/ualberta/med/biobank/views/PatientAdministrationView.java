@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
-import edu.ualberta.med.biobank.rcp.perspective.PatientsAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -29,7 +28,7 @@ public class PatientAdministrationView extends
 
     public PatientAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(PatientsAdministrationPerspective.ID, this);
+        SessionManager.addView(ID, this);
     }
 
     @Override
@@ -116,6 +115,16 @@ public class PatientAdministrationView extends
 
     public static PatientAdministrationView getCurrent() {
         return currentInstance;
+    }
+
+    @Override
+    public String getId() {
+        return ID;
+    }
+
+    @Override
+    protected String getTreeTextToolTip() {
+        return "Enter a patient number and hit enter";
     }
 
 }

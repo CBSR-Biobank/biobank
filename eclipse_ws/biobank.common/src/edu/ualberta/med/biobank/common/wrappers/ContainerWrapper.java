@@ -383,7 +383,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             typesString = typesString.replaceFirst(" or", "");
             throw new BiobankCheckException("Can't find container with label "
                 + parentContainerLabel + " holding containers of types "
-                + typesString);
+                + typesString + " and in site "
+                + (getSite() == null ? "'none'" : getSite().getNameShort()));
         }
         if (possibleParents.size() > 1) {
             throw new BiobankCheckException(
@@ -736,15 +737,16 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     @Override
     public boolean checkIntegrity() {
-        if (wrappedObject != null)
-            if (((getContainerType() != null)
-                && (getContainerType().getRowCapacity() != null) && (getContainerType()
-                .getColCapacity() != null)) || (getContainerType() == null))
-                if (((getPosition() != null) && (getPosition().row != null) && (getPosition().col != null))
-                    || (getPosition() == null))
-                    if (wrappedObject.getSite() != null)
-                        return true;
-        return false;
+        /*
+         * outdated? if (wrappedObject != null) if (((getContainerType() !=
+         * null) && (getContainerType().getRowCapacity() != null) &&
+         * (getContainerType() .getColCapacity() != null)) ||
+         * (getContainerType() == null)) if (((getPosition() != null) &&
+         * (getPosition().row != null) && (getPosition().col != null)) ||
+         * (getPosition() == null)) if (wrappedObject.getSite() != null) return
+         * true; return false;
+         */
+        return true;
 
     }
 
@@ -839,6 +841,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public static List<ContainerWrapper> getContainersHoldingContainerTypes(
         WritableApplicationService appService, String label, SiteWrapper site,
         List<ContainerTypeWrapper> types) throws ApplicationException {
+        if (site == null)
+            return new ArrayList<ContainerWrapper>();
         String typeIds = "";
         for (ContainerTypeWrapper type : types) {
             typeIds += "," + type.getId();

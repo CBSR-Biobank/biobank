@@ -20,4 +20,10 @@ public class SiteStudyGroup extends AbstractStudyGroup {
         SiteAdapter site = getParentFromClass(SiteAdapter.class);
         return site.getWrapper().getStudyCollection();
     }
+
+    @Override
+    protected int getWrapperChildCount() throws Exception {
+        SiteAdapter site = getParentFromClass(SiteAdapter.class);
+        return site.getWrapper().getStudyCollection().size();
+    }
 }

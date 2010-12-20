@@ -76,8 +76,8 @@ public class CalgaryConfigJob {
         appService = SessionManager.getInstance().getSession().getAppService();
 
         try {
-            sampleTypesList = SampleTypeWrapper.getAllSampleTypes(
-                appService, false);
+            sampleTypesList = SampleTypeWrapper.getAllSampleTypes(appService,
+                false);
             shippingCompaniesList = ShippingMethodWrapper
                 .getShippingMethods(appService);
         } catch (Exception e) {
@@ -123,7 +123,6 @@ public class CalgaryConfigJob {
                     @Override
                     public void run() {
                         try {
-                            SessionManager.getInstance().updateSites();
                             SessionManager.getInstance().getSession().rebuild();
                             SessionManager.getInstance().getSession()
                                 .performExpand();

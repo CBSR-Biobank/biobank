@@ -52,4 +52,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public List<Object> runReport(Report report, int maxResults, int firstRow,
         int timeout) throws ApplicationException;
+
+    public void checkVersion(String clientVersion) throws ApplicationException;
+
+    public String getServerVersion();
 }

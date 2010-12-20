@@ -240,7 +240,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
     }
 
     public void addDoubleClickListener(IDoubleClickListener listener) {
-        patientTable.addDoubleClickListener(listener);
+        patientTable.addClickListener(listener);
     }
 
     public class PatientAddListener extends WrapperListenerAdapter {

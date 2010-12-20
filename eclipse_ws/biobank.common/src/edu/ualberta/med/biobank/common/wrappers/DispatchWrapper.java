@@ -385,7 +385,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
                     aliquot.setPosition(null);
                     modifiedAliquots.add(aliquot);
                 }
-                dsa.setShipment(this);
+                dsa.setDispatch(this);
                 allDsaObjects.add(dsa.getWrappedObject());
                 allDsaWrappers.add(dsa);
                 currentAliquots.add(aliquot);
@@ -429,7 +429,8 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
                 + aliquot.getInventoryId()
                 + ": it has no position. A position should be first assigned.");
         }
-        if (!aliquot.getParent().getSite().equals(getSender())) {
+        if (aliquot.getParent() != null
+            && !aliquot.getParent().getSite().equals(getSender())) {
             return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
                 + " is currently assigned to site "
                 + aliquot.getParent().getSite().getNameShort()
@@ -551,7 +552,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
      * Search for shipments with the given waybill. Site can be the sender or
      * the receiver.
      */
-    public static List<DispatchWrapper> getShipmentsInSite(
+    public static List<DispatchWrapper> getDispatchesInSite(
         WritableApplicationService appService, String waybill, SiteWrapper site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria("from "
@@ -570,7 +571,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
      * Search for shipments with the given date sent. Don't use hour and minute.
      * Site can be the sender or the receiver.
      */
-    public static List<DispatchWrapper> getShipmentsInSiteByDateSent(
+    public static List<DispatchWrapper> getDispatchesInSiteByDateSent(
         WritableApplicationService appService, Date dateReceived,
         SiteWrapper site) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
@@ -602,7 +603,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
      * Search for shipments with the given date received. Don't use hour and
      * minute. Site can be the sender or the receiver.
      */
-    public static List<DispatchWrapper> getShipmentsInSiteByDateReceived(
+    public static List<DispatchWrapper> getDispatchesInSiteByDateReceived(
         WritableApplicationService appService, Date dateReceived,
         SiteWrapper site) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
@@ -644,8 +645,8 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     private void setState(DispatchState state) {
         Integer oldState = wrappedObject.getState();
         wrappedObject.setState(state.getId());
-        stateModified = oldState == null || state == null
-            || !oldState.equals(state);
+        stateModified = ((oldState == null) || (state == null) || !oldState
+            .equals(state.getId()));
     }
 
     public void setInCreationState() {
@@ -668,9 +669,10 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         setState(DispatchState.RECEIVED);
     }
 
-    public boolean canBeSentBy(User user, SiteWrapper site) {
+    public boolean canBeSentBy(User user) throws Exception {
         return getSender() != null && canUpdate(user)
-            && getSender().equals(site) && isInCreationState() && hasAliquots();
+            && SiteWrapper.getSites(appService).contains(getSender())
+            && isInCreationState() && hasAliquots();
     }
 
     public boolean hasAliquots() {
@@ -678,16 +680,17 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
             && getAliquotCollection().size() > 0;
     }
 
-    public boolean canBeReceivedBy(User user, SiteWrapper site) {
+    public boolean canBeReceivedBy(User user) throws Exception {
         return getReceiver() != null && canUpdate(user)
-            && getReceiver().equals(site) && isInTransitState()
-            && user.canUpdateSite(site);
+            && SiteWrapper.getSites(appService).contains(getReceiver())
+            && isInTransitState() && user.canUpdateSite(getReceiver());
     }
 
-    public boolean canBeClosedBy(User user, SiteWrapper site) {
+    public boolean canBeClosedBy(User user) throws Exception {
         return getReceiver() != null && canUpdate(user)
-            && getReceiver().equals(site) && isInReceivedState()
-            && !hasPendingAliquots() && user.canUpdateSite(site);
+            && SiteWrapper.getSites(appService).contains(getReceiver())
+            && isInReceivedState() && !hasPendingAliquots()
+            && user.canUpdateSite(getReceiver());
     }
 
     private boolean hasPendingAliquots() {

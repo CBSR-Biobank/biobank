@@ -10,10 +10,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
@@ -70,54 +69,50 @@ public abstract class AbstractTodayNode extends AdapterBase {
 
     @Override
     public void performExpand() {
-        if (!SessionManager.getInstance().isAllSitesSelected()) {
-            try {
-                List<? extends ModelWrapper<?>> todayElements =
-                    getTodayElements();
+        try {
+            List<? extends ModelWrapper<?>> todayElements = getTodayElements();
 
-                // remove elements that are not in today list
-                for (AdapterBase child : getChildren()) {
-                    ModelWrapper<?> childWrapper = child.getModelObject();
-                    childWrapper.reload();
-                    List<AdapterBase> subChildren =
-                        new ArrayList<AdapterBase>(child.getChildren());
-                    for (AdapterBase subChild : subChildren) {
-                        ModelWrapper<?> subChildWrapper =
-                            subChild.getModelObject();
-                        subChildWrapper.reload();
-                        if (!todayElements.contains(subChildWrapper)
-                            || !isParentTo(childWrapper, subChildWrapper)) {
-                            subChild.getParent().removeChild(subChild);
-                        }
+            // remove elements that are not in today list
+            for (AdapterBase child : getChildren()) {
+                ModelWrapper<?> childWrapper = child.getModelObject();
+                childWrapper.reload();
+                List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
+                    child.getChildren());
+                for (AdapterBase subChild : subChildren) {
+                    ModelWrapper<?> subChildWrapper = subChild.getModelObject();
+                    subChildWrapper.reload();
+                    if (!todayElements.contains(subChildWrapper)
+                        || !isParentTo(childWrapper, subChildWrapper)) {
+                        subChild.getParent().removeChild(subChild);
                     }
                 }
-
-                // add today elements is not yet there
-                for (ModelWrapper<?> wrapper : todayElements) {
-                    assert wrapper instanceof PatientWrapper
-                        || wrapper instanceof ShipmentWrapper;
-                    if (wrapper instanceof PatientWrapper) {
-                        PatientAdministrationView.getCurrent().addToNode(this,
-                            wrapper);
-                    } else if (wrapper instanceof ShipmentWrapper) {
-                        ShipmentAdministrationView.getCurrent().addToNode(this,
-                            wrapper);
-                    }
-                }
-
-                // remove sub children without any children
-                List<AdapterBase> children =
-                    new ArrayList<AdapterBase>(getChildren());
-                for (AdapterBase child : children) {
-                    if (child.getChildren().size() == 0) {
-                        removeChild(child);
-                    }
-                }
-            } catch (final RemoteAccessException exp) {
-                BioBankPlugin.openRemoteAccessErrorMessage(exp);
-            } catch (Exception e) {
-                logger.error("Error while getting today's patients", e);
             }
+
+            // add today elements is not yet there
+            for (ModelWrapper<?> wrapper : todayElements) {
+                assert wrapper instanceof PatientWrapper
+                    || wrapper instanceof ShipmentWrapper;
+                if (wrapper instanceof PatientWrapper) {
+                    PatientAdministrationView.getCurrent().addToNode(this,
+                        wrapper);
+                } else if (wrapper instanceof ShipmentWrapper) {
+                    ShipmentAdministrationView.getCurrent().addToNode(this,
+                        wrapper);
+                }
+            }
+
+            // remove sub children without any children
+            List<AdapterBase> children = new ArrayList<AdapterBase>(
+                getChildren());
+            for (AdapterBase child : children) {
+                if (child.getChildren().size() == 0) {
+                    removeChild(child);
+                }
+            }
+        } catch (final RemoteAccessException exp) {
+            BioBankPlugin.openRemoteAccessErrorMessage(exp);
+        } catch (Exception e) {
+            logger.error("Error while getting today's patients", e);
         }
     }
 

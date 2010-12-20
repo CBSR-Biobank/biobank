@@ -9,6 +9,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeExpansionEvent;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerComparator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.dnd.DND;
@@ -16,6 +17,7 @@ import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.graphics.Cursor;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
@@ -32,6 +34,7 @@ import edu.ualberta.med.biobank.treeview.util.NodeContentProvider;
 import edu.ualberta.med.biobank.treeview.util.NodeLabelProvider;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectNodeTransfer;
+import edu.ualberta.med.biobank.widgets.utils.TreeFilter;
 
 public class AdapterTreeWidget extends Composite {
 
@@ -123,7 +126,9 @@ public class AdapterTreeWidget extends Composite {
                 AbstractViewWithAdapterTree view = SessionManager
                     .getCurrentAdapterViewWithTree();
                 view.setFocus();
-                treeViewer.getTree().setFocus();
+                // make sure the view is activated when the user click in the
+                // tree (to update the icons) :
+                view.activate();
             }
         });
 
@@ -162,6 +167,24 @@ public class AdapterTreeWidget extends Composite {
                 return 0;
             }
         });
+
+        treeViewer.getTree().addListener(SWT.MouseMove, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                String tooltip = null;
+                ViewerCell cell = treeViewer
+                    .getCell(new Point(event.x, event.y));
+                if (cell != null) {
+                    Object element = cell.getElement();
+                    if (element != null) {
+                        tooltip = ((AdapterBase) element).getTooltipText();
+                    }
+                }
+                treeViewer.getTree().setToolTipText(tooltip);
+            }
+
+        });
+
     }
 
     public TreeViewer getTreeViewer() {

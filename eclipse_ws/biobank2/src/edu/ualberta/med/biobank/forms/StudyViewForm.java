@@ -14,7 +14,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
@@ -102,20 +102,21 @@ public class StudyViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient("Clinic Information");
 
         contactsTable = new StudyContactInfoTable(client, study);
+        contactsTable.addClickListener(collectionDoubleClickListener);
         contactsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(contactsTable);
 
-        contactsTable.addDoubleClickListener(new IDoubleClickListener() {
+        contactsTable.addClickListener(new IDoubleClickListener() {
             @Override
             public void doubleClick(DoubleClickEvent event) {
                 Object selection = event.getSelection();
                 if (selection instanceof InfoTableSelection) {
                     Object obj = ((InfoTableSelection) selection).getObject();
-                    if (obj instanceof ContactWrapper) {
-                        ContactWrapper contact = (ContactWrapper) obj;
+                    if (obj instanceof ClinicWrapper) {
+                        ClinicWrapper c = (ClinicWrapper) obj;
                         DoubleClickEvent newEvent = new DoubleClickEvent(
                             (Viewer) event.getSource(), new InfoTableSelection(
-                                contact.getClinic()));
+                                c));
                         collectionDoubleClickListener.doubleClick(newEvent);
                     } else {
                         Assert.isTrue(false,

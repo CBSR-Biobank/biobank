@@ -280,7 +280,6 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         if (table.isDisposed()) {
             return;
         }
-
         final int[] maxCellContentsWidths = new int[table.getColumnCount()];
         Text textRenderer = new Text(menu.getShell(), SWT.NONE);
         textRenderer.setVisible(false);
@@ -321,7 +320,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             sumOfMaxTextWidths += width;
         }
 
-        int tableWidth = tableViewer.getTable().getSize().x;
+        int tableWidth = Math.max(500, tableViewer.getTable().getSize().x);
 
         int totalWidths = 0;
         for (int i = 0; i < table.getColumnCount(); i++) {
@@ -344,6 +343,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         gd.heightHint = (rows - 1) * table.getItemHeight()
             + table.getHeaderHeight() + 4;
         layout(true, true);
+
     }
 
     protected abstract void setPaginationParams(List<T> collection);
@@ -415,6 +415,11 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         gd.exclude = false;
         paginationWidget.setLayoutData(gd);
         layout(true, true);
+    }
+
+    @Override
+    public Menu getMenu() {
+        return menu;
     }
 
     protected abstract void setDefaultWidgetsEnabled();

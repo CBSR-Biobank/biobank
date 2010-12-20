@@ -4,23 +4,27 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.internal.WorkbenchWindow;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.ServiceRegistration;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.p2.BiobankPolicy;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
@@ -48,12 +52,20 @@ import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchGro
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchGroup;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.request.AcceptedRequestNode;
+import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
+import edu.ualberta.med.biobank.treeview.request.FilledRequestNode;
+import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
+import edu.ualberta.med.biobank.treeview.request.ShippedRequestNode;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
+import edu.ualberta.med.biobank.views.DispatchSiteAdapter;
+import edu.ualberta.med.biobank.views.RequestSiteAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
  * The activator class controls the plug-in life cycle
  */
+@SuppressWarnings("restriction")
 public class BioBankPlugin extends AbstractUIPlugin {
 
     public static final String PLUGIN_ID = "biobank2";
@@ -122,6 +134,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SCAN_CLOSE_EDIT = "scanCloseEdit";
     public static final String IMG_RECEIVED = "received";
     public static final String IMG_SENT = "sent";
+    public static final String IMG_REQUEST = "request";
+    public static final String IMG_REQUEST_EDIT = "request_edit";
+    public static final String IMG_REQUEST_SHIPPED = "request_shipped";
+    public static final String IMG_REQUEST_FILLED = "request_filled";
     public static final String IMG_ALIQUOT = "aliquot";
     public static final String IMG_LOCK = "lock";
     public static final String IMG_UP = "bullet_arrow_up";
@@ -181,6 +197,20 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
         classToImageKey.put(DispatchAdapter.class.getName(),
             BioBankPlugin.IMG_DISPATCH_SHIPMENT);
+        classToImageKey.put(DispatchSiteAdapter.class.getName(),
+            BioBankPlugin.IMG_SITE);
+        classToImageKey.put(RequestSiteAdapter.class.getName(),
+            BioBankPlugin.IMG_SITE);
+        classToImageKey.put(ApprovedRequestNode.class.getName(),
+            BioBankPlugin.IMG_REQUEST);
+        classToImageKey.put(AcceptedRequestNode.class.getName(),
+            BioBankPlugin.IMG_REQUEST_EDIT);
+        classToImageKey.put(ShippedRequestNode.class.getName(),
+            BioBankPlugin.IMG_REQUEST_SHIPPED);
+        classToImageKey.put(FilledRequestNode.class.getName(),
+            BioBankPlugin.IMG_REQUEST_FILLED);
+        classToImageKey.put(RequestAdapter.class.getName(),
+            BioBankPlugin.IMG_REQUEST);
         classToImageKey.put(AliquotAdapter.class.getName(),
             BioBankPlugin.IMG_ALIQUOT);
     };
@@ -200,6 +230,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     // The shared instance
     private static BioBankPlugin plugin;
 
+    private ServiceRegistration policyRegistration;
+
     /**
      * The constructor
      */
@@ -218,6 +250,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
         super.start(context);
         plugin = this;
         SessionManager.getInstance();
+        registerP2Policy(context);
     }
 
     @Override
@@ -279,6 +312,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
             "dispatch_error.png");
         registerImage(registry, IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT,
             "dispatchScanAdd.png");
+        registerImage(registry, IMG_REQUEST, "request.png");
+        registerImage(registry, IMG_REQUEST_EDIT, "request_edit.png");
+        registerImage(registry, IMG_REQUEST_SHIPPED, "request_shipped.png");
+        registerImage(registry, IMG_REQUEST_FILLED, "request_filled.png");
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_SITES, "sites.png");
         registerImage(registry, IMG_STUDIES, "studies.png");
@@ -321,6 +358,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
     @Override
     public void stop(BundleContext context) throws Exception {
         plugin = null;
+        policyRegistration.unregister();
+        policyRegistration = null;
         super.stop(context);
     }
 
@@ -462,6 +501,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
         }
     }
 
+    public boolean windowTitleShowVersionEnabled() {
+        return getPreferenceStore().getBoolean(
+            PreferenceConstants.GENERAL_SHOW_VERSION);
+    }
+
     public boolean isCancelBarcode(String code) {
         return getPreferenceStore().getString(
             PreferenceConstants.GENERAL_CANCEL).equals(code);
@@ -473,29 +517,12 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public int getPlateNumber(String barcode) {
-        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
-            if (isRealScanEnabled()
-                && !ScannerConfigPlugin.getDefault().getPlateEnabled(i + 1))
-                continue;
-
-            String pref = getPreferenceStore().getString(
-                PreferenceConstants.SCANNER_PLATE_BARCODES[i]);
-            Assert.isTrue(!pref.isEmpty(), "preference not assigned");
-            if (pref.equals(barcode)) {
-                return i + 1;
-            }
-        }
-        return -1;
+        return ScannerConfigPlugin.getDefault().getPlateNumber(barcode,
+            isRealScanEnabled());
     }
 
     public static int getPlatesEnabledCount() {
-        int count = 0;
-        for (int i = 0; i < PreferenceConstants.SCANNER_PLATE_BARCODES.length; i++) {
-            if (!isRealScanEnabled()
-                || ScannerConfigPlugin.getDefault().getPlateEnabled(i + 1))
-                count++;
-        }
-        return count;
+        return ScannerConfigPlugin.getPlatesEnabledCount(isRealScanEnabled());
     }
 
     public boolean isValidPlateBarcode(String value) {
@@ -587,6 +614,25 @@ public class BioBankPlugin extends AbstractUIPlugin {
 
         classToImageKey.put(typeName, imageKey);
         return BioBankPlugin.getDefault().getImageRegistry().get(imageKey);
+    }
+
+    private void registerP2Policy(BundleContext context) {
+        policyRegistration = context.registerService(Policy.class.getName(),
+            new BiobankPolicy(), null);
+    }
+
+    /**
+     * Show or hide the heap status based on selection.
+     * 
+     * @param selection
+     */
+    public void updateHeapStatus(boolean selection) {
+        for (IWorkbenchWindow window : PlatformUI.getWorkbench()
+            .getWorkbenchWindows()) {
+            if (window instanceof WorkbenchWindow) {
+                ((WorkbenchWindow) window).showHeapStatus(selection);
+            }
+        }
     }
 
 }

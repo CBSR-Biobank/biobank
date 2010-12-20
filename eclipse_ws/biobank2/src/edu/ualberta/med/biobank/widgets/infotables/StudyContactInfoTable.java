@@ -45,6 +45,16 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
     }
 
     @Override
+    public ClinicWrapper getSelection() {
+        BiobankCollectionModel item = getSelectionInternal();
+        if (item == null)
+            return null;
+        TableRowData row = (TableRowData) item.o;
+        Assert.isNotNull(row);
+        return row.contact.getClinic();
+    }
+
+    @Override
     protected BiobankLabelProvider getLabelProvider() {
         return new BiobankLabelProvider() {
             @Override
@@ -90,16 +100,6 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         info.contactName = contact.getName();
         info.contactTitle = contact.getTitle();
         return info;
-    }
-
-    @Override
-    public ContactWrapper getSelection() {
-        BiobankCollectionModel item = getSelectionInternal();
-        if (item == null)
-            return null;
-        TableRowData row = (TableRowData) item.o;
-        Assert.isNotNull(row);
-        return row.contact;
     }
 
     @Override

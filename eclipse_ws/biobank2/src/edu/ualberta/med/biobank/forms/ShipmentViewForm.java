@@ -45,6 +45,8 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private BiobankText activityStatusLabel;
 
+    private ShipmentPatientsWidget shipPatientsWidget;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue((adapter instanceof ShipmentAdapter),
@@ -55,7 +57,7 @@ public class ShipmentViewForm extends BiobankViewForm {
         shipment = shipmentAdapter.getWrapper();
         retrieveShipment();
 
-        setPartName("Shipment " + shipment.getFormattedDateReceived());
+        setPartName();
     }
 
     private void retrieveShipment() {
@@ -69,9 +71,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Shipment received on "
-            + shipment.getFormattedDateReceived() + " from "
-            + shipment.getClinic().getNameShort());
+        setFormText();
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
@@ -84,8 +84,8 @@ public class ShipmentViewForm extends BiobankViewForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
-        ShipmentPatientsWidget shipPatientsWidget = new ShipmentPatientsWidget(
-            client, SWT.NONE, shipment, toolkit, false);
+        shipPatientsWidget = new ShipmentPatientsWidget(client, SWT.NONE,
+            shipment, toolkit, false);
         shipPatientsWidget
             .addDoubleClickListener(collectionDoubleClickListener);
     }
@@ -146,11 +146,22 @@ public class ShipmentViewForm extends BiobankViewForm {
     @Override
     public void reload() throws Exception {
         retrieveShipment();
-        setPartName("Shipment " + shipment.getWaybill());
-        if (!form.isDisposed()) {
-            form.setText("Shipment waybill: " + shipment.getWaybill());
-        }
+        setPartName();
+        setFormText();
         setShipmentValues();
+        shipPatientsWidget.updateList();
+    }
+
+    private void setPartName() {
+        setPartName("Shipment " + shipment.getFormattedDateReceived());
+    }
+
+    private void setFormText() {
+        if (!form.isDisposed()) {
+            form.setText("Shipment received on "
+                + shipment.getFormattedDateReceived() + " from "
+                + shipment.getClinic().getNameShort());
+        }
     }
 
 }

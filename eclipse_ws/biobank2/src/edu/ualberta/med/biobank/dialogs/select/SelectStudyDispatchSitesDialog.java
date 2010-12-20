@@ -140,8 +140,8 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Select a study and then choose which site can receive aliquots from this "
-            + srcSite.getNameShort();
+        return "Select a study and then choose the site(s) that can receive dispatches from the "
+            + srcSite.getNameShort() + " repository site";
     }
 
     @Override

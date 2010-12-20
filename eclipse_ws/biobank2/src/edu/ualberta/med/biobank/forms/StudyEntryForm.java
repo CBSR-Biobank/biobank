@@ -271,7 +271,8 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getDeletedSampleStorages());
         study.persist();
 
-        studyAdapter.getParent().performExpand();
+        if (studyAdapter.getParent() != null)
+            studyAdapter.getParent().performExpand();
     }
 
     private void setStudyPvAttr() throws Exception, UserUIException {

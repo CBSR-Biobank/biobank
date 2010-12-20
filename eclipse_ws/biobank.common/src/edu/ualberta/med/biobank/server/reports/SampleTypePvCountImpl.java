@@ -18,9 +18,6 @@ public class SampleTypePvCountImpl extends AbstractReport {
         + " a where a.container.label like '"
         + SENT_SAMPLES_FREEZER_NAME
         + "')) and pv.shipmentPatient.patient.study.nameShort LIKE ? "
-        + " and Alias.patientVisit.shipmentPatient.shipment.site "
-        + SITE_OPERATOR
-        + SITE_ID
         + " GROUP BY pv, Alias.sampleType ORDER BY pv.shipmentPatient.patient.pnumber, pv.dateProcessed";
 
     public SampleTypePvCountImpl(BiobankReport report) {

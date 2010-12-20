@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.Set;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
@@ -17,18 +17,17 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
@@ -56,8 +55,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ComboViewer shippingMethodComboViewer;
 
-    private SiteWrapper site;
-
     private ShipmentPatientsWidget shipmentPatientsWidget;
 
     private BiobankText waybillText;
@@ -82,6 +79,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private NotNullValidator departedValidator;
 
+    private BasicSiteCombo siteCombo;
+
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ShipmentAdapter,
@@ -90,9 +89,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
         shipmentAdapter = (ShipmentAdapter) adapter;
         shipment = shipmentAdapter.getWrapper();
-        site = SessionManager.getCurrentSite();
         try {
-            site.reload();
             shipment.reload();
         } catch (Exception e) {
             logger.error("Error while retrieving shipment", e);
@@ -125,22 +122,25 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Site");
-        setTextValue(siteLabel, site.getName());
+        siteCombo = createBasicSiteCombo(client, true,
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    shipment.setSite(siteCombo.getSelectedSite());
+                    if (clinicsComboViewer != null)
+                        clinicsComboViewer.setInput(siteCombo.getSelectedSite()
+                            .getWorkingClinicCollection());
+                }
+            });
+        setFirstControl(siteCombo);
 
         ClinicWrapper selectedClinic = null;
         if (shipment.isNew()) {
             // choose clinic for new shipment
-            Set<ClinicWrapper> siteClinics = SessionManager.getCurrentSite()
-                .getWorkingClinicCollection();
             selectedClinic = shipment.getClinic();
-            if (siteClinics.size() == 1) {
-                selectedClinic = siteClinics.toArray(new ClinicWrapper[1])[0];
-            }
             clinicsComboViewer = createComboViewer(client, "Clinic",
-                siteClinics, selectedClinic, "A clinic should be selected",
-                new ComboSelectionUpdate() {
+                new ArrayList<ClinicWrapper>(), selectedClinic,
+                "A clinic should be selected", new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
                         shipment.setClinic((ClinicWrapper) selectedObject);
@@ -159,7 +159,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                         }
                     }
                 });
-            setFirstControl(clinicsComboViewer.getCombo());
         } else {
             BiobankText clinicLabel = createReadOnlyLabelledField(client,
                 SWT.NONE, "Clinic");
@@ -167,6 +166,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 clinicLabel.setText(shipment.getClinic().getName());
             }
         }
+        siteCombo.setSelectedSite(shipment.getSite(), true);
 
         waybillLabel = widgetCreator.createLabel(client, "Waybill");
         waybillLabel.setLayoutData(new GridData(
@@ -316,7 +316,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        shipment.setSite(site);
         if (!Boolean.TRUE.equals(shipment.getClinic().getSendsShipments())) {
             shipment.setWaybill(null);
         }
@@ -332,8 +331,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             public void run() {
                 if (newShipment) {
                     if (shipmentAdapter.getWrapper().isReceivedToday()) {
-                        shipmentAdapter.getParent().removeChild(
-                            shipmentAdapter, false);
+                        if (shipmentAdapter.getParent() != null)
+                            shipmentAdapter.getParent().removeChild(
+                                shipmentAdapter, false);
                         ShipmentAdministrationView.getCurrent().reload();
                         if (PatientAdministrationView.getCurrent() != null) {
                             PatientAdministrationView.getCurrent().reload();
@@ -343,8 +343,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     }
                 } else {
                     if (dateReceivedModified) {
-                        shipmentAdapter.getParent().removeChild(
-                            shipmentAdapter, false);
+                        if (shipmentAdapter.getParent() != null)
+                            shipmentAdapter.getParent().removeChild(
+                                shipmentAdapter, false);
                         ShipmentAdministrationView.getCurrent().reload();
                         if (PatientAdministrationView.getCurrent() != null) {
                             PatientAdministrationView.getCurrent().reload();

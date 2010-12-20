@@ -10,6 +10,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -29,7 +30,7 @@ public class DateTimeWidget extends BiobankWidget {
     private Listener dataEntryModifyListener = new Listener() {
         @Override
         public void handleEvent(Event event) {
-            if (event.type == SWT.Modify) {
+            if (event.type == SWT.Modify || event.type == SWT.Selection) {
                 fireModifyListeners();
             }
         }
@@ -64,6 +65,7 @@ public class DateTimeWidget extends BiobankWidget {
             dateEntry.setPattern(DateFormatter.DATE_FORMAT);
 
         dateEntry.addListener(SWT.Modify, dataEntryModifyListener);
+        dateEntry.addListener(SWT.Selection, dataEntryModifyListener);
 
         gd = new GridData();
         gd.grabExcessHorizontalSpace = true;
@@ -126,5 +128,11 @@ public class DateTimeWidget extends BiobankWidget {
 
     public String getPattern() {
         return dateEntry.getPattern();
+    }
+
+    @Override
+    public void setBackground(Color color) {
+        super.setBackground(color);
+        dateEntry.setBackground(color);
     }
 }

@@ -38,7 +38,7 @@ public class PvListViewForm extends BiobankViewForm {
 
         patientVisits = new PvListInfoTable(page, pvs);
         patientVisits.adaptToToolkit(toolkit, true);
-        patientVisits.addDoubleClickListener(collectionDoubleClickListener);
+        patientVisits.addClickListener(collectionDoubleClickListener);
     }
 
     @Override

@@ -31,7 +31,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -44,6 +43,7 @@ import org.eclipse.ui.ISaveablePart;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 import org.eclipse.ui.services.ISourceProviderService;
@@ -58,6 +58,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.sourceproviders.ConfirmState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
+import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -73,9 +74,6 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(BiobankEntryForm.class.getName());
-
-    public static final Color READ_ONLY_TEXT_BGR = Display.getCurrent()
-        .getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
 
     protected String sessionName;
 
@@ -268,6 +266,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         super.createPartControl(parent);
         addToolbarButtons();
         bindChangeListener();
+
+        IContextService contextService = (IContextService) getSite()
+            .getService(IContextService.class);
+        contextService.activateContext("biobank2.context.entryForm");
     }
 
     abstract protected void saveForm() throws Exception;
@@ -343,20 +345,8 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     @Override
     protected BiobankText createReadOnlyLabelledField(Composite parent,
         int widgetOptions, String fieldLabel, String value) {
-        BiobankText widget = super.createReadOnlyLabelledField(parent,
-            widgetOptions, fieldLabel, value);
-        widget.setBackground(READ_ONLY_TEXT_BGR);
-        return widget;
-    }
-
-    protected BiobankText createReadOnlyLabelledField(Composite parent,
-        int widgetOptions, String fieldLabel,
-        IObservableValue modelObservableValue) {
-        BiobankText widget = (BiobankText) createBoundWidgetWithLabel(parent,
-            BiobankText.class, widgetOptions | SWT.READ_ONLY, fieldLabel, null,
-            modelObservableValue, null);
-        widget.setBackground(READ_ONLY_TEXT_BGR);
-        return widget;
+        return createReadOnlyLabelledField(parent, widgetOptions, fieldLabel,
+            value, true);
     }
 
     protected void bindChangeListener() {
@@ -542,4 +532,12 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      */
     public abstract String getNextOpenedFormID();
 
+    protected BasicSiteCombo createBasicSiteCombo(Composite parent,
+        boolean canUpdateOnly, ComboSelectionUpdate csu) {
+        Label label = widgetCreator.createLabel(parent, "Repository Site");
+        BasicSiteCombo siteCombo = new BasicSiteCombo(parent, widgetCreator,
+            appService, label, canUpdateOnly, csu);
+        siteCombo.adaptToToolkit(toolkit, true);
+        return siteCombo;
+    }
 }

@@ -10,7 +10,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.SessionManager;
@@ -145,7 +144,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         }, ContactWrapper.class);
         studiesTable = new StudyAddInfoTable(section, site);
         studiesTable.adaptToToolkit(toolkit, true);
-        studiesTable.addDoubleClickListener(collectionDoubleClickListener);
+        studiesTable.addClickListener(collectionDoubleClickListener);
         studiesTable.addSelectionChangedListener(listener);
         section.setClient(studiesTable);
     }
@@ -161,7 +160,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             }, ContactWrapper.class);
         dispatchTable = new SiteDispatchAddInfoTable(section, site);
         dispatchTable.adaptToToolkit(toolkit, true);
-        dispatchTable.addDoubleClickListener(collectionDoubleClickListener);
+        dispatchTable.addClickListener(collectionDoubleClickListener);
         dispatchTable.addSelectionChangedListener(listener);
         section.setClient(dispatchTable);
     }
@@ -176,23 +175,11 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void saveForm() throws Exception {
-        final boolean newSite = site.isNew();
         if (siteAdapter.getParent() == null) {
             siteAdapter.setParent(SessionManager.getInstance().getSession());
         }
         site.persist();
 
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                SessionManager.getInstance().updateSites();
-                if (newSite
-                    && !SessionManager.getInstance().isAllSitesSelected()) {
-                    SessionManager.getInstance().getSiteCombo()
-                        .setSelection(site);
-                }
-            }
-        });
     }
 
     @Override

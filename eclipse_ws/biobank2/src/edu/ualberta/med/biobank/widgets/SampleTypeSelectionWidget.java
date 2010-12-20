@@ -73,7 +73,7 @@ public class SampleTypeSelectionWidget {
 
     private void createCombo(Composite parent, List<SampleTypeWrapper> types) {
         combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
-        combo.setLayoutData(new GridData(SWT.LEFT, SWT.TOP, true, false));
+        combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
         cv = new ComboViewer(combo);
         cv.setContentProvider(new ArrayContentProvider());
@@ -105,9 +105,6 @@ public class SampleTypeSelectionWidget {
                 }
             }
         });
-        GridData gd = new GridData();
-        gd.horizontalAlignment = SWT.FILL;
-        combo.setLayoutData(gd);
     }
 
     private boolean setNextFocus() {
@@ -137,20 +134,17 @@ public class SampleTypeSelectionWidget {
             selectionDone.setValue(true);
         } else {
             combo.setEnabled(true);
-            selectionDone.setValue(false);
+            selectionDone.setValue(getSelection() != null);
         }
         textNumber.setText(text);
     }
 
-    public void addOneToNumber() {
-        if (number == null) {
+    public void increaseNumber() {
+        if (number == null)
             number = 0;
-        }
         number++;
         setNumber(number);
-        if (getSelection() != null) {
-            selectionDone.setValue(true);
-        }
+        selectionDone.setValue(getSelection() != null);
     }
 
     public boolean isComboEnabled() {
@@ -203,25 +197,26 @@ public class SampleTypeSelectionWidget {
         }
     }
 
-    public void resetValues(boolean resetNumber) {
-        cv.setSelection(null);
-        if (resetNumber) {
+    public void resetValues(boolean resetSelection, boolean resetNumber) {
+        if (resetSelection)
+            cv.setSelection(null);
+        if (resetNumber)
             setNumber(null);
-        } else {
+        else
             setNumber(number); // to re-do the validation tests
-        }
     }
 
-    public void resetValues(final boolean resetNumber, boolean async) {
+    public void resetValues(final boolean resetSelection,
+        final boolean resetNumber, boolean async) {
         if (async) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    resetValues(resetNumber);
+                    resetValues(resetSelection, resetNumber);
                 }
             });
         } else {
-            resetValues(resetNumber);
+            resetValues(resetSelection, resetNumber);
         }
     }
 

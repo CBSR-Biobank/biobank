@@ -59,6 +59,7 @@ import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.QueryTree;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
+@Deprecated
 public class AdvancedReportsEditor extends BiobankFormBase {
 
     public static String ID = "edu.ualberta.med.biobank.editors.AdvancedReportsEditor";
@@ -432,7 +433,7 @@ public class AdvancedReportsEditor extends BiobankFormBase {
     }
 
     private void setEnabled(boolean enabled) {
-        SessionManager.getInstance().getSiteCombo().setEnabled(enabled);
+        // SessionManager.getInstance().getSiteCombo().setEnabled(enabled);
         generateButton.setEnabled(enabled);
         saveButton.setEnabled(enabled);
         printButton.setEnabled(enabled);

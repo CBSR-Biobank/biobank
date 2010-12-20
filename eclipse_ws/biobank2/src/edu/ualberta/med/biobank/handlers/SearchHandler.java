@@ -22,7 +22,7 @@ public class SearchHandler extends AbstractHandler {
         try {
             page.showView(SearchView.ID);
         } catch (PartInitException e) {
-            throw new ExecutionException("View can't be open", e);
+            throw new ExecutionException("View cannot be opened", e);
         }
         return null;
     }

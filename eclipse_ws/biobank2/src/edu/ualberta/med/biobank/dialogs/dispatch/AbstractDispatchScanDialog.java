@@ -27,6 +27,8 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.Messages;
@@ -46,7 +48,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     private PalletScanManagement palletScanManagement;
     protected ScanPalletWidget spw;
-    protected DispatchWrapper currentShipment;
+    protected ModelWrapper<?> currentShipment;
     private IObservableValue scanHasBeenLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
     private IObservableValue scanOkValue = new WritableValue(Boolean.TRUE,
@@ -57,10 +59,13 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     private boolean scanTubeAloneMode = false;
     private boolean rescanMode = false;
 
+    protected SiteWrapper currentSite;
+
     public AbstractDispatchScanDialog(Shell parentShell,
-        final DispatchWrapper currentShipment) {
+        final DispatchWrapper currentShipment, SiteWrapper currentSite) {
         super(parentShell);
         this.currentShipment = currentShipment;
+        this.currentSite = currentSite;
         palletScanManagement = new PalletScanManagement() {
 
             @Override
@@ -72,7 +77,47 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
             protected void processScanResult(IProgressMonitor monitor)
                 throws Exception {
                 setScanHasBeenLaunched(true);
-                AbstractDispatchScanDialog.this.processScanResult(monitor);
+                AbstractDispatchScanDialog.this.processScanResult(monitor,
+                    AbstractDispatchScanDialog.this.currentSite);
+            }
+
+            @Override
+            protected Map<RowColPos, PalletCell> getFakeScanCells()
+                throws Exception {
+                return AbstractDispatchScanDialog.this.getFakeScanCells();
+            }
+
+            @Override
+            protected void afterScanAndProcess() {
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        spw.setCells(getCells());
+                        setRescanMode(true);
+                    }
+                });
+            }
+        };
+    }
+
+    public AbstractDispatchScanDialog(Shell parentShell,
+        ModelWrapper<?> currentShipment, SiteWrapper currentSite) {
+        super(parentShell);
+        this.currentShipment = currentShipment;
+        this.currentSite = currentSite;
+        palletScanManagement = new PalletScanManagement() {
+
+            @Override
+            protected void beforeThreadStart() {
+                AbstractDispatchScanDialog.this.beforeScanThreadStart();
+            }
+
+            @Override
+            protected void processScanResult(IProgressMonitor monitor)
+                throws Exception {
+                setScanHasBeenLaunched(true);
+                AbstractDispatchScanDialog.this.processScanResult(monitor,
+                    AbstractDispatchScanDialog.this.currentSite);
             }
 
             @Override
@@ -118,8 +163,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
     protected abstract Map<RowColPos, PalletCell> getFakeScanCells()
         throws Exception;
 
-    protected abstract void processScanResult(IProgressMonitor monitor)
-        throws Exception;
+    protected abstract void processScanResult(IProgressMonitor monitor,
+        SiteWrapper currentSite) throws Exception;
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
@@ -187,8 +232,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     }
 
-    protected void createCustomDialogContents(
-        @SuppressWarnings("unused") Composite parent) {
+    @SuppressWarnings("unused")
+    protected void createCustomDialogContents(Composite parent) {
     }
 
     protected abstract List<CellStatus> getPalletCellStatus();
