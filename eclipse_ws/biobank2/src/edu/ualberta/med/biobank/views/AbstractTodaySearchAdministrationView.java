@@ -89,6 +89,7 @@ public abstract class AbstractTodaySearchAdministrationView extends
     @Override
     public void reload() {
         todayNode.performExpand();
+        searchedNode.removeObjects(todayNode.getCurrentTodayElements());
         searchedNode.performExpand();
         super.reload();
     }

@@ -148,4 +148,8 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         searchedObjects.clear();
         removeAll();
     }
+
+    public void removeObjects(List<? extends ModelWrapper<?>> children) {
+        searchedObjects.removeAll(children);
+    }
 }
