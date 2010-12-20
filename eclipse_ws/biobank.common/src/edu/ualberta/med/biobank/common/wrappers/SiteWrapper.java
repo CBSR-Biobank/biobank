@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -13,19 +12,17 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
-import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Request;
-import edu.ualberta.med.biobank.model.RequestAliquot;
-import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -55,7 +52,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
             "sitePvAttrCollection", "street1", "street2", "city", "province",
             "postalCode", "sentDispatchCollection", "sentDispatchCollection",
             "notificationCollection", "srcDispatchInfoCollection",
-            "studyCollection", "requestCollection" };
+            "studyCollection", "approvedRequestCollection",
+            "acceptedRequestCollection", "filledRequestCollection",
+            "shippedRequestCollection" };
     }
 
     public String getName() {
@@ -274,66 +273,89 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    public List<RequestWrapper> getRequestCollection() {
-        RequestWrapper request = new RequestWrapper(appService, new Request());
-        request.setInApprovedState();
-        request.setWaybill("testwaybill");
-        request.setSite(this);
-        request.setSubmitted(new Date());
-        StudyWrapper study = getStudyCollection().get(0);
-        ResearchGroupWrapper rg = new ResearchGroupWrapper(appService,
-            new ResearchGroup());
-        rg.setNameShort("testRG");
-        study.setResearchGroup(rg);
-        request.setStudy(study);
-        Address address = new Address();
-        address.setId(4);
-        request.setAddress(address);
-        List<Aliquot> aliquots = null;
-        try {
-            aliquots = appService.query(new HQLCriteria(
-                "select * from aliquot limit 50"));
-        } catch (ApplicationException e1) {
-            // TODO Auto-generated catch block
-            e1.printStackTrace();
+    @SuppressWarnings("unchecked")
+    public List<RequestWrapper> getApprovedRequestCollection() {
+        List<RequestWrapper> requestCollection = (List<RequestWrapper>) propertiesMap
+            .get("approvedRequestCollection");
+        if (requestCollection == null) {
+            Collection<Request> children = wrappedObject.getRequestCollection();
+            if (children != null) {
+                requestCollection = new ArrayList<RequestWrapper>();
+                for (Request request : children) {
+                    if (request.getState()
+                        .equals(RequestState.APPROVED.getId()))
+                        requestCollection.add(new RequestWrapper(appService,
+                            request));
+                }
+                propertiesMap.put("approvedRequestCollection",
+                    requestCollection);
+            }
         }
-        List<RequestAliquot> rAliquots = new ArrayList<RequestAliquot>();
-        for (Aliquot a : aliquots) {
-            RequestAliquot r = new RequestAliquot();
-            r.setAliquot(a);
-            if (a.getId() % 2 == 0)
-                r.setClaimedBy("me");
-            r.setRequest(request.getWrappedObject());
-            if (a.getId() % 3 == 0)
-                r.setState(2);
-            else
-                r.setState(3);
-            rAliquots.add(r);
-        }
-        List<RequestAliquotWrapper> wrappers = new ArrayList<RequestAliquotWrapper>();
-        for (RequestAliquot a : rAliquots)
-            wrappers.add(new RequestAliquotWrapper(appService, a));
-        request.setRequestAliquotCollection(rAliquots, wrappers);
-        try {
-            request.persist();
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        List<RequestWrapper> requestList = new ArrayList<RequestWrapper>();
-        requestList.add(request);
-        return requestList;
+        return requestCollection;
 
-        /*
-         * List<OrderWrapper> orderCollection = (List<OrderWrapper>)
-         * propertiesMap .get("orderCollection"); if (orderCollection == null) {
-         * Collection<Order> children = wrappedObject.getOrderCollection(); if
-         * (children != null) { orderCollection = new ArrayList<OrderWrapper>();
-         * for (Order order : children) { orderCollection.add(new
-         * OrderWrapper(appService, order)); }
-         * propertiesMap.put("orderCollection", orderCollection); } } return
-         * orderCollection;
-         */
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<RequestWrapper> getAcceptedRequestCollection() {
+        List<RequestWrapper> requestCollection = (List<RequestWrapper>) propertiesMap
+            .get("acceptedRequestCollection");
+        if (requestCollection == null) {
+            Collection<Request> children = wrappedObject.getRequestCollection();
+            if (children != null) {
+                requestCollection = new ArrayList<RequestWrapper>();
+                for (Request request : children) {
+                    if (request.getState()
+                        .equals(RequestState.ACCEPTED.getId()))
+                        requestCollection.add(new RequestWrapper(appService,
+                            request));
+                }
+                propertiesMap.put("acceptedRequestCollection",
+                    requestCollection);
+            }
+        }
+        return requestCollection;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<RequestWrapper> getFilledRequestCollection() {
+        List<RequestWrapper> requestCollection = (List<RequestWrapper>) propertiesMap
+            .get("filledRequestCollection");
+        if (requestCollection == null) {
+            Collection<Request> children = wrappedObject.getRequestCollection();
+            if (children != null) {
+                requestCollection = new ArrayList<RequestWrapper>();
+                for (Request request : children) {
+                    if (request.getState().equals(RequestState.FILLED.getId()))
+                        requestCollection.add(new RequestWrapper(appService,
+                            request));
+                }
+                propertiesMap.put("filledRequestCollection", requestCollection);
+            }
+        }
+        return requestCollection;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<RequestWrapper> getShippedRequestCollection() {
+        List<RequestWrapper> requestCollection = (List<RequestWrapper>) propertiesMap
+            .get("shippedRequestCollection");
+        if (requestCollection == null) {
+            Collection<Request> children = wrappedObject.getRequestCollection();
+            if (children != null) {
+                requestCollection = new ArrayList<RequestWrapper>();
+                for (Request request : children) {
+                    if (request.getState().equals(RequestState.SHIPPED.getId()))
+                        requestCollection.add(new RequestWrapper(appService,
+                            request));
+                }
+                propertiesMap
+                    .put("shippedRequestCollection", requestCollection);
+            }
+        }
+        return requestCollection;
+
     }
 
     @SuppressWarnings("unchecked")

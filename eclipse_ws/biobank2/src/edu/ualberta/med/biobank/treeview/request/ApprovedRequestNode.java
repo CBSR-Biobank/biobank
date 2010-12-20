@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class ApprovedRequestNode extends AdapterBase {
 
     private SiteWrapper site;
+    private static final String NODE_INFO = "Requests have been approved by a PI, pending acceptance from a site";
 
     public ApprovedRequestNode(AdapterBase parent, int id, SiteWrapper site) {
         super(parent, id, "Approved", true, false);
@@ -22,12 +23,12 @@ public class ApprovedRequestNode extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return null;
+        return NODE_INFO;
     }
 
     @Override
     public String getTooltipText() {
-        return null;
+        return NODE_INFO;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class ApprovedRequestNode extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode() {
-        return null;
+        return new RequestAdapter(this, null);
     }
 
     @Override
@@ -47,12 +48,13 @@ public class ApprovedRequestNode extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return site.getRequestCollection();
+        site.reset();
+        return site.getApprovedRequestCollection();
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return 0;
+        return getWrapperChildren().size();
     }
 
     @Override
@@ -63,13 +65,6 @@ public class ApprovedRequestNode extends AdapterBase {
     @Override
     public String getEntryFormId() {
         return null;
-    }
-
-    @Override
-    public void rebuild() {
-        for (AdapterBase adaper : getChildren()) {
-            adaper.rebuild();
-        }
     }
 
     @Override

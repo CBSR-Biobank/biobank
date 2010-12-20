@@ -27,6 +27,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
@@ -47,7 +48,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     private PalletScanManagement palletScanManagement;
     protected ScanPalletWidget spw;
-    protected DispatchWrapper currentShipment;
+    protected ModelWrapper<?> currentShipment;
     private IObservableValue scanHasBeenLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
     private IObservableValue scanOkValue = new WritableValue(Boolean.TRUE,
@@ -62,6 +63,45 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     public AbstractDispatchScanDialog(Shell parentShell,
         final DispatchWrapper currentShipment, SiteWrapper currentSite) {
+        super(parentShell);
+        this.currentShipment = currentShipment;
+        this.currentSite = currentSite;
+        palletScanManagement = new PalletScanManagement() {
+
+            @Override
+            protected void beforeThreadStart() {
+                AbstractDispatchScanDialog.this.beforeScanThreadStart();
+            }
+
+            @Override
+            protected void processScanResult(IProgressMonitor monitor)
+                throws Exception {
+                setScanHasBeenLaunched(true);
+                AbstractDispatchScanDialog.this.processScanResult(monitor,
+                    AbstractDispatchScanDialog.this.currentSite);
+            }
+
+            @Override
+            protected Map<RowColPos, PalletCell> getFakeScanCells()
+                throws Exception {
+                return AbstractDispatchScanDialog.this.getFakeScanCells();
+            }
+
+            @Override
+            protected void afterScanAndProcess() {
+                Display.getDefault().asyncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        spw.setCells(getCells());
+                        setRescanMode(true);
+                    }
+                });
+            }
+        };
+    }
+
+    public AbstractDispatchScanDialog(Shell parentShell,
+        ModelWrapper<?> currentShipment, SiteWrapper currentSite) {
         super(parentShell);
         this.currentShipment = currentShipment;
         this.currentSite = currentSite;

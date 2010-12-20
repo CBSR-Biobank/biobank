@@ -6,7 +6,7 @@ package edu.ualberta.med.biobank.common.util;
  */
 public enum RequestAliquotState {
     NONPROCESSED_STATE(0, "Non-Processed"), PROCESSED_STATE(1, "Processed"),
-    MISSING(2, "Missing");
+    UNAVAILABLE_STATE(2, "Unavailable");
 
     private Integer id;
     private String label;

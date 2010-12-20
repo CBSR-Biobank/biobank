@@ -1410,25 +1410,6 @@
          <toolbar
                id="edu.ualberta.med.biobank.views.RequestAdminView">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.requests.processRequest"
-                  icon="icons/request_edit.png"
-                  label="Process Request"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete Selected Item"
-                  style="push"
-                  tooltip="Delete Selected Item">
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"
                   label="Search"

@@ -1,10 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
@@ -17,18 +20,18 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class RequestWrapper extends ModelWrapper<Request> {
 
-    private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedDispatchAliquotCollection";
+    private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedRequestAliquotCollection";
 
-    private static final String PROCESSED_ALIQUOTS_KEY = "receivedDispatchAliquots";
+    private static final String PROCESSED_ALIQUOTS_KEY = "processedRequestAliquots";
 
-    private static final String MISSING_ALIQUOTS_KEY = "missingDispatchAliquots";
+    private static final String UNAVAILABLE_ALIQUOTS_KEY = "unavailableRequestAliquots";
 
-    private static final String ALL_ALIQUOTS_KEY = "aliquotCollection";
+    private static final String ALL_ALIQUOTS_KEY = "requestAliquotCollection";
 
-    private boolean stateModified = false;
     private AddressWrapper address;
 
     public RequestWrapper(WritableApplicationService appService) {
@@ -44,7 +47,7 @@ public class RequestWrapper extends ModelWrapper<Request> {
     @Override
     protected String[] getPropertyChangeNames() {
         return new String[] { "id", "submitted", "accepted", "shipped",
-            "waybill", "state" };
+            "waybill", "state", "requestAliquotCollection" };
     }
 
     @Override
@@ -93,28 +96,28 @@ public class RequestWrapper extends ModelWrapper<Request> {
         return wrappedObject.getSubmitted();
     }
 
-    public boolean isInCreationState() {
-        return true;
+    public boolean isInLostState() {
+        return RequestState.LOST.isEquals(getState());
     }
 
-    public boolean isInNewState() {
-        return true;
+    public boolean isInApprovedState() {
+        return RequestState.APPROVED.isEquals(getState());
     }
 
-    public boolean isInProcessingState() {
-        return true;
+    public boolean isInAcceptedState() {
+        return RequestState.ACCEPTED.isEquals(getState());
     }
 
     public boolean isInFilledState() {
-        return true;
+        return RequestState.FILLED.isEquals(getState());
     }
 
     public boolean isInShippedState() {
-        return true;
+        return RequestState.SHIPPED.isEquals(getState());
     }
 
     public boolean isInClosedState() {
-        return true;
+        return RequestState.CLOSED.isEquals(getState());
     }
 
     public void setInCloseState() {
@@ -122,10 +125,7 @@ public class RequestWrapper extends ModelWrapper<Request> {
     }
 
     private void setState(RequestState state) {
-        Integer oldState = wrappedObject.getState();
         wrappedObject.setState(state.getId());
-        stateModified = oldState == null || state == null
-            || !oldState.equals(state);
     }
 
     public void setInLostState() {
@@ -136,12 +136,17 @@ public class RequestWrapper extends ModelWrapper<Request> {
         setState(RequestState.APPROVED);
     }
 
-    public void setInNewState() {
-        setState(RequestState.NEW);
+    public void setInFilledState() {
+        setState(RequestState.FILLED);
     }
 
     public void setInAcceptedState() {
+        wrappedObject.setAccepted(new Date());
         setState(RequestState.ACCEPTED);
+    }
+
+    public void setInShippedState() {
+        setState(RequestState.SHIPPED);
     }
 
     public Date getSubmitted() {
@@ -217,6 +222,41 @@ public class RequestWrapper extends ModelWrapper<Request> {
         return site;
     }
 
+    public void receiveAliquots(List<AliquotWrapper> aliquots) throws Exception {
+        List<RequestAliquotWrapper> flagged = new ArrayList<RequestAliquotWrapper>();
+        List<RequestAliquotWrapper> ras = getNonProcessedRequestAliquotCollection();
+        for (RequestAliquotWrapper r : ras)
+            for (AliquotWrapper a : aliquots)
+                if (r.getAliquot().getInventoryId().equals(a.getInventoryId())) {
+                    flagged.add(r);
+                }
+        flagAliquots(flagged);
+    }
+
+    public void flagAliquots(List<RequestAliquotWrapper> scanned)
+        throws Exception {
+        for (RequestAliquotWrapper a : scanned) {
+            a.setState(RequestAliquotState.PROCESSED_STATE.getId());
+            a.persist();
+        }
+        propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
+        propertiesMap.put(PROCESSED_ALIQUOTS_KEY, null);
+    }
+
+    public void receiveAliquot(String text) throws Exception {
+        List<RequestAliquotWrapper> ras = getNonProcessedRequestAliquotCollection();
+        for (RequestAliquotWrapper r : ras)
+            if (r.getAliquot().getInventoryId().equals(text)) {
+                flagAliquots(Arrays.asList(r));
+                break;
+            }
+        throw new Exception(
+            "Aliquot "
+                + text
+                + " is not expected for this request. Do not include it in this shipment.");
+
+    }
+
     public void setSite(SiteWrapper site) {
         propertiesMap.put("site", site);
         Site oldSite = wrappedObject.getSite();
@@ -252,7 +292,12 @@ public class RequestWrapper extends ModelWrapper<Request> {
         List<RequestAliquotWrapper> allAliquotWrappers) {
         Collection<RequestAliquot> oldAliquots = wrappedObject
             .getRequestAliquotCollection();
-        wrappedObject.setRequestAliquotCollection(allAliquotObjects);
+        if (allAliquotObjects instanceof Set)
+            wrappedObject.setRequestAliquotCollection(allAliquotObjects);
+        else
+            wrappedObject
+                .setRequestAliquotCollection(new HashSet<RequestAliquot>(
+                    allAliquotObjects));
         propertyChangeSupport.firePropertyChange("requestAliquotCollection",
             oldAliquots, allAliquotObjects);
         propertiesMap.put("requestAliquotCollection", allAliquotWrappers);
@@ -280,7 +325,7 @@ public class RequestWrapper extends ModelWrapper<Request> {
                 for (RequestAliquotWrapper dsa : children) {
                     boolean hasState = false;
                     for (RequestAliquotState state : states) {
-                        if (state.isEquals(dsa.getState())) {
+                        if (state.getId().equals(dsa.getState())) {
                             hasState = true;
                             break;
                         }
@@ -294,6 +339,40 @@ public class RequestWrapper extends ModelWrapper<Request> {
         if ((dsaCollection != null) && sort)
             Collections.sort(dsaCollection);
         return dsaCollection;
+    }
+
+    public List<RequestAliquotWrapper> getUnavailableRequestAliquotCollection() {
+        return getRequestAliquotCollectionWithState(UNAVAILABLE_ALIQUOTS_KEY,
+            true, RequestAliquotState.UNAVAILABLE_STATE);
+    }
+
+    public void resetStateLists() {
+        propertiesMap.put(UNAVAILABLE_ALIQUOTS_KEY, null);
+        propertiesMap.put(PROCESSED_ALIQUOTS_KEY, null);
+        propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
+        propertiesMap.put(ALL_ALIQUOTS_KEY, null);
+    }
+
+    public RequestAliquotWrapper getRequestAliquot(String inventoryId) {
+        for (RequestAliquotWrapper dsa : getRequestAliquotCollection(false)) {
+            if (dsa.getAliquot().getInventoryId().equals(inventoryId))
+                return dsa;
+        }
+        return null;
+    }
+
+    public static List<RequestWrapper> getRequestByNumber(
+        WritableApplicationService appService, String requestNumber)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria("from "
+            + Request.class.getName() + " where id = ?",
+            Arrays.asList(new Object[] { Integer.parseInt(requestNumber) }));
+        List<Request> shipments = appService.query(criteria);
+        List<RequestWrapper> wrappers = new ArrayList<RequestWrapper>();
+        for (Request s : shipments) {
+            wrappers.add(new RequestWrapper(appService, s));
+        }
+        return wrappers;
     }
 
 }

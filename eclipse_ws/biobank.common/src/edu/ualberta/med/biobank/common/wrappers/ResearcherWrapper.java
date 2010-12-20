@@ -43,7 +43,7 @@ public class ResearcherWrapper extends ModelWrapper<Researcher> {
         return researchGroupCollection;
     }
 
-    private void setResearchGroupCollection(
+    public void setResearchGroupCollection(
         Collection<ResearchGroup> allResearchGroupObjects,
         List<ResearchGroupWrapper> allResearchGroupWrappers) {
         Collection<ResearchGroup> oldResearchGroups = wrappedObject

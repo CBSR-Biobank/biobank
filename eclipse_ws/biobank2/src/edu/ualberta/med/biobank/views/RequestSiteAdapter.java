@@ -8,12 +8,14 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.request.AcceptedRequestNode;
 import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
 import edu.ualberta.med.biobank.treeview.request.FilledRequestNode;
+import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.treeview.request.ShippedRequestNode;
 
 public class RequestSiteAdapter extends AdapterBase {
@@ -25,7 +27,10 @@ public class RequestSiteAdapter extends AdapterBase {
 
     public RequestSiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site, false);
+        createNodes(site);
+    }
 
+    private void createNodes(SiteWrapper site) {
         approvedNode = new ApprovedRequestNode(this, 0, site);
         approvedNode.setParent(this);
         this.addChild(approvedNode);
@@ -41,7 +46,6 @@ public class RequestSiteAdapter extends AdapterBase {
         shippedNode = new ShippedRequestNode(this, 3, site);
         shippedNode.setParent(this);
         this.addChild(shippedNode);
-
     }
 
     public SiteWrapper getWrapper() {
@@ -81,12 +85,12 @@ public class RequestSiteAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode() {
-        return null;
+        return new RequestAdapter(this, null);
     }
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        return null;
+        return new RequestAdapter(this, (RequestWrapper) child);
     }
 
     @Override
@@ -96,7 +100,7 @@ public class RequestSiteAdapter extends AdapterBase {
 
     @Override
     protected int getWrapperChildCount() {
-        return 0;
+        return getWrapperChildren().size();
     }
 
     @Override
@@ -110,15 +114,14 @@ public class RequestSiteAdapter extends AdapterBase {
     }
 
     @Override
+    public void performDoubleClick() {
+
+    }
+
+    @Override
     public void rebuild() {
         for (AdapterBase adaper : getChildren()) {
             adaper.rebuild();
         }
     }
-
-    @Override
-    public void performDoubleClick() {
-
-    }
-
 }

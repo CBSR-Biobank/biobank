@@ -27,7 +27,7 @@
       <fontsize>12</fontsize>
       <defaultstereotypeview>0</defaultstereotypeview>
       <generationoutputdir>/tmp</generationoutputdir>
-      <activediagram>DM-REQUEST</activediagram>
+      <activediagram>Request</activediagram>
     </settings>
     <searchpath href="PROJECT_DIR" />
     <members>
@@ -165,7 +165,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Wed Dec 08 12:17:07 MST 2010'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Thu Dec 09 11:17:09 MST 2010'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -11628,6 +11628,30 @@
                     </UML:Dependency>
                   </UML:Namespace.ownedElement>
                   <UML:Classifier.feature>
+                    <UML:Attribute xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C25'
+                      name = 'ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
+                      changeability = 'changeable' targetScope = 'instance'>
+                      <UML:StructuralFeature.multiplicity>
+                        <UML:Multiplicity xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C26'>
+                          <UML:Multiplicity.range>
+                            <UML:MultiplicityRange xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C27'
+                              lower = '1' upper = '1'/>
+                          </UML:Multiplicity.range>
+                        </UML:Multiplicity>
+                      </UML:StructuralFeature.multiplicity>
+                      <UML:ModelElement.taggedValue>
+                        <UML:TaggedValue xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C2F'
+                          isSpecification = 'false'>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.RequestAliquot.id</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.type>
+                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
+                          </UML:TaggedValue.type>
+                        </UML:TaggedValue>
+                      </UML:ModelElement.taggedValue>
+                      <UML:StructuralFeature.type>
+                        <UML:DataType xmi.idref = 'eaxmiid0'/>
+                      </UML:StructuralFeature.type>
+                    </UML:Attribute>
                     <UML:Attribute xmi.id = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001B82'
                       name = 'REQUEST_ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
                       changeability = 'changeable' targetScope = 'instance'>
@@ -11739,30 +11763,6 @@
                         </UML:Parameter>
                       </UML:BehavioralFeature.parameter>
                     </UML:Operation>
-                    <UML:Attribute xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C25'
-                      name = 'ID' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
-                      changeability = 'changeable' targetScope = 'instance'>
-                      <UML:StructuralFeature.multiplicity>
-                        <UML:Multiplicity xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C26'>
-                          <UML:Multiplicity.range>
-                            <UML:MultiplicityRange xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C27'
-                              lower = '1' upper = '1'/>
-                          </UML:Multiplicity.range>
-                        </UML:Multiplicity>
-                      </UML:StructuralFeature.multiplicity>
-                      <UML:ModelElement.taggedValue>
-                        <UML:TaggedValue xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C2F'
-                          isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.RequestAliquot.id</UML:TaggedValue.dataValue>
-                          <UML:TaggedValue.type>
-                            <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
-                          </UML:TaggedValue.type>
-                        </UML:TaggedValue>
-                      </UML:ModelElement.taggedValue>
-                      <UML:StructuralFeature.type>
-                        <UML:DataType xmi.idref = 'eaxmiid0'/>
-                      </UML:StructuralFeature.type>
-                    </UML:Attribute>
                     <UML:Attribute xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C29'
                       name = 'STATE' visibility = 'public' isSpecification = 'false' ownerScope = 'instance'
                       changeability = 'changeable' targetScope = 'instance'>
@@ -11806,14 +11806,7 @@
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:1121acba21f:-8000:0000000000003190'/>
                           </UML:TaggedValue.type>
                         </UML:TaggedValue>
-                        <UML:TaggedValue xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C34'
-                          isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
-                          <UML:TaggedValue.type>
-                            <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001CCB'/>
-                          </UML:TaggedValue.type>
-                        </UML:TaggedValue>
-                        <UML:TaggedValue xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C35'
+                        <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C6E'
                           isSpecification = 'false'>
                           <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
@@ -18243,9 +18236,9 @@
                                       <UML:ModelElement.taggedValue>
                                         <UML:TaggedValue xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C52'
                                           isSpecification = 'false'>
-                                          <UML:TaggedValue.dataValue></UML:TaggedValue.dataValue>
+                                          <UML:TaggedValue.dataValue>all</UML:TaggedValue.dataValue>
                                           <UML:TaggedValue.type>
-                                            <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001CCB'/>
+                                            <UML:TagDefinition xmi.idref = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C7D'/>
                                           </UML:TaggedValue.type>
                                         </UML:TaggedValue>
                                       </UML:ModelElement.taggedValue>
@@ -19087,6 +19080,22 @@
               </UML:Multiplicity.range>
             </UML:Multiplicity>
           </UML:TagDefinition.multiplicity>
+        </UML:TagDefinition>
+        <UML:TagDefinition xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C7D'
+          name = 'NCI_CASCADE_ASSOCIATION#edu.ualberta.med.biobank.model.Request.requestAliquotCollection'
+          isSpecification = 'false'>
+          <UML:TagDefinition.multiplicity>
+            <UML:Multiplicity xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C7E'>
+              <UML:Multiplicity.range>
+                <UML:MultiplicityRange xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C7F'
+                  lower = '0' upper = '1'/>
+              </UML:Multiplicity.range>
+            </UML:Multiplicity>
+          </UML:TagDefinition.multiplicity>
+          <UML:ModelElement.taggedValue>
+            <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C80'
+              isSpecification = 'false'/>
+          </UML:ModelElement.taggedValue>
         </UML:TagDefinition>
       </UML:Namespace.ownedElement>
     </UML:Model>
@@ -20052,6 +20061,104 @@
       </UML:TaggedValue.type>
     </UML:TaggedValue>
     <UML:TaggedValue xmi.id = '10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C6C'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C6F'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C70'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C71'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C72'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C73'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C74'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C75'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C76'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C77'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C78'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C79'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C7A'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C7B'
+      isSpecification = 'false'>
+      <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
+      <UML:TaggedValue.type>
+        <UML:TagDefinition xmi.idref = '10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001BC1'/>
+      </UML:TaggedValue.type>
+    </UML:TaggedValue>
+    <UML:TaggedValue xmi.id = '10-13-7--5--3609eb09:12cc2120219:-8000:0000000000001C7C'
       isSpecification = 'false'>
       <UML:TaggedValue.dataValue>true</UML:TaggedValue.dataValue>
       <UML:TaggedValue.type>
@@ -64225,7 +64332,7 @@
       name="DM-DISPATCH"
 >
   <group name="Fig0"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[1208, 336, 393, 417]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[1184, 584, 393, 417]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1-242f6e29:11fd7d1c55e:-8000:00000000000013BE"
        fill="1"
        fillcolor="white"
@@ -64236,8 +64343,8 @@
     </private>
     
     <rectangle name="Fig0.0"
-      x="1208"
-      y="336"
+      x="1184"
+      y="584"
       width="393"
       height="417"
       fill="1"
@@ -64246,7 +64353,7 @@
       strokecolor="black"
     />
     <group name="Fig0.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[1208, 336, 393, 17]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[1184, 584, 393, 17]"
          href="127-0-1-1-242f6e29:11fd7d1c55e:-8000:00000000000013BE"
          fill="1"
          fillcolor="white"
@@ -64257,8 +64364,8 @@
       </private>
       
       <rectangle name="Fig0.1.0"
-        x="1208"
-        y="336"
+        x="1184"
+        y="584"
         width="393"
         height="17"
         fill="1"
@@ -64267,8 +64374,8 @@
         strokecolor="black"
       />
       <text name="Fig0.1.1"
-        x="1209"
-        y="337"
+        x="1185"
+        y="585"
         width="391"
         height="15"
         fill="1"
@@ -64284,8 +64391,8 @@
       >&lt;&lt;table&gt;&gt;</text>
     </group>
     <text name="Fig0.2"
-      x="1208"
-      y="353"
+      x="1184"
+      y="601"
       width="393"
       height="22"
       fill="1"
@@ -64300,7 +64407,7 @@
       justification="Center"
     >ALIQUOT</text>
     <group name="Fig0.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[1209, 593, 392, 159]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[1185, 841, 392, 159]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -64310,8 +64417,8 @@
       </private>
       
       <rectangle name="Fig0.3.0"
-        x="1209"
-        y="593"
+        x="1185"
+        y="841"
         width="392"
         height="159"
         fill="1"
@@ -64326,14 +64433,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="1209"
-                y="593" />
-        <lineto x="1601"
-                y="593" />
+        <moveto x="1185"
+                y="841" />
+        <lineto x="1577"
+                y="841" />
       </path>
       <text name="Fig0.3.2"
-        x="1209"
-        y="594"
+        x="1185"
+        y="842"
         width="161"
         height="18"
         fill="0"
@@ -64348,8 +64455,8 @@
         justification="Left"
       >PK_ALIQUOT(ID : NUMBER)</text>
       <text name="Fig0.3.3"
-        x="1209"
-        y="609"
+        x="1185"
+        y="857"
         width="342"
         height="18"
         fill="0"
@@ -64364,8 +64471,8 @@
         justification="Left"
       >FK_ALIQUOT_PATIENT_VISIT(PATIENT_VISIT_ID : NUMBER)</text>
       <text name="Fig0.3.4"
-        x="1209"
-        y="624"
+        x="1185"
+        y="872"
         width="342"
         height="18"
         fill="0"
@@ -64380,8 +64487,8 @@
         justification="Left"
       >FK_ALIQUOT_SAMPLE_TYPE(SAMPLE_TYPE_ID : NUMBER)</text>
       <text name="Fig0.3.5"
-        x="1209"
-        y="639"
+        x="1185"
+        y="887"
         width="380"
         height="24"
         fill="0"
@@ -64397,7 +64504,7 @@
       >FK_ALIQUOT_ACTIVITY_STATUS(ACTIVITY_STATUS_ID : NUMBER)</text>
     </group>
     <group name="Fig0.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[1209, 376, 392, 216]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[1185, 624, 392, 216]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -64407,8 +64514,8 @@
       </private>
       
       <rectangle name="Fig0.4.0"
-        x="1209"
-        y="376"
+        x="1185"
+        y="624"
         width="392"
         height="216"
         fill="1"
@@ -64423,14 +64530,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="1209"
-                y="376" />
-        <lineto x="1601"
-                y="376" />
+        <moveto x="1185"
+                y="624" />
+        <lineto x="1577"
+                y="624" />
       </path>
       <text name="Fig0.4.2"
-        x="1209"
-        y="377"
+        x="1185"
+        y="625"
         width="79"
         height="18"
         fill="0"
@@ -64445,8 +64552,8 @@
         justification="Left"
       >ID : NUMBER</text>
       <text name="Fig0.4.3"
-        x="1209"
-        y="392"
+        x="1185"
+        y="640"
         width="170"
         height="18"
         fill="0"
@@ -64461,8 +64568,8 @@
         justification="Left"
       >SAMPLE_TYPE_ID : NUMBER</text>
       <text name="Fig0.4.4"
-        x="1209"
-        y="407"
+        x="1185"
+        y="655"
         width="188"
         height="15"
         fill="0"
@@ -64477,8 +64584,8 @@
         justification="Left"
       >INVENTORY_ID : VARCHAR(100)</text>
       <text name="Fig0.4.5"
-        x="1209"
-        y="422"
+        x="1185"
+        y="670"
         width="111"
         height="15"
         fill="0"
@@ -64493,8 +64600,8 @@
         justification="Left"
       >LINK_DATE : DATE</text>
       <text name="Fig0.4.6"
-        x="1209"
-        y="437"
+        x="1185"
+        y="685"
         width="104"
         height="15"
         fill="0"
@@ -64509,8 +64616,8 @@
         justification="Left"
       >COMMENT : TEXT</text>
       <text name="Fig0.4.7"
-        x="1209"
-        y="452"
+        x="1185"
+        y="700"
         width="123"
         height="15"
         fill="0"
@@ -64525,8 +64632,8 @@
         justification="Left"
       >QUANTITY : DOUBLE</text>
       <text name="Fig0.4.8"
-        x="1209"
-        y="467"
+        x="1185"
+        y="715"
         width="170"
         height="18"
         fill="0"
@@ -64541,8 +64648,8 @@
         justification="Left"
       >PATIENT_VISIT_ID : NUMBER</text>
       <text name="Fig0.4.9"
-        x="1209"
-        y="482"
+        x="1185"
+        y="730"
         width="189"
         height="24"
         fill="0"
@@ -64558,8 +64665,8 @@
       >ACTIVITY_STATUS_ID : NUMBER</text>
     </group>
     <rectangle name="Fig0.5"
-      x="1208"
-      y="336"
+      x="1184"
+      y="584"
       width="393"
       height="417"
       fill="0"
@@ -65759,9 +65866,9 @@
       strokecolor="black"
     >
       <moveto x="1248"
-              y="336" />
+              y="405" />
       <lineto x="1248"
-              y="336" />
+              y="584" />
     </path>
   </group>
   <group name="Fig8"
@@ -67848,7 +67955,7 @@
     />
   </group>
   <group name="Fig1"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[16, 200, 160, 101]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[0, 216, 160, 101]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000001855"
        fill="1"
        fillcolor="white"
@@ -67859,8 +67966,8 @@
     </private>
     
     <rectangle name="Fig1.0"
-      x="16"
-      y="200"
+      x="0"
+      y="216"
       width="160"
       height="101"
       fill="1"
@@ -67869,7 +67976,7 @@
       strokecolor="black"
     />
     <group name="Fig1.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[16, 200, 160, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[0, 216, 160, 0]"
          href="127-0-1-1-546a13a8:12c32bc9037:-8000:0000000000001855"
          fill="1"
          fillcolor="white"
@@ -67880,8 +67987,8 @@
       </private>
       
       <rectangle name="Fig1.1.0"
-        x="16"
-        y="200"
+        x="0"
+        y="216"
         width="160"
         height="0"
         fill="1"
@@ -67891,8 +67998,8 @@
       />
     </group>
     <text name="Fig1.2"
-      x="16"
-      y="200"
+      x="0"
+      y="216"
       width="160"
       height="22"
       fill="1"
@@ -67907,7 +68014,7 @@
       justification="Center"
     >ReportFilter</text>
     <group name="Fig1.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[17, 277, 159, 23]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[1, 293, 159, 23]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -67917,8 +68024,8 @@
       </private>
       
       <rectangle name="Fig1.3.0"
-        x="17"
-        y="277"
+        x="1"
+        y="293"
         width="159"
         height="23"
         fill="1"
@@ -67933,14 +68040,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="17"
-                y="277" />
-        <lineto x="176"
-                y="277" />
+        <moveto x="1"
+                y="293" />
+        <lineto x="160"
+                y="293" />
       </path>
     </group>
     <group name="Fig1.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[17, 223, 159, 53]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[1, 239, 159, 53]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -67950,8 +68057,8 @@
       </private>
       
       <rectangle name="Fig1.4.0"
-        x="17"
-        y="223"
+        x="1"
+        y="239"
         width="159"
         height="53"
         fill="1"
@@ -67966,14 +68073,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="17"
-                y="223" />
-        <lineto x="176"
-                y="223" />
+        <moveto x="1"
+                y="239" />
+        <lineto x="160"
+                y="239" />
       </path>
       <text name="Fig1.4.2"
-        x="17"
-        y="224"
+        x="1"
+        y="240"
         width="63"
         height="15"
         fill="0"
@@ -67988,8 +68095,8 @@
         justification="Left"
       >id : Integer</text>
       <text name="Fig1.4.3"
-        x="17"
-        y="239"
+        x="1"
+        y="255"
         width="97"
         height="15"
         fill="0"
@@ -68004,8 +68111,8 @@
         justification="Left"
       >position : Integer</text>
       <text name="Fig1.4.4"
-        x="17"
-        y="254"
+        x="1"
+        y="270"
         width="99"
         height="21"
         fill="0"
@@ -68021,8 +68128,8 @@
       >operator : Integer</text>
     </group>
     <rectangle name="Fig1.5"
-      x="16"
-      y="200"
+      x="0"
+      y="216"
       width="160"
       height="101"
       fill="0"
@@ -68435,7 +68542,7 @@
       strokecolor="black"
     >
       <moveto x="56"
-              y="200" />
+              y="216" />
       <lineto x="56"
               y="124" />
     </path>
@@ -68460,9 +68567,9 @@
       strokecolor="black"
     >
       <moveto x="248"
-              y="208" />
-      <lineto x="176"
-              y="208" />
+              y="264" />
+      <lineto x="160"
+              y="264" />
     </path>
   </group>
   <group name="Fig6"
@@ -68485,7 +68592,7 @@
       strokecolor="black"
     >
       <moveto x="56"
-              y="301" />
+              y="317" />
       <lineto x="56"
               y="464" />
     </path>
@@ -73917,7 +74024,7 @@
     </path>
   </group>
   <group name="Fig11"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[56, 112, 97, 146]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[72, 88, 97, 146]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001CD7"
        fill="1"
        fillcolor="white"
@@ -73928,8 +74035,8 @@
     </private>
     
     <rectangle name="Fig11.0"
-      x="56"
-      y="112"
+      x="72"
+      y="88"
       width="97"
       height="146"
       fill="1"
@@ -73938,7 +74045,7 @@
       strokecolor="black"
     />
     <group name="Fig11.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[56, 112, 97, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[72, 88, 97, 0]"
          href="10-13-7--5-1e57a77f:12cad857ace:-8000:0000000000001CD7"
          fill="1"
          fillcolor="white"
@@ -73949,8 +74056,8 @@
       </private>
       
       <rectangle name="Fig11.1.0"
-        x="56"
-        y="112"
+        x="72"
+        y="88"
         width="97"
         height="0"
         fill="1"
@@ -73960,8 +74067,8 @@
       />
     </group>
     <text name="Fig11.2"
-      x="56"
-      y="112"
+      x="72"
+      y="88"
       width="97"
       height="22"
       fill="1"
@@ -73976,7 +74083,7 @@
       justification="Center"
     >Request</text>
     <group name="Fig11.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[57, 234, 96, 23]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[73, 210, 96, 23]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -73986,8 +74093,8 @@
       </private>
       
       <rectangle name="Fig11.3.0"
-        x="57"
-        y="234"
+        x="73"
+        y="210"
         width="96"
         height="23"
         fill="1"
@@ -74002,14 +74109,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="57"
-                y="234" />
-        <lineto x="153"
-                y="234" />
+        <moveto x="73"
+                y="210" />
+        <lineto x="169"
+                y="210" />
       </path>
     </group>
     <group name="Fig11.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[57, 135, 96, 98]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[73, 111, 96, 98]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -74019,8 +74126,8 @@
       </private>
       
       <rectangle name="Fig11.4.0"
-        x="57"
-        y="135"
+        x="73"
+        y="111"
         width="96"
         height="98"
         fill="1"
@@ -74035,14 +74142,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="57"
-                y="135" />
-        <lineto x="153"
-                y="135" />
+        <moveto x="73"
+                y="111" />
+        <lineto x="169"
+                y="111" />
       </path>
       <text name="Fig11.4.2"
-        x="57"
-        y="136"
+        x="73"
+        y="112"
         width="63"
         height="15"
         fill="0"
@@ -74057,8 +74164,8 @@
         justification="Left"
       >id : Integer</text>
       <text name="Fig11.4.3"
-        x="57"
-        y="151"
+        x="73"
+        y="127"
         width="96"
         height="15"
         fill="0"
@@ -74073,8 +74180,8 @@
         justification="Left"
       >submitted : Date</text>
       <text name="Fig11.4.4"
-        x="57"
-        y="166"
+        x="73"
+        y="142"
         width="91"
         height="15"
         fill="0"
@@ -74089,8 +74196,8 @@
         justification="Left"
       >accepted : Date</text>
       <text name="Fig11.4.5"
-        x="57"
-        y="181"
+        x="73"
+        y="157"
         width="86"
         height="15"
         fill="0"
@@ -74105,8 +74212,8 @@
         justification="Left"
       >shipped : Date</text>
       <text name="Fig11.4.6"
-        x="57"
-        y="196"
+        x="73"
+        y="172"
         width="84"
         height="15"
         fill="0"
@@ -74121,8 +74228,8 @@
         justification="Left"
       >waybill : String</text>
       <text name="Fig11.4.7"
-        x="57"
-        y="211"
+        x="73"
+        y="187"
         width="80"
         height="21"
         fill="0"
@@ -74138,8 +74245,8 @@
       >state : Integer</text>
     </group>
     <rectangle name="Fig11.5"
-      x="56"
-      y="112"
+      x="72"
+      y="88"
       width="97"
       height="146"
       fill="0"
@@ -74167,9 +74274,9 @@
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="106"
-              y="258" />
-      <lineto x="106"
+      <moveto x="105"
+              y="234" />
+      <lineto x="105"
               y="328" />
     </path>
   </group>
@@ -74192,10 +74299,10 @@
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="153"
-              y="157" />
-      <lineto x="272"
-              y="157" />
+      <moveto x="169"
+              y="149" />
+      <lineto x="248"
+              y="149" />
     </path>
   </group>
   <group name="Fig14"
@@ -74217,9 +74324,9 @@
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="153"
-              y="258" />
-      <lineto x="153"
+      <moveto x="152"
+              y="234" />
+      <lineto x="152"
               y="408" />
     </path>
   </group>
@@ -74242,14 +74349,14 @@
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="153"
-              y="258" />
+      <moveto x="169"
+              y="234" />
       <lineto x="368"
-              y="258" />
+              y="256" />
     </path>
   </group>
   <group name="Fig16"
-       description="org.argouml.uml.diagram.static_structure.ui.FigClass[272, 72, 120, 101]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
+       description="org.argouml.uml.diagram.static_structure.ui.FigClass[248, 56, 120, 101]pathVisible=false;stereotypeView=0;operationsVisible=true;attributesVisible=true;"
        href="10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C39"
        fill="1"
        fillcolor="white"
@@ -74260,8 +74367,8 @@
     </private>
     
     <rectangle name="Fig16.0"
-      x="272"
-      y="72"
+      x="248"
+      y="56"
       width="120"
       height="101"
       fill="1"
@@ -74270,7 +74377,7 @@
       strokecolor="black"
     />
     <group name="Fig16.1"
-         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[272, 72, 120, 0]"
+         description="org.argouml.uml.diagram.ui.FigStereotypesCompartment[248, 56, 120, 0]"
          href="10-13-7--5-30300c71:12cbdf59771:-8000:0000000000001C39"
          fill="1"
          fillcolor="white"
@@ -74281,8 +74388,8 @@
       </private>
       
       <rectangle name="Fig16.1.0"
-        x="272"
-        y="72"
+        x="248"
+        y="56"
         width="120"
         height="0"
         fill="1"
@@ -74292,8 +74399,8 @@
       />
     </group>
     <text name="Fig16.2"
-      x="272"
-      y="72"
+      x="248"
+      y="56"
       width="120"
       height="22"
       fill="1"
@@ -74308,7 +74415,7 @@
       justification="Center"
     >RequestAliquot</text>
     <group name="Fig16.3"
-         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[273, 149, 119, 23]"
+         description="org.argouml.uml.diagram.ui.FigOperationsCompartment[249, 133, 119, 23]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -74318,8 +74425,8 @@
       </private>
       
       <rectangle name="Fig16.3.0"
-        x="273"
-        y="149"
+        x="249"
+        y="133"
         width="119"
         height="23"
         fill="1"
@@ -74334,14 +74441,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="273"
-                y="149" />
-        <lineto x="392"
-                y="149" />
+        <moveto x="249"
+                y="133" />
+        <lineto x="368"
+                y="133" />
       </path>
     </group>
     <group name="Fig16.4"
-         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[273, 95, 119, 53]"
+         description="org.argouml.uml.diagram.ui.FigAttributesCompartment[249, 79, 119, 53]"
          fill="1"
          fillcolor="white"
          stroke="0"
@@ -74351,8 +74458,8 @@
       </private>
       
       <rectangle name="Fig16.4.0"
-        x="273"
-        y="95"
+        x="249"
+        y="79"
         width="119"
         height="53"
         fill="1"
@@ -74367,14 +74474,14 @@
         stroke="1"
         strokecolor="black"
       >
-        <moveto x="273"
-                y="95" />
-        <lineto x="392"
-                y="95" />
+        <moveto x="249"
+                y="79" />
+        <lineto x="368"
+                y="79" />
       </path>
       <text name="Fig16.4.2"
-        x="273"
-        y="96"
+        x="249"
+        y="80"
         width="63"
         height="15"
         fill="0"
@@ -74389,8 +74496,8 @@
         justification="Left"
       >id : Integer</text>
       <text name="Fig16.4.3"
-        x="273"
-        y="111"
+        x="249"
+        y="95"
         width="80"
         height="15"
         fill="0"
@@ -74405,8 +74512,8 @@
         justification="Left"
       >state : Integer</text>
       <text name="Fig16.4.4"
-        x="273"
-        y="126"
+        x="249"
+        y="110"
         width="104"
         height="21"
         fill="0"
@@ -74422,8 +74529,8 @@
       >claimedBy : String</text>
     </group>
     <rectangle name="Fig16.5"
-      x="272"
-      y="72"
+      x="248"
+      y="56"
       width="120"
       height="101"
       fill="0"
@@ -74451,8 +74558,8 @@
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="392"
-              y="168" />
+      <moveto x="368"
+              y="157" />
       <lineto x="512"
               y="168" />
     </path>
@@ -75012,38 +75119,6 @@
       <text name="Fig1.4.2"
         x="721"
         y="497"
-        width="144"
-        height="15"
-        fill="0"
-        fillcolor="white"
-        stroke="0"
-        strokecolor="black"
-        textcolor="black"
-        font="Arial"
-        italic="false"
-        bold="false"
-        textsize="12"
-        justification="Left"
-      >REQUEST_ID : NUMBER</text>
-      <text name="Fig1.4.3"
-        x="721"
-        y="512"
-        width="137"
-        height="15"
-        fill="0"
-        fillcolor="white"
-        stroke="0"
-        strokecolor="black"
-        textcolor="black"
-        font="Arial"
-        italic="false"
-        bold="false"
-        textsize="12"
-        justification="Left"
-      >ALIQUOT_ID : NUMBER</text>
-      <text name="Fig1.4.4"
-        x="721"
-        y="527"
         width="79"
         height="15"
         fill="0"
@@ -75057,6 +75132,38 @@
         textsize="12"
         justification="Left"
       >ID : NUMBER</text>
+      <text name="Fig1.4.3"
+        x="721"
+        y="512"
+        width="144"
+        height="15"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="12"
+        justification="Left"
+      >REQUEST_ID : NUMBER</text>
+      <text name="Fig1.4.4"
+        x="721"
+        y="527"
+        width="137"
+        height="15"
+        fill="0"
+        fillcolor="white"
+        stroke="0"
+        strokecolor="black"
+        textcolor="black"
+        font="Arial"
+        italic="false"
+        bold="false"
+        textsize="12"
+        justification="Left"
+      >ALIQUOT_ID : NUMBER</text>
       <text name="Fig1.4.5"
         x="721"
         y="542"
@@ -75077,7 +75184,7 @@
         x="721"
         y="557"
         width="168"
-        height="21"
+        height="24"
         fill="0"
         fillcolor="white"
         stroke="0"

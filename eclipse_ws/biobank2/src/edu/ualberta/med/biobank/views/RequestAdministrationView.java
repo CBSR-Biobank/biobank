@@ -11,11 +11,12 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.request.RequestSearchedNode;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class RequestAdministrationView extends AbstractAdministrationView {
 
@@ -98,10 +99,10 @@ public class RequestAdministrationView extends AbstractAdministrationView {
         try {
             List<? extends ModelWrapper<?>> searchedObject = search();
             if (searchedObject == null || searchedObject.size() == 0) {
-                String msg = "No Dispatch found";
+                String msg = "No Request found";
                 if (radioRequestNumber.getSelection())
-                    msg += " for waybill " + treeText.getText();
-                BioBankPlugin.openMessage("Dispatch not found", msg);
+                    msg += " for number " + treeText.getText();
+                BioBankPlugin.openMessage("Request not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);
@@ -111,9 +112,10 @@ public class RequestAdministrationView extends AbstractAdministrationView {
         }
     }
 
-    protected List<DispatchWrapper> search() {
+    protected List<RequestWrapper> search() throws ApplicationException {
         if (radioRequestNumber.getSelection()) {
-            return null;
+            return RequestWrapper.getRequestByNumber(
+                SessionManager.getAppService(), treeText.getText().trim());
         }
         return null;
     }
@@ -142,7 +144,6 @@ public class RequestAdministrationView extends AbstractAdministrationView {
 
     @Override
     protected String getTreeTextToolTip() {
-        // TODO Auto-generated method stub
         return null;
     }
 

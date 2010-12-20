@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.forms.utils;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 
@@ -18,6 +17,12 @@ public enum RequestTableGroup {
         @Override
         public List<RequestAliquotWrapper> getChildren(RequestWrapper request) {
             return request.getNonProcessedRequestAliquotCollection();
+        }
+    },
+    UNAVAILABLE("Unavailable") {
+        @Override
+        public List<RequestAliquotWrapper> getChildren(RequestWrapper request) {
+            return request.getUnavailableRequestAliquotCollection();
         }
     };
 
@@ -39,9 +44,9 @@ public enum RequestTableGroup {
     public abstract List<RequestAliquotWrapper> getChildren(
         RequestWrapper shipment);
 
-    public static Object findParent(AliquotWrapper dsa) {
+    public static RequestTableGroup findParent(RequestAliquotWrapper dsa) {
         for (RequestTableGroup tg : values()) {
-            if (tg.getChildren(null).contains(dsa)) {
+            if (tg.getChildren(dsa.getRequest()).contains(dsa)) {
                 return tg;
             }
         }
@@ -54,6 +59,7 @@ public enum RequestTableGroup {
         List<RequestTableGroup> groups = new ArrayList<RequestTableGroup>();
         groups.add(PROCESSED);
         groups.add(NON_PROCESSED);
+        groups.add(UNAVAILABLE);
         return groups;
     }
 }

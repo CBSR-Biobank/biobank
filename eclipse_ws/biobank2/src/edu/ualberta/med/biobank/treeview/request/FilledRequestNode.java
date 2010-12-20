@@ -3,15 +3,9 @@ package edu.ualberta.med.biobank.treeview.request;
 import java.util.Collection;
 
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -20,6 +14,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class FilledRequestNode extends AdapterBase {
 
     private SiteWrapper site;
+    private static final String NODE_INFO = "Requests that have been filled and are ready to be shipped";
 
     public FilledRequestNode(AdapterBase parent, int id, SiteWrapper site) {
         super(parent, id, "Filled", true, false);
@@ -28,31 +23,21 @@ public class FilledRequestNode extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        return null;
+        return NODE_INFO;
     }
 
     @Override
     public String getTooltipText() {
-        return null;
+        return NODE_INFO;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(DispatchWrapper.class, null)) {
-            MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Dispatch");
-            mi.addSelectionListener(new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent event) {
-                    // addDispatch();
-                }
-            });
-        }
     }
 
     @Override
     protected AdapterBase createChildNode() {
-        return null;
+        return new RequestAdapter(this, null);
     }
 
     @Override
@@ -63,12 +48,13 @@ public class FilledRequestNode extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return site.getRequestCollection();
+        site.reset();
+        return site.getFilledRequestCollection();
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return 0;
+        return getWrapperChildren().size();
     }
 
     @Override
@@ -79,13 +65,6 @@ public class FilledRequestNode extends AdapterBase {
     @Override
     public String getEntryFormId() {
         return null;
-    }
-
-    @Override
-    public void rebuild() {
-        for (AdapterBase adaper : getChildren()) {
-            adaper.rebuild();
-        }
     }
 
     @Override

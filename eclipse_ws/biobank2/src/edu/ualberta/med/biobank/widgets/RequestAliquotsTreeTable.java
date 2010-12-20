@@ -5,7 +5,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -28,27 +27,23 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
-import org.eclipse.ui.PlatformUI;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.util.RequestAliquotState;
+import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
 
 public class RequestAliquotsTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
-    private DispatchWrapper shipment;
-    private int fakeMaxCount;
+    private RequestWrapper shipment;
 
-    public RequestAliquotsTreeTable(Composite parent,
-        final RequestWrapper shipment, final boolean editAliquotsState,
-        final boolean editAliquotsComment) {
+    public RequestAliquotsTreeTable(Composite parent, RequestWrapper shipment) {
         super(parent, SWT.NONE);
+
+        this.shipment = shipment;
 
         setLayout(new FillLayout());
         GridData gd = new GridData();
@@ -90,21 +85,23 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
 
             @Override
             public Object[] getElements(Object inputElement) {
-                return RequestTableGroup.getGroupsForShipment(shipment).toArray();
+                return RequestTableGroup.getGroupsForShipment(
+                    RequestAliquotsTreeTable.this.shipment).toArray();
             }
 
             @Override
             public Object[] getChildren(Object parentElement) {
                 if (parentElement instanceof RequestTableGroup)
                     return ((RequestTableGroup) parentElement).getChildren(
-                        shipment).toArray();
+                        RequestAliquotsTreeTable.this.shipment).toArray();
                 return null;
             }
 
             @Override
             public Object getParent(Object element) {
-                if (element instanceof DispatchAliquotWrapper)
-                    return RequestTableGroup.findParent((AliquotWrapper) element);
+                if (element instanceof RequestAliquotWrapper)
+                    return RequestTableGroup
+                        .findParent((RequestAliquotWrapper) element);
                 return null;
             }
 
@@ -115,21 +112,14 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         };
         tv.setContentProvider(contentProvider);
 
-        fakeMaxCount = 0;
         final BiobankLabelProvider labelProvider = new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
                 if (element instanceof RequestTableGroup) {
                     if (columnIndex == 0)
-                        return ((RequestTableGroup) element).getTitle(shipment);
+                        return ((RequestTableGroup) element)
+                            .getTitle(RequestAliquotsTreeTable.this.shipment);
                     return "";
-                }
-                if (element instanceof AliquotWrapper && columnIndex == 3) {
-                    if (fakeMaxCount < 15) {
-                        fakeMaxCount++;
-                        return "Aaron";
-                    } else
-                        return "";
                 }
                 return super.getColumnText(element, columnIndex);
             }
@@ -142,93 +132,78 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public void doubleClick(DoubleClickEvent event) {
                 Object o = ((IStructuredSelection) tv.getSelection())
                     .getFirstElement();
-                if (o instanceof DispatchAliquotWrapper) {
-                    DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) o;
-                    SessionManager.openViewForm(dsa.getAliquot());
+                if (o instanceof RequestAliquotWrapper) {
+                    RequestAliquotWrapper ra = (RequestAliquotWrapper) o;
+                    SessionManager.openViewForm(ra.getAliquot());
                 }
             }
         });
 
-        final Menu menu = new Menu(this);
-        tv.getTree().setMenu(menu);
+        if (shipment.isInAcceptedState()) {
+            final Menu menu = new Menu(this);
+            tv.getTree().setMenu(menu);
 
-        menu.addListener(SWT.Show, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                for (MenuItem menuItem : menu.getItems()) {
-                    menuItem.dispose();
-                }
-                addClipboardCopySupport(menu, labelProvider);
-                if (editAliquotsState || editAliquotsComment) {
-                    DispatchAliquotWrapper dsa = getSelectedAliquot();
-                    if (dsa != null) {
-                        if (editAliquotsState
-                            && DispatchAliquotState.getState(dsa.getState()) == DispatchAliquotState.NONE_STATE)
-                            addSetMissingMenu(menu);
-                        if (editAliquotsComment)
-                            addModifyCommentMenu(menu);
+            menu.addListener(SWT.Show, new Listener() {
+                @Override
+                public void handleEvent(Event event) {
+                    for (MenuItem menuItem : menu.getItems()) {
+                        menuItem.dispose();
+                    }
+
+                    RequestAliquotWrapper ra = getSelectedAliquot();
+                    if (ra != null) {
+                        addClipboardCopySupport(menu, labelProvider);
+                        addSetUnavailableMenu(menu);
+                        if (ra.getClaimedBy() == null)
+                            addClaimMenu(menu);
                     }
                 }
-            }
-        });
+            });
+        }
     }
 
-    protected DispatchAliquotWrapper getSelectedAliquot() {
+    protected RequestAliquotWrapper getSelectedAliquot() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
         if (selection != null && selection.size() > 0
-            && selection.getFirstElement() instanceof DispatchAliquotWrapper) {
-            return (DispatchAliquotWrapper) selection.getFirstElement();
+            && selection.getFirstElement() instanceof RequestAliquotWrapper) {
+            return (RequestAliquotWrapper) selection.getFirstElement();
         }
         return null;
     }
 
-    protected void addModifyCommentMenu(Menu menu) {
+    protected void addClaimMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Modify comment");
+        item.setText("Claim Aliquot");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
-                    null);
+                RequestAliquotWrapper a = getSelectedAliquot();
+                a.setClaimedBy(SessionManager.getUser().getFirstName());
+                try {
+                    a.persist();
+                } catch (Exception e) {
+                    BioBankPlugin.openAsyncError("Failed to claim", e);
+                }
+                tv.refresh();
             }
         });
     }
 
-    private void addSetMissingMenu(final Menu menu) {
+    private void addSetUnavailableMenu(final Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Set as missing");
+        item.setText("Flag as unavailable");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                modifyCommentAndState((IStructuredSelection) tv.getSelection(),
-                    DispatchAliquotState.MISSING);
+                getSelectedAliquot().setState(
+                    RequestAliquotState.UNAVAILABLE_STATE.getId());
+                shipment.resetStateLists();
+                tv.refresh();
             }
         });
-    }
-
-    private void modifyCommentAndState(
-        IStructuredSelection iStructuredSelection, DispatchAliquotState newState) {
-        ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            newState);
-        int res = dialog.open();
-        if (res == Dialog.OK) {
-            String comment = dialog.getComment();
-            for (@SuppressWarnings("rawtypes")
-            Iterator iter = iStructuredSelection.iterator(); iter.hasNext();) {
-                DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) iter
-                    .next();
-                dsa.setComment(comment);
-                if (newState != null)
-                    dsa.setState(newState.ordinal());
-            }
-            shipment.resetStateLists();
-            tv.refresh();
-            notifyListeners();
-        }
     }
 
     public void refresh() {
@@ -239,7 +214,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         final BiobankLabelProvider labelProvider) {
         Assert.isNotNull(menu);
         MenuItem item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Claim");
+        item.setText("Copy");
         item.addSelectionListener(new SelectionAdapter() {
             @SuppressWarnings("unchecked")
             @Override

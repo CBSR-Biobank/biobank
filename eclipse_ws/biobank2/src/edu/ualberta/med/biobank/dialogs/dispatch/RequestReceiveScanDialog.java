@@ -14,20 +14,20 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
+import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
+import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
-public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
+public class RequestReceiveScanDialog extends AbstractDispatchScanDialog {
 
     private static final String TITLE = "Scanning received pallets";
 
@@ -37,14 +37,14 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
 
     private int errors;
 
-    public DispatchReceiveScanDialog(Shell parentShell,
-        final DispatchWrapper currentShipment, SiteWrapper currentSite) {
+    public RequestReceiveScanDialog(Shell parentShell,
+        final RequestWrapper currentShipment, SiteWrapper currentSite) {
         super(parentShell, currentShipment, currentSite);
     }
 
     @Override
     protected String getTitleAreaMessage() {
-        return "Scan one pallet received in the shipment.";
+        return "Scan one pallet.";
     }
 
     @Override
@@ -61,7 +61,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
      * set the status of the cell. return the aliquot if it is an extra one.
      */
     protected void processCellStatus(PalletCell cell) {
-        AliquotInfo info = DispatchReceivingEntryForm.getInfoForInventoryId(
+        AliquotInfo info = RequestEntryFormBase.getInfoForInventoryId(
             currentShipment, cell.getValue());
         if (info.aliquot != null) {
             cell.setAliquot(info.aliquot);
@@ -140,19 +140,9 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    BioBankPlugin
-                        .openInformation(
-                            "Not in dispatch aliquots",
-                            "Some of the aliquots in this pallet were not supposed"
-                                + " to be in this shipment. They will be added to the"
-                                + " extra-pending list.");
-                    try {
-                        ((DispatchWrapper) currentShipment).addExtraAliquots(
-                            extraAliquots, false);
-                    } catch (Exception e) {
-                        BioBankPlugin.openAsyncError("Error flagging aliquots",
-                            e);
-                    }
+                    BioBankPlugin.openInformation("Extra aliquots",
+                        "Some of the aliquots in this pallet were not supposed"
+                            + " to be in this shipment.");
                 }
             });
         }
@@ -183,7 +173,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             }
         }
         try {
-            ((DispatchWrapper) currentShipment).receiveAliquots(aliquots);
+            ((RequestWrapper) currentShipment).receiveAliquots(aliquots);
             redrawPallet();
             pendingAliquotsNumber = 0;
             setOkButtonEnabled(true);
@@ -209,13 +199,17 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        if (((DispatchWrapper) currentShipment).getAliquotCollection().size() > 0) {
+        if (((RequestWrapper) currentShipment).getRequestAliquotCollection(
+            false).size() > 0) {
             int i = 0;
-            for (DispatchAliquotWrapper dsa : ((DispatchWrapper) currentShipment)
-                .getDispatchAliquotCollection()) {
+            for (RequestAliquotWrapper dsa : ((RequestWrapper) currentShipment)
+                .getRequestAliquotCollection(false)) {
                 int row = i / 12;
                 int col = i % 12;
-                if (!DispatchAliquotState.MISSING.isEquals(dsa.getState()))
+                if (row > 7)
+                    break;
+                if (!RequestAliquotState.UNAVAILABLE_STATE.isEquals(dsa
+                    .getState()))
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getAliquot()
                             .getInventoryId())));

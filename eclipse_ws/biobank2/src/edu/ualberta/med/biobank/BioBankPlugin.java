@@ -56,6 +56,7 @@ import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.biobank.treeview.request.AcceptedRequestNode;
 import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
 import edu.ualberta.med.biobank.treeview.request.FilledRequestNode;
+import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.treeview.request.ShippedRequestNode;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.views.DispatchSiteAdapter;
@@ -204,6 +205,8 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_REQUEST_SHIPPED);
         classToImageKey.put(FilledRequestNode.class.getName(),
             BioBankPlugin.IMG_REQUEST_FILLED);
+        classToImageKey.put(RequestAdapter.class.getName(),
+            BioBankPlugin.IMG_REQUEST);
         classToImageKey.put(AliquotAdapter.class.getName(),
             BioBankPlugin.IMG_ALIQUOT);
     };

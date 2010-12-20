@@ -207,10 +207,10 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 } else {
                     scanCell.setAliquot(foundAliquot);
                     if (expectedAliquot != null || currentPallet == null) {
-                        List<AliquotWrapper> currentAliquots = currentShipment
+                        List<AliquotWrapper> currentAliquots = ((DispatchWrapper) currentShipment)
                             .getAliquotCollection(false);
-                        CheckStatus check = currentShipment.checkCanAddAliquot(
-                            foundAliquot, false);
+                        CheckStatus check = ((DispatchWrapper) currentShipment)
+                            .checkCanAddAliquot(foundAliquot, false);
                         if (check.ok) {
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)
@@ -271,7 +271,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
             }
         }
-        currentShipment.addNewAliquots(aliquots, false);
+        ((DispatchWrapper) currentShipment).addNewAliquots(aliquots, false);
         if (currentPallet != null) {
             removedPallets.add(currentPallet);
         }
@@ -314,9 +314,10 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell
-                .getRandomAliquotsAlreadyAssigned(SessionManager
-                    .getAppService(), currentShipment.getSender().getId(),
-                    currentShipment.getStudy().getId());
+                .getRandomAliquotsAlreadyAssigned(
+                    SessionManager.getAppService(),
+                    ((DispatchWrapper) currentShipment).getSender().getId(),
+                    ((DispatchWrapper) currentShipment).getStudy().getId());
             return cells;
         } else {
             for (AliquotWrapper aliquot : currentPallet.getAliquots().values()) {

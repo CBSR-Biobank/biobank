@@ -16,7 +16,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ResearchGroupWrapper extends ModelWrapper<ResearchGroup> {
 
-    private Object address;
+    private AddressWrapper address;
 
     public ResearchGroupWrapper(WritableApplicationService appService,
         ResearchGroup rg) {
@@ -60,7 +60,7 @@ public class ResearchGroupWrapper extends ModelWrapper<ResearchGroup> {
         return researcherCollection;
     }
 
-    private void setResearcherCollection(
+    public void setResearcherCollection(
         Collection<Researcher> allResearcherObjects,
         List<ResearcherWrapper> allResearcherWrappers) {
         Collection<Researcher> oldResearchers = wrappedObject
@@ -79,17 +79,17 @@ public class ResearchGroupWrapper extends ModelWrapper<ResearchGroup> {
         wrappedObject.setStudy(study);
     }
 
-    private AddressWrapper getAddress() {
+    public AddressWrapper getAddress() {
         if (address == null) {
             Address a = wrappedObject.getAddress();
             if (a == null)
                 return null;
             address = new AddressWrapper(appService, a);
         }
-        return (AddressWrapper) address;
+        return address;
     }
 
-    private void setAddress(Address address) {
+    public void setAddress(Address address) {
         if (address == null)
             this.address = null;
         else
@@ -102,8 +102,7 @@ public class ResearchGroupWrapper extends ModelWrapper<ResearchGroup> {
 
     @Override
     protected String[] getPropertyChangeNames() {
-        // TODO Auto-generated method stub
-        return null;
+        return new String[] { "name", "nameShort", "address", "study" };
     }
 
     @Override
