@@ -253,6 +253,8 @@ public class ReportEntryForm extends BiobankEntryForm {
             }
         });
 
+        updateGenerateButton();
+
         return generateButton;
     }
 
@@ -469,10 +471,20 @@ public class ReportEntryForm extends BiobankEntryForm {
                     setDirty(true);
                     book.reflow(true);
                     form.layout(true, true);
+
+                    updateGenerateButton();
                 }
             });
 
         section.setClient(options);
+    }
+
+    private void updateGenerateButton() {
+        boolean hasColumnsSelected = !columnsWidget.getReportColumns()
+            .isEmpty();
+        if (generateButton != null && !generateButton.isDisposed()) {
+            generateButton.setEnabled(hasColumnsSelected);
+        }
     }
 
     // TODO: extract printing/ exporting methods into some interfaces and
