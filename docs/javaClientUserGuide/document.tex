@@ -6,6 +6,8 @@
 \usepackage{graphicx}
 \usepackage{float}
 \usepackage{multirow}
+%\usepackage[colorlinks]{hyperref}
+\usepackage[colorinlistoftodos, textwidth=3cm, textsize=tiny, shadow]{todonotes}
 \usepackage[pdftex,
   pdfauthor={AICML},
   pdftitle={BioBank2 Java Client User Manual},
@@ -22,14 +24,14 @@
 
 \oddsidemargin  0.0in
 \evensidemargin 0.0in
-\textwidth      6.75in
+\textwidth      6.0in
 \headheight     0.0in
 \topmargin      0.0in
 \textheight     9.0in
 \setlength{\marginparwidth}{0.8in}
 \let\oldmarginpar\marginpar
-\renewcommand\marginpar[1]{\-\oldmarginpar[\raggedleft\footnotesize #1]%
-{\raggedright\footnotesize #1}}
+
+\setcounter{secnumdepth}{3}
 
 \begin{document}
 \frontmatter
@@ -42,6 +44,8 @@ by the Alberta Ingenuity Centre for Machine Learning}
 \tableofcontents
 \clearpage
 \listoffigures
+\clearpage
+\listoftodos
 \clearpage
 
 \mainmatter
