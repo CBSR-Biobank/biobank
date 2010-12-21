@@ -172,7 +172,7 @@
       <srcfiles file="model/biobank2.uml" />
     </uptodate>
   </target>
-  <target name="sdk" depends="log4j-conf,check-cacore-sdk-uptodate"
+  <target name="sdk" depends="check-cacore-sdk-uptodate,log4j-conf"
           unless="cacore.sdk.uptodate"
           description="builds the caCORE SDK from the data model">
     <copy file="sdk_conf/deploy.properties"
