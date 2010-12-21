@@ -60,7 +60,14 @@ public class ReportAdministrationView extends AbstractAdministrationView {
     }
 
     @Override
-    protected void siteChanged(Object sourceValue) {
+    protected String getTreeTextToolTip() {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public String getId() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }
