@@ -112,7 +112,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private void checkVisitsFromLinkedShipment() throws BiobankCheckException {
-        List<ShipmentWrapper> shipments = getShipmentCollection();
+        List<ShipmentWrapper> shipments = getShipmentCollection(null);
         List<PatientVisitWrapper> visits = getPatientVisitCollection();
         if (visits != null && visits.size() > 0) {
             if (shipments == null || shipments.size() == 0) {
@@ -285,15 +285,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patient;
     }
 
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort,
-        final boolean ascending) {
-        return getShipmentCollection(sort, ascending, null);
-    }
-
     /**
      * Get the shipment collection. To link patients and shipments, use
      * Shipment.setPatientCollection method If user is not null, will return
-     * only shipments that are linked to a site this user can update
+     * only shipments that are linked to a site this user can update, unless
+     * user is null
      */
     public List<ShipmentWrapper> getShipmentCollection(boolean sort,
         final boolean ascending, User user) {
@@ -302,7 +298,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         if (csps != null) {
             for (ShipmentPatientWrapper csp : csps) {
                 ShipmentWrapper ship = csp.getShipment();
-                if (user != null && user.canUpdateSite(ship.getSite())) {
+                if (user == null || user.canUpdateSite(ship.getSite())) {
                     shipmentCollection.add(ship);
                 }
             }
@@ -324,8 +320,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return shipmentCollection;
     }
 
-    public List<ShipmentWrapper> getShipmentCollection() {
-        return getShipmentCollection(false, true);
+    /**
+     * if user is no null, will return only shipment this user can update.
+     */
+    public List<ShipmentWrapper> getShipmentCollection(User user) {
+        return getShipmentCollection(false, true, user);
     }
 
     @Override
@@ -358,8 +357,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private boolean hasShipments() {
-        if (getShipmentCollection() != null
-            && getShipmentCollection().size() > 0)
+        if (getShipmentCollection(null) != null
+            && getShipmentCollection(null).size() > 0)
             return true;
         return false;
     }
