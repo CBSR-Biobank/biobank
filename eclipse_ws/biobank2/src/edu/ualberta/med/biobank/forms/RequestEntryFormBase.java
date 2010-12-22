@@ -40,8 +40,8 @@ public class RequestEntryFormBase extends BiobankFormBase {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Requested on "
-            + DateFormatter.formatAsDateTime(request.getSubmitted())
-            + request.getStudy());
+            + DateFormatter.formatAsDateTime(request.getSubmitted()) + " "
+            + request.getStudy().getNameShort());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -225,7 +225,7 @@ public class RequestEntryFormBase extends BiobankFormBase {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
         this.request = (RequestWrapper) adapter.getModelObject();
-        setPartName("New Request");
+        setPartName("Request " + request.getId().toString());
     }
 
     public static AliquotInfo getInfoForInventoryId(

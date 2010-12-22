@@ -34,6 +34,9 @@ import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.RequestAliquotAdapter;
+import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
 public class RequestAliquotsTreeTable extends BiobankWidget {
 
@@ -94,20 +97,26 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                 if (parentElement instanceof RequestTableGroup)
                     return ((RequestTableGroup) parentElement).getChildren(
                         RequestAliquotsTreeTable.this.shipment).toArray();
-                return null;
+                else
+                    return ((AdapterBase) parentElement).getChildren()
+                        .toArray();
             }
 
             @Override
             public Object getParent(Object element) {
-                if (element instanceof RequestAliquotWrapper)
+                if (element instanceof AdapterBase)
+                    return ((AdapterBase) element).getParent();
+                else
                     return RequestTableGroup
                         .findParent((RequestAliquotWrapper) element);
-                return null;
             }
 
             @Override
             public boolean hasChildren(Object element) {
-                return element instanceof RequestTableGroup;
+                if (element instanceof RequestTableGroup)
+                    return true;
+                else
+                    return ((AdapterBase) element).hasChildren();
             }
         };
         tv.setContentProvider(contentProvider);
@@ -120,8 +129,28 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                         return ((RequestTableGroup) element)
                             .getTitle(RequestAliquotsTreeTable.this.shipment);
                     return "";
+                } else if (element instanceof RequestContainerAdapter) {
+                    if (columnIndex == 0)
+                        return ((RequestContainerAdapter) element).getLabel();
+                    return "";
+                } else if (element instanceof RequestAliquotAdapter) {
+                    switch (columnIndex) {
+                    case 0:
+                        return ((RequestAliquotAdapter) element).getLabel();
+                    case 1:
+                        return ((RequestAliquotAdapter) element).getAliquot()
+                            .getSampleType().getNameShort();
+                    case 2:
+                        return ((RequestAliquotAdapter) element).getAliquot()
+                            .getPositionString();
+                    case 3:
+                        return ((RequestAliquotWrapper) ((RequestAliquotAdapter) element)
+                            .getModelObject()).getClaimedBy();
+                    default:
+                        return "";
+                    }
                 }
-                return super.getColumnText(element, columnIndex);
+                return "";
             }
         };
         tv.setLabelProvider(labelProvider);
@@ -166,8 +195,9 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
         if (selection != null && selection.size() > 0
-            && selection.getFirstElement() instanceof RequestAliquotWrapper) {
-            return (RequestAliquotWrapper) selection.getFirstElement();
+            && selection.getFirstElement() instanceof RequestAliquotAdapter) {
+            return (RequestAliquotWrapper) ((RequestAliquotAdapter) selection
+                .getFirstElement()).getModelObject();
         }
         return null;
     }
