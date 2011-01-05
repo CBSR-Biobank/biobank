@@ -1,4 +1,4 @@
-\documentclass{beamer}
+\documentclass[hyperref={pdfpagelabels=false}]{beamer}
 \mode<presentation>
 {
   \usetheme{Copenhagen}
@@ -58,16 +58,38 @@
     \item Storage services include robust robotic systems for sample
       aliquoting, tracking, storage, and retrieval
     \item Chain of custody ensured on all samples.
-    \item Temperature monitoring system ensures that all samples are maintained
+    \item Temperature monitoring systems ensure that all samples are maintained
       at the chosen temperature.
     \item Regulatory-grade audit trail for all samples.
   \end{itemize}
 \end{frame}
 
+\begin{frame}{Personnel}
+  CBSR currently has the following presonnel:
+  \begin{itemize}
+    \item Director: Dr. Bruce Ritchie
+    \item Financial Supervisor: Meagen LaFave
+    \item Technicians: 4 members
+    \item Inventory Tracking System software team: 4 members
+  \end{itemize}
+\end{frame}
+
+
+\begin{frame}{Technician Duties}
+  The most important tasks performed by technicians are:
+  \begin{itemize}
+    \item Sample Processing
+    \item Sample Order Processing
+    \item Materials Requests
+    \item Inventory Audit
+    \item Study SOP definition
+  \end{itemize}
+\end{frame}
+
 \begin{frame}{Sample Processing}{}
   \begin{itemize}
-    \item Sample packages received by CBSR from multiple clinics. Sample
-      packages contain multiple biological samples from multiple patients.
+    \item Sample packages received by CBSR from multiple clinics.
+      Packages contain biological samples from multiple patients.
     \item The sending clinic follows the collection protocol defined in the
       \emph{Study SOP} (standard operating procedure).
     \item CBSR technician processes the samples according to the SOP. This
@@ -86,19 +108,6 @@
     \item Technicians use the inventory tracking software to link a sample's
       inventory ID to a patient. Each samaple is also linked to a container
       position.
-    \item Containers used by CBSR are of several types: -80$^\circ$ freezer,
-      -180$^\circ$ freezer, room temperature cabinet.
-    \item Freezers and cabinets contain subcontainers which themselves can hold
-      further subcontainers. Freezers and cabinets each have their own
-      subcontainer hierarchy.
-    \item Each container in CBSR has a product ID encoded either in a 1D or 2D
-      barcode.
-  \end{itemize}
-\end{frame}
-
-\begin{frame}{Inventory Software}
-  \begin{itemize}
-    \item
   \end{itemize}
 \end{frame}
 
@@ -114,19 +123,47 @@
 \end{frame}
 
 \begin{frame}{Clinic Materials and Equipment}{}
+  CBSR Provides clinics with the following materials and equipment:
   \begin{itemize}
-    \item CBSR Provides clinics with the following materials and equipment.
-      \begin{itemize}
-        \item
-      \end{itemize}
+  \item
   \end{itemize}
 \end{frame}
 
-\begin{frame}{}{}
+\begin{frame}{Storage Details}{}
   \begin{itemize}
-    \item
+  \item Containers used by CBSR are of several types: -80$^\circ$ freezer,
+    -180$^\circ$ freezer, room temperature cabinet.
+  \item Freezers and cabinets contain subcontainers which themselves can hold
+    more subcontainers. Freezers and cabinets each have their own
+    subcontainer hierarchy.
+  \item Each container and subcontainer in CBSR has a product ID encoded either
+    in a 1D or 2D barcode.
   \end{itemize}
 \end{frame}
+
+\begin{frame}{Inventory Software}
+  \begin{itemize}
+  \item The software is a Java based N-tier client server application that
+    allows multiple users to access the system at any time.
+  \item Based on the National Cancer Intitute's caBIG architecture.
+  \item Integrated scanning and decoding software to decode DataMatrix tubes.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Future Plans}{}
+  The following projects will soon be undertaken at CBSR:
+  \begin{itemize}
+  \item Expansion to second site.
+  \item Automated sample processing robots
+  \item In-freezer robot for tube placement and retrieval
+  \end{itemize}
+\end{frame}
+
+%% \begin{frame}{}{}
+%%   \begin{itemize}
+%%     \item
+%%   \end{itemize}
+%% \end{frame}
 
 \end{document}
 
