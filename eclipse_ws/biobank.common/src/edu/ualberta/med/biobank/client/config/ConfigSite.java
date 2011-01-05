@@ -110,7 +110,7 @@ public class ConfigSite {
         for (PatientVisitWrapper visit : visits) {
             patientVisitDeleteSubObjects(visit);
         }
-        for (ShipmentWrapper ship : patient.getShipmentCollection()) {
+        for (ShipmentWrapper ship : patient.getShipmentCollection(null)) {
             ship.removePatients(Arrays.asList(patient));
             if (ship.getPatientCollection().size() == 0) {
                 ship.delete();

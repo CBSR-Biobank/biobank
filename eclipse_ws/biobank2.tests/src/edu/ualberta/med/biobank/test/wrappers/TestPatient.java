@@ -177,7 +177,7 @@ public class TestPatient extends TestDatabase {
         shipment.persist();
         patient.reload();
 
-        shipment = patient.getShipmentCollection().get(0);
+        shipment = patient.getShipmentCollection(null).get(0);
         Assert.assertNotNull(shipment);
 
         int count = r.nextInt(15) + 1;
@@ -352,7 +352,7 @@ public class TestPatient extends TestDatabase {
         patient.reload();
 
         List<ShipmentWrapper> savedShipments = patient.getShipmentCollection(
-            true, true);
+            true, true, null);
         Assert.assertEquals(shipments.size(), savedShipments.size());
         for (ShipmentWrapper shipment : savedShipments) {
             Assert.assertTrue(shipments.contains(shipment));
@@ -433,7 +433,7 @@ public class TestPatient extends TestDatabase {
         patient1.reload();
         patient2.reload();
 
-        shipment = patient1.getShipmentCollection().get(0);
+        shipment = patient1.getShipmentCollection(null).get(0);
         Assert.assertNotNull(shipment);
 
         ContainerWrapper childL1 = containerMap.get("ChildL1");
