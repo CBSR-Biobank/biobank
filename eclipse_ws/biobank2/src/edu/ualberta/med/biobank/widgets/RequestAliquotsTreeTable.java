@@ -183,21 +183,31 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                     if (ra != null) {
                         addClipboardCopySupport(menu, labelProvider);
                         addSetUnavailableMenu(menu);
-                        if (ra.getClaimedBy() == null)
+                        addClaimMenu(menu);
+                    } else {
+                        AdapterBase node = getSelectedNode();
+                        if (node != null) {
                             addClaimMenu(menu);
+                        }
                     }
                 }
             });
         }
     }
 
-    protected RequestAliquotWrapper getSelectedAliquot() {
+    protected AdapterBase getSelectedNode() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
-        if (selection != null && selection.size() > 0
-            && selection.getFirstElement() instanceof RequestAliquotAdapter) {
-            return (RequestAliquotWrapper) ((RequestAliquotAdapter) selection
-                .getFirstElement()).getModelObject();
+        if (selection != null && selection.size() > 0)
+            return (AdapterBase) selection.getFirstElement();
+        return null;
+    }
+
+    protected RequestAliquotWrapper getSelectedAliquot() {
+        AdapterBase node = getSelectedNode();
+        if (node != null && node instanceof RequestAliquotAdapter) {
+            return (RequestAliquotWrapper) ((RequestAliquotAdapter) node)
+                .getModelObject();
         }
         return null;
     }
@@ -205,20 +215,31 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
     protected void addClaimMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Claim Aliquot");
+        item.setText("Claim");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                RequestAliquotWrapper a = getSelectedAliquot();
-                a.setClaimedBy(SessionManager.getUser().getFirstName());
-                try {
-                    a.persist();
-                } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Failed to claim", e);
-                }
+                claim(getSelectedNode());
                 tv.refresh();
             }
         });
+    }
+
+    protected void claim(AdapterBase node) {
+        try {
+            if (node instanceof RequestAliquotAdapter) {
+                RequestAliquotWrapper a = (RequestAliquotWrapper) ((RequestAliquotAdapter) node)
+                    .getModelObject();
+                a.setClaimedBy(SessionManager.getUser().getFirstName());
+                a.persist();
+            } else {
+                List<AdapterBase> children = node.getChildren();
+                for (AdapterBase child : children)
+                    claim(child);
+            }
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Failed to claim", e);
+        }
     }
 
     private void addSetUnavailableMenu(final Menu menu) {
