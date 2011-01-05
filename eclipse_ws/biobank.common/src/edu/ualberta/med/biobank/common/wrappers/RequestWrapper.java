@@ -248,7 +248,7 @@ public class RequestWrapper extends ModelWrapper<Request> {
         for (RequestAliquotWrapper r : ras)
             if (r.getAliquot().getInventoryId().equals(text)) {
                 flagAliquots(Arrays.asList(r));
-                break;
+                return;
             }
         throw new Exception(
             "Aliquot "
