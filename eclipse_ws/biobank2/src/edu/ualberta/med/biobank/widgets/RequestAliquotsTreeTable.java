@@ -42,6 +42,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
     private RequestWrapper shipment;
+    protected List<RequestTableGroup> groups;
 
     public RequestAliquotsTreeTable(Composite parent, RequestWrapper shipment) {
         super(parent, SWT.NONE);
@@ -84,19 +85,20 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
+                groups = RequestTableGroup
+                    .getGroupsForShipment(RequestAliquotsTreeTable.this.shipment);
             }
 
             @Override
             public Object[] getElements(Object inputElement) {
-                return RequestTableGroup.getGroupsForShipment(
-                    RequestAliquotsTreeTable.this.shipment).toArray();
+                return groups.toArray();
             }
 
             @Override
             public Object[] getChildren(Object parentElement) {
                 if (parentElement instanceof RequestTableGroup)
-                    return ((RequestTableGroup) parentElement).getChildren(
-                        RequestAliquotsTreeTable.this.shipment).toArray();
+                    return ((RequestTableGroup) parentElement).getChildren()
+                        .toArray();
                 else
                     return ((AdapterBase) parentElement).getChildren()
                         .toArray();
@@ -106,9 +108,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public Object getParent(Object element) {
                 if (element instanceof AdapterBase)
                     return ((AdapterBase) element).getParent();
-                else
-                    return RequestTableGroup
-                        .findParent((RequestAliquotWrapper) element);
+                return null;
             }
 
             @Override
@@ -126,8 +126,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public String getColumnText(Object element, int columnIndex) {
                 if (element instanceof RequestTableGroup) {
                     if (columnIndex == 0)
-                        return ((RequestTableGroup) element)
-                            .getTitle(RequestAliquotsTreeTable.this.shipment);
+                        return ((RequestTableGroup) element).getTitle();
                     return "";
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
@@ -138,14 +137,12 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                     case 0:
                         return ((RequestAliquotAdapter) element).getLabel();
                     case 1:
-                        return ((RequestAliquotAdapter) element).getAliquot()
-                            .getSampleType().getNameShort();
+                        return ((RequestAliquotAdapter) element)
+                            .getSampleType();
                     case 2:
-                        return ((RequestAliquotAdapter) element).getAliquot()
-                            .getPositionString();
+                        return ((RequestAliquotAdapter) element).getPosition();
                     case 3:
-                        return ((RequestAliquotWrapper) ((RequestAliquotAdapter) element)
-                            .getModelObject()).getClaimedBy();
+                        return ((RequestAliquotAdapter) element).getClaimedBy();
                     default:
                         return "";
                     }
@@ -302,6 +299,11 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                 }
             }
         });
+    }
+
+    public boolean isAllProcessed() {
+        return groups.get(RequestAliquotState.NONPROCESSED_STATE.getId())
+            .getChildren().size() == 0;
     }
 
 }

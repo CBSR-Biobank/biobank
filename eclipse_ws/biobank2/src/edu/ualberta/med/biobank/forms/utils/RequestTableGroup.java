@@ -1,136 +1,115 @@
 package edu.ualberta.med.biobank.forms.utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerPath;
+import edu.ualberta.med.biobank.model.RequestAliquot;
 import edu.ualberta.med.biobank.treeview.RequestAliquotAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public enum RequestTableGroup {
-    PROCESSED("Processed") {
-        @Override
-        public List<RequestContainerAdapter> getChildren(RequestWrapper request) {
-            return getAdapterTree(request
-                .getProcessedRequestAliquotCollection());
-        }
+public class RequestTableGroup {
 
-        @Override
-        public List<RequestAliquotWrapper> getAliquotChildren(
-            RequestWrapper request) {
-            return request.getProcessedRequestAliquotCollection();
-        }
-    },
-    NON_PROCESSED("Non Processed") {
-        @Override
-        public List<RequestContainerAdapter> getChildren(RequestWrapper request) {
-            return getAdapterTree(request
-                .getNonProcessedRequestAliquotCollection());
-        }
+    private Integer numAliquots = 0;
+    private RequestAliquotState state;
+    private List<RequestContainerAdapter> tops;
+    private static final Pattern p = Pattern.compile("/");
 
-        @Override
-        public List<RequestAliquotWrapper> getAliquotChildren(
-            RequestWrapper request) {
-            return request.getNonProcessedRequestAliquotCollection();
-        }
-    },
-    UNAVAILABLE("Unavailable") {
-        @Override
-        public List<RequestContainerAdapter> getChildren(RequestWrapper request) {
-            return getAdapterTree(getAliquotChildren(request));
-        }
-
-        @Override
-        public List<RequestAliquotWrapper> getAliquotChildren(
-            RequestWrapper request) {
-            return request.getUnavailableRequestAliquotCollection();
-        }
-
-    };
-
-    private String label;
-
-    private RequestTableGroup(String label) {
-        this.label = label;
+    private RequestTableGroup(RequestAliquotState state, RequestWrapper request) {
+        this.state = state;
+        getAdapterTree(state.getId(), request);
     }
-
-    public abstract List<RequestAliquotWrapper> getAliquotChildren(
-        RequestWrapper request);
 
     @Override
     public String toString() {
-        return label;
+        return state.getLabel();
     }
 
-    public String getTitle(RequestWrapper request) {
-        return label + " (" + getAliquotChildren(request).size() + ")";
+    public String getTitle() {
+        return state.getLabel() + " (" + numAliquots + ")";
     }
 
-    public abstract List<RequestContainerAdapter> getChildren(
-        RequestWrapper shipment);
-
-    public static RequestTableGroup findParent(RequestAliquotWrapper dsa) {
-        for (RequestTableGroup tg : values()) {
-            if (tg.getChildren(dsa.getRequest()).contains(dsa)) {
-                return tg;
-            }
-        }
-        return null;
-    }
-
-    @SuppressWarnings("unused")
     public static List<RequestTableGroup> getGroupsForShipment(
         RequestWrapper ship) {
         List<RequestTableGroup> groups = new ArrayList<RequestTableGroup>();
-        groups.add(PROCESSED);
-        groups.add(NON_PROCESSED);
-        groups.add(UNAVAILABLE);
+        groups.add(new RequestTableGroup(RequestAliquotState.PROCESSED_STATE,
+            ship));
+        groups.add(new RequestTableGroup(
+            RequestAliquotState.NONPROCESSED_STATE, ship));
+        groups.add(new RequestTableGroup(RequestAliquotState.UNAVAILABLE_STATE,
+            ship));
         return groups;
     }
 
-    public List<RequestContainerAdapter> getAdapterTree(
-        List<RequestAliquotWrapper> aliquots) {
-        HashSet<ContainerWrapper> containers = new HashSet<ContainerWrapper>();
-        // get all the containers to display
-        for (RequestAliquotWrapper a : aliquots) {
-            containers.add(a.getAliquot().getParent());
-            containers.addAll(getParents(a.getAliquot().getParent()));
+    public void getAdapterTree(Integer state, RequestWrapper request) {
+        List<Object[]> results = new ArrayList<Object[]>();
+        // test hql
+        HQLCriteria query = new HQLCriteria(
+            "select ra, cp.container, cp.path from "
+                + RequestAliquot.class.getName()
+                + " ra inner join fetch ra.aliquot inner join fetch ra.aliquot.sampleType, "
+                + ContainerPath.class.getName()
+                + " cp where ra.request ="
+                + request.getId()
+                + " and ra.aliquot.aliquotPosition.container=cp.container and ra.state=?",
+            Arrays.asList(new Object[] { state }));
+        try {
+            results = SessionManager.getAppService().query(query);
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
         }
-        // create adapters
-        HashMap<ContainerWrapper, RequestContainerAdapter> adapters = new HashMap<ContainerWrapper, RequestContainerAdapter>();
-        for (ContainerWrapper c : containers)
-            adapters.put(c, new RequestContainerAdapter(null, c));
-        // set up relationships
-        for (ContainerWrapper c : containers) {
-            RequestContainerAdapter child = adapters.get(c);
-            if (containers.contains(c.getParent())) {
-                RequestContainerAdapter parent = adapters.get(c.getParent());
-                parent.addChild(child);
-            }
-            for (RequestAliquotWrapper raw : aliquots)
-                if (raw.getAliquot().getParent().equals(c))
-                    child.addChild(new RequestAliquotAdapter(null, raw));
-        }
-        // get the top containers to start with
+
+        HashSet<Integer> containers = new HashSet<Integer>();
+        HashMap<Integer, RequestContainerAdapter> adapters = new HashMap<Integer, RequestContainerAdapter>();
         List<RequestContainerAdapter> tops = new ArrayList<RequestContainerAdapter>();
-        for (RequestContainerAdapter ca : adapters.values())
-            if (ca.getParent() == null)
-                tops.add(ca);
+
+        // get all the containers to display
+        for (Object o : results) {
+            String path = (String) ((Object[]) o)[2];
+            RequestAliquot ra = (RequestAliquot) ((Object[]) o)[0];
+            Container container = (Container) ((Object[]) o)[1];
+            String[] cIds = p.split(path);
+            int i = 0;
+            for (; i < cIds.length; i++) {
+                Integer id = Integer.parseInt(cIds[i]);
+                containers.add(id);
+                RequestContainerAdapter adapter = null;
+                if (!adapters.containsKey(id)) {
+                    // add adapter
+                    ContainerWrapper cw = new ContainerWrapper(
+                        SessionManager.getAppService(), container);
+                    adapter = new RequestContainerAdapter(null, cw);
+                    if (i == 0)
+                        tops.add(adapter);
+                    else
+                        adapters.get(Integer.parseInt(cIds[i - 1])).addChild(
+                            adapter);
+                    adapters.put(id, adapter);
+                }
+            }
+            adapters.get(Integer.parseInt(cIds[i - 1])).addChild(
+                new RequestAliquotAdapter(adapters.get(Integer
+                    .parseInt(cIds[i - 1])), new RequestAliquotWrapper(
+                    SessionManager.getAppService(), ra)));
+            numAliquots++;
+        }
+
+        this.tops = tops;
+    }
+
+    public List<RequestContainerAdapter> getChildren() {
         return tops;
     }
-
-    private List<ContainerWrapper> getParents(ContainerWrapper c) {
-        if (c.getParent() == null)
-            return new ArrayList<ContainerWrapper>();
-        else {
-            List<ContainerWrapper> parents = getParents(c.getParent());
-            parents.add(c);
-            return parents;
-        }
-    }
-
 }

@@ -128,8 +128,7 @@ public class RequestEntryFormBase extends BiobankFormBase {
                 }
 
             });
-            button.setEnabled(request.getNonProcessedRequestAliquotCollection()
-                .size() == 0);
+            button.setEnabled(aliquotsTree.isAllProcessed());
             button
                 .setToolTipText("All aliquots must be processed or unavailable to completely fill this request");
         } else if (RequestState.getState(orderState)

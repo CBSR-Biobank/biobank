@@ -268,7 +268,7 @@ public class RequestWrapper extends ModelWrapper<Request> {
     @SuppressWarnings("unchecked")
     public List<RequestAliquotWrapper> getRequestAliquotCollection(boolean sort) {
         List<RequestAliquotWrapper> requestAliquotCollection = (List<RequestAliquotWrapper>) propertiesMap
-            .get("requestAliquotCollection");
+            .get(ALL_ALIQUOTS_KEY);
         if (requestAliquotCollection == null) {
             Collection<RequestAliquot> children = wrappedObject
                 .getRequestAliquotCollection();
@@ -278,8 +278,7 @@ public class RequestWrapper extends ModelWrapper<Request> {
                     requestAliquotCollection.add(new RequestAliquotWrapper(
                         appService, aliquot));
                 }
-                propertiesMap.put("requestAliquotCollection",
-                    requestAliquotCollection);
+                propertiesMap.put(ALL_ALIQUOTS_KEY, requestAliquotCollection);
             }
             if ((requestAliquotCollection != null) && sort)
                 Collections.sort(requestAliquotCollection);
@@ -335,9 +334,9 @@ public class RequestWrapper extends ModelWrapper<Request> {
                 }
                 propertiesMap.put(mapKey, dsaCollection);
             }
+            if ((dsaCollection != null) && sort)
+                Collections.sort(dsaCollection);
         }
-        if ((dsaCollection != null) && sort)
-            Collections.sort(dsaCollection);
         return dsaCollection;
     }
 
@@ -350,7 +349,6 @@ public class RequestWrapper extends ModelWrapper<Request> {
         propertiesMap.put(UNAVAILABLE_ALIQUOTS_KEY, null);
         propertiesMap.put(PROCESSED_ALIQUOTS_KEY, null);
         propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
-        propertiesMap.put(ALL_ALIQUOTS_KEY, null);
     }
 
     public RequestAliquotWrapper getRequestAliquot(String inventoryId) {
