@@ -1,8 +1,9 @@
 \documentclass[hyperref={pdfpagelabels=false}]{beamer}
-\mode<presentation>
-{
-  \usetheme{Copenhagen}
-}
+\useoutertheme{infolines}
+\usetheme[height=7mm]{Singapore}
+\setbeamertemplate{items}[ball]
+\setbeamertemplate{blocks}[rounded][shadow=true]
+\setbeamertemplate{navigation symbols}{}
 
 \usepackage[english]{babel}
 \usepackage[latin1]{inputenc}
@@ -11,7 +12,8 @@
 
 \title[CBSR Overview]{Canadian BioSample Repository}
 \subtitle{An Overview}
-\author{Prepared by AICML}
+\author{}
+\institute{Prepared by AICML}
 \subject{CBSR Overview}
 
 \pgfdeclareimage[height=0.5cm]{logo}{cbsr}
@@ -75,8 +77,8 @@
 \end{frame}
 
 
-\begin{frame}{Technician Duties}
-  The most important tasks performed by technicians are:
+\begin{frame}{Technician Primary Tasks}
+  The primary tasks performed by the technicians are:
   \begin{itemize}
     \item Sample Processing
     \item Sample Order Processing
@@ -106,7 +108,7 @@
 \begin{frame}{Sample Processing}{Continued}
   \begin{itemize}
     \item Technicians use the inventory tracking software to link a sample's
-      inventory ID to a patient. Each samaple is also linked to a container
+      inventory ID to a patient. Each sample is also linked to a container
       position.
   \end{itemize}
 \end{frame}
@@ -138,6 +140,13 @@
     subcontainer hierarchy.
   \item Each container and subcontainer in CBSR has a product ID encoded either
     in a 1D or 2D barcode.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Administrative Tasks}
+  The primary administration tasks are:
+  \begin{itemize}
+    \item
   \end{itemize}
 \end{frame}
 
