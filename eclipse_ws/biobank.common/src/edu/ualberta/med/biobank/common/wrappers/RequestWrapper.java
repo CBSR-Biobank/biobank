@@ -250,10 +250,8 @@ public class RequestWrapper extends ModelWrapper<Request> {
                 flagAliquots(Arrays.asList(r));
                 return;
             }
-        throw new Exception(
-            "Aliquot "
-                + text
-                + " is not expected for this request. Do not include it in this shipment.");
+        throw new Exception("Aliquot " + text
+            + " is not in the non-processed list.");
 
     }
 
@@ -373,4 +371,19 @@ public class RequestWrapper extends ModelWrapper<Request> {
         return wrappers;
     }
 
+    public boolean isAllProcessed() {
+        // using the collection was too slow
+        List<Object> results = null;
+        HQLCriteria c = new HQLCriteria("select count(*) from "
+            + RequestAliquot.class.getName() + " ra where ra.state="
+            + RequestAliquotState.NONPROCESSED_STATE.getId()
+            + " and ra.request=" + getId());
+        try {
+            results = appService.query(c);
+        } catch (ApplicationException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return 0 == (Long) results.get(0);
+    }
 }

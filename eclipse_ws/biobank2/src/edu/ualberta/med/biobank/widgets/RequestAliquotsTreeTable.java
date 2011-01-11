@@ -158,8 +158,9 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public void doubleClick(DoubleClickEvent event) {
                 Object o = ((IStructuredSelection) tv.getSelection())
                     .getFirstElement();
-                if (o instanceof RequestAliquotWrapper) {
-                    RequestAliquotWrapper ra = (RequestAliquotWrapper) o;
+                if (o instanceof RequestAliquotAdapter) {
+                    RequestAliquotWrapper ra = (RequestAliquotWrapper) ((RequestAliquotAdapter) o)
+                        .getModelObject();
                     SessionManager.openViewForm(ra.getAliquot());
                 }
             }
@@ -195,7 +196,8 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
     protected AdapterBase getSelectedNode() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
-        if (selection != null && selection.size() > 0)
+        if (selection != null && selection.size() > 0
+            && selection.getFirstElement() instanceof AdapterBase)
             return (AdapterBase) selection.getFirstElement();
         return null;
     }
@@ -217,7 +219,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 claim(getSelectedNode());
-                tv.refresh();
+                refresh();
             }
         });
     }
@@ -248,14 +250,18 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public void widgetSelected(SelectionEvent event) {
                 getSelectedAliquot().setState(
                     RequestAliquotState.UNAVAILABLE_STATE.getId());
-                shipment.resetStateLists();
-                tv.refresh();
+                try {
+                    getSelectedAliquot().persist();
+                } catch (Exception e) {
+                    BioBankPlugin.openAsyncError("Save Error", e);
+                }
+                refresh();
             }
         });
     }
 
     public void refresh() {
-        tv.refresh();
+        tv.setInput("refresh");
     }
 
     private void addClipboardCopySupport(Menu menu,
@@ -299,11 +305,6 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                 }
             }
         });
-    }
-
-    public boolean isAllProcessed() {
-        return groups.get(RequestAliquotState.NONPROCESSED_STATE.getId())
-            .getChildren().size() == 0;
     }
 
 }

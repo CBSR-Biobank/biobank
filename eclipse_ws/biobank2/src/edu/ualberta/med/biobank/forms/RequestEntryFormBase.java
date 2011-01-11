@@ -128,7 +128,7 @@ public class RequestEntryFormBase extends BiobankFormBase {
                 }
 
             });
-            button.setEnabled(aliquotsTree.isAllProcessed());
+            button.setEnabled(request.isAllProcessed());
             button
                 .setToolTipText("All aliquots must be processed or unavailable to completely fill this request");
         } else if (RequestState.getState(orderState)
@@ -187,8 +187,7 @@ public class RequestEntryFormBase extends BiobankFormBase {
                 newAliquotText.setFocus();
                 newAliquotText.setText("");
                 aliquotsTree.refresh();
-                button.setEnabled(request
-                    .getNonProcessedRequestAliquotCollection().size() == 0);
+                button.setEnabled(request.isAllProcessed());
             }
         });
         toolkit.createLabel(addComposite, "or open scan dialog:");
@@ -213,8 +212,7 @@ public class RequestEntryFormBase extends BiobankFormBase {
             // setDirty(true);
         }
         aliquotsTree.refresh();
-        button.setEnabled(request.getNonProcessedRequestAliquotCollection()
-            .size() == 0);
+        button.setEnabled(request.isAllProcessed());
     }
 
     @Override
