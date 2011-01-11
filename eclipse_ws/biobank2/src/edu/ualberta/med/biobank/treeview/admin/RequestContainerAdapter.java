@@ -1,30 +1,55 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.Node;
 
-public class RequestContainerAdapter extends ContainerAdapter {
+public class RequestContainerAdapter implements Node {
 
-    public RequestContainerAdapter(AdapterBase parent,
-        ContainerWrapper container) {
-        super(parent, container);
+    public Object parent;
+    public ContainerWrapper container;
+    List<Object> children;
+
+    public RequestContainerAdapter(Object parent, ContainerWrapper container) {
+        this.parent = parent;
+        this.container = container;
+        this.children = new ArrayList<Object>();
     }
 
     @Override
-    protected String getLabelInternal() {
-        return getContainer().getLabel() + " ("
-            + getContainer().getContainerType().getNameShort() + ")" + " ("
+    public Object getParent() {
+        return parent;
+    }
+
+    public boolean hasChildren() {
+        return getChildren().size() != 0;
+    }
+
+    @Override
+    public List<Object> getChildren() {
+        return children;
+    }
+
+    public String getLabelInternal() {
+        return container.getLabel() + " ("
+            + container.getContainerType().getNameShort() + ")" + " ("
             + getAliquotCount() + ")";
     }
 
     private Integer getAliquotCount() {
         Integer aliquots = 0;
-        for (AdapterBase child : getChildren()) {
+        for (Object child : getChildren()) {
             if (child instanceof RequestContainerAdapter)
                 aliquots += ((RequestContainerAdapter) child).getAliquotCount();
             else
                 aliquots++;
         }
         return aliquots;
+    }
+
+    public void addChild(Object c) {
+        children.add(c);
     }
 }

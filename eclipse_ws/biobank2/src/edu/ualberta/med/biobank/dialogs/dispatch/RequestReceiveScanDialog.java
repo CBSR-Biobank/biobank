@@ -27,7 +27,8 @@ import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
-public class RequestReceiveScanDialog extends AbstractDispatchScanDialog {
+public class RequestReceiveScanDialog extends
+    AbstractScanDialog<RequestWrapper> {
 
     private static final String TITLE = "Scanning received pallets";
 
@@ -173,7 +174,7 @@ public class RequestReceiveScanDialog extends AbstractDispatchScanDialog {
             }
         }
         try {
-            ((RequestWrapper) currentShipment).receiveAliquots(aliquots);
+            (currentShipment).receiveAliquots(aliquots);
             redrawPallet();
             pendingAliquotsNumber = 0;
             setOkButtonEnabled(true);
@@ -193,16 +194,15 @@ public class RequestReceiveScanDialog extends AbstractDispatchScanDialog {
 
     @Override
     protected List<CellStatus> getPalletCellStatus() {
-        return CellStatus.DEFAULT_PALLET_DISPATCH_RECEIVE_STATUS_LIST;
+        return CellStatus.REQUEST_PALLET_STATUS_LIST;
     }
 
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        if (((RequestWrapper) currentShipment).getRequestAliquotCollection(
-            false).size() > 0) {
+        if ((currentShipment).getRequestAliquotCollection(false).size() > 0) {
             int i = 0;
-            for (RequestAliquotWrapper dsa : ((RequestWrapper) currentShipment)
+            for (RequestAliquotWrapper dsa : (currentShipment)
                 .getRequestAliquotCollection(false)) {
                 int row = i / 12;
                 int col = i % 12;

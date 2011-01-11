@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.RequestAliquotAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
@@ -96,27 +96,17 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
 
             @Override
             public Object[] getChildren(Object parentElement) {
-                if (parentElement instanceof RequestTableGroup)
-                    return ((RequestTableGroup) parentElement).getChildren()
-                        .toArray();
-                else
-                    return ((AdapterBase) parentElement).getChildren()
-                        .toArray();
+                return ((Node) parentElement).getChildren().toArray();
             }
 
             @Override
             public Object getParent(Object element) {
-                if (element instanceof AdapterBase)
-                    return ((AdapterBase) element).getParent();
-                return null;
+                return ((Node) element).getParent();
             }
 
             @Override
             public boolean hasChildren(Object element) {
-                if (element instanceof RequestTableGroup)
-                    return true;
-                else
-                    return ((AdapterBase) element).hasChildren();
+                return ((Node) element).getChildren().size() != 0;
             }
         };
         tv.setContentProvider(contentProvider);
@@ -130,12 +120,14 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                     return "";
                 } else if (element instanceof RequestContainerAdapter) {
                     if (columnIndex == 0)
-                        return ((RequestContainerAdapter) element).getLabel();
+                        return ((RequestContainerAdapter) element)
+                            .getLabelInternal();
                     return "";
                 } else if (element instanceof RequestAliquotAdapter) {
                     switch (columnIndex) {
                     case 0:
-                        return ((RequestAliquotAdapter) element).getLabel();
+                        return ((RequestAliquotAdapter) element)
+                            .getLabelInternal();
                     case 1:
                         return ((RequestAliquotAdapter) element)
                             .getSampleType();
@@ -159,8 +151,8 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                 Object o = ((IStructuredSelection) tv.getSelection())
                     .getFirstElement();
                 if (o instanceof RequestAliquotAdapter) {
-                    RequestAliquotWrapper ra = (RequestAliquotWrapper) ((RequestAliquotAdapter) o)
-                        .getModelObject();
+                    RequestAliquotWrapper ra = ((RequestAliquotAdapter) o)
+                        .getAliquot();
                     SessionManager.openViewForm(ra.getAliquot());
                 }
             }
@@ -183,7 +175,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                         addSetUnavailableMenu(menu);
                         addClaimMenu(menu);
                     } else {
-                        AdapterBase node = getSelectedNode();
+                        Object node = getSelectedNode();
                         if (node != null) {
                             addClaimMenu(menu);
                         }
@@ -193,20 +185,21 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         }
     }
 
-    protected AdapterBase getSelectedNode() {
+    protected Object getSelectedNode() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
-        if (selection != null && selection.size() > 0
-            && selection.getFirstElement() instanceof AdapterBase)
-            return (AdapterBase) selection.getFirstElement();
+        if (selection != null
+            && selection.size() > 0
+            && (selection.getFirstElement() instanceof RequestAliquotAdapter || selection
+                .getFirstElement() instanceof RequestContainerAdapter))
+            return selection.getFirstElement();
         return null;
     }
 
     protected RequestAliquotWrapper getSelectedAliquot() {
-        AdapterBase node = getSelectedNode();
+        Object node = getSelectedNode();
         if (node != null && node instanceof RequestAliquotAdapter) {
-            return (RequestAliquotWrapper) ((RequestAliquotAdapter) node)
-                .getModelObject();
+            return ((RequestAliquotAdapter) node).getAliquot();
         }
         return null;
     }
@@ -224,16 +217,17 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         });
     }
 
-    protected void claim(AdapterBase node) {
+    protected void claim(Object node) {
         try {
             if (node instanceof RequestAliquotAdapter) {
-                RequestAliquotWrapper a = (RequestAliquotWrapper) ((RequestAliquotAdapter) node)
-                    .getModelObject();
+                RequestAliquotWrapper a = ((RequestAliquotAdapter) node)
+                    .getAliquot();
                 a.setClaimedBy(SessionManager.getUser().getFirstName());
                 a.persist();
             } else {
-                List<AdapterBase> children = node.getChildren();
-                for (AdapterBase child : children)
+                List<Object> children = ((RequestContainerAdapter) node)
+                    .getChildren();
+                for (Object child : children)
                     claim(child);
             }
         } catch (Exception e) {

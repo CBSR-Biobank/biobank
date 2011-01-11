@@ -1,81 +1,52 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 
-import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.Tree;
-
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
+import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
-public class RequestAliquotAdapter extends AdapterBase {
+public class RequestAliquotAdapter implements Node {
 
     // variables are replicated here to avoid repeated calls to remote api
 
-    public RequestAliquotAdapter(AdapterBase parent, RequestAliquotWrapper raw) {
-        super(parent, raw);
+    public RequestContainerAdapter parent;
+    public RequestAliquotWrapper raw;
+
+    public RequestAliquotAdapter(RequestContainerAdapter parent,
+        RequestAliquotWrapper raw) {
+        this.parent = parent;
+        this.raw = raw;
     }
 
-    @Override
-    protected String getLabelInternal() {
-        return ((RequestAliquotWrapper) getModelObject()).getAliquot()
-            .getInventoryId();
+    public RequestAliquotWrapper getAliquot() {
+        return raw;
     }
 
-    @Override
-    public String getTooltipText() {
-        return null;
-    }
-
-    @Override
-    public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-
-    }
-
-    @Override
-    protected AdapterBase createChildNode() {
-        return null;
-    }
-
-    @Override
-    protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        return null;
-    }
-
-    @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
-        return null;
-    }
-
-    @Override
-    protected int getWrapperChildCount() throws Exception {
-        return 0;
-    }
-
-    @Override
-    public String getViewFormId() {
-        return null;
-    }
-
-    @Override
-    public String getEntryFormId() {
-        return null;
+    public String getLabelInternal() {
+        return raw.getAliquot().getInventoryId();
     }
 
     public String getClaimedBy() {
-        return ((RequestAliquotWrapper) getModelObject()).getClaimedBy();
+        return raw.getClaimedBy();
     }
 
     public String getSampleType() {
-        return ((RequestAliquotWrapper) getModelObject()).getAliquot()
-            .getSampleType().getNameShort();
+        return raw.getAliquot().getSampleType().getNameShort();
     }
 
     public String getPosition() {
-        return ((RequestAliquotWrapper) getModelObject()).getAliquot()
-            .getPositionString();
+        return raw.getAliquot().getPositionString();
+    }
+
+    @Override
+    public List<Object> getChildren() {
+        return new ArrayList<Object>();
+    }
+
+    @Override
+    public Object getParent() {
+        return parent;
     }
 
 }

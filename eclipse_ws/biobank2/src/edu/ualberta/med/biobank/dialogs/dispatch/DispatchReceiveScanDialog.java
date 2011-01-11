@@ -27,7 +27,8 @@ import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
-public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
+public class DispatchReceiveScanDialog extends
+    AbstractScanDialog<DispatchWrapper> {
 
     private static final String TITLE = "Scanning received pallets";
 
@@ -147,8 +148,8 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
                                 + " to be in this shipment. They will be added to the"
                                 + " extra-pending list.");
                     try {
-                        ((DispatchWrapper) currentShipment).addExtraAliquots(
-                            extraAliquots, false);
+                        (currentShipment)
+                            .addExtraAliquots(extraAliquots, false);
                     } catch (Exception e) {
                         BioBankPlugin.openAsyncError("Error flagging aliquots",
                             e);
@@ -183,7 +184,7 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
             }
         }
         try {
-            ((DispatchWrapper) currentShipment).receiveAliquots(aliquots);
+            (currentShipment).receiveAliquots(aliquots);
             redrawPallet();
             pendingAliquotsNumber = 0;
             setOkButtonEnabled(true);
@@ -209,9 +210,9 @@ public class DispatchReceiveScanDialog extends AbstractDispatchScanDialog {
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        if (((DispatchWrapper) currentShipment).getAliquotCollection().size() > 0) {
+        if ((currentShipment).getAliquotCollection().size() > 0) {
             int i = 0;
-            for (DispatchAliquotWrapper dsa : ((DispatchWrapper) currentShipment)
+            for (DispatchAliquotWrapper dsa : (currentShipment)
                 .getDispatchAliquotCollection()) {
                 int row = i / 12;
                 int col = i % 12;

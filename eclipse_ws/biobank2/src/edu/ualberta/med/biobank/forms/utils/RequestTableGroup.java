@@ -15,16 +15,18 @@ import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import edu.ualberta.med.biobank.model.RequestAliquot;
+import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.RequestAliquotAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class RequestTableGroup {
+public class RequestTableGroup implements Node {
 
     private Integer numAliquots = 0;
     private RequestAliquotState state;
-    private List<RequestContainerAdapter> tops;
+    private List<Object> tops;
     private static final Pattern p = Pattern.compile("/");
+    private Object parent = null;
 
     private RequestTableGroup(RequestAliquotState state, RequestWrapper request) {
         this.state = state;
@@ -73,7 +75,7 @@ public class RequestTableGroup {
 
         HashSet<Integer> containers = new HashSet<Integer>();
         HashMap<Integer, RequestContainerAdapter> adapters = new HashMap<Integer, RequestContainerAdapter>();
-        List<RequestContainerAdapter> tops = new ArrayList<RequestContainerAdapter>();
+        List<Object> tops = new ArrayList<Object>();
 
         // get all the containers to display
         for (Object o : results) {
@@ -109,7 +111,13 @@ public class RequestTableGroup {
         this.tops = tops;
     }
 
-    public List<RequestContainerAdapter> getChildren() {
+    @Override
+    public List<Object> getChildren() {
         return tops;
+    }
+
+    @Override
+    public Object getParent() {
+        return parent;
     }
 }
