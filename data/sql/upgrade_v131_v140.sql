@@ -119,12 +119,16 @@ CREATE TABLE report_filter_value (
 
 # sample order tables
 
+DROP TABLE IF EXISTS order_aliquot;
+
 CREATE TABLE order_aliquot (
     ALIQUOT_ID INT(11) NOT NULL,
     ORDER_ID INT(11) NOT NULL,
     INDEX FK74AC5176898584F (ALIQUOT_ID),
     PRIMARY KEY (ORDER_ID, ALIQUOT_ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+DROP TABLE IF EXISTS research_group;
 
 CREATE TABLE research_group (
     ID INT(11) NOT NULL,
@@ -139,6 +143,8 @@ CREATE TABLE research_group (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
+DROP TABLE IF EXISTS research_group_researcher;
+
 CREATE TABLE research_group_researcher (
     RESEARCH_GROUP_ID INT(11) NOT NULL,
     RESEARCHER_ID INT(11) NOT NULL,
@@ -146,6 +152,8 @@ CREATE TABLE research_group_researcher (
     INDEX FK83006F8C4BD922D8 (RESEARCH_GROUP_ID),
     PRIMARY KEY (RESEARCHER_ID, RESEARCH_GROUP_ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+DROP TABLE IF EXISTS researcher;
 
 CREATE TABLE researcher (
     ID INT(11) NOT NULL,
