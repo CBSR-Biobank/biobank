@@ -207,14 +207,17 @@ public class ReportRunner {
      */
     private void loadProperty(Object object, String property) {
         try {
-            Class<?> klazz = object.getClass();
+            Class<?> objectKlazz = object.getClass();
 
             String methodSuffix = Character.toUpperCase(property.charAt(0))
                 + property.substring(1);
 
-            Method getProperty = klazz.getMethod("get" + methodSuffix);
-            Method setProperty = klazz.getMethod("set" + methodSuffix,
-                getProperty.getReturnType());
+            Method getProperty = objectKlazz.getMethod("get" + methodSuffix);
+
+            Class<?> propertyKlazz = getProperty.getReturnType();
+
+            Method setProperty = objectKlazz.getMethod("set" + methodSuffix,
+                propertyKlazz);
 
             Object propertyValue = getProperty.invoke(object);
 
@@ -222,23 +225,18 @@ public class ReportRunner {
                 return;
             }
 
-            Method getId = klazz.getMethod("getId");
-            Serializable id = (Serializable) getId.invoke(object);
+            Class<?> proxyKlazz = propertyValue.getClass();
+            Method getId = proxyKlazz.getMethod("getId");
+            Serializable id = (Serializable) getId.invoke(propertyValue);
 
-            if (id == null) {
-                return;
+            Object databaseObject = null;
+            if (id != null) {
+                databaseObject = session.load(propertyKlazz, id);
             }
 
-            Object databaseObject = session.load(klazz, id);
-
-            if (databaseObject == null) {
-                return;
-            }
-
-            // replace the property value with the persisted property value
-            propertyValue = getProperty.invoke(databaseObject);
-            setProperty.invoke(object, propertyValue);
+            setProperty.invoke(object, databaseObject);
         } catch (Exception e) {
+            // TODO: log this?
         }
     }
 
