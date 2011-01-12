@@ -1292,12 +1292,6 @@
                   icon="icons/patient_add.png"
                   label="Add Patient"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
@@ -1310,12 +1304,6 @@
                   icon="icons/patientVisit_add.png"
                   label="Add Patient Visit"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.deleteSelection"
@@ -1583,7 +1571,7 @@
                moveable="false"
                ratio="0.20"
                relationship="stack"
-               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
+               relative="edu.ualberta.med.biobank.views.ShipmentAdminView"
                showTitle="false"
                standalone="false"
                visible="true">
@@ -1595,7 +1583,7 @@
                moveable="false"
                ratio="0.20"
                relationship="stack"
-               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
+               relative="edu.ualberta.med.biobank.views.DispatchAdministrationView"
                showTitle="false"
                standalone="false"
                visible="true">
@@ -2375,6 +2363,7 @@
             restorable="true">
       </view>
       <view
+            allowMultiple="false"
             class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
             icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.views.ShipmentAdminView"
@@ -2382,6 +2371,7 @@
             restorable="true">
       </view>
       <view
+            allowMultiple="false"
             class="edu.ualberta.med.biobank.views.DispatchAdministrationView"
             icon="icons/dispatch.png"
             id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
