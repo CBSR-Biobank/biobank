@@ -278,9 +278,11 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
         this.listener = l;
     }
 
-    private void init() {
+    public AbstractBiobankListProxy init() {
         if (listChunk == null) {
             updateListChunk(-1);
         }
+
+        return this;
     }
 }

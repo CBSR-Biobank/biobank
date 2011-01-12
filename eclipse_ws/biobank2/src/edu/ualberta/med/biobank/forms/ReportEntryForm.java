@@ -45,10 +45,12 @@ import org.supercsv.prefs.CsvPreference;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.Holder;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
+import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
@@ -56,7 +58,7 @@ import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.views.ReportAdministrationView;
+import edu.ualberta.med.biobank.views.AdvancedReportsView;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ReportResultsTableWidget;
@@ -96,7 +98,7 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     @Override
     protected void doAfterSave() {
-        ReportAdministrationView.getCurrent().reload();
+        AdvancedReportsView.getCurrent().reload();
     }
 
     @Override
@@ -105,7 +107,7 @@ public class ReportEntryForm extends BiobankEntryForm {
             @Override
             public void run() {
                 // update the model before saving
-                updateReport();
+                updateReportModel();
             }
         });
 
@@ -113,7 +115,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         reportAdapter.getParent().performExpand();
     }
 
-    private void updateReport() {
+    private void updateReportModel() {
         // don't set through the wrappers because we don't want to alert
         // anything listening to the wrapper (for example, the
         // FilterSelectWidget and the ColumnSelectWidget).
@@ -217,45 +219,110 @@ public class ReportEntryForm extends BiobankEntryForm {
         generateButton.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                // update the model before running
-                updateReport();
-
-                for (Control control : resultsContainer.getChildren()) {
-                    if (!control.isDisposed()) {
-                        control.dispose();
-                    }
-                }
-
-                // TODO: push getHeaders, openViewForm, etc. into
-                // ReportResultsTableWidget class?
-                Report rawReport = report.getWrappedObject();
-                results = new ReportListProxy(
-                    (BiobankApplicationService) appService, rawReport);
-
-                resultsTable = new ReportResultsTableWidget<Object>(
-                    resultsContainer, results, getHeaders());
-
-                if (!report.getIsCount()) {
-                    resultsTable
-                        .addDoubleClickListener(new IDoubleClickListener() {
-                            @Override
-                            public void doubleClick(DoubleClickEvent event) {
-                                ISelection selection = event.getSelection();
-                                openViewForm(selection);
-                            }
-                        });
-                }
-
-                exportButton.setEnabled(true);
-
-                book.reflow(true);
-                form.layout(true, true);
+                generateReport();
             }
         });
 
         updateGenerateButton();
 
         return generateButton;
+    }
+
+    private void emptyResultsContainer() {
+        for (Control control : resultsContainer.getChildren()) {
+            if (!control.isDisposed()) {
+                control.dispose();
+            }
+        }
+
+        resultsTable = null;
+    }
+
+    private void generateReport() {
+        exportButton.setEnabled(false);
+
+        updateReportModel();
+        emptyResultsContainer();
+
+        final Report rawReport = report.getWrappedObject();
+
+        IRunnableWithProgress op = new IRunnableWithProgress() {
+            @Override
+            public void run(IProgressMonitor monitor) {
+                monitor.beginTask("Generating report...",
+                    IProgressMonitor.UNKNOWN);
+                try {
+                    results = new ArrayList<Object>();
+
+                    Thread thread = new Thread("Querying") {
+                        @Override
+                        public void run() {
+                            results = new ReportListProxy(
+                                (BiobankApplicationService) appService,
+                                rawReport).init();
+
+                            if (results instanceof AbstractBiobankListProxy)
+                                ((AbstractBiobankListProxy) results)
+                                    .addBusyListener(new ProgressMonitorDialogBusyListener(
+                                        "Loading more results..."));
+                        }
+                    };
+
+                    thread.start();
+                    while (true) {
+                        if (monitor.isCanceled()) {
+                            thread.interrupt();
+                            return;
+                        } else if (!thread.isAlive()) {
+                            break;
+                        }
+                        try {
+                            Thread.sleep(500);
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+                    }
+
+                    exportButton.getDisplay().syncExec(new Runnable() {
+                        @Override
+                        public void run() {
+                            resultsTable = new ReportResultsTableWidget<Object>(
+                                resultsContainer, null, getHeaders());
+
+                            resultsTable.setCollection(results);
+
+                            if (!report.getIsCount()) {
+                                resultsTable
+                                    .addDoubleClickListener(new IDoubleClickListener() {
+                                        @Override
+                                        public void doubleClick(
+                                            DoubleClickEvent event) {
+                                            ISelection selection = event
+                                                .getSelection();
+                                            openViewForm(selection);
+                                        }
+                                    });
+                            }
+
+                            exportButton.setEnabled(true);
+                        }
+                    });
+                } catch (Exception e) {
+                    BioBankPlugin.openAsyncError("Report Generation Error", e);
+                }
+                monitor.done();
+            }
+        };
+
+        try {
+            new ProgressMonitorDialog(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell()).run(true, true, op);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        } finally {
+            book.reflow(true);
+            form.layout(true, true);
+        }
     }
 
     private Control createExportButtons(Composite parent) {

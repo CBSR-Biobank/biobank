@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.reports;
 
+import java.io.Serializable;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -75,6 +77,7 @@ public class ReportRunner {
     private Collection<ReportColumn> getOrderedReportColumns() {
         List<ReportColumn> orderedCols = new ArrayList<ReportColumn>();
 
+        loadProperty(report, "reportColumnCollection");
         Collection<ReportColumn> reportCols = report
             .getReportColumnCollection();
         if (reportCols != null) {
@@ -92,10 +95,12 @@ public class ReportRunner {
     }
 
     private Criteria createCriteria() {
+        loadProperty(report, "reportColumnCollection");
         if (!isCount() && report.getReportColumnCollection().isEmpty()) {
             return null;
         }
 
+        loadProperty(report, "entity");
         Criteria criteria = session.createCriteria(report.getEntity()
             .getClassName());
 
@@ -115,6 +120,8 @@ public class ReportRunner {
 
         int colNum = 1;
         for (ReportColumn reportColumn : getOrderedReportColumns()) {
+            loadProperty(reportColumn, "entityColumn");
+            loadProperty(reportColumn.getEntityColumn(), "entityProperty");
             String path = reportColumn.getEntityColumn().getEntityProperty()
                 .getProperty();
             String aliasedProperty = getAliasedProperty(path);
@@ -158,10 +165,14 @@ public class ReportRunner {
 
         criteria.setProjection(pList);
 
+        loadProperty(report, "reportFilterCollection");
         Collection<ReportFilter> rfCollection = report
             .getReportFilterCollection();
         if (rfCollection != null) {
             for (ReportFilter reportFilter : rfCollection) {
+                loadProperty(reportFilter, "entityFilter");
+                loadProperty(reportFilter.getEntityFilter(), "entityProperty");
+
                 EntityFilter filter = reportFilter.getEntityFilter();
                 FilterType filterType = FilterTypes.getFilterType(filter
                     .getFilterType());
@@ -186,21 +197,74 @@ public class ReportRunner {
         return criteria;
     }
 
+    /**
+     * Read the property of the given <code>Object</code>. If the property
+     * exists and is an uninitialized Hibernate proxy object, then replace it
+     * with a copy from the database.
+     * 
+     * @param object
+     * @param property
+     */
+    private void loadProperty(Object object, String property) {
+        try {
+            Class<?> klazz = object.getClass();
+
+            String methodSuffix = Character.toUpperCase(property.charAt(0))
+                + property.substring(1);
+
+            Method getProperty = klazz.getMethod("get" + methodSuffix);
+            Method setProperty = klazz.getMethod("set" + methodSuffix,
+                getProperty.getReturnType());
+
+            Object propertyValue = getProperty.invoke(object);
+
+            if (Hibernate.isInitialized(propertyValue)) {
+                return;
+            }
+
+            Method getId = klazz.getMethod("getId");
+            Serializable id = (Serializable) getId.invoke(object);
+
+            if (id == null) {
+                return;
+            }
+
+            Object databaseObject = session.load(klazz, id);
+
+            if (databaseObject == null) {
+                return;
+            }
+
+            // replace the property value with the persisted property value
+            propertyValue = getProperty.invoke(databaseObject);
+            setProperty.invoke(object, propertyValue);
+        } catch (Exception e) {
+        }
+    }
+
     private void createAssociations(Criteria criteria) {
         Set<String> createdPoperties = new HashSet<String>();
 
+        loadProperty(report, "reportColumnCollection");
         Collection<ReportColumn> cols = report.getReportColumnCollection();
         if (cols != null) {
-            for (ReportColumn col : cols) {
-                String property = col.getEntityColumn().getEntityProperty()
-                    .getProperty();
+            for (ReportColumn reportColumn : cols) {
+                loadProperty(reportColumn, "entityColumn");
+                loadProperty(reportColumn.getEntityColumn(), "entityProperty");
+
+                String property = reportColumn.getEntityColumn()
+                    .getEntityProperty().getProperty();
                 createAssociations(criteria, property, createdPoperties);
             }
         }
 
+        loadProperty(report, "reportFilterCollection");
         Collection<ReportFilter> filters = report.getReportFilterCollection();
         if (filters != null) {
             for (ReportFilter filter : filters) {
+                loadProperty(filter, "entityFilter");
+                loadProperty(filter.getEntityFilter(), "entityProperty");
+
                 String property = filter.getEntityFilter().getEntityProperty()
                     .getProperty();
                 createAssociations(criteria, property, createdPoperties);

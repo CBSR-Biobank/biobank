@@ -413,14 +413,17 @@ class FilterRow extends Composite {
                 continue;
             }
 
-            FilterOperator op = FilterOperator.getFilterOperator(filter
-                .getOperator());
+            Integer opId = filter.getOperator();
+            if (opId != null) {
+                FilterOperator op = FilterOperator.getFilterOperator(opId);
 
-            if (op.isValueRequired()
-                && (filter.getReportFilterValueCollection() == null || filter
-                    .getReportFilterValueCollection().isEmpty())) {
-                // do not consider filters that require a value, yet none is set
-                continue;
+                if (op.isValueRequired()
+                    && (filter.getReportFilterValueCollection() == null || filter
+                        .getReportFilterValueCollection().isEmpty())) {
+                    // do not consider filters that require a value, yet none is
+                    // set
+                    continue;
+                }
             }
             reportFilters.add(filter);
         }
@@ -464,6 +467,7 @@ class FilterRow extends Composite {
             } else {
                 BioBankPlugin.openError("Cannot Suggest Options",
                     "There was a problem trying to find suggestions.");
+                e.printStackTrace();
             }
             return false;
         }

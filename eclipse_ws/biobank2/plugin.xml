@@ -1530,6 +1530,18 @@
                standalone="false"
                visible="true">
          </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.AdvancedReportsView"
+               minimized="false"
+               moveable="false"
+               ratio="0.20"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.ReportsView"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.processing">
@@ -2394,13 +2406,21 @@
             id="edu.ualberta.med.biobank.views.SessionsView"
             name="Administration"
             restorable="true">
-      </view>
+	      </view>
+	      <view
+	            allowMultiple="false"
+	            class="edu.ualberta.med.biobank.views.ReportsView"
+	            id="edu.ualberta.med.biobank.views.ReportsView"
+	            icon="icons/reportsPerspective.png"
+	            name="Reports"
+	            restorable="true">
+	      </view>
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.ReportsView"
-            id="edu.ualberta.med.biobank.views.ReportsView"
+            class="edu.ualberta.med.biobank.views.AdvancedReportsView"
+            id="edu.ualberta.med.biobank.views.AdvancedReportsView"
             icon="icons/reportsPerspective.png"
-            name="Reports"
+            name="Advanced Reports"
             restorable="true">
       </view>
       <view
@@ -2426,7 +2446,7 @@
             restorable="true">
       </view>
       <view
-            class="edu.ualberta.med.biobank.views.ReportAdministrationView"
+            class="edu.ualberta.med.biobank.views.AdvancedReportsView"
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.views.ReportAdministrationView"
             name="Advanced Reports"

@@ -3,20 +3,19 @@ package edu.ualberta.med.biobank.views;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.rcp.perspective.ReportAdministrationPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.report.AbstractReportGroup;
 import edu.ualberta.med.biobank.treeview.report.PrivateReportsGroup;
 import edu.ualberta.med.biobank.treeview.report.SharedReportsGroup;
 
-public class ReportAdministrationView extends AbstractAdministrationView {
-    public static final String ID = "edu.ualberta.med.biobank.views.ReportAdministrationView";
+public class AdvancedReportsView extends AbstractAdministrationView {
+    public static final String ID = "edu.ualberta.med.biobank.views.AdvancedReportsView";
 
-    private static ReportAdministrationView currentView;
+    private static AdvancedReportsView currentView;
 
-    public ReportAdministrationView() {
+    public AdvancedReportsView() {
         currentView = this;
-        SessionManager.addView(ReportAdministrationPerspective.ID, this);
+        SessionManager.addView(ID, this);
     }
 
     @Override
@@ -37,7 +36,7 @@ public class ReportAdministrationView extends AbstractAdministrationView {
         super.reload();
     }
 
-    public static ReportAdministrationView getCurrent() {
+    public static AdvancedReportsView getCurrent() {
         return currentView;
     }
 
@@ -67,7 +66,6 @@ public class ReportAdministrationView extends AbstractAdministrationView {
 
     @Override
     public String getId() {
-        // TODO Auto-generated method stub
-        return null;
+        return ID;
     }
 }
