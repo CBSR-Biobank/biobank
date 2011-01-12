@@ -14,6 +14,7 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
@@ -141,7 +142,8 @@ public abstract class AbstractAdministrationView extends
 
     @Override
     public void opened() {
-        reload();
+        if (SessionManager.getInstance().isConnected())
+            reload();
     }
 
 }
