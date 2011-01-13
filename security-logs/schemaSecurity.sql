@@ -433,7 +433,6 @@ LOCK TABLES `csm_role_privilege` WRITE;
 INSERT INTO `csm_role_privilege` VALUES (19,8,1);
 INSERT INTO `csm_role_privilege` VALUES (16,7,3);
 INSERT INTO `csm_role_privilege` VALUES (18,8,3);
-INSERT INTO `csm_role_privilege` VALUES (21,9,3);
 INSERT INTO `csm_role_privilege` VALUES (20,8,5);
 INSERT INTO `csm_role_privilege` VALUES (22,9,5);
 INSERT INTO `csm_role_privilege` VALUES (17,8,6);
@@ -487,7 +486,6 @@ INSERT INTO `csm_user` VALUES (17,'tpolasek',0,'thomas','polasek','','','','','8
 INSERT INTO `csm_user` VALUES (18,'aaron_aicml',0,'Aaron','Young','','','','','qmP9VkaU0jO32lSKMjM/lw==','aaron.young@ualberta.ca',NULL,NULL,'2010-10-18','');
 INSERT INTO `csm_user` VALUES (19,'Andrijana',0,'Andrijana','Lawton','','','','','V4PzQj6by/Q=','',NULL,NULL,'2010-08-11','');
 INSERT INTO `csm_user` VALUES (20,'Virginia',0,'Virginia','Doe','','','','','tsjSShkZ7qC8j2uyHEABIQ==','',NULL,NULL,'2010-08-11','');
-INSERT INTO `csm_user` VALUES (21,'testuser',0,'testuser','testuser',NULL,NULL,NULL,NULL,'orDBlaojDQE=',NULL,NULL,NULL,'2010-12-06',NULL);
 /*!40000 ALTER TABLE `csm_user` ENABLE KEYS */;
 UNLOCK TABLES;
 
