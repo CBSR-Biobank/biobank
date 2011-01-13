@@ -225,6 +225,7 @@ public class ReportRunner {
                 return;
             }
 
+            // TODO: treat Collection-s differently
             Class<?> proxyKlazz = propertyValue.getClass();
             Method getId = proxyKlazz.getMethod("getId");
             Serializable id = (Serializable) getId.invoke(propertyValue);
