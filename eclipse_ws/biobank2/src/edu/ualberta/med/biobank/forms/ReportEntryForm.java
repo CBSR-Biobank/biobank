@@ -578,8 +578,7 @@ public class ReportEntryForm extends BiobankEntryForm {
         path.setValue(fd.open());
 
         if (path.getValue() == null || !path.getValue().endsWith(".csv")) {
-            BioBankPlugin.openAsyncError("Exporting canceled.",
-                "Select a valid path and try again.");
+            return;
         }
 
         IRunnableContext context = new ProgressMonitorDialog(Display
