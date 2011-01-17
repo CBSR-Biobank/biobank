@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public class DecodePlateForm extends PlateForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.DecodePlateForm";
@@ -163,7 +164,8 @@ public class DecodePlateForm extends PlateForm {
         monitor.subTask("Launching scan");
 
         ScanCell[][] decodedCells = null;
-        decodedCells = ScannerConfigPlugin.scan(plateToScan, "All");
+        decodedCells = ScannerConfigPlugin.scan(plateToScan,
+            ProfileManager.ALL_PROFILE_NAME);
         cells = PalletCell.convertArray(decodedCells);
     }
 

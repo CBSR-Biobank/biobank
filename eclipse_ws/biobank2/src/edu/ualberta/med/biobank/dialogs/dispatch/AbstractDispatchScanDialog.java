@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
@@ -200,8 +201,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     private void launchScan() {
         setScanOkValue(false);
-        palletScanManagement.launchScanAndProcessResult(plateToScan, "All",
-            isRescanMode());
+        palletScanManagement.launchScanAndProcessResult(plateToScan,
+            ProfileManager.ALL_PROFILE_NAME, isRescanMode());
     }
 
     protected void startNewPallet() {
