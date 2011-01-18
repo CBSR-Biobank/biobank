@@ -121,10 +121,15 @@ public class SessionManager {
     public void deleteSession() throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
         rootNode.removeChild(sessionAdapter);
-        DispatchAdministrationView view = DispatchAdministrationView
+        DispatchAdministrationView dview = DispatchAdministrationView
             .getCurrent();
-        if (view != null) {
-            view.clear();
+        RequestAdministrationView rview = RequestAdministrationView
+            .getCurrent();
+        if (dview != null) {
+            dview.clear();
+        }
+        if (rview != null) {
+            rview.clear();
         }
         sessionAdapter = null;
         updateMenus();

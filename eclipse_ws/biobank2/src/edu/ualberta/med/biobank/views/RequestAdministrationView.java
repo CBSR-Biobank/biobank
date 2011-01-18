@@ -152,4 +152,8 @@ public class RequestAdministrationView extends AbstractAdministrationView {
         return ID;
     }
 
+    public void clear() {
+        rootNode.removeAll();
+    }
+
 }

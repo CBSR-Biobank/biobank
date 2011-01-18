@@ -323,6 +323,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         int tableWidth = Math.max(500, tableViewer.getTable().getSize().x);
 
         int totalWidths = 0;
+        tableViewer.getTable().setVisible(false);
         for (int i = 0; i < table.getColumnCount(); i++) {
             int width = (int) ((double) maxCellContentsWidths[i]
                 / sumOfMaxTextWidths * tableWidth);
@@ -332,6 +333,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
                 table.getColumn(i).setWidth(width);
             totalWidths += width;
         }
+        tableViewer.getTable().setVisible(true);
     }
 
     protected abstract void init(List<T> collection);

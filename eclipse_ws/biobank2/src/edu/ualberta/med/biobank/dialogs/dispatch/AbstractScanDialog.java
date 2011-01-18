@@ -26,7 +26,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
@@ -40,7 +39,8 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
-public abstract class AbstractDispatchScanDialog extends BiobankDialog {
+public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
+    BiobankDialog {
 
     private BiobankText plateToScanText;
 
@@ -48,7 +48,7 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     private PalletScanManagement palletScanManagement;
     protected ScanPalletWidget spw;
-    protected ModelWrapper<?> currentShipment;
+    protected T currentShipment;
     private IObservableValue scanHasBeenLaunchedValue = new WritableValue(
         Boolean.FALSE, Boolean.class);
     private IObservableValue scanOkValue = new WritableValue(Boolean.TRUE,
@@ -61,8 +61,8 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
     protected SiteWrapper currentSite;
 
-    public AbstractDispatchScanDialog(Shell parentShell,
-        final DispatchWrapper currentShipment, SiteWrapper currentSite) {
+    public AbstractScanDialog(Shell parentShell, final T currentShipment,
+        SiteWrapper currentSite) {
         super(parentShell);
         this.currentShipment = currentShipment;
         this.currentSite = currentSite;
@@ -70,60 +70,21 @@ public abstract class AbstractDispatchScanDialog extends BiobankDialog {
 
             @Override
             protected void beforeThreadStart() {
-                AbstractDispatchScanDialog.this.beforeScanThreadStart();
+                AbstractScanDialog.this.beforeScanThreadStart();
             }
 
             @Override
             protected void processScanResult(IProgressMonitor monitor)
                 throws Exception {
                 setScanHasBeenLaunched(true);
-                AbstractDispatchScanDialog.this.processScanResult(monitor,
-                    AbstractDispatchScanDialog.this.currentSite);
+                AbstractScanDialog.this.processScanResult(monitor,
+                    AbstractScanDialog.this.currentSite);
             }
 
             @Override
             protected Map<RowColPos, PalletCell> getFakeScanCells()
                 throws Exception {
-                return AbstractDispatchScanDialog.this.getFakeScanCells();
-            }
-
-            @Override
-            protected void afterScanAndProcess() {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        spw.setCells(getCells());
-                        setRescanMode(true);
-                    }
-                });
-            }
-        };
-    }
-
-    public AbstractDispatchScanDialog(Shell parentShell,
-        ModelWrapper<?> currentShipment, SiteWrapper currentSite) {
-        super(parentShell);
-        this.currentShipment = currentShipment;
-        this.currentSite = currentSite;
-        palletScanManagement = new PalletScanManagement() {
-
-            @Override
-            protected void beforeThreadStart() {
-                AbstractDispatchScanDialog.this.beforeScanThreadStart();
-            }
-
-            @Override
-            protected void processScanResult(IProgressMonitor monitor)
-                throws Exception {
-                setScanHasBeenLaunched(true);
-                AbstractDispatchScanDialog.this.processScanResult(monitor,
-                    AbstractDispatchScanDialog.this.currentSite);
-            }
-
-            @Override
-            protected Map<RowColPos, PalletCell> getFakeScanCells()
-                throws Exception {
-                return AbstractDispatchScanDialog.this.getFakeScanCells();
+                return AbstractScanDialog.this.getFakeScanCells();
             }
 
             @Override

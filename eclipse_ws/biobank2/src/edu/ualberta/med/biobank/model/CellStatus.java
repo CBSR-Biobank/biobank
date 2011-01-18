@@ -10,16 +10,17 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 
 public enum CellStatus {
     NOT_INITIALIZED(SWT.COLOR_WHITE, "Not Initialized"), INITIALIZED(
-        SWT.COLOR_DARK_GRAY, "Initialized"), FULL(SWT.COLOR_DARK_GRAY, "Full"), FREE_LOCATIONS(
-        SWT.COLOR_WHITE, "Free locations"), EMPTY(SWT.COLOR_WHITE, "Empty"), FILLED(
-        SWT.COLOR_DARK_GRAY, "Filled"), NEW(SWT.COLOR_DARK_GREEN, "New"), MOVED(
-        217, 161, 65, "Moved"), MISSING(SWT.COLOR_CYAN, "Missing"), ERROR(
-        SWT.COLOR_RED, "Error"), NO_TYPE(SWT.COLOR_DARK_GREEN, "No type"), TYPE(
-        SWT.COLOR_DARK_GRAY, "Type"), IN_SHIPMENT_EXPECTED(
-        SWT.COLOR_DARK_GREEN, "Expected"), IN_SHIPMENT_ADDED(
-        SWT.COLOR_DARK_GREEN, "Added"), IN_SHIPMENT_RECEIVED(
-        SWT.COLOR_DARK_GRAY, "Received"), EXTRA(SWT.COLOR_YELLOW, "Extra"), SCAN_PROFILE(
-        185, 211, 238, "Profiled cell");
+        SWT.COLOR_DARK_GRAY, "Initialized"), FULL(SWT.COLOR_DARK_GRAY, "Full"),
+    FREE_LOCATIONS(SWT.COLOR_WHITE, "Free locations"), EMPTY(SWT.COLOR_WHITE,
+        "Empty"), FILLED(SWT.COLOR_DARK_GRAY, "Filled"), NEW(
+        SWT.COLOR_DARK_GREEN, "New"), MOVED(217, 161, 65, "Moved"), MISSING(
+        SWT.COLOR_CYAN, "Missing"), ERROR(SWT.COLOR_RED, "Error"), NO_TYPE(
+        SWT.COLOR_DARK_GREEN, "No type"), TYPE(SWT.COLOR_DARK_GRAY, "Type"),
+    IN_SHIPMENT_EXPECTED(SWT.COLOR_DARK_GREEN, "Expected"), IN_SHIPMENT_ADDED(
+        SWT.COLOR_DARK_GREEN, "Added"), DUPLICATE_SCAN(SWT.COLOR_DARK_GRAY,
+        "Already Scanned"), IN_SHIPMENT_RECEIVED(SWT.COLOR_DARK_GRAY,
+        "Received"), EXTRA(SWT.COLOR_YELLOW, "Extra"), SCAN_PROFILE(185, 211,
+        238, "Profiled cell");
 
     private Color color;
     private String legend;
@@ -38,6 +39,9 @@ public enum CellStatus {
 
     public static List<CellStatus> DEFAULT_PALLET_DISPATCH_CREATE_STATUS_LIST = Arrays
         .asList(EMPTY, FILLED, IN_SHIPMENT_ADDED, MISSING, ERROR);
+
+    public static List<CellStatus> REQUEST_PALLET_STATUS_LIST = Arrays.asList(
+        EMPTY, DUPLICATE_SCAN, IN_SHIPMENT_EXPECTED, EXTRA, ERROR);
 
     private CellStatus(int color, String legend) {
         this.color = BioBankPlugin.getDefault().getWorkbench().getDisplay()

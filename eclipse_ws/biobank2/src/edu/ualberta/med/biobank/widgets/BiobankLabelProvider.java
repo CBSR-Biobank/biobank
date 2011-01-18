@@ -138,7 +138,9 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return dsa.getAliquot().getPositionString(true, true);
             if (columnIndex == 3)
                 return dsa.getClaimedBy();
-        } else {
+        } else if (element instanceof AdapterBase)
+            return ((AdapterBase) element).getLabel();
+        else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());
         }
         return "";

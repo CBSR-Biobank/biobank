@@ -34,11 +34,15 @@ import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
+import edu.ualberta.med.biobank.treeview.Node;
+import edu.ualberta.med.biobank.treeview.RequestAliquotAdapter;
+import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
 
 public class RequestAliquotsTreeTable extends BiobankWidget {
 
     private TreeViewer tv;
     private RequestWrapper shipment;
+    protected List<RequestTableGroup> groups;
 
     public RequestAliquotsTreeTable(Composite parent, RequestWrapper shipment) {
         super(parent, SWT.NONE);
@@ -81,33 +85,28 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             @Override
             public void inputChanged(Viewer viewer, Object oldInput,
                 Object newInput) {
+                groups = RequestTableGroup
+                    .getGroupsForShipment(RequestAliquotsTreeTable.this.shipment);
             }
 
             @Override
             public Object[] getElements(Object inputElement) {
-                return RequestTableGroup.getGroupsForShipment(
-                    RequestAliquotsTreeTable.this.shipment).toArray();
+                return groups.toArray();
             }
 
             @Override
             public Object[] getChildren(Object parentElement) {
-                if (parentElement instanceof RequestTableGroup)
-                    return ((RequestTableGroup) parentElement).getChildren(
-                        RequestAliquotsTreeTable.this.shipment).toArray();
-                return null;
+                return ((Node) parentElement).getChildren().toArray();
             }
 
             @Override
             public Object getParent(Object element) {
-                if (element instanceof RequestAliquotWrapper)
-                    return RequestTableGroup
-                        .findParent((RequestAliquotWrapper) element);
-                return null;
+                return ((Node) element).getParent();
             }
 
             @Override
             public boolean hasChildren(Object element) {
-                return element instanceof RequestTableGroup;
+                return ((Node) element).getChildren().size() != 0;
             }
         };
         tv.setContentProvider(contentProvider);
@@ -117,11 +116,30 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public String getColumnText(Object element, int columnIndex) {
                 if (element instanceof RequestTableGroup) {
                     if (columnIndex == 0)
-                        return ((RequestTableGroup) element)
-                            .getTitle(RequestAliquotsTreeTable.this.shipment);
+                        return ((RequestTableGroup) element).getTitle();
                     return "";
+                } else if (element instanceof RequestContainerAdapter) {
+                    if (columnIndex == 0)
+                        return ((RequestContainerAdapter) element)
+                            .getLabelInternal();
+                    return "";
+                } else if (element instanceof RequestAliquotAdapter) {
+                    switch (columnIndex) {
+                    case 0:
+                        return ((RequestAliquotAdapter) element)
+                            .getLabelInternal();
+                    case 1:
+                        return ((RequestAliquotAdapter) element)
+                            .getSampleType();
+                    case 2:
+                        return ((RequestAliquotAdapter) element).getPosition();
+                    case 3:
+                        return ((RequestAliquotAdapter) element).getClaimedBy();
+                    default:
+                        return "";
+                    }
                 }
-                return super.getColumnText(element, columnIndex);
+                return "";
             }
         };
         tv.setLabelProvider(labelProvider);
@@ -132,8 +150,9 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public void doubleClick(DoubleClickEvent event) {
                 Object o = ((IStructuredSelection) tv.getSelection())
                     .getFirstElement();
-                if (o instanceof RequestAliquotWrapper) {
-                    RequestAliquotWrapper ra = (RequestAliquotWrapper) o;
+                if (o instanceof RequestAliquotAdapter) {
+                    RequestAliquotWrapper ra = ((RequestAliquotAdapter) o)
+                        .getAliquot();
                     SessionManager.openViewForm(ra.getAliquot());
                 }
             }
@@ -154,20 +173,33 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                     if (ra != null) {
                         addClipboardCopySupport(menu, labelProvider);
                         addSetUnavailableMenu(menu);
-                        if (ra.getClaimedBy() == null)
+                        addClaimMenu(menu);
+                    } else {
+                        Object node = getSelectedNode();
+                        if (node != null) {
                             addClaimMenu(menu);
+                        }
                     }
                 }
             });
         }
     }
 
-    protected RequestAliquotWrapper getSelectedAliquot() {
+    protected Object getSelectedNode() {
         IStructuredSelection selection = (IStructuredSelection) tv
             .getSelection();
-        if (selection != null && selection.size() > 0
-            && selection.getFirstElement() instanceof RequestAliquotWrapper) {
-            return (RequestAliquotWrapper) selection.getFirstElement();
+        if (selection != null
+            && selection.size() > 0
+            && (selection.getFirstElement() instanceof RequestAliquotAdapter || selection
+                .getFirstElement() instanceof RequestContainerAdapter))
+            return selection.getFirstElement();
+        return null;
+    }
+
+    protected RequestAliquotWrapper getSelectedAliquot() {
+        Object node = getSelectedNode();
+        if (node != null && node instanceof RequestAliquotAdapter) {
+            return ((RequestAliquotAdapter) node).getAliquot();
         }
         return null;
     }
@@ -175,20 +207,32 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
     protected void addClaimMenu(Menu menu) {
         MenuItem item;
         item = new MenuItem(menu, SWT.PUSH);
-        item.setText("Claim Aliquot");
+        item.setText("Claim");
         item.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                RequestAliquotWrapper a = getSelectedAliquot();
-                a.setClaimedBy(SessionManager.getUser().getFirstName());
-                try {
-                    a.persist();
-                } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Failed to claim", e);
-                }
-                tv.refresh();
+                claim(getSelectedNode());
+                refresh();
             }
         });
+    }
+
+    protected void claim(Object node) {
+        try {
+            if (node instanceof RequestAliquotAdapter) {
+                RequestAliquotWrapper a = ((RequestAliquotAdapter) node)
+                    .getAliquot();
+                a.setClaimedBy(SessionManager.getUser().getFirstName());
+                a.persist();
+            } else {
+                List<Object> children = ((RequestContainerAdapter) node)
+                    .getChildren();
+                for (Object child : children)
+                    claim(child);
+            }
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Failed to claim", e);
+        }
     }
 
     private void addSetUnavailableMenu(final Menu menu) {
@@ -200,14 +244,18 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             public void widgetSelected(SelectionEvent event) {
                 getSelectedAliquot().setState(
                     RequestAliquotState.UNAVAILABLE_STATE.getId());
-                shipment.resetStateLists();
-                tv.refresh();
+                try {
+                    getSelectedAliquot().persist();
+                } catch (Exception e) {
+                    BioBankPlugin.openAsyncError("Save Error", e);
+                }
+                refresh();
             }
         });
     }
 
     public void refresh() {
-        tv.refresh();
+        tv.setInput("refresh");
     }
 
     private void addClipboardCopySupport(Menu menu,

@@ -107,8 +107,7 @@ public class RequestAdapter extends AdapterBase {
                 }
 
             });
-            mi.setEnabled(request.getNonProcessedRequestAliquotCollection()
-                .size() == 0);
+            mi.setEnabled(request.isAllProcessed());
         } else if (RequestState.getState(orderState)
             .equals(RequestState.FILLED)) {
             MenuItem mi = new MenuItem(menu, SWT.NONE);
