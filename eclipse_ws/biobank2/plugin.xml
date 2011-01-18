@@ -268,13 +268,8 @@
       </command>
       <command
             categoryId="biobank2.command.category.server"
-            id="edu.ualberta.med.biobank.commands.addUser"
-            name="Add User">
-      </command>
-      <command
-            categoryId="biobank2.command.category.server"
-            id="edu.ualberta.med.biobank.commands.editUsers"
-            name="Edit Users">
+            id="edu.ualberta.med.biobank.commands.manageSecurity"
+            name="Manage Security">
       </command>
       <command
             categoryId="biobank2.command.category.server"
@@ -826,25 +821,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.EditUsersHandler"
-            commandId="edu.ualberta.med.biobank.commands.editUsers">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.loggedIn">
-               </reference>
-               <reference
-                     definitionId="biobank2.isWebAdmin">
-               </reference>
-               <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
-               </reference>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.AddUserHandler"
-            commandId="edu.ualberta.med.biobank.commands.addUser">
+            class="edu.ualberta.med.biobank.handlers.ManageSecurityHandler"
+            commandId="edu.ualberta.med.biobank.commands.manageSecurity">
          <activeWhen>
             <and>
                <reference
@@ -974,15 +952,9 @@
                       style="push">
                 </command>
                 <command
-                      commandId="edu.ualberta.med.biobank.commands.addUser"
-                      id="edu.ualberta.med.biobank.menu.addUser"
-                      label="Add User"
-                      style="push">
-                </command>
-                <command
-                      commandId="edu.ualberta.med.biobank.commands.editUsers"
-                      id="edu.ualberta.med.biobank.menu.editUsers"
-                      label="Edit User"
+                      commandId="edu.ualberta.med.biobank.commands.manageSecurity"
+                      id="edu.ualberta.med.biobank.menu.manageSecurity"
+                      label="Manage Security"
                       style="push">
                 </command>
                 <command
@@ -2246,16 +2218,10 @@
             sequence="M3+P">
       </key>  
 	  <key
-            commandId="edu.ualberta.med.biobank.commands.editUsers"
+            commandId="edu.ualberta.med.biobank.commands.manageSecurity"
             contextId="edu.ualberta.med.biobank.perspective.main"
             schemeId="biobank2.scheme"
             sequence="M3+U">
-      </key>
-	  <key
-            commandId="edu.ualberta.med.biobank.commands.addUser"
-            contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
-            sequence="M3+E">
       </key>
 	  <key
             commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"

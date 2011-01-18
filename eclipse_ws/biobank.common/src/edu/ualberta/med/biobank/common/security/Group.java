@@ -27,6 +27,10 @@ public class Group implements Serializable, NotAProxy {
 
     private Map<String, ProtectionGroupPrivilege> pgMap;
 
+    public Group() {
+
+    }
+
     public Group(Long id, String name) {
         this.id = id;
         this.name = name;
