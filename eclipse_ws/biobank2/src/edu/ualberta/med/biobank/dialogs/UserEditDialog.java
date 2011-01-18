@@ -47,7 +47,6 @@ public class UserEditDialog extends BiobankDialog {
     private static final String CONFIRM_DEMOTION_MESSAGE = "Are you certain you want to remove yourself as a "
         + Group.GROUP_WEBSITE_ADMINISTRATOR + "?";
     private static final String USER_PERSIST_ERROR_TITLE = "Unable to Save User";
-    private static final String MSG_GROUP_REQUIRED = "Each user must be assigned to at least one group. Please assign a group.";
     private static final String MSG_LOGIN_UNIQUE = "Each user login must be unique: \"{0}\" is already taken. Please try a different login name.";
     private static final String USER_PERSIST_TITLE = "User Information Saved";
     private static final String USER_PERSIST_SELF_MESSAGE = "Your information has been successfully updated. You will be logged out and have to reconnect.";
@@ -76,10 +75,6 @@ public class UserEditDialog extends BiobankDialog {
         if (isNewUser) {
             modifiedUser.setNeedToChangePassword(true);
         }
-    }
-
-    public User getModifiedUser() {
-        return modifiedUser;
     }
 
     @Override
@@ -151,21 +146,20 @@ public class UserEditDialog extends BiobankDialog {
                     lh.execute(null);
                 } catch (ExecutionException e) {
                 }
-
                 setReturnCode(CLOSE_PARENT_RETURN_CODE);
             } else {
                 setReturnCode(OK);
             }
             close();
         } catch (ApplicationException e) {
-            String message = null;
-            if (groupsWidget.getSelected().size() == 0) {
-                message = MSG_GROUP_REQUIRED;
+            if (e.getMessage().contains("Duplicate entry")) {
+                BioBankPlugin.openAsyncError(
+                    USER_PERSIST_ERROR_TITLE,
+                    MessageFormat.format(MSG_LOGIN_UNIQUE,
+                        modifiedUser.getLogin()));
             } else {
-                message = MessageFormat.format(MSG_LOGIN_UNIQUE,
-                    modifiedUser.getLogin());
+                BioBankPlugin.openAsyncError(USER_PERSIST_ERROR_TITLE, e);
             }
-            BioBankPlugin.openAsyncError(USER_PERSIST_ERROR_TITLE, message);
         }
     }
 

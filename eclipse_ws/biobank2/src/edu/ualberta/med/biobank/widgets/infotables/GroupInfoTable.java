@@ -5,15 +5,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.IBaseLabelProvider;
-import org.eclipse.jface.window.Window;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
+import edu.ualberta.med.biobank.dialogs.GroupEditDialog;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class GroupInfoTable extends InfoTableWidget<Group> {
     public static final int ROWS_PER_PAGE = 5;
@@ -23,14 +26,8 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
     private static final String CONFIRM_DELETE_TITLE = "Confirm Deletion";
     private static final String CONFIRM_DELETE_MESSAGE = "Are you certain you want to delete \"{0}\"?";
 
-    private Window parentWindow;
-    private MenuItem unlockMenuItem;
-
-    public GroupInfoTable(Composite parent, List<Group> collection,
-        Window parentWindow) {
+    public GroupInfoTable(Composite parent, List<Group> collection) {
         super(parent, collection, HEADINGS, ROWS_PER_PAGE);
-
-        this.parentWindow = parentWindow;
 
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
@@ -104,38 +101,33 @@ public class GroupInfoTable extends InfoTableWidget<Group> {
         };
     }
 
-    private void editGroup(Group group) {
-        // UserEditDialog dlg = new UserEditDialog(PlatformUI.getWorkbench()
-        // .getActiveWorkbenchWindow().getShell(), user, groups, false);
-        // int res = dlg.open();
-        // if (res == Dialog.OK) {
-        // reloadCollection(getCollection(), user);
-        // notifyListeners();
-        // } else if (res == UserEditDialog.CLOSE_PARENT_RETURN_CODE) {
-        // parentWindow.close();
-        // }
-        // TODO
+    protected void editGroup(Group group) {
+        GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), group, false);
+        int res = dlg.open();
+        if (res == Dialog.OK) {
+            reloadCollection(getCollection(), group);
+            notifyListeners();
+        }
     }
 
-    private void deleteGroup(Group group) {
-        // try {
-        String name = group.getName();
-        String message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
-            new Object[] { name });
+    protected boolean deleteGroup(Group group) {
+        try {
+            String name = group.getName();
+            String message = MessageFormat.format(CONFIRM_DELETE_MESSAGE,
+                new Object[] { name });
 
-        if (BioBankPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
-            // TODO
-            // SessionManager.getAppService().deleteUser(login)User(loginName);
-
-            // remove the user from the collection
-            // getCollection().remove(user);
-
-            // reloadCollection(getCollection(), null);
-            // notifyListeners();
+            if (BioBankPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
+                SessionManager.getAppService().deleteGroup(group);
+                // remove the user from the collection
+                getCollection().remove(group);
+                reloadCollection(getCollection(), null);
+                notifyListeners();
+                return true;
+            }
+        } catch (ApplicationException e) {
+            BioBankPlugin.openAsyncError(GROUP_DELETE_ERROR, e);
         }
-        // } catch (ApplicationException e) {
-        // BioBankPlugin.openAsyncError(GROUP_DELETE_ERROR, e);
-        // return;
-        // }
+        return false;
     }
 }

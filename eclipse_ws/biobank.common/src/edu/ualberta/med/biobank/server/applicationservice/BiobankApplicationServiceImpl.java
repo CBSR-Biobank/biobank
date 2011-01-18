@@ -445,7 +445,8 @@ public class BiobankApplicationServiceImpl extends
                     groups.add(g);
                 }
                 if (groups.size() == 0) {
-                    throw new Exception("No group has been set for this user.");
+                    throw new ApplicationException(
+                        "No group has been set for this user.");
                 }
                 serverUser.setGroups(groups);
                 if (serverUser.getUserId() == null) {
@@ -458,7 +459,7 @@ public class BiobankApplicationServiceImpl extends
                 throw ae;
             } catch (Exception ex) {
                 log.error("Error persisting security user", ex);
-                throw new ApplicationException(ex);
+                throw new ApplicationException(ex.getMessage(), ex);
             }
         } else {
             throw new ApplicationException(
@@ -488,7 +489,7 @@ public class BiobankApplicationServiceImpl extends
                 throw ae;
             } catch (Exception ex) {
                 log.error("Error deleting security user", ex);
-                throw new ApplicationException(ex);
+                throw new ApplicationException(ex.getMessage(), ex);
             }
         } else {
             throw new ApplicationException(
@@ -515,7 +516,7 @@ public class BiobankApplicationServiceImpl extends
             throw ae;
         } catch (Exception ex) {
             log.error("Error getting current user", ex);
-            throw new ApplicationException(ex);
+            throw new ApplicationException(ex.getMessage(), ex);
         }
     }
 
@@ -642,5 +643,79 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public String getServerVersion() {
         return props.getProperty(SERVER_VERSION_PROP_KEY);
+    }
+
+    @Override
+    public void persistGroup(
+        edu.ualberta.med.biobank.common.security.Group group)
+        throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            try {
+                UserProvisioningManager upm = SecurityServiceProvider
+                    .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+                if (!group.canBeEdited()) {
+                    throw new ApplicationException(
+                        "This group cannot be modified.");
+                }
+                if (group.getName() == null) {
+                    throw new ApplicationException("Name should be set.");
+                }
+
+                Group serverGroup = null;
+                if (group.getId() != null) {
+                    serverGroup = upm.getGroupById(group.getId().toString());
+                }
+                if (serverGroup == null) {
+                    serverGroup = new Group();
+                }
+                serverGroup.setGroupName(group.getName());
+                if (serverGroup.getGroupId() == null) {
+                    upm.createGroup(serverGroup);
+                } else {
+                    upm.modifyGroup(serverGroup);
+                }
+            } catch (ApplicationException ae) {
+                log.error("Error persisting security group", ae);
+                throw ae;
+            } catch (Exception ex) {
+                log.error("Error persisting security group", ex);
+                throw new ApplicationException(ex.getMessage(), ex);
+            }
+        } else {
+            throw new ApplicationException(
+                "Only Website Administrators can add/modify groups");
+        }
+    }
+
+    @Override
+    public void deleteGroup(edu.ualberta.med.biobank.common.security.Group group)
+        throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            try {
+                UserProvisioningManager upm = SecurityServiceProvider
+                    .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+                if (group.canBeDeleted()) {
+                    Group serverGroup = upm.getGroupById(group.getId()
+                        .toString());
+                    if (serverGroup == null) {
+                        throw new ApplicationException("Security group "
+                            + group.getName() + " not found.");
+                    }
+                    upm.removeGroup(serverGroup.getGroupId().toString());
+                } else {
+                    throw new ApplicationException("Deletion of group "
+                        + group.getName() + " is not authorized.");
+                }
+            } catch (ApplicationException ae) {
+                log.error("Error deleting security group", ae);
+                throw ae;
+            } catch (Exception ex) {
+                log.error("Error deleting security group", ex);
+                throw new ApplicationException(ex.getMessage(), ex);
+            }
+        } else {
+            throw new ApplicationException(
+                "Only Website Administrators can delete groups");
+        }
     }
 }

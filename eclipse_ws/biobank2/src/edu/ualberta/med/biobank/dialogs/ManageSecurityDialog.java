@@ -35,10 +35,14 @@ public class ManageSecurityDialog extends BiobankDialog {
     private final String TITLE = "Manage Security";
     private final String TITLE_AREA_MESSAGE = "Right-click to modify, delete or unlock users and groups.";
     private UserInfoTable userInfoTable;
+    private List<User> currentUserList;
     private GroupInfoTable groupInfoTable;
+    private List<Group> currentGroupList;
 
     private static final String USER_ADDED_TITLE = "User Added";
     private static final String USER_ADDED_MESSAGE = "Successfully added new user \"{0}\".";
+    private static final String GROUP_ADDED_TITLE = "Group Added";
+    private static final String GROUP_ADDED_MESSAGE = "Successfully added new group \"{0}\".";
 
     public ManageSecurityDialog(Shell parentShell) {
         super(parentShell);
@@ -72,7 +76,24 @@ public class ManageSecurityDialog extends BiobankDialog {
                     addUser();
                 }
             });
-        userInfoTable = new UserInfoTable(usersSection, null, this);
+        userInfoTable = new UserInfoTable(usersSection, null) {
+            @Override
+            protected int editUser(User user) {
+                int res = super.editUser(user);
+                if (res == UserEditDialog.CLOSE_PARENT_RETURN_CODE) {
+                    close();
+                }
+                return res;
+            }
+
+            @Override
+            protected boolean deleteUser(User user) {
+                boolean deleted = super.deleteUser(user);
+                if (deleted)
+                    currentUserList.remove(user);
+                return deleted;
+            }
+        };
         usersSection.setClient(userInfoTable);
         addExpansionListener(contents, usersSection, userInfoTable);
         List<User> tmpUsers = new ArrayList<User>();
@@ -84,14 +105,21 @@ public class ManageSecurityDialog extends BiobankDialog {
         userInfoTable.setCollection(tmpUsers);
 
         Section groupsSection = createSection(contents, "Groups",
-            "Add a new groups", new SelectionAdapter() {
+            "Add a new group", new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    // TODO Auto-generated method stub
-
+                    addGroup();
                 }
             });
-        groupInfoTable = new GroupInfoTable(groupsSection, null, this);
+        groupInfoTable = new GroupInfoTable(groupsSection, null) {
+            @Override
+            protected boolean deleteGroup(Group group) {
+                boolean deleted = super.deleteGroup(group);
+                if (deleted)
+                    currentGroupList.remove(group);
+                return deleted;
+            }
+        };
         groupsSection.setClient(groupInfoTable);
         addExpansionListener(contents, groupsSection, groupInfoTable);
         List<Group> tmpGroups = new ArrayList<Group>();
@@ -101,7 +129,6 @@ public class ManageSecurityDialog extends BiobankDialog {
             tmpGroups.add(group);
         }
         groupInfoTable.setCollection(tmpGroups);
-        groupsSection.setExpanded(false);
 
         Thread t = new Thread() {
             @Override
@@ -109,22 +136,22 @@ public class ManageSecurityDialog extends BiobankDialog {
                 BiobankApplicationService appService = SessionManager
                     .getAppService();
                 try {
-                    final List<User> users = appService.getSecurityUsers();
+                    currentUserList = appService.getSecurityUsers();
                     getShell().getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
-                            userInfoTable.setCollection(users);
+                            userInfoTable.setCollection(currentUserList);
                         }
                     });
                 } catch (ApplicationException e) {
                     BioBankPlugin.openAsyncError("Unable to load users.", e);
                 }
                 try {
-                    final List<Group> groups = appService.getSecurityGroups();
+                    currentGroupList = appService.getSecurityGroups();
                     getShell().getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
-                            groupInfoTable.setCollection(groups);
+                            groupInfoTable.setCollection(currentGroupList);
                         }
                     });
                 } catch (ApplicationException e) {
@@ -139,14 +166,27 @@ public class ManageSecurityDialog extends BiobankDialog {
     protected void addUser() {
         User user = new User();
         UserEditDialog dlg = new UserEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), user,
-            groupInfoTable.getCollection(), true);
+            .getActiveWorkbenchWindow().getShell(), user, currentGroupList,
+            true);
         int res = dlg.open();
         if (res == Status.OK) {
             BioBankPlugin.openAsyncInformation(USER_ADDED_TITLE,
                 MessageFormat.format(USER_ADDED_MESSAGE, user.getLogin()));
-            userInfoTable.getCollection().add(user);
-            userInfoTable.reloadCollection(userInfoTable.getCollection());
+            currentUserList.add(user);
+            userInfoTable.reloadCollection(currentUserList, user);
+        }
+    }
+
+    protected void addGroup() {
+        Group group = new Group();
+        GroupEditDialog dlg = new GroupEditDialog(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(), group, true);
+        int res = dlg.open();
+        if (res == Status.OK) {
+            BioBankPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
+                MessageFormat.format(GROUP_ADDED_MESSAGE, group.getName()));
+            currentGroupList.add(group);
+            groupInfoTable.reloadCollection(currentGroupList, group);
         }
     }
 
