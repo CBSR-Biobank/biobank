@@ -12,6 +12,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Hibernate;
 import org.hibernate.Session;
@@ -325,12 +326,12 @@ public class ReportRunner {
         String... childProperties) {
         StringBuilder sb = new StringBuilder();
 
-        sb.append(parentProperty);
-
-        for (String childProperty : childProperties) {
+        if (parentProperty != null) {
+            sb.append(parentProperty);
             sb.append(PROPERTY_DELIMITER);
-            sb.append(childProperty);
         }
+
+        sb.append(StringUtils.join(childProperties, PROPERTY_DELIMITER));
 
         return sb.toString();
     }
