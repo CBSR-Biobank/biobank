@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -53,16 +52,16 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
+import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
 
-public abstract class ReportsEditor extends BiobankFormBase implements
-    edu.ualberta.med.biobank.common.util.IBusyListener {
+public abstract class ReportsEditor extends BiobankFormBase {
 
     // Report
     protected ReportTreeNode node;
@@ -83,7 +82,6 @@ public abstract class ReportsEditor extends BiobankFormBase implements
     private Button printButton;
     private Button exportPDFButton;
     private Button exportCSVButton;
-    private Semaphore semaphore = new Semaphore(1);
 
     // Mostly for visibility reasons
     private String path;
@@ -92,6 +90,8 @@ public abstract class ReportsEditor extends BiobankFormBase implements
     private IObservableValue statusObservable;
 
     QueryHandle query;
+    ProgressMonitorDialogBusyListener listener = new ProgressMonitorDialogBusyListener(
+        "Generating report...");
 
     @Override
     protected void init() throws Exception {
@@ -227,16 +227,49 @@ public abstract class ReportsEditor extends BiobankFormBase implements
         try {
             query = ((BiobankApplicationService) appService)
                 .createQuery(report);
+
+            IRunnableContext context = new ProgressMonitorDialog(Display
+                .getDefault().getActiveShell());
+            context.run(true, true, new IRunnableWithProgress() {
+                @Override
+                public void run(final IProgressMonitor monitor) {
+                    Thread t = new Thread("Querying") {
+                        @Override
+                        public void run() {
+                            try {
+                                reportData = ((BiobankApplicationService) appService)
+                                    .startQuery(query);
+                            } catch (Exception e) {
+                                reportData = new ArrayList<Object>();
+                                BioBankPlugin.openAsyncError("Query Error", e);
+                            }
+                        }
+                    };
+                    monitor.beginTask("Generating Report...",
+                        IProgressMonitor.UNKNOWN);
+                    t.start();
+                    while (true) {
+                        if (monitor.isCanceled()) {
+                            // TODO t.stop(); we need a safe way to kill query
+                            reportData = new ArrayList<Object>();
+                            break;
+                        } else if (!t.isAlive())
+                            break;
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            break;
+                        }
+                    }
+                };
+            });
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Failed to load query", e1);
         }
 
-        try {
-            reportData = ((BiobankApplicationService) appService)
-                .startQuery(query);
-        } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Query Error", e);
-        }
+        if (reportData instanceof HQLCriteriaListProxy)
+            ((HQLCriteriaListProxy) reportData).addBusyListener(listener);
+
         if (!reportData.isEmpty()) {
             printButton.setEnabled(true);
             exportPDFButton.setEnabled(true);
@@ -249,8 +282,8 @@ public abstract class ReportsEditor extends BiobankFormBase implements
         reportTable.dispose();
         // if size > 1000 or unknown, disable print and
         // export to pdf
-        if ((reportData instanceof BiobankListProxy && (((BiobankListProxy) reportData)
-            .getRealSize() == -1 || ((BiobankListProxy) reportData)
+        if ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy) reportData)
+            .getRealSize() == -1 || ((HQLCriteriaListProxy) reportData)
             .getRealSize() > 1000))
             || reportData.size() > 1000) {
             printButton.setEnabled(false);
@@ -554,51 +587,4 @@ public abstract class ReportsEditor extends BiobankFormBase implements
             return processedDate;
     }
 
-    @Override
-    public void showBusy() {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                IRunnableContext context = new ProgressMonitorDialog(Display
-                    .getDefault().getActiveShell());
-                try {
-                    context.run(true, true, new IRunnableWithProgress() {
-                        @Override
-                        public void run(final IProgressMonitor monitor) {
-                            try {
-                                semaphore.acquire();
-                                monitor.beginTask("Loading...",
-                                    IProgressMonitor.UNKNOWN);
-                                while (semaphore.availablePermits() == 0) {
-                                    if (monitor.isCanceled()) {
-                                        try {
-                                            ((BiobankApplicationService) appService)
-                                                .stopQuery(query);
-                                        } catch (Exception e) {
-                                            BioBankPlugin.openAsyncError(
-                                                "Failed to run query", e);
-                                        }
-                                        semaphore.release();
-                                        break;
-                                    } else
-                                        Thread.sleep(1000);
-                                }
-                            } catch (InterruptedException e1) {
-                                e1.printStackTrace();
-                                semaphore.release();
-                            }
-                            monitor.done();
-                        }
-                    });
-                } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Loading Error", e);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void done() {
-        semaphore.release();
-    }
 }

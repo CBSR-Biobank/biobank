@@ -59,8 +59,7 @@ echo "extracting old database..."
 gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2
 #mysql --safe-updates=0 -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v123_v130.sql
 echo "upgrading database..."
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v123_v130.sql
-mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v130_v131.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v123_v131.sql
 echo "setting global security..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < $DUMPFILE
 echo "setting CBSR sites security..."

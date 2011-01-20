@@ -140,6 +140,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_REQUEST_FILLED = "request_filled";
     public static final String IMG_ALIQUOT = "aliquot";
     public static final String IMG_LOCK = "lock";
+    public static final String IMG_UP = "bullet_arrow_up";
+    public static final String IMG_DOWN = "bullet_arrow_down";
+    public static final String IMG_REMOVE = "remove";
+    public static final String IMG_WAND = "wand";
+    public static final String IMG_HOURGLASS = "hourglass";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -323,6 +328,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SENT, "sent.png");
         registerImage(registry, IMG_ALIQUOT, "aliquot.png");
         registerImage(registry, IMG_LOCK, "lock.png");
+        registerImage(registry, IMG_UP, "bullet_arrow_up.png");
+        registerImage(registry, IMG_DOWN, "bullet_arrow_down.png");
+        registerImage(registry, IMG_REMOVE, "remove.png");
+        registerImage(registry, IMG_WAND, "wand.png");
+        registerImage(registry, IMG_HOURGLASS, "hourglass.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,

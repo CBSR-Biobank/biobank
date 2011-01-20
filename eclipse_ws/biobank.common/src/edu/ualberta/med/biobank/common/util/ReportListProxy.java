@@ -1,26 +1,38 @@
 package edu.ualberta.med.biobank.common.util;
 
-import gov.nih.nci.system.applicationservice.ApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
+import java.io.Serializable;
+import java.util.List;
 
-public class ReportListProxy extends BiobankListProxy {
+import edu.ualberta.med.biobank.model.Report;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+import gov.nih.nci.system.applicationservice.ApplicationService;
+
+public class ReportListProxy extends AbstractBiobankListProxy implements
+    Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private AbstractRowPostProcess pp;
+    protected Report report;
 
-    public ReportListProxy(ApplicationService appService, HQLCriteria criteria,
-        AbstractRowPostProcess pp) {
-        super(appService, criteria);
-        this.pp = pp;
+    public ReportListProxy(BiobankApplicationService appService, Report report) {
+        super(appService);
+        this.report = report;
     }
 
     @Override
-    public Object getRowObject(Object object) {
-        if (pp == null) {
-            return object;
-        }
-        return pp.rowPostProcess(object);
+    public List<Object> getChunk(Integer firstRow) throws ApplicationException {
+        return ((BiobankApplicationService) appService).runReport(report,
+            pageSize, firstRow, 0);
     }
 
+    @Override
+    public void setAppService(ApplicationService as) {
+        if (!(as instanceof BiobankApplicationService)) {
+            throw new IllegalArgumentException(
+                "expecting BiobankApplicationService not ApplicationService");
+        }
+
+        super.setAppService(as);
+    }
 }

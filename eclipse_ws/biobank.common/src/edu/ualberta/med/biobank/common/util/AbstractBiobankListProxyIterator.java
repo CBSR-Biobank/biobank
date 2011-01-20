@@ -2,13 +2,13 @@ package edu.ualberta.med.biobank.common.util;
 
 import java.util.Iterator;
 
-public class BiobankListProxyIterator implements Iterator<Object> {
-
-    BiobankListProxy proxy;
+public class AbstractBiobankListProxyIterator implements Iterator<Object> {
+    AbstractBiobankListProxy proxy;
     int index;
 
-    public BiobankListProxyIterator(BiobankListProxy proxy) {
-        this.proxy = proxy;
+    public AbstractBiobankListProxyIterator(
+        AbstractBiobankListProxy abstractBiobankListProxy) {
+        this.proxy = abstractBiobankListProxy;
         this.index = -1;
     }
 

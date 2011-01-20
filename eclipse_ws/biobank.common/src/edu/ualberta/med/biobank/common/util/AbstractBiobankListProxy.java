@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.common.util;
 
-import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.ApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -22,7 +20,8 @@ import org.springframework.util.Assert;
  * <li>Non-searchable</li><br>
  * </ul>
  */
-public class BiobankListProxy implements List<Object>, Serializable {
+public abstract class AbstractBiobankListProxy implements List<Object>,
+    Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -33,22 +32,23 @@ public class BiobankListProxy implements List<Object>, Serializable {
     protected int nextOffset;
     protected int realSize;
     protected transient ApplicationService appService;
-    protected HQLCriteria criteria;
 
     protected int loadedOffset;
 
     private IBusyListener listener;
     private Semaphore semaphore = new Semaphore(1);
 
-    public BiobankListProxy(ApplicationService appService, HQLCriteria criteria) {
-        this.appService = appService;
+    public AbstractBiobankListProxy(ApplicationService appService) {
         this.offset = 0;
         this.nextOffset = 1000;
         this.loadedOffset = -2000;
         this.pageSize = appService.getMaxRecordsCount();
-        this.criteria = criteria;
+        this.appService = appService;
         this.realSize = -1;
     }
+
+    protected abstract List<Object> getChunk(Integer firstRow)
+        throws ApplicationException;
 
     @Override
     public boolean add(Object e) {
@@ -85,6 +85,7 @@ public class BiobankListProxy implements List<Object>, Serializable {
 
     @Override
     public Object get(int index) {
+        init();
         Assert.isTrue(index >= 0);
         updateListChunk(index);
         if (listChunk.size() > 0 && listChunk.size() > index - offset)
@@ -121,11 +122,8 @@ public class BiobankListProxy implements List<Object>, Serializable {
                 // user loading out of order, do a query on demand
                 try {
                     offset = (index / pageSize) * pageSize;
-                    listener.showBusy();
-                    listChunk = appService.query(criteria, offset,
-                        Site.class.getName());
+                    listChunk = getChunk(offset);
                     // add cancel support
-                    listener.done();
                     if (listChunk.size() != 1000 && realSize == -1)
                         realSize = offset + listChunk.size();
                 } catch (ApplicationException e) {
@@ -148,8 +146,7 @@ public class BiobankListProxy implements List<Object>, Serializable {
                 public void run() {
                     try {
                         semaphore.acquire();
-                        nextListChunk = appService.query(criteria, nextOffset,
-                            Site.class.getName());
+                        nextListChunk = getChunk(nextOffset);
                         if (nextListChunk.size() != 1000 && realSize == -1)
                             realSize = nextOffset + nextListChunk.size();
                         semaphore.release();
@@ -169,12 +166,13 @@ public class BiobankListProxy implements List<Object>, Serializable {
 
     @Override
     public boolean isEmpty() {
+        init();
         return listChunk.isEmpty();
     }
 
     @Override
     public Iterator<Object> iterator() {
-        return new BiobankListProxyIterator(this);
+        return new AbstractBiobankListProxyIterator(this);
     }
 
     @Override
@@ -228,6 +226,7 @@ public class BiobankListProxy implements List<Object>, Serializable {
 
     @Override
     public List<Object> subList(int fromIndex, int toIndex) {
+        init();
         assert (fromIndex >= 0 && toIndex >= 0);
         assert (fromIndex <= toIndex);
         updateListChunk(fromIndex);
@@ -264,6 +263,7 @@ public class BiobankListProxy implements List<Object>, Serializable {
      * Used in BiobankProxyHelperImpl
      */
     public List<Object> getListChunk() {
+        init();
         return listChunk;
     }
 
@@ -276,5 +276,13 @@ public class BiobankListProxy implements List<Object>, Serializable {
 
     public void addBusyListener(IBusyListener l) {
         this.listener = l;
+    }
+
+    public AbstractBiobankListProxy init() {
+        if (listChunk == null) {
+            updateListChunk(-1);
+        }
+
+        return this;
     }
 }

@@ -4,7 +4,9 @@ import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.common.reports.QueryProcess;
+import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
+import edu.ualberta.med.biobank.server.reports.ReportRunner;
 import gov.nih.nci.system.dao.DAOException;
 import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
@@ -15,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.hibernate.HibernateException;
+import org.hibernate.JDBCException;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.springframework.dao.DataAccessResourceFailureException;
@@ -34,7 +37,28 @@ public class BiobankORMDAOImpl extends WritableORMDAOImpl {
 
     @Override
     public Response query(Request request) throws DAOException {
-        if (request.getRequest() instanceof QueryHandleRequest) {
+        Object obj = request.getRequest();
+        if (obj instanceof ReportData) {
+            Response rsp = new Response();
+            ReportData data = (ReportData) obj;
+
+            ReportRunner reportRunner = new ReportRunner(getSession(), data);
+            List<?> results = reportRunner.run();
+
+            rsp.setResponse(results);
+
+            return rsp;
+        } else if (obj instanceof BiobankSQLCriteria) {
+            try {
+                return query(request, (BiobankSQLCriteria) obj);
+            } catch (JDBCException ex) {
+                log.error("JDBC Exception in ORMDAOImpl ", ex);
+                throw new DAOException("JDBC Exception in ORMDAOImpl ", ex);
+            } catch (Exception e) {
+                log.error("Exception ", e);
+                throw new DAOException("Exception in ORMDAOImpl ", e);
+            }
+        } else if (request.getRequest() instanceof QueryHandleRequest) {
             QueryHandleRequest qhr = (QueryHandleRequest) request.getRequest();
             if (qhr.getCommandType().equals(CommandType.CREATE)) {
                 QueryHandle handle = new QueryHandle(nextHandleId++);

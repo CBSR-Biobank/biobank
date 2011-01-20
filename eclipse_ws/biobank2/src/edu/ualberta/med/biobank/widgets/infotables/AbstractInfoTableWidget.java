@@ -231,39 +231,44 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
     }
 
     public void setCollection(final List<T> collection, final T selection) {
-        if ((collection == null)
-            || ((backgroundThread != null) && backgroundThread.isAlive())) {
-            return;
-        } else if (this.collection != collection || size != collection.size()) {
-            this.collection = collection;
-            init(collection);
-            setPaginationParams(collection);
-        }
-
-        if (paginationRequired) {
-            showPaginationWidget();
-            setPageLabelText();
-            enablePaginationWidget(false);
-        } else if (paginationWidget != null)
-            paginationWidget.setVisible(false);
-
-        final Display display = getTableViewer().getTable().getDisplay();
-        resizeTable();
-        backgroundThread = new Thread() {
-            @Override
-            public void run() {
-                tableLoader(collection, selection);
-                if (autoSizeColumns) {
-                    display.syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            autoSizeColumns();
-                        }
-                    });
-                }
+        try {
+            if ((collection == null)
+                || ((backgroundThread != null) && backgroundThread.isAlive())) {
+                return;
+            } else if (this.collection != collection
+                || size != collection.size()) {
+                this.collection = collection;
+                init(collection);
+                setPaginationParams(collection);
             }
-        };
-        backgroundThread.start();
+
+            if (paginationRequired) {
+                showPaginationWidget();
+                setPageLabelText();
+                enablePaginationWidget(false);
+            } else if (paginationWidget != null)
+                paginationWidget.setVisible(false);
+
+            final Display display = getTableViewer().getTable().getDisplay();
+            resizeTable();
+            backgroundThread = new Thread() {
+                @Override
+                public void run() {
+                    tableLoader(collection, selection);
+                    if (autoSizeColumns) {
+                        display.syncExec(new Runnable() {
+                            @Override
+                            public void run() {
+                                autoSizeColumns();
+                            }
+                        });
+                    }
+                }
+            };
+            backgroundThread.start();
+        } catch (Exception e) {
+            BioBankPlugin.openAsyncError("Cannot Load Table Data", e);
+        }
 
         layout(true, true);
     }

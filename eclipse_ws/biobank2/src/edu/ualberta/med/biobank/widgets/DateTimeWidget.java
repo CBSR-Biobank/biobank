@@ -126,6 +126,10 @@ public class DateTimeWidget extends BiobankWidget {
         dateEntry.addSelectionListener(listener);
     }
 
+    public String getPattern() {
+        return dateEntry.getPattern();
+    }
+
     @Override
     public void setBackground(Color color) {
         super.setBackground(color);
