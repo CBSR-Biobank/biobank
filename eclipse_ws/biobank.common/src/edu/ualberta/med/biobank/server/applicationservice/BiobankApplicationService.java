@@ -5,6 +5,7 @@ import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -56,6 +57,9 @@ public interface BiobankApplicationService extends WritableApplicationService {
         throws ApplicationException;
 
     public void unlockUser(String userName) throws ApplicationException;
+
+    public List<Object> runReport(Report report, int maxResults, int firstRow,
+        int timeout) throws ApplicationException;
 
     public void checkVersion(String clientVersion) throws ApplicationException;
 

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.server.applicationservice;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ClientVersionInvalidException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionInvalidException;
@@ -32,6 +33,8 @@ import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.security.exceptions.CSTransactionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
+import gov.nih.nci.system.dao.Request;
+import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
@@ -267,6 +270,28 @@ public class BiobankApplicationServiceImpl extends
     public List<Object> launchReport(BiobankReport report)
         throws ApplicationException {
         return ReportFactory.createReport(report).generate(this);
+    }
+
+    @Override
+    public List<Object> runReport(Report report, int maxResults, int firstRow,
+        int timeout) throws ApplicationException {
+
+        ReportData reportData = new ReportData(report);
+        reportData.setMaxResults(maxResults);
+        reportData.setFirstRow(firstRow);
+        reportData.setTimeout(timeout);
+
+        Request request = new Request(reportData);
+        request.setIsCount(Boolean.FALSE);
+        request.setFirstRow(0);
+        request.setDomainObjectName(Report.class.getName());
+
+        Response response = query(request);
+
+        @SuppressWarnings("unchecked")
+        List<Object> results = (List<Object>) response.getResponse();
+
+        return results;
     }
 
     @Override
@@ -667,7 +692,6 @@ public class BiobankApplicationServiceImpl extends
         return props.getProperty(SERVER_VERSION_PROP_KEY);
     }
 
-    @SuppressWarnings("unchecked")
     @Override
     public edu.ualberta.med.biobank.common.security.Group persistGroup(
         edu.ualberta.med.biobank.common.security.Group group)

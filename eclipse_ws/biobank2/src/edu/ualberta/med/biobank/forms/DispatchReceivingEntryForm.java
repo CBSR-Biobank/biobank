@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
@@ -120,15 +121,17 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
         }
     }
 
-    public static AliquotInfo getInfoForInventoryId(DispatchWrapper shipment,
-        String inventoryId) {
-        DispatchAliquotWrapper dsa = shipment.getDispatchAliquot(inventoryId);
+    public static AliquotInfo getInfoForInventoryId(
+        ModelWrapper<?> currentShipment, String inventoryId) {
+        DispatchAliquotWrapper dsa = ((DispatchWrapper) currentShipment)
+            .getDispatchAliquot(inventoryId);
         if (dsa == null) {
             // aliquot not in shipment. Check if exists in DB:
             AliquotWrapper aliquot = null;
             try {
-                aliquot = AliquotWrapper.getAliquot(shipment.getAppService(),
-                    inventoryId, SessionManager.getUser());
+                aliquot = AliquotWrapper.getAliquot(
+                    currentShipment.getAppService(), inventoryId,
+                    SessionManager.getUser());
             } catch (Exception ae) {
                 BioBankPlugin.openAsyncError("Error retrieving aliquot", ae);
             }

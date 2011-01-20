@@ -19,10 +19,12 @@ public abstract class AbstractViewWithTree<T> extends ViewPart {
 
     @SuppressWarnings("unchecked")
     public T getSelectedNode() {
-        IStructuredSelection treeSelection = (IStructuredSelection) getTreeViewer()
-            .getSelection();
-        if (treeSelection != null && treeSelection.size() > 0) {
-            return (T) treeSelection.getFirstElement();
+        if (getTreeViewer() != null) {
+            IStructuredSelection treeSelection = (IStructuredSelection) getTreeViewer()
+                .getSelection();
+            if (treeSelection != null && treeSelection.size() > 0) {
+                return (T) treeSelection.getFirstElement();
+            }
         }
         return null;
     }

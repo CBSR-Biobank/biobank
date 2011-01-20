@@ -12,7 +12,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Table;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -213,8 +213,9 @@ public class ReportTableWidget<T> extends AbstractInfoTableWidget<T> {
     @Override
     protected void init(List<T> collection) {
         if (pageInfo.pageTotal == 0) {
-            if (collection instanceof BiobankListProxy) {
-                int realSize = ((BiobankListProxy) collection).getRealSize();
+            if (collection instanceof AbstractBiobankListProxy) {
+                int realSize = ((AbstractBiobankListProxy) collection)
+                    .getRealSize();
                 if (realSize != -1)
                     pageInfo.pageTotal = realSize / pageInfo.rowsPerPage + 1;
             } else

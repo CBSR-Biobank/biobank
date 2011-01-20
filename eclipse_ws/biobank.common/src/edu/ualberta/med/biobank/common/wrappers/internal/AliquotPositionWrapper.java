@@ -5,7 +5,9 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -72,6 +74,36 @@ public class AliquotPositionWrapper extends
         return aliquot;
     }
 
+    @Override
+    public void setRow(Integer row) {
+        if (row == null || !row.equals(getRow())) {
+            updatePositionString();
+        }
+
+        super.setRow(row);
+    }
+
+    @Override
+    public void setCol(Integer col) {
+        if (col == null || !col.equals(getCol())) {
+            updatePositionString();
+        }
+
+        super.setCol(col);
+    }
+
+    private void updatePositionString() {
+        ContainerWrapper container = getContainer();
+        if (container != null && getRow() != null && getCol() != null) {
+            ContainerTypeWrapper containerType = container.getContainerType();
+            if (containerType != null) {
+                String positionString = containerType
+                    .getPositionString(new RowColPos(getRow(), getCol()));
+                wrappedObject.setPositionString(positionString);
+            }
+        }
+    }
+
     private void setContainer(ContainerWrapper container) {
         this.container = container;
         Container oldContainer = wrappedObject.getContainer();
@@ -80,6 +112,7 @@ public class AliquotPositionWrapper extends
             newContainer = container.getWrappedObject();
         }
         wrappedObject.setContainer(newContainer);
+        updatePositionString();
         propertyChangeSupport.firePropertyChange("container", oldContainer,
             newContainer);
     }
@@ -140,5 +173,4 @@ public class AliquotPositionWrapper extends
         aliquot = null;
         container = null;
     }
-
 }
