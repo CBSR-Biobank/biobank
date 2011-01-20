@@ -369,7 +369,8 @@ public abstract class AbstractReportTest {
 
         Collection<Object> expectedResults = getExpectedResults();
 
-        List<Object> actualResults = getReport().generate(getAppService());
+        List<Object> actualResults = ReportFactory.createReport(getReport())
+            .generate(getAppService());
         List<Object> postProcessedExpectedResults = postProcessExpectedResults(expectedResults);
 
         testPostProcess(cmpOptions, expectedResults,

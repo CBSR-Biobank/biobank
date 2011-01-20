@@ -51,14 +51,15 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
 import edu.ualberta.med.biobank.common.util.BiobankListProxy;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public abstract class ReportsEditor extends BiobankFormBase implements
     edu.ualberta.med.biobank.common.util.IBusyListener {
@@ -89,6 +90,8 @@ public abstract class ReportsEditor extends BiobankFormBase implements
 
     // Global status
     private IObservableValue statusObservable;
+
+    QueryHandle query;
 
     @Override
     protected void init() throws Exception {
@@ -214,10 +217,18 @@ public abstract class ReportsEditor extends BiobankFormBase implements
     }
 
     private void generate() {
+        appService = SessionManager.getAppService();
         try {
             initReport();
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Failed to load parameters", e1);
+        }
+
+        try {
+            query = ((BiobankApplicationService) appService)
+                .createQuery(report);
+        } catch (Exception e1) {
+            BioBankPlugin.openAsyncError("Failed to load query", e1);
         }
         IRunnableContext context = new ProgressMonitorDialog(Display
             .getDefault().getActiveShell());
@@ -225,31 +236,31 @@ public abstract class ReportsEditor extends BiobankFormBase implements
             context.run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    Thread t = new Thread("Querying") {
+                    monitor.beginTask("Generating Report...",
+                        IProgressMonitor.UNKNOWN);
+                    Thread t = new Thread() {
                         @Override
                         public void run() {
                             try {
-                                reportData = generateReport();
+                                reportData = ((BiobankApplicationService) appService)
+                                    .startQuery(query);
+                                monitor.done();
                             } catch (Exception e) {
-                                reportData = new ArrayList<Object>();
                                 BioBankPlugin.openAsyncError(
-                                    "Error while querying for results", e);
+                                    "Failed to run query", e);
                             }
                         }
-
-                        private List<Object> generateReport()
-                            throws ApplicationException {
-                            return report.generate(SessionManager
-                                .getAppService());
-                        }
                     };
-                    monitor.beginTask("Generating Report...",
-                        IProgressMonitor.UNKNOWN);
                     t.start();
                     while (true) {
                         if (monitor.isCanceled()) {
-                            // TODO t.stop(); we need a safe way to kill query
-                            reportData = new ArrayList<Object>();
+                            try {
+                                ((BiobankApplicationService) appService)
+                                    .stopQuery(query);
+                            } catch (Exception e) {
+                                BioBankPlugin.openAsyncError(
+                                    "Failed to run query", e);
+                            }
                             break;
                         } else if (!t.isAlive())
                             break;
@@ -259,45 +270,37 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                             break;
                         }
                     }
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            monitor.done();
-                            if (!reportData.isEmpty()) {
-                                printButton.setEnabled(true);
-                                exportPDFButton.setEnabled(true);
-                                exportCSVButton.setEnabled(true);
-                            } else {
-                                printButton.setEnabled(false);
-                                exportPDFButton.setEnabled(false);
-                                exportCSVButton.setEnabled(false);
-                            }
-                            reportTable.dispose();
-                            // if size > 1000 or unknown, disable print and
-                            // export to pdf
-                            if ((reportData instanceof BiobankListProxy && (((BiobankListProxy) reportData)
-                                .getRealSize() == -1 || ((BiobankListProxy) reportData)
-                                .getRealSize() > 1000))
-                                || reportData.size() > 1000) {
-                                printButton.setEnabled(false);
-                                exportPDFButton.setEnabled(false);
-                                printButton
-                                    .setToolTipText("Results exceed 1000 rows");
-                                exportPDFButton
-                                    .setToolTipText("Results exceed 1000 rows");
-                            } else {
-                                printButton.setToolTipText("Print");
-                                exportPDFButton.setToolTipText("Export PDF");
-                            }
-                            reportTable = new ReportTableWidget<Object>(page,
-                                reportData, getColumnNames());
-                            reportTable.adaptToToolkit(toolkit, true);
-                            page.layout(true, true);
-                            book.reflow(true);
-                        }
-                    });
-                }
+                };
             });
+            if (!reportData.isEmpty()) {
+                printButton.setEnabled(true);
+                exportPDFButton.setEnabled(true);
+                exportCSVButton.setEnabled(true);
+            } else {
+                printButton.setEnabled(false);
+                exportPDFButton.setEnabled(false);
+                exportCSVButton.setEnabled(false);
+            }
+            reportTable.dispose();
+            // if size > 1000 or unknown, disable print and
+            // export to pdf
+            if ((reportData instanceof BiobankListProxy && (((BiobankListProxy) reportData)
+                .getRealSize() == -1 || ((BiobankListProxy) reportData)
+                .getRealSize() > 1000))
+                || reportData.size() > 1000) {
+                printButton.setEnabled(false);
+                exportPDFButton.setEnabled(false);
+                printButton.setToolTipText("Results exceed 1000 rows");
+                exportPDFButton.setToolTipText("Results exceed 1000 rows");
+            } else {
+                printButton.setToolTipText("Print");
+                exportPDFButton.setToolTipText("Export PDF");
+            }
+            reportTable = new ReportTableWidget<Object>(page, reportData,
+                getColumnNames());
+            reportTable.adaptToToolkit(toolkit, true);
+            page.layout(true, true);
+            book.reflow(true);
             if (reportData instanceof BiobankListProxy)
                 ((BiobankListProxy) reportData).addBusyListener(this);
         } catch (Exception e) {

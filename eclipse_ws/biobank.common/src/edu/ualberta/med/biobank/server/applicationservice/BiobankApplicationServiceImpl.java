@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.QueryCommand;
+import edu.ualberta.med.biobank.common.reports.QueryHandle;
+import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
+import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ClientVersionInvalidException;
@@ -9,7 +12,6 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersi
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionOlderException;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
-import edu.ualberta.med.biobank.server.reports.ReportFactory;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authentication.LockoutManager;
@@ -28,6 +30,7 @@ import gov.nih.nci.security.dao.SearchCriteria;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
+import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.query.example.DeleteExampleQuery;
@@ -257,12 +260,6 @@ public class BiobankApplicationServiceImpl extends
         Logger logger = Logger.getLogger("Biobank.Activity");
         logger.log(Level.toLevel("INFO"),
             MessageGenerator.generateStringMessage(log));
-    }
-
-    @Override
-    public List<Object> launchReport(BiobankReport report)
-        throws ApplicationException {
-        return ReportFactory.createReport(report).generate(this);
     }
 
     @Override
@@ -574,6 +571,31 @@ public class BiobankApplicationServiceImpl extends
         return result;
     }
 
+    @Override
+    public QueryHandle createQuery(QueryCommand qc) throws Exception {
+        QueryHandleRequest qhr = new QueryHandleRequest(qc, CommandType.CREATE,
+            null, this);
+        return (QueryHandle) getWritableDAO(Site.class.getName()).query(
+            new Request(qhr)).getResponse();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object> startQuery(QueryHandle qh) throws Exception {
+        QueryHandleRequest qhr = new QueryHandleRequest(null,
+            CommandType.START, qh, this);
+        return (List<Object>) getWritableDAO(Site.class.getName()).query(
+            new Request(qhr)).getResponse();
+    }
+
+    @Override
+    public void stopQuery(QueryHandle qh) throws Exception {
+        QueryHandleRequest qhr = new QueryHandleRequest(null, CommandType.STOP,
+            qh, this);
+        getWritableDAO(Site.class.getName()).query(new Request(qhr))
+            .getResponse();
+    }
+
     private static void serverVersionStrToIntArray(String version) {
         if (serverVersionArr != null)
             return;
@@ -643,4 +665,5 @@ public class BiobankApplicationServiceImpl extends
     public String getServerVersion() {
         return props.getProperty(SERVER_VERSION_PROP_KEY);
     }
+
 }
