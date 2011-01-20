@@ -30,6 +30,7 @@ public class QueryProcess {
         try {
             obs = (qc.start(s, appService));
         } catch (Exception e) {
+            e.printStackTrace();
         }
         return new Response(obs);
     }

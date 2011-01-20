@@ -230,82 +230,42 @@ public abstract class ReportsEditor extends BiobankFormBase implements
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Failed to load query", e1);
         }
-        IRunnableContext context = new ProgressMonitorDialog(Display
-            .getDefault().getActiveShell());
+
         try {
-            context.run(true, true, new IRunnableWithProgress() {
-                @Override
-                public void run(final IProgressMonitor monitor) {
-                    monitor.beginTask("Generating Report...",
-                        IProgressMonitor.UNKNOWN);
-                    Thread t = new Thread() {
-                        @Override
-                        public void run() {
-                            try {
-                                reportData = ((BiobankApplicationService) appService)
-                                    .startQuery(query);
-                                monitor.done();
-                            } catch (Exception e) {
-                                BioBankPlugin.openAsyncError(
-                                    "Failed to run query", e);
-                            }
-                        }
-                    };
-                    t.start();
-                    while (true) {
-                        if (monitor.isCanceled()) {
-                            try {
-                                ((BiobankApplicationService) appService)
-                                    .stopQuery(query);
-                            } catch (Exception e) {
-                                BioBankPlugin.openAsyncError(
-                                    "Failed to run query", e);
-                            }
-                            break;
-                        } else if (!t.isAlive())
-                            break;
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
-                    }
-                };
-            });
-            if (!reportData.isEmpty()) {
-                printButton.setEnabled(true);
-                exportPDFButton.setEnabled(true);
-                exportCSVButton.setEnabled(true);
-            } else {
-                printButton.setEnabled(false);
-                exportPDFButton.setEnabled(false);
-                exportCSVButton.setEnabled(false);
-            }
-            reportTable.dispose();
-            // if size > 1000 or unknown, disable print and
-            // export to pdf
-            if ((reportData instanceof BiobankListProxy && (((BiobankListProxy) reportData)
-                .getRealSize() == -1 || ((BiobankListProxy) reportData)
-                .getRealSize() > 1000))
-                || reportData.size() > 1000) {
-                printButton.setEnabled(false);
-                exportPDFButton.setEnabled(false);
-                printButton.setToolTipText("Results exceed 1000 rows");
-                exportPDFButton.setToolTipText("Results exceed 1000 rows");
-            } else {
-                printButton.setToolTipText("Print");
-                exportPDFButton.setToolTipText("Export PDF");
-            }
-            reportTable = new ReportTableWidget<Object>(page, reportData,
-                getColumnNames());
-            reportTable.adaptToToolkit(toolkit, true);
-            page.layout(true, true);
-            book.reflow(true);
-            if (reportData instanceof BiobankListProxy)
-                ((BiobankListProxy) reportData).addBusyListener(this);
+            reportData = ((BiobankApplicationService) appService)
+                .startQuery(query);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Query Error", e);
         }
+        if (!reportData.isEmpty()) {
+            printButton.setEnabled(true);
+            exportPDFButton.setEnabled(true);
+            exportCSVButton.setEnabled(true);
+        } else {
+            printButton.setEnabled(false);
+            exportPDFButton.setEnabled(false);
+            exportCSVButton.setEnabled(false);
+        }
+        reportTable.dispose();
+        // if size > 1000 or unknown, disable print and
+        // export to pdf
+        if ((reportData instanceof BiobankListProxy && (((BiobankListProxy) reportData)
+            .getRealSize() == -1 || ((BiobankListProxy) reportData)
+            .getRealSize() > 1000))
+            || reportData.size() > 1000) {
+            printButton.setEnabled(false);
+            exportPDFButton.setEnabled(false);
+            printButton.setToolTipText("Results exceed 1000 rows");
+            exportPDFButton.setToolTipText("Results exceed 1000 rows");
+        } else {
+            printButton.setToolTipText("Print");
+            exportPDFButton.setToolTipText("Export PDF");
+        }
+        reportTable = new ReportTableWidget<Object>(page, reportData,
+            getColumnNames());
+        reportTable.adaptToToolkit(toolkit, true);
+        page.layout(true, true);
+        book.reflow(true);
     }
 
     private void createEmptyReportTable() {
@@ -609,14 +569,25 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                                 semaphore.acquire();
                                 monitor.beginTask("Loading...",
                                     IProgressMonitor.UNKNOWN);
-                                // waits thread until allowed to proceed
-                                semaphore.acquire();
+                                while (semaphore.availablePermits() == 0) {
+                                    if (monitor.isCanceled()) {
+                                        try {
+                                            ((BiobankApplicationService) appService)
+                                                .stopQuery(query);
+                                        } catch (Exception e) {
+                                            BioBankPlugin.openAsyncError(
+                                                "Failed to run query", e);
+                                        }
+                                        semaphore.release();
+                                        break;
+                                    } else
+                                        Thread.sleep(1000);
+                                }
+                            } catch (InterruptedException e1) {
+                                e1.printStackTrace();
                                 semaphore.release();
-                                monitor.done();
-
-                            } catch (Exception e) {
-                                BioBankPlugin.openAsyncError("Thread Error", e);
                             }
+                            monitor.done();
                         }
                     });
                 } catch (Exception e) {

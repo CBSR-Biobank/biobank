@@ -11,6 +11,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.Semaphore;
 
 import org.springframework.util.Assert;
 
@@ -36,9 +37,8 @@ public class BiobankListProxy implements List<Object>, Serializable {
 
     protected int loadedOffset;
 
-    protected boolean loading;
-
     private IBusyListener listener;
+    private Semaphore semaphore = new Semaphore(1);
 
     public BiobankListProxy(ApplicationService appService, HQLCriteria criteria) {
         this.appService = appService;
@@ -48,7 +48,6 @@ public class BiobankListProxy implements List<Object>, Serializable {
         this.pageSize = appService.getMaxRecordsCount();
         this.criteria = criteria;
         this.realSize = -1;
-        updateListChunk(-1);
     }
 
     @Override
@@ -98,18 +97,17 @@ public class BiobankListProxy implements List<Object>, Serializable {
         if (index - offset >= pageSize || index < offset) {
             if (index < loadedOffset + pageSize) {
                 // swap
-                if (loading) {
+                if (semaphore.availablePermits() == 0) {
                     if (listener != null)
                         listener.showBusy();
-                    while (loading) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
+                    try {
+                        semaphore.acquire();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
                     if (listener != null)
                         listener.done();
+                    semaphore.release();
                 }
                 if (nextListChunk != null) {
                     List<Object> temp = listChunk;
@@ -123,8 +121,11 @@ public class BiobankListProxy implements List<Object>, Serializable {
                 // user loading out of order, do a query on demand
                 try {
                     offset = (index / pageSize) * pageSize;
+                    listener.showBusy();
                     listChunk = appService.query(criteria, offset,
                         Site.class.getName());
+                    // add cancel support
+                    listener.done();
                     if (listChunk.size() != 1000 && realSize == -1)
                         realSize = offset + listChunk.size();
                 } catch (ApplicationException e) {
@@ -146,13 +147,13 @@ public class BiobankListProxy implements List<Object>, Serializable {
                 @Override
                 public void run() {
                     try {
-                        loading = true;
+                        semaphore.acquire();
                         nextListChunk = appService.query(criteria, nextOffset,
                             Site.class.getName());
                         if (nextListChunk.size() != 1000 && realSize == -1)
                             realSize = nextOffset + nextListChunk.size();
-                        loading = false;
-                    } catch (ApplicationException e) {
+                        semaphore.release();
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
