@@ -52,7 +52,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
+import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
@@ -275,8 +276,8 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                             reportTable.dispose();
                             // if size > 1000 or unknown, disable print and
                             // export to pdf
-                            if ((reportData instanceof BiobankListProxy && (((BiobankListProxy) reportData)
-                                .getRealSize() == -1 || ((BiobankListProxy) reportData)
+                            if ((reportData instanceof AbstractBiobankListProxy && (((AbstractBiobankListProxy) reportData)
+                                .getRealSize() == -1 || ((AbstractBiobankListProxy) reportData)
                                 .getRealSize() > 1000))
                                 || reportData.size() > 1000) {
                                 printButton.setEnabled(false);
@@ -298,8 +299,8 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                     });
                 }
             });
-            if (reportData instanceof BiobankListProxy)
-                ((BiobankListProxy) reportData).addBusyListener(this);
+            if (reportData instanceof HQLCriteriaListProxy)
+                ((HQLCriteriaListProxy) reportData).addBusyListener(this);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Query Error", e);
         }

@@ -50,14 +50,16 @@ import edu.ualberta.med.biobank.treeview.dispatch.ReceivingInTransitDispatchGrou
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingNoErrorsDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchGroup;
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchGroup;
-import edu.ualberta.med.biobank.treeview.order.FilledOrderNode;
-import edu.ualberta.med.biobank.treeview.order.NewOrderNode;
-import edu.ualberta.med.biobank.treeview.order.ProcessingOrderNode;
-import edu.ualberta.med.biobank.treeview.order.ShippedOrderNode;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.request.AcceptedRequestNode;
+import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
+import edu.ualberta.med.biobank.treeview.request.FilledRequestNode;
+import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
+import edu.ualberta.med.biobank.treeview.request.ShippedRequestNode;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.views.DispatchSiteAdapter;
+import edu.ualberta.med.biobank.views.RequestSiteAdapter;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 /**
@@ -132,12 +134,17 @@ public class BioBankPlugin extends AbstractUIPlugin {
     public static final String IMG_SCAN_CLOSE_EDIT = "scanCloseEdit";
     public static final String IMG_RECEIVED = "received";
     public static final String IMG_SENT = "sent";
-    public static final String IMG_ORDER = "order";
-    public static final String IMG_ORDER_EDIT = "order_edit";
-    public static final String IMG_ORDER_SHIPPED = "order_shipped";
-    public static final String IMG_ORDER_FILLED = "order_filled";
+    public static final String IMG_REQUEST = "request";
+    public static final String IMG_REQUEST_EDIT = "request_edit";
+    public static final String IMG_REQUEST_SHIPPED = "request_shipped";
+    public static final String IMG_REQUEST_FILLED = "request_filled";
     public static final String IMG_ALIQUOT = "aliquot";
     public static final String IMG_LOCK = "lock";
+    public static final String IMG_UP = "bullet_arrow_up";
+    public static final String IMG_DOWN = "bullet_arrow_down";
+    public static final String IMG_REMOVE = "remove";
+    public static final String IMG_WAND = "wand";
+    public static final String IMG_HOURGLASS = "hourglass";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -192,14 +199,18 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_DISPATCH_SHIPMENT);
         classToImageKey.put(DispatchSiteAdapter.class.getName(),
             BioBankPlugin.IMG_SITE);
-        classToImageKey.put(NewOrderNode.class.getName(),
-            BioBankPlugin.IMG_ORDER);
-        classToImageKey.put(ProcessingOrderNode.class.getName(),
-            BioBankPlugin.IMG_ORDER_EDIT);
-        classToImageKey.put(ShippedOrderNode.class.getName(),
-            BioBankPlugin.IMG_ORDER_SHIPPED);
-        classToImageKey.put(FilledOrderNode.class.getName(),
-            BioBankPlugin.IMG_ORDER_FILLED);
+        classToImageKey.put(RequestSiteAdapter.class.getName(),
+            BioBankPlugin.IMG_SITE);
+        classToImageKey.put(ApprovedRequestNode.class.getName(),
+            BioBankPlugin.IMG_REQUEST);
+        classToImageKey.put(AcceptedRequestNode.class.getName(),
+            BioBankPlugin.IMG_REQUEST_EDIT);
+        classToImageKey.put(ShippedRequestNode.class.getName(),
+            BioBankPlugin.IMG_REQUEST_SHIPPED);
+        classToImageKey.put(FilledRequestNode.class.getName(),
+            BioBankPlugin.IMG_REQUEST_FILLED);
+        classToImageKey.put(RequestAdapter.class.getName(),
+            BioBankPlugin.IMG_REQUEST);
         classToImageKey.put(AliquotAdapter.class.getName(),
             BioBankPlugin.IMG_ALIQUOT);
     };
@@ -301,10 +312,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
             "dispatch_error.png");
         registerImage(registry, IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT,
             "dispatchScanAdd.png");
-        registerImage(registry, IMG_ORDER, "order.png");
-        registerImage(registry, IMG_ORDER_EDIT, "order_edit.png");
-        registerImage(registry, IMG_ORDER_SHIPPED, "order_shipped.png");
-        registerImage(registry, IMG_ORDER_FILLED, "order_filled.png");
+        registerImage(registry, IMG_REQUEST, "request.png");
+        registerImage(registry, IMG_REQUEST_EDIT, "request_edit.png");
+        registerImage(registry, IMG_REQUEST_SHIPPED, "request_shipped.png");
+        registerImage(registry, IMG_REQUEST_FILLED, "request_filled.png");
         registerImage(registry, IMG_SITE, "site.png");
         registerImage(registry, IMG_SITES, "sites.png");
         registerImage(registry, IMG_STUDIES, "studies.png");
@@ -317,6 +328,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_SENT, "sent.png");
         registerImage(registry, IMG_ALIQUOT, "aliquot.png");
         registerImage(registry, IMG_LOCK, "lock.png");
+        registerImage(registry, IMG_UP, "bullet_arrow_up.png");
+        registerImage(registry, IMG_DOWN, "bullet_arrow_down.png");
+        registerImage(registry, IMG_REMOVE, "remove.png");
+        registerImage(registry, IMG_WAND, "wand.png");
+        registerImage(registry, IMG_HOURGLASS, "hourglass.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,

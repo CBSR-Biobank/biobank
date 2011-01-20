@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -92,6 +93,31 @@ public class StudyWrapper extends ModelWrapper<Study> {
         wrappedObject.setActivityStatus(rawObject);
         propertyChangeSupport.firePropertyChange("activityStatus",
             oldActivityStatus, activityStatus);
+    }
+
+    public ResearchGroupWrapper getResearchGroup() {
+        ResearchGroupWrapper researchGroup = (ResearchGroupWrapper) propertiesMap
+            .get("ResearchGroup");
+        if (researchGroup == null) {
+            ResearchGroup a = wrappedObject.getResearchGroup();
+            if (a == null)
+                return null;
+            researchGroup = new ResearchGroupWrapper(appService, a);
+            propertiesMap.put("ResearchGroup", researchGroup);
+        }
+        return researchGroup;
+    }
+
+    public void setResearchGroup(ResearchGroupWrapper researchGroup) {
+        propertiesMap.put("researchGroup", researchGroup);
+        ResearchGroup oldResearchGroup = wrappedObject.getResearchGroup();
+        ResearchGroup rawObject = null;
+        if (researchGroup != null) {
+            rawObject = researchGroup.getWrappedObject();
+        }
+        wrappedObject.setResearchGroup(rawObject);
+        propertyChangeSupport.firePropertyChange("researchGroup",
+            oldResearchGroup, researchGroup);
     }
 
     public String getComment() {

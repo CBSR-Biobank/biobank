@@ -32,7 +32,8 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
-public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
+public class DispatchCreateScanDialog extends
+    AbstractScanDialog<DispatchWrapper> {
 
     private class ProductBarcodeValue {
         private String value;
@@ -207,10 +208,10 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 } else {
                     scanCell.setAliquot(foundAliquot);
                     if (expectedAliquot != null || currentPallet == null) {
-                        List<AliquotWrapper> currentAliquots = currentShipment
+                        List<AliquotWrapper> currentAliquots = (currentShipment)
                             .getAliquotCollection(false);
-                        CheckStatus check = currentShipment.checkCanAddAliquot(
-                            foundAliquot, false);
+                        CheckStatus check = (currentShipment)
+                            .checkCanAddAliquot(foundAliquot, false);
                         if (check.ok) {
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)
@@ -271,7 +272,7 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
                 cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
             }
         }
-        currentShipment.addNewAliquots(aliquots, false);
+        (currentShipment).addNewAliquots(aliquots, false);
         if (currentPallet != null) {
             removedPallets.add(currentPallet);
         }
@@ -315,8 +316,8 @@ public class DispatchCreateScanDialog extends AbstractDispatchScanDialog {
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell
                 .getRandomAliquotsAlreadyAssigned(SessionManager
-                    .getAppService(), currentShipment.getSender().getId(),
-                    currentShipment.getStudy().getId());
+                    .getAppService(), (currentShipment).getSender().getId(),
+                    (currentShipment).getStudy().getId());
             return cells;
         } else {
             for (AliquotWrapper aliquot : currentPallet.getAliquots().values()) {

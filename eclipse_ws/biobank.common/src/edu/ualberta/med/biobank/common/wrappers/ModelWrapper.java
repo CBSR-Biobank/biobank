@@ -580,4 +580,27 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         @SuppressWarnings("unused") Integer siteId) {
         return true;
     }
+
+    public static ModelWrapper<?> wrapObject(
+        WritableApplicationService appService, Object nakedObject)
+        throws Exception {
+
+        Class<?> nakedKlazz = nakedObject.getClass();
+        String wrapperClassName = ModelWrapper.class.getPackage().getName()
+            + "." + nakedObject.getClass().getSimpleName() + "Wrapper";
+
+        try {
+            Class<?> wrapperKlazz = Class.forName(wrapperClassName);
+
+            Class<?>[] params = new Class[] { WritableApplicationService.class,
+                nakedKlazz };
+            Constructor<?> constructor = wrapperKlazz.getConstructor(params);
+
+            Object[] args = new Object[] { appService, nakedObject };
+            return (ModelWrapper<?>) constructor.newInstance(args);
+        } catch (Exception e) {
+            throw new Exception("cannot find or create expected Wrapper ("
+                + wrapperClassName + ") for " + nakedKlazz.getName(), e);
+        }
+    }
 }

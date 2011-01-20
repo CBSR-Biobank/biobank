@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -127,7 +128,19 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return dsa.getAliquot().getActivityStatus().toString();
             if (columnIndex == 4)
                 return dsa.getComment();
-        } else {
+        } else if (element instanceof RequestAliquotWrapper) {
+            RequestAliquotWrapper dsa = (RequestAliquotWrapper) element;
+            if (columnIndex == 0)
+                return dsa.getAliquot().getInventoryId();
+            if (columnIndex == 1)
+                return dsa.getAliquot().getSampleType().getNameShort();
+            if (columnIndex == 2)
+                return dsa.getAliquot().getPositionString(true, true);
+            if (columnIndex == 3)
+                return dsa.getClaimedBy();
+        } else if (element instanceof AdapterBase)
+            return ((AdapterBase) element).getLabel();
+        else {
             Assert.isTrue(false, "invalid object type: " + element.getClass());
         }
         return "";

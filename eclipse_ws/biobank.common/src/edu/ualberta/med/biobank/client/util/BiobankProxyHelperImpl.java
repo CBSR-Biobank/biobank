@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.client.util;
 
-import edu.ualberta.med.biobank.common.util.BiobankListProxy;
+import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import gov.nih.nci.system.applicationservice.ApplicationService;
 import gov.nih.nci.system.client.proxy.ListProxy;
@@ -16,8 +16,8 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
 
     @Override
     public Object convertToProxy(ApplicationService as, Object obj) {
-        if (obj instanceof BiobankListProxy) {
-            return convertListProxyToProxy(as, (BiobankListProxy) obj);
+        if (obj instanceof AbstractBiobankListProxy) {
+            return convertListProxyToProxy(as, (AbstractBiobankListProxy) obj);
         }
         if (obj instanceof NotAProxy) {
             return obj;
@@ -35,7 +35,7 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
     }
 
     private Object convertListProxyToProxy(ApplicationService as,
-        BiobankListProxy proxy) {
+        AbstractBiobankListProxy proxy) {
         proxy.setAppService(as);
         // We don't convert the chunk: it is suppose to contain only simple
         // object, no model objects
@@ -78,8 +78,8 @@ public class BiobankProxyHelperImpl extends ProxyHelperImpl {
                 ((ListProxy) obj).setAppService(as);
 
             // Add this part for our own ListProxy
-            if (obj instanceof BiobankListProxy)
-                ((BiobankListProxy) obj).setAppService(as);
+            if (obj instanceof AbstractBiobankListProxy)
+                ((AbstractBiobankListProxy) obj).setAppService(as);
 
             if (!field.getType().getName()
                 .equalsIgnoreCase("java.util.Collection")) {

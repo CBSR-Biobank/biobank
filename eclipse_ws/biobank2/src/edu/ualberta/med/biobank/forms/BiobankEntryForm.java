@@ -210,6 +210,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                     }
                 }
             });
+            doAfterSave();
         } catch (Exception e) {
             setDirty(true);
             throw new RuntimeException(e);
@@ -222,6 +223,15 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      */
     @SuppressWarnings("unused")
     protected void doBeforeSave() throws Exception {
+        // do nothing by default
+    }
+
+    /**
+     * Called after the monitor start. Can be used to get values on the GUI
+     * objects.
+     */
+    @SuppressWarnings("unused")
+    protected void doAfterSave() throws Exception {
         // do nothing by default
     }
 

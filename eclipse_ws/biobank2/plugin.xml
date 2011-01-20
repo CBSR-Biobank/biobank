@@ -291,6 +291,10 @@
             id="edu.ualberta.med.biobank.commands.dispatchAdmin"
             name="Open Dispatch Shipment View">
       </command>
+      <command
+            id="edu.ualberta.med.biobank.commands.advancedReports"
+            name="Advanced Reports">
+      </command>
        <command
              categoryId="org.eclipse.ui.category.edit"
              id="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
@@ -302,8 +306,8 @@
              name="Export Errors Logs">
        </command>
        <command
-             id="edu.ualberta.med.biobank.commands.orders.processOrder"
-             name="Process Order">
+             id="edu.ualberta.med.biobank.commands.requests.processRequest"
+             name="Process Request">
        </command>
        <category
              id="biobank2.command.category.server"
@@ -1292,12 +1296,6 @@
                   icon="icons/patient_add.png"
                   label="Add Patient"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
@@ -1310,12 +1308,6 @@
                   icon="icons/patientVisit_add.png"
                   label="Add Patient Visit"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.deleteSelection"
@@ -1453,26 +1445,7 @@
             </command>
          </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.views.OrderAdminView">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.orders.processOrder"
-                  icon="icons/order_edit.png"
-                  label="Process Order"
-                  style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete Selected Item"
-                  style="push"
-                  tooltip="Delete Selected Item">
-            </command>
+               id="edu.ualberta.med.biobank.views.RequestAdminView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"
@@ -1545,6 +1518,18 @@
                standalone="false"
                visible="true">
          </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.AdvancedReportsView"
+               minimized="false"
+               moveable="false"
+               ratio="0.20"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.ReportsView"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.processing">
@@ -1602,19 +1587,19 @@
                moveable="false"
                ratio="0.20"
                relationship="stack"
-               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
+               relative="edu.ualberta.med.biobank.views.ShipmentAdminView"
                showTitle="false"
                standalone="false"
                visible="true">
          </view>
          <view
                closeable="false"
-               id="edu.ualberta.med.biobank.views.OrderAdminView"
+               id="edu.ualberta.med.biobank.views.RequestAdminView"
                minimized="false"
                moveable="false"
                ratio="0.20"
                relationship="stack"
-               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
+               relative="edu.ualberta.med.biobank.views.DispatchAdministrationView"
                showTitle="false"
                standalone="false"
                visible="true">
@@ -1644,6 +1629,32 @@
                showTitle="true"
                standalone="false"
                visible="false">
+         </view>
+      </perspectiveExtension>
+      <perspectiveExtension
+            targetID="edu.ualberta.med.biobank.perspective.advancedReports">
+         <view
+               closeable="true"
+               id="org.eclipse.pde.runtime.LogView"
+               minimized="false"
+               moveable="true"
+               relationship="bottom"
+               relative="org.eclipse.ui.editorss"
+               showTitle="true"
+               standalone="false"
+               visible="false">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.ReportAdministrationView"
+               minimized="false"
+               moveable="false"
+               ratio="0.4"
+               relationship="left"
+               relative="org.eclipse.ui.editorss"
+               showTitle="false"
+               standalone="false"
+               visible="true">
          </view>
       </perspectiveExtension>
       </extension>
@@ -1815,6 +1826,13 @@
             icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.forms.DispatchEntryForm"
             name="Dispatch Entry">
+      </editor>
+      <editor
+            class="edu.ualberta.med.biobank.forms.ReportEntryForm"
+            default="false"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.forms.ReportEntryForm"
+            name="Report Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.DispatchViewForm"
@@ -2052,11 +2070,11 @@
       name="Dispatch Sending Entry">
 </editor>
 <editor
-      class="edu.ualberta.med.biobank.forms.OrderEntryFormBase"
+      class="edu.ualberta.med.biobank.forms.RequestEntryFormBase"
       default="false"
-      icon="icons/order.png"
-      id="edu.ualberta.med.biobank.forms.OrderEntryFormBase"
-      name="Order Receiving Form">
+      icon="icons/request.png"
+      id="edu.ualberta.med.biobank.forms.RequestEntryFormBase"
+      name="Request Receiving Form">
 </editor>
    </extension>
    <extension
@@ -2376,13 +2394,21 @@
             id="edu.ualberta.med.biobank.views.SessionsView"
             name="Administration"
             restorable="true">
-      </view>
+	      </view>
+	      <view
+	            allowMultiple="false"
+	            class="edu.ualberta.med.biobank.views.ReportsView"
+	            id="edu.ualberta.med.biobank.views.ReportsView"
+	            icon="icons/reportsPerspective.png"
+	            name="Reports"
+	            restorable="true">
+	      </view>
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.ReportsView"
-            id="edu.ualberta.med.biobank.views.ReportsView"
+            class="edu.ualberta.med.biobank.views.AdvancedReportsView"
+            id="edu.ualberta.med.biobank.views.AdvancedReportsView"
             icon="icons/reportsPerspective.png"
-            name="Reports"
+            name="Advanced Reports"
             restorable="true">
       </view>
       <view
@@ -2394,6 +2420,7 @@
             restorable="true">
       </view>
       <view
+            allowMultiple="false"
             class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
             icon="icons/shipment.png"
             id="edu.ualberta.med.biobank.views.ShipmentAdminView"
@@ -2401,10 +2428,18 @@
             restorable="true">
       </view>
       <view
+            allowMultiple="false"
             class="edu.ualberta.med.biobank.views.DispatchAdministrationView"
             icon="icons/dispatch.png"
             id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
             name="Dispatches"
+            restorable="true">
+      </view>
+      <view
+            class="edu.ualberta.med.biobank.views.AdvancedReportsView"
+            icon="icons/reportsPerspective.png"
+            id="edu.ualberta.med.biobank.views.ReportAdministrationView"
+            name="Advanced Reports"
             restorable="true">
       </view>
       <view
@@ -2424,10 +2459,10 @@
       </view>
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.OrderAdministrationView"
-            icon="icons/order.png"
-            id="edu.ualberta.med.biobank.views.OrderAdminView"
-            name="Orders"
+            class="edu.ualberta.med.biobank.views.RequestAdministrationView"
+            icon="icons/request.png"
+            id="edu.ualberta.med.biobank.views.RequestAdminView"
+            name="Requests"
             restorable="true">
       </view>
    </extension>
