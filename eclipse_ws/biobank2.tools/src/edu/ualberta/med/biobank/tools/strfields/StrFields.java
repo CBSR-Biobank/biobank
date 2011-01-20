@@ -17,6 +17,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.ualberta.med.biobank.tools.ModelUmlParser;
+
 public class StrFields {
 
     private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR TEMPLATE\n\n"
@@ -52,12 +54,12 @@ public class StrFields {
         }
 
         try {
-            DataModelExtractor.getInstance().getModel(appArgs.modelFileName);
+            ModelUmlParser.getInstance().geDataModel(appArgs.modelFileName);
 
             if (appArgs.verbose) {
-                for (String className : DataModelExtractor.getInstance()
+                for (String className : ModelUmlParser.getInstance()
                     .getDmTableSet()) {
-                    Map<String, String> attrMap = DataModelExtractor
+                    Map<String, String> attrMap = ModelUmlParser
                         .getInstance().getDmTableAttrMap(className);
                     for (String attrName : attrMap.keySet()) {
                         String type = attrMap.get(attrName);
@@ -119,7 +121,7 @@ public class StrFields {
         String className = hbmFileName.replace(HBM_FILE_EXTENSION, "");
         String tableName = toTitleCase(className);
 
-        Map<String, String> attrMap = DataModelExtractor.getInstance()
+        Map<String, String> attrMap = ModelUmlParser.getInstance()
             .getDmTableAttrMap(tableName);
         Map<String, Integer> attrLengthMap = new HashMap<String, Integer>();
 
@@ -146,9 +148,9 @@ public class StrFields {
         String newLine = System.getProperty("line.separator");
         StringBuffer sb = new StringBuffer();
 
-        for (String className : DataModelExtractor.getInstance()
+        for (String className : ModelUmlParser.getInstance()
             .getDmTableSet()) {
-            Map<String, String> attrMap = DataModelExtractor.getInstance()
+            Map<String, String> attrMap = ModelUmlParser.getInstance()
                 .getDmTableAttrMap(className);
             for (String attrName : attrMap.keySet()) {
                 String attrType = attrMap.get(attrName);
