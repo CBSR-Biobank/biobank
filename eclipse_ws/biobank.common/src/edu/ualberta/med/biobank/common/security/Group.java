@@ -1,8 +1,10 @@
 package edu.ualberta.med.biobank.common.security;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -21,6 +23,12 @@ public class Group implements Serializable, NotAProxy {
 
     // FIXME just remember the ID that should never change ?
     public static final String PG_SITE_ADMINISTRATION = "Site Administration Features";
+    // same as above
+    public static final Long PG_SITE_ADMINISTRATION_ID = 45L;
+
+    public static final String SITE_FULL_ACCESS = "Site Full Access";
+    public static final String READ_ONLY = "Read Only";
+    public static final String OBJECT_FULL_ACCESS = "Object Full Access";
 
     private Long id;
 
@@ -36,15 +44,24 @@ public class Group implements Serializable, NotAProxy {
      */
     private Map<String, ProtectionGroupPrivilege> pgMap;
 
-    public Group() {
+    private List<Integer> readOnlySitesId;
+    private List<Integer> canUpdateSitesId;
+    private List<Integer> featuresEnabledId;
+    private Boolean isSiteAdministrator;
 
+    public Group() {
+        pePrivilegeMap = new HashMap<ProtectionElement, Set<Privilege>>();
+        pgMap = new HashMap<String, ProtectionGroupPrivilege>();
+        readOnlySitesId = new ArrayList<Integer>();
+        canUpdateSitesId = new ArrayList<Integer>();
+        featuresEnabledId = new ArrayList<Integer>();
+        isSiteAdministrator = false;
     }
 
     public Group(Long id, String name) {
+        this();
         this.id = id;
         this.name = name;
-        pePrivilegeMap = new HashMap<ProtectionElement, Set<Privilege>>();
-        pgMap = new HashMap<String, ProtectionGroupPrivilege>();
     }
 
     public void setId(Long id) {
@@ -125,9 +142,26 @@ public class Group implements Serializable, NotAProxy {
         return pgMap;
     }
 
+    /**
+     * @return true if this group is administrator of the site with id siteId
+     */
     public boolean isSiteAdministrator(Integer siteId) {
         return hasPrivilegeOnProtectionGroup(Privilege.UPDATE,
             PG_SITE_ADMINISTRATION, siteId);
+    }
+
+    /**
+     * @return true is is site administrator of sites the group can update.
+     */
+    public boolean getIsSiteAdministrator() {
+        return isSiteAdministrator;
+    }
+
+    /**
+     * set if the group is site administrator of sites the group can update.
+     */
+    public void setIsSiteAdministrator(boolean admin) {
+        isSiteAdministrator = admin;
     }
 
     public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
@@ -144,6 +178,12 @@ public class Group implements Serializable, NotAProxy {
     public void copy(Group group) {
         id = group.getId();
         name = group.getName();
+        isSiteAdministrator = group.isSiteAdministrator;
+        pePrivilegeMap = new HashMap<ProtectionElement, Set<Privilege>>(
+            group.pePrivilegeMap);
+        pgMap = new HashMap<String, ProtectionGroupPrivilege>(group.pgMap);
+        readOnlySitesId = new ArrayList<Integer>(group.readOnlySitesId);
+        canUpdateSitesId = new ArrayList<Integer>(group.canUpdateSitesId);
     }
 
     public boolean canBeDeleted() {
@@ -153,5 +193,29 @@ public class Group implements Serializable, NotAProxy {
     public boolean canBeEdited() {
         return !GROUP_WEBSITE_ADMINISTRATOR.equals(name)
             && !GROUP_WEBSITE_ADMINISTRATOR_ID.equals(id);
+    }
+
+    public List<Integer> getReadOnlySites() {
+        return readOnlySitesId;
+    }
+
+    public void setReadOnlySites(List<Integer> readOnlySitesId) {
+        this.readOnlySitesId = readOnlySitesId;
+    }
+
+    public List<Integer> getCanUpdateSites() {
+        return canUpdateSitesId;
+    }
+
+    public void setCanUpdateSites(List<Integer> readOnlySitesId) {
+        this.canUpdateSitesId = readOnlySitesId;
+    }
+
+    public List<Integer> getFeaturesEnabled() {
+        return featuresEnabledId;
+    }
+
+    public void setFeaturesEnabled(List<Integer> featuresEnabledId) {
+        this.featuresEnabledId = featuresEnabledId;
     }
 }

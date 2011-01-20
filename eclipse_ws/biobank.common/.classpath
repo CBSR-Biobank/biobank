@@ -33,6 +33,5 @@
 	<classpathentry exported="true" kind="lib" path="lib/server/csmapi-4.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-writable-core.jar"/>
-	<classpathentry kind="lib" path="lib/client/mysql-connector-java-5.0.8.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

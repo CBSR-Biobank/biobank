@@ -26,7 +26,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.infotables.GroupInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -90,7 +89,7 @@ public class ManageSecurityDialog extends BiobankDialog {
             protected boolean deleteUser(User user) {
                 boolean deleted = super.deleteUser(user);
                 if (deleted)
-                    currentUserList.remove(user);
+                    getUsers().remove(user);
                 return deleted;
             }
         };
@@ -116,7 +115,7 @@ public class ManageSecurityDialog extends BiobankDialog {
             protected boolean deleteGroup(Group group) {
                 boolean deleted = super.deleteGroup(group);
                 if (deleted)
-                    currentGroupList.remove(group);
+                    getGroups().remove(group);
                 return deleted;
             }
         };
@@ -133,47 +132,60 @@ public class ManageSecurityDialog extends BiobankDialog {
         Thread t = new Thread() {
             @Override
             public void run() {
-                BiobankApplicationService appService = SessionManager
-                    .getAppService();
-                try {
-                    currentUserList = appService.getSecurityUsers();
-                    getShell().getDisplay().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            userInfoTable.setCollection(currentUserList);
-                        }
-                    });
-                } catch (ApplicationException e) {
-                    BioBankPlugin.openAsyncError("Unable to load users.", e);
-                }
-                try {
-                    currentGroupList = appService.getSecurityGroups();
-                    getShell().getDisplay().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            groupInfoTable.setCollection(currentGroupList);
-                        }
-                    });
-                } catch (ApplicationException e) {
-                    BioBankPlugin.openAsyncError("Unable to load groups.", e);
-                }
+                final List<User> users = getUsers();
+                getShell().getDisplay().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        userInfoTable.setCollection(users);
+                    }
+                });
+                final List<Group> groups = getGroups();
+                getShell().getDisplay().syncExec(new Runnable() {
+                    @Override
+                    public void run() {
+                        groupInfoTable.setCollection(groups);
+                    }
+                });
             }
+
         };
         t.start();
+    }
 
+    protected List<Group> getGroups() {
+        if (currentGroupList == null) {
+            try {
+                currentGroupList = SessionManager.getAppService()
+                    .getSecurityGroups();
+            } catch (ApplicationException e) {
+                BioBankPlugin.openAsyncError("Unable to load groups.", e);
+            }
+        }
+        return currentGroupList;
+    }
+
+    protected List<User> getUsers() {
+        if (currentUserList == null) {
+            try {
+                currentUserList = SessionManager.getAppService()
+                    .getSecurityUsers();
+            } catch (ApplicationException e) {
+                BioBankPlugin.openAsyncError("Unable to load users.", e);
+            }
+        }
+        return currentUserList;
     }
 
     protected void addUser() {
         User user = new User();
         UserEditDialog dlg = new UserEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), user, currentGroupList,
-            true);
+            .getActiveWorkbenchWindow().getShell(), user, getGroups(), true);
         int res = dlg.open();
         if (res == Status.OK) {
             BioBankPlugin.openAsyncInformation(USER_ADDED_TITLE,
                 MessageFormat.format(USER_ADDED_MESSAGE, user.getLogin()));
-            currentUserList.add(user);
-            userInfoTable.reloadCollection(currentUserList, user);
+            getUsers().add(user);
+            userInfoTable.reloadCollection(getUsers(), user);
         }
     }
 
@@ -185,8 +197,8 @@ public class ManageSecurityDialog extends BiobankDialog {
         if (res == Status.OK) {
             BioBankPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
                 MessageFormat.format(GROUP_ADDED_MESSAGE, group.getName()));
-            currentGroupList.add(group);
-            groupInfoTable.reloadCollection(currentGroupList, group);
+            getGroups().add(group);
+            groupInfoTable.reloadCollection(getGroups(), group);
         }
     }
 
