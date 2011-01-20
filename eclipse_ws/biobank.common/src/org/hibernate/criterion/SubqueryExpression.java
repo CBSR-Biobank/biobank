@@ -20,6 +20,11 @@ import org.hibernate.type.Type;
  */
 public abstract class SubqueryExpression implements Criterion {
 
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -9179524270239201903L;
+
     private CriteriaImpl criteriaImpl;
     private String quantifier;
     private String op;
@@ -41,6 +46,7 @@ public abstract class SubqueryExpression implements Criterion {
     protected abstract String toLeftSqlString(Criteria criteria,
         CriteriaQuery outerQuery);
 
+    @Override
     public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery)
         throws HibernateException {
 
@@ -73,6 +79,7 @@ public abstract class SubqueryExpression implements Criterion {
             criteriaImpl.getEntityOrClassName(), new HashMap()) {
             // need to override default of "this_" to whatever the innerQuery is
             // using
+            @Override
             protected String generateRootAlias(final String description) {
                 return innerQuery.getRootSQLALias();
             }
@@ -90,6 +97,7 @@ public abstract class SubqueryExpression implements Criterion {
         return buf.append('(').append(sql).append(')').toString();
     }
 
+    @Override
     public TypedValue[] getTypedValues(Criteria criteria,
         CriteriaQuery criteriaQuery) throws HibernateException {
         // the following two lines were added to ensure that this.params is not
