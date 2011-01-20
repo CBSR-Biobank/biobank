@@ -4,27 +4,33 @@ import java.io.Serializable;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 
-public class ProtectionElementPrivilege implements Serializable, NotAProxy {
+/**
+ * represent a protection element
+ * 
+ */
+public class ProtectionElement implements Serializable, NotAProxy {
 
     private static final long serialVersionUID = 1L;
 
     /**
-     * This is the CSM protection element object id
+     * This is the CSM protection element object id (for instance, can be
+     * 'edu.ualberta.med.biobank.model.Clinic')
      */
     private String type;
 
     /**
      * If the CSM protection element define a attribute "id", then this is the
-     * value of this attribute.
+     * value of this attribute. (for instance, this is used for sites objects,
+     * to set different accesses depending on the site id)
      */
     private String id;
 
-    public ProtectionElementPrivilege(String type, String id) {
+    public ProtectionElement(String type, String id) {
         this.type = type;
         this.id = id;
     }
 
-    public ProtectionElementPrivilege(String type, Integer id) {
+    public ProtectionElement(String type, Integer id) {
         this(type, id == null ? null : id.toString());
     }
 
@@ -51,8 +57,8 @@ public class ProtectionElementPrivilege implements Serializable, NotAProxy {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof ProtectionElementPrivilege) {
-            ProtectionElementPrivilege pep = (ProtectionElementPrivilege) obj;
+        if (obj instanceof ProtectionElement) {
+            ProtectionElement pep = (ProtectionElement) obj;
             boolean sameType = getType() != null && pep.getType() != null
                 && getType().equals(pep.getType());
             boolean sameId = (getId() == null && pep.getId() == null)

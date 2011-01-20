@@ -138,7 +138,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 

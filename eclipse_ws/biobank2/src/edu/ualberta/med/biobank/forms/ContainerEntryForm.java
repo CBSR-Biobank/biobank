@@ -11,7 +11,6 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
@@ -54,8 +53,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private ComboViewer activityStatusComboViewer;
 
     private boolean doSave;
-
-    private boolean newName;
 
     protected List<ContainerTypeWrapper> containerTypes;
 
@@ -131,8 +128,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                     if (container.isNew())
                         adapter.setParent(((SiteAdapter) SessionManager
-                            .getCurrentAdapterViewWithTree().searchNode(
-                                selectedSite)).getContainersGroupNode());
+                            .searchFirstNode(selectedSite))
+                            .getContainersGroupNode());
                     container.setSite(selectedSite);
                 }
             });
@@ -230,10 +227,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (container.hasChildren() || container.hasAliquots()) {
             containerTypeComboViewer.getCombo().setEnabled(false);
         }
-        // if (containerTypes.size() == 1) {
-        // containerTypeComboViewer.setSelection(new StructuredSelection(
-        // containerTypes.get(0)));
-        // }
     }
 
     private void createButtonsSection() {
@@ -256,14 +249,12 @@ public class ContainerEntryForm extends BiobankEntryForm {
     @Override
     protected void doBeforeSave() throws Exception {
         doSave = true;
-        newName = false;
         if (container.hasChildren() && oldContainerLabel != null
             && !oldContainerLabel.equals(container.getLabel())) {
             doSave = BioBankPlugin
                 .openConfirm(
                     "Renaming container",
                     "This container has been renamed. Its children will also be renamed. Are you sure you want to continue ?");
-            newName = true;
         }
     }
 
@@ -271,24 +262,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     protected void saveForm() throws Exception {
         if (doSave) {
             container.persist();
-            if (newName) {
-                container.reload();
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        containerAdapter.rebuild();
-                        containerAdapter.performExpand();
-                    }
-                });
-            } else {
-                Display.getDefault().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                        containerAdapter.getParent().addChild(containerAdapter);
-                        containerAdapter.getParent().performExpand();
-                    }
-                });
-            }
+            SessionManager.updateAllSimilarNodes(containerAdapter, true);
         } else {
             setDirty(true);
         }
@@ -303,13 +277,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
     public void reset() throws Exception {
         super.reset();
         siteCombo.setSelectedSite(container.getSite(), true);
-        // currentContainerType = container.getContainerType();
-        // if (currentContainerType != null) {
-        // containerTypeComboViewer.setSelection(new StructuredSelection(
-        // currentContainerType));
-        // } else if (containerTypeComboViewer.getCombo().getItemCount() > 1) {
-        // containerTypeComboViewer.getCombo().deselectAll();
-        // }
         ActivityStatusWrapper activity = container.getActivityStatus();
         if (activity != null) {
             activityStatusComboViewer.setSelection(new StructuredSelection(

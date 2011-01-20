@@ -308,7 +308,6 @@ public class LoggingView extends ViewPart {
             @Override
             public void sourceChanged(int sourcePriority, String sourceName,
                 Object sourceValue) {
-
                 if (sourceValue.equals(SessionState.LOGGED_OUT)) {
                     setEnableAllFields(false);
                 } else if (sourceValue.equals(SessionState.LOGGED_IN)) {

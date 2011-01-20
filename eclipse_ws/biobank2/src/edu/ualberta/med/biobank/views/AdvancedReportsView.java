@@ -15,7 +15,7 @@ public class AdvancedReportsView extends AbstractAdministrationView {
 
     public AdvancedReportsView() {
         currentView = this;
-        SessionManager.addView(ID, this);
+        SessionManager.addView(this);
     }
 
     @Override

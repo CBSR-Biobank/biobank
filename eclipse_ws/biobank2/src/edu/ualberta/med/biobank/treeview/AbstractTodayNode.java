@@ -23,6 +23,8 @@ public abstract class AbstractTodayNode extends AdapterBase {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AbstractTodayNode.class.getName());
 
+    private List<? extends ModelWrapper<?>> currentTodayElements;
+
     public AbstractTodayNode(AdapterBase parent, int id) {
         super(parent, id, "Today", true, false);
     }
@@ -70,7 +72,7 @@ public abstract class AbstractTodayNode extends AdapterBase {
     @Override
     public void performExpand() {
         try {
-            List<? extends ModelWrapper<?>> todayElements = getTodayElements();
+            currentTodayElements = getTodayElements();
 
             // remove elements that are not in today list
             for (AdapterBase child : getChildren()) {
@@ -81,7 +83,7 @@ public abstract class AbstractTodayNode extends AdapterBase {
                 for (AdapterBase subChild : subChildren) {
                     ModelWrapper<?> subChildWrapper = subChild.getModelObject();
                     subChildWrapper.reload();
-                    if (!todayElements.contains(subChildWrapper)
+                    if (!currentTodayElements.contains(subChildWrapper)
                         || !isParentTo(childWrapper, subChildWrapper)) {
                         subChild.getParent().removeChild(subChild);
                     }
@@ -89,15 +91,13 @@ public abstract class AbstractTodayNode extends AdapterBase {
             }
 
             // add today elements is not yet there
-            for (ModelWrapper<?> wrapper : todayElements) {
+            for (ModelWrapper<?> wrapper : currentTodayElements) {
                 assert wrapper instanceof PatientWrapper
                     || wrapper instanceof ShipmentWrapper;
                 if (wrapper instanceof PatientWrapper) {
-                    PatientAdministrationView.getCurrent().addToNode(this,
-                        wrapper);
+                    PatientAdministrationView.addToNode(this, wrapper);
                 } else if (wrapper instanceof ShipmentWrapper) {
-                    ShipmentAdministrationView.getCurrent().addToNode(this,
-                        wrapper);
+                    ShipmentAdministrationView.addToNode(this, wrapper);
                 }
             }
 
@@ -123,7 +123,11 @@ public abstract class AbstractTodayNode extends AdapterBase {
         throws ApplicationException;
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
+    }
+
+    public List<? extends ModelWrapper<?>> getCurrentTodayElements() {
+        return currentTodayElements;
     }
 }

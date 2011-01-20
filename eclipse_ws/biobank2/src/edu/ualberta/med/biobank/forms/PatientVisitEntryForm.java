@@ -397,10 +397,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         patientVisit.persist();
-        PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
-            .getParent();
-        if (patientAdapter != null)
-            patientAdapter.performExpand();
+        SessionManager.updateAllSimilarNodes(patientVisitAdapter, true);
     }
 
     private void savePvCustomInfo() throws Exception {

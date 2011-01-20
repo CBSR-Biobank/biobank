@@ -62,11 +62,8 @@ public class PatientTodayNode extends AbstractTodayNode {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
-        if (searchedObject instanceof StudyWrapper) {
-            return getChild((ModelWrapper<?>) searchedObject, true);
-        }
-        return searchChildren(searchedObject);
+    public List<AdapterBase> search(Object searchedObject) {
+        return findChildFromClass(searchedObject, StudyWrapper.class);
     }
 
 }

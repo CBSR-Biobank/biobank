@@ -41,8 +41,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         mi.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent event) {
-                searchedObjects.clear();
-                removeAll();
+                clear();
             }
         });
     }
@@ -141,7 +140,16 @@ public abstract class AbstractSearchedNode extends AdapterBase {
         ModelWrapper<?> child);
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
+    }
+
+    public void clear() {
+        searchedObjects.clear();
+        removeAll();
+    }
+
+    public void removeObjects(List<? extends ModelWrapper<?>> children) {
+        searchedObjects.removeAll(children);
     }
 }

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -82,11 +83,8 @@ public class PatientAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
-        if (searchedObject instanceof PatientVisitWrapper) {
-            return getChild((ModelWrapper<?>) searchedObject, true);
-        }
-        return searchChildren(searchedObject);
+    public List<AdapterBase> search(Object searchedObject) {
+        return findChildFromClass(searchedObject, PatientVisitWrapper.class);
     }
 
     @Override

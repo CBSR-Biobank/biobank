@@ -17,25 +17,32 @@ public abstract class AbstractTodaySearchAdministrationView extends
 
     protected AbstractSearchedNode searchedNode;
 
+    protected abstract String getString();
+
     @Override
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 
-        todayNode = getTodayNode();
+        todayNode = createTodayNode();
         todayNode.setParent(rootNode);
         rootNode.addChild(todayNode);
 
-        searchedNode = getSearchedNode();
+        searchedNode = createSearchedNode();
         searchedNode.setParent(rootNode);
         rootNode.addChild(searchedNode);
     }
 
-    protected abstract AbstractTodayNode getTodayNode();
+    protected abstract AbstractTodayNode createTodayNode();
 
-    protected abstract AbstractSearchedNode getSearchedNode();
+    protected abstract AbstractSearchedNode createSearchedNode();
 
-    public abstract AdapterBase addToNode(AdapterBase parentNode,
-        ModelWrapper<?> wrapper);
+    public AbstractTodayNode getTodayNode() {
+        return todayNode;
+    }
+
+    public AbstractSearchedNode getSearchedNode() {
+        return searchedNode;
+    }
 
     @Override
     protected void internalSearch() {
@@ -61,19 +68,19 @@ public abstract class AbstractTodaySearchAdministrationView extends
     protected void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            AdapterBase node = todayNode.search(searchedObject);
-            if (node == null) {
-                node = searchedNode.search(searchedObject);
-                if (node == null) {
+            List<AdapterBase> nodeRes = todayNode.search(searchedObject);
+            if (nodeRes.size() == 0) {
+                nodeRes = searchedNode.search(searchedObject);
+                if (nodeRes.size() == 0) {
                     searchedNode.addSearchObject(searchedObject);
                     searchedNode.performExpand();
-                    node = searchedNode.search(searchedObject);
+                    nodeRes = searchedNode.search(searchedObject);
                 }
             }
-            if (node != null) {
-                setSelectedNode(node);
+            if (nodeRes.size() > 0) {
+                setSelectedNode(nodeRes.get(0));
                 if (doubleClick) {
-                    node.performDoubleClick();
+                    nodeRes.get(0).performDoubleClick();
                 }
             }
         }
@@ -82,8 +89,15 @@ public abstract class AbstractTodaySearchAdministrationView extends
     @Override
     public void reload() {
         todayNode.performExpand();
+        searchedNode.removeObjects(todayNode.getCurrentTodayElements());
         searchedNode.performExpand();
         super.reload();
+    }
+
+    @Override
+    public void clear() {
+        todayNode.removeAll();
+        searchedNode.clear();
     }
 
 }

@@ -1,13 +1,13 @@
 package edu.ualberta.med.biobank;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.ui.IViewPart;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
@@ -29,8 +28,6 @@ import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import edu.ualberta.med.biobank.utils.BindingContextHelper;
 import edu.ualberta.med.biobank.views.AbstractViewWithAdapterTree;
-import edu.ualberta.med.biobank.views.DispatchAdministrationView;
-import edu.ualberta.med.biobank.views.RequestAdministrationView;
 import edu.ualberta.med.biobank.views.SessionsView;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -45,10 +42,6 @@ public class SessionManager {
 
     private static SessionManager instance = null;
 
-    private static IWorkbenchWindow workbenchWindow;
-
-    private SessionsView view;
-
     private SessionAdapter sessionAdapter;
 
     private RootNode rootNode;
@@ -58,6 +51,8 @@ public class SessionManager {
      * perspective is set
      */
     public Map<String, AbstractViewWithAdapterTree> possibleViewMap;
+
+    private String currentAdministrationViewId;
 
     private SessionManager() {
         super();
@@ -73,8 +68,7 @@ public class SessionManager {
     }
 
     public void setSessionsView(SessionsView view) {
-        this.view = view;
-        addView(MainPerspective.ID, view);
+        addView(view);
         updateMenus();
     }
 
@@ -86,9 +80,6 @@ public class SessionManager {
             serverName, user);
         rootNode.addChild(sessionAdapter);
 
-        rebuildSession();
-        rebuiltDispatch();
-        rebuildRequest();
         updateMenus();
 
         if (sessionAdapter.getUser().passwordChangeRequired()) {
@@ -97,43 +88,20 @@ public class SessionManager {
             dlg.open();
         }
 
+        // for key binding contexts:
         BindingContextHelper
             .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
         BindingContextHelper
             .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
     }
 
-    private void rebuildRequest() {
-        RequestAdministrationView view = RequestAdministrationView.getCurrent();
-        if (view == null)
-            return;
-        view.createNodes();
-    }
-
-    private void rebuiltDispatch() {
-        DispatchAdministrationView view = DispatchAdministrationView
-            .getCurrent();
-        if (view == null)
-            return;
-        view.createNodes();
-    }
-
     public void deleteSession() throws Exception {
         WritableApplicationService appService = sessionAdapter.getAppService();
-        rootNode.removeChild(sessionAdapter);
-        DispatchAdministrationView dview = DispatchAdministrationView
-            .getCurrent();
-        RequestAdministrationView rview = RequestAdministrationView
-            .getCurrent();
-        if (dview != null) {
-            dview.clear();
-        }
-        if (rview != null) {
-            rview.clear();
-        }
         sessionAdapter = null;
         updateMenus();
         ServiceConnection.logout(appService);
+
+        // for key binding contexts:
         BindingContextHelper
             .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
         BindingContextHelper
@@ -174,22 +142,22 @@ public class SessionManager {
         return getInstance().getSession().getAppService();
     }
 
-    public static void updateAdapterTreeNode(AdapterBase node) {
-        AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+    public static void updateAdapterTreeNode(final AdapterBase node) {
+        final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
             view.getTreeViewer().update(node, null);
         }
     }
 
-    public static void refreshTreeNode(AdapterBase node) {
-        AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+    public static void refreshTreeNode(final AdapterBase node) {
+        final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
             view.getTreeViewer().refresh(node, true);
         }
     }
 
-    public static void setSelectedNode(AdapterBase node) {
-        AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+    public static void setSelectedNode(final AdapterBase node) {
+        final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null && node != null) {
             view.setSelectedNode(node);
         }
@@ -205,7 +173,7 @@ public class SessionManager {
     }
 
     public static void openViewForm(ModelWrapper<?> wrapper) {
-        AdapterBase adapter = searchNode(wrapper);
+        AdapterBase adapter = searchFirstNode(wrapper);
         if (adapter != null) {
             adapter.performDoubleClick();
             return;
@@ -220,23 +188,22 @@ public class SessionManager {
     }
 
     public static AbstractViewWithAdapterTree getCurrentAdapterViewWithTree() {
-        IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
-        if (workbench != null && !workbench.isClosing()) {
-            workbenchWindow = workbench.getActiveWorkbenchWindow();
-            if (workbenchWindow != null) {
-                IWorkbenchPage page = workbenchWindow.getActivePage();
-                for (IViewPart view : getInstance().possibleViewMap.values())
-                    if (page.isPartVisible(view))
-                        return (AbstractViewWithAdapterTree) view;
-            }
-        }
-        return null;
+        SessionManager sm = getInstance();
+        return sm.possibleViewMap.get(sm.currentAdministrationViewId);
     }
 
-    public static AdapterBase searchNode(ModelWrapper<?> wrapper) {
+    public static List<AdapterBase> searchNodes(ModelWrapper<?> wrapper) {
         AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
         if (view != null) {
             return view.searchNode(wrapper);
+        }
+        return new ArrayList<AdapterBase>();
+    }
+
+    public static AdapterBase searchFirstNode(ModelWrapper<?> wrapper) {
+        List<AdapterBase> nodes = searchNodes(wrapper);
+        if (nodes.size() > 0) {
+            return nodes.get(0);
         }
         return null;
     }
@@ -245,19 +212,9 @@ public class SessionManager {
         return rootNode;
     }
 
-    public static void addView(String perspectiveId,
-        AbstractViewWithAdapterTree view) {
-        getInstance().possibleViewMap.put(perspectiveId, view);
-    }
-
-    public void rebuildSession() {
-        SessionAdapter session = SessionManager.getInstance().getSession();
-        if (session != null) {
-            session.rebuild();
-        }
-        if (view != null) {
-            getSession().getSitesGroupNode().performExpand();
-        }
+    public static void addView(AbstractViewWithAdapterTree view) {
+        getInstance().possibleViewMap.put(view.getId(), view);
+        getInstance().currentAdministrationViewId = view.getId();
     }
 
     public static User getUser() {
@@ -311,13 +268,48 @@ public class SessionManager {
             type);
     }
 
-    @Deprecated
-    public boolean isAllSitesSelected() {
-        return false;
+    /**
+     * do an update on node holding the same wrapper than the given adapter.
+     * 
+     * @param canRest if true, then the node found will be reloaded from the
+     *            database (might not want that if the object could be open in
+     *            an entry form).
+     * @param expandParent if true will expand the parent node of 'adapter'
+     * 
+     */
+    public static void updateAllSimilarNodes(final AdapterBase adapter,
+        final boolean canReset) {
+        Display.getDefault().asyncExec(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    // add to add the correct node if it is a new adapter:
+                    AdapterBase parent = adapter.getParent();
+                    if (parent != null)
+                        parent.addChild(adapter);
+                    List<AdapterBase> res = searchNodes(adapter
+                        .getModelObject());
+                    final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
+                    if (view != null) {
+                        for (AdapterBase ab : res) {
+                            if (canReset)
+                                try {
+                                    if (ab != adapter)
+                                        ab.resetObject();
+                                } catch (Exception ex) {
+                                    logger.error("Problem reseting object", ex);
+                                }
+                            view.getTreeViewer().update(ab, null);
+                        }
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                }
+            }
+        });
     }
 
-    @Deprecated
-    public static SiteWrapper getCurrentSite() {
-        return null;
+    public static void setCurrentAdministrationViewId(String id) {
+        getInstance().currentAdministrationViewId = id;
     }
 }

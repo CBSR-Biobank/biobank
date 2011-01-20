@@ -230,7 +230,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             @Override
             public void run() {
                 PatientAdapter p = (PatientAdapter) SessionManager
-                    .searchNode(patient2);
+                    .searchFirstNode(patient2);
                 if (p != null) {
                     p.getParent().removeChild(p);
                 }

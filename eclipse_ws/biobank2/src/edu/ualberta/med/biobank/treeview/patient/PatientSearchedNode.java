@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.treeview.patient;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -37,15 +39,12 @@ public class PatientSearchedNode extends AbstractSearchedNode {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
-        if (searchedObject instanceof StudyWrapper) {
-            return getChild((ModelWrapper<?>) searchedObject, true);
-        }
-        return searchChildren(searchedObject);
+    public List<AdapterBase> search(Object searchedObject) {
+        return findChildFromClass(searchedObject, StudyWrapper.class);
     }
 
     @Override
     protected void addNode(ModelWrapper<?> wrapper) {
-        PatientAdministrationView.getCurrent().addToNode(this, wrapper);
+        PatientAdministrationView.addToNode(this, wrapper);
     }
 }

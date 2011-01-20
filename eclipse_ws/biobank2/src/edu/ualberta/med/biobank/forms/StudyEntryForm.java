@@ -16,6 +16,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.GlobalPvAttrWrapper;
@@ -271,8 +272,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             .getDeletedSampleStorages());
         study.persist();
 
-        if (studyAdapter.getParent() != null)
-            studyAdapter.getParent().performExpand();
+        SessionManager.updateAllSimilarNodes(studyAdapter, true);
     }
 
     private void setStudyPvAttr() throws Exception, UserUIException {

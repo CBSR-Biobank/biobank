@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.security.Group;
+import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
@@ -48,6 +49,13 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public User getCurrentUser() throws ApplicationException;
 
+    public Group persistGroup(
+        edu.ualberta.med.biobank.common.security.Group group)
+        throws ApplicationException;
+
+    public void deleteGroup(edu.ualberta.med.biobank.common.security.Group group)
+        throws ApplicationException;
+
     public void unlockUser(String userName) throws ApplicationException;
 
     public List<Object> runReport(Report report, int maxResults, int firstRow,
@@ -56,4 +64,7 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void checkVersion(String clientVersion) throws ApplicationException;
 
     public String getServerVersion();
+
+    public List<ProtectionGroupPrivilege> getSecurityFeatures()
+        throws ApplicationException;
 }

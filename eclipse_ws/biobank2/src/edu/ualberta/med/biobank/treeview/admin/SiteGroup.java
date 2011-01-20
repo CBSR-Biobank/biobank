@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -58,11 +59,8 @@ public class SiteGroup extends AdapterBase {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
-        if (searchedObject instanceof SiteWrapper) {
-            return getChild((ModelWrapper<?>) searchedObject, true);
-        }
-        return searchChildren(searchedObject);
+    public List<AdapterBase> search(Object searchedObject) {
+        return findChildFromClass(searchedObject, SiteWrapper.class);
     }
 
     @Override
