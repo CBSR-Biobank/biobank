@@ -33,10 +33,13 @@ public class ModelUmlParser {
 
         private Map<String, String> attrMap;
 
+        private Map<String, ModelClass> assoc;
+
         public ModelClass(String name, String xmiId) {
             this.name = name;
             this.xmiId = xmiId;
             attrMap = new HashMap<String, String>();
+            assoc = new HashMap<String, ModelClass>();
         }
     }
 
@@ -294,24 +297,40 @@ public class ModelUmlParser {
                 throw new Exception("association with more than 2 classes");
             }
 
-            if ((classAssocs.get(0).assocName == null)
-                || (classAssocs.get(0).assocName.length() == 0)) {
-                LOGGER.debug("LM  assoc: " + classAssocs.get(0).toClass.name
-                    + "." + classAssocs.get(1).assocName + " -> "
-                    + classAssocs.get(1).toClass.name);
-            } else if ((classAssocs.get(1).assocName == null)
-                || (classAssocs.get(1).assocName.length() == 0)) {
-                LOGGER.debug("LM  assoc: " + classAssocs.get(1).toClass.name
-                    + "." + classAssocs.get(0).assocName + " -> "
-                    + classAssocs.get(0).toClass.name);
-            } else if ((classAssocs.get(0).assocName.length() > 0)
+            if ((classAssocs.get(0).assocName != null)
+                && (classAssocs.get(0).assocName.length() > 0)) {
+                addClassAssoc(classAssocs.get(1).toClass.name,
+                    classAssocs.get(0).assocName,
+                    classAssocs.get(0).toClass.name);
+            }
+
+            if ((classAssocs.get(1).assocName != null)
                 && (classAssocs.get(1).assocName.length() > 0)) {
-                LOGGER.debug("LM  assoc: " + classAssocs.get(0).toClass.name
-                    + "." + classAssocs.get(1).assocName + " <-> "
-                    + classAssocs.get(1).toClass.name + "."
-                    + classAssocs.get(0).assocName);
+                addClassAssoc(classAssocs.get(0).toClass.name,
+                    classAssocs.get(1).assocName,
+                    classAssocs.get(1).toClass.name);
             }
         }
+    }
+
+    private void addClassAssoc(String fromClassName, String assocName,
+        String toClassName) throws Exception {
+        ModelClass fromModelClass = logicalModelClassMap.get(fromClassName);
+
+        if (fromModelClass == null) {
+            throw new Exception("class not found: " + fromClassName);
+        }
+
+        ModelClass toModelClass = logicalModelClassMap.get(fromClassName);
+
+        if (toModelClass == null) {
+            throw new Exception("class not found: " + fromClassName);
+        }
+
+        fromModelClass.assoc.put(assocName, toModelClass);
+
+        LOGGER.debug("LM assoc: " + fromClassName + "." + assocName + " -> "
+            + toClassName);
     }
 
     public void geDataModel(String modelFileName) throws Exception {
