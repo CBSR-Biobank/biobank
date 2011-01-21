@@ -33,23 +33,26 @@ public class ModelUmlParser {
 
         private Map<String, String> attrMap;
 
-        private Map<String, ModelClass> assoc;
+        private Map<String, ClassAssociation> assocMap;
 
         public ModelClass(String name, String xmiId) {
             this.name = name;
             this.xmiId = xmiId;
             attrMap = new HashMap<String, String>();
-            assoc = new HashMap<String, ModelClass>();
+            assocMap = new HashMap<String, ClassAssociation>();
         }
     }
 
     private class ClassAssociation {
         private ModelClass toClass;
         private String assocName;
+        private String multiplicity;
 
-        public ClassAssociation(ModelClass toClass, String assocName) {
+        public ClassAssociation(ModelClass toClass, String assocName,
+            String multiplicity) {
             this.toClass = toClass;
             this.assocName = assocName;
+            this.multiplicity = multiplicity;
         }
 
     }
@@ -89,6 +92,27 @@ public class ModelUmlParser {
         DocumentBuilder builder = domFactory.newDocumentBuilder();
         Document doc = builder.parse(modelFileName);
         getLmClasses(doc);
+
+        for (ModelClass modelClass : logicalModelClassMap.values()) {
+            LOGGER.debug("class " + modelClass.name + "{");
+            for (String attr : modelClass.attrMap.keySet()) {
+                LOGGER.debug("   " + modelClass.attrMap.get(attr) + " " + attr
+                    + ";");
+            }
+            for (String assocName : modelClass.assocMap.keySet()) {
+                ClassAssociation assoc = modelClass.assocMap.get(assocName);
+
+                if (assoc.multiplicity.equals("0-*")
+                    || assoc.multiplicity.equals("1-*")) {
+                    LOGGER.debug("   Collection<" + assoc.toClass.name + "> "
+                        + assocName + ";");
+                } else {
+                    LOGGER.debug("   " + assoc.toClass.name + " " + assocName
+                        + ";");
+                }
+            }
+            LOGGER.debug("};\n");
+        }
     }
 
     private void addLogicalModelClass(String name, String xmiId) {
@@ -257,7 +281,6 @@ public class ModelUmlParser {
                 }
 
                 String endXmiId = attrs.getNamedItem("xmi.id").getNodeValue();
-
                 XPathExpression classExpr = xpath
                     .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
                         + "/Namespace.ownedElement/Package[@name='Logical Model']"
@@ -290,7 +313,8 @@ public class ModelUmlParser {
                             + assocName + " xmi.idref/" + assocClassXmiIdRef);
                 }
 
-                classAssocs.add(new ClassAssociation(modelClass, assocName));
+                classAssocs.add(new ClassAssociation(modelClass, assocName,
+                    getMultiplicity(doc, assocXmiId, endXmiId)));
             }
 
             if (classAssocs.size() != 2) {
@@ -301,33 +325,81 @@ public class ModelUmlParser {
                 && (classAssocs.get(0).assocName.length() > 0)) {
                 addClassAssoc(classAssocs.get(1).toClass.name,
                     classAssocs.get(0).assocName,
-                    classAssocs.get(0).toClass.name);
+                    classAssocs.get(0).toClass.name,
+                    classAssocs.get(0).multiplicity);
             }
 
             if ((classAssocs.get(1).assocName != null)
                 && (classAssocs.get(1).assocName.length() > 0)) {
                 addClassAssoc(classAssocs.get(0).toClass.name,
                     classAssocs.get(1).assocName,
-                    classAssocs.get(1).toClass.name);
+                    classAssocs.get(1).toClass.name,
+                    classAssocs.get(1).multiplicity);
             }
         }
     }
 
+    private String getMultiplicity(Document doc, String assocXmiId,
+        String endXmiId) throws Exception {
+        XPath xpath = XPathFactory.newInstance().newXPath();
+
+        XPathExpression multExpr = xpath
+            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                + "/Namespace.ownedElement/Package[@name='Logical Model']"
+                + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
+                + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
+                + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                + "/Association[@xmi.id='"
+                + assocXmiId
+                + "']/Association.connection/AssociationEnd[@xmi.id='"
+                + endXmiId
+                + "']"
+                + "/AssociationEnd.multiplicity/Multiplicity/Multiplicity.range/MultiplicityRange");
+
+        NodeList assocMultNodes = (NodeList) multExpr.evaluate(doc,
+            XPathConstants.NODESET);
+        if (assocMultNodes.getLength() != 1) {
+            throw new Exception(
+                "association end has more than one multiplicity node: assoc/"
+                    + assocXmiId + " endId/" + endXmiId);
+        }
+
+        NamedNodeMap multAttrs = assocMultNodes.item(0).getAttributes();
+
+        String lowerMult = multAttrs.getNamedItem("lower").getNodeValue();
+        String upperMult = multAttrs.getNamedItem("upper").getNodeValue();
+
+        String multiplicity = null;
+        if (lowerMult.equals("1") && upperMult.equals("1")) {
+            multiplicity = "1";
+        } else if (lowerMult.equals("0") && upperMult.equals("1")) {
+            multiplicity = "0-1";
+        } else if (lowerMult.equals("1") && upperMult.equals("-1")) {
+            multiplicity = "1-*";
+        } else if (lowerMult.equals("0") && upperMult.equals("-1")) {
+            multiplicity = "0-*";
+        }
+        if (multiplicity == null) {
+            throw new Exception("Could not determine muliplicity");
+        }
+        return multiplicity;
+    }
+
     private void addClassAssoc(String fromClassName, String assocName,
-        String toClassName) throws Exception {
+        String toClassName, String muliplicity) throws Exception {
         ModelClass fromModelClass = logicalModelClassMap.get(fromClassName);
+        ModelClass toModelClass = logicalModelClassMap.get(toClassName);
 
         if (fromModelClass == null) {
             throw new Exception("class not found: " + fromClassName);
         }
 
-        ModelClass toModelClass = logicalModelClassMap.get(fromClassName);
-
         if (toModelClass == null) {
-            throw new Exception("class not found: " + fromClassName);
+            throw new Exception("class not found: " + toClassName);
         }
 
-        fromModelClass.assoc.put(assocName, toModelClass);
+        fromModelClass.assocMap.put(assocName, new ClassAssociation(
+            toModelClass, assocName, muliplicity));
 
         LOGGER.debug("LM assoc: " + fromClassName + "." + assocName + " -> "
             + toClassName);
