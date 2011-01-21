@@ -250,7 +250,12 @@ public abstract class ReportsEditor extends BiobankFormBase {
                     t.start();
                     while (true) {
                         if (monitor.isCanceled()) {
-                            // TODO t.stop(); we need a safe way to kill query
+                            try {
+                                ((BiobankApplicationService) appService)
+                                    .stopQuery(query);
+                            } catch (Exception e) {
+                                BioBankPlugin.openAsyncError("Stop Failed", e);
+                            }
                             reportData = new ArrayList<Object>();
                             break;
                         } else if (!t.isAlive())
