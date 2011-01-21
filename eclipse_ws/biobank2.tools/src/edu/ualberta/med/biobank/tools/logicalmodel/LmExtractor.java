@@ -6,14 +6,21 @@ import jargs.gnu.CmdLineParser.OptionException;
 
 import java.net.URISyntaxException;
 
+import org.apache.log4j.Logger;
+import org.apache.log4j.PropertyConfigurator;
+
 import edu.ualberta.med.biobank.tools.ModelUmlParser;
 
 public class LmExtractor {
 
     private static String USAGE = "Usage: lmextractor UMLFILE OUTDIR";
 
+    private static final Logger LOGGER = Logger.getLogger(LmExtractor.class
+        .getName());
+
     private static LmExtractor instance = null;
 
+    @SuppressWarnings("unused")
     private AppArgs appArgs = null;
 
     private LmExtractor() {
@@ -38,19 +45,11 @@ public class LmExtractor {
     public void doWork(AppArgs appArgs) {
         this.appArgs = appArgs;
 
-        if (appArgs.verbose) {
-            System.out.println("  UML file: " + appArgs.modelFileName);
-            System.out.println("  output dir:  " + appArgs.outDir);
-            System.out.println();
-        }
+        LOGGER.info("  UML file: " + appArgs.modelFileName);
+        LOGGER.info("  output dir:  " + appArgs.outDir);
 
         try {
             ModelUmlParser.getInstance().geLogicalModel(appArgs.modelFileName);
-
-            if (appArgs.verbose) {
-
-            }
-
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -67,6 +66,8 @@ public class LmExtractor {
     private static AppArgs parseCommandLine(String argv[])
         throws URISyntaxException {
         AppArgs appArgs = new AppArgs();
+
+        PropertyConfigurator.configure("conf/log4j.properties");
 
         CmdLineParser parser = new CmdLineParser();
         Option verboseOpt = parser.addBooleanOption('v', "verbose");
