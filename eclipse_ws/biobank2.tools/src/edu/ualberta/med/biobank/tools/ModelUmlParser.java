@@ -29,15 +29,16 @@ public class ModelUmlParser {
 
     private class ModelClass {
         private String name;
-        private String xmiId;
+
+        private ModelClass extendsClass;
 
         private Map<String, String> attrMap;
 
         private Map<String, ClassAssociation> assocMap;
 
-        public ModelClass(String name, String xmiId) {
+        public ModelClass(String name) {
             this.name = name;
-            this.xmiId = xmiId;
+            extendsClass = null;
             attrMap = new HashMap<String, String>();
             assocMap = new HashMap<String, ClassAssociation>();
         }
@@ -54,7 +55,16 @@ public class ModelUmlParser {
             this.assocName = assocName;
             this.multiplicity = multiplicity;
         }
+    }
 
+    private class Generalization {
+        ModelClass parentClass;
+        ModelClass childClass;
+
+        Generalization(ModelClass parentClass, ModelClass childClass) {
+            this.parentClass = parentClass;
+            this.childClass = childClass;
+        }
     }
 
     private static ModelUmlParser instance = null;
@@ -68,6 +78,8 @@ public class ModelUmlParser {
     private Map<String, ModelClass> logicalModelClassMap;
 
     private Map<String, ModelClass> logicalModelXmiIdClassMap;
+
+    private Map<String, Generalization> lmGeneralizationXmiIdClassMap;
 
     private ModelUmlParser() {
         dataModelDataTypeMap = new HashMap<String, String>();
@@ -94,7 +106,13 @@ public class ModelUmlParser {
         getLmClasses(doc);
 
         for (ModelClass modelClass : logicalModelClassMap.values()) {
-            LOGGER.debug("class " + modelClass.name + "{");
+
+            if (modelClass.extendsClass != null) {
+                LOGGER.debug("class " + modelClass.name + " extends "
+                    + modelClass.extendsClass + " {");
+            } else {
+                LOGGER.debug("class " + modelClass.name + "{");
+            }
             for (String attr : modelClass.attrMap.keySet()) {
                 LOGGER.debug("   " + modelClass.attrMap.get(attr) + " " + attr
                     + ";");
@@ -116,7 +134,7 @@ public class ModelUmlParser {
     }
 
     private void addLogicalModelClass(String name, String xmiId) {
-        ModelClass modelClass = new ModelClass(name, xmiId);
+        ModelClass modelClass = new ModelClass(name);
         logicalModelClassMap.put(name, modelClass);
         logicalModelXmiIdClassMap.put(xmiId, modelClass);
         LOGGER.debug("LM class/" + name);
@@ -144,6 +162,56 @@ public class ModelUmlParser {
 
         getLmClassAttributes(doc);
         getLmClassAssociations(doc);
+    }
+
+    private void getLmClassGeneralizations(Document doc) throws Exception {
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPathExpression expr;
+        NodeList nodes;
+
+        for (ModelClass modelClass : logicalModelClassMap.values()) {
+            // path to get all generalizations
+            expr = xpath
+                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                    + "/Package/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                    + "/Package/Namespace.ownedElement/Generalization/@xmi.id");
+
+            nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+            for (int i = 0, n = nodes.getLength(); i < n; ++i) {
+                String xmiId = nodes.item(i).getNodeValue();
+
+            }
+        }
+
+        for (ModelClass modelClass : logicalModelClassMap.values()) {
+            // path to get all derived classes
+            expr = xpath
+                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                    + "/Package/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                    + "/Package/Namespace.ownedElement/Class[@name='"
+                    + modelClass.name
+                    + "']/GeneralizableElement.generalization"
+                    + "/Generalization/@xmi.idref");
+
+            nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+            if (nodes.getLength() == 1) {
+                String xmiRefId = nodes.item(0).getNodeValue();
+                modelClass.extendsClass = logicalModelXmiIdClassMap
+                    .get(xmiRefId);
+                LOGGER.debug("LM class/" + modelClass.name + " extends/"
+                    + modelClass.extendsClass.name);
+            } else if (nodes.getLength() > 1) {
+                throw new Exception(
+                    "generalization has more than one class node: className/"
+                        + modelClass.name);
+            }
+        }
     }
 
     private void getLmClassAttributes(Document doc) throws Exception {
@@ -530,7 +598,7 @@ public class ModelUmlParser {
 
             ModelClass dmClass = dataModelClassMap.get(className);
             if (dmClass == null) {
-                dmClass = new ModelClass(className, "");
+                dmClass = new ModelClass(className);
                 dataModelClassMap.put(className, dmClass);
             }
             dmClass.attrMap.put(attrName, modelDataType);
