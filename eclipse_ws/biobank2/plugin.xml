@@ -268,8 +268,8 @@
       </command>
       <command
             categoryId="biobank2.command.category.server"
-            id="edu.ualberta.med.biobank.commands.manageSecurity"
-            name="Manage Security">
+            id="edu.ualberta.med.biobank.commands.userManagement"
+            name="User Management">
       </command>
       <command
             categoryId="biobank2.command.category.server"
@@ -825,8 +825,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.ManageSecurityHandler"
-            commandId="edu.ualberta.med.biobank.commands.manageSecurity">
+            class="edu.ualberta.med.biobank.handlers.UserManagementHandler"
+            commandId="edu.ualberta.med.biobank.commands.userManagement">
          <activeWhen>
             <and>
                <reference
@@ -956,9 +956,9 @@
                       style="push">
                 </command>
                 <command
-                      commandId="edu.ualberta.med.biobank.commands.manageSecurity"
-                      id="edu.ualberta.med.biobank.menu.manageSecurity"
-                      label="Manage Security"
+                      commandId="edu.ualberta.med.biobank.commands.userManagement"
+                      id="edu.ualberta.med.biobank.menu.userManagement"
+                      label="User Management"
                       style="push">
                 </command>
                 <command
@@ -2203,7 +2203,7 @@
             sequence="M3+P">
       </key>  
 	  <key
-            commandId="edu.ualberta.med.biobank.commands.manageSecurity"
+            commandId="edu.ualberta.med.biobank.commands.userManagement"
             contextId="edu.ualberta.med.biobank.perspective.main"
             schemeId="biobank2.scheme"
             sequence="M3+U">

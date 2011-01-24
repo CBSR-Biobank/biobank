@@ -57,6 +57,7 @@ public class ModelUmlParser {
         }
     }
 
+    @SuppressWarnings("unused")
     private class Generalization {
         ModelClass parentClass;
         ModelClass childClass;
@@ -79,6 +80,7 @@ public class ModelUmlParser {
 
     private Map<String, ModelClass> logicalModelXmiIdClassMap;
 
+    @SuppressWarnings("unused")
     private Map<String, Generalization> lmGeneralizationXmiIdClassMap;
 
     private ModelUmlParser() {
@@ -164,6 +166,7 @@ public class ModelUmlParser {
         getLmClassAssociations(doc);
     }
 
+    @SuppressWarnings("unused")
     private void getLmClassGeneralizations(Document doc) throws Exception {
         XPath xpath = XPathFactory.newInstance().newXPath();
         XPathExpression expr;
