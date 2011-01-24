@@ -1,20 +1,24 @@
 package edu.ualberta.med.biobank.common.reports;
 
-import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import gov.nih.nci.system.applicationservice.ApplicationException;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 
-public class BiobankReport implements Serializable {
+import org.hibernate.Session;
 
-    private static final long serialVersionUID = 5851068592524377223L;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.reports.ReportFactory;
+import gov.nih.nci.system.applicationservice.ApplicationException;
+
+public class BiobankReport implements QueryCommand {
+
+    /**
+     * 
+     */
+    private static final long serialVersionUID = 1L;
     private static Map<String, ReportData> REPORTS = new TreeMap<String, ReportData>();
     public static String editorPath = "edu.ualberta.med.biobank.editors.";
 
@@ -110,14 +114,6 @@ public class BiobankReport implements Serializable {
         return new BiobankReport(data);
     }
 
-    public List<Object> generate(WritableApplicationService appService)
-        throws ApplicationException {
-        if (appService instanceof BiobankApplicationService) {
-            return ((BiobankApplicationService) appService).launchReport(this);
-        }
-        return null;
-    }
-
     public void setParams(List<Object> params) {
         this.params = params;
     }
@@ -145,6 +141,12 @@ public class BiobankReport implements Serializable {
 
     public String getContainerList() {
         return containerList;
+    }
+
+    @Override
+    public List<Object> start(Session s, BiobankApplicationService appService)
+        throws ApplicationException {
+        return ReportFactory.createReport(this).generate(appService);
     }
 
 }

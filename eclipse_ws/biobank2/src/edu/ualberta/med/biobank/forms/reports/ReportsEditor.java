@@ -11,7 +11,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Semaphore;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperPrint;
@@ -51,18 +50,18 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.ReportTreeNode;
-import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.HQLCriteriaListProxy;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.forms.input.ReportInput;
+import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.infotables.ReportTableWidget;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class ReportsEditor extends BiobankFormBase implements
-    edu.ualberta.med.biobank.common.util.IBusyListener {
+public abstract class ReportsEditor extends BiobankFormBase {
 
     // Report
     protected ReportTreeNode node;
@@ -83,13 +82,16 @@ public abstract class ReportsEditor extends BiobankFormBase implements
     private Button printButton;
     private Button exportPDFButton;
     private Button exportCSVButton;
-    private Semaphore semaphore = new Semaphore(1);
 
     // Mostly for visibility reasons
     private String path;
 
     // Global status
     private IObservableValue statusObservable;
+
+    QueryHandle query;
+    ProgressMonitorDialogBusyListener listener = new ProgressMonitorDialogBusyListener(
+        "Generating report...");
 
     @Override
     protected void init() throws Exception {
@@ -215,14 +217,19 @@ public abstract class ReportsEditor extends BiobankFormBase implements
     }
 
     private void generate() {
+        appService = SessionManager.getAppService();
         try {
             initReport();
         } catch (Exception e1) {
             BioBankPlugin.openAsyncError("Failed to load parameters", e1);
         }
-        IRunnableContext context = new ProgressMonitorDialog(Display
-            .getDefault().getActiveShell());
+
         try {
+            query = ((BiobankApplicationService) appService)
+                .createQuery(report);
+
+            IRunnableContext context = new ProgressMonitorDialog(Display
+                .getDefault().getActiveShell());
             context.run(true, true, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
@@ -230,18 +237,12 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                         @Override
                         public void run() {
                             try {
-                                reportData = generateReport();
+                                reportData = ((BiobankApplicationService) appService)
+                                    .startQuery(query);
                             } catch (Exception e) {
                                 reportData = new ArrayList<Object>();
-                                BioBankPlugin.openAsyncError(
-                                    "Error while querying for results", e);
+                                BioBankPlugin.openAsyncError("Query Error", e);
                             }
-                        }
-
-                        private List<Object> generateReport()
-                            throws ApplicationException {
-                            return report.generate(SessionManager
-                                .getAppService());
                         }
                     };
                     monitor.beginTask("Generating Report...",
@@ -249,7 +250,12 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                     t.start();
                     while (true) {
                         if (monitor.isCanceled()) {
-                            // TODO t.stop(); we need a safe way to kill query
+                            try {
+                                ((BiobankApplicationService) appService)
+                                    .stopQuery(query);
+                            } catch (Exception e) {
+                                BioBankPlugin.openAsyncError("Stop Failed", e);
+                            }
                             reportData = new ArrayList<Object>();
                             break;
                         } else if (!t.isAlive())
@@ -260,50 +266,44 @@ public abstract class ReportsEditor extends BiobankFormBase implements
                             break;
                         }
                     }
-                    Display.getDefault().syncExec(new Runnable() {
-                        @Override
-                        public void run() {
-                            monitor.done();
-                            if (!reportData.isEmpty()) {
-                                printButton.setEnabled(true);
-                                exportPDFButton.setEnabled(true);
-                                exportCSVButton.setEnabled(true);
-                            } else {
-                                printButton.setEnabled(false);
-                                exportPDFButton.setEnabled(false);
-                                exportCSVButton.setEnabled(false);
-                            }
-                            reportTable.dispose();
-                            // if size > 1000 or unknown, disable print and
-                            // export to pdf
-                            if ((reportData instanceof AbstractBiobankListProxy && (((AbstractBiobankListProxy) reportData)
-                                .getRealSize() == -1 || ((AbstractBiobankListProxy) reportData)
-                                .getRealSize() > 1000))
-                                || reportData.size() > 1000) {
-                                printButton.setEnabled(false);
-                                exportPDFButton.setEnabled(false);
-                                printButton
-                                    .setToolTipText("Results exceed 1000 rows");
-                                exportPDFButton
-                                    .setToolTipText("Results exceed 1000 rows");
-                            } else {
-                                printButton.setToolTipText("Print");
-                                exportPDFButton.setToolTipText("Export PDF");
-                            }
-                            reportTable = new ReportTableWidget<Object>(page,
-                                reportData, getColumnNames());
-                            reportTable.adaptToToolkit(toolkit, true);
-                            page.layout(true, true);
-                            book.reflow(true);
-                        }
-                    });
-                }
+                };
             });
-            if (reportData instanceof HQLCriteriaListProxy)
-                ((HQLCriteriaListProxy) reportData).addBusyListener(this);
-        } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Query Error", e);
+        } catch (Exception e1) {
+            BioBankPlugin.openAsyncError("Failed to load query", e1);
         }
+
+        if (reportData instanceof HQLCriteriaListProxy)
+            ((HQLCriteriaListProxy) reportData).addBusyListener(listener);
+
+        if (!reportData.isEmpty()) {
+            printButton.setEnabled(true);
+            exportPDFButton.setEnabled(true);
+            exportCSVButton.setEnabled(true);
+        } else {
+            printButton.setEnabled(false);
+            exportPDFButton.setEnabled(false);
+            exportCSVButton.setEnabled(false);
+        }
+        reportTable.dispose();
+        // if size > 1000 or unknown, disable print and
+        // export to pdf
+        if ((reportData instanceof HQLCriteriaListProxy && (((HQLCriteriaListProxy) reportData)
+            .getRealSize() == -1 || ((HQLCriteriaListProxy) reportData)
+            .getRealSize() > 1000))
+            || reportData.size() > 1000) {
+            printButton.setEnabled(false);
+            exportPDFButton.setEnabled(false);
+            printButton.setToolTipText("Results exceed 1000 rows");
+            exportPDFButton.setToolTipText("Results exceed 1000 rows");
+        } else {
+            printButton.setToolTipText("Print");
+            exportPDFButton.setToolTipText("Export PDF");
+        }
+        reportTable = new ReportTableWidget<Object>(page, reportData,
+            getColumnNames());
+        reportTable.adaptToToolkit(toolkit, true);
+        page.layout(true, true);
+        book.reflow(true);
     }
 
     private void createEmptyReportTable() {
@@ -592,40 +592,4 @@ public abstract class ReportsEditor extends BiobankFormBase implements
             return processedDate;
     }
 
-    @Override
-    public void showBusy() {
-        Display.getDefault().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-                IRunnableContext context = new ProgressMonitorDialog(Display
-                    .getDefault().getActiveShell());
-                try {
-                    context.run(true, true, new IRunnableWithProgress() {
-                        @Override
-                        public void run(final IProgressMonitor monitor) {
-                            try {
-                                semaphore.acquire();
-                                monitor.beginTask("Loading...",
-                                    IProgressMonitor.UNKNOWN);
-                                // waits thread until allowed to proceed
-                                semaphore.acquire();
-                                semaphore.release();
-                                monitor.done();
-
-                            } catch (Exception e) {
-                                BioBankPlugin.openAsyncError("Thread Error", e);
-                            }
-                        }
-                    });
-                } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Loading Error", e);
-                }
-            }
-        });
-    }
-
-    @Override
-    public void done() {
-        semaphore.release();
-    }
 }

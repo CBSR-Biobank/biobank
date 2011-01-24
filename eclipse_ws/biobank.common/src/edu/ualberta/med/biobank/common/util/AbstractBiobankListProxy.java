@@ -9,6 +9,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.Semaphore;
 
 import org.springframework.util.Assert;
 
@@ -34,9 +35,8 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
 
     protected int loadedOffset;
 
-    protected boolean loading;
-
     private IBusyListener listener;
+    private Semaphore semaphore = new Semaphore(1);
 
     public AbstractBiobankListProxy(ApplicationService appService) {
         this.offset = 0;
@@ -97,19 +97,18 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
     private void updateListChunk(int index) {
         if (index - offset >= pageSize || index < offset) {
             if (index < loadedOffset + pageSize) {
-                // swapquery
-                if (loading) {
+                // swap
+                if (semaphore.availablePermits() == 0) {
                     if (listener != null)
                         listener.showBusy();
-                    while (loading) {
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            break;
-                        }
+                    try {
+                        semaphore.acquire();
+                    } catch (InterruptedException e) {
+                        throw new RuntimeException(e);
                     }
                     if (listener != null)
                         listener.done();
+                    semaphore.release();
                 }
                 if (nextListChunk != null) {
                     List<Object> temp = listChunk;
@@ -124,6 +123,7 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
                 try {
                     offset = (index / pageSize) * pageSize;
                     listChunk = getChunk(offset);
+                    // add cancel support
                     if (listChunk.size() != 1000 && realSize == -1)
                         realSize = offset + listChunk.size();
                 } catch (ApplicationException e) {
@@ -145,12 +145,12 @@ public abstract class AbstractBiobankListProxy implements List<Object>,
                 @Override
                 public void run() {
                     try {
-                        loading = true;
+                        semaphore.acquire();
                         nextListChunk = getChunk(nextOffset);
                         if (nextListChunk.size() != 1000 && realSize == -1)
                             realSize = nextOffset + nextListChunk.size();
-                        loading = false;
-                    } catch (ApplicationException e) {
+                        semaphore.release();
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }

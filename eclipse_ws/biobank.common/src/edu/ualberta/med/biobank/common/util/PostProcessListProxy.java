@@ -13,6 +13,7 @@ public class PostProcessListProxy extends HQLCriteriaListProxy {
         HQLCriteria criteria, AbstractRowPostProcess pp) {
         super(appService, criteria);
         this.pp = pp;
+        init();
     }
 
     @Override

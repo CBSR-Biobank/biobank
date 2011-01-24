@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.QueryCommand;
+import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
@@ -31,9 +32,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
         throws Exception;
 
     public void logActivity(Log log) throws Exception;
-
-    public List<Object> launchReport(BiobankReport report)
-        throws ApplicationException;
 
     public void modifyPassword(String oldPassword, String newPassword)
         throws ApplicationException;
@@ -67,4 +65,10 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public List<ProtectionGroupPrivilege> getSecurityFeatures()
         throws ApplicationException;
+
+    public QueryHandle createQuery(QueryCommand qc) throws Exception;
+
+    public List<Object> startQuery(QueryHandle qh) throws Exception;
+
+    public void stopQuery(QueryHandle qh) throws Exception;
 }

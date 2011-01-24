@@ -1247,13 +1247,6 @@
                   tooltip="Search Panel">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.logging"
-                  icon="icons/table_row_delete.png"
-                  label="Logging"
-                  style="push"
-                  tooltip="Logging">
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
@@ -1463,18 +1456,6 @@
                standalone="false"
                visible="false">
          </view>
-         <view
-               closeable="true"
-               id="edu.ualberta.med.biobank.views.LoggingView"
-               minimized="false"
-               moveable="true"
-               ratio="0.3"
-               relationship="stack"
-               relative="edu.ualberta.med.biobank.views.SessionsView"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.reports">
@@ -1498,6 +1479,18 @@
                ratio="0.20"
                relationship="stack"
                relative="edu.ualberta.med.biobank.views.ReportsView"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.LoggingView"
+               minimized="false"
+               moveable="false"
+               ratio="0.20"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.AdvancedReportsView"
                showTitle="false"
                standalone="false"
                visible="true">
