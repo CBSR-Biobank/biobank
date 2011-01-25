@@ -19,7 +19,6 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -29,6 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -40,7 +40,6 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -49,6 +48,7 @@ import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
 import edu.ualberta.med.biobank.test.internal.PvSourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
+import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -155,6 +155,7 @@ public class TestPatientVisit extends TestDatabase {
 
         visit = new PatientVisitWrapper(appService);
         Assert.assertEquals(null, visit.getPatient());
+        Assert.assertEquals(null, visit.getActivityStatus());
     }
 
     @Test
@@ -167,9 +168,9 @@ public class TestPatientVisit extends TestDatabase {
         Calendar cal = Calendar.getInstance();
         cal.setTime(date);
         cal.add(Calendar.DATE, 1);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(
-            site, clinic, ShippingMethodWrapper.getShippingMethods(appService)
-                .get(0), patient);
+        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0),
+            patient);
 
         PatientVisitWrapper visit2 = PatientVisitHelper.addPatientVisit(
             patient, shipment2, cal.getTime(), date);
@@ -590,7 +591,7 @@ public class TestPatientVisit extends TestDatabase {
     }
 
     @Test
-    public void testCheckHasShipment() {
+    public void testCheckHasShipment() throws Exception {
         // check valid case
         PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(patient,
             shipment, TestCommon.getUniqueDate(r), Utils.getRandomDate());
