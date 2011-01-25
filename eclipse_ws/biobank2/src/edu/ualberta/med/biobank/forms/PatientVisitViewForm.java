@@ -33,6 +33,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private BiobankText studyLabel;
 
+    private BiobankText activityStatusLabel;
+
     private AliquotListInfoTable aliquotWidget;
 
     private List<FormPvCustomInfo> pvCustomInfoList;
@@ -90,6 +92,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Activity Status");
         clinicLabel = createReadOnlyLabelledField(client, SWT.NONE, "Clinic");
         shipmentLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Shipment");
@@ -145,6 +149,8 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private void setPatientVisitValues() {
         setTextValue(siteLabel, patientVisit.getShipment().getSite().getName());
         setTextValue(studyLabel, patientVisit.getPatient().getStudy().getName());
+        setTextValue(activityStatusLabel, patientVisit.getActivityStatus()
+            .getName());
         setTextValue(clinicLabel, patientVisit.getShipment() == null ? ""
             : patientVisit.getShipment().getClinic().getName());
         setTextValue(shipmentLabel, patientVisit.getShipment().toString());

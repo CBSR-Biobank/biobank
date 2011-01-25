@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ShipmentPatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
@@ -30,6 +31,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     private static final String PROP_KEY_CSP = "shipmentPatient";
+    private static final String PROP_KEY_ACTIVITY_STATUS = "activityStatus";
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
@@ -72,7 +74,32 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     protected String[] getPropertyChangeNames() {
         return new String[] { "patient", "dateProcessed", "dateDrawn",
             "comment", "pvAttrCollection", "aliquotCollection", "shipment",
-            "pvSourceVesselCollection" };
+            "pvSourceVesselCollection", PROP_KEY_ACTIVITY_STATUS };
+    }
+
+    public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
+            .get(PROP_KEY_ACTIVITY_STATUS);
+        if (activity == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            activity = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put(PROP_KEY_ACTIVITY_STATUS, activity);
+        }
+        return activity;
+    }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        propertiesMap.put(PROP_KEY_ACTIVITY_STATUS, activityStatus);
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
+        propertyChangeSupport.firePropertyChange(PROP_KEY_ACTIVITY_STATUS,
+            oldActivityStatus, activityStatus);
     }
 
     public Date getDateProcessed() {
