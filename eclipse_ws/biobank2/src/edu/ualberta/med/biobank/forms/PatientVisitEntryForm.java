@@ -95,7 +95,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     private ComboViewer activityStatusComboViewer;
 
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue(adapter instanceof PatientVisitAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -112,9 +112,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         String tabName;
         if (patientVisit.isNew()) {
             tabName = "New Patient Visit";
+            patientVisit.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         } else {
             tabName = "Visit " + patientVisit.getFormattedDateProcessed();
         }
+
         setPartName(tabName);
     }
 
