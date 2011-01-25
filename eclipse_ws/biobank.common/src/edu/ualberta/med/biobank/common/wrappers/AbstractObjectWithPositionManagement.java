@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class AbstractObjectWithPositionManagement<T extends AbstractPosition> {
+public abstract class AbstractObjectWithPositionManagement<T extends AbstractPosition, E extends ModelWrapper<?>> {
     protected RowColPos rowColPosition;
     private AbstractPositionWrapper<T> positionWrapper;
 
@@ -14,6 +14,12 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     protected boolean nullPositionSet = false;
 
     private ContainerWrapper parent;
+
+    private E objectAtPosition;
+
+    protected AbstractObjectWithPositionManagement(E objectAtPosition) {
+        this.objectAtPosition = objectAtPosition;
+    }
 
     protected void persist() {
         boolean origPositionSet = (!nullPositionSet && (rowColPosition != null));
@@ -79,7 +85,11 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
     }
 
     public ContainerWrapper getTop() {
-        ContainerWrapper top = getParent();
+        ContainerWrapper top;
+        if (objectAtPosition instanceof ContainerWrapper)
+            top = (ContainerWrapper) objectAtPosition;
+        else
+            top = getParent();
 
         while (top != null && top.getParent() != null) {
             top = top.getParent();
@@ -119,4 +129,5 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
 
     protected abstract AbstractPositionWrapper<T> getSpecificPositionWrapper(
         boolean initIfNoPosition);
+
 }

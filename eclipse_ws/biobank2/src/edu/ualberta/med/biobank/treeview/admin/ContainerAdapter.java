@@ -64,9 +64,12 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public String getTooltipText() {
         ContainerWrapper container = getContainer();
-        SiteWrapper site = container.getSite();
-        if (site != null) {
-            return site.getNameShort() + " - " + getTooltipText("Container");
+        if (container != null) {
+            SiteWrapper site = container.getSite();
+            if (site != null) {
+                return site.getNameShort() + " - "
+                    + getTooltipText("Container");
+            }
         }
         return getTooltipText("Container");
     }
