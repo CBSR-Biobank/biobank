@@ -42,32 +42,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     public PatientVisitWrapper(WritableApplicationService appService,
         PatientVisit wrappedObject) {
         super(appService, wrappedObject);
-
-        // FIXME temporary fix until activity status fully implemented in GUI
-        try {
-            if (appService != null) {
-                wrappedObject.setActivityStatus(ActivityStatusWrapper
-                    .getActiveActivityStatus(appService).getWrappedObject());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // FIXME temp fix above
     }
 
     public PatientVisitWrapper(WritableApplicationService appService) {
         super(appService);
-
-        // FIXME temporary fix until activity status fully implemented in GUI
-        try {
-            if (appService != null) {
-                wrappedObject.setActivityStatus(ActivityStatusWrapper
-                    .getActiveActivityStatus(appService).getWrappedObject());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        // FIXME temp fix above
     }
 
     @Override
