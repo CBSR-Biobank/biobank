@@ -43,8 +43,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
         // FIXME temporary fix until activity status fully implemented in GUI
         try {
-            wrappedObject.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService).getWrappedObject());
+            if (appService != null) {
+                wrappedObject.setActivityStatus(ActivityStatusWrapper
+                    .getActiveActivityStatus(appService).getWrappedObject());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -56,8 +58,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
 
         // FIXME temporary fix until activity status fully implemented in GUI
         try {
-            wrappedObject.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService).getWrappedObject());
+            if (appService != null) {
+                wrappedObject.setActivityStatus(ActivityStatusWrapper
+                    .getActiveActivityStatus(appService).getWrappedObject());
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
