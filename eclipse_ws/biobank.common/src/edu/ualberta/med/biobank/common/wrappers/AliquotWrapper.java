@@ -26,7 +26,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
-    private AbstractObjectWithPositionManagement<AliquotPosition> objectWithPositionManagement;
+    private AbstractObjectWithPositionManagement<AliquotPosition, AliquotWrapper> objectWithPositionManagement;
 
     public AliquotWrapper(WritableApplicationService appService,
         Aliquot wrappedObject) {
@@ -40,7 +40,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     private void initManagement() {
-        objectWithPositionManagement = new AbstractObjectWithPositionManagement<AliquotPosition>() {
+        objectWithPositionManagement = new AbstractObjectWithPositionManagement<AliquotPosition, AliquotWrapper>(
+            this) {
 
             @Override
             protected AbstractPositionWrapper<AliquotPosition> getSpecificPositionWrapper(

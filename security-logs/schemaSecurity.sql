@@ -1,9 +1,8 @@
-
--- MySQL dump 10.13  Distrib 5.1.41, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.1.49, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: biobank2
 -- ------------------------------------------------------
--- Server version	5.1.41-3ubuntu12.8
+-- Server version	5.1.49-1ubuntu8.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -441,7 +440,7 @@ CREATE TABLE `csm_role_privilege` (
   KEY `idx_ROLE_ID` (`ROLE_ID`),
   CONSTRAINT `FK_PRIVILEGE_ROLE` FOREIGN KEY (`PRIVILEGE_ID`) REFERENCES `csm_privilege` (`PRIVILEGE_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=23 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=25 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -453,8 +452,9 @@ LOCK TABLES `csm_role_privilege` WRITE;
 INSERT INTO `csm_role_privilege` VALUES (19,8,1);
 INSERT INTO `csm_role_privilege` VALUES (16,7,3);
 INSERT INTO `csm_role_privilege` VALUES (18,8,3);
+INSERT INTO `csm_role_privilege` VALUES (23,9,3);
 INSERT INTO `csm_role_privilege` VALUES (20,8,5);
-INSERT INTO `csm_role_privilege` VALUES (22,9,5);
+INSERT INTO `csm_role_privilege` VALUES (24,9,5);
 INSERT INTO `csm_role_privilege` VALUES (17,8,6);
 /*!40000 ALTER TABLE `csm_role_privilege` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -640,4 +640,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-01-13 11:02:00
+-- Dump completed on 2011-01-25 11:50:08
