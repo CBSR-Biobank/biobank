@@ -14,6 +14,7 @@ import org.apache.log4j.PropertyConfigurator;
 
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
+import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
 public class BioBankPeerBuilder {
 
@@ -28,7 +29,6 @@ public class BioBankPeerBuilder {
 
     Map<String, ModelClass> modelClasses;
 
-    @SuppressWarnings("unused")
     private AppArgs appArgs = null;
 
     private BioBankPeerBuilder() {
@@ -77,8 +77,17 @@ public class BioBankPeerBuilder {
             f = new File(appArgs.outDir + "/" + mc.getName() + "Peer.java");
             FileOutputStream fos = new FileOutputStream(f);
 
-            StringBuffer sb = new StringBuffer("package " + PACKAGE + ";\n\n");
-            sb.append("public class " + mc.getName() + " {\n");
+            StringBuffer sb = new StringBuffer("package ").append(PACKAGE)
+                .append(";\n\n");
+            sb.append("import edu.ualberta.med.biobank.common.util.TypeReference;\n\n");
+            sb.append("public class ").append(mc.getName()).append("Peer {\n");
+
+            for (String attr : mc.getAttrMap().keySet()) {
+                sb.append("   public static final String ")
+                    .append(CamelCase.toTitleCase(attr)).append(" = \"")
+                    .append(attr).append("\";\n\n");
+            }
+
             sb.append("}\n");
             fos.write(sb.toString().getBytes());
         }

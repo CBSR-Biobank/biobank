@@ -107,14 +107,17 @@ public class ModelUmlParser {
         }
     }
 
-    private void addLogicalModelClass(String name, String xmiId) {
+    private ModelClass addLogicalModelClass(String name, String xmiId) {
         ModelClass modelClass = new ModelClass(name);
         logicalModelClassMap.put(name, modelClass);
         logicalModelXmiIdClassMap.put(xmiId, modelClass);
         LOGGER.debug("LM class/" + name);
+        return modelClass;
     }
 
     private void getLmClasses(Document doc) throws Exception {
+        getLmClassAttributeTypes(doc);
+
         XPath xpath = XPathFactory.newInstance().newXPath();
 
         // path to get all logical model class names
@@ -130,13 +133,14 @@ public class ModelUmlParser {
             Node node = nodes.item(i);
             NamedNodeMap attrs = node.getAttributes();
 
-            addLogicalModelClass(attrs.getNamedItem("name").getNodeValue(),
-                attrs.getNamedItem("xmi.id").getNodeValue());
+            ModelClass mc = addLogicalModelClass(attrs.getNamedItem("name")
+                .getNodeValue(), attrs.getNamedItem("xmi.id").getNodeValue());
+
+            getLmClassAttributes(node, mc);
         }
 
-        getLmClassGeneralizations(doc);
-        getLmClassAttributes(doc);
         getLmClassAssociations(doc);
+        getLmClassGeneralizations(doc);
     }
 
     private void getLmClassGeneralizations(Document doc) throws Exception {
@@ -151,38 +155,30 @@ public class ModelUmlParser {
                 + "/Namespace.ownedElement/Package/Namespace.ownedElement"
                 + "/Package/Namespace.ownedElement/Package"
                 + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                + "/Package/Namespace.ownedElement/Generalization/@xmi.id");
+                + "/Package/Namespace.ownedElement/Generalization");
 
         nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0, n = nodes.getLength(); i < n; ++i) {
-            String xmiId = nodes.item(i).getNodeValue();
+            Node node = nodes.item(i);
+            NamedNodeMap attrs = node.getAttributes();
+
+            String xmiId = attrs.getNamedItem("xmi.id").getNodeValue();
 
             XPathExpression childExpr = xpath
-                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Package/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Package/Namespace.ownedElement/Generalization[@xmi.id='"
-                    + xmiId + "']/Generalization.child/Class/@xmi.idref");
+                .compile("Generalization.child/Class/@xmi.idref");
 
-            NodeList childNodes = (NodeList) childExpr.evaluate(doc,
+            NodeList childNodes = (NodeList) childExpr.evaluate(node,
                 XPathConstants.NODESET);
             if (childNodes.getLength() != 1) {
-                throw new Exception("Generalization has more than one child");
+                throw new Exception(
+                    "Generalization does not have only one child");
             }
             String childXmiIdRef = childNodes.item(0).getNodeValue();
 
             XPathExpression parentExpr = xpath
-                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Package/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Package/Namespace.ownedElement/Generalization[@xmi.id='"
-                    + xmiId + "']/Generalization.parent/Class/@xmi.idref");
+                .compile("Generalization.parent/Class/@xmi.idref");
 
-            NodeList parentNodes = (NodeList) parentExpr.evaluate(doc,
+            NodeList parentNodes = (NodeList) parentExpr.evaluate(node,
                 XPathConstants.NODESET);
             if (parentNodes.getLength() != 1) {
                 throw new Exception("Generalization has more than one parent");
@@ -247,73 +243,43 @@ public class ModelUmlParser {
         }
     }
 
-    private void getLmClassAttributes(Document doc) throws Exception {
-        getLmClassAttributeTypes(doc);
-
-        XPath xpath = XPathFactory.newInstance().newXPath();
-        XPathExpression expr;
-        NodeList nodes;
-
-        for (ModelClass modelClass : logicalModelClassMap.values()) {
-            // path to get all logical model class attributes
-            expr = xpath
-                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Package/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Package/Namespace.ownedElement/Class[@name='"
-                    + modelClass.getName()
-                    + "']/Classifier.feature/Attribute/@name");
-
-            nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-            for (int i = 0, n = nodes.getLength(); i < n; ++i) {
-                String classAttrName = nodes.item(i).getNodeValue();
-                modelClass.getAttrMap().put(classAttrName, "UNKNOWN");
-                LOGGER.debug("LM class/" + modelClass.getName() + " attribute/"
-                    + classAttrName);
-            }
+    private void getLmClassAttributes(Node node, ModelClass modelClass)
+        throws Exception {
+        if (logicalModelDataTypeMap.size() == 0) {
+            throw new Exception("logical model data types not parsed yet");
         }
 
-        for (ModelClass modelClass : logicalModelClassMap.values()) {
-            for (String classAttrName : modelClass.getAttrMap().keySet()) {
-                // path to get all logical model class attribute types
-                expr = xpath
-                    .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement"
-                        + "/Package/Namespace.ownedElement"
-                        + "/Package[@name='Logical Model']"
-                        + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                        + "/Package/Namespace.ownedElement/Package"
-                        + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                        + "/Package/Namespace.ownedElement/Class[@name='"
-                        + modelClass.getName()
-                        + "']/Classifier.feature/Attribute[@name='"
-                        + classAttrName
-                        + "']/StructuralFeature.type/Class/@xmi.idref");
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPathExpression expr = xpath.compile("Classifier.feature/Attribute");
+        NodeList nodes = (NodeList) expr.evaluate(node, XPathConstants.NODESET);
 
-                nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-                for (int i = 0, n = nodes.getLength(); i < n; ++i) {
-                    String xmiIdRef = nodes.item(i).getNodeValue();
-                    if (modelClass.getAttrMap().get(classAttrName) == null) {
-                        throw new Exception("class " + modelClass.getName()
-                            + " does not have attribute " + classAttrName);
-                    }
+        for (int i = 0, n = nodes.getLength(); i < n; ++i) {
+            Node attrNode = nodes.item(i);
+            NamedNodeMap attrs = attrNode.getAttributes();
+            String classAttrName = attrs.getNamedItem("name").getNodeValue();
 
-                    String classAttrType = logicalModelDataTypeMap
-                        .get(xmiIdRef);
+            // path to get model class attribute type
+            expr = xpath.compile("StructuralFeature.type/Class/@xmi.idref");
+            NodeList typeNodes = (NodeList) expr.evaluate(attrNode,
+                XPathConstants.NODESET);
 
-                    if (classAttrType == null) {
-                        throw new Exception("class " + modelClass.getName()
-                            + " does not have an attribute type for attribute"
-                            + classAttrName);
-                    }
-
-                    modelClass.getAttrMap().put(classAttrName, classAttrType);
-                    LOGGER.debug("LM class/" + modelClass.getName()
-                        + " attribute/" + classAttrName + " type/"
-                        + classAttrType);
-                }
+            if (typeNodes.getLength() != 1) {
+                throw new Exception(
+                    "Attribute does not have only one type child");
             }
+
+            String xmiIdRef = typeNodes.item(0).getNodeValue();
+            String classAttrType = logicalModelDataTypeMap.get(xmiIdRef);
+
+            if (classAttrType == null) {
+                throw new Exception(
+                    "logical model does not have attribute type for xmi id"
+                        + xmiIdRef);
+            }
+
+            modelClass.getAttrMap().put(classAttrName, classAttrType);
+            LOGGER.debug("LM class/" + modelClass.getName() + " attribute/"
+                + classAttrName + " type/" + classAttrType);
         }
     }
 
@@ -351,54 +317,39 @@ public class ModelUmlParser {
                 + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
                 + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
                 + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                + "/Association/@xmi.id");
+                + "/Association");
 
         NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0, n = nodes.getLength(); i < n; ++i) {
+            Node node = nodes.item(i);
+            NamedNodeMap attrs = node.getAttributes();
 
-            String assocXmiId = nodes.item(i).getNodeValue();
+            String assocXmiId = attrs.getNamedItem("xmi.id").getNodeValue();
 
             XPathExpression assocEndExpr = xpath
-                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Association[@xmi.id='"
-                    + assocXmiId
-                    + "']/Association.connection/AssociationEnd");
+                .compile("Association.connection/AssociationEnd");
 
-            NodeList assocEndNodes = (NodeList) assocEndExpr.evaluate(doc,
+            NodeList assocEndNodes = (NodeList) assocEndExpr.evaluate(node,
                 XPathConstants.NODESET);
 
             List<ClassAssociation> classAssocs = new ArrayList<ClassAssociation>();
 
             for (int i1 = 0, n1 = assocEndNodes.getLength(); i1 < n1; ++i1) {
-                Node node = assocEndNodes.item(i1);
-                NamedNodeMap attrs = node.getAttributes();
+                Node assocEndNode = assocEndNodes.item(i1);
+                NamedNodeMap assocendNodeAttrs = node.getAttributes();
 
                 String assocName = null;
-                Node nameNode = attrs.getNamedItem("name");
+                Node nameNode = assocendNodeAttrs.getNamedItem("name");
                 if (nameNode != null) {
                     assocName = nameNode.getNodeValue();
                 }
 
                 String endXmiId = attrs.getNamedItem("xmi.id").getNodeValue();
                 XPathExpression classExpr = xpath
-                    .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                        + "/Namespace.ownedElement/Package[@name='Logical Model']"
-                        + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                        + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                        + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                        + "/Association[@xmi.id='"
-                        + assocXmiId
-                        + "']/Association.connection/AssociationEnd[@xmi.id='"
-                        + endXmiId
-                        + "']"
-                        + "/AssociationEnd.participant/Class/@xmi.idref");
+                    .compile("AssociationEnd.participant/Class/@xmi.idref");
 
-                NodeList assocClassNodes = (NodeList) classExpr.evaluate(doc,
-                    XPathConstants.NODESET);
+                NodeList assocClassNodes = (NodeList) classExpr.evaluate(
+                    assocEndNode, XPathConstants.NODESET);
                 if (assocClassNodes.getLength() != 1) {
                     throw new Exception(
                         "association end has more than one class node: assoc/"
@@ -417,7 +368,7 @@ public class ModelUmlParser {
                 }
 
                 classAssocs.add(new ClassAssociation(modelClass, assocName,
-                    getLmMultiplicity(doc, assocXmiId, endXmiId)));
+                    getLmMultiplicity(assocEndNode, assocXmiId, endXmiId)));
             }
 
             if (classAssocs.size() != 2) {
@@ -442,24 +393,15 @@ public class ModelUmlParser {
         }
     }
 
-    private String getLmMultiplicity(Document doc, String assocXmiId,
+    private String getLmMultiplicity(Node node, String assocXmiId,
         String endXmiId) throws Exception {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
         XPathExpression multExpr = xpath
-            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package[@name='Logical Model']"
-                + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                + "/Association[@xmi.id='"
-                + assocXmiId
-                + "']/Association.connection/AssociationEnd[@xmi.id='"
-                + endXmiId
-                + "']"
-                + "/AssociationEnd.multiplicity/Multiplicity/Multiplicity.range/MultiplicityRange");
+            .compile("AssociationEnd.multiplicity/Multiplicity"
+                + "/Multiplicity.range/MultiplicityRange");
 
-        NodeList assocMultNodes = (NodeList) multExpr.evaluate(doc,
+        NodeList assocMultNodes = (NodeList) multExpr.evaluate(node,
             XPathConstants.NODESET);
         if (assocMultNodes.getLength() != 1) {
             throw new Exception(
@@ -570,44 +512,42 @@ public class ModelUmlParser {
         XPathExpression expr = xpath
             .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
                 + "/Namespace.ownedElement/Package[@name='Data Model']"
-                + "/Namespace.ownedElement/Class/@name");
+                + "/Namespace.ownedElement/Class");
 
         NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
         for (int i = 0, n = nodes.getLength(); i < n; i++) {
-            ModelClass mc = new ModelClass(nodes.item(i).getNodeValue());
+            NamedNodeMap attrs = nodes.item(i).getAttributes();
+
+            ModelClass mc = new ModelClass(attrs.getNamedItem("name")
+                .getNodeValue());
             dataModelClassMap.put(mc.getName(), mc);
-            getDmTableAttributes(doc, mc);
+            getDmTableAttributes(nodes.item(i), mc);
         }
     }
 
-    private void getDmTableAttributes(Document doc, ModelClass mc)
+    private void getDmTableAttributes(Node node, ModelClass mc)
         throws Exception {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
         // path to get all logical model class names
-        XPathExpression expr = xpath
-            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                + "/Namespace.ownedElement/Package[@name='Data Model']"
-                + "/Namespace.ownedElement/Class[@name='" + mc.getName()
-                + "']/Classifier.feature/Attribute/@name");
+        XPathExpression expr = xpath.compile("Classifier.feature/Attribute");
 
-        NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+        NodeList attrNodes = (NodeList) expr.evaluate(node,
+            XPathConstants.NODESET);
 
-        for (int i = 0, n = nodes.getLength(); i < n; ++i) {
-            String attrName = nodes.item(i).getNodeValue();
+        for (int i = 0, n = attrNodes.getLength(); i < n; ++i) {
+            Node attrNode = attrNodes.item(i);
+            NamedNodeMap attrs = node.getAttributes();
+
+            String attrName = attrs.getNamedItem("name").getNodeValue();
 
             // path to get all logical model class names
             XPathExpression dataTypeExpr = xpath
-                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
-                    + "/Namespace.ownedElement/Package[@name='Data Model']"
-                    + "/Namespace.ownedElement/Class[@name='"
-                    + mc.getName()
-                    + "']/Classifier.feature/Attribute[@name='"
-                    + attrName
-                    + "']/StructuralFeature.type/DataType/@xmi.idref");
+                .compile("StructuralFeature.type/DataType/@xmi.idref");
 
-            NodeList typeNodes = (NodeList) dataTypeExpr.evaluate(doc,
+            NodeList typeNodes = (NodeList) dataTypeExpr.evaluate(attrNode,
                 XPathConstants.NODESET);
+
             int typeNodesCount = typeNodes.getLength();
             if (typeNodesCount != 1) {
                 throw new Exception(

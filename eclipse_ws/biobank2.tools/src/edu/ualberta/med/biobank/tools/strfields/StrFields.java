@@ -18,6 +18,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
+import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
 public class StrFields {
 
@@ -59,8 +60,8 @@ public class StrFields {
             if (appArgs.verbose) {
                 for (String className : ModelUmlParser.getInstance()
                     .getDmTableSet()) {
-                    Map<String, String> attrMap = ModelUmlParser
-                        .getInstance().getDmTableAttrMap(className);
+                    Map<String, String> attrMap = ModelUmlParser.getInstance()
+                        .getDmTableAttrMap(className);
                     for (String attrName : attrMap.keySet()) {
                         String type = attrMap.get(attrName);
                         if (!type.startsWith("VARCHAR")
@@ -119,7 +120,7 @@ public class StrFields {
     private void updateHbmFile(String hbmFileName) throws Exception {
         String hbmFilePath = appArgs.hbmDir + "/" + hbmFileName;
         String className = hbmFileName.replace(HBM_FILE_EXTENSION, "");
-        String tableName = toTitleCase(className);
+        String tableName = CamelCase.toTitleCase(className);
 
         Map<String, String> attrMap = ModelUmlParser.getInstance()
             .getDmTableAttrMap(tableName);
@@ -132,8 +133,8 @@ public class StrFields {
                 Matcher varcharMatcher = VARCHAR_LEN.matcher(attrType);
 
                 if (varcharMatcher.find()) {
-                    attrLengthMap.put(attrName, Integer.valueOf(varcharMatcher
-                        .group(1)));
+                    attrLengthMap.put(attrName,
+                        Integer.valueOf(varcharMatcher.group(1)));
                 }
             } else if (attrType.startsWith("TEXT")) {
                 attrLengthMap.put(attrName, 500);
@@ -148,8 +149,7 @@ public class StrFields {
         String newLine = System.getProperty("line.separator");
         StringBuffer sb = new StringBuffer();
 
-        for (String className : ModelUmlParser.getInstance()
-            .getDmTableSet()) {
+        for (String className : ModelUmlParser.getInstance().getDmTableSet()) {
             Map<String, String> attrMap = ModelUmlParser.getInstance()
                 .getDmTableAttrMap(className);
             for (String attrName : attrMap.keySet()) {
@@ -163,10 +163,9 @@ public class StrFields {
                     if (varcharMatcher.find()) {
                         attrType = varcharMatcher.group(1);
 
-                        sb
-                            .append("\t\taMap.put(\"edu.ualberta.med.biobank.model."
-                                + toCamelCase(className + "." + attrName, true)
-                                + "\", " + attrType + ");");
+                        sb.append("\t\taMap.put(\"edu.ualberta.med.biobank.model."
+                            + CamelCase.toCamelCase(className + "." + attrName,
+                                true) + "\", " + attrType + ");");
                         sb.append(newLine);
                     }
                 }
@@ -234,42 +233,6 @@ public class StrFields {
         appArgs.template = args[2];
 
         return appArgs;
-    }
-
-    private String toCamelCase(String str, boolean firstCharUpperCase) {
-        StringBuffer sb = new StringBuffer();
-        String[] splitStr = str.split("_");
-        boolean firstTime = true;
-        for (String temp : splitStr) {
-            if (firstTime && !firstCharUpperCase) {
-                sb.append(temp.toLowerCase());
-                firstTime = false;
-            } else {
-                sb.append(Character.toUpperCase(temp.charAt(0)));
-                sb.append(temp.substring(1).toLowerCase());
-            }
-        }
-        return sb.toString();
-    }
-
-    private String toTitleCase(String str) {
-        StringBuffer sb = new StringBuffer();
-        for (int i = 0, n = str.length(); i < n; ++i) {
-            if (i == 0) {
-                sb.append(str.charAt(0));
-                continue;
-            }
-
-            char ch = str.charAt(i);
-
-            if (Character.isUpperCase(ch)) {
-                sb.append("_" + ch);
-            } else {
-                sb.append(Character.toUpperCase(ch));
-            }
-        }
-
-        return sb.toString();
     }
 }
 
