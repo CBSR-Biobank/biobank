@@ -336,7 +336,7 @@ public class ModelUmlParser {
 
             for (int i1 = 0, n1 = assocEndNodes.getLength(); i1 < n1; ++i1) {
                 Node assocEndNode = assocEndNodes.item(i1);
-                NamedNodeMap assocendNodeAttrs = node.getAttributes();
+                NamedNodeMap assocendNodeAttrs = assocEndNode.getAttributes();
 
                 String assocName = null;
                 Node nameNode = assocendNodeAttrs.getNamedItem("name");

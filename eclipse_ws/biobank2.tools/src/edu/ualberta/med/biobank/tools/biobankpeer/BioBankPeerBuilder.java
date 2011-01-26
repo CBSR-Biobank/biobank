@@ -88,6 +88,12 @@ public class BioBankPeerBuilder {
                     .append(attr).append("\";\n\n");
             }
 
+            for (String assoc : mc.getAssocMap().keySet()) {
+                sb.append("   public static final String ")
+                    .append(CamelCase.toTitleCase(assoc)).append(" = \"")
+                    .append(assoc).append("\";\n\n");
+            }
+
             sb.append("}\n");
             fos.write(sb.toString().getBytes());
         }
