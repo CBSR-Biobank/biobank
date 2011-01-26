@@ -79,19 +79,43 @@ public class BioBankPeerBuilder {
 
             StringBuffer sb = new StringBuffer("package ").append(PACKAGE)
                 .append(";\n\n");
-            sb.append("import edu.ualberta.med.biobank.common.util.TypeReference;\n\n");
-            sb.append("public class ").append(mc.getName()).append("Peer {\n");
+            sb.append("import edu.ualberta.med.biobank.common.util.TypeReference;\n");
+            sb.append("import edu.ualberta.med.biobank.common.util.Property;\n\n");
+            sb.append("public class ").append(mc.getName()).append("Peer ");
 
+            ModelClass ec = mc.getExtendsClass();
+
+            if (ec != null) {
+                sb.append(" extends ").append(ec.getName()).append("Peer ");
+            }
+
+            sb.append("{\n");
+
+            // Member property names
             for (String attr : mc.getAttrMap().keySet()) {
                 sb.append("   public static final String ")
                     .append(CamelCase.toTitleCase(attr)).append(" = \"")
                     .append(attr).append("\";\n\n");
             }
 
+            // Associated member property names
             for (String assoc : mc.getAssocMap().keySet()) {
                 sb.append("   public static final String ")
                     .append(CamelCase.toTitleCase(assoc)).append(" = \"")
                     .append(assoc).append("\";\n\n");
+            }
+
+            // Member property fields
+            for (String attr : mc.getAttrMap().keySet()) {
+                sb.append("   //public static final Property<")
+                    .append(mc.getAttrMap().get(attr)).append("> PROP_")
+                    .append(CamelCase.toTitleCase(attr))
+                    .append(" = Property.create(\"").append(attr)
+                    .append("\", new TypeReference<")
+                    .append(mc.getAttrMap().get(attr)).append(">());\n\n");
+            }
+
+            for (String assoc : mc.getAssocMap().keySet()) {
             }
 
             sb.append("}\n");
