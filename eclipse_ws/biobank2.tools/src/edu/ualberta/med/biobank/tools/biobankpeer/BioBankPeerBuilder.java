@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.logicalmodel;
+package edu.ualberta.med.biobank.tools.biobankpeer;
 
 import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.Option;
@@ -9,34 +9,34 @@ import java.net.URISyntaxException;
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
-import edu.ualberta.med.biobank.tools.ModelUmlParser;
+import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 
-public class LmExtractor {
+public class BioBankPeerBuilder {
 
     private static String USAGE = "Usage: lmextractor UMLFILE OUTDIR";
 
-    private static final Logger LOGGER = Logger.getLogger(LmExtractor.class
-        .getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(BioBankPeerBuilder.class.getName());
 
-    private static LmExtractor instance = null;
+    private static BioBankPeerBuilder instance = null;
 
     @SuppressWarnings("unused")
     private AppArgs appArgs = null;
 
-    private LmExtractor() {
+    private BioBankPeerBuilder() {
 
     }
 
-    public static LmExtractor getInstance() {
+    public static BioBankPeerBuilder getInstance() {
         if (instance == null) {
-            instance = new LmExtractor();
+            instance = new BioBankPeerBuilder();
         }
         return instance;
     }
 
     public static void main(String argv[]) {
         try {
-            LmExtractor.getInstance().doWork(parseCommandLine(argv));
+            BioBankPeerBuilder.getInstance().doWork(parseCommandLine(argv));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -45,8 +45,8 @@ public class LmExtractor {
     public void doWork(AppArgs appArgs) {
         this.appArgs = appArgs;
 
-        LOGGER.info("  UML file: " + appArgs.modelFileName);
-        LOGGER.info("  output dir:  " + appArgs.outDir);
+        LOGGER.info("UML file: " + appArgs.modelFileName);
+        LOGGER.info("output dir:  " + appArgs.outDir);
 
         try {
             ModelUmlParser.getInstance().geLogicalModel(appArgs.modelFileName);

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools;
+package edu.ualberta.med.biobank.tools.modelumlparser;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,47 +26,6 @@ public class ModelUmlParser {
 
     private static final Logger LOGGER = Logger.getLogger(ModelUmlParser.class
         .getName());
-
-    private class ModelClass {
-        private String name;
-
-        private ModelClass extendsClass;
-
-        private Map<String, String> attrMap;
-
-        private Map<String, ClassAssociation> assocMap;
-
-        public ModelClass(String name) {
-            this.name = name;
-            extendsClass = null;
-            attrMap = new HashMap<String, String>();
-            assocMap = new HashMap<String, ClassAssociation>();
-        }
-    }
-
-    private class ClassAssociation {
-        private ModelClass toClass;
-        private String assocName;
-        private String multiplicity;
-
-        public ClassAssociation(ModelClass toClass, String assocName,
-            String multiplicity) {
-            this.toClass = toClass;
-            this.assocName = assocName;
-            this.multiplicity = multiplicity;
-        }
-    }
-
-    @SuppressWarnings("unused")
-    private class Generalization {
-        ModelClass parentClass;
-        ModelClass childClass;
-
-        Generalization(ModelClass parentClass, ModelClass childClass) {
-            this.parentClass = parentClass;
-            this.childClass = childClass;
-        }
-    }
 
     private static ModelUmlParser instance = null;
 
@@ -102,7 +61,8 @@ public class ModelUmlParser {
         return instance;
     }
 
-    public void geLogicalModel(String modelFileName) throws Exception {
+    public Map<String, ModelClass> geLogicalModel(String modelFileName)
+        throws Exception {
         DocumentBuilderFactory domFactory = DocumentBuilderFactory
             .newInstance();
         domFactory.setNamespaceAware(false);
@@ -110,28 +70,37 @@ public class ModelUmlParser {
         Document doc = builder.parse(modelFileName);
         getLmClasses(doc);
 
+        // displayModelInLogger();
+
+        return logicalModelClassMap;
+    }
+
+    @SuppressWarnings("unused")
+    private void displayModelInLogger() {
         for (ModelClass modelClass : logicalModelClassMap.values()) {
 
-            if (modelClass.extendsClass != null) {
-                LOGGER.debug("class " + modelClass.name + " extends "
-                    + modelClass.extendsClass.name + " {");
+            if (modelClass.getExtendsClass() != null) {
+                LOGGER.debug("class " + modelClass.getName() + " extends "
+                    + modelClass.getExtendsClass().getName() + " {");
             } else {
-                LOGGER.debug("class " + modelClass.name + "{");
+                LOGGER.debug("class " + modelClass.getName() + "{");
             }
-            for (String attr : modelClass.attrMap.keySet()) {
-                LOGGER.debug("   " + modelClass.attrMap.get(attr) + " " + attr
-                    + ";");
+            for (String attr : modelClass.getAttrMap().keySet()) {
+                LOGGER.debug("   " + modelClass.getAttrMap().get(attr) + " "
+                    + attr + ";");
             }
-            for (String assocName : modelClass.assocMap.keySet()) {
-                ClassAssociation assoc = modelClass.assocMap.get(assocName);
+            for (String assocName : modelClass.getAssocMap().keySet()) {
+                ClassAssociation assoc = modelClass.getAssocMap()
+                    .get(assocName);
 
-                if (assoc.multiplicity.equals("0-*")
-                    || assoc.multiplicity.equals("1-*")) {
-                    LOGGER.debug("   Collection<" + assoc.toClass.name + "> "
-                        + assocName + ";");
+                if (assoc.getMultiplicity().equals("0-*")
+                    || assoc.getMultiplicity().equals("1-*")) {
+                    LOGGER
+                        .debug("   Collection<" + assoc.getToClass().getName()
+                            + "> " + assocName + ";");
                 } else {
-                    LOGGER.debug("   " + assoc.toClass.name + " " + assocName
-                        + ";");
+                    LOGGER.debug("   " + assoc.getToClass().getName() + " "
+                        + assocName + ";");
                 }
             }
             LOGGER.debug("};\n");
@@ -233,8 +202,8 @@ public class ModelUmlParser {
             Generalization g = new Generalization(parentClass, childClass);
             generalizationMap.put(xmiId, g);
 
-            LOGGER.debug("Generalization: " + g.parentClass.name + " <- "
-                + g.childClass.name);
+            LOGGER.debug("Generalization: " + g.getParentClass().getName()
+                + " <- " + g.getChildClass().getName());
         }
 
         for (ModelClass modelClass : logicalModelClassMap.values()) {
@@ -246,7 +215,7 @@ public class ModelUmlParser {
                     + "/Package/Namespace.ownedElement/Package"
                     + "/Namespace.ownedElement/Package/Namespace.ownedElement"
                     + "/Package/Namespace.ownedElement/Class[@name='"
-                    + modelClass.name
+                    + modelClass.getName()
                     + "']/GeneralizableElement.generalization"
                     + "/Generalization/@xmi.idref");
 
@@ -260,19 +229,20 @@ public class ModelUmlParser {
                     throw new Exception("generalization not found" + xmiIdRef);
                 }
 
-                if (g.childClass != modelClass) {
+                if (g.getChildClass() != modelClass) {
                     throw new Exception(
                         "generalization child does not match class");
                 }
 
-                modelClass.extendsClass = g.parentClass;
+                modelClass.setExtendsClass(g.getParentClass());
 
-                LOGGER.debug("LM class/" + modelClass.name + " parent/"
-                    + g.parentClass.name + " child/" + g.childClass.name);
+                LOGGER.debug("LM class/" + modelClass.getName() + " parent/"
+                    + g.getParentClass().getName() + " child/"
+                    + g.getChildClass().getName());
             } else if (nodes.getLength() > 1) {
                 throw new Exception(
                     "generalization has more than one class node: className/"
-                        + modelClass.name);
+                        + modelClass.getName());
             }
         }
     }
@@ -293,19 +263,20 @@ public class ModelUmlParser {
                     + "/Package/Namespace.ownedElement/Package"
                     + "/Namespace.ownedElement/Package/Namespace.ownedElement"
                     + "/Package/Namespace.ownedElement/Class[@name='"
-                    + modelClass.name + "']/Classifier.feature/Attribute/@name");
+                    + modelClass.getName()
+                    + "']/Classifier.feature/Attribute/@name");
 
             nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
             for (int i = 0, n = nodes.getLength(); i < n; ++i) {
                 String classAttrName = nodes.item(i).getNodeValue();
-                modelClass.attrMap.put(classAttrName, "UNKNOWN");
-                LOGGER.debug("LM class/" + modelClass.name + " attribute/"
+                modelClass.getAttrMap().put(classAttrName, "UNKNOWN");
+                LOGGER.debug("LM class/" + modelClass.getName() + " attribute/"
                     + classAttrName);
             }
         }
 
         for (ModelClass modelClass : logicalModelClassMap.values()) {
-            for (String classAttrName : modelClass.attrMap.keySet()) {
+            for (String classAttrName : modelClass.getAttrMap().keySet()) {
                 // path to get all logical model class attribute types
                 expr = xpath
                     .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement"
@@ -315,7 +286,7 @@ public class ModelUmlParser {
                         + "/Package/Namespace.ownedElement/Package"
                         + "/Namespace.ownedElement/Package/Namespace.ownedElement"
                         + "/Package/Namespace.ownedElement/Class[@name='"
-                        + modelClass.name
+                        + modelClass.getName()
                         + "']/Classifier.feature/Attribute[@name='"
                         + classAttrName
                         + "']/StructuralFeature.type/Class/@xmi.idref");
@@ -323,8 +294,8 @@ public class ModelUmlParser {
                 nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
                 for (int i = 0, n = nodes.getLength(); i < n; ++i) {
                     String xmiIdRef = nodes.item(i).getNodeValue();
-                    if (modelClass.attrMap.get(classAttrName) == null) {
-                        throw new Exception("class " + modelClass.name
+                    if (modelClass.getAttrMap().get(classAttrName) == null) {
+                        throw new Exception("class " + modelClass.getName()
                             + " does not have attribute " + classAttrName);
                     }
 
@@ -332,14 +303,15 @@ public class ModelUmlParser {
                         .get(xmiIdRef);
 
                     if (classAttrType == null) {
-                        throw new Exception("class " + modelClass.name
+                        throw new Exception("class " + modelClass.getName()
                             + " does not have an attribute type for attribute"
                             + classAttrName);
                     }
 
-                    modelClass.attrMap.put(classAttrName, classAttrType);
-                    LOGGER.debug("LM class/" + modelClass.name + " attribute/"
-                        + classAttrName + " type/" + classAttrType);
+                    modelClass.getAttrMap().put(classAttrName, classAttrType);
+                    LOGGER.debug("LM class/" + modelClass.getName()
+                        + " attribute/" + classAttrName + " type/"
+                        + classAttrType);
                 }
             }
         }
@@ -452,20 +424,20 @@ public class ModelUmlParser {
                 throw new Exception("association with more than 2 classes");
             }
 
-            if ((classAssocs.get(0).assocName != null)
-                && (classAssocs.get(0).assocName.length() > 0)) {
-                addClassAssoc(classAssocs.get(1).toClass.name,
-                    classAssocs.get(0).assocName,
-                    classAssocs.get(0).toClass.name,
-                    classAssocs.get(0).multiplicity);
+            if ((classAssocs.get(0).getAssocName() != null)
+                && (classAssocs.get(0).getAssocName().length() > 0)) {
+                addClassAssoc(classAssocs.get(1).getToClass().getName(),
+                    classAssocs.get(0).getAssocName(), classAssocs.get(0)
+                        .getToClass().getName(), classAssocs.get(0)
+                        .getMultiplicity());
             }
 
-            if ((classAssocs.get(1).assocName != null)
-                && (classAssocs.get(1).assocName.length() > 0)) {
-                addClassAssoc(classAssocs.get(0).toClass.name,
-                    classAssocs.get(1).assocName,
-                    classAssocs.get(1).toClass.name,
-                    classAssocs.get(1).multiplicity);
+            if ((classAssocs.get(1).getAssocName() != null)
+                && (classAssocs.get(1).getAssocName().length() > 0)) {
+                addClassAssoc(classAssocs.get(0).getToClass().getName(),
+                    classAssocs.get(1).getAssocName(), classAssocs.get(1)
+                        .getToClass().getName(), classAssocs.get(1)
+                        .getMultiplicity());
             }
         }
     }
@@ -529,8 +501,8 @@ public class ModelUmlParser {
             throw new Exception("class not found: " + toClassName);
         }
 
-        fromModelClass.assocMap.put(assocName, new ClassAssociation(
-            toModelClass, assocName, muliplicity));
+        fromModelClass.getAssocMap().put(assocName,
+            new ClassAssociation(toModelClass, assocName, muliplicity));
 
         LOGGER.debug("LM assoc: " + fromClassName + "." + assocName + " -> "
             + toClassName);
@@ -568,7 +540,7 @@ public class ModelUmlParser {
         if (dmTable == null) {
             throw new Exception("invalid data model class name: " + className);
         }
-        return dmTable.attrMap;
+        return dmTable.getAttrMap();
     }
 
     private void getDataModel(Document doc) throws Exception {
@@ -664,7 +636,7 @@ public class ModelUmlParser {
                 dmClass = new ModelClass(className);
                 dataModelClassMap.put(className, dmClass);
             }
-            dmClass.attrMap.put(attrName, modelDataType);
+            dmClass.getAttrMap().put(attrName, modelDataType);
         }
     }
 }

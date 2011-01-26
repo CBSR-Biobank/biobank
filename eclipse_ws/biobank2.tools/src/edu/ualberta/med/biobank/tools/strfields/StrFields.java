@@ -17,7 +17,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.ualberta.med.biobank.tools.ModelUmlParser;
+import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 
 public class StrFields {
 
