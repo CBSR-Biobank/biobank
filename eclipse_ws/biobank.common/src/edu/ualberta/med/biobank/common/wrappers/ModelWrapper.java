@@ -1,10 +1,26 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
@@ -19,18 +35,165 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
+    private final Map<Property<?>, Object> propertyMap = new HashMap<Property<?>, Object>();
+
+    public static class Property<T> {
+        private final String name;
+        private final TypeReference<T> type;
+
+        private Property(String name, TypeReference<T> type) {
+            this.name = name;
+            this.type = type;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Type getType() {
+            return type.getType();
+        }
+
+        public static <E> Property<E> create(String name, TypeReference<E> type) {
+            return new Property<E>(name, type);
+        }
+
+        // TODO: override equals/ hashcode on Property<T>, maybe use a composite
+        // as a key so can have nested properties stored and retrieved properly
+        // ;)
+    }
+
+    // NOTE: properties need to use the unwrapped types because (1) easier to
+    // directly get the property from the model (2) necessary for the eager-load
+    // function.
+    // use (un)wrap() to walk an object and wrap stuff?
+    protected <W extends ModelWrapper<R>, R> W getWrappedProperty(R raw) {
+        try {
+            @SuppressWarnings("unchecked")
+            W wrapper = (W) ModelWrapper.wrapObject(appService, raw);
+            return wrapper;
+        } catch (Exception e) {
+            // TODO: something better?
+        }
+
+        return null;
+    }
+
+    protected <W extends ModelWrapper<R>, R> void setWrappedProperty(W wrapper) {
+    }
+
+    protected <W extends ModelWrapper<R>, R> void setWrappedCollection(
+        Property<? extends Collection<R>> property, Collection<W> wrappers) {
+        Collection<R> newValues = new HashSet<R>();
+        for (W element : wrappers) {
+            newValues.add(element.getWrappedObject());
+        }
+
+        Collection<R> oldValues = getProperty(property);
+        setProperty(property, newValues);
+
+        firePropertyChange(property, oldValues, newValues);
+        cache(property, wrappers);
+    }
+
+    protected <W extends ModelWrapper<R>, R> List<W> getWrappedCollection(
+        Property<? extends Collection<R>> property) {
+        return getWrappedCollection(property, false);
+    }
+
+    protected <W extends ModelWrapper<R>, R> List<W> getWrappedCollection(
+        Property<? extends Collection<R>> property, boolean sort) {
+
+        @SuppressWarnings("unchecked")
+        List<W> wrappers = (List<W>) recall(property);
+
+        if (wrappers == null) {
+            wrappers = new ArrayList<W>();
+
+            Collection<R> raw = getProperty(property);
+            for (R element : raw) {
+                try {
+                    @SuppressWarnings("unchecked")
+                    W wrapper = (W) ModelWrapper
+                        .wrapObject(appService, element);
+                    wrappers.add(wrapper);
+                } catch (Exception e) {
+                    // TODO: DEAL WITH THIS BETTER!
+                }
+            }
+
+            cache(property, wrappers);
+        }
+
+        if (wrappers != null && sort) {
+            Collections.sort(wrappers);
+        }
+
+        return wrappers;
+    }
+
+    private <T> T getProperty(Property<T> property) {
+        T value = null;
+
+        try {
+            Class<?> modelKlazz = getWrappedObject().getClass();
+            Method getter = modelKlazz.getMethod("get"
+                + capitalizeFirstLetter(property.getName()));
+
+            @SuppressWarnings("unchecked")
+            T tmp = (T) getter.invoke(this);
+            value = tmp;
+        } catch (Exception e) {
+            // TODO: DEAL WITH THIS BETTER?
+        }
+
+        return value;
+    }
+
+    private <T> void setProperty(Property<? extends T> property, T value) {
+        try {
+            Class<?> modelKlazz = getWrappedObject().getClass();
+
+            Method getter = modelKlazz.getMethod("get"
+                + capitalizeFirstLetter(property.getName()));
+
+            Method setter = modelKlazz.getMethod("set"
+                + capitalizeFirstLetter(property.getName()),
+                getter.getReturnType());
+
+            setter.invoke(this, value);
+        } catch (Exception e) {
+            // TODO: DEAL WITH THIS BETTER?
+        }
+    }
+
+    private void firePropertyChange(Property<?> property, Object oldValue,
+        Object newValue) {
+        propertyChangeSupport.firePropertyChange(property.getName(), oldValue,
+            newValue);
+    }
+
+    private void cache(Property<?> property, Object value) {
+        propertyMap.put(property, value);
+    }
+
+    private Object recall(Property<?> property) {
+        return propertyMap.get(property);
+    }
+
+    private String capitalizeFirstLetter(String name) {
+        StringBuilder sb = new StringBuilder();
+
+        if (name.length() > 0) {
+            sb.append(Character.toUpperCase(name.charAt(0)));
+            if (name.length() > 1) {
+                sb.append(name.substring(1));
+            }
+        }
+
+        return sb.toString();
+    }
 
     protected WritableApplicationService appService;
 

@@ -13,6 +13,7 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RequestState;
+import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -31,6 +32,18 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends ModelWrapper<Site> {
+    public static final Property<Collection<Study>> STUDY_COLLECTION = Property
+        .create("studyCollection", new TypeReference<Collection<Study>>() {
+        });
+
+    public Collection<StudyWrapper> getStudies(boolean sort) {
+        // TODO: Q: pass StudyWrapper.class?
+        return getWrappedCollection(STUDY_COLLECTION, sort);
+    }
+
+    public void setStudies(Collection<StudyWrapper> studies) {
+        setWrappedCollection(STUDY_COLLECTION, studies);
+    }
 
     private AddressWrapper address;
 
