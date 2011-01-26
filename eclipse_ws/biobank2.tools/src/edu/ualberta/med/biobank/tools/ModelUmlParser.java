@@ -80,6 +80,8 @@ public class ModelUmlParser {
 
     private Map<String, ModelClass> logicalModelXmiIdClassMap;
 
+    private Map<String, Generalization> generalizationMap;
+
     @SuppressWarnings("unused")
     private Map<String, Generalization> lmGeneralizationXmiIdClassMap;
 
@@ -90,6 +92,7 @@ public class ModelUmlParser {
         dataModelClassMap = new HashMap<String, ModelClass>();
         logicalModelClassMap = new HashMap<String, ModelClass>();
         logicalModelXmiIdClassMap = new HashMap<String, ModelClass>();
+        generalizationMap = new HashMap<String, Generalization>();
     }
 
     public static ModelUmlParser getInstance() {
@@ -111,7 +114,7 @@ public class ModelUmlParser {
 
             if (modelClass.extendsClass != null) {
                 LOGGER.debug("class " + modelClass.name + " extends "
-                    + modelClass.extendsClass + " {");
+                    + modelClass.extendsClass.name + " {");
             } else {
                 LOGGER.debug("class " + modelClass.name + "{");
             }
@@ -162,31 +165,76 @@ public class ModelUmlParser {
                 attrs.getNamedItem("xmi.id").getNodeValue());
         }
 
+        getLmClassGeneralizations(doc);
         getLmClassAttributes(doc);
         getLmClassAssociations(doc);
     }
 
-    @SuppressWarnings("unused")
     private void getLmClassGeneralizations(Document doc) throws Exception {
         XPath xpath = XPathFactory.newInstance().newXPath();
         XPathExpression expr;
         NodeList nodes;
 
-        for (ModelClass modelClass : logicalModelClassMap.values()) {
-            // path to get all generalizations
-            expr = xpath
+        // path to get all generalizations
+        expr = xpath
+            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                + "/Namespace.ownedElement/Package[@name='Logical Model']"
+                + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                + "/Package/Namespace.ownedElement/Package"
+                + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                + "/Package/Namespace.ownedElement/Generalization/@xmi.id");
+
+        nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+        for (int i = 0, n = nodes.getLength(); i < n; ++i) {
+            String xmiId = nodes.item(i).getNodeValue();
+
+            XPathExpression childExpr = xpath
                 .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
                     + "/Namespace.ownedElement/Package[@name='Logical Model']"
                     + "/Namespace.ownedElement/Package/Namespace.ownedElement"
                     + "/Package/Namespace.ownedElement/Package"
                     + "/Namespace.ownedElement/Package/Namespace.ownedElement"
-                    + "/Package/Namespace.ownedElement/Generalization/@xmi.id");
+                    + "/Package/Namespace.ownedElement/Generalization[@xmi.id='"
+                    + xmiId + "']/Generalization.child/Class/@xmi.idref");
 
-            nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
-            for (int i = 0, n = nodes.getLength(); i < n; ++i) {
-                String xmiId = nodes.item(i).getNodeValue();
-
+            NodeList childNodes = (NodeList) childExpr.evaluate(doc,
+                XPathConstants.NODESET);
+            if (childNodes.getLength() != 1) {
+                throw new Exception("Generalization has more than one child");
             }
+            String childXmiIdRef = childNodes.item(0).getNodeValue();
+
+            XPathExpression parentExpr = xpath
+                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package[@name='Logical Model']"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                    + "/Package/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package/Namespace.ownedElement"
+                    + "/Package/Namespace.ownedElement/Generalization[@xmi.id='"
+                    + xmiId + "']/Generalization.parent/Class/@xmi.idref");
+
+            NodeList parentNodes = (NodeList) parentExpr.evaluate(doc,
+                XPathConstants.NODESET);
+            if (parentNodes.getLength() != 1) {
+                throw new Exception("Generalization has more than one parent");
+            }
+            String parentXmiIdRef = parentNodes.item(0).getNodeValue();
+
+            ModelClass parentClass = logicalModelXmiIdClassMap
+                .get(parentXmiIdRef);
+            ModelClass childClass = logicalModelXmiIdClassMap
+                .get(childXmiIdRef);
+
+            if ((parentClass == null) || (childClass == null)) {
+                throw new Exception("generalization classes not found: parent/"
+                    + parentXmiIdRef + " child/" + childXmiIdRef);
+            }
+
+            Generalization g = new Generalization(parentClass, childClass);
+            generalizationMap.put(xmiId, g);
+
+            LOGGER.debug("Generalization: " + g.parentClass.name + " <- "
+                + g.childClass.name);
         }
 
         for (ModelClass modelClass : logicalModelClassMap.values()) {
@@ -204,11 +252,23 @@ public class ModelUmlParser {
 
             nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
             if (nodes.getLength() == 1) {
-                String xmiRefId = nodes.item(0).getNodeValue();
-                modelClass.extendsClass = logicalModelXmiIdClassMap
-                    .get(xmiRefId);
-                LOGGER.debug("LM class/" + modelClass.name + " extends/"
-                    + modelClass.extendsClass.name);
+                String xmiIdRef = nodes.item(0).getNodeValue();
+
+                Generalization g = generalizationMap.get(xmiIdRef);
+
+                if (g == null) {
+                    throw new Exception("generalization not found" + xmiIdRef);
+                }
+
+                if (g.childClass != modelClass) {
+                    throw new Exception(
+                        "generalization child does not match class");
+                }
+
+                modelClass.extendsClass = g.parentClass;
+
+                LOGGER.debug("LM class/" + modelClass.name + " parent/"
+                    + g.parentClass.name + " child/" + g.childClass.name);
             } else if (nodes.getLength() > 1) {
                 throw new Exception(
                     "generalization has more than one class node: className/"
