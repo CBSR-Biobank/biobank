@@ -4,21 +4,29 @@ import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.Option;
 import jargs.gnu.CmdLineParser.OptionException;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.net.URISyntaxException;
+import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 
 public class BioBankPeerBuilder {
 
     private static String USAGE = "Usage: lmextractor UMLFILE OUTDIR";
 
+    private static String PACKAGE = "edu.ualberta.med.biobank.common.peer";
+
     private static final Logger LOGGER = Logger
         .getLogger(BioBankPeerBuilder.class.getName());
 
     private static BioBankPeerBuilder instance = null;
+
+    Map<String, ModelClass> modelClasses;
 
     @SuppressWarnings("unused")
     private AppArgs appArgs = null;
@@ -49,17 +57,31 @@ public class BioBankPeerBuilder {
         LOGGER.info("output dir:  " + appArgs.outDir);
 
         try {
-            ModelUmlParser.getInstance().geLogicalModel(appArgs.modelFileName);
+            modelClasses = ModelUmlParser.getInstance().geLogicalModel(
+                appArgs.modelFileName);
+            createSourceCode();
         } catch (Exception e) {
             e.printStackTrace();
         }
 
-        createSourceCode();
-
     }
 
-    private void createSourceCode() {
-        // TODO Auto-generated method stub
+    private void createSourceCode() throws Exception {
+        File f = new File(appArgs.outDir);
+        if (!f.exists()) {
+            f.mkdir();
+        }
+
+        for (ModelClass mc : modelClasses.values()) {
+            LOGGER.info("generating peer class for " + mc.getName());
+            f = new File(appArgs.outDir + "/" + mc.getName() + "Peer.java");
+            FileOutputStream fos = new FileOutputStream(f);
+
+            StringBuffer sb = new StringBuffer("package " + PACKAGE + ";\n\n");
+            sb.append("public class " + mc.getName() + " {\n");
+            sb.append("}\n");
+            fos.write(sb.toString().getBytes());
+        }
 
     }
 

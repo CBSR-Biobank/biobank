@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.tools.modelumlparser;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +18,6 @@ import javax.xml.xpath.XPathFactory;
 
 import org.apache.log4j.Logger;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -31,9 +31,9 @@ public class ModelUmlParser {
 
     private Map<String, String> dataModelDataTypeMap;
 
-    private Map<String, String> logicalModelDataTypeMap;
-
     private Map<String, ModelClass> dataModelClassMap;
+
+    private Map<String, String> logicalModelDataTypeMap;
 
     private Map<String, ModelClass> logicalModelClassMap;
 
@@ -72,7 +72,7 @@ public class ModelUmlParser {
 
         // displayModelInLogger();
 
-        return logicalModelClassMap;
+        return Collections.unmodifiableMap(logicalModelClassMap);
     }
 
     @SuppressWarnings("unused")
@@ -417,7 +417,7 @@ public class ModelUmlParser {
                 }
 
                 classAssocs.add(new ClassAssociation(modelClass, assocName,
-                    getMultiplicity(doc, assocXmiId, endXmiId)));
+                    getLmMultiplicity(doc, assocXmiId, endXmiId)));
             }
 
             if (classAssocs.size() != 2) {
@@ -442,7 +442,7 @@ public class ModelUmlParser {
         }
     }
 
-    private String getMultiplicity(Document doc, String assocXmiId,
+    private String getLmMultiplicity(Document doc, String assocXmiId,
         String endXmiId) throws Exception {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
@@ -540,103 +540,88 @@ public class ModelUmlParser {
         if (dmTable == null) {
             throw new Exception("invalid data model class name: " + className);
         }
-        return dmTable.getAttrMap();
-    }
-
-    private void getDataModel(Document doc) throws Exception {
-        NodeList nodeLst = doc.getElementsByTagName("Class");
-        for (int i = 0, n = nodeLst.getLength(); i < n; i++) {
-            Node node = nodeLst.item(i);
-            Node grandParent = node.getParentNode().getParentNode();
-            if (grandParent == null) {
-                throw new Exception("Class node does not have a grandparent");
-            }
-            if (!((Element) grandParent).getAttribute("name").equals(
-                "Data Model"))
-                continue;
-
-            NodeList childNodeLst = node.getChildNodes();
-
-            for (int i2 = 0, n2 = childNodeLst.getLength(); i2 < n2; ++i2) {
-                Node childNode = (Node) childNodeLst.item(i2);
-                if (!childNode.getNodeName().equals("Classifier.feature"))
-                    continue;
-
-                getDmClassifierFeature(childNode);
-            }
-        }
+        return Collections.unmodifiableMap(dmTable.getAttrMap());
     }
 
     private void getDataModelDataTypes(Document doc) throws Exception {
-        NodeList nodeLst = doc.getElementsByTagName("DataType");
-        for (int i = 0, n = nodeLst.getLength(); i < n; i++) {
-            Node node = nodeLst.item(i);
-            Node grandParent = node.getParentNode().getParentNode();
-            if (grandParent == null) {
-                throw new Exception("DataType node does not have a grandparent");
-            }
-            if (!((Element) grandParent).getAttribute("name").equals("Model"))
-                continue;
+        XPath xpath = XPathFactory.newInstance().newXPath();
 
-            dataModelDataTypeMap.put(((Element) node).getAttribute("xmi.id"),
-                ((Element) node).getAttribute("name"));
+        // path to get all logical model class names
+        XPathExpression expr = xpath
+            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/DataType");
+
+        NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+        int n = nodes.getLength();
+        if (n == 0) {
+            throw new Exception("DataType nodes not found in UML");
+        }
+        for (int i = 0; i < n; i++) {
+            Node node = nodes.item(i);
+            NamedNodeMap attrs = node.getAttributes();
+            dataModelDataTypeMap.put(attrs.getNamedItem("xmi.id")
+                .getNodeValue(), attrs.getNamedItem("name").getNodeValue());
         }
     }
 
-    private void getDmClassifierFeature(Node node) throws Exception {
-        NodeList childNodeLst = node.getChildNodes();
+    private void getDataModel(Document doc) throws Exception {
+        XPath xpath = XPathFactory.newInstance().newXPath();
 
-        for (int i = 0, n = childNodeLst.getLength(); i < n; ++i) {
-            Node childNode = (Node) childNodeLst.item(i);
-            if (!childNodeLst.item(i).getNodeName().equals("Attribute"))
-                continue;
+        // path to get all logical model class names
+        XPathExpression expr = xpath
+            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                + "/Namespace.ownedElement/Package[@name='Data Model']"
+                + "/Namespace.ownedElement/Class/@name");
 
-            getDmTableAttribute(childNode);
+        NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+        for (int i = 0, n = nodes.getLength(); i < n; i++) {
+            ModelClass mc = new ModelClass(nodes.item(i).getNodeValue());
+            dataModelClassMap.put(mc.getName(), mc);
+            getDmTableAttributes(doc, mc);
         }
     }
 
-    private void getDmTableAttribute(Node node) throws Exception {
-        NodeList childNodeLst = node.getChildNodes();
+    private void getDmTableAttributes(Document doc, ModelClass mc)
+        throws Exception {
+        XPath xpath = XPathFactory.newInstance().newXPath();
 
-        for (int i = 0, n = childNodeLst.getLength(); i < n; ++i) {
-            Node childNode = (Node) childNodeLst.item(i);
-            if (!childNodeLst.item(i).getNodeName()
-                .equals("StructuralFeature.type"))
-                continue;
+        // path to get all logical model class names
+        XPathExpression expr = xpath
+            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                + "/Namespace.ownedElement/Package[@name='Data Model']"
+                + "/Namespace.ownedElement/Class[@name='" + mc.getName()
+                + "']/Classifier.feature/Attribute/@name");
 
-            getDmClassAttrStructFeature(childNode);
-        }
-    }
+        NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
 
-    private void getDmClassAttrStructFeature(Node node) throws Exception {
-        Node classParent = node.getParentNode().getParentNode().getParentNode();
-        if (classParent == null) {
-            throw new Exception("Attribute node does not have a class parent");
-        }
+        for (int i = 0, n = nodes.getLength(); i < n; ++i) {
+            String attrName = nodes.item(i).getNodeValue();
 
-        NodeList childNodeLst = node.getChildNodes();
+            // path to get all logical model class names
+            XPathExpression dataTypeExpr = xpath
+                .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Package"
+                    + "/Namespace.ownedElement/Package[@name='Data Model']"
+                    + "/Namespace.ownedElement/Class[@name='"
+                    + mc.getName()
+                    + "']/Classifier.feature/Attribute[@name='"
+                    + attrName
+                    + "']/StructuralFeature.type/DataType/@xmi.idref");
 
-        for (int i = 0, n = childNodeLst.getLength(); i < n; ++i) {
-            Node childNode = (Node) childNodeLst.item(i);
-            if (!childNodeLst.item(i).getNodeName().equals("DataType"))
-                continue;
-
-            String className = ((Element) classParent).getAttribute("name");
-            String attrName = ((Element) node.getParentNode())
-                .getAttribute("name");
-            String idref = ((Element) childNode).getAttribute("xmi.idref");
-            String modelDataType = dataModelDataTypeMap.get(idref);
-            if (modelDataType == null) {
-                throw new Exception("could not find data type for " + className
-                    + "." + attrName);
+            NodeList typeNodes = (NodeList) dataTypeExpr.evaluate(doc,
+                XPathConstants.NODESET);
+            int typeNodesCount = typeNodes.getLength();
+            if (typeNodesCount != 1) {
+                throw new Exception(
+                    "attribute node does not have a type or more than one type");
             }
 
-            ModelClass dmClass = dataModelClassMap.get(className);
-            if (dmClass == null) {
-                dmClass = new ModelClass(className);
-                dataModelClassMap.put(className, dmClass);
+            String xmiIdRef = typeNodes.item(0).getNodeValue();
+            String attrType = dataModelDataTypeMap.get(xmiIdRef);
+
+            if (attrType == null) {
+                throw new Exception("xmi id ref not found: " + xmiIdRef);
             }
-            dmClass.getAttrMap().put(attrName, modelDataType);
+
+            mc.getAttrMap().put(attrName, attrType);
         }
     }
 }
