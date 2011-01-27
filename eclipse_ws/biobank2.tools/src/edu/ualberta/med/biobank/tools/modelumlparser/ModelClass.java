@@ -1,10 +1,14 @@
 package edu.ualberta.med.biobank.tools.modelumlparser;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class ModelClass {
+
     private String name;
+
+    private String pkg;
 
     private ModelClass extendsClass;
 
@@ -27,6 +31,14 @@ public class ModelClass {
         this.name = name;
     }
 
+    public String getPkg() {
+        return pkg;
+    }
+
+    public void setPkg(String pkg) {
+        this.pkg = pkg;
+    }
+
     public ModelClass getExtendsClass() {
         return extendsClass;
     }
@@ -36,19 +48,19 @@ public class ModelClass {
     }
 
     public Map<String, String> getAttrMap() {
-        return attrMap;
+        return Collections.unmodifiableMap(attrMap);
     }
 
-    public void setAttrMap(Map<String, String> attrMap) {
-        this.attrMap = attrMap;
+    public void addAttr(String attrName, String attrType) {
+        attrMap.put(attrName, attrType);
     }
 
     public Map<String, ClassAssociation> getAssocMap() {
-        return assocMap;
+        return Collections.unmodifiableMap(assocMap);
     }
 
-    public void setAssocMap(Map<String, ClassAssociation> assocMap) {
-        this.assocMap = assocMap;
+    public void addAssoc(String assocName, ClassAssociation assoc) {
+        assocMap.put(assocName, assoc);
     }
 
 }

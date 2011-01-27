@@ -1,15 +1,16 @@
 package edu.ualberta.med.biobank.tools.modelumlparser;
 
 public class ClassAssociation {
+
     private ModelClass toClass;
     private String assocName;
-    private String multiplicity;
+    private ClassAssociationType assocType;
 
     public ClassAssociation(ModelClass toClass, String assocName,
-        String multiplicity) {
+        ClassAssociationType assocType) {
         this.toClass = toClass;
         this.assocName = assocName;
-        this.multiplicity = multiplicity;
+        this.assocType = assocType;
     }
 
     public ModelClass getToClass() {
@@ -28,12 +29,12 @@ public class ClassAssociation {
         this.assocName = assocName;
     }
 
-    public String getMultiplicity() {
-        return multiplicity;
+    public ClassAssociationType getAssociationType() {
+        return assocType;
     }
 
-    public void setMultiplicity(String multiplicity) {
-        this.multiplicity = multiplicity;
+    public void setAssociationType(ClassAssociationType assocType) {
+        this.assocType = assocType;
     }
 
 }

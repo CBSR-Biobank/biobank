@@ -93,8 +93,8 @@ public class ModelUmlParser {
                 ClassAssociation assoc = modelClass.getAssocMap()
                     .get(assocName);
 
-                if (assoc.getMultiplicity().equals("0-*")
-                    || assoc.getMultiplicity().equals("1-*")) {
+                if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+                    || (assoc.getAssociationType() == ClassAssociationType.ONE_TO_MANY)) {
                     LOGGER
                         .debug("   Collection<" + assoc.getToClass().getName()
                             + "> " + assocName + ";");
@@ -135,7 +135,7 @@ public class ModelUmlParser {
 
             ModelClass mc = addLogicalModelClass(attrs.getNamedItem("name")
                 .getNodeValue(), attrs.getNamedItem("xmi.id").getNodeValue());
-
+            mc.setPkg(getLmPackageName(node.getParentNode()));
             getLmClassAttributes(node, mc);
         }
 
@@ -277,7 +277,7 @@ public class ModelUmlParser {
                         + xmiIdRef);
             }
 
-            modelClass.getAttrMap().put(classAttrName, classAttrType);
+            modelClass.addAttr(classAttrName, classAttrType);
             LOGGER.debug("LM class/" + modelClass.getName() + " attribute/"
                 + classAttrName + " type/" + classAttrType);
         }
@@ -380,7 +380,7 @@ public class ModelUmlParser {
                 addClassAssoc(classAssocs.get(1).getToClass().getName(),
                     classAssocs.get(0).getAssocName(), classAssocs.get(0)
                         .getToClass().getName(), classAssocs.get(0)
-                        .getMultiplicity());
+                        .getAssociationType());
             }
 
             if ((classAssocs.get(1).getAssocName() != null)
@@ -388,13 +388,13 @@ public class ModelUmlParser {
                 addClassAssoc(classAssocs.get(0).getToClass().getName(),
                     classAssocs.get(1).getAssocName(), classAssocs.get(1)
                         .getToClass().getName(), classAssocs.get(1)
-                        .getMultiplicity());
+                        .getAssociationType());
             }
         }
     }
 
-    private String getLmMultiplicity(Node node, String assocXmiId,
-        String endXmiId) throws Exception {
+    private ClassAssociationType getLmMultiplicity(Node node,
+        String assocXmiId, String endXmiId) throws Exception {
         XPath xpath = XPathFactory.newInstance().newXPath();
 
         XPathExpression multExpr = xpath
@@ -414,24 +414,24 @@ public class ModelUmlParser {
         String lowerMult = multAttrs.getNamedItem("lower").getNodeValue();
         String upperMult = multAttrs.getNamedItem("upper").getNodeValue();
 
-        String multiplicity = null;
+        ClassAssociationType assocType = null;
         if (lowerMult.equals("1") && upperMult.equals("1")) {
-            multiplicity = "1";
+            assocType = ClassAssociationType.ONE_TO_ONE;
         } else if (lowerMult.equals("0") && upperMult.equals("1")) {
-            multiplicity = "0-1";
+            assocType = ClassAssociationType.ZERO_OR_ONE_TO_ONE;
         } else if (lowerMult.equals("1") && upperMult.equals("-1")) {
-            multiplicity = "1-*";
+            assocType = ClassAssociationType.ONE_TO_MANY;
         } else if (lowerMult.equals("0") && upperMult.equals("-1")) {
-            multiplicity = "0-*";
+            assocType = ClassAssociationType.ZERO_OR_ONE_TO_MANY;
         }
-        if (multiplicity == null) {
+        if (assocType == null) {
             throw new Exception("Could not determine muliplicity");
         }
-        return multiplicity;
+        return assocType;
     }
 
     private void addClassAssoc(String fromClassName, String assocName,
-        String toClassName, String muliplicity) throws Exception {
+        String toClassName, ClassAssociationType assocType) throws Exception {
         ModelClass fromModelClass = logicalModelClassMap.get(fromClassName);
         ModelClass toModelClass = logicalModelClassMap.get(toClassName);
 
@@ -443,8 +443,8 @@ public class ModelUmlParser {
             throw new Exception("class not found: " + toClassName);
         }
 
-        fromModelClass.getAssocMap().put(assocName,
-            new ClassAssociation(toModelClass, assocName, muliplicity));
+        fromModelClass.addAssoc(assocName, new ClassAssociation(toModelClass,
+            assocName, assocType));
 
         LOGGER.debug("LM assoc: " + fromClassName + "." + assocName + " -> "
             + toClassName);
@@ -563,5 +563,25 @@ public class ModelUmlParser {
 
             mc.getAttrMap().put(attrName, attrType);
         }
+    }
+
+    private String getLmPackageName(Node node) {
+        String nodeName = node.getNodeName();
+        if (nodeName.equals("UML:Namespace.ownedElement")) {
+            return getLmPackageName(node.getParentNode());
+        }
+
+        if (nodeName.equals("UML:Package")) {
+            String pkg = node.getAttributes().getNamedItem("name")
+                .getNodeValue();
+            if (!pkg.equals("Logical Model")) {
+                String parentPkg = getLmPackageName(node.getParentNode());
+                if (parentPkg == null) {
+                    return pkg;
+                }
+                return parentPkg + "." + pkg;
+            }
+        }
+        return null;
     }
 }

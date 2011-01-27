@@ -7,11 +7,18 @@ import jargs.gnu.CmdLineParser.OptionException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URISyntaxException;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
 import org.apache.log4j.PropertyConfigurator;
 
+import edu.ualberta.med.biobank.common.util.TypeReference;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociation;
+import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociationType;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
@@ -72,50 +79,96 @@ public class BioBankPeerBuilder {
             f.mkdir();
         }
 
+        Map<String, Integer> importCount = new HashMap<String, Integer>();
+
         for (ModelClass mc : modelClasses.values()) {
             LOGGER.info("generating peer class for " + mc.getName());
             f = new File(appArgs.outDir + "/" + mc.getName() + "Peer.java");
             FileOutputStream fos = new FileOutputStream(f);
 
             StringBuffer sb = new StringBuffer("package ").append(PACKAGE)
-                .append(";\n\n");
-            sb.append("import edu.ualberta.med.biobank.common.util.TypeReference;\n");
-            sb.append("import edu.ualberta.med.biobank.common.util.Property;\n\n");
-            sb.append("public class ").append(mc.getName()).append("Peer ");
+                .append(";\n");
+            sb.append("\nimport ").append(TypeReference.class.getName())
+                .append(";\n");
+            sb.append("import ").append(Property.class.getName()).append(";\n");
 
+            // add imports for required classes
+            importCount.clear();
+            for (String attrType : mc.getAttrMap().values()) {
+                if (importCount.get(attrType) != null) {
+                    // already added an import for this class
+                    continue;
+                }
+
+                importCount.put(attrType, 1);
+                if (attrType.equals("Date")) {
+                    sb.append("import ").append(Date.class.getName())
+                        .append(";\n");
+                }
+            }
+
+            boolean hasCollections = false;
+            Map<String, ClassAssociation> assocMap = mc.getAssocMap();
+            for (ClassAssociation assoc : assocMap.values()) {
+                ModelClass toClass = assoc.getToClass();
+
+                if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+                    || (assoc.getAssociationType() == ClassAssociationType.ONE_TO_MANY)) {
+                    hasCollections = true;
+                }
+
+                if (importCount.get(toClass.getName()) != null) {
+                    // already added an import for this class
+                    continue;
+                }
+
+                importCount.put(toClass.getName(), 1);
+                sb.append("import ").append(toClass.getPkg()).append(".")
+                    .append(toClass.getName()).append(";\n");
+            }
+
+            if (hasCollections) {
+                sb.append("import ").append(Collection.class.getName())
+                    .append(";\n");
+            }
+
+            sb.append("\npublic class ").append(mc.getName()).append("Peer ");
             ModelClass ec = mc.getExtendsClass();
-
             if (ec != null) {
                 sb.append(" extends ").append(ec.getName()).append("Peer ");
             }
-
             sb.append("{\n");
-
-            // Member property names
-            for (String attr : mc.getAttrMap().keySet()) {
-                sb.append("   public static final String ")
-                    .append(CamelCase.toTitleCase(attr)).append(" = \"")
-                    .append(attr).append("\";\n\n");
-            }
-
-            // Associated member property names
-            for (String assoc : mc.getAssocMap().keySet()) {
-                sb.append("   public static final String ")
-                    .append(CamelCase.toTitleCase(assoc)).append(" = \"")
-                    .append(assoc).append("\";\n\n");
-            }
 
             // Member property fields
             for (String attr : mc.getAttrMap().keySet()) {
-                sb.append("   //public static final Property<")
-                    .append(mc.getAttrMap().get(attr)).append("> PROP_")
+                sb.append("   public static final Property<")
+                    .append(mc.getAttrMap().get(attr)).append("> ")
                     .append(CamelCase.toTitleCase(attr))
                     .append(" = Property.create(\"").append(attr)
                     .append("\", new TypeReference<")
-                    .append(mc.getAttrMap().get(attr)).append(">());\n\n");
+                    .append(mc.getAttrMap().get(attr)).append(">() {});\n\n");
             }
 
-            for (String assoc : mc.getAssocMap().keySet()) {
+            for (String assocName : mc.getAssocMap().keySet()) {
+                ClassAssociation assoc = mc.getAssocMap().get(assocName);
+                if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+                    || (assoc.getAssociationType() == ClassAssociationType.ONE_TO_MANY)) {
+                    sb.append("   public static final Property<Collection<")
+                        .append(assoc.getToClass().getName()).append(">> ")
+                        .append(CamelCase.toTitleCase(assocName))
+                        .append(" = Property.create(\"").append(assocName)
+                        .append("\", new TypeReference<Collection<")
+                        .append(assoc.getToClass().getName())
+                        .append(">>() {});\n\n");
+                } else {
+                    sb.append("   public static final Property<")
+                        .append(assoc.getToClass().getName()).append("> ")
+                        .append(CamelCase.toTitleCase(assocName))
+                        .append(" = Property.create(\"").append(assocName)
+                        .append("\", new TypeReference<")
+                        .append(assoc.getToClass().getName())
+                        .append(">() {});\n\n");
+                }
             }
 
             sb.append("}\n");
