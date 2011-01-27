@@ -13,6 +13,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ShipmentPatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
@@ -49,10 +50,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "patient", "dateProcessed", "dateDrawn",
-            "comment", "pvAttrCollection", "aliquotCollection", "shipment",
-            "pvSourceVesselCollection", PROP_KEY_ACTIVITY_STATUS };
+    protected List<String> getPropertyChangeNames() {
+        return PatientVisitPeer.PROP_NAMES;
     }
 
     public ActivityStatusWrapper getActivityStatus() {

@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -44,17 +45,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
         super(appService);
     }
 
+    protected static final List<String> propNames;
+    static {
+        List<String> aList = new ArrayList<String>();
+        aList.add("name");
+        propNames = Collections.unmodifiableList(aList);
+    };
+
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "address", "clinicCollection", "siteCollection",
-            "containerCollection", "shipmentCollection",
-            "sitePvAttrCollection", "street1", "street2", "city", "province",
-            "postalCode", "sentDispatchCollection", "sentDispatchCollection",
-            "notificationCollection", "srcDispatchInfoCollection",
-            "studyCollection", "approvedRequestCollection",
-            "acceptedRequestCollection", "filledRequestCollection",
-            "shippedRequestCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return SitePeer.PROP_NAMES;
     }
 
     public String getName() {

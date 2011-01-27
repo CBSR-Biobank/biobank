@@ -7,13 +7,15 @@ import jargs.gnu.CmdLineParser.OptionException;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
-import org.apache.log4j.PropertyConfigurator;
 
 import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.Property;
@@ -25,7 +27,7 @@ import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
 public class BioBankPeerBuilder {
 
-    private static String USAGE = "Usage: lmextractor UMLFILE OUTDIR";
+    private static String USAGE = "Usage: bbpeerbuilder UMLFILE OUTDIR";
 
     private static String PACKAGE = "edu.ualberta.med.biobank.common.peer";
 
@@ -51,6 +53,7 @@ public class BioBankPeerBuilder {
 
     public static void main(String argv[]) {
         try {
+            // PropertyConfigurator.configure("conf/log4j.properties");
             BioBankPeerBuilder.getInstance().doWork(parseCommandLine(argv));
         } catch (Exception e) {
             e.printStackTrace();
@@ -87,10 +90,14 @@ public class BioBankPeerBuilder {
             FileOutputStream fos = new FileOutputStream(f);
 
             StringBuffer sb = new StringBuffer("package ").append(PACKAGE)
+                .append(";\n").append("\nimport ")
+                .append(TypeReference.class.getName()).append(";\n")
+                .append("import ").append(Collections.class.getName())
+                .append(";\n").append("import ")
+                .append(Property.class.getName()).append(";\n")
+                .append("import ").append(List.class.getName()).append(";\n")
+                .append("import ").append(ArrayList.class.getName())
                 .append(";\n");
-            sb.append("\nimport ").append(TypeReference.class.getName())
-                .append(";\n");
-            sb.append("import ").append(Property.class.getName()).append(";\n");
 
             // add imports for required classes
             importCount.clear();
@@ -149,6 +156,7 @@ public class BioBankPeerBuilder {
                     .append(mc.getAttrMap().get(attr)).append(">() {});\n\n");
             }
 
+            // Association property fields
             for (String assocName : mc.getAssocMap().keySet()) {
                 ClassAssociation assoc = mc.getAssocMap().get(assocName);
                 if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
@@ -171,6 +179,30 @@ public class BioBankPeerBuilder {
                 }
             }
 
+            // property change names
+            if (mc.getAttrMap().size() + mc.getAssocMap().size() > 0) {
+                sb.append("   public static final List<String> PROP_NAMES;\n")
+                    .append("   static {\n")
+                    .append(
+                        "      List<String> aList = new ArrayList<String>();\n");
+                if (ec != null) {
+                    sb.append("      aList.addAll(").append(ec.getName())
+                        .append("Peer.PROP_NAMES").append(");\n");
+                }
+
+                for (String attr : mc.getAttrMap().keySet()) {
+                    sb.append("      aList.add(\"").append(attr)
+                        .append("\");\n");
+                }
+                for (String assocName : mc.getAssocMap().keySet()) {
+                    sb.append("      aList.add(\"").append(assocName)
+                        .append("\");\n");
+                }
+                sb.append(
+                    "      PROP_NAMES = Collections.unmodifiableList(aList);\n")
+                    .append("   }");
+            }
+
             sb.append("}\n");
             fos.write(sb.toString().getBytes());
         }
@@ -180,8 +212,6 @@ public class BioBankPeerBuilder {
     private static AppArgs parseCommandLine(String argv[])
         throws URISyntaxException {
         AppArgs appArgs = new AppArgs();
-
-        PropertyConfigurator.configure("conf/log4j.properties");
 
         CmdLineParser parser = new CmdLineParser();
         Option verboseOpt = parser.addBooleanOption('v', "verbose");

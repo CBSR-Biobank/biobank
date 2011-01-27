@@ -13,6 +13,7 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
@@ -164,11 +165,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "contactCollection", "sampleStorageCollection",
-            "sourceVesselCollection", "studyPvAttrCollection",
-            "patientCollection", "dispatchInfoCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return StudyPeer.PROP_NAMES;
     }
 
     @Override

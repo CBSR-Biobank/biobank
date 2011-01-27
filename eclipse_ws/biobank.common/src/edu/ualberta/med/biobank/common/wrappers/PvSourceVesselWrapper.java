@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Date;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.PvSourceVesselPeer;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
 import edu.ualberta.med.biobank.model.SourceVessel;
@@ -22,9 +24,8 @@ public class PvSourceVesselWrapper extends ModelWrapper<PvSourceVessel> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "quantity", "patientVisit", "sourceVessel",
-            "patientCollection", "timeDrawn", "volume" };
+    protected List<String> getPropertyChangeNames() {
+        return PvSourceVesselPeer.PROP_NAMES;
     }
 
     @Override

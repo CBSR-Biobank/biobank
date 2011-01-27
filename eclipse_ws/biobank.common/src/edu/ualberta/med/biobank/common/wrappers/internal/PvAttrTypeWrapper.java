@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.PvAttrTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.PvAttrType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -22,8 +23,8 @@ public class PvAttrTypeWrapper extends ModelWrapper<PvAttrType> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name" };
+    protected List<String> getPropertyChangeNames() {
+        return PvAttrTypePeer.PROP_NAMES;
     }
 
     @Override

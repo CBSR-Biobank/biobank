@@ -10,6 +10,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DateCompare;
@@ -92,9 +93,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      * @throws Exception
      */
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "pnumber", "study", "patientVisitCollection",
-            "shptSourceVesselCollection", "shipmentCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return PatientPeer.PROP_NAMES;
     }
 
     @Override

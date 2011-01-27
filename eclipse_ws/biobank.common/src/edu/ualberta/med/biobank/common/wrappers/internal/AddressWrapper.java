@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -77,9 +80,8 @@ public class AddressWrapper extends ModelWrapper<Address> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "street1", "street2", "city", "province",
-            "postalCode" };
+    protected List<String> getPropertyChangeNames() {
+        return AddressPeer.PROP_NAMES;
     }
 
     @Override

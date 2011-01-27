@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ContainerLabelingSchemePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -51,9 +52,8 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "maxRows", "maxCols", "maxCapacity",
-            "minChars", "maxChars" };
+    protected List<String> getPropertyChangeNames() {
+        return ContainerLabelingSchemePeer.PROP_NAMES;
     }
 
     public void setName(String name) {

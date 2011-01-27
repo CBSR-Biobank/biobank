@@ -55,7 +55,7 @@ public class ResearcherWrapper extends ModelWrapper<Researcher> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
+    protected List<String> getPropertyChangeNames() {
         // TODO Auto-generated method stub
         return null;
     }

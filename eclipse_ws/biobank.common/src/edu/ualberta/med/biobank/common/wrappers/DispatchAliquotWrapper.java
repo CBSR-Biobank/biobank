@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.DispatchAliquotPeer;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Dispatch;
@@ -20,8 +23,8 @@ public class DispatchAliquotWrapper extends ModelWrapper<DispatchAliquot> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "aliquot", "dispatch", "state", "comment" };
+    protected List<String> getPropertyChangeNames() {
+        return DispatchAliquotPeer.PROP_NAMES;
     }
 
     @Override

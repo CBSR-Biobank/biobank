@@ -3,26 +3,26 @@ package edu.ualberta.med.biobank.common.wrappers.internal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.peer.ShipmentPatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperException;
-import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShipmentPatient;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.model.ShipmentPatient;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class ShipmentPatientWrapper extends
-    ModelWrapper<ShipmentPatient> {
+public class ShipmentPatientWrapper extends ModelWrapper<ShipmentPatient> {
     private static final String PROP_KEY_SHIPMENT = "shipment";
     private static final String PROP_KEY_PATIENT = "patient";
-    private static final String PROP_KEY_PV_COLLECTION =
-        "patientVisitCollection";
+    private static final String PROP_KEY_PV_COLLECTION = "patientVisitCollection";
 
     public ShipmentPatientWrapper(WritableApplicationService appService) {
         super(appService);
@@ -44,8 +44,7 @@ public class ShipmentPatientWrapper extends
             Shipment rawShipment = wrappedObject.getShipment();
 
             if (rawShipment != null) {
-                wrappedShipment =
-                    new ShipmentWrapper(appService, rawShipment);
+                wrappedShipment = new ShipmentWrapper(appService, rawShipment);
             }
 
             propertiesMap.put(PROP_KEY_SHIPMENT, wrappedShipment);
@@ -91,10 +90,9 @@ public class ShipmentPatientWrapper extends
     @SuppressWarnings("unchecked")
     public Collection<PatientVisitWrapper> getPatientVisitCollection() {
         if (!propertiesMap.containsKey(PROP_KEY_PV_COLLECTION)) {
-            Collection<PatientVisitWrapper> wrappedPvs =
-                new ArrayList<PatientVisitWrapper>();
-            Collection<PatientVisit> rawPvs =
-                wrappedObject.getPatientVisitCollection();
+            Collection<PatientVisitWrapper> wrappedPvs = new ArrayList<PatientVisitWrapper>();
+            Collection<PatientVisit> rawPvs = wrappedObject
+                .getPatientVisitCollection();
 
             if (rawPvs != null) {
                 PatientVisitWrapper wrappedPv;
@@ -137,9 +135,8 @@ public class ShipmentPatientWrapper extends
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        // TODO: don't want anyone to listen to our properties?
-        return new String[] {};
+    protected List<String> getPropertyChangeNames() {
+        return ShipmentPatientPeer.PROP_NAMES;
     }
 
     @Override
@@ -154,11 +151,10 @@ public class ShipmentPatientWrapper extends
     public static Collection<ShipmentPatientWrapper> wrapShipmentPatientCollection(
         WritableApplicationService appService,
         Collection<ShipmentPatient> rawCsps) {
-        Collection<ShipmentPatientWrapper> wrappedCsps =
-            new ArrayList<ShipmentPatientWrapper>();
+        Collection<ShipmentPatientWrapper> wrappedCsps = new ArrayList<ShipmentPatientWrapper>();
         for (ShipmentPatient csp : rawCsps) {
-            ShipmentPatientWrapper wrappedCsp =
-                new ShipmentPatientWrapper(appService, csp);
+            ShipmentPatientWrapper wrappedCsp = new ShipmentPatientWrapper(
+                appService, csp);
             wrappedCsps.add(wrappedCsp);
         }
         return wrappedCsps;

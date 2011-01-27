@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.RequestAliquotPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Request;
@@ -20,8 +23,8 @@ public class RequestAliquotWrapper extends ModelWrapper<RequestAliquot> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "request", "aliquot", "state", "claimedBy" };
+    protected List<String> getPropertyChangeNames() {
+        return RequestAliquotPeer.PROP_NAMES;
     }
 
     @Override

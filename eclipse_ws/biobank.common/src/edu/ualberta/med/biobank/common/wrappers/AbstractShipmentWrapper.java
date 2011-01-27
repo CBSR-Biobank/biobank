@@ -2,9 +2,11 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.AbstractShipmentPeer;
 import edu.ualberta.med.biobank.model.AbstractShipment;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.Shipment;
@@ -24,9 +26,8 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "dateReceived", "comment", "waybill", "departed",
-            "boxNumber", "shippingMethod" };
+    protected List<String> getPropertyChangeNames() {
+        return AbstractShipmentPeer.PROP_NAMES;
     }
 
     @Override

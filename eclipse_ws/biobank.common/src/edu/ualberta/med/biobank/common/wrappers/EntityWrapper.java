@@ -7,6 +7,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.EntityPeer;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
@@ -126,8 +127,8 @@ public class EntityWrapper extends ModelWrapper<Entity> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] {};
+    protected List<String> getPropertyChangeNames() {
+        return EntityPeer.PROP_NAMES;
     }
 
     @Override

@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.DispatchInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -36,8 +37,8 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "study", "fromSite", "destSiteCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return DispatchInfoPeer.PROP_NAMES;
     }
 
     @Override

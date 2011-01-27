@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.PvAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
@@ -24,8 +27,8 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "studyPvAttr", "value", "patientVisit" };
+    protected List<String> getPropertyChangeNames() {
+        return PvAttrPeer.PROP_NAMES;
     }
 
     @Override

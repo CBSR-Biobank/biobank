@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
 import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.StudySourceVessel;
@@ -34,8 +35,8 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name" };
+    protected List<String> getPropertyChangeNames() {
+        return SourceVesselPeer.PROP_NAMES;
     }
 
     @Override
@@ -104,8 +105,8 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         String queryString = "select count(s) from "
             + StudySourceVessel.class.getName()
             + " as s where s.sourceVessel=?)";
-        HQLCriteria c = new HQLCriteria(queryString, Arrays
-            .asList(new Object[] { wrappedObject }));
+        HQLCriteria c = new HQLCriteria(queryString,
+            Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -115,8 +116,8 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         }
         String queryString2 = "select count(s) from "
             + PvSourceVessel.class.getName() + " as s where s.sourceVessel=?)";
-        HQLCriteria c2 = new HQLCriteria(queryString2, Arrays
-            .asList(new Object[] { wrappedObject }));
+        HQLCriteria c2 = new HQLCriteria(queryString2,
+            Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results2 = appService.query(c2);
         if (results2.size() != 1) {
             throw new BiobankCheckException("Invalid size for HQL query result");
@@ -133,8 +134,8 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
 
     private void checkNoDuplicates(String propertyName, String value,
         String errorMessage) throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(Arrays
-            .asList(new Object[] { value }));
+        List<Object> parameters = new ArrayList<Object>(
+            Arrays.asList(new Object[] { value }));
 
         // if global type, check the name is use nowhere
 

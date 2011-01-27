@@ -78,11 +78,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public void addPropertyChangeListener(String propertyName,
         PropertyChangeListener listener) {
-        String[] properties = getPropertyChangeNames();
-        if ((properties == null) || (properties.length == 0)) {
+        List<String> propertiesList = getPropertyChangeNames();
+        if ((propertiesList == null) || (propertiesList.size() == 0)) {
             throw new RuntimeException("wrapper has not defined any properties");
         }
-        List<String> propertiesList = Arrays.asList(properties);
         if (!propertiesList.contains(propertyName)) {
             throw new RuntimeException("invalid property: " + propertyName);
         }
@@ -126,7 +125,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return the list of the different properties we want to notify when we
      * call firePropertyChanges
      */
-    protected abstract String[] getPropertyChangeNames();
+    protected abstract List<String> getPropertyChangeNames();
 
     /**
      * When retrieve the values from the database, need to fire the
@@ -134,7 +133,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     private void firePropertyChanges(Object oldWrappedObject,
         Object newWrappedObject) throws Exception {
-        String[] memberNames = getPropertyChangeNames();
+        List<String> memberNames = getPropertyChangeNames();
         if (memberNames == null) {
             throw new Exception("memberNames cannot be null");
         }
@@ -228,36 +227,35 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected void checkFieldLimits() throws BiobankCheckException,
         BiobankStringLengthException {
         String fieldValue = "";
-        String[] fields = getPropertyChangeNames();
-        for (int i = 0; i < fields.length; i++) {
+        for (String field : getPropertyChangeNames()) {
             Integer maxLen = VarCharLengths.getMaxSize(
-                wrappedObject.getClass(), fields[i]);
+                wrappedObject.getClass(), field);
             if (maxLen == null)
                 continue;
 
             Method method;
             try {
                 method = this.getClass().getMethod(
-                    "get" + Character.toUpperCase(fields[i].charAt(0))
-                        + fields[i].substring(1));
+                    "get" + Character.toUpperCase(field.charAt(0))
+                        + field.substring(1));
                 if (method.getReturnType().equals(String.class)) {
                     fieldValue = (String) method.invoke(this);
                     if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
                         throw new BiobankStringLengthException(
-                            "Field exceeds max length: field: " + fields[i]
+                            "Field exceeds max length: field: " + field
                                 + ", value \"" + fieldValue + "\"");
                     }
                 }
             } catch (SecurityException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             } catch (NoSuchMethodException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             } catch (IllegalArgumentException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             } catch (IllegalAccessException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             } catch (InvocationTargetException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             }
         }
     }

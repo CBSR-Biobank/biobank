@@ -189,17 +189,17 @@
   </target>
   <target name="log4j-conf">
   	<copy file="security-logs/log4j.xml"
-  		  tofile="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml" overwrite="true"/> 
-    <replace file="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml">    	
+  		  tofile="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml" overwrite="true"/>
+    <replace file="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml">
     	<replacefilter token="@LOG4J_LEVEL@" value="${LOG4J_LEVEL}"/>
     	<!-- these one are copied from the caCore ant build file. -->
-    	<replacefilter token="@CLM_DB_DRIVER@" value="${CLM_DB_DRIVER}" />	
-    	<replacefilter token="@CLM_DB_CONNECTION_URL@" value="${CLM_DB_CONNECTION_URL}" />	
-    	<replacefilter token="@CLM_DB_USERNAME@" value="${CLM_DB_USERNAME}" />	
-    	<replacefilter token="@CLM_DB_PASSWORD@" value="${CLM_DB_PASSWORD}" />	
+    	<replacefilter token="@CLM_DB_DRIVER@" value="${CLM_DB_DRIVER}" />
+    	<replacefilter token="@CLM_DB_CONNECTION_URL@" value="${CLM_DB_CONNECTION_URL}" />
+    	<replacefilter token="@CLM_DB_USERNAME@" value="${CLM_DB_USERNAME}" />
+    	<replacefilter token="@CLM_DB_PASSWORD@" value="${CLM_DB_PASSWORD}" />
     	<replacefilter token="@CLM_PROJECT_NAME@" value="${CLM_PROJECT_NAME}" />
     </replace>
-    	
+
   </target>
   <target name="sdk-files" depends="sdk">
     <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib"
@@ -457,9 +457,19 @@
     </java>
   </target>
 
+  <target name="bbpeerbuilder"
+          description="Builds wrapper peer classes based on UML logical model."
+          depends="sdk">
+    <java classpath="scripts/bbpeerbuilder.jar" classname="edu.ualberta.med.biobank.tools.biobankpeer.BioBankPeerBuilder"
+          failonerror="true" fork="true">
+      <arg value="${model.proj.dir}/biobank2.uml" />
+      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
+    </java>
+  </target>
+
   <target name="package-codegen-orm"
           description="REDO:: Packages the generated ORM and bean artifacts"
-          depends="strfields">
+          depends="strfields,bbpeerbuilder">
     <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
          basedir="${cacore.sdk.dir}\${output.src.dir}">
       <manifest>
