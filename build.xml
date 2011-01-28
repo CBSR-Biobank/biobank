@@ -466,6 +466,16 @@
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
     </java>
   </target>
+	
+  <target name="validators"
+	      description="create the validators xml file used by cacore to generate the source code"
+	      depends="sdk">
+    <java classpath="scripts/bbpeerbuilder.jar" classname="edu.ualberta.med.biobank.tools.validator.ValidatorGeneration"
+	      failonerror="true" fork="true">
+	  <arg value="${model.proj.dir}/biobank2.uml" />
+	  <arg value="/home/delphine/tmp/validator-test.xml" />
+	</java>
+  </target>
 
   <target name="package-codegen-orm"
           description="REDO:: Packages the generated ORM and bean artifacts"

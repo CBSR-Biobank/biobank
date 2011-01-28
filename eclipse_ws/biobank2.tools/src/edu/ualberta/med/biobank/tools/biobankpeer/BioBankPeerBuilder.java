@@ -19,6 +19,7 @@ import org.apache.log4j.Logger;
 
 import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociation;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociationType;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
@@ -101,7 +102,8 @@ public class BioBankPeerBuilder {
 
             // add imports for required classes
             importCount.clear();
-            for (String attrType : mc.getAttrMap().values()) {
+            for (Attribute attr : mc.getAttrMap().values()) {
+                String attrType = attr.getType();
                 if (importCount.get(attrType) != null) {
                     // already added an import for this class
                     continue;
@@ -149,11 +151,12 @@ public class BioBankPeerBuilder {
             // Member property fields
             for (String attr : mc.getAttrMap().keySet()) {
                 sb.append("   public static final Property<")
-                    .append(mc.getAttrMap().get(attr)).append("> ")
+                    .append(mc.getAttrMap().get(attr).getType()).append("> ")
                     .append(CamelCase.toTitleCase(attr))
                     .append(" = Property.create(\"").append(attr)
                     .append("\", new TypeReference<")
-                    .append(mc.getAttrMap().get(attr)).append(">() {});\n\n");
+                    .append(mc.getAttrMap().get(attr).getType())
+                    .append(">() {});\n\n");
             }
 
             // Association property fields

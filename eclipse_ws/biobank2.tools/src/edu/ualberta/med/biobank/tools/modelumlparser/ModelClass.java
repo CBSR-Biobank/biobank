@@ -12,14 +12,14 @@ public class ModelClass {
 
     private ModelClass extendsClass;
 
-    private Map<String, String> attrMap;
+    private Map<String, Attribute> attrMap;
 
     private Map<String, ClassAssociation> assocMap;
 
     public ModelClass(String name) {
         this.name = name;
         extendsClass = null;
-        attrMap = new HashMap<String, String>();
+        attrMap = new HashMap<String, Attribute>();
         assocMap = new HashMap<String, ClassAssociation>();
     }
 
@@ -47,12 +47,12 @@ public class ModelClass {
         this.extendsClass = extendsClass;
     }
 
-    public Map<String, String> getAttrMap() {
+    public Map<String, Attribute> getAttrMap() {
         return Collections.unmodifiableMap(attrMap);
     }
 
-    public void addAttr(String attrName, String attrType) {
-        attrMap.put(attrName, attrType);
+    public void addAttr(String attrName, Attribute attr) {
+        attrMap.put(attrName, attr);
     }
 
     public Map<String, ClassAssociation> getAssocMap() {

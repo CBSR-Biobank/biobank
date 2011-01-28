@@ -12,15 +12,23 @@ import java.io.FileWriter;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
 public class StrFields {
+    private static final String NOT_EMPTY_STEREOTYPE = "not-empty";
+
+    private static final String NOT_NULL_STEREOTYPE = "not-null";
+
+    private static final String UNIQUE_STEREOTYPE = "unique";
 
     private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR TEMPLATE\n\n"
         + "Options\n" + "  -v, --verbose    Shows verbose output";
@@ -60,10 +68,10 @@ public class StrFields {
             if (appArgs.verbose) {
                 for (String className : ModelUmlParser.getInstance()
                     .getDmTableSet()) {
-                    Map<String, String> attrMap = ModelUmlParser.getInstance()
-                        .getDmTableAttrMap(className);
+                    Map<String, Attribute> attrMap = ModelUmlParser
+                        .getInstance().getDmTableAttrMap(className);
                     for (String attrName : attrMap.keySet()) {
-                        String type = attrMap.get(attrName);
+                        String type = attrMap.get(attrName).getType();
                         if (!type.startsWith("VARCHAR")
                             && !type.startsWith("TEXT"))
                             continue;
@@ -122,13 +130,17 @@ public class StrFields {
         String className = hbmFileName.replace(HBM_FILE_EXTENSION, "");
         String tableName = CamelCase.toTitleCase(className);
 
-        Map<String, String> attrMap = ModelUmlParser.getInstance()
+        Map<String, Attribute> attrMap = ModelUmlParser.getInstance()
             .getDmTableAttrMap(tableName);
         Map<String, Integer> attrLengthMap = new HashMap<String, Integer>();
 
-        for (String attrName : attrMap.keySet()) {
-            String attrType = attrMap.get(attrName);
+        Set<String> uniqueList = new HashSet<String>();
+        Set<String> notNullList = new HashSet<String>();
 
+        for (String attrName : attrMap.keySet()) {
+            Attribute attr = attrMap.get(attrName);
+
+            String attrType = attr.getType();
             if (attrType.startsWith("VARCHAR")) {
                 Matcher varcharMatcher = VARCHAR_LEN.matcher(attrType);
 
@@ -139,10 +151,16 @@ public class StrFields {
             } else if (attrType.startsWith("TEXT")) {
                 attrLengthMap.put(attrName, 500);
             }
+            if (attr.hasStereotype(UNIQUE_STEREOTYPE))
+                uniqueList.add(attrName);
+            if (attr.hasStereotype(NOT_NULL_STEREOTYPE))
+                notNullList.add(attrName);
+            if (attr.hasStereotype(NOT_EMPTY_STEREOTYPE))
+                notNullList.add(attrName);
         }
 
         HbmModifier.getInstance().alterMapping(hbmFilePath, className,
-            tableName, attrLengthMap);
+            tableName, attrLengthMap, uniqueList, notNullList);
     }
 
     private void createVarCharLengthsSourceCode() throws Exception {
@@ -150,10 +168,10 @@ public class StrFields {
         StringBuffer sb = new StringBuffer();
 
         for (String className : ModelUmlParser.getInstance().getDmTableSet()) {
-            Map<String, String> attrMap = ModelUmlParser.getInstance()
+            Map<String, Attribute> attrMap = ModelUmlParser.getInstance()
                 .getDmTableAttrMap(className);
             for (String attrName : attrMap.keySet()) {
-                String attrType = attrMap.get(attrName);
+                String attrType = attrMap.get(attrName).getType();
                 if (!attrType.startsWith("VARCHAR"))
                     continue;
 

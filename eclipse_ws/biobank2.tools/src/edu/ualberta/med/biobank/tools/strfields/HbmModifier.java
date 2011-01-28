@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,9 @@ public class HbmModifier {
     private static Pattern HBM_STRING_ATTR = Pattern.compile(
         "<property.*type=\"string\"\\s*column=\"([^\"]*)\"/>",
         Pattern.CASE_INSENSITIVE);
+
+    private static Pattern HBM_ATTR = Pattern.compile(
+        "<property.*column=\"([^\"]*)\"/>", Pattern.CASE_INSENSITIVE);
 
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
 
@@ -35,7 +39,8 @@ public class HbmModifier {
     }
 
     public void alterMapping(String filename, String className,
-        String tableName, Map<String, Integer> columnLenMap) throws Exception {
+        String tableName, Map<String, Integer> columnLenMap,
+        Set<String> uniqueList, Set<String> notNullList) throws Exception {
         if (!filename.contains(className)) {
             throw new Exception(
                 "HBM file name does not contain class name: filename "
@@ -51,6 +56,7 @@ public class HbmModifier {
             String line = reader.readLine();
             while (line != null) {
                 Matcher stringAttrMatcher = HBM_STRING_ATTR.matcher(line);
+                Matcher attrMatcher = HBM_ATTR.matcher(line);
                 if (stringAttrMatcher.find() && !line.contains("length=\"")) {
                     String attrName = stringAttrMatcher.group(1);
                     Integer attrLen = columnLenMap.get(attrName);
@@ -62,7 +68,13 @@ public class HbmModifier {
 
                     line = line.replace("type=\"string\"",
                         "type=\"string\" length=\"" + attrLen + "\"");
+                    line = addContraints(line, attrName, uniqueList,
+                        notNullList);
                     documentChanged = true;
+                } else if (attrMatcher.find()) {
+                    String attrName = attrMatcher.group(1);
+                    line = addContraints(line, attrName, uniqueList,
+                        notNullList);
                 }
 
                 writer.write(line);
@@ -86,5 +98,19 @@ public class HbmModifier {
             System.out.println("class " + className
                 + " does not have a corresponding HBM file");
         }
+    }
+
+    private String addContraints(String line, String attrName,
+        Set<String> uniqueList, Set<String> notNullList) {
+        String s = "";
+        if (uniqueList.contains(attrName) && !s.contains("unique="))
+            s += " unique=\"true\"";
+        if (notNullList.contains(attrName) && !s.contains("not-null="))
+            s += " not-null=\"true\"";
+        if (s.length() > 0) {
+            documentChanged = true;
+            return line.replace("/>", s + "/>");
+        }
+        return line;
     }
 }

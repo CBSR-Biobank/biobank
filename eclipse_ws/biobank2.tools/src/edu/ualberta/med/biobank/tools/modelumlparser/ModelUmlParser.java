@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -24,6 +25,8 @@ import org.w3c.dom.NodeList;
 
 public class ModelUmlParser {
 
+    public static final String INVALID_DATA_MODEL_CLASS_NAME_MSG = "invalid data model class name: ";
+
     private static final Logger LOGGER = Logger.getLogger(ModelUmlParser.class
         .getName());
 
@@ -41,8 +44,12 @@ public class ModelUmlParser {
 
     private Map<String, Generalization> generalizationMap;
 
+    private Map<String, String> customStereotypesMap;
+
     @SuppressWarnings("unused")
     private Map<String, Generalization> lmGeneralizationXmiIdClassMap;
+
+    private Document document;
 
     private ModelUmlParser() {
         dataModelDataTypeMap = new HashMap<String, String>();
@@ -52,6 +59,7 @@ public class ModelUmlParser {
         logicalModelClassMap = new HashMap<String, ModelClass>();
         logicalModelXmiIdClassMap = new HashMap<String, ModelClass>();
         generalizationMap = new HashMap<String, Generalization>();
+        customStereotypesMap = new HashMap<String, String>();
     }
 
     public static ModelUmlParser getInstance() {
@@ -61,14 +69,22 @@ public class ModelUmlParser {
         return instance;
     }
 
+    private Document getDocument(String modelFileName) throws Exception {
+        if (document == null) {
+            File file = new File(modelFileName);
+            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(false);
+            DocumentBuilder db = dbf.newDocumentBuilder();
+            document = db.parse(file);
+            document.getDocumentElement().normalize();
+            initCustomStereotypes(document);
+        }
+        return document;
+    }
+
     public Map<String, ModelClass> geLogicalModel(String modelFileName)
         throws Exception {
-        DocumentBuilderFactory domFactory = DocumentBuilderFactory
-            .newInstance();
-        domFactory.setNamespaceAware(false);
-        DocumentBuilder builder = domFactory.newDocumentBuilder();
-        Document doc = builder.parse(modelFileName);
-        getLmClasses(doc);
+        getLmClasses(getDocument(modelFileName));
 
         // displayModelInLogger();
 
@@ -277,7 +293,8 @@ public class ModelUmlParser {
                         + xmiIdRef);
             }
 
-            modelClass.addAttr(classAttrName, classAttrType);
+            modelClass.addAttr(classAttrName, new Attribute(classAttrName,
+                classAttrType, getStereotypes(attrNode)));
             LOGGER.debug("LM class/" + modelClass.getName() + " attribute/"
                 + classAttrName + " type/" + classAttrType);
         }
@@ -456,15 +473,6 @@ public class ModelUmlParser {
         getDataModel(doc);
     }
 
-    private Document getDocument(String modelFileName) throws Exception {
-        File file = new File(modelFileName);
-        DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-        DocumentBuilder db = dbf.newDocumentBuilder();
-        Document doc = db.parse(file);
-        doc.getDocumentElement().normalize();
-        return doc;
-    }
-
     public Set<String> getDmTableSet() throws Exception {
         if (dataModelClassMap.size() == 0) {
             throw new Exception("UML file not parsed yet");
@@ -472,7 +480,7 @@ public class ModelUmlParser {
         return dataModelClassMap.keySet();
     }
 
-    public Map<String, String> getDmTableAttrMap(String className)
+    public Map<String, Attribute> getDmTableAttrMap(String className)
         throws Exception {
         if (dataModelClassMap.size() == 0) {
             throw new Exception("UML file not parsed yet");
@@ -480,7 +488,7 @@ public class ModelUmlParser {
 
         ModelClass dmTable = dataModelClassMap.get(className);
         if (dmTable == null) {
-            throw new Exception("invalid data model class name: " + className);
+            throw new Exception(INVALID_DATA_MODEL_CLASS_NAME_MSG + className);
         }
         return Collections.unmodifiableMap(dmTable.getAttrMap());
     }
@@ -537,7 +545,7 @@ public class ModelUmlParser {
 
         for (int i = 0, n = attrNodes.getLength(); i < n; ++i) {
             Node attrNode = attrNodes.item(i);
-            NamedNodeMap attrs = node.getAttributes();
+            NamedNodeMap attrs = attrNode.getAttributes();
 
             String attrName = attrs.getNamedItem("name").getNodeValue();
 
@@ -561,8 +569,28 @@ public class ModelUmlParser {
                 throw new Exception("xmi id ref not found: " + xmiIdRef);
             }
 
-            mc.getAttrMap().put(attrName, attrType);
+            mc.addAttr(attrName, new Attribute(attrName, attrType,
+                getStereotypes(attrNode)));
         }
+    }
+
+    private Set<String> getStereotypes(Node node)
+        throws XPathExpressionException {
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPathExpression exp = xpath
+            .compile("ModelElement.stereotype/Stereotype/@xmi.idref");
+        NodeList stereotypesNodes = (NodeList) exp.evaluate(node,
+            XPathConstants.NODESET);
+        if (stereotypesNodes.getLength() == 0)
+            return null;
+        Set<String> set = new HashSet<String>();
+        for (int s = 0; s < stereotypesNodes.getLength(); s++) {
+            String stereotype = customStereotypesMap.get(stereotypesNodes.item(
+                s).getNodeValue());
+            if (stereotype != null)
+                set.add(stereotype);
+        }
+        return set;
     }
 
     private String getLmPackageName(Node node) {
@@ -583,5 +611,19 @@ public class ModelUmlParser {
             }
         }
         return null;
+    }
+
+    private void initCustomStereotypes(Document doc)
+        throws XPathExpressionException {
+        XPath xpath = XPathFactory.newInstance().newXPath();
+        XPathExpression expr = xpath
+            .compile("uml/XMI/XMI.content/Model/Namespace.ownedElement/Stereotype");
+        NodeList nodes = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Node node = nodes.item(i);
+            NamedNodeMap attrs = node.getAttributes();
+            customStereotypesMap.put(attrs.getNamedItem("xmi.id")
+                .getNodeValue(), attrs.getNamedItem("name").getNodeValue());
+        }
     }
 }
