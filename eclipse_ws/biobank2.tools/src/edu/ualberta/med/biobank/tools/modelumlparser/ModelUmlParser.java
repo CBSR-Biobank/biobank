@@ -561,7 +561,7 @@ public class ModelUmlParser {
                 throw new Exception("xmi id ref not found: " + xmiIdRef);
             }
 
-            mc.getAttrMap().put(attrName, attrType);
+            mc.addAttr(attrName, attrType);
         }
     }
 

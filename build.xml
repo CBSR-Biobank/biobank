@@ -232,7 +232,7 @@
       <entry key="0" value="${java.client.version.num}"/>
     </propertyfile>
   </target>
-  <target name="deploy-eclipse" depends="sdk-files,java-client-manifest,modelpeer"
+  <target name="deploy-eclipse" depends="sdk-files,java-client-manifest"
           description="deploys the caCORE SDK beans to the eclipse project">
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/system/lib"
@@ -387,7 +387,7 @@
           description="generates the database schema for the caCORE SDK data model">
     <ant dir="${schema.dir}" target="schemaexport" inheritRefs="false" />
   </target>
-  <target name="dbcreate-add-tables" depends="strfields">
+  <target name="dbcreate-add-tables" depends="hbmstrings">
     <sql driver="${DB_DRIVER}"
          url="${DB_CONNECTION_URL}"
          userid="${DB_USERNAME}" password="${DB_PASSWORD}">
@@ -446,42 +446,23 @@
     </exec>
   </target>
 
-  <target name="strfields"
-          description="Add the length='#' field into *.hbm.xml files, references the biobank.uml file for the VARCHAR(#)"
-          depends="sdk">
-    <java classpath="scripts/strfields.jar" classname="edu.ualberta.med.biobank.strfields.StrFields"
-          failonerror="true" fork="true">
-      <arg value="${model.proj.dir}/biobank2.uml" />
-      <arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
-      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java.template" />
-    </java>
-  </target>
-
-
-  <target name="build-modelpeer" depends="build-common-project">
+  <target name="build-modelpeer">
     <echo message="Building model peer tool" />
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
-    <copy includeemptydirs="false" todir="${eclipse.proj.dir.tools}/output">
-      <fileset dir="${eclipse.proj.dir.common}/output">
-  	<include name="**/TypeReference.class" />
-  	<include name="**/Property.class" />
-      </fileset>
-    </copy>
     <javac debug="on" debuglevel="source,lines,vars"
       destdir="${eclipse.proj.dir.tools}/output" source="1.6" target="1.6"
       includeantruntime="false">
-      <src path="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/tools/modelpeer" />
-      <src path="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/tools/modelumlparser" />
-      <src path="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/tools/utils" />
+      <src path="${eclipse.proj.dir.tools}/src" />
+      <src path="${eclipse.proj.dir.common}/src" />
+      <include name="**/tools/modelpeer/*.java" />
+      <include name="**/tools/modelumlparser/*.java" />
+      <include name="**/tools/utils/*.java" />
+      <include name="**/common/util/TypeReference.java" />
+      <include name="**/common/wrappers.Property.java" />
       <classpath>
   	<path id="biobank.tools.classpath">
    	  <fileset dir="${eclipse.proj.dir.tools}/lib">
 	    <include name="*.jar" />
-	  </fileset>
-	</path>
-  	<path id="biobank.common.classpath">
-   	  <fileset dir="${eclipse.proj.dir.common}/output">
-	    <include name="**/*.class" />
 	  </fileset>
 	</path>
       </classpath>
@@ -492,37 +473,59 @@
           description="Builds wrapper peer classes based on UML logical model."
           depends="build-modelpeer">
     <java classname="edu.ualberta.med.biobank.tools.modelpeer.ModelPeerBuilder"
-          failonerror="true" fork="true">
+      failonerror="true" fork="true">
+      <jvmarg
+      value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
       <arg value="${model.proj.dir}/biobank2.uml" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
       <classpath>
-  	<path id="biobank.common.classpath">
-   	  <fileset dir="${eclipse.proj.dir.tools}/output">
-	    <include name="**/*.class" />
-	  </fileset>
-	</path>
+        <pathelement location="${req.jars.dir}/jargs.jar" />
+        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
+        <pathelement location="${eclipse.proj.dir.tools}/output" />
       </classpath>
     </java>
   </target>
 
-  <target name="package-codegen-orm"
-          description="REDO:: Packages the generated ORM and bean artifacts"
-          depends="strfields">
-    <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
-         basedir="${cacore.sdk.dir}\${output.src.dir}">
-      <manifest>
-        <attribute name="Generated-By" value="caCORE SDK Code Generator" />
-        <attribute name="Version" value="${VERSION}" />
-      </manifest>
-      <include name="**/*.hbm.xml" />
-      <include name="*.cfg.xml" />
-      <include name="ehcache.xml" />
-      <exclude name="${csm.security.config.file}" />
-    </jar>
+  <target name="build-hbmstrings" depends="sdk">
+    <echo message="Building HBM string fixing tool" />
+    <mkdir dir="${eclipse.proj.dir.tools}/output" />
+    <javac debug="on" debuglevel="source,lines,vars"
+      destdir="${eclipse.proj.dir.tools}/output" source="1.6" target="1.6"
+      includeantruntime="false">
+      <src path="${eclipse.proj.dir.tools}/src" />
+      <src path="${eclipse.proj.dir.common}/src" />
+      <include name="**/tools/strfields/*.java" />
+      <include name="**/tools/modelumlparser/*.java" />
+      <include name="**/tools/utils/*.java" />
+      <classpath>
+  	<path id="biobank.tools.classpath">
+   	  <fileset dir="${eclipse.proj.dir.tools}/lib">
+	    <include name="*.jar" />
+	  </fileset>
+	</path>
+      </classpath>
+    </javac>
   </target>
 
+  <target name="hbmstrings"
+    description="Adds the length='#' field into *.hbm.xml files, references the biobank.uml file for the VARCHAR(#)"
+          depends="build-hbmstrings">
+    <java classname="edu.ualberta.med.biobank.tools.strfields.StrFields"
+      failonerror="true" fork="true">
+      <jvmarg
+      value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
+      <arg value="${model.proj.dir}/biobank2.uml" />
+      <arg value="${cacore.sdk.dir}/output/biobank2/src/edu/ualberta/med/biobank/model" />
+      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java.template" />
+      <classpath>
+        <pathelement location="${req.jars.dir}/jargs.jar" />
+        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
+        <pathelement location="${eclipse.proj.dir.tools}/output" />
+      </classpath>
+    </java>
+  </target>
 
-  <target name="build-common-project" depends="sdk-files">
+  <target name="build-common-project" depends="sdk-files,modelpeer">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
@@ -543,6 +546,9 @@
 	  <fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib">
 	    <include name="*.jar" />
 	  </fileset>
+	  <fileset dir="${cacore.sdk.dir}/writable-api/dist">
+	    <include name="*.jar" />
+	  </fileset>
 	  <fileset dir="${cacore.sdk.dir}/system/security/dist">
 	    <include name="*.jar" />
 	  </fileset>
@@ -553,6 +559,22 @@
 
       </classpath>
     </javac>
+  </target>
+
+  <target name="package-codegen-orm"
+          description="REDO:: Packages the generated ORM and bean artifacts"
+          depends="strfields">
+    <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
+         basedir="${cacore.sdk.dir}\${output.src.dir}">
+      <manifest>
+        <attribute name="Generated-By" value="caCORE SDK Code Generator" />
+        <attribute name="Version" value="${VERSION}" />
+      </manifest>
+      <include name="**/*.hbm.xml" />
+      <include name="*.cfg.xml" />
+      <include name="ehcache.xml" />
+      <exclude name="${csm.security.config.file}" />
+    </jar>
   </target>
 
 

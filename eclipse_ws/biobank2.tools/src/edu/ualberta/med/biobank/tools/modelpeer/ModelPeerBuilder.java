@@ -53,7 +53,6 @@ public class ModelPeerBuilder {
 
     public static void main(String argv[]) {
         try {
-            // PropertyConfigurator.configure("conf/log4j.properties");
             ModelPeerBuilder.getInstance().doWork(parseCommandLine(argv));
         } catch (Exception e) {
             e.printStackTrace();
