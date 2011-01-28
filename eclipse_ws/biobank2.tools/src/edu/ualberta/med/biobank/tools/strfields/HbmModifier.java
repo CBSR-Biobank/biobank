@@ -55,14 +55,11 @@ public class HbmModifier {
                     String attrName = stringAttrMatcher.group(1);
                     Integer attrLen = columnLenMap.get(attrName);
 
-                    if (attrLen == null) {
-                        // no length for this attribute
-                        continue;
+                    if (attrLen != null) {
+                        line = line.replace("type=\"string\"",
+                            "type=\"string\" length=\"" + attrLen + "\"");
+                        documentChanged = true;
                     }
-
-                    line = line.replace("type=\"string\"",
-                        "type=\"string\" length=\"" + attrLen + "\"");
-                    documentChanged = true;
                 }
 
                 writer.write(line);

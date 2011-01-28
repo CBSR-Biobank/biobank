@@ -201,6 +201,7 @@
     </replace>
 
   </target>
+
   <target name="sdk-files" depends="sdk">
     <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib"
              id="sdk.jar.files">
@@ -220,6 +221,7 @@
       <map from="${cacore.sdk.dir}/output/biobank2/package/local-client/lib/" to="" />
     </pathconvert>
   </target>
+
   <!-- Eclipse -->
   <target name="java-client-manifest">
     <manifest file="${eclipse.proj.dir}/META-INF/MANIFEST.MF" mode="update">
@@ -563,7 +565,7 @@
 
   <target name="package-codegen-orm"
           description="REDO:: Packages the generated ORM and bean artifacts"
-          depends="strfields">
+          depends="hbmstrings">
     <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
          basedir="${cacore.sdk.dir}\${output.src.dir}">
       <manifest>
