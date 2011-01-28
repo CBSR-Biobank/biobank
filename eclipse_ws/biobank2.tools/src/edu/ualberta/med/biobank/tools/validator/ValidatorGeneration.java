@@ -20,8 +20,8 @@ public class ValidatorGeneration {
 
     private static ValidatorGeneration instance = null;
 
-    // private static final Logger LOGGER = Logger
-    // .getLogger(ValidatorGeneration.class.getName());
+    private static final Logger LOGGER = Logger
+        .getLogger(ValidatorGeneration.class.getName());
 
     private Map<String, ModelClass> modelClasses;
 

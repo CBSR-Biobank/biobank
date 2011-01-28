@@ -487,10 +487,31 @@
       </classpath>
     </java>
   </target>
+
+  <target name="build-validators" depends="sdk">
+  	<echo message="Building hibernate validators generation tool" />
+	<mkdir dir="${eclipse.proj.dir.tools}/output" />
+	<javac debug="on" debuglevel="source,lines,vars"
+	       destdir="${eclipse.proj.dir.tools}/output" source="1.6" target="1.6"
+	       includeantruntime="false">
+	  <src path="${eclipse.proj.dir.tools}/src" />
+	  <src path="${eclipse.proj.dir.common}/src" />
+	  <include name="**/tools/validator/*.java" />
+	  <include name="**/tools/modelumlparser/*.java" />
+	  <include name="**/tools/utils/*.java" />
+	  <classpath>
+	  	<path id="biobank.tools.classpath">
+	   	  <fileset dir="${eclipse.proj.dir.tools}/lib">
+		    <include name="*.jar" />
+		  </fileset>
+		</path>
+	  </classpath>
+	</javac>
+  </target>	
 	
   <target name="validators"
 	      description="create the validators xml file used by cacore to generate the source code"
-	      depends="sdk">
+	      depends="build-validators">
     <java classname="edu.ualberta.med.biobank.tools.validator.ValidatorGeneration"
 	      failonerror="true" fork="true">
       <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
@@ -498,6 +519,7 @@
 	  <arg value="/home/delphine/tmp/validator-test.xml" />
       <classpath>
     	<pathelement location="${req.jars.dir}/jargs.jar" />
+      	<pathelement location="${req.jars.dir}/commons-io-1.4.jar" />
     	<pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
     	<pathelement location="${eclipse.proj.dir.tools}/output" />
       </classpath>
