@@ -19,6 +19,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.log4j.Logger;
+
 import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
@@ -29,6 +31,9 @@ public class StrFields {
     private static final String NOT_NULL_STEREOTYPE = "not-null";
 
     private static final String UNIQUE_STEREOTYPE = "unique";
+
+    private static final Logger LOGGER = Logger.getLogger(StrFields.class
+        .getName());
 
     private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR TEMPLATE\n\n"
         + "Options\n" + "  -v, --verbose    Shows verbose output";
@@ -56,10 +61,9 @@ public class StrFields {
         this.appArgs = appArgs;
 
         if (appArgs.verbose) {
-            System.out.println("  UML file: " + appArgs.modelFileName);
-            System.out.println("  HBM dir:  " + appArgs.hbmDir);
-            System.out.println("  Template: " + appArgs.template);
-            System.out.println();
+            LOGGER.info("  UML file: " + appArgs.modelFileName);
+            LOGGER.info("  HBM dir:  " + appArgs.hbmDir);
+            LOGGER.info("  Template: " + appArgs.template);
         }
 
         try {
@@ -76,11 +80,10 @@ public class StrFields {
                             && !type.startsWith("TEXT"))
                             continue;
 
-                        System.out.println("  " + className + "." + attrName
-                            + ": " + type);
+                        LOGGER.info("  " + className + "." + attrName + ": "
+                            + type);
                     }
                 }
-                System.out.println();
             }
 
             for (String file : getHbmFiles(appArgs.hbmDir)) {
@@ -108,7 +111,7 @@ public class StrFields {
         File dir = new File(hbmDir);
         String[] files = dir.list();
         if (files == null) {
-            System.out.println("Error: no files found in directory " + hbmDir);
+            LOGGER.info("Error: no files found in directory " + hbmDir);
             System.exit(-1);
         }
 
@@ -231,7 +234,7 @@ public class StrFields {
         try {
             parser.parse(argv);
         } catch (OptionException e) {
-            System.out.println(e.getMessage());
+            LOGGER.info(e.getMessage());
             System.exit(-1);
         }
 
@@ -242,7 +245,7 @@ public class StrFields {
 
         String[] args = parser.getRemainingArgs();
         if (args.length != 3) {
-            System.out.println("Error: invalid arguments\n" + USAGE);
+            LOGGER.info("Error: invalid arguments\n" + USAGE);
             System.exit(-1);
         }
 
