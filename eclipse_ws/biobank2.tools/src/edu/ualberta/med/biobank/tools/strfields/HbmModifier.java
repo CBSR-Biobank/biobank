@@ -5,6 +5,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Map;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -61,11 +62,13 @@ public class HbmModifier {
                     String attrName = stringAttrMatcher.group(1);
                     Integer attrLen = columnLenMap.get(attrName);
 
-                    if (attrLen != null) {
-                        line = line.replace("type=\"string\"",
-                            "type=\"string\" length=\"" + attrLen + "\"");
-                        documentChanged = true;
+                    if (attrLen == null) {
+                        throw new Exception("column not found in column map: "
+                            + attrName);
                     }
+                    line = line.replace("type=\"string\"",
+                        "type=\"string\" length=\"" + attrLen + "\"");
+                    documentChanged = true;
                     line = addContraints(line, attrName, uniqueList,
                         notNullList);
                     documentChanged = true;
@@ -92,7 +95,7 @@ public class HbmModifier {
             }
 
             outFile.deleteOnExit();
-        } catch (Exception e) {
+        } catch (IOException e) {
             System.out.println("class " + className
                 + " does not have a corresponding HBM file");
         }
