@@ -35,15 +35,50 @@ public class SiteWrapper extends ModelWrapper<Site> {
     public static final Property<Collection<Study>> STUDY_COLLECTION = Property
         .create("studyCollection", new TypeReference<Collection<Study>>() {
         });
+    public static final Property<String> NAME = Property.create("name",
+        new TypeReference<String>() {
+        });
+    public static final Property<Address> ADDRESS = Property.create("address",
+        new TypeReference<Address>() {
+        });
 
     public Collection<StudyWrapper> getStudies(boolean sort) {
-        // TODO: Q: pass StudyWrapper.class?
         return getWrappedCollection(STUDY_COLLECTION, sort);
     }
 
     public void setStudies(Collection<StudyWrapper> studies) {
         setWrappedCollection(STUDY_COLLECTION, studies);
     }
+
+    public String getName2() {
+        return getProperty(NAME);
+    }
+
+    public void setName2(String name) {
+        setProperty(NAME, name);
+    }
+
+    private AddressWrapper getAddress2() {
+        return getWrappedProperty(ADDRESS);
+    }
+
+    public void setAddress2(AddressWrapper address) {
+        setWrappedProperty(ADDRESS, address);
+    }
+
+    public String getCity2() {
+        return getProperty(getAddress2(), AddressWrapper.CITY);
+    }
+
+    public void setCity2(String city) {
+        setProperty(getAddress2(), AddressWrapper.CITY, city);
+    }
+
+    // protected String[] getPropertyChangeNames() {
+    // super.getPropertyChangeNames();
+    //
+    // listenToProperty(ADDRESS);
+    // }
 
     private AddressWrapper address;
 

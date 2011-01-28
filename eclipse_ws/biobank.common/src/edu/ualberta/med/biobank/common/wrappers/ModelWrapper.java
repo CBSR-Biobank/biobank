@@ -38,9 +38,15 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final Map<Property<?>, Object> propertyMap = new HashMap<Property<?>, Object>();
 
+    // NOTE: properties need to use the unwrapped types because (1) easier to
+    // directly get the property from the model (2) necessary for the eager-load
+    // function.
     public static class Property<T> {
         private final String name;
         private final TypeReference<T> type;
+
+        // TODO: include the model class as a type parameter and check this
+        // against what it's called on?
 
         private Property(String name, TypeReference<T> type) {
             this.name = name;
@@ -59,67 +65,116 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             return new Property<E>(name, type);
         }
 
-        // TODO: override equals/ hashcode on Property<T>, maybe use a composite
-        // as a key so can have nested properties stored and retrieved properly
-        // ;)
-    }
-
-    // NOTE: properties need to use the unwrapped types because (1) easier to
-    // directly get the property from the model (2) necessary for the eager-load
-    // function.
-    // use (un)wrap() to walk an object and wrap stuff?
-    protected <W extends ModelWrapper<R>, R> W getWrappedProperty(R raw) {
-        try {
-            @SuppressWarnings("unchecked")
-            W wrapper = (W) ModelWrapper.wrapObject(appService, raw);
-            return wrapper;
-        } catch (Exception e) {
-            // TODO: something better?
+        @Override
+        public int hashCode() {
+            final int prime = 31;
+            int result = 1;
+            result = prime * result + ((name == null) ? 0 : name.hashCode());
+            return result;
         }
 
-        return null;
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj)
+                return true;
+            if (obj == null)
+                return false;
+            if (getClass() != obj.getClass())
+                return false;
+            Property<?> other = (Property<?>) obj;
+            if (name == null) {
+                if (other.name != null)
+                    return false;
+            } else if (!name.equals(other.name))
+                return false;
+            return true;
+        }
     }
 
-    protected <W extends ModelWrapper<R>, R> void setWrappedProperty(W wrapper) {
+    public <W extends ModelWrapper<R>, R> W getWrappedProperty(
+        Property<R> property) {
+        return getWrappedProperty(this, property);
     }
 
-    protected <W extends ModelWrapper<R>, R> void setWrappedCollection(
+    public <W extends ModelWrapper<R>, R> W getWrappedProperty(
+        ModelWrapper<?> modelWrapper, Property<R> property) {
+
+        @SuppressWarnings("unchecked")
+        W wrapper = (W) recall(property);
+
+        if (wrapper == null && !isCached(property)) {
+            R raw = getModelProperty(modelWrapper, property);
+
+            if (raw != null) {
+                try {
+                    W tmp = ModelWrapper.wrapObject(appService, raw);
+                    wrapper = tmp;
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
+
+            cache(property, wrapper);
+        }
+
+        return wrapper;
+    }
+
+    public <W extends ModelWrapper<R>, R> void setWrappedProperty(
+        Property<R> property, W wrapper) {
+        setWrappedProperty(this, property, wrapper);
+    }
+
+    public <W extends ModelWrapper<R>, R> void setWrappedProperty(
+        ModelWrapper<?> modelWrapper, Property<R> property, W wrapper) {
+        R newValue = wrapper.getWrappedObject();
+        setProperty(modelWrapper, property, newValue);
+        cache(property, wrapper);
+    }
+
+    public <W extends ModelWrapper<R>, R> void setWrappedCollection(
+        Property<? extends Collection<R>> property, Collection<W> wrappers) {
+        setWrappedCollection(this, property, wrappers);
+    }
+
+    public <W extends ModelWrapper<R>, R> void setWrappedCollection(
+        ModelWrapper<?> modelWrapper,
         Property<? extends Collection<R>> property, Collection<W> wrappers) {
         Collection<R> newValues = new HashSet<R>();
         for (W element : wrappers) {
             newValues.add(element.getWrappedObject());
         }
 
-        Collection<R> oldValues = getProperty(property);
-        setProperty(property, newValues);
-
-        firePropertyChange(property, oldValues, newValues);
+        setModelProperty(modelWrapper, property, newValues);
         cache(property, wrappers);
     }
 
-    protected <W extends ModelWrapper<R>, R> List<W> getWrappedCollection(
-        Property<? extends Collection<R>> property) {
-        return getWrappedCollection(property, false);
+    public <W extends ModelWrapper<R>, R> List<W> getWrappedCollection(
+        Property<? extends Collection<R>> property, boolean sort) {
+        return getWrappedCollection(this, property, sort);
     }
 
-    protected <W extends ModelWrapper<R>, R> List<W> getWrappedCollection(
+    public <W extends ModelWrapper<R>, R> List<W> getWrappedCollection(
+        ModelWrapper<?> modelWrapper,
         Property<? extends Collection<R>> property, boolean sort) {
 
         @SuppressWarnings("unchecked")
         List<W> wrappers = (List<W>) recall(property);
 
-        if (wrappers == null) {
-            wrappers = new ArrayList<W>();
+        if (wrappers == null && !isCached(property)) {
+            Collection<R> raw = getModelProperty(modelWrapper, property);
 
-            Collection<R> raw = getProperty(property);
-            for (R element : raw) {
-                try {
-                    @SuppressWarnings("unchecked")
-                    W wrapper = (W) ModelWrapper
-                        .wrapObject(appService, element);
-                    wrappers.add(wrapper);
-                } catch (Exception e) {
-                    // TODO: DEAL WITH THIS BETTER!
+            if (raw != null) {
+                wrappers = new ArrayList<W>();
+
+                for (R element : raw) {
+                    try {
+                        W wrapper = ModelWrapper
+                            .wrapObject(appService, element);
+                        wrappers.add(wrapper);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
                 }
             }
 
@@ -133,11 +188,39 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return wrappers;
     }
 
-    private <T> T getProperty(Property<T> property) {
+    protected <T> T getProperty(Property<T> property) {
+        return getProperty(this, property);
+    }
+
+    protected <T> T getProperty(ModelWrapper<?> modelWrapper,
+        Property<T> property) {
+        @SuppressWarnings("unchecked")
+        T value = (T) recall(property);
+
+        if (value == null && !isCached(property)) {
+            value = getModelProperty(modelWrapper, property);
+            cache(property, value);
+        }
+
+        return value;
+    }
+
+    protected <T> void setProperty(Property<T> property, T newValue) {
+        setProperty(this, property, newValue);
+    }
+
+    protected <T> void setProperty(ModelWrapper<?> modelWrapper,
+        Property<T> property, T newValue) {
+        setModelProperty(modelWrapper, property, newValue);
+        cache(property, newValue);
+    }
+
+    private <T> T getModelProperty(ModelWrapper<?> modelWrapper,
+        Property<T> property) {
         T value = null;
 
         try {
-            Class<?> modelKlazz = getWrappedObject().getClass();
+            Class<?> modelKlazz = modelWrapper.getWrappedObject().getClass();
             Method getter = modelKlazz.getMethod("get"
                 + capitalizeFirstLetter(property.getName()));
 
@@ -145,37 +228,42 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             T tmp = (T) getter.invoke(this);
             value = tmp;
         } catch (Exception e) {
-            // TODO: DEAL WITH THIS BETTER?
+            throw new RuntimeException(e.getMessage());
         }
 
         return value;
     }
 
-    private <T> void setProperty(Property<? extends T> property, T value) {
+    private <T> void setModelProperty(ModelWrapper<?> modelWrapper,
+        Property<? extends T> property, T newValue) {
         try {
-            Class<?> modelKlazz = getWrappedObject().getClass();
+            Class<?> modelKlazz = modelWrapper.getWrappedObject().getClass();
 
             Method getter = modelKlazz.getMethod("get"
                 + capitalizeFirstLetter(property.getName()));
+
+            @SuppressWarnings("unchecked")
+            T oldValue = (T) getter.invoke(this);
 
             Method setter = modelKlazz.getMethod("set"
                 + capitalizeFirstLetter(property.getName()),
                 getter.getReturnType());
 
-            setter.invoke(this, value);
-        } catch (Exception e) {
-            // TODO: DEAL WITH THIS BETTER?
-        }
-    }
+            setter.invoke(this, newValue);
 
-    private void firePropertyChange(Property<?> property, Object oldValue,
-        Object newValue) {
-        propertyChangeSupport.firePropertyChange(property.getName(), oldValue,
-            newValue);
+            propertyChangeSupport.firePropertyChange(property.getName(),
+                oldValue, newValue);
+        } catch (Exception e) {
+            throw new RuntimeException(e.getMessage());
+        }
     }
 
     private void cache(Property<?> property, Object value) {
         propertyMap.put(property, value);
+    }
+
+    private boolean isCached(Property<?> property) {
+        return propertyMap.containsKey(property);
     }
 
     private Object recall(Property<?> property) {
@@ -744,9 +832,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return true;
     }
 
-    public static ModelWrapper<?> wrapObject(
-        WritableApplicationService appService, Object nakedObject)
-        throws Exception {
+    public static <R, W extends ModelWrapper<R>> W wrapObject(
+        WritableApplicationService appService, R nakedObject) throws Exception {
 
         Class<?> nakedKlazz = nakedObject.getClass();
         String wrapperClassName = ModelWrapper.class.getPackage().getName()
@@ -760,7 +847,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             Constructor<?> constructor = wrapperKlazz.getConstructor(params);
 
             Object[] args = new Object[] { appService, nakedObject };
-            return (ModelWrapper<?>) constructor.newInstance(args);
+
+            @SuppressWarnings("unchecked")
+            W newInstance = (W) constructor.newInstance(args);
+
+            return newInstance;
         } catch (Exception e) {
             throw new Exception("cannot find or create expected Wrapper ("
                 + wrapperClassName + ") for " + nakedKlazz.getName(), e);

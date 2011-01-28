@@ -1,12 +1,16 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AddressWrapper extends ModelWrapper<Address> {
+    public static final Property<String> CITY = Property.create("city",
+        new TypeReference<String>() {
+        });
 
     public AddressWrapper(WritableApplicationService appService,
         Address wrappedObject) {
