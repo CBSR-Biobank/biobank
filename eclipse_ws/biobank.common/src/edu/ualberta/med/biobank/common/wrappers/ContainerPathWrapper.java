@@ -57,12 +57,12 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
             wrappedObject.setPath(path);
 
-            Container topContainer = container.getTop().getWrappedObject();
+            ContainerWrapper topContainer = container.getTop();
             if (topContainer == null) {
                 throw new Exception("no top container");
             }
 
-            wrappedObject.setTopContainer(topContainer);
+            wrappedObject.setTopContainer(topContainer.getWrappedObject());
 
             propertyChangeSupport.firePropertyChange("path", oldLabel, path);
         }

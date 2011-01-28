@@ -46,6 +46,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Rectangle getBounds(int columnIndex) {
         return item.getBounds(columnIndex);
     }
@@ -53,6 +54,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Rectangle getBounds() {
         return item.getBounds();
     }
@@ -60,6 +62,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Widget getItem() {
         return item;
     }
@@ -71,6 +74,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getColumnCount() {
         return item.getParent().getColumnCount();
     }
@@ -78,6 +82,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Color getBackground(int columnIndex) {
         return item.getBackground(columnIndex);
     }
@@ -85,6 +90,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Font getFont(int columnIndex) {
         return item.getFont(columnIndex);
     }
@@ -92,6 +98,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Color getForeground(int columnIndex) {
         return item.getForeground(columnIndex);
     }
@@ -99,6 +106,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Image getImage(int columnIndex) {
         return item.getImage(columnIndex);
     }
@@ -106,6 +114,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public String getText(int columnIndex) {
         return item.getText(columnIndex);
     }
@@ -113,6 +122,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setBackground(int columnIndex, Color color) {
         item.setBackground(columnIndex, color);
     }
@@ -120,6 +130,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setFont(int columnIndex, Font font) {
         item.setFont(columnIndex, font);
     }
@@ -127,6 +138,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setForeground(int columnIndex, Color color) {
         item.setForeground(columnIndex, color);
     }
@@ -134,6 +146,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setImage(int columnIndex, Image image) {
         Image oldImage = item.getImage(columnIndex);
         if (oldImage != image) {
@@ -144,6 +157,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public void setText(int columnIndex, String text) {
         item.setText(columnIndex, text == null ? "" : text); //$NON-NLS-1$
     }
@@ -151,6 +165,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Control getControl() {
         return item.getParent();
     }
@@ -158,6 +173,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public ViewerRow getNeighbor(int direction, boolean sameLevel) {
         if (direction == ViewerRow.ABOVE) {
             return getRowAbove();
@@ -197,6 +213,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public TreePath getTreePath() {
         return new TreePath(new Object[] { item.getData() });
     }
@@ -204,6 +221,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object clone() {
         return new TableComboViewerRow(item);
     }
@@ -211,6 +229,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Object getElement() {
         return item.getData();
     }
@@ -218,6 +237,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getVisualIndex(int creationIndex) {
         int[] order = item.getParent().getColumnOrder();
 
@@ -233,6 +253,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public int getCreationIndex(int visualIndex) {
         if (item != null && !item.isDisposed() && hasColumns()
             && isValidOrderIndex(visualIndex)) {
@@ -244,6 +265,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Rectangle getTextBounds(int index) {
         return item.getTextBounds(index);
     }
@@ -251,6 +273,7 @@ public class TableComboViewerRow extends ViewerRow {
     /**
      * {@inheritDoc}
      */
+    @Override
     public Rectangle getImageBounds(int index) {
         return item.getImageBounds(index);
     }
@@ -263,6 +286,7 @@ public class TableComboViewerRow extends ViewerRow {
         return currentIndex < this.item.getParent().getColumnOrder().length;
     }
 
+    @Override
     protected boolean scrollCellIntoView(int columnIndex) {
         item.getParent().showItem(item);
         if (hasColumns()) {

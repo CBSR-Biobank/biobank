@@ -22,12 +22,12 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 
 public class ScanPlateForm extends PlateForm implements PaintListener {
-    public static final String ID =
-        "edu.ualberta.med.biobank.forms.ScanPlateForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ScanPlateForm";
 
     public static final String PALLET_IMAGE_FILE = "plate.bmp";
 
@@ -63,9 +63,8 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
         page.setLayout(layout);
         page.setLayoutData(new GridData(SWT.BEGINNING, SWT.TOP, false, false));
 
-        Label label =
-            toolkit.createLabel(page,
-                "NOTE: Cell A1 is at the TOP RIGHT corner of the image.");
+        Label label = toolkit.createLabel(page,
+            "NOTE: Cell A1 is at the TOP RIGHT corner of the image.");
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.grabExcessHorizontalSpace = true;
@@ -103,9 +102,9 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
         File plateFile = new File(PALLET_IMAGE_FILE);
 
         if (plateFile.exists()) {
-            img =
-                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                    .getShell().getDisplay(), PALLET_IMAGE_FILE);
+            img = new Image(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell().getDisplay(),
+                PALLET_IMAGE_FILE);
         }
 
         if (img == null)
@@ -115,13 +114,12 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
         Rectangle imgBounds = img.getBounds();
 
         double w = canvasSize.x;
-        double h =
-            (double) canvasSize.x * (double) imgBounds.height / imgBounds.width;
+        double h = (double) canvasSize.x * (double) imgBounds.height
+            / imgBounds.width;
         if (h > canvasSize.y) {
             h = canvasSize.y;
-            w =
-                (double) canvasSize.y * (double) imgBounds.width
-                    / imgBounds.height;
+            w = (double) canvasSize.y * (double) imgBounds.width
+                / imgBounds.height;
         }
 
         GC gc = new GC(imageCanvas);

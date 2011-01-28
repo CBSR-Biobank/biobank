@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.QueryCommand;
+import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.security.Group;
+import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
@@ -31,9 +33,6 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public void logActivity(Log log) throws Exception;
 
-    public List<Object> launchReport(BiobankReport report)
-        throws ApplicationException;
-
     public void modifyPassword(String oldPassword, String newPassword)
         throws ApplicationException;
 
@@ -48,6 +47,13 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public User getCurrentUser() throws ApplicationException;
 
+    public Group persistGroup(
+        edu.ualberta.med.biobank.common.security.Group group)
+        throws ApplicationException;
+
+    public void deleteGroup(edu.ualberta.med.biobank.common.security.Group group)
+        throws ApplicationException;
+
     public void unlockUser(String userName) throws ApplicationException;
 
     public List<Object> runReport(Report report, int maxResults, int firstRow,
@@ -56,4 +62,13 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void checkVersion(String clientVersion) throws ApplicationException;
 
     public String getServerVersion();
+
+    public List<ProtectionGroupPrivilege> getSecurityFeatures()
+        throws ApplicationException;
+
+    public QueryHandle createQuery(QueryCommand qc) throws Exception;
+
+    public List<Object> startQuery(QueryHandle qh) throws Exception;
+
+    public void stopQuery(QueryHandle qh) throws Exception;
 }

@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview.request;
 
 import java.util.Date;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 
@@ -29,21 +30,16 @@ public class RequestSearchedNode extends AbstractSearchedNode {
     @Override
     protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
         if (child instanceof RequestWrapper) {
-            return parent
-                .equals(((RequestWrapper) child).getSiteLinkedToObject());
+            return parent.equals(((RequestWrapper) child)
+                .getSiteLinkedToObject());
         }
         return false;
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
-        if (searchedObject instanceof Date) {
-            Date date = (Date) searchedObject;
-            return getChild((int) date.getTime());
-        } else if (searchedObject instanceof RequestWrapper) {
-            return getChild((ModelWrapper<?>) searchedObject, true);
-        }
-        return searchChildren(searchedObject);
+    public List<AdapterBase> search(Object searchedObject) {
+        return findChildFromClass(searchedObject, Date.class,
+            RequestWrapper.class);
     }
 
     @Override

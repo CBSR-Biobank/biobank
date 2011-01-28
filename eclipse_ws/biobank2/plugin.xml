@@ -268,13 +268,8 @@
       </command>
       <command
             categoryId="biobank2.command.category.server"
-            id="edu.ualberta.med.biobank.commands.addUser"
-            name="Add User">
-      </command>
-      <command
-            categoryId="biobank2.command.category.server"
-            id="edu.ualberta.med.biobank.commands.editUsers"
-            name="Edit Users">
+            id="edu.ualberta.med.biobank.commands.userManagement"
+            name="User Management">
       </command>
       <command
             categoryId="biobank2.command.category.server"
@@ -830,25 +825,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.EditUsersHandler"
-            commandId="edu.ualberta.med.biobank.commands.editUsers">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.loggedIn">
-               </reference>
-               <reference
-                     definitionId="biobank2.isWebAdmin">
-               </reference>
-               <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
-               </reference>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.AddUserHandler"
-            commandId="edu.ualberta.med.biobank.commands.addUser">
+            class="edu.ualberta.med.biobank.handlers.UserManagementHandler"
+            commandId="edu.ualberta.med.biobank.commands.userManagement">
          <activeWhen>
             <and>
                <reference
@@ -978,15 +956,9 @@
                       style="push">
                 </command>
                 <command
-                      commandId="edu.ualberta.med.biobank.commands.addUser"
-                      id="edu.ualberta.med.biobank.menu.addUser"
-                      label="Add User"
-                      style="push">
-                </command>
-                <command
-                      commandId="edu.ualberta.med.biobank.commands.editUsers"
-                      id="edu.ualberta.med.biobank.menu.editUsers"
-                      label="Edit User"
+                      commandId="edu.ualberta.med.biobank.commands.userManagement"
+                      id="edu.ualberta.med.biobank.menu.userManagement"
+                      label="User Management"
                       style="push">
                 </command>
                 <command
@@ -1275,13 +1247,6 @@
                   tooltip="Search Panel">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.logging"
-                  icon="icons/table_row_delete.png"
-                  label="Logging"
-                  style="push"
-                  tooltip="Logging">
-            </command>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.reloadViewWithTree"
                   icon="icons/reload.png"
                   label="Reload"
@@ -1491,18 +1456,6 @@
                standalone="false"
                visible="false">
          </view>
-         <view
-               closeable="true"
-               id="edu.ualberta.med.biobank.views.LoggingView"
-               minimized="false"
-               moveable="true"
-               ratio="0.3"
-               relationship="stack"
-               relative="edu.ualberta.med.biobank.views.SessionsView"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
       </perspectiveExtension>
       <perspectiveExtension
             targetID="edu.ualberta.med.biobank.perspective.reports">
@@ -1526,6 +1479,18 @@
                ratio="0.20"
                relationship="stack"
                relative="edu.ualberta.med.biobank.views.ReportsView"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.LoggingView"
+               minimized="false"
+               moveable="false"
+               ratio="0.20"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.AdvancedReportsView"
                showTitle="false"
                standalone="false"
                visible="true">
@@ -1629,32 +1594,6 @@
                showTitle="true"
                standalone="false"
                visible="false">
-         </view>
-      </perspectiveExtension>
-      <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.advancedReports">
-         <view
-               closeable="true"
-               id="org.eclipse.pde.runtime.LogView"
-               minimized="false"
-               moveable="true"
-               relationship="bottom"
-               relative="org.eclipse.ui.editorss"
-               showTitle="true"
-               standalone="false"
-               visible="false">
-         </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.ReportAdministrationView"
-               minimized="false"
-               moveable="false"
-               ratio="0.4"
-               relationship="left"
-               relative="org.eclipse.ui.editorss"
-               showTitle="false"
-               standalone="false"
-               visible="true">
          </view>
       </perspectiveExtension>
       </extension>
@@ -2264,16 +2203,10 @@
             sequence="M3+P">
       </key>  
 	  <key
-            commandId="edu.ualberta.med.biobank.commands.editUsers"
+            commandId="edu.ualberta.med.biobank.commands.userManagement"
             contextId="edu.ualberta.med.biobank.perspective.main"
             schemeId="biobank2.scheme"
             sequence="M3+U">
-      </key>
-	  <key
-            commandId="edu.ualberta.med.biobank.commands.addUser"
-            contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
-            sequence="M3+E">
       </key>
 	  <key
             commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"

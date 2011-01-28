@@ -1,0 +1,57 @@
+\chapter{Administration}
+\label{chap:administration}
+
+\section{Repository Sites}
+\section{Clinics}
+\section{Studies}
+\section{Container Types}
+\section{Containers}
+\section{Moving Samples Between Containers}
+\section{Sample Types}
+\section{Source Vessels}
+\section{Shipping Methods}
+\section{Activity Status}
+\section{User Administration}
+
+\subsection{Adding Users}
+To add a new user select \texttt{Administration} $\to$ \texttt{Add User}
+from the main menu. You will see the following dialog window pop up. Enter the
+user's details and press the \fbox{OK} button.
+\begin{figure}[H]
+  \centering
+  \scalebox{0.5}
+	   { \includegraphics*{screenshots/administration/add_user} }
+	   \caption{Adding a user.}
+	   \label{fig:add_user}
+\end{figure}
+
+For \texttt{Available Groups} the following exist:
+\begin{description}
+\item[Website Administrator] This user type has acces to create any type of
+  object in the system: create repository sites, studies, clinics and
+  containers, etc. This user type can also edit global data such as sample
+  types, shipment methods, etc. And also create and edit users.
+\item[CBSR Technician Level 1] This user type can view, update, create and
+  delete patients, shipments, samples, sample types and containers. This user
+  type cannot create repository sites, studies and clinics.
+\item[CBSR Technician Level 2] This user type can view, update and create
+  patients, shipments and samples. This user type cannot create repository
+  sites, studies and clinics.
+\item[Calgary Administrator] \todo[size=\small]{description requried?}.
+\item[Calgary Technician] \todo[size=\small]{description requried?}.
+\end{description}
+
+The password assigned to the new user is temporary. When the user logs in for
+the first time, he / she will be asked to enter the temporary password and
+select a new password.
+
+\subsection{Editing Users}
+\begin{figure}[H]
+  \centering
+  \scalebox{0.5}
+	   { \includegraphics*{screenshots/administration/edit_users} }
+	   \caption{Editing users.}
+	   \label{fig:edit_users}
+\end{figure}
+
+\subsection{Password Change}

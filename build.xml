@@ -183,14 +183,23 @@
     <copy file="sdk_conf/application-config-client.xml" tofile="${cacore.sdk.dir}/conf/system/package/local-client/conf/application-config-client.xml" />
     <copy file="sdk_conf/application-config-client-info.xml" tofile="${cacore.sdk.dir}/conf/system/package/remote-client/conf/application-config-client-info.xml" />
     <copy file="sdk_conf/application-config-security.xml" tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
-    <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
+    <copy file="${req.jars.dir}/mysql-connector-java-5.1.7-bin.jar" tofile="${cacore.sdk.dir}/system/lib/mysql-connector-java-5.1.7-bin.jar" />
+	<delete file="${cacore.sdk.dir}/system/lib/mysql-connector-java-3.1.13-bin.jar"/>
+	<ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
   </target>
   <target name="log4j-conf">
-    <copy file="security-logs/log4j.xml"
-          tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" overwrite="true"/>
-    <replace file="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml" token="@LOG4J_LEVEL@" value="${LOG4J_LEVEL}"/>
-    <copy file="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/log4j.xml"
-	  tofile="${cacore.sdk.dir}/${build.conf.system.web.dir}/WEB-INF/classes/log4j.xml" overwrite="true"/>
+  	<copy file="security-logs/log4j.xml"
+  		  tofile="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml" overwrite="true"/> 
+    <replace file="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml">    	
+    	<replacefilter token="@LOG4J_LEVEL@" value="${LOG4J_LEVEL}"/>
+    	<!-- these one are copied from the caCore ant build file. -->
+    	<replacefilter token="@CLM_DB_DRIVER@" value="${CLM_DB_DRIVER}" />	
+    	<replacefilter token="@CLM_DB_CONNECTION_URL@" value="${CLM_DB_CONNECTION_URL}" />	
+    	<replacefilter token="@CLM_DB_USERNAME@" value="${CLM_DB_USERNAME}" />	
+    	<replacefilter token="@CLM_DB_PASSWORD@" value="${CLM_DB_PASSWORD}" />	
+    	<replacefilter token="@CLM_PROJECT_NAME@" value="${CLM_PROJECT_NAME}" />
+    </replace>
+    	
   </target>
   <target name="sdk-files" depends="sdk">
     <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib"
@@ -280,6 +289,7 @@
       <fileset dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib" />
       <filelist dir="${cacore.sdk.dir}/system/lib" files="${cacore.system.jar.files}" />
       <filelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
+	  <fileset file="${req.jars.dir}/mysql-connector-java-5.1.7-bin.jar" />
       <fileset file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-client-framework.jar"/>
     </copy>
@@ -305,6 +315,9 @@
     </copy>
     <copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
       <filelist dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib" files="biobank2-beans.jar"/>
+    </copy>
+    <copy todir="${eclipse.proj.dir.tools}/lib">
+      <fileset file="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/log4j-1.2.14.jar"/>
     </copy>
   </target>
   <!-- JBoss -->
@@ -716,27 +729,27 @@
     <echo message="coverage report: file://${converage.output}/index.html" />
   </target>
 
-	
+
   <target name="eclipse.home.env">
 	<fail unless="env.ECLIPSE_HOME" message="ECLIPSE_HOME environment variable not defined. It should define a path to an eclipse installation containing the Delta Pack." />
   </target>
-		
-	
+
+
   <target name="product" depends="eclipse.home.env">
-  	<property name="buildDirectory" value="${product.dir}/buildDirectory"/> 
-	<delete dir="${buildDirectory}"/>			
+  	<property name="buildDirectory" value="${product.dir}/buildDirectory"/>
+	<delete dir="${buildDirectory}"/>
 	<copy todir="${buildDirectory}/plugins/biobank2">
 		<fileset dir="${eclipse.workspace.dir}/biobank2"/>
-	</copy>			  	
+	</copy>
 	<copy todir="${buildDirectory}/plugins/scannerConfig">
 		<fileset dir="${eclipse.workspace.dir}/scannerConfig"/>
-	</copy>			  	
+	</copy>
 	<copy todir="${buildDirectory}/plugins/biobank.common">
 		<fileset dir="${eclipse.workspace.dir}/biobank.common"/>
 	</copy>
 	<copy todir="${buildDirectory}/plugins/sampleProcessingRobot">
 		<fileset dir="${eclipse.workspace.dir}/sampleProcessingRobot"/>
-	</copy>  
+	</copy>
 	<copy todir="${buildDirectory}/features/biobank2.feature.core">
 		<fileset dir="${eclipse.workspace.dir}/biobank2.feature.core"/>
 	</copy>
@@ -750,7 +763,7 @@
   	<fileset id="pde.build.id.all" dir="${env.ECLIPSE_HOME}/plugins/" includes="org.eclipse.pde.build_*/scripts/productBuild/productBuild.xml"/>
   	<last id="pde.build.id" count="1"><fileset refid="pde.build.id.all" /></last>
   	<!-- launch product creation -->
-    <java classpath="${toString:launcher.id}" 
+    <java classpath="${toString:launcher.id}"
     	classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
       <arg line="-application org.eclipse.ant.core.antRunner"/>
       <arg line="-buildfile ${toString:pde.build.id}"/>
@@ -765,9 +778,9 @@
     </java>
   	<antcall target="updateSiteMetadata" />
   	</target>
-	
+
   	<target name="updateSiteMetadata" depends="eclipse.home.env">
-  	  <property name="buildDirectory" value="${product.dir}/buildDirectory"/> 
+  	  <property name="buildDirectory" value="${product.dir}/buildDirectory"/>
   	  <property name="updateSiteFolder" value="${buildDirectory}/updateSite"/>
       <copy todir="${updateSiteFolder}/features/">
   	    <fileset dir="${buildDirectory}/buildRepo/features/"/>
@@ -782,17 +795,17 @@
   	  	  <pathelement location="${product.dir}/ant-contrib/ant-contrib-1.0b3.jar"/>
   	  	</classpath>
   	  </taskdef>
-  	  <propertyregex property="featureVersion" input="${featureJar}" 
+  	  <propertyregex property="featureVersion" input="${featureJar}"
   	    regexp="biobank2.feature.core_(.*)\.jar"
   	  	select="\1" casesensitive="true" />
   	  <copy file="${product.dir}/site.xml" tofile="${updateSiteFolder}/site.xml" />
   	  <replace file="${updateSiteFolder}/site.xml" token="@VERSION@" value="${featureVersion}"/>
-  		
-  		
+
+
   	  <!-- get current org.eclipse.equinox.launcher jar. If find more than one, will use the last one in the list (should be the last version)-->
   	  <fileset id="launcher.id.all" dir="${env.ECLIPSE_HOME}/plugins/" includes="org.eclipse.equinox.launcher_*.jar" />
   	  <last id="launcher.id" count="1"><fileset refid="launcher.id.all" /></last>
-	  <java classpath="${toString:launcher.id}" 
+	  <java classpath="${toString:launcher.id}"
 	    	classname="org.eclipse.equinox.launcher.Main" failonerror="true" fork="true">
 	 	<arg line="-application org.eclipse.equinox.p2.publisher.UpdateSitePublisher"/>
 	 	<arg line="-source ${updateSiteFolder}"/>
@@ -803,6 +816,6 @@
 	 	<arg line="-metadataRepository file:${updateSiteFolder}"/>
 	 </java>
   </target>
-	 
+
 
 </project>

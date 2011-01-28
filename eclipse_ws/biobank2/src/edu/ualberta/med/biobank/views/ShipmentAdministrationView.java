@@ -49,7 +49,7 @@ public class ShipmentAdministrationView extends
 
     public ShipmentAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(ID, this);
+        SessionManager.addView(this);
     }
 
     @Override
@@ -149,34 +149,45 @@ public class ShipmentAdministrationView extends
         return null;
     }
 
-    @Override
-    public AdapterBase addToNode(AdapterBase parentNode, ModelWrapper<?> wrapper) {
-        if (wrapper instanceof ShipmentWrapper) {
+    public static AdapterBase addToNode(AdapterBase parentNode,
+        ModelWrapper<?> wrapper) {
+        if (currentInstance != null && wrapper instanceof ShipmentWrapper) {
             ShipmentWrapper shipment = (ShipmentWrapper) wrapper;
 
             AdapterBase topNode = parentNode;
-            if (parentNode.equals(searchedNode) && !radioWaybill.getSelection()) {
-                Date date = dateReceivedWidget.getDate();
-                AdapterBase dateNode = parentNode.search(date);
-                if (dateNode == null) {
+            if (parentNode.equals(currentInstance.searchedNode)
+                && !currentInstance.radioWaybill.getSelection()) {
+                Date date = currentInstance.dateReceivedWidget.getDate();
+                List<AdapterBase> dateNodeRes = parentNode.search(date);
+                AdapterBase dateNode = null;
+                if (dateNodeRes.size() > 0)
+                    dateNode = dateNodeRes.get(0);
+                else {
                     dateNode = new DateNode(parentNode,
-                        dateReceivedWidget.getDate());
+                        currentInstance.dateReceivedWidget.getDate());
                     parentNode.addChild(dateNode);
                 }
                 topNode = dateNode;
             }
-            ClinicWithShipmentAdapter clinicAdapter = (ClinicWithShipmentAdapter) topNode
-                .search(shipment.getClinic());
-            if (clinicAdapter == null) {
+            List<AdapterBase> clinicAdapterList = topNode.search(shipment
+                .getClinic());
+            ClinicWithShipmentAdapter clinicAdapter = null;
+            if (clinicAdapterList.size() > 0)
+                clinicAdapter = (ClinicWithShipmentAdapter) clinicAdapterList
+                    .get(0);
+            else {
                 clinicAdapter = new ClinicWithShipmentAdapter(topNode,
                     shipment.getClinic());
                 clinicAdapter.setEditable(false);
                 clinicAdapter.setLoadChildrenInBackground(false);
                 topNode.addChild(clinicAdapter);
             }
-            ShipmentAdapter shipmentAdapter = (ShipmentAdapter) clinicAdapter
+            ShipmentAdapter shipmentAdapter = null;
+            List<AdapterBase> shipmentAdapterList = clinicAdapter
                 .search(shipment);
-            if (shipmentAdapter == null) {
+            if (shipmentAdapterList.size() > 0)
+                shipmentAdapter = (ShipmentAdapter) shipmentAdapterList.get(0);
+            else {
                 shipmentAdapter = new ShipmentAdapter(clinicAdapter, shipment);
                 clinicAdapter.addChild(shipmentAdapter);
             }
@@ -209,12 +220,12 @@ public class ShipmentAdministrationView extends
     }
 
     @Override
-    protected AbstractTodayNode getTodayNode() {
+    protected AbstractTodayNode createTodayNode() {
         return new ShipmentTodayNode(rootNode, 0);
     }
 
     @Override
-    protected AbstractSearchedNode getSearchedNode() {
+    protected AbstractSearchedNode createSearchedNode() {
         return new ShipmentSearchedNode(rootNode, 1);
     }
 
@@ -227,6 +238,11 @@ public class ShipmentAdministrationView extends
 
     public static ShipmentAdministrationView getCurrent() {
         return currentInstance;
+    }
+
+    public static void reloadCurrent() {
+        if (currentInstance != null)
+            currentInstance.reload();
     }
 
     public static ShipmentAdapter getCurrentShipment() {
@@ -245,5 +261,10 @@ public class ShipmentAdministrationView extends
     @Override
     protected String getTreeTextToolTip() {
         return "Enter a shipment waybill and hit enter";
+    }
+
+    @Override
+    protected String getString() {
+        return toString();
     }
 }

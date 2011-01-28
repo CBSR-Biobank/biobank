@@ -1,16 +1,17 @@
 package edu.ualberta.med.biobank.treeview.shipment;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -18,8 +19,7 @@ import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 
 public class ShipmentAdapter extends AdapterBase {
 
-    public ShipmentAdapter(AdapterBase parent,
-        ShipmentWrapper shipment) {
+    public ShipmentAdapter(AdapterBase parent, ShipmentWrapper shipment) {
         super(parent, shipment);
         setHasChildren(true);
     }
@@ -63,11 +63,8 @@ public class ShipmentAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
-        if (searchedObject instanceof PatientVisitWrapper) {
-            return getChild((ModelWrapper<?>) searchedObject, true);
-        }
-        return searchChildren(searchedObject);
+    public List<AdapterBase> search(Object searchedObject) {
+        return findChildFromClass(searchedObject, PatientVisitWrapper.class);
     }
 
     @Override

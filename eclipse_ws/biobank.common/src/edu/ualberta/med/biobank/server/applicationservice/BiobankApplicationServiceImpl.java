@@ -1,6 +1,10 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
-import edu.ualberta.med.biobank.common.reports.BiobankReport;
+import edu.ualberta.med.biobank.common.reports.QueryCommand;
+import edu.ualberta.med.biobank.common.reports.QueryHandle;
+import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
+import edu.ualberta.med.biobank.common.reports.QueryHandleRequest.CommandType;
+import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
@@ -10,7 +14,6 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersi
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionOlderException;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
-import edu.ualberta.med.biobank.server.reports.ReportFactory;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authentication.LockoutManager;
@@ -25,8 +28,11 @@ import gov.nih.nci.security.authorization.domainobjects.Role;
 import gov.nih.nci.security.authorization.domainobjects.User;
 import gov.nih.nci.security.dao.GroupSearchCriteria;
 import gov.nih.nci.security.dao.ProtectionElementSearchCriteria;
+import gov.nih.nci.security.dao.ProtectionGroupSearchCriteria;
+import gov.nih.nci.security.dao.RoleSearchCriteria;
 import gov.nih.nci.security.dao.SearchCriteria;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
+import gov.nih.nci.security.exceptions.CSTransactionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.dao.Request;
@@ -263,12 +269,6 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<Object> launchReport(BiobankReport report)
-        throws ApplicationException {
-        return ReportFactory.createReport(report).generate(this);
-    }
-
-    @Override
     public List<Object> runReport(Report report, int maxResults, int firstRow,
         int timeout) throws ApplicationException {
 
@@ -349,7 +349,8 @@ public class BiobankApplicationServiceImpl extends
         throws CSObjectNotFoundException {
         edu.ualberta.med.biobank.common.security.Group biobankGroup = new edu.ualberta.med.biobank.common.security.Group(
             group.getGroupId(), group.getGroupName());
-
+        biobankGroup.setReadOnlySites(new ArrayList<Integer>());
+        biobankGroup.setCanUpdateSites(new ArrayList<Integer>());
         Set<?> pepcList = upm
             .getProtectionElementPrivilegeContextForGroup(group.getGroupId()
                 .toString());
@@ -369,6 +370,15 @@ public class BiobankApplicationServiceImpl extends
                 id = pe.getValue();
             }
             biobankGroup.addProtectionElementPrivilege(type, id, privileges);
+            if (type.equals(Site.class.getName()) && id != null) {
+                if (privileges
+                    .contains(edu.ualberta.med.biobank.common.security.Privilege.UPDATE)) {
+                    biobankGroup.getCanUpdateSites().add(new Integer(id));
+                } else if (privileges
+                    .contains(edu.ualberta.med.biobank.common.security.Privilege.READ)) {
+                    biobankGroup.getReadOnlySites().add(new Integer(id));
+                }
+            }
         }
 
         Set<?> pgrcList = upm.getProtectionGroupRoleContextForGroup(group
@@ -377,8 +387,14 @@ public class BiobankApplicationServiceImpl extends
             ProtectionGroupRoleContext pgrc = (ProtectionGroupRoleContext) o;
             ProtectionGroup pg = pgrc.getProtectionGroup();
             Set<edu.ualberta.med.biobank.common.security.Privilege> privileges = new HashSet<edu.ualberta.med.biobank.common.security.Privilege>();
+            boolean containsFullAccessObject = false;
             for (Object r : pgrc.getRoles()) {
                 Role role = (Role) r;
+                if (role
+                    .getName()
+                    .equals(
+                        edu.ualberta.med.biobank.common.security.Group.OBJECT_FULL_ACCESS))
+                    containsFullAccessObject = true;
                 for (Object p : upm.getPrivileges(role.getId().toString())) {
                     Privilege csmPrivilege = (Privilege) p;
                     privileges
@@ -388,8 +404,10 @@ public class BiobankApplicationServiceImpl extends
             }
             biobankGroup.addProtectionGroupPrivilege(
                 pg.getProtectionGroupName(), privileges);
+            if (edu.ualberta.med.biobank.common.security.Group.PG_SITE_ADMINISTRATION_ID
+                .equals(pg.getProtectionGroupId()) && containsFullAccessObject)
+                biobankGroup.setIsSiteAdministrator(true);
         }
-
         return biobankGroup;
     }
 
@@ -470,7 +488,8 @@ public class BiobankApplicationServiceImpl extends
                     groups.add(g);
                 }
                 if (groups.size() == 0) {
-                    throw new Exception("No group has been set for this user.");
+                    throw new ApplicationException(
+                        "No group has been set for this user.");
                 }
                 serverUser.setGroups(groups);
                 if (serverUser.getUserId() == null) {
@@ -483,7 +502,7 @@ public class BiobankApplicationServiceImpl extends
                 throw ae;
             } catch (Exception ex) {
                 log.error("Error persisting security user", ex);
-                throw new ApplicationException(ex);
+                throw new ApplicationException(ex.getMessage(), ex);
             }
         } else {
             throw new ApplicationException(
@@ -513,7 +532,7 @@ public class BiobankApplicationServiceImpl extends
                 throw ae;
             } catch (Exception ex) {
                 log.error("Error deleting security user", ex);
-                throw new ApplicationException(ex);
+                throw new ApplicationException(ex.getMessage(), ex);
             }
         } else {
             throw new ApplicationException(
@@ -540,7 +559,7 @@ public class BiobankApplicationServiceImpl extends
             throw ae;
         } catch (Exception ex) {
             log.error("Error getting current user", ex);
-            throw new ApplicationException(ex);
+            throw new ApplicationException(ex.getMessage(), ex);
         }
     }
 
@@ -597,6 +616,31 @@ public class BiobankApplicationServiceImpl extends
             }
         }
         return result;
+    }
+
+    @Override
+    public QueryHandle createQuery(QueryCommand qc) throws Exception {
+        QueryHandleRequest qhr = new QueryHandleRequest(qc, CommandType.CREATE,
+            null, this);
+        return (QueryHandle) getWritableDAO(Site.class.getName()).query(
+            new Request(qhr)).getResponse();
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public List<Object> startQuery(QueryHandle qh) throws Exception {
+        QueryHandleRequest qhr = new QueryHandleRequest(null,
+            CommandType.START, qh, this);
+        return (List<Object>) getWritableDAO(Site.class.getName()).query(
+            new Request(qhr)).getResponse();
+    }
+
+    @Override
+    public void stopQuery(QueryHandle qh) throws Exception {
+        QueryHandleRequest qhr = new QueryHandleRequest(null, CommandType.STOP,
+            qh, this);
+        getWritableDAO(Site.class.getName()).query(new Request(qhr))
+            .getResponse();
     }
 
     private static void serverVersionStrToIntArray(String version) {
@@ -667,5 +711,180 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public String getServerVersion() {
         return props.getProperty(SERVER_VERSION_PROP_KEY);
+    }
+
+    @Override
+    public edu.ualberta.med.biobank.common.security.Group persistGroup(
+        edu.ualberta.med.biobank.common.security.Group group)
+        throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            try {
+                UserProvisioningManager upm = SecurityServiceProvider
+                    .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+                if (!group.canBeEdited()) {
+                    throw new ApplicationException(
+                        "This group cannot be modified.");
+                }
+                if (group.getName() == null) {
+                    throw new ApplicationException("Name should be set.");
+                }
+
+                Group serverGroup = null;
+                if (group.getId() != null) {
+                    serverGroup = upm.getGroupById(group.getId().toString());
+                }
+                if (serverGroup == null) {
+                    serverGroup = new Group();
+                }
+                serverGroup.setGroupName(group.getName());
+                if (serverGroup.getGroupId() == null) {
+                    upm.createGroup(serverGroup);
+                } else {
+                    upm.modifyGroup(serverGroup);
+                }
+                // Default is Read Only
+                addPGRoleAssociationToGroup(upm, serverGroup, 1L,
+                    edu.ualberta.med.biobank.common.security.Group.READ_ONLY);
+                if (group.getIsSiteAdministrator()) {
+                    addPGRoleAssociationToGroup(
+                        upm,
+                        serverGroup,
+                        edu.ualberta.med.biobank.common.security.Group.PG_SITE_ADMINISTRATION_ID,
+                        edu.ualberta.med.biobank.common.security.Group.OBJECT_FULL_ACCESS);
+                }
+                for (Integer siteId : group.getCanUpdateSites()) {
+                    setSiteSecurityForGroup(
+                        upm,
+                        serverGroup,
+                        siteId,
+                        edu.ualberta.med.biobank.common.security.Group.SITE_FULL_ACCESS);
+                }
+                for (Integer siteId : group.getReadOnlySites()) {
+                    if (!group.getCanUpdateSites().contains(siteId))
+                        setSiteSecurityForGroup(
+                            upm,
+                            serverGroup,
+                            siteId,
+                            edu.ualberta.med.biobank.common.security.Group.READ_ONLY);
+                }
+                for (Integer pgId : group.getFeaturesEnabled()) {
+                    addPGRoleAssociationToGroup(
+                        upm,
+                        serverGroup,
+                        pgId.longValue(),
+                        edu.ualberta.med.biobank.common.security.Group.OBJECT_FULL_ACCESS);
+                }
+                return createGroup(upm, serverGroup);
+            } catch (ApplicationException ae) {
+                log.error("Error persisting security group", ae);
+                throw ae;
+            } catch (Exception ex) {
+                log.error("Error persisting security group", ex);
+                throw new ApplicationException(ex.getMessage(), ex);
+            }
+        } else {
+            throw new ApplicationException(
+                "Only Website Administrators can add/modify groups");
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private void setSiteSecurityForGroup(UserProvisioningManager upm,
+        Group serverGroup, Integer siteId, String roleName)
+        throws ApplicationException, CSTransactionException,
+        CSObjectNotFoundException {
+        ProtectionElement pe = new ProtectionElement();
+        pe.setObjectId(Site.class.getName());
+        pe.setAttribute("id");
+        pe.setValue(siteId.toString());
+        ProtectionElementSearchCriteria c = new ProtectionElementSearchCriteria(
+            pe);
+        List<?> peList = upm.getObjects(c);
+        if (peList.size() != 1)
+            throw new ApplicationException(
+                "Problem with site protection element for id=" + siteId);
+        pe = (ProtectionElement) peList.get(0);
+        Set<ProtectionGroup> pgs = upm.getProtectionGroups(pe
+            .getProtectionElementId().toString());
+        if (pgs.size() != 1)
+            throw new ApplicationException(
+                "Problem with protection group for site with id=" + siteId);
+        addPGRoleAssociationToGroup(upm, serverGroup, pgs.iterator().next()
+            .getProtectionGroupId(), roleName);
+    }
+
+    private void addPGRoleAssociationToGroup(UserProvisioningManager upm,
+        Group serverGroup, Long protectionGroupID, String roleName)
+        throws ApplicationException, CSTransactionException {
+        Role role = new Role();
+        role.setName(roleName);
+        List<?> roles = upm.getObjects(new RoleSearchCriteria(role));
+        if (roles.size() != 1)
+            throw new ApplicationException("Problem getting role " + roleName);
+        role = (Role) roles.get(0);
+        upm.assignGroupRoleToProtectionGroup(protectionGroupID.toString(),
+            serverGroup.getGroupId().toString(), new String[] { role.getId()
+                .toString() });
+    }
+
+    @Override
+    public void deleteGroup(edu.ualberta.med.biobank.common.security.Group group)
+        throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            try {
+                UserProvisioningManager upm = SecurityServiceProvider
+                    .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+                if (group.canBeDeleted()) {
+                    Group serverGroup = upm.getGroupById(group.getId()
+                        .toString());
+                    if (serverGroup == null) {
+                        throw new ApplicationException("Security group "
+                            + group.getName() + " not found.");
+                    }
+                    upm.removeGroup(serverGroup.getGroupId().toString());
+                } else {
+                    throw new ApplicationException("Deletion of group "
+                        + group.getName() + " is not authorized.");
+                }
+            } catch (ApplicationException ae) {
+                log.error("Error deleting security group", ae);
+                throw ae;
+            } catch (Exception ex) {
+                log.error("Error deleting security group", ex);
+                throw new ApplicationException(ex.getMessage(), ex);
+            }
+        } else {
+            throw new ApplicationException(
+                "Only Website Administrators can delete groups");
+        }
+    }
+
+    @Override
+    public List<ProtectionGroupPrivilege> getSecurityFeatures()
+        throws ApplicationException {
+        if (isWebsiteAdministrator()) {
+            try {
+                UserProvisioningManager upm = SecurityServiceProvider
+                    .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
+                ProtectionGroup pg = new ProtectionGroup();
+                pg.setProtectionGroupName("%Feature");
+                List<ProtectionGroupPrivilege> features = new ArrayList<ProtectionGroupPrivilege>();
+                for (Object object : upm
+                    .getObjects(new ProtectionGroupSearchCriteria(pg))) {
+                    ProtectionGroup pgFeature = (ProtectionGroup) object;
+                    features.add(new ProtectionGroupPrivilege(pgFeature
+                        .getProtectionGroupId(), pgFeature
+                        .getProtectionGroupName(), pgFeature
+                        .getProtectionGroupDescription()));
+                }
+                return features;
+            } catch (Exception ex) {
+                log.error("Error retrieving security features", ex);
+                throw new ApplicationException(ex);
+            }
+        } else {
+            throw new ApplicationException(
+                "Only Website Administrators can retrieve security features");
+        }
     }
 }

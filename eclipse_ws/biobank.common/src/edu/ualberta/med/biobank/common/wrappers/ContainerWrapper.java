@@ -26,7 +26,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerWrapper extends ModelWrapper<Container> {
 
-    private AbstractObjectWithPositionManagement<ContainerPosition> objectWithPositionManagement;
+    private AbstractObjectWithPositionManagement<ContainerPosition, ContainerWrapper> objectWithPositionManagement;
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
 
@@ -44,7 +44,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     private void initManagement() {
-        objectWithPositionManagement = new AbstractObjectWithPositionManagement<ContainerPosition>() {
+        objectWithPositionManagement = new AbstractObjectWithPositionManagement<ContainerPosition, ContainerWrapper>(
+            this) {
 
             @Override
             protected AbstractPositionWrapper<ContainerPosition> getSpecificPositionWrapper(
