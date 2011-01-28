@@ -60,6 +60,7 @@ import org.acegisecurity.Authentication;
 import org.acegisecurity.context.SecurityContextHolder;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
+import org.hibernate.PropertyValueException;
 
 /**
  * Implementation of the BiobankApplicationService interface. This class will be
@@ -146,18 +147,34 @@ public class BiobankApplicationServiceImpl extends
     @Override
     public SDKQueryResult executeQuery(SDKQuery query)
         throws ApplicationException {
-        SDKQueryResult res = super.executeQuery(query);
-        if (query instanceof ExampleQuery) {
-            Object queryObject = ((ExampleQuery) query).getExample();
-            if (queryObject != null && queryObject instanceof Site) {
-                if (query instanceof InsertExampleQuery) {
-                    newSiteSecurity((Site) res.getObjectResult());
-                } else if (query instanceof DeleteExampleQuery) {
-                    deleteSiteSecurity((Site) queryObject);
+        try {
+            SDKQueryResult res = super.executeQuery(query);
+            if (query instanceof ExampleQuery) {
+                Object queryObject = ((ExampleQuery) query).getExample();
+                if (queryObject != null && queryObject instanceof Site) {
+                    if (query instanceof InsertExampleQuery) {
+                        newSiteSecurity((Site) res.getObjectResult());
+                    } else if (query instanceof DeleteExampleQuery) {
+                        deleteSiteSecurity((Site) queryObject);
+                    }
                 }
             }
+            return res;
+        } catch (ApplicationException ae) {
+            Throwable e = ae;
+            while (e.getCause() != null
+                && !(e.getCause() instanceof PropertyValueException)) {
+                e = e.getCause();
+            }
+            if (e.getCause() instanceof PropertyValueException) {
+                PropertyValueException pve = (PropertyValueException) e
+                    .getCause();
+                throw new ApplicationException("Value " + pve.getPropertyName()
+                    + " has not been set.", ae);
+            } else {
+                throw ae;
+            }
         }
-        return res;
     }
 
     @SuppressWarnings("unchecked")
