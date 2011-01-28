@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.biobankpeer;
+package edu.ualberta.med.biobank.tools.modelpeer;
 
 import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.Option;
@@ -25,28 +25,28 @@ import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
-public class BioBankPeerBuilder {
+public class ModelPeerBuilder {
 
     private static String USAGE = "Usage: bbpeerbuilder UMLFILE OUTDIR";
 
     private static String PACKAGE = "edu.ualberta.med.biobank.common.peer";
 
     private static final Logger LOGGER = Logger
-        .getLogger(BioBankPeerBuilder.class.getName());
+        .getLogger(ModelPeerBuilder.class.getName());
 
-    private static BioBankPeerBuilder instance = null;
+    private static ModelPeerBuilder instance = null;
 
     Map<String, ModelClass> modelClasses;
 
     private AppArgs appArgs = null;
 
-    private BioBankPeerBuilder() {
+    private ModelPeerBuilder() {
 
     }
 
-    public static BioBankPeerBuilder getInstance() {
+    public static ModelPeerBuilder getInstance() {
         if (instance == null) {
-            instance = new BioBankPeerBuilder();
+            instance = new ModelPeerBuilder();
         }
         return instance;
     }
@@ -54,7 +54,7 @@ public class BioBankPeerBuilder {
     public static void main(String argv[]) {
         try {
             // PropertyConfigurator.configure("conf/log4j.properties");
-            BioBankPeerBuilder.getInstance().doWork(parseCommandLine(argv));
+            ModelPeerBuilder.getInstance().doWork(parseCommandLine(argv));
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -200,7 +200,7 @@ public class BioBankPeerBuilder {
                 }
                 sb.append(
                     "      PROP_NAMES = Collections.unmodifiableList(aList);\n")
-                    .append("   }");
+                    .append("   };\n");
             }
 
             sb.append("}\n");

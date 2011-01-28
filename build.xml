@@ -232,7 +232,7 @@
       <entry key="0" value="${java.client.version.num}"/>
     </propertyfile>
   </target>
-  <target name="deploy-eclipse" depends="sdk-files,java-client-manifest"
+  <target name="deploy-eclipse" depends="sdk-files,java-client-manifest,modelpeer"
           description="deploys the caCORE SDK beans to the eclipse project">
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/system/lib"
@@ -457,19 +457,57 @@
     </java>
   </target>
 
-  <target name="bbpeerbuilder"
+
+  <target name="build-modelpeer" depends="build-common-project">
+    <echo message="Building model peer tool" />
+    <mkdir dir="${eclipse.proj.dir.tools}/output" />
+    <copy includeemptydirs="false" todir="${eclipse.proj.dir.tools}/output">
+      <fileset dir="${eclipse.proj.dir.common}/output">
+  	<include name="**/TypeReference.class" />
+  	<include name="**/Property.class" />
+      </fileset>
+    </copy>
+    <javac debug="on" debuglevel="source,lines,vars"
+      destdir="${eclipse.proj.dir.tools}/output" source="1.6" target="1.6"
+      includeantruntime="false">
+      <src path="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/tools/modelpeer" />
+      <src path="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/tools/modelumlparser" />
+      <src path="${eclipse.proj.dir.tools}/src/edu/ualberta/med/biobank/tools/utils" />
+      <classpath>
+  	<path id="biobank.tools.classpath">
+   	  <fileset dir="${eclipse.proj.dir.tools}/lib">
+	    <include name="*.jar" />
+	  </fileset>
+	</path>
+  	<path id="biobank.common.classpath">
+   	  <fileset dir="${eclipse.proj.dir.common}/output">
+	    <include name="**/*.class" />
+	  </fileset>
+	</path>
+      </classpath>
+    </javac>
+  </target>
+
+  <target name="modelpeer"
           description="Builds wrapper peer classes based on UML logical model."
-          depends="sdk">
-    <java classpath="scripts/bbpeerbuilder.jar" classname="edu.ualberta.med.biobank.tools.biobankpeer.BioBankPeerBuilder"
+          depends="build-modelpeer">
+    <java classname="edu.ualberta.med.biobank.tools.modelpeer.ModelPeerBuilder"
           failonerror="true" fork="true">
       <arg value="${model.proj.dir}/biobank2.uml" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
+      <classpath>
+  	<path id="biobank.common.classpath">
+   	  <fileset dir="${eclipse.proj.dir.tools}/output">
+	    <include name="**/*.class" />
+	  </fileset>
+	</path>
+      </classpath>
     </java>
   </target>
 
   <target name="package-codegen-orm"
           description="REDO:: Packages the generated ORM and bean artifacts"
-          depends="strfields,bbpeerbuilder">
+          depends="strfields">
     <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
          basedir="${cacore.sdk.dir}\${output.src.dir}">
       <manifest>
@@ -484,7 +522,7 @@
   </target>
 
 
-  <target name="build-common-project">
+  <target name="build-common-project" depends="sdk-files">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
@@ -499,13 +537,20 @@
       <src path="${eclipse.proj.dir.common}/src" />
       <classpath>
   	<path id="biobank.common.classpath">
-   	  <fileset dir="${eclipse.proj.dir.common}/lib/server">
+	  <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib">
 	    <include name="*.jar" />
 	  </fileset>
-	  <fileset dir="${eclipse.proj.dir.common}/lib/client">
+	  <fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib">
+	    <include name="*.jar" />
+	  </fileset>
+	  <fileset dir="${cacore.sdk.dir}/system/security/dist">
+	    <include name="*.jar" />
+	  </fileset>
+	  <fileset dir="${req.jars.dir}">
 	    <include name="*.jar" />
 	  </fileset>
 	</path>
+
       </classpath>
     </javac>
   </target>
@@ -578,6 +623,7 @@
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <ant target="clean-jars" />
     <delete dir="${eclipse.proj.dir.common}/output" />
+    <delete dir="${eclipse.proj.dir.tools}/output" />
   </target>
 
   <target name="clean-caCore"
