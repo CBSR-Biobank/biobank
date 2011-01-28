@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 public class StudyMasterGroup extends AbstractStudyGroup {
 
     public StudyMasterGroup(SessionAdapter parent, int id) {
-        super(parent, id, "Studies Master");
+        super(parent, id, "All Studies");
     }
 
     @Override
@@ -43,7 +43,7 @@ public class StudyMasterGroup extends AbstractStudyGroup {
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return StudyWrapper.getAllStudies(getAppService()).size();
+        return (int) StudyWrapper.getCount(getAppService());
     }
 
     public void addStudy() {
