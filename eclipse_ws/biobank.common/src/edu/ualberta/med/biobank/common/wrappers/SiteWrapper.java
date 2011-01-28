@@ -74,12 +74,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         setProperty(getAddress2(), AddressWrapper.CITY, city);
     }
 
-    // protected String[] getPropertyChangeNames() {
-    // super.getPropertyChangeNames();
-    //
-    // listenToProperty(ADDRESS);
-    // }
-
     private AddressWrapper address;
 
     private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();

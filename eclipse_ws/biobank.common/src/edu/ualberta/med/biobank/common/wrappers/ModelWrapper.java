@@ -109,7 +109,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
             if (raw != null) {
                 try {
-                    W tmp = ModelWrapper.wrapObject(appService, raw);
+                    @SuppressWarnings("unchecked")
+                    W tmp = (W) ModelWrapper.wrapObject(appService, raw);
                     wrapper = tmp;
                 } catch (Exception e) {
                     throw new RuntimeException(e.getMessage());
@@ -171,8 +172,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
                 for (R element : raw) {
                     try {
-                        W wrapper = ModelWrapper
-                            .wrapObject(appService, element);
+                        @SuppressWarnings("unchecked")
+                        W wrapper = (W) ModelWrapper.wrapObject(appService,
+                            element);
                         wrappers.add(wrapper);
                     } catch (Exception e) {
                         throw new RuntimeException(e.getMessage());
@@ -834,8 +836,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return true;
     }
 
-    public static <R, W extends ModelWrapper<R>> W wrapObject(
-        WritableApplicationService appService, R nakedObject) throws Exception {
+    public static ModelWrapper<?> wrapObject(
+        WritableApplicationService appService, Object nakedObject)
+        throws Exception {
 
         Class<?> nakedKlazz = nakedObject.getClass();
         String wrapperClassName = ModelWrapper.class.getPackage().getName()
@@ -851,9 +854,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             Object[] args = new Object[] { appService, nakedObject };
 
             @SuppressWarnings("unchecked")
-            W newInstance = (W) constructor.newInstance(args);
+            ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
+                .newInstance(args);
 
-            return newInstance;
+            return wrapper;
         } catch (Exception e) {
             throw new Exception("cannot find or create expected Wrapper ("
                 + wrapperClassName + ") for " + nakedKlazz.getName(), e);
