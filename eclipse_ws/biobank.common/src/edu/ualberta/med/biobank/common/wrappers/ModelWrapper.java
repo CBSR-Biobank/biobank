@@ -36,12 +36,12 @@ import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
-    private final Map<Property<?>, Object> propertyMap = new HashMap<Property<?>, Object>();
+    private final Map<Property<?, ?>, Object> propertyMap = new HashMap<Property<?, ?>, Object>();
 
     // NOTE: properties need to use the unwrapped types because (1) easier to
     // directly get the property from the model (2) necessary for the eager-load
     // function.
-    public static class Property<T> {
+    public static class Property<T, W> {
         private final String name;
         private final TypeReference<T> type;
 
@@ -61,8 +61,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             return type.getType();
         }
 
-        public static <E> Property<E> create(String name, TypeReference<E> type) {
-            return new Property<E>(name, type);
+        public static <E, W> Property<E, W> create(String name,
+            TypeReference<E> type) {
+            return new Property<E, W>(name, type);
         }
 
         @Override
@@ -81,7 +82,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 return false;
             if (getClass() != obj.getClass())
                 return false;
-            Property<?> other = (Property<?>) obj;
+            Property<?, ?> other = (Property<?, ?>) obj;
             if (name == null) {
                 if (other.name != null)
                     return false;
@@ -92,12 +93,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<R>, R> W getWrappedProperty(
-        Property<R> property) {
-        return getWrappedProperty(this, property);
+        Property<R, E> property, Class<W> wrapperKlazz) {
+        return getWrappedProperty(this, property, wrapperKlazz);
     }
 
-    public <W extends ModelWrapper<R>, R> W getWrappedProperty(
-        ModelWrapper<?> modelWrapper, Property<R> property) {
+    public <W extends ModelWrapper<R>, R, M> W getWrappedProperty(
+        ModelWrapper<M> modelWrapper, Property<R, M> property,
+        @SuppressWarnings("unused") Class<W> wrapperKlazz) {
 
         @SuppressWarnings("unchecked")
         W wrapper = (W) recall(property);
@@ -121,25 +123,25 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<R>, R> void setWrappedProperty(
-        Property<R> property, W wrapper) {
+        Property<R, E> property, W wrapper) {
         setWrappedProperty(this, property, wrapper);
     }
 
-    public <W extends ModelWrapper<R>, R> void setWrappedProperty(
-        ModelWrapper<?> modelWrapper, Property<R> property, W wrapper) {
+    public <W extends ModelWrapper<R>, R, M> void setWrappedProperty(
+        ModelWrapper<M> modelWrapper, Property<R, M> property, W wrapper) {
         R newValue = wrapper.getWrappedObject();
         setProperty(modelWrapper, property, newValue);
         cache(property, wrapper);
     }
 
     public <W extends ModelWrapper<R>, R> void setWrappedCollection(
-        Property<? extends Collection<R>> property, Collection<W> wrappers) {
+        Property<? extends Collection<R>, E> property, Collection<W> wrappers) {
         setWrappedCollection(this, property, wrappers);
     }
 
-    public <W extends ModelWrapper<R>, R> void setWrappedCollection(
-        ModelWrapper<?> modelWrapper,
-        Property<? extends Collection<R>> property, Collection<W> wrappers) {
+    public <W extends ModelWrapper<R>, R, M> void setWrappedCollection(
+        ModelWrapper<M> modelWrapper,
+        Property<? extends Collection<R>, M> property, Collection<W> wrappers) {
         Collection<R> newValues = new HashSet<R>();
         for (W element : wrappers) {
             newValues.add(element.getWrappedObject());
@@ -150,13 +152,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<R>, R> List<W> getWrappedCollection(
-        Property<? extends Collection<R>> property, boolean sort) {
+        Property<? extends Collection<R>, E> property, boolean sort) {
         return getWrappedCollection(this, property, sort);
     }
 
-    public <W extends ModelWrapper<R>, R> List<W> getWrappedCollection(
-        ModelWrapper<?> modelWrapper,
-        Property<? extends Collection<R>> property, boolean sort) {
+    public <W extends ModelWrapper<R>, R, M> List<W> getWrappedCollection(
+        ModelWrapper<M> modelWrapper,
+        Property<? extends Collection<R>, M> property, boolean sort) {
 
         @SuppressWarnings("unchecked")
         List<W> wrappers = (List<W>) recall(property);
@@ -188,12 +190,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return wrappers;
     }
 
-    protected <T> T getProperty(Property<T> property) {
+    protected <T> T getProperty(Property<T, E> property) {
         return getProperty(this, property);
     }
 
-    protected <T> T getProperty(ModelWrapper<?> modelWrapper,
-        Property<T> property) {
+    protected <T, M> T getProperty(ModelWrapper<M> modelWrapper,
+        Property<T, M> property) {
         @SuppressWarnings("unchecked")
         T value = (T) recall(property);
 
@@ -205,18 +207,18 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return value;
     }
 
-    protected <T> void setProperty(Property<T> property, T newValue) {
+    protected <T> void setProperty(Property<T, E> property, T newValue) {
         setProperty(this, property, newValue);
     }
 
-    protected <T> void setProperty(ModelWrapper<?> modelWrapper,
-        Property<T> property, T newValue) {
+    protected <T, M> void setProperty(ModelWrapper<M> modelWrapper,
+        Property<T, M> property, T newValue) {
         setModelProperty(modelWrapper, property, newValue);
         cache(property, newValue);
     }
 
-    private <T> T getModelProperty(ModelWrapper<?> modelWrapper,
-        Property<T> property) {
+    private <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
+        Property<T, M> property) {
         T value = null;
 
         try {
@@ -234,8 +236,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return value;
     }
 
-    private <T> void setModelProperty(ModelWrapper<?> modelWrapper,
-        Property<? extends T> property, T newValue) {
+    private <T, M> void setModelProperty(ModelWrapper<M> modelWrapper,
+        Property<? extends T, M> property, T newValue) {
         try {
             Class<?> modelKlazz = modelWrapper.getWrappedObject().getClass();
 
@@ -258,15 +260,15 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    private void cache(Property<?> property, Object value) {
+    private void cache(Property<?, ?> property, Object value) {
         propertyMap.put(property, value);
     }
 
-    private boolean isCached(Property<?> property) {
+    private boolean isCached(Property<?, ?> property) {
         return propertyMap.containsKey(property);
     }
 
-    private Object recall(Property<?> property) {
+    private Object recall(Property<?, ?> property) {
         return propertyMap.get(property);
     }
 

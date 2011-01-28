@@ -32,14 +32,14 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends ModelWrapper<Site> {
-    public static final Property<Collection<Study>> STUDY_COLLECTION = Property
+    public static final Property<Collection<Study>, Site> STUDY_COLLECTION = Property
         .create("studyCollection", new TypeReference<Collection<Study>>() {
         });
-    public static final Property<String> NAME = Property.create("name",
+    public static final Property<String, Site> NAME = Property.create("name",
         new TypeReference<String>() {
         });
-    public static final Property<Address> ADDRESS = Property.create("address",
-        new TypeReference<Address>() {
+    public static final Property<Address, Site> ADDRESS = Property.create(
+        "address", new TypeReference<Address>() {
         });
 
     public Collection<StudyWrapper> getStudies(boolean sort) {
@@ -59,7 +59,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     private AddressWrapper getAddress2() {
-        return getWrappedProperty(ADDRESS);
+        return getWrappedProperty(ADDRESS, AddressWrapper.class);
     }
 
     public void setAddress2(AddressWrapper address) {
