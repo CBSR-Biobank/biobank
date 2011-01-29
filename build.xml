@@ -50,8 +50,7 @@
             value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.7-bin.jar" />
   <property name="cacore.system.jar.files"
             value="commons-collections-3.2.jar,commons-logging-1.1.jar,hibernate-validator.jar" />
-  <property name="test.output" location="testing" />
-  <property name="converage.output" location="coverage" />
+<property name="converage.output" location="coverage" />
   <condition property="perl" value="perl" else="/usr/bin/perl">
     <os family="windows" />
   </condition>
@@ -691,7 +690,10 @@
   </target>
 
 
-  <!-- JUnit -->
+  <!-- JUnit -->  
+	
+	<property name="test.output" location="testing" />
+    <property name="test.data.dir" location="testing" />
 
   <property name="dest.dir" value="${eclipse.proj.dir.junit}/build" />
   <property name="dest.dir.classes" value="${dest.dir}/classes" />
@@ -755,8 +757,9 @@
       <classpath refid="application.config.class.path" />
       <classpath refid="common.lib.class.path" />
       <classpath refid="test.class.path" />
-      <formatter usefile="yes" type="brief" />
-      <batchtest todir="testing/raw">
+      <formatter usefile="yes" type="xml" />
+      <test name="${testcase}" todir="${dest.dir.results.raw}" if="testcase"/>
+      <batchtest todir="${dest.dir.results.raw}" unless="testcase">
         <fileset dir="${eclipse.proj.dir.junit}/src">
           <include name="**/Test*.java" />
           <exclude name="edu/ualberta/med/biobank/test/speed/**" />
