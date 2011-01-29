@@ -45,8 +45,6 @@ public class AllTests {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        System.out.println("server: "
-            + System.getProperty("server", "http://localhost:8080"));
         appService = ServiceConnection
             .getAppService(
                 System.getProperty("server", "http://localhost:8080")
