@@ -8,6 +8,7 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ContainerLabelingSchemePeer;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -119,9 +120,12 @@ public class ContainerLabelingSchemeWrapper extends
         ApplicationException {
     }
 
+    private static final String HAS_CONTAINER_TYPES_QRY = "from "
+        + ContainerType.class.getName() + " where "
+        + ContainerTypePeer.CHILD_LABELING_SCHEME.getName() + "=?";
+
     private boolean hasContainerTypes() throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + ContainerType.class.getName() + " where childLabelingScheme=?",
+        HQLCriteria criteria = new HQLCriteria(HAS_CONTAINER_TYPES_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         List<ContainerType> types = appService.query(criteria);
         return types.size() > 0;
@@ -264,11 +268,12 @@ public class ContainerLabelingSchemeWrapper extends
         return isInBounds;
     }
 
+    private static final String POS_LABEL_LEN_QRY = "select min(minChars), max(maxChars) from "
+        + ContainerLabelingScheme.class.getName();
+
     public static List<Integer> getPossibleLabelLength(
         WritableApplicationService appService) throws ApplicationException {
-        String query = "select min(minChars), max(maxChars) from "
-            + ContainerLabelingScheme.class.getName();
-        HQLCriteria rangeQuery = new HQLCriteria(query);
+        HQLCriteria rangeQuery = new HQLCriteria(POS_LABEL_LEN_QRY);
         Object[] minMax = (Object[]) appService.query(rangeQuery).get(0);
         List<Integer> validLengths = new ArrayList<Integer>();
         for (int i = (Integer) minMax[0]; i < (Integer) minMax[1] + 1; i++) {

@@ -194,11 +194,14 @@ public class ContactWrapper extends ModelWrapper<Contact> {
         return getName() + " (" + getMobileNumber() + ")";
     }
 
+    private static final String ALL_CONTACTS_QRY = "from "
+        + Contact.class.getName();
+
     public static List<ContactWrapper> getAllContacts(
         WritableApplicationService appService) throws ApplicationException {
         List<Contact> contacts = new ArrayList<Contact>();
         List<ContactWrapper> wrappers = new ArrayList<ContactWrapper>();
-        HQLCriteria c = new HQLCriteria("from " + Contact.class.getName());
+        HQLCriteria c = new HQLCriteria(ALL_CONTACTS_QRY);
         contacts = appService.query(c);
         for (Contact contact : contacts) {
             wrappers.add(new ContactWrapper(appService, contact));

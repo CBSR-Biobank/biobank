@@ -142,7 +142,6 @@
       <command
             categoryId="org.eclipse.ui.category.window"
             id="edu.ualberta.med.biobank.commands.processingAdmin"
-            name="Processing Administration">
             name="Open Reports View">
       </command>
       <command

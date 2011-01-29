@@ -471,7 +471,7 @@ public class TestAliquot extends TestDatabase {
             nonActiveAliquots.add(a);
         }
 
-        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsNonActive(
+        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsNonActiveInSite(
             appService, site);
         Assert.assertEquals(nonActiveAliquots.size(), aliquots.size());
         Assert.assertTrue(aliquots.containsAll(nonActiveAliquots));

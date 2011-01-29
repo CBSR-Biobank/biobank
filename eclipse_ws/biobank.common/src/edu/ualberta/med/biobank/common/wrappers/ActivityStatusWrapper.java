@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -67,11 +68,13 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
         Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
             Container.class, ContainerType.class, SampleStorage.class,
-            Site.class, Study.class, StudyPvAttr.class };
+            Site.class, Study.class, StudyPvAttr.class, PatientVisit.class };
 
         for (Class<?> clazz : classes) {
-            HQLCriteria c = new HQLCriteria("select count(x) from "
-                + clazz.getName() + " as x where x.activityStatus=?",
+            StringBuilder sb = new StringBuilder("select count(x) from ")
+                .append(clazz.getName()).append(
+                    " as x where x.activityStatus=?");
+            HQLCriteria c = new HQLCriteria(sb.toString(),
                 Arrays.asList(new Object[] { wrappedObject }));
             List<Long> results = appService.query(c);
             if (results.size() != 1) {
@@ -119,13 +122,15 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return 0;
     }
 
+    private static final String ALL_ACTIVITY_STATUSES_QRY = "from "
+        + ActivityStatus.class.getName();
+
     public static List<ActivityStatusWrapper> getAllActivityStatuses(
         WritableApplicationService appService) throws ApplicationException {
 
         List<ActivityStatusWrapper> activities = new ArrayList<ActivityStatusWrapper>();
 
-        HQLCriteria c = new HQLCriteria("from "
-            + ActivityStatus.class.getName());
+        HQLCriteria c = new HQLCriteria(ALL_ACTIVITY_STATUSES_QRY);
         List<ActivityStatus> result = appService.query(c);
         for (ActivityStatus ac : result) {
             activities.add(new ActivityStatusWrapper(appService, ac));
@@ -134,12 +139,14 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return activities;
     }
 
+    private static final String ACTIVITY_STATUS_QRY = "from "
+        + ActivityStatus.class.getName() + " where name = ?";
+
     public static ActivityStatusWrapper getActivityStatus(
         WritableApplicationService appService, String name)
         throws ApplicationException, BiobankCheckException {
 
-        HQLCriteria c = new HQLCriteria("from "
-            + ActivityStatus.class.getName() + " where name = ?",
+        HQLCriteria c = new HQLCriteria(ACTIVITY_STATUS_QRY,
             Arrays.asList(new Object[] { name }));
 
         List<ActivityStatus> result = appService.query(c);
