@@ -28,9 +28,7 @@
   <property name="eclipse.proj.dir.junit"
             location="eclipse_ws/biobank2.tests" />
   <property name="scripts.proj.dir" location="scripts" />
-  <!--tp-->
   <property name="model.proj.dir" location="model" />
-  <!--tp-->
   <property name="data.dir" location="data" />
   <property name="data.sql.dir" location="${data.dir}/sql" />
   <property name="schema.dir" location="schema" />
@@ -462,11 +460,9 @@
       <include name="**/common/util/TypeReference.java" />
       <include name="**/common/wrappers.Property.java" />
       <classpath>
-  	<path id="biobank.tools.classpath">
-   	  <fileset dir="${eclipse.proj.dir.tools}/lib">
-	    <include name="*.jar" />
-	  </fileset>
-	</path>
+        <pathelement location="${req.jars.dir}/jargs.jar" />
+        <pathelement location="${req.jars.dir}/commons-lang-2.4.jar" />
+        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
       </classpath>
     </javac>
   </target>
