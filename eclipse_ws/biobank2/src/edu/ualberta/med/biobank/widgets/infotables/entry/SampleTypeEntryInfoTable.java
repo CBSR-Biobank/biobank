@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SampleTypeInfoTable;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Displays the current sample storage collection and allows the user to add
@@ -180,14 +179,15 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                         .getNameShort().equals(type.getNameShort())))
                     throw new BiobankCheckException(
                         "That sample type has already been added.");
-            type.checkNameAndShortNameUnique();
+            // type.checkNameAndShortNameUnique();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);
             return false;
-        } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Check error", e);
-            return false;
         }
+        // catch (ApplicationException e) {
+        // BioBankPlugin.openAsyncError("Check error", e);
+        // return false;
+        // }
         return true;
     }
 

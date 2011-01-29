@@ -21,6 +21,8 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
@@ -179,7 +181,7 @@ public class TestClinic extends TestDatabase {
         try {
             clinic.persist();
             Assert.fail("Should not insert the clinic : no address");
-        } catch (BiobankCheckException bce) {
+        } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
 
@@ -201,7 +203,7 @@ public class TestClinic extends TestDatabase {
         try {
             clinic.persist();
             Assert.fail("Should not insert the clinic : no activity status");
-        } catch (BiobankCheckException bce) {
+        } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
         clinic.setActivityStatus(ActivityStatusWrapper
@@ -222,7 +224,7 @@ public class TestClinic extends TestDatabase {
             clinic.persist();
             Assert
                 .fail("Should not insert the clinic : same name already in database for this site");
-        } catch (BiobankCheckException bce) {
+        } catch (DuplicateEntryException dee) {
             Assert.assertTrue(true);
         }
         clinic.setName(name + "_otherName");

@@ -37,11 +37,6 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
     }

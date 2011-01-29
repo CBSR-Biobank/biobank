@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ClientVersi
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionInvalidException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionNewerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ServerVersionOlderException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.security.SecurityServiceProvider;
@@ -169,8 +170,9 @@ public class BiobankApplicationServiceImpl extends
             if (e.getCause() instanceof PropertyValueException) {
                 PropertyValueException pve = (PropertyValueException) e
                     .getCause();
-                throw new ApplicationException("Value " + pve.getPropertyName()
-                    + " has not been set.", ae);
+                // FIXME check the message to be sure this is the right
+                // exception ?
+                throw new ValueNotSetException(pve.getPropertyName(), ae);
             } else {
                 throw ae;
             }

@@ -173,14 +173,15 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                     && sm.getName().equals(type.getName()))
                     throw new BiobankCheckException(
                         "That shipping method has already been added.");
-            type.checkUnique();
+            // type.checkUnique();
         } catch (BiobankCheckException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);
             return false;
-        } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Check error", e);
-            return false;
         }
+        // catch (ApplicationException e) {
+        // BioBankPlugin.openAsyncError("Check error", e);
+        // return false;
+        // }
         return true;
     }
 

@@ -44,15 +44,6 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the study pv attribute does not have an activity status");
-        }
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
         if (isUsedByPatientVisits()) {

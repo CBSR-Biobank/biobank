@@ -89,46 +89,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         return SampleType.class;
     }
 
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        checkNotEmpty(getName(), "Name");
-        checkNotEmpty(getNameShort(), "Short Name");
-        checkNameAndShortNameUnique();
-    }
-
-    public void checkNameAndShortNameUnique() throws ApplicationException,
-        BiobankCheckException {
-        checkNoDuplicates("name", getName(), "A sample type with name \""
-            + getName() + "\" already exists");
-
-        checkNoDuplicates("nameShort", getNameShort(),
-            "A sample type with short name \"" + getNameShort()
-                + "\" already exists");
-    }
-
-    private void checkNoDuplicates(String propertyName, String value,
-        String errorMessage) throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(
-            Arrays.asList(new Object[] { value }));
-
-        String notSameObject = "";
-        if (!isNew()) {
-            notSameObject = " and id <> ?";
-            parameters.add(getId());
-        }
-        HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + SampleType.class.getName() + " where " + propertyName + "=? "
-            + notSameObject, parameters);
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        if (result.get(0) > 0) {
-            throw new BiobankCheckException(errorMessage);
-        }
-    }
-
     /**
      * get all sample types in a site for containers which type name contains
      * "typeNameContains" (go recursively inside found containers)

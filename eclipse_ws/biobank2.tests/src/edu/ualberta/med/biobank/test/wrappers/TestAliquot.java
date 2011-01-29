@@ -30,6 +30,8 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
@@ -116,12 +118,23 @@ public class TestAliquot extends TestDatabase {
         try {
             pAliquot.persist();
             Assert.fail("Should not insert the aliquot : no activity status");
-        } catch (BiobankCheckException bce) {
+        } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
         pAliquot.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
         pAliquot.persist();
+    }
+
+    @Test
+    public void testCheckInventoryIdUnique() throws BiobankCheckException,
+        Exception {
+        aliquot.persist();
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), aliquot.getParent(),
+            aliquot.getPatientVisit(), 2, 2);
+        duplicate.setInventoryId(aliquot.getInventoryId());
+        duplicate.checkInventoryIdUnique();
     }
 
     @Test
@@ -137,7 +150,7 @@ public class TestAliquot extends TestDatabase {
         try {
             duplicate.persist();
             Assert.fail("same inventory id !");
-        } catch (BiobankCheckException bce) {
+        } catch (DuplicateEntryException dee) {
             Assert.assertTrue(true);
         }
 
@@ -149,7 +162,7 @@ public class TestAliquot extends TestDatabase {
             duplicate.persist();
             Assert
                 .fail("still can't save it with  the same inventoryId after a first add with anotehr inventoryId!");
-        } catch (BiobankCheckException bce) {
+        } catch (DuplicateEntryException dee) {
             Assert.assertTrue(true);
         }
     }
@@ -215,7 +228,7 @@ public class TestAliquot extends TestDatabase {
         try {
             aliquot.persist();
             Assert.fail("Patient visit should be set!");
-        } catch (BiobankCheckException bce) {
+        } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
     }

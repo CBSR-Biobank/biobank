@@ -10,11 +10,9 @@ import edu.ualberta.med.biobank.common.peer.DispatchInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
@@ -44,12 +42,6 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
     @Override
     public Class<DispatchInfo> getWrappedClass() {
         return DispatchInfo.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-
     }
 
     @Override

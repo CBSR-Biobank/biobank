@@ -224,26 +224,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        if (getAddress() == null) {
-            throw new BiobankCheckException(
-                "the clinic does not have an address");
-        }
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the clinic does not have an activity status");
-        }
-        checkNotEmpty(getName(), "Name");
-        checkNoDuplicates(Clinic.class, "name", getName(),
-            "A clinic with name \"" + getName() + "\" already exists.");
-        checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicates(Clinic.class, "nameShort", getNameShort(),
-            "A clinic with short name \"" + getNameShort()
-                + "\" already exists.");
-    }
-
-    @Override
     protected void persistDependencies(Clinic origObject) throws Exception {
         for (ContactWrapper cw : deletedContacts) {
             if (!cw.isNew()) {

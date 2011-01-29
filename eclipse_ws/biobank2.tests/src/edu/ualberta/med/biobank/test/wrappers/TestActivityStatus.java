@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
@@ -261,7 +262,7 @@ public class TestActivityStatus extends TestDatabase {
             newAs.persist();
             Assert.fail("Cannot have 2 statuses with same name");
             addedstatus.add(newAs);
-        } catch (BiobankCheckException bce) {
+        } catch (DuplicateEntryException dee) {
             Assert.assertTrue(true);
         }
     }

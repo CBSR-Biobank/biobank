@@ -59,16 +59,6 @@ public class CapacityWrapper extends ModelWrapper<Capacity> {
     }
 
     @Override
-    public void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        // if ((getRowCapacity() == null) || (getColCapacity() == null)
-        // || (getRowCapacity() < 0) || (getColCapacity() < 0)) {
-        // throw new BiobankCheckException("Capacity '" + getRowCapacity()
-        // + ":" + getColCapacity() + "' is invalid");
-        // }
-    }
-
-    @Override
     public int compareTo(ModelWrapper<Capacity> cap) {
         if (cap instanceof CapacityWrapper) {
             Integer rowCapacity1 = wrappedObject.getRowCapacity();

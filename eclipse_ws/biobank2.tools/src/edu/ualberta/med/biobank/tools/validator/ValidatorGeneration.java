@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -71,8 +72,6 @@ public class ValidatorGeneration {
 
     private Map<String, ModelClass> modelClasses;
 
-    private Object dmClasses;
-
     public static class AppArgs {
         boolean verbose = false;
         String modelFileName = null;
@@ -111,36 +110,46 @@ public class ValidatorGeneration {
     private void createValidatorFile(String validatorFileName) throws Exception {
         File f = new File(validatorFileName);
         FileOutputStream fos = new FileOutputStream(f);
-        StringBuffer errorMsgs = new StringBuffer();
         fos.write(getXmlFileString("file.begin").getBytes());
+
         for (ModelClass clazz : modelClasses.values()) {
-            String tableName = CamelCase.toTitleCase(clazz.getName());
-            Map<String, Attribute> tableAttributes = null;
-            try {
-                tableAttributes = ModelUmlParser.getInstance()
-                    .getDmTableAttrMap(tableName);
-            } catch (Exception ex) {
-                // FIXME class devrait savoir la table associee grace a la
-                // dependance
+            Map<String, Attribute> tableAttributes = new HashMap<String, Attribute>();
+            ModelClass currentModelClass = clazz;
+            while (currentModelClass != null) {
+                String tableName = CamelCase.toTitleCase(currentModelClass
+                    .getName());
+                try {
+                    tableAttributes.putAll(ModelUmlParser.getInstance()
+                        .getDmTableAttrMap(tableName));
+                } catch (Exception ex) {
+                }
+                currentModelClass = currentModelClass.getExtendsClass();
             }
             List<Attribute> attrList = new ArrayList<Attribute>();
-            if (tableAttributes != null)
-                for (Attribute attr : clazz.getAttrMap().values()) {
-                    Attribute tableAttribute = tableAttributes.get(CamelCase
-                        .toTitleCase(attr.getName()));
-                    Set<String> classAttrSter = attr.getStereotypes();
-                    Set<String> tableAttrSter = tableAttribute.getStereotypes();
-                    if ((classAttrSter.size() != tableAttrSter.size())
-                        || !classAttrSter.containsAll(tableAttrSter)) {
-                        errorMsgs.append("Not same stereotypes between "
-                            + clazz.getName() + " and " + tableName
+            boolean hasErrors = false;
+            for (Attribute attr : clazz.getAttrMap().values()) {
+                Attribute tableAttribute = tableAttributes.get(CamelCase
+                    .toTitleCase(attr.getName()));
+                if (tableAttribute == null)
+                    throw new Exception("No table attribute for "
+                        + attr.getName() + " of class " + clazz.getName());
+                Set<String> classAttrSter = attr.getStereotypes();
+                Set<String> tableAttrSter = tableAttribute.getStereotypes();
+                if ((classAttrSter.size() != tableAttrSter.size())
+                    || !classAttrSter.containsAll(tableAttrSter)) {
+                    LOGGER
+                        .error(clazz.getName()
+                            + ": not same stereotypes between logical model and data model"
                             + " for attribute " + attr.getName() + "\n");
-                    } else if (classAttrSter.size() > 0) {
-                        if ((classAttrSter.size() != 1)
-                            || !classAttrSter.contains("unique"))
-                            attrList.add(attr);
-                    }
+                    hasErrors = true;
+                } else if (classAttrSter.size() > 0) {
+                    if ((classAttrSter.size() != 1)
+                        || !classAttrSter.contains("unique"))
+                        attrList.add(attr);
                 }
+            }
+            if (hasErrors)
+                throw new Exception("Problems with attribute. See above errors");
             if (attrList.size() > 0)
                 fos.write(getXmlFileString("entry.begin",
                     clazz.getPkg() + "." + clazz.getName()).getBytes());
@@ -175,8 +184,6 @@ public class ValidatorGeneration {
         fos.write(getXmlFileString("file.end").getBytes());
         fos.flush();
         fos.close();
-        if (errorMsgs.length() > 0)
-            throw new Exception("Problems in uml:\n" + errorMsgs.toString());
     }
 
     private static AppArgs parseCommandLine(String argv[])

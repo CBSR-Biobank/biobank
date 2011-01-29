@@ -66,7 +66,6 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        super.persistChecks();
         if (getClinic() == null) {
             throw new BiobankCheckException("A clinic should be set");
         }

@@ -5,14 +5,12 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Researcher;
 import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ResearchGroupWrapper extends ModelWrapper<ResearchGroup> {
@@ -110,13 +108,6 @@ public class ResearchGroupWrapper extends ModelWrapper<ResearchGroup> {
     public Class<ResearchGroup> getWrappedClass() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override
