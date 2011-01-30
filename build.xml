@@ -52,6 +52,7 @@
             value="commons-collections-3.2.jar,commons-logging-1.1.jar,hibernate-validator.jar" />
   <property name="test.output" location="testing" />
   <property name="converage.output" location="coverage" />
+	
   <condition property="perl" value="perl" else="/usr/bin/perl">
     <os family="windows" />
   </condition>
@@ -81,6 +82,29 @@
   <condition property="cacore.sdk.available">
     <available file="${cacore.sdk.dir}/build.xml"/>
   </condition>
+	
+    <path id="biobank.common.build.classpath">
+      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${cacore.sdk.dir}/writable-api/dist">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${cacore.sdk.dir}/system/security/dist">
+        <include name="*.jar" />
+      </fileset>
+      <fileset dir="${req.jars.dir}">
+        <include name="*.jar" />
+      </fileset>
+    </path>
+    
+    <path id="biobank.common.run.classpath">
+        <pathelement location="${eclipse.proj.dir.common}/output" />
+        <pathelement location="${eclipse.proj.dir.common}/conf" />
+    </path>
 
   <!--
      files included in the sdk build.xml - necessary to be sure that we have
@@ -446,7 +470,8 @@
     </exec>
   </target>
 
-  <target name="build-modelpeer">
+  <target name="build-modelpeer" depends="check-cacore-sdk-uptodate,sdk"
+    unless="cacore.sdk.uptodate">
     <echo message="Building model peer tool" />
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <javac debug="on" debuglevel="source,lines,vars"
@@ -469,7 +494,8 @@
 
   <target name="modelpeer"
           description="Builds wrapper peer classes based on UML logical model."
-          depends="build-modelpeer">
+          depends="check-cacore-sdk-uptodate,build-modelpeer"
+          unless="cacore.sdk.uptodate">
     <java classname="edu.ualberta.med.biobank.tools.modelpeer.ModelPeerBuilder"
       failonerror="true" fork="true">
       <jvmarg
@@ -522,7 +548,8 @@
 	</java>
   </target>
 
-  <target name="build-hbmstrings" depends="sdk">
+  <target name="build-hbmstrings" depends="check-cacore-sdk-uptodate,sdk"
+    unless="cacore.sdk.uptodate">
     <echo message="Building HBM string fixing tool" />
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <javac debug="on" debuglevel="source,lines,vars"
@@ -545,7 +572,8 @@
 
   <target name="hbmstrings"
     description="Adds the length='#' field into *.hbm.xml files, references the biobank.uml file for the VARCHAR(#)"
-          depends="build-hbmstrings">
+          depends="check-cacore-sdk-uptodate,build-hbmstrings"
+          unless="cacore.sdk.uptodate">
     <java classname="edu.ualberta.med.biobank.tools.strfields.StrFields"
       failonerror="true" fork="true">
       <jvmarg
@@ -562,7 +590,8 @@
     </java>
   </target>
 
-  <target name="build-common-project" depends="sdk-files,modelpeer">
+  <target name="build-common-project" depends="check-cacore-sdk-uptodate,sdk-files,hbmstrings,modelpeer"
+  	unless="cacore.sdk.uptodate">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
@@ -575,32 +604,12 @@
   	destdir="${eclipse.proj.dir.common}/output" source="1.6" target="1.6"
            includeantruntime="false">
       <src path="${eclipse.proj.dir.common}/src" />
-      <classpath>
-  	<path id="biobank.common.classpath">
-	  <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib">
-	    <include name="*.jar" />
-	  </fileset>
-	  <fileset dir="${cacore.sdk.dir}/output/biobank2/package/local-client/lib">
-	    <include name="*.jar" />
-	  </fileset>
-	  <fileset dir="${cacore.sdk.dir}/writable-api/dist">
-	    <include name="*.jar" />
-	  </fileset>
-	  <fileset dir="${cacore.sdk.dir}/system/security/dist">
-	    <include name="*.jar" />
-	  </fileset>
-	  <fileset dir="${req.jars.dir}">
-	    <include name="*.jar" />
-	  </fileset>
-	</path>
-
-      </classpath>
+        <classpath refid="biobank.common.build.classpath" />
     </javac>
   </target>
 
   <target name="package-codegen-orm"
-          description="REDO:: Packages the generated ORM and bean artifacts"
-          depends="hbmstrings">
+          description="REDO:: Packages the generated ORM and bean artifacts">
     <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
          basedir="${cacore.sdk.dir}\${output.src.dir}">
       <manifest>
@@ -702,19 +711,6 @@
       <include name="*.jar" />
     </fileset>
   </path>
-  <path id="junit.class.path">
-    <fileset dir="jars">
-      <include name="*.jar" />
-    </fileset>
-  </path>
-  <path id="application.config.class.path">
-    <pathelement location="${eclipse.proj.dir.common}/conf" />
-  </path>
-  <path id="common.lib.class.path">
-    <fileset dir="${eclipse.proj.dir.common}/lib">
-      <include name="**/*.jar" />
-    </fileset>
-  </path>
   <path id="test.class.path">
     <pathelement location="${test.build.dir}" />
   </path>
@@ -737,21 +733,16 @@
         <pathelement location="${eclipse.proj.dir.common}/output" />
         <pathelement location="${eclipse.proj.dir.common}/lib/client" />
       </classpath>
-      <classpath refid="junit.class.path" />
-      <classpath refid="biobank.common.classpath" />
+      <classpath refid="biobank.common.build.classpath" />
     </javac>
-  </target>
+  </target>	
 	
   <target name="test" depends="tests-compile"
           description="executes test cases">
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
-      <classpath>
-      	<pathelement location="${eclipse.proj.dir.common}/output" />
-      </classpath>
-      <classpath refid="junit.class.path" />
-      <classpath refid="application.config.class.path" />
       <classpath refid="test.class.path" />
-      <classpath refid="biobank.common.classpath" />
+      <classpath refid="biobank.common.build.classpath" />
+      <classpath refid="biobank.common.run.classpath" />
       <formatter usefile="yes" type="xml" />
       <test name="${testcase}" todir="${test.output.raw}" if="testcase"/>
       <batchtest todir="${test.output.raw}" unless="testcase">
@@ -791,9 +782,8 @@
           description="executes test cases with code coverage">
     <delete file="${test.output}/coverage.emma" />
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
-      <classpath refid="junit.class.path" />
-      <classpath refid="application.config.class.path" />
-      <classpath refid="biobank.common.classpath" />
+      <classpath refid="biobank.common.build.classpath" />
+      <classpath refid="biobank.common.run.classpath" />
       <classpath refid="test.class.path" />
       <classpath refid="emma.lib" />
       <formatter usefile="yes" type="brief" />
