@@ -102,6 +102,7 @@
   </path>
 
   <path id="biobank.common.run.classpath">
+  	<path refid="biobank.common.build.classpath" />
     <pathelement location="${eclipse.proj.dir.common}/output" />
     <pathelement location="${eclipse.proj.dir.common}/conf" />
   </path>
@@ -736,26 +737,26 @@
       <classpath refid="biobank.common.build.classpath" />
     </javac>
   </target>
+	
+    <fileset id="testcase.files" dir="${eclipse.proj.dir.junit}/src">
+      <include name="**/Test*.java" />
+      <exclude name="**/speed/**" />
+      <exclude name="**/TestCommon.java" />
+      <exclude name="**/TestDatabase.java" />
+      <exclude name="**/TestFunctionalities.java" />
+      <exclude name="**/TestReportsOnExistingData.java" />
+      <exclude name="**/AllTests.java" />
+    </fileset>
 
   <target name="test" depends="tests-compile"
     description="executes test cases">
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
-      <classpath refid="biobank.common.build.classpath" />
       <classpath refid="biobank.common.run.classpath" />
       <formatter usefile="yes" type="xml" />
       <test name="${testcase}" todir="${test.output.raw}" if="testcase"/>
       <batchtest todir="${test.output.raw}" unless="testcase">
-        <fileset dir="${eclipse.proj.dir.junit}/src">
-          <include name="**/Test*.java" />
-          <exclude name="**/speed/**" />
-          <exclude name="**/TestCommon.java" />
-          <exclude name="**/TestDatabase.java" />
-          <exclude name="**/TestFunctionalities.java" />
-          <exclude name="**/TestReportsOnExistingData.java" />
-          <exclude name="**/AllTests.java" />
-        </fileset>
-        <formatter type="xml" />
+        <fileset refid="testcase.files" />
       </batchtest>
     </junit>
     <junitreport todir="${test.output}">
@@ -782,7 +783,6 @@
     description="executes test cases with code coverage">
     <delete file="${test.output}/coverage.emma" />
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
-      <classpath refid="biobank.common.build.classpath" />
       <classpath refid="biobank.common.run.classpath" />
       <classpath refid="test.class.path" />
       <classpath refid="emma.lib" />
@@ -790,15 +790,7 @@
       <formatter type="xml" />
       <test name="${testcase}" todir="${test.output.raw}" if="testcase"/>
       <batchtest todir="testing/raw" unless="testcase">
-        <fileset dir="${eclipse.proj.dir.junit}/src">
-          <include name="**/Test*.java" />
-          <exclude name="edu/ualberta/med/biobank/test/speed/**" />
-          <exclude name="**/TestCommon.java" />
-          <exclude name="**/TestDatabase.java" />
-          <exclude name="**/TestFunctionalities.java" />
-          <exclude name="**/AllTests.java" />
-        </fileset>
-        <formatter type="xml" />
+      	<fileset refid="testcase.files" />
       </batchtest>
       <jvmarg value="-Xbootclasspath/a:${emma.dir}/emma.jar" />
       <jvmarg value="emmarun" />
