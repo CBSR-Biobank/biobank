@@ -11,6 +11,10 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
+import edu.ualberta.med.biobank.common.peer.ContactPeer;
+import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentPatientPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -322,6 +326,14 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return null;
     }
 
+    private static final String STUDY_COLLECTION_QUERY = "select distinct studies from "
+        + Contact.class.getName()
+        + " as contacts inner join contacts."
+        + ContactPeer.STUDY_COLLECTION.getName()
+        + " as studies where contacts."
+        + Property.concatNames(ContactPeer.CLINIC, ClinicPeer.ID)
+        + " = ? order by studies.nameShort";
+
     @SuppressWarnings("unchecked")
     public List<StudyWrapper> getStudyCollection() throws ApplicationException {
         List<StudyWrapper> studyCollection = (List<StudyWrapper>) propertiesMap
@@ -329,10 +341,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
         if (studyCollection == null) {
             studyCollection = new ArrayList<StudyWrapper>();
-            HQLCriteria c = new HQLCriteria("select distinct studies from "
-                + Contact.class.getName() + " as contacts"
-                + " inner join contacts.studyCollection as studies"
-                + " where contacts.clinic.id = ? order by studies.nameShort",
+            HQLCriteria c = new HQLCriteria(STUDY_COLLECTION_QUERY,
                 Arrays.asList(new Object[] { getId() }));
             List<Study> collection = appService.query(c);
             for (Study study : collection) {
@@ -381,6 +390,11 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return getShipmentCount(false);
     }
 
+    public static final String SHIPMENT_COUNT_QRY = "select count(shipment) from "
+        + Shipment.class.getName()
+        + " as shipment where "
+        + Property.concatNames(ShipmentPeer.CLINIC, ClinicPeer.ID) + " = ?";
+
     /**
      * fast = true will execute a hql query. fast = false will call the
      * getShipmentCollection().size method
@@ -388,9 +402,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     public long getShipmentCount(boolean fast) throws ApplicationException,
         BiobankCheckException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(
-                "select count(shipment) from " + Shipment.class.getName()
-                    + " as shipment where shipment.clinic.id = ?",
+            HQLCriteria criteria = new HQLCriteria(SHIPMENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
@@ -478,6 +490,14 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return getName();
     }
 
+    public static final String PATIENT_COUNT_QRY = "select count(distinct csps.patient) from "
+        + Clinic.class.getName()
+        + " as clinic join clinic."
+        + ClinicPeer.SHIPMENT_COLLECTION.getName()
+        + " as shipments join shipments."
+        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
+        + " as csps where clinic." + ClinicPeer.ID.getName() + " = ?";
+
     /**
      * fast = true will execute a hql query. fast = false will call the
      * getShipmentCollection() method and loop on it to get patients
@@ -488,10 +508,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     public long getPatientCount(boolean fast) throws BiobankCheckException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(
-                "select count(distinct csps.patient) from "
-                    + Clinic.class.getName()
-                    + " as clinic join clinic.shipmentCollection as shipments join shipments.shipmentPatientCollection as csps where clinic.id = ?",
+            HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
@@ -510,6 +527,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return uniquePatients.size();
     }
 
+    public static final String VISIT_COLLECTION_QRY = "select distinct pv from "
+        + PatientVisit.class.getName()
+        + " as pv where pv."
+        + Property.concatNames(PatientVisitPeer.SHIPMENT_PATIENT,
+            ShipmentPatientPeer.SHIPMENT, ShipmentPeer.CLINIC, ClinicPeer.ID)
+        + " = ?";
+
     @SuppressWarnings("unchecked")
     public List<PatientVisitWrapper> getPatientVisitCollection()
         throws ApplicationException {
@@ -518,9 +542,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
         if (pvCollection == null) {
             pvCollection = new ArrayList<PatientVisitWrapper>();
-            HQLCriteria c = new HQLCriteria("select distinct pv from "
-                + PatientVisit.class.getName()
-                + " as pv where shipmentPatient.shipment.clinic.id = ?",
+            HQLCriteria c = new HQLCriteria(VISIT_COLLECTION_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<PatientVisit> collection = appService.query(c);
             for (PatientVisit pv : collection) {
@@ -547,6 +569,17 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         for (Clinic clinic : clinics)
             wrappers.add(new ClinicWrapper(appService, clinic));
         return wrappers;
+    }
+
+    public static long getCount(WritableApplicationService appService)
+        throws BiobankCheckException, ApplicationException {
+        HQLCriteria c = new HQLCriteria("select count (*) from "
+            + Clinic.class.getName());
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankCheckException("Invalid size for HQL query result");
+        }
+        return results.get(0);
     }
 
     @Override
