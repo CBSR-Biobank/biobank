@@ -1,26 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
@@ -35,62 +19,22 @@ import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final Map<Property<?, ?>, Object> propertyMap = new HashMap<Property<?, ?>, Object>();
-
-    // NOTE: properties need to use the unwrapped types because (1) easier to
-    // directly get the property from the model (2) necessary for the eager-load
-    // function.
-    public static class Property<T, W> {
-        private final String name;
-        private final TypeReference<T> type;
-
-        // TODO: include the model class as a type parameter and check this
-        // against what it's called on?
-
-        private Property(String name, TypeReference<T> type) {
-            this.name = name;
-            this.type = type;
-        }
-
-        public String getName() {
-            return name;
-        }
-
-        public Type getType() {
-            return type.getType();
-        }
-
-        public static <E, W> Property<E, W> create(String name,
-            TypeReference<E> type) {
-            return new Property<E, W>(name, type);
-        }
-
-        @Override
-        public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((name == null) ? 0 : name.hashCode());
-            return result;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj)
-                return true;
-            if (obj == null)
-                return false;
-            if (getClass() != obj.getClass())
-                return false;
-            Property<?, ?> other = (Property<?, ?>) obj;
-            if (name == null) {
-                if (other.name != null)
-                    return false;
-            } else if (!name.equals(other.name))
-                return false;
-            return true;
-        }
-    }
 
     public <W extends ModelWrapper<R>, R> W getWrappedProperty(
         Property<R, E> property, Class<W> wrapperKlazz) {
@@ -100,6 +44,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public <W extends ModelWrapper<R>, R, M> W getWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, M> property,
         @SuppressWarnings("unused") Class<W> wrapperKlazz) {
+        if (modelWrapper == null) {
+            return null;
+        }
 
         @SuppressWarnings("unchecked")
         W wrapper = (W) recall(property);
@@ -160,6 +107,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     public <W extends ModelWrapper<R>, R, M> List<W> getWrappedCollection(
         ModelWrapper<M> modelWrapper,
         Property<? extends Collection<R>, M> property, boolean sort) {
+        if (modelWrapper == null) {
+            return null;
+        }
 
         @SuppressWarnings("unchecked")
         List<W> wrappers = (List<W>) recall(property);
@@ -198,6 +148,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected <T, M> T getProperty(ModelWrapper<M> modelWrapper,
         Property<T, M> property) {
+        if (modelWrapper == null) {
+            return null;
+        }
+
         @SuppressWarnings("unchecked")
         T value = (T) recall(property);
 
@@ -333,11 +287,10 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public void addPropertyChangeListener(String propertyName,
         PropertyChangeListener listener) {
-        String[] properties = getPropertyChangeNames();
-        if ((properties == null) || (properties.length == 0)) {
+        List<String> propertiesList = getPropertyChangeNames();
+        if ((propertiesList == null) || (propertiesList.size() == 0)) {
             throw new RuntimeException("wrapper has not defined any properties");
         }
-        List<String> propertiesList = Arrays.asList(properties);
         if (!propertiesList.contains(propertyName)) {
             throw new RuntimeException("invalid property: " + propertyName);
         }
@@ -381,7 +334,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return the list of the different properties we want to notify when we
      * call firePropertyChanges
      */
-    protected abstract String[] getPropertyChangeNames();
+    protected abstract List<String> getPropertyChangeNames();
 
     /**
      * When retrieve the values from the database, need to fire the
@@ -389,7 +342,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     private void firePropertyChanges(Object oldWrappedObject,
         Object newWrappedObject) throws Exception {
-        String[] memberNames = getPropertyChangeNames();
+        List<String> memberNames = getPropertyChangeNames();
         if (memberNames == null) {
             throw new Exception("memberNames cannot be null");
         }
@@ -483,36 +436,35 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected void checkFieldLimits() throws BiobankCheckException,
         BiobankStringLengthException {
         String fieldValue = "";
-        String[] fields = getPropertyChangeNames();
-        for (int i = 0; i < fields.length; i++) {
+        for (String field : getPropertyChangeNames()) {
             Integer maxLen = VarCharLengths.getMaxSize(
-                wrappedObject.getClass(), fields[i]);
+                wrappedObject.getClass(), field);
             if (maxLen == null)
                 continue;
 
             Method method;
             try {
                 method = this.getClass().getMethod(
-                    "get" + Character.toUpperCase(fields[i].charAt(0))
-                        + fields[i].substring(1));
+                    "get" + Character.toUpperCase(field.charAt(0))
+                        + field.substring(1));
                 if (method.getReturnType().equals(String.class)) {
                     fieldValue = (String) method.invoke(this);
                     if ((fieldValue != null) && (fieldValue.length() > maxLen)) {
                         throw new BiobankStringLengthException(
-                            "Field exceeds max length: field: " + fields[i]
+                            "Field exceeds max length: field: " + field
                                 + ", value \"" + fieldValue + "\"");
                     }
                 }
             } catch (SecurityException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             } catch (NoSuchMethodException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             } catch (IllegalArgumentException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             } catch (IllegalAccessException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             } catch (InvocationTargetException e) {
-                throwBiobankException(fields[i], e);
+                throwBiobankException(field, e);
             }
         }
     }
@@ -853,11 +805,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
             Object[] args = new Object[] { appService, nakedObject };
 
-            @SuppressWarnings("unchecked")
-            ModelWrapper<?> wrapper = (ModelWrapper<?>) constructor
-                .newInstance(args);
-
-            return wrapper;
+            return (ModelWrapper<?>) constructor.newInstance(args);
         } catch (Exception e) {
             throw new Exception("cannot find or create expected Wrapper ("
                 + wrapperClassName + ") for " + nakedKlazz.getName(), e);

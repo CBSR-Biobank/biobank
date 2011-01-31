@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -38,11 +39,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "activityStatus",
-            "sendsShipments", "comment", "address", "site",
-            "contactCollection", "shipmentCollection", "street1", "street2",
-            "city", "province", "postalCode", "patientVisitCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return ClinicPeer.PROP_NAMES;
     }
 
     private AddressWrapper getAddress() {

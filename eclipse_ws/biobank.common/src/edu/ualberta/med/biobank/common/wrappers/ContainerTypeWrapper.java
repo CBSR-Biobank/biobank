@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
@@ -40,11 +41,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "comment", "nameShort", "topLevel",
-            "defaultTemperature", "activityStatus", "sampleTypeCollection",
-            "childContainerTypeCollection", "site", "capacity",
-            "childLabelingScheme", "rowCapacity", "colCapacity" };
+    protected List<String> getPropertyChangeNames() {
+        return ContainerTypePeer.PROP_NAMES;
     }
 
     @Override

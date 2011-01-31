@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ContainerPathPeer;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -26,8 +27,8 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "path", "container" };
+    protected List<String> getPropertyChangeNames() {
+        return ContainerPathPeer.PROP_NAMES;
     }
 
     @Override

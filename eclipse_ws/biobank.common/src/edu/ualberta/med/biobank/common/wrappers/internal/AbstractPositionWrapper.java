@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.AbstractPositionPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
@@ -20,8 +23,8 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "row", "col" };
+    protected List<String> getPropertyChangeNames() {
+        return AbstractPositionPeer.PROP_NAMES;
     }
 
     public void setRow(Integer row) {

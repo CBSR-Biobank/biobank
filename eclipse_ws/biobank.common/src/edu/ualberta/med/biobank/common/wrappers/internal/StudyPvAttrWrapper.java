@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.StudyPvAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -33,9 +34,8 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "label", "permissible", "activityStatus",
-            "pvAttrType", "study" };
+    protected List<String> getPropertyChangeNames() {
+        return StudyPvAttrPeer.PROP_NAMES;
     }
 
     @Override

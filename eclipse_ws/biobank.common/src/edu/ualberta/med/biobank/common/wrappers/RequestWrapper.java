@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
@@ -45,9 +46,8 @@ public class RequestWrapper extends ModelWrapper<Request> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "id", "submitted", "accepted", "shipped",
-            "waybill", "state", "requestAliquotCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return RequestPeer.PROP_NAMES;
     }
 
     @Override

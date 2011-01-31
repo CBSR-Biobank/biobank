@@ -1,17 +1,15 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.TypeReference;
+import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AddressWrapper extends ModelWrapper<Address> {
-    public static final Property<String, Address> CITY = Property.create(
-        "city", new TypeReference<String>() {
-        });
-
     public AddressWrapper(WritableApplicationService appService,
         Address wrappedObject) {
         super(appService, wrappedObject);
@@ -81,9 +79,8 @@ public class AddressWrapper extends ModelWrapper<Address> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "street1", "street2", "city", "province",
-            "postalCode" };
+    protected List<String> getPropertyChangeNames() {
+        return AddressPeer.PROP_NAMES;
     }
 
     @Override

@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -18,8 +21,8 @@ public class CapacityWrapper extends ModelWrapper<Capacity> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "rowCapacity", "colCapacity" };
+    protected List<String> getPropertyChangeNames() {
+        return CapacityPeer.PROP_NAMES;
     }
 
     public void setRow(Integer rowCapacity) {

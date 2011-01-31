@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +31,7 @@ public class TestModelWrapper extends TestDatabase {
         }
 
         @Override
-        protected String[] getPropertyChangeNames() {
+        protected List<String> getPropertyChangeNames() {
             return null;
         }
 
@@ -62,7 +63,7 @@ public class TestModelWrapper extends TestDatabase {
         }
 
         @Override
-        protected String[] getPropertyChangeNames() {
+        protected List<String> getPropertyChangeNames() {
             return null;
         }
 

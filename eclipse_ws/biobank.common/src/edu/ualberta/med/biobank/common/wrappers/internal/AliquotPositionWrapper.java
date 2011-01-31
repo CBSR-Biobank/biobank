@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -33,12 +33,8 @@ public class AliquotPositionWrapper extends
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        List<String> properties = new ArrayList<String>(Arrays.asList(super
-            .getPropertyChangeNames()));
-        properties.add("aliquot");
-        properties.add("container");
-        return properties.toArray(new String[properties.size()]);
+    protected List<String> getPropertyChangeNames() {
+        return AliquotPositionPeer.PROP_NAMES;
     }
 
     @Override

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ReportPeer;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.Report;
@@ -261,11 +262,8 @@ public class ReportWrapper extends ModelWrapper<Report> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { PROPERTY_NAME, PROPERTY_DESCRIPTION,
-            PROPERTY_IS_COUNT, PROPERTY_IS_PUBLIC, PROPERTY_USER_ID,
-            PROPERTY_REPORT_COLUMN_COLLECTION,
-            PROPERTY_REPORT_FILTER_COLLECTION };
+    protected List<String> getPropertyChangeNames() {
+        return ReportPeer.PROP_NAMES;
     }
 
     @Override

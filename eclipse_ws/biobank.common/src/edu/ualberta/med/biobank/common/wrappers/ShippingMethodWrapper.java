@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
 import edu.ualberta.med.biobank.model.AbstractShipment;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
@@ -41,8 +42,8 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "shipmentCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return ShippingMethodPeer.PROP_NAMES;
     }
 
     @Override

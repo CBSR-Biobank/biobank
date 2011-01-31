@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.ShipmentPatientWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -53,12 +54,8 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        String[] properties = super.getPropertyChangeNames();
-        List<String> list = new ArrayList<String>(Arrays.asList(properties));
-        list.addAll(Arrays.asList("clinic", "patientVisitCollection",
-            "patientCollection", "activityStatus"));
-        return list.toArray(new String[list.size()]);
+    protected List<String> getPropertyChangeNames() {
+        return ShipmentPeer.PROP_NAMES;
     }
 
     @Override

@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.StudySourceVesselPeer;
 import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudySourceVessel;
@@ -23,9 +26,8 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "sourceVessel", "study", "needTimeDrawn",
-            "needOriginalVolume" };
+    protected List<String> getPropertyChangeNames() {
+        return StudySourceVesselPeer.PROP_NAMES;
     }
 
     @Override

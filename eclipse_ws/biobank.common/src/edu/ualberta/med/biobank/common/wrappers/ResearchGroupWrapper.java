@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ResearchGroupPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.ResearchGroup;
@@ -101,8 +102,8 @@ public class ResearchGroupWrapper extends ModelWrapper<ResearchGroup> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "address", "study" };
+    protected List<String> getPropertyChangeNames() {
+        return ResearchGroupPeer.PROP_NAMES;
     }
 
     @Override

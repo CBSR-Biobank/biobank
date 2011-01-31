@@ -11,13 +11,12 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.AddressPeer;
+import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -32,49 +31,37 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends ModelWrapper<Site> {
-    public static final Property<Collection<Study>, Site> STUDY_COLLECTION = Property
-        .create("studyCollection", new TypeReference<Collection<Study>>() {
-        });
-    public static final Property<String, Site> NAME = Property.create("name",
-        new TypeReference<String>() {
-        });
-    public static final Property<Address, Site> ADDRESS = Property.create(
-        "address", new TypeReference<Address>() {
-        });
-
     public Collection<StudyWrapper> getStudies(boolean sort) {
-        return getWrappedCollection(STUDY_COLLECTION, sort);
+        return getWrappedCollection(SitePeer.STUDY_COLLECTION, sort);
     }
 
     public void setStudies(Collection<StudyWrapper> studies) {
-        setWrappedCollection(STUDY_COLLECTION, studies);
+        setWrappedCollection(SitePeer.STUDY_COLLECTION, studies);
     }
 
     public String getName2() {
-        return getProperty(NAME);
+        return getProperty(SitePeer.NAME);
     }
 
     public void setName2(String name) {
-        setProperty(NAME, name);
+        setProperty(SitePeer.NAME, name);
     }
 
     private AddressWrapper getAddress2() {
-        return getWrappedProperty(ADDRESS, AddressWrapper.class);
+        return getWrappedProperty(SitePeer.ADDRESS, AddressWrapper.class);
     }
 
     public void setAddress2(AddressWrapper address) {
-        setWrappedProperty(ADDRESS, address);
+        setWrappedProperty(SitePeer.ADDRESS, address);
     }
 
     public String getCity2() {
-        return getProperty(getAddress2(), AddressWrapper.CITY);
+        return getProperty(getAddress2(), AddressPeer.CITY);
     }
 
     public void setCity2(String city) {
-        setProperty(getAddress2(), AddressWrapper.CITY, city);
+        setProperty(getAddress2(), AddressPeer.CITY, city);
     }
-
-    private AddressWrapper address;
 
     private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();
 
@@ -87,184 +74,104 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "address", "clinicCollection", "siteCollection",
-            "containerCollection", "shipmentCollection",
-            "sitePvAttrCollection", "street1", "street2", "city", "province",
-            "postalCode", "sentDispatchCollection", "sentDispatchCollection",
-            "notificationCollection", "srcDispatchInfoCollection",
-            "studyCollection", "approvedRequestCollection",
-            "acceptedRequestCollection", "filledRequestCollection",
-            "shippedRequestCollection" };
+    protected List<String> getPropertyChangeNames() {
+        // TODO: cache this?
+        return SitePeer.PROP_NAMES;
     }
 
     public String getName() {
-        return wrappedObject.getName();
+        return getProperty(SitePeer.NAME);
     }
 
     public void setName(String name) {
-        String oldName = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
+        setProperty(SitePeer.NAME, name);
     }
 
     public String getNameShort() {
-        return wrappedObject.getNameShort();
+        return getProperty(SitePeer.NAME_SHORT);
     }
 
     public void setNameShort(String nameShort) {
-        String oldNameShort = getNameShort();
-        wrappedObject.setNameShort(nameShort);
-        propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
-            nameShort);
+        setProperty(SitePeer.NAME_SHORT, nameShort);
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
-            .get("activityStatus");
-        if (activityStatus == null) {
-            ActivityStatus a = wrappedObject.getActivityStatus();
-            if (a == null)
-                return null;
-            activityStatus = new ActivityStatusWrapper(appService, a);
-            propertiesMap.put("activityStatus", activityStatus);
-        }
-        return activityStatus;
+        return getWrappedProperty(SitePeer.ACTIVITY_STATUS,
+            ActivityStatusWrapper.class);
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        propertiesMap.put("activityStatus", activityStatus);
-        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        ActivityStatus rawObject = null;
-        if (activityStatus != null) {
-            rawObject = activityStatus.getWrappedObject();
-        }
-        wrappedObject.setActivityStatus(rawObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
+        setWrappedProperty(SitePeer.ACTIVITY_STATUS, activityStatus);
     }
 
     public String getComment() {
-        return wrappedObject.getComment();
+        return getProperty(SitePeer.COMMENT);
     }
 
     public void setComment(String comment) {
-        String oldComment = getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
+        setProperty(SitePeer.COMMENT, comment);
     }
 
     private AddressWrapper getAddress() {
+        return getWrappedProperty(SitePeer.ADDRESS, AddressWrapper.class);
+    }
+
+    private void setAddress(AddressWrapper address) {
+        setWrappedProperty(SitePeer.ADDRESS, address);
+    }
+
+    private AddressWrapper initAddress() {
+        AddressWrapper address = getAddress();
         if (address == null) {
-            Address a = wrappedObject.getAddress();
-            if (a == null)
-                return null;
-            address = new AddressWrapper(appService, a);
+            address = new AddressWrapper(appService);
+            setAddress(address);
         }
         return address;
     }
 
-    private void setAddress(Address address) {
-        if (address == null)
-            this.address = null;
-        else
-            this.address = new AddressWrapper(appService, address);
-        Address oldAddress = wrappedObject.getAddress();
-        wrappedObject.setAddress(address);
-        propertyChangeSupport
-            .firePropertyChange("address", oldAddress, address);
-    }
-
-    private AddressWrapper initAddress() {
-        setAddress(new Address());
-        return getAddress();
-    }
-
     public String getStreet1() {
-        AddressWrapper address = getAddress();
-        if (getAddress() == null) {
-            return null;
-        }
-        return address.getStreet1();
+        return getProperty(getAddress(), AddressPeer.STREET1);
     }
 
     public void setStreet1(String street1) {
-        String old = getStreet1();
-        if (getAddress() == null) {
-            address = initAddress();
-        }
-        wrappedObject.getAddress().setStreet1(street1);
-        propertyChangeSupport.firePropertyChange("street1", old, street1);
+        initAddress();
+        setProperty(getAddress(), AddressPeer.STREET1, street1);
     }
 
     public String getStreet2() {
-        AddressWrapper address = getAddress();
-        if (getAddress() == null) {
-            return null;
-        }
-        return address.getStreet2();
+        return getProperty(getAddress(), AddressPeer.STREET2);
     }
 
     public void setStreet2(String street2) {
-        String old = getStreet2();
-        if (getAddress() == null) {
-            address = initAddress();
-        }
-        wrappedObject.getAddress().setStreet2(street2);
-        propertyChangeSupport.firePropertyChange("street2", old, street2);
+        initAddress();
+        setProperty(getAddress(), AddressPeer.STREET2, street2);
     }
 
     public String getCity() {
-        AddressWrapper address = getAddress();
-        if (getAddress() == null) {
-            return null;
-        }
-        return address.getCity();
+        return getProperty(getAddress(), AddressPeer.CITY);
     }
 
     public void setCity(String city) {
-        String old = getCity();
-        if (getAddress() == null) {
-            address = initAddress();
-        }
-        wrappedObject.getAddress().setCity(city);
-        propertyChangeSupport.firePropertyChange("city", old, city);
+        initAddress();
+        setProperty(getAddress(), AddressPeer.CITY, city);
     }
 
     public String getProvince() {
-        AddressWrapper address = getAddress();
-        if (getAddress() == null) {
-            return null;
-        }
-        return address.getProvince();
+        return getProperty(getAddress(), AddressPeer.PROVINCE);
     }
 
     public void setProvince(String province) {
-        String old = getProvince();
-        if (getAddress() == null) {
-            address = initAddress();
-        }
-        wrappedObject.getAddress().setProvince(province);
-        propertyChangeSupport.firePropertyChange("province", old, province);
+        initAddress();
+        setProperty(getAddress(), AddressPeer.PROVINCE, province);
     }
 
     public String getPostalCode() {
-        AddressWrapper address = getAddress();
-        if (getAddress() == null) {
-            return null;
-        }
-        return address.getPostalCode();
+        return getProperty(getAddress(), AddressPeer.POSTAL_CODE);
     }
 
     public void setPostalCode(String postalCode) {
-        String old = postalCode;
-        if (getAddress() == null) {
-            address = initAddress();
-        }
-        wrappedObject.getAddress().setPostalCode(postalCode);
-        propertyChangeSupport.firePropertyChange("postalCode", old, postalCode);
+        initAddress();
+        setProperty(getAddress(), AddressPeer.POSTAL_CODE, postalCode);
     }
 
     @Override
@@ -752,7 +659,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     @Override
     public void resetInternalFields() {
-        address = null;
         removedDispatchInfoWrapper.clear();
     }
 

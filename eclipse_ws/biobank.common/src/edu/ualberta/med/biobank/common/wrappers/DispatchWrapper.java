@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -57,12 +58,8 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        String[] properties = super.getPropertyChangeNames();
-        List<String> list = new ArrayList<String>(Arrays.asList(properties));
-        list.addAll(Arrays.asList("sender", "receiver", "aliquotCollection",
-            "study"));
-        return list.toArray(new String[] {});
+    protected List<String> getPropertyChangeNames() {
+        return DispatchPeer.PROP_NAMES;
     }
 
     @Override

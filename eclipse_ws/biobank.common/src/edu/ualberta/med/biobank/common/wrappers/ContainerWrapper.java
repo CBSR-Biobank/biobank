@@ -9,6 +9,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
@@ -80,11 +81,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "position", "site", "label", "temperature",
-            "aliquotPositionCollection", "aliquots", "childPositionCollection",
-            "children", "activityStatus", "containerType", "parent",
-            "productBarcode", "comment" };
+    protected List<String> getPropertyChangeNames() {
+        return ContainerPeer.PROP_NAMES;
     }
 
     @Override

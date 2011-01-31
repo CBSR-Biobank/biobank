@@ -8,6 +8,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -66,9 +67,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "inventoryId", "patientVisit", "position",
-            "linkDate", "sampleType", "quantity", "activityStatus", "comment" };
+    protected List<String> getPropertyChangeNames() {
+        return AliquotPeer.PROP_NAMES;
     }
 
     @Override

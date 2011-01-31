@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -44,8 +45,8 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] {};
+    protected List<String> getPropertyChangeNames() {
+        return ActivityStatusPeer.PROP_NAMES;
     }
 
     public String getName() {
