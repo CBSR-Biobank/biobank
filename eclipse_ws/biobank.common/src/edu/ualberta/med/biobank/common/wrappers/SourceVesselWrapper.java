@@ -119,4 +119,11 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         return results2.get(0) > 0;
     }
 
+    public void checkUnique() throws ApplicationException,
+        BiobankCheckException {
+        checkNoDuplicates(SourceVessel.class, SourceVesselPeer.NAME.getName(),
+            getName(), "A source vessel with name \"" + getName()
+                + "\" already exists.");
+    }
+
 }

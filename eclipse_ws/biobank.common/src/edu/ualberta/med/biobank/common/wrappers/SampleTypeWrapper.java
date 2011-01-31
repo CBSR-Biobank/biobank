@@ -206,4 +206,16 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         super.reload();
     }
 
+    public void checkNameAndShortNameUnique() throws ApplicationException,
+        BiobankCheckException {
+        checkNoDuplicates(SampleType.class, SampleTypePeer.NAME.getName(),
+            getName(), "A sample type with name \"" + getName()
+                + "\" already exists");
+
+        checkNoDuplicates(SampleType.class,
+            SampleTypePeer.NAME_SHORT.getName(), getNameShort(),
+            "A sample type with short name \"" + getNameShort()
+                + "\" already exists");
+    }
+
 }

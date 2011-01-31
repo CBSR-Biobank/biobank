@@ -172,4 +172,11 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         return name != null && !name.equals(PICK_UP_NAME)
             && !name.equals(DROP_OFF_NAME);
     }
+
+    public void checkUnique() throws BiobankCheckException,
+        ApplicationException {
+        checkNoDuplicates(ShippingMethod.class,
+            ShippingMethodPeer.NAME.getName(), getName(),
+            "A shipping method with name \"" + getName() + "\" already exists.");
+    }
 }
