@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
 import gov.nih.nci.security.authentication.LockoutManager;
-import gov.nih.nci.security.authorization.domainobjects.Application;
 import gov.nih.nci.security.authorization.domainobjects.Group;
 import gov.nih.nci.security.authorization.domainobjects.Privilege;
 import gov.nih.nci.security.authorization.domainobjects.ProtectionElement;
@@ -31,7 +30,6 @@ import gov.nih.nci.security.dao.GroupSearchCriteria;
 import gov.nih.nci.security.dao.ProtectionElementSearchCriteria;
 import gov.nih.nci.security.dao.ProtectionGroupSearchCriteria;
 import gov.nih.nci.security.dao.RoleSearchCriteria;
-import gov.nih.nci.security.dao.SearchCriteria;
 import gov.nih.nci.security.exceptions.CSObjectNotFoundException;
 import gov.nih.nci.security.exceptions.CSTransactionException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -40,15 +38,11 @@ import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
 import gov.nih.nci.system.query.SDKQuery;
 import gov.nih.nci.system.query.SDKQueryResult;
-import gov.nih.nci.system.query.example.DeleteExampleQuery;
-import gov.nih.nci.system.query.example.ExampleQuery;
-import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -78,15 +72,15 @@ public class BiobankApplicationServiceImpl extends
 
     public static final String SITE_CLASS_NAME = "edu.ualberta.med.biobank.model.Site";
 
-    private static final String APPLICATION_CONTEXT_NAME = "biobank2";
+    public static final String APPLICATION_CONTEXT_NAME = "biobank2";
 
-    private static final String ALL_SITES_PG_ID = "11";
+    public static final String ALL_SITES_PG_ID = "11";
 
-    private static final String SERVER_VERSION_PROP_FILE = "version.properties";
+    public static final String SERVER_VERSION_PROP_FILE = "version.properties";
 
-    private static final String SERVER_VERSION_PROP_KEY = "server.version";
+    public static final String SERVER_VERSION_PROP_KEY = "server.version";
 
-    private static int[] serverVersionArr = null;
+    public static int[] serverVersionArr = null;
 
     private static Properties props = null;
 
@@ -149,18 +143,7 @@ public class BiobankApplicationServiceImpl extends
     public SDKQueryResult executeQuery(SDKQuery query)
         throws ApplicationException {
         try {
-            SDKQueryResult res = super.executeQuery(query);
-            if (query instanceof ExampleQuery) {
-                Object queryObject = ((ExampleQuery) query).getExample();
-                if (queryObject != null && queryObject instanceof Site) {
-                    if (query instanceof InsertExampleQuery) {
-                        newSiteSecurity((Site) res.getObjectResult());
-                    } else if (query instanceof DeleteExampleQuery) {
-                        deleteSiteSecurity((Site) queryObject);
-                    }
-                }
-            }
-            return res;
+            return super.executeQuery(query);
         } catch (ApplicationException ae) {
             Throwable e = ae;
             while (e.getCause() != null
@@ -176,92 +159,6 @@ public class BiobankApplicationServiceImpl extends
             } else {
                 throw ae;
             }
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    private void deleteSiteSecurity(Site site) throws ApplicationException {
-        Object id = null;
-        String nameShort = null;
-        try {
-            id = site.getId();
-            nameShort = site.getNameShort();
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
-            ProtectionElement searchPE = new ProtectionElement();
-            searchPE.setObjectId(Site.class.getName());
-            searchPE.setAttribute("id");
-            searchPE.setValue(id.toString());
-            SearchCriteria sc = new ProtectionElementSearchCriteria(searchPE);
-            List<ProtectionElement> peToDelete = upm.getObjects(sc);
-            if (peToDelete == null || peToDelete.size() == 0) {
-                return;
-            }
-            List<String> pgIdsToDelete = new ArrayList<String>();
-            for (ProtectionElement pe : peToDelete) {
-                Set<ProtectionGroup> pgs = upm.getProtectionGroups(pe
-                    .getProtectionElementId().toString());
-                for (ProtectionGroup pg : pgs) {
-                    // remove the protection group only if it contains only
-                    // this protection element and is not the main site
-                    // admin group
-                    String pgId = pg.getProtectionGroupId().toString();
-                    if (!pgId.equals(ALL_SITES_PG_ID)
-                        && upm.getProtectionElements(pgId).size() == 1) {
-                        pgIdsToDelete.add(pgId);
-                    }
-                }
-                upm.removeProtectionElement(pe.getProtectionElementId()
-                    .toString());
-            }
-            for (String pgId : pgIdsToDelete) {
-                upm.removeProtectionGroup(pgId);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new ApplicationException("Error deleting site " + id + ":"
-                + nameShort + " security: " + e.getMessage());
-        }
-
-    }
-
-    private void newSiteSecurity(Site site) throws ApplicationException {
-        Integer siteId = null;
-        String nameShort = null;
-        try {
-            siteId = site.getId();
-            nameShort = site.getNameShort();
-            UserProvisioningManager upm = SecurityServiceProvider
-                .getUserProvisioningManager(APPLICATION_CONTEXT_NAME);
-            Application currentApplication = upm
-                .getApplication(APPLICATION_CONTEXT_NAME);
-            // Create protection element for the site
-            ProtectionElement pe = new ProtectionElement();
-            pe.setApplication(currentApplication);
-            pe.setProtectionElementName(SITE_CLASS_NAME + "/" + nameShort);
-            pe.setProtectionElementDescription(nameShort);
-            pe.setObjectId(SITE_CLASS_NAME);
-            pe.setAttribute("id");
-            pe.setValue(siteId.toString());
-            upm.createProtectionElement(pe);
-
-            // Create a new protection group for this protection element only
-            ProtectionGroup pg = new ProtectionGroup();
-            pg.setApplication(currentApplication);
-            pg.setProtectionGroupName(nameShort + " site");
-            pg.setProtectionGroupDescription("Protection group for site "
-                + nameShort + " (id=" + siteId + ")");
-            pg.setProtectionElements(new HashSet<ProtectionElement>(Arrays
-                .asList(pe)));
-            // parent will be the "all sites" protection group
-            ProtectionGroup allSitePg = upm
-                .getProtectionGroupById(ALL_SITES_PG_ID);
-            pg.setParentProtectionGroup(allSitePg);
-            upm.createProtectionGroup(pg);
-        } catch (Exception e) {
-            log.error("error adding new site security", e);
-            throw new ApplicationException("Error adding new site " + siteId
-                + ":" + nameShort + " security:" + e.getMessage());
         }
     }
 

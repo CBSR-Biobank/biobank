@@ -309,7 +309,7 @@
     </copy>
     <copy todir="${eclipse.proj.dir.importer}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank.importer.jar.files}"/>
-      <fileset file="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/log4j-1.2.14.jar"/>
+      <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar"/>
       <fileset file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar"/>
     </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib">
@@ -319,7 +319,7 @@
       <filelist dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib" files="biobank2-beans.jar"/>
     </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib">
-      <fileset file="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib/log4j-1.2.14.jar"/>
+      <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar"/>
     </copy>
   </target>
   <!-- JBoss -->
@@ -503,11 +503,9 @@
 	  <include name="**/tools/modelumlparser/*.java" />
 	  <include name="**/tools/utils/*.java" />
 	  <classpath>
-	  	<path id="biobank.tools.classpath">
-	   	  <fileset dir="${eclipse.proj.dir.tools}/lib">
-		    <include name="*.jar" />
-		  </fileset>
-		</path>
+	  	<pathelement location="${req.jars.dir}/jargs.jar" />
+	  	<pathelement location="${req.jars.dir}/commons-io-1.4.jar" />
+	  	<pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
 	  </classpath>
 	</javac>
   </target>	

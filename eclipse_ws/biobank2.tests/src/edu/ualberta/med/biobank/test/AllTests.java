@@ -12,6 +12,7 @@ import edu.ualberta.med.biobank.test.wrappers.TestActivityStatus;
 import edu.ualberta.med.biobank.test.wrappers.TestAliquot;
 import edu.ualberta.med.biobank.test.wrappers.TestClinic;
 import edu.ualberta.med.biobank.test.wrappers.TestContact;
+import edu.ualberta.med.biobank.test.wrappers.TestContainer;
 import edu.ualberta.med.biobank.test.wrappers.TestContainerLabelingScheme;
 import edu.ualberta.med.biobank.test.wrappers.TestContainerPath;
 import edu.ualberta.med.biobank.test.wrappers.TestContainerType;
@@ -32,7 +33,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
 @SuiteClasses({ TestActivityStatus.class, TestAliquot.class, TestClinic.class,
-    TestShipment.class, TestContact.class, /* TestContainer.class, */
+    TestShipment.class, TestContact.class, TestContainer.class,
     TestContainerLabelingScheme.class, TestContainerPath.class,
     TestContainerType.class, TestDispatch.class, TestModelWrapper.class,
     TestPatient.class, TestPatientVisit.class, TestPvSourceVessel.class,

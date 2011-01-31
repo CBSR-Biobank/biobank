@@ -133,8 +133,33 @@ public class TestAliquot extends TestDatabase {
         AliquotWrapper duplicate = AliquotHelper.newAliquot(
             aliquot.getSampleType(), aliquot.getParent(),
             aliquot.getPatientVisit(), 2, 2);
+
         duplicate.setInventoryId(aliquot.getInventoryId());
-        duplicate.checkInventoryIdUnique();
+        try {
+            duplicate.checkInventoryIdUnique();
+            Assert.fail("The check should detect that this is the same");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCheckInventoryIdUniqueCaseSensitive()
+        throws BiobankCheckException, Exception {
+        int i = r.nextInt();
+        aliquot.setInventoryId("toto" + i);
+        aliquot.persist();
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), aliquot.getParent(),
+            aliquot.getPatientVisit(), 2, 2);
+
+        duplicate.setInventoryId("TOTO" + i);
+        try {
+            duplicate.checkInventoryIdUnique();
+            Assert.assertTrue(true);
+        } catch (BiobankCheckException bce) {
+            Assert.fail("InventoryId is case sensitive. Should not fail");
+        }
     }
 
     @Test
@@ -165,6 +190,29 @@ public class TestAliquot extends TestDatabase {
         } catch (DuplicateEntryException dee) {
             Assert.assertTrue(true);
         }
+    }
+
+    @Test
+    public void testPersistCheckInventoryIdUniqueCaseSensitive()
+        throws BiobankCheckException, Exception {
+        int i = r.nextInt();
+        aliquot.setInventoryId("toto" + i);
+        aliquot.persist();
+
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), aliquot.getParent(),
+            aliquot.getPatientVisit(), 2, 2);
+        duplicate.setInventoryId("toto" + i);
+
+        try {
+            duplicate.persist();
+            Assert.fail("same inventory id !");
+        } catch (DuplicateEntryException dee) {
+            Assert.assertTrue(true);
+        }
+
+        duplicate.setInventoryId("TOTO" + r.nextInt());
+        duplicate.persist();
     }
 
     @Test

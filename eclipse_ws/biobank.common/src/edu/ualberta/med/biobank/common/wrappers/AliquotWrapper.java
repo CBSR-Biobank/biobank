@@ -115,17 +115,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        /*
-         * AliquotWrapper existingAliquot = getAliquot(appService,
-         * getInventoryId()); boolean alreadyExists = false; if (existingAliquot
-         * != null && isNew()) { alreadyExists = true; } else if
-         * (existingAliquot != null && !existingAliquot.getId().equals(getId()))
-         * { alreadyExists = true; } if (alreadyExists) { throw new
-         * BiobankCheckException("An aliquot with inventory id \"" +
-         * getInventoryId() + "\" already exists."); }
-         */
         checkNoDuplicates(Aliquot.class, AliquotPeer.INVENTORY_ID.getName(),
-            getInventoryId(), AliquotPeer.INVENTORY_ID.getName());
+            getInventoryId(), AliquotPeer.INVENTORY_ID.getName(), true);
     }
 
     private void checkParentAcceptSampleType() throws BiobankCheckException {

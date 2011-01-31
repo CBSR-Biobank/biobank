@@ -55,6 +55,7 @@
 							<constructor-arg value="false"/>
 						</bean>
 						@ATTRIBUTE_LEVEL_SECURITY_END@
+						<bean class="edu.ualberta.med.biobank.server.applicationservice.BiobankObjectStateInterceptor"/>
 					</list>		
 				</constructor-arg>
 			</bean>
