@@ -183,6 +183,6 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     public void checkUnique() throws BiobankException, ApplicationException {
         checkNoDuplicates(ShippingMethod.class,
             ShippingMethodPeer.NAME.getName(), getName(),
-            ShippingMethodPeer.NAME.getName());
+            "A shipping method with name");
     }
 }

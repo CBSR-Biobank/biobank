@@ -124,7 +124,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Aliquot.class, AliquotPeer.INVENTORY_ID.getName(),
-            getInventoryId(), AliquotPeer.INVENTORY_ID.getName());
+            getInventoryId(), "An aliquot with inventoryId");
     }
 
     private void checkParentAcceptSampleType() throws BiobankCheckException {

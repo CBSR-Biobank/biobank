@@ -88,7 +88,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Patient.class, PatientPeer.PNUMBER.getName(),
-            getPnumber(), PatientPeer.PNUMBER.getName());
+            getPnumber(), "A patient with PNumber");
         checkVisitsFromLinkedShipment();
     }
 

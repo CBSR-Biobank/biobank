@@ -98,7 +98,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         ApplicationException {
         checkNoDuplicates(ActivityStatus.class,
             ActivityStatusPeer.NAME.getName(), getName(),
-            ActivityStatusPeer.NAME.getName());
+            "An activity status with name");
     }
 
     @Override

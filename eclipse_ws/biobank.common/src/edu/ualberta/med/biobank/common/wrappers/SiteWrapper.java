@@ -231,9 +231,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Site.class, SitePeer.NAME.getName(), getName(),
-            SitePeer.NAME.getName());
+            "A site with name");
         checkNoDuplicates(Site.class, SitePeer.NAME_SHORT.getName(),
-            getNameShort(), SitePeer.NAME_SHORT.getName());
+            getNameShort(), "A site with name short");
     }
 
     @Override
