@@ -28,6 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -308,7 +309,7 @@ public class TestContainerType extends TestDatabase {
             topType2.persist();
             Assert
                 .fail("should not be allowed to add container type because of duplicate name");
-        } catch (BiobankCheckException e) {
+        } catch (DuplicateEntryException e) {
             Assert.assertTrue(true);
         }
     }
@@ -369,8 +370,8 @@ public class TestContainerType extends TestDatabase {
 
         // test changing labeling scheme
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
-        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), null,
-            site, topType);
+        ContainerHelper.addContainer(String.valueOf(r.nextInt()),
+            TestCommon.getNewBarcode(r), null, site, topType);
         topType.setChildLabelingScheme(3);
 
         try {
@@ -386,8 +387,8 @@ public class TestContainerType extends TestDatabase {
         ContainerTypeWrapper topType;
 
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
-        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), null,
-            site, topType);
+        ContainerHelper.addContainer(String.valueOf(r.nextInt()),
+            TestCommon.getNewBarcode(r), null, site, topType);
         topType.setTopLevel(false);
 
         try {
@@ -403,8 +404,8 @@ public class TestContainerType extends TestDatabase {
         ContainerTypeWrapper topType;
 
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
-        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), null,
-            site, topType);
+        ContainerHelper.addContainer(String.valueOf(r.nextInt()),
+            TestCommon.getNewBarcode(r), null, site, topType);
         topType.setRowCapacity(1);
 
         try {
@@ -428,8 +429,8 @@ public class TestContainerType extends TestDatabase {
     public void testDelete() throws Exception {
         ContainerTypeWrapper topType = addContainerTypeHierarchy(containerTypeMap
             .get("TopCT"));
-        ContainerHelper.addContainer(null, TestCommon.getNewBarcode(r), null,
-            site, topType);
+        ContainerHelper.addContainer(String.valueOf(r.nextInt()),
+            TestCommon.getNewBarcode(r), null, site, topType);
         try {
             topType.delete();
             Assert.fail("cannot delete, one container is using this type");
@@ -672,7 +673,8 @@ public class TestContainerType extends TestDatabase {
             containerTypeMap.get("ChildCtL3"), 0, 0);
 
         StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt());
-        PatientWrapper patient = PatientHelper.addPatient("5684", study);
+        PatientWrapper patient = PatientHelper.addPatient(
+            "5684_" + r.nextInt(), study);
         ClinicWrapper clinic = ClinicHelper.addClinic("clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");

@@ -308,8 +308,9 @@ public class TestSite extends TestDatabase {
 
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerTypeRandom(
             site, name);
-        ContainerWrapper container = ContainerHelper.newContainer(null, name
-            + "newContainer", null, site, type);
+        ContainerWrapper container = ContainerHelper.newContainer(
+            String.valueOf(r.nextInt()), name + "newContainer", null, site,
+            type);
         site.addContainers(Arrays.asList(container));
         site.persist();
 

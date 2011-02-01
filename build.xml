@@ -407,6 +407,7 @@
          url="${DB_CONNECTION_URL}"
          userid="${DB_USERNAME}" password="${DB_PASSWORD}">
       <transaction src="${data.sql.dir}/createIndices.sql" />
+      <transaction src="${data.sql.dir}/uniqueConstraints.sql" />
       <transaction src="${data.sql.dir}/activityStatus.sql" />
       <transaction src="${data.sql.dir}/globalPvAttr.sql" />
       <transaction src="${data.sql.dir}/pvAttrType.sql" />

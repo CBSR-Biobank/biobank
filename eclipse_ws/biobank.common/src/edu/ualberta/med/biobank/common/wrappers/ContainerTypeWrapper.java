@@ -49,15 +49,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        if (getSite() != null) {
-            checkNoDuplicatesInSite(ContainerType.class, "name", getName(),
-                getSite().getId(), "A container type with name \"" + getName()
-                    + "\" already exists.");
-            checkNoDuplicatesInSite(ContainerType.class, "nameShort",
-                getNameShort(), getSite().getId(),
-                "A container type with short name \"" + getNameShort()
-                    + "\" already exists.");
-        }
         if (getCapacity() == null) {
             throw new ValueNotSetException("capacity");
         }

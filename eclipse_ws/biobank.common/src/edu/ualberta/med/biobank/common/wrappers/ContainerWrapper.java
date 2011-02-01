@@ -88,11 +88,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        checkLabelUniqueForType();
-        checkNoDuplicatesInSite(Container.class, "productBarcode",
-            getProductBarcode(), getSite().getId(),
-            "A container with product barcode \"" + getProductBarcode()
-                + "\" already exists.");
         checkTopAndParent();
         checkParentAcceptContainerType();
         checkContainerTypeSameSite();

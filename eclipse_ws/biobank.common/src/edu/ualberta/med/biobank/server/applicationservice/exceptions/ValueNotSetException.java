@@ -1,10 +1,8 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
-import gov.nih.nci.system.applicationservice.ApplicationException;
-
 import java.text.MessageFormat;
 
-public class ValueNotSetException extends ApplicationException {
+public class ValueNotSetException extends BiobankDataErrorException {
 
     private static final long serialVersionUID = 1L;
 

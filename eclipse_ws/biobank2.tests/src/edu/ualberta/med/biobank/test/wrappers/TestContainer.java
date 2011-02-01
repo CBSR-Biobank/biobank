@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -245,15 +246,17 @@ public class TestContainer extends TestDatabase {
 
     @Test
     public void testGettersAndSetters() throws BiobankCheckException, Exception {
-        ContainerWrapper container = ContainerHelper.addContainer(null, null,
-            null, site, containerTypeMap.get("TopCT"));
+        ContainerWrapper container = ContainerHelper.addContainer(
+            String.valueOf(r.nextInt()), null, null, site,
+            containerTypeMap.get("TopCT"));
         testGettersAndSetters(container);
     }
 
     @Test
     public void testGetWrappedClass() throws Exception {
-        ContainerWrapper container = ContainerHelper.addContainer(null, null,
-            null, site, containerTypeMap.get("TopCT"));
+        ContainerWrapper container = ContainerHelper.addContainer(
+            String.valueOf(r.nextInt()), null, null, site,
+            containerTypeMap.get("TopCT"));
         Assert.assertEquals(Container.class, container.getWrappedClass());
     }
 
@@ -1315,7 +1318,7 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(0, top.compareTo(top));
     }
 
-    @Test(expected = BiobankCheckException.class)
+    @Test(expected = DuplicateEntryException.class)
     public void testContainerTypeSameSite() throws Exception {
         SiteWrapper altSite = SiteHelper.addSite("Site2 - Container Test"
             + Utils.getRandomString(10));

@@ -12,11 +12,11 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Contact;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestContact extends TestDatabase {
 
@@ -94,7 +94,7 @@ public class TestContact extends TestDatabase {
         Assert.assertTrue(contact1.compareTo(contact2) < 0);
     }
 
-    @Test(expected = ApplicationException.class)
+    @Test(expected = ValueNotSetException.class)
     public void TestPersistsNullClinic() throws Exception {
         // null clinic
         ContactWrapper c = new ContactWrapper(appService);
