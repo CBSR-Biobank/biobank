@@ -58,7 +58,7 @@
   <condition property="debugFileExtension" value="-debug" else="">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
-  <condition property="LOG4J_LEVEL" value="warn" else="error">
+  <condition property="LOG4J_LEVEL" value="debug" else="error">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="isHostAicmlMed">
@@ -205,26 +205,26 @@
            compression="gzip"
            dest="${cacore.sdk.dir}" />
   </target>
-  <target name="check-cacore-sdk-uptodate" depends="cacore-untar">
+  <target name="check-cacore-sdk-uptodate">
     <uptodate property="cacore.sdk.uptodate"
               targetfile="${cacore.sdk.dir}/output/biobank2">
       <srcfiles file="sdk_conf/deploy.properties" />
       <srcfiles file="sdk_conf/build.properties" />
-      <!-- <srcfiles file="sdk_conf/validator-extension-Config.xml" />-->
+      <srcfiles file="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
       <srcfiles file="sdk_conf/config.xml" />
       <srcfiles file="sdk_conf/application-config-client.xml" />
-      <srcfiles file="model/biobank2.uml" />
+      <srcfiles file="${model.proj.dir}/biobank2.uml" />
     </uptodate>
   </target>
+
   <target name="sdk"
-          depends="check-cacore-sdk-uptodate,log4j-conf"
+          depends="validators,check-cacore-sdk-uptodate,log4j-conf"
           unless="cacore.sdk.uptodate"
           description="builds the caCORE SDK from the data model">
     <copy file="sdk_conf/deploy.properties"
           tofile="${cacore.sdk.dir}/conf/deploy.properties" />
     <copy file="sdk_conf/build.properties"
           tofile="${cacore.sdk.dir}/build.properties" />
-    <!--<copy file="sdk_conf/validator-extension-Config.xml" tofile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />-->
     <copy file="sdk_conf/application-config.xml"
           tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config.xml" />
     <copy file="sdk_conf/application-config-client.xml"
@@ -236,9 +236,6 @@
     <copy file="${req.jars.dir}/mysql-connector-java-5.1.7-bin.jar"
           tofile="${cacore.sdk.dir}/system/lib/mysql-connector-java-5.1.7-bin.jar" />
     <delete file="${cacore.sdk.dir}/system/lib/mysql-connector-java-3.1.13-bin.jar" />
-
-    <!-- we want this file generated only if the sdk build is launched -->
-    <ant target="validators" inheritRefs="false" />
     <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
   </target>
   <target name="log4j-conf">
@@ -586,7 +583,7 @@
     </java>
   </target>
 
-  <target name="build-validators">
+  <target name="build-validators" depends="cacore-untar">
     <echo message="Building hibernate validators generation tool" />
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.tools}/output">
@@ -613,9 +610,16 @@
     </javac>
   </target>
 
+  <target name="check-run-validators">
+    <uptodate property="validators.uptodate"
+              srcfile="${model.proj.dir}/biobank2.uml"
+              targetfile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
+  </target>
+
   <target name="validators"
-          description="create the validators xml file used by cacore to generate the source code"
-          depends="build-validators">
+          depends="build-validators,check-run-validators"
+          unless="validators.uptodate"
+          description="create the validators xml file used by cacore to generate the source code">
     <java classname="edu.ualberta.med.biobank.tools.validator.ValidatorGeneration"
           failonerror="true"
           fork="true">

@@ -58,15 +58,15 @@
   </logger>
 
   <logger name="org.hibernate.tool.hbm2ddl">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="warn" />
   </logger>
 
   <logger name="org.hibernate.cache">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="warn" />
   </logger>
 
   <logger name="org.hibernate.jdbc">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="warn" />
   </logger>
 
   <logger	name="org.hibernate.connection.DriverManagerConnectionProvider">
@@ -74,7 +74,7 @@
   </logger>
 
   <logger name="gov.nih.nci">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="warn" />
   </logger>
 
   <root>
