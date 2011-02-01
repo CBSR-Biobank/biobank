@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -96,8 +97,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
+    protected void persistChecks() throws BiobankException,
         ApplicationException {
+        checkInventoryIdUnique();
         checkParentAcceptSampleType();
         objectWithPositionManagement.persistChecks();
     }
@@ -113,10 +115,10 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             inventoryId);
     }
 
-    public void checkInventoryIdUnique() throws BiobankCheckException,
+    public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Aliquot.class, AliquotPeer.INVENTORY_ID.getName(),
-            getInventoryId(), AliquotPeer.INVENTORY_ID.getName(), true);
+            getInventoryId(), AliquotPeer.INVENTORY_ID.getName());
     }
 
     private void checkParentAcceptSampleType() throws BiobankCheckException {

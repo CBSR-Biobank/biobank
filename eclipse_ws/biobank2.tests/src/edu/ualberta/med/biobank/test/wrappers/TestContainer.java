@@ -31,7 +31,6 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
@@ -913,7 +912,7 @@ public class TestContainer extends TestDatabase {
             childL3.canHoldAliquot(aliquot);
             Assert
                 .fail("should not be allowed to add aliquot with null sample type");
-        } catch (WrapperException e) {
+        } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
     }
@@ -1686,7 +1685,7 @@ public class TestContainer extends TestDatabase {
             container.initObjectWith(null);
             Assert
                 .fail("should not be allowed to add initialize container with null wrapper");
-        } catch (WrapperException e) {
+        } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
 

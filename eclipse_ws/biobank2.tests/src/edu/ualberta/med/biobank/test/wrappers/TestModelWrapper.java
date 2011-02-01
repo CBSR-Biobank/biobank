@@ -24,10 +24,6 @@ public class TestModelWrapper extends TestDatabase {
         }
 
         @Override
-        protected void deleteChecks() throws Exception {
-        }
-
-        @Override
         protected List<String> getPropertyChangeNames() {
             return null;
         }
@@ -48,10 +44,6 @@ public class TestModelWrapper extends TestDatabase {
 
         public TestSiteWrapper(WritableApplicationService appService) {
             super(appService);
-        }
-
-        @Override
-        protected void deleteChecks() throws Exception {
         }
 
         @Override

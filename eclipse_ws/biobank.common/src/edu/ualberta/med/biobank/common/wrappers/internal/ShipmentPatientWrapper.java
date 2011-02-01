@@ -137,10 +137,6 @@ public class ShipmentPatientWrapper extends ModelWrapper<ShipmentPatient> {
         return ShipmentPatientPeer.PROP_NAMES;
     }
 
-    @Override
-    protected void deleteChecks() throws Exception {
-    }
-
     public static Collection<ShipmentPatientWrapper> wrapShipmentPatientCollection(
         WritableApplicationService appService,
         Collection<ShipmentPatient> rawCsps) {

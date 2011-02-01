@@ -21,10 +21,6 @@ public class LogWrapper extends ModelWrapper<Log> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
-    }
-
-    @Override
     protected List<String> getPropertyChangeNames() {
         return LogPeer.PROP_NAMES;
     }

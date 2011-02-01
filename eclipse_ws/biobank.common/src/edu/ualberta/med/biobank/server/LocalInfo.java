@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.server.logging.user;
+package edu.ualberta.med.biobank.server;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -6,9 +6,11 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-public class UserInfo implements Serializable {
+/**
+ * local information keep on the local thread.
+ */
+public class LocalInfo implements Serializable {
     private String userName;
-    private String objectIDKey;
     private Map<Integer, SiteInfo> sitesInfos;
 
     public String getUsername() {
@@ -20,20 +22,6 @@ public class UserInfo implements Serializable {
     }
 
     private static final long serialVersionUID = 7526471155622776147L;
-
-    /**
-     * @return Returns the objectID.
-     */
-    public String getObjectIDKey() {
-        return objectIDKey;
-    }
-
-    /**
-     * @param objectID The objectID to set.
-     */
-    public void setObjectIDKey(String objectIDKey) {
-        this.objectIDKey = objectIDKey;
-    }
 
     public void addNewSiteInfo(Integer siteId, String nameShort, Type type) {
         if (sitesInfos == null)

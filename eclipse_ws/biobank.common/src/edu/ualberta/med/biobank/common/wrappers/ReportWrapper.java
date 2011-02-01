@@ -251,10 +251,6 @@ public class ReportWrapper extends ModelWrapper<Report> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
-    }
-
-    @Override
     protected List<String> getPropertyChangeNames() {
         return ReportPeer.PROP_NAMES;
     }

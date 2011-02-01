@@ -135,7 +135,4 @@ public class EntityWrapper extends ModelWrapper<Entity> {
         return Entity.class;
     }
 
-    @Override
-    protected void deleteChecks() throws Exception {
-    }
 }

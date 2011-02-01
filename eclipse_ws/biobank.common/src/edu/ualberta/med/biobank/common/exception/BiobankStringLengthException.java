@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.common.exception;
 
-public class BiobankStringLengthException extends Exception {
+public class BiobankStringLengthException extends BiobankException {
 
     private static final long serialVersionUID = 1L;
 

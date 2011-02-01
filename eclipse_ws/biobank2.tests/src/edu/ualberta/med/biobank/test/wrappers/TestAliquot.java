@@ -138,7 +138,7 @@ public class TestAliquot extends TestDatabase {
         try {
             duplicate.checkInventoryIdUnique();
             Assert.fail("The check should detect that this is the same");
-        } catch (BiobankCheckException bce) {
+        } catch (DuplicateEntryException e) {
             Assert.assertTrue(true);
         }
     }

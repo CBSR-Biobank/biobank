@@ -11,6 +11,8 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RequestState;
@@ -223,6 +225,15 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
         wrappedObject.getAddress().setPostalCode(postalCode);
         propertyChangeSupport.firePropertyChange("postalCode", old, postalCode);
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        checkNoDuplicates(Site.class, SitePeer.NAME.getName(), getName(),
+            SitePeer.NAME.getName());
+        checkNoDuplicates(Site.class, SitePeer.NAME_SHORT.getName(),
+            getNameShort(), SitePeer.NAME_SHORT.getName());
     }
 
     @Override
@@ -599,13 +610,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * @throws BiobankCheckException
      */
     public Long getShipmentCount() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
             + Shipment.class.getName() + " where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -619,7 +630,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -633,7 +644,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -648,7 +659,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -726,9 +737,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
-        throws WrapperException {
+        throws BiobankException {
         if (study == null) {
-            throw new WrapperException("study is null");
+            throw new BiobankException("study is null");
         }
         Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
         if (srcMap == null)

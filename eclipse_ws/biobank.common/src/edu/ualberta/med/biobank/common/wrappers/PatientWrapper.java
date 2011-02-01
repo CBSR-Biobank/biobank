@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
@@ -71,21 +73,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             newStudyRaw);
     }
 
-    public boolean checkPatientNumberUnique() throws ApplicationException {
-        String isSamePatient = "";
-        List<Object> params = new ArrayList<Object>();
-        params.add(getPnumber());
-        if (!isNew()) {
-            isSamePatient = " and id <> ?";
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria("from " + Patient.class.getName()
-            + " where pnumber = ?" + isSamePatient, params);
-
-        List<Object> results = appService.query(c);
-        return results.size() == 0;
-    }
-
     /**
      * When retrieve the values from the database, need to fire the
      * modifications for the different objects contained in the wrapped object
@@ -98,8 +85,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
+    protected void persistChecks() throws BiobankException,
         ApplicationException {
+        checkNoDuplicates(Patient.class, PatientPeer.PNUMBER.getName(),
+            getPnumber(), PatientPeer.PNUMBER.getName());
         checkVisitsFromLinkedShipment();
     }
 
@@ -335,8 +324,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMorePatientVisits();
         if (getAliquotsCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
@@ -364,7 +352,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
     }
 
-    public long getAliquotsCount(boolean fast) throws BiobankCheckException,
+    public long getAliquotsCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(
@@ -375,8 +363,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             return results.get(0);
         }
@@ -404,7 +391,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public boolean canBeAddedToShipment(ShipmentWrapper shipment)
-        throws ApplicationException, BiobankCheckException {
+        throws ApplicationException, BiobankException {
         if (shipment.getClinic() == null) {
             return true;
         }

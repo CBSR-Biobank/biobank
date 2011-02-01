@@ -20,10 +20,6 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
-    }
-
-    @Override
     protected List<String> getPropertyChangeNames() {
         return StudySourceVesselPeer.PROP_NAMES;
     }
