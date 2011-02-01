@@ -14,15 +14,14 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.Predicate;
+import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchInfo;
-import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -31,38 +30,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends ModelWrapper<Site> {
-    public Collection<StudyWrapper> getStudies(boolean sort) {
-        return getWrappedCollection(SitePeer.STUDY_COLLECTION, sort);
-    }
-
-    public void setStudies(Collection<StudyWrapper> studies) {
-        setWrappedCollection(SitePeer.STUDY_COLLECTION, studies);
-    }
-
-    public String getName2() {
-        return getProperty(SitePeer.NAME);
-    }
-
-    public void setName2(String name) {
-        setProperty(SitePeer.NAME, name);
-    }
-
-    private AddressWrapper getAddress2() {
-        return getWrappedProperty(SitePeer.ADDRESS, AddressWrapper.class);
-    }
-
-    public void setAddress2(AddressWrapper address) {
-        setWrappedProperty(SitePeer.ADDRESS, address);
-    }
-
-    public String getCity2() {
-        return getProperty(getAddress2(), AddressPeer.CITY);
-    }
-
-    public void setCity2(String city) {
-        setProperty(getAddress2(), AddressPeer.CITY, city);
-    }
-
+    private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
     private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
@@ -76,7 +44,10 @@ public class SiteWrapper extends ModelWrapper<Site> {
     @Override
     protected List<String> getPropertyChangeNames() {
         // TODO: cache this?
-        return SitePeer.PROP_NAMES;
+        List<String> names = new ArrayList<String>();
+        names.addAll(SitePeer.PROP_NAMES);
+        names.addAll(AddressPeer.PROP_NAMES);
+        return names;
     }
 
     public String getName() {
@@ -134,8 +105,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setStreet1(String street1) {
-        initAddress();
-        setProperty(getAddress(), AddressPeer.STREET1, street1);
+        setProperty(initAddress(), AddressPeer.STREET1, street1);
     }
 
     public String getStreet2() {
@@ -143,8 +113,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setStreet2(String street2) {
-        initAddress();
-        setProperty(getAddress(), AddressPeer.STREET2, street2);
+        setProperty(initAddress(), AddressPeer.STREET2, street2);
     }
 
     public String getCity() {
@@ -152,8 +121,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setCity(String city) {
-        initAddress();
-        setProperty(getAddress(), AddressPeer.CITY, city);
+        setProperty(initAddress(), AddressPeer.CITY, city);
     }
 
     public String getProvince() {
@@ -161,8 +129,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setProvince(String province) {
-        initAddress();
-        setProperty(getAddress(), AddressPeer.PROVINCE, province);
+        setProperty(initAddress(), AddressPeer.PROVINCE, province);
     }
 
     public String getPostalCode() {
@@ -170,8 +137,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void setPostalCode(String postalCode) {
-        initAddress();
-        setProperty(getAddress(), AddressPeer.POSTAL_CODE, postalCode);
+        setProperty(initAddress(), AddressPeer.POSTAL_CODE, postalCode);
     }
 
     @Override
@@ -222,108 +188,47 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    private List<RequestWrapper> getRequestCollection(final RequestState state) {
+        List<RequestWrapper> requestCollection = requestCollectionMap
+            .get(state);
+
+        if (requestCollection == null) {
+            requestCollection = new ArrayList<RequestWrapper>();
+
+            PredicateUtil.filterInto(requestCollection,
+                new Predicate<RequestWrapper>() {
+                    @Override
+                    public boolean evaluate(RequestWrapper request) {
+                        return state.getId().equals(request.getState());
+                    }
+
+                }, requestCollection);
+
+            requestCollectionMap.put(state, requestCollection);
+        }
+
+        return requestCollection;
+    }
+
     public List<RequestWrapper> getApprovedRequestCollection() {
-        List<RequestWrapper> requestCollection = (List<RequestWrapper>) propertiesMap
-            .get("approvedRequestCollection");
-        if (requestCollection == null) {
-            Collection<Request> children = wrappedObject.getRequestCollection();
-            if (children != null) {
-                requestCollection = new ArrayList<RequestWrapper>();
-                for (Request request : children) {
-                    if (request.getState()
-                        .equals(RequestState.APPROVED.getId()))
-                        requestCollection.add(new RequestWrapper(appService,
-                            request));
-                }
-                propertiesMap.put("approvedRequestCollection",
-                    requestCollection);
-            }
-        }
-        return requestCollection;
-
+        return getRequestCollection(RequestState.APPROVED);
     }
 
-    @SuppressWarnings("unchecked")
     public List<RequestWrapper> getAcceptedRequestCollection() {
-        List<RequestWrapper> requestCollection = (List<RequestWrapper>) propertiesMap
-            .get("acceptedRequestCollection");
-        if (requestCollection == null) {
-            Collection<Request> children = wrappedObject.getRequestCollection();
-            if (children != null) {
-                requestCollection = new ArrayList<RequestWrapper>();
-                for (Request request : children) {
-                    if (request.getState()
-                        .equals(RequestState.ACCEPTED.getId()))
-                        requestCollection.add(new RequestWrapper(appService,
-                            request));
-                }
-                propertiesMap.put("acceptedRequestCollection",
-                    requestCollection);
-            }
-        }
-        return requestCollection;
-
+        return getRequestCollection(RequestState.ACCEPTED);
     }
 
-    @SuppressWarnings("unchecked")
     public List<RequestWrapper> getFilledRequestCollection() {
-        List<RequestWrapper> requestCollection = (List<RequestWrapper>) propertiesMap
-            .get("filledRequestCollection");
-        if (requestCollection == null) {
-            Collection<Request> children = wrappedObject.getRequestCollection();
-            if (children != null) {
-                requestCollection = new ArrayList<RequestWrapper>();
-                for (Request request : children) {
-                    if (request.getState().equals(RequestState.FILLED.getId()))
-                        requestCollection.add(new RequestWrapper(appService,
-                            request));
-                }
-                propertiesMap.put("filledRequestCollection", requestCollection);
-            }
-        }
-        return requestCollection;
-
+        return getRequestCollection(RequestState.FILLED);
     }
 
-    @SuppressWarnings("unchecked")
     public List<RequestWrapper> getShippedRequestCollection() {
-        List<RequestWrapper> requestCollection = (List<RequestWrapper>) propertiesMap
-            .get("shippedRequestCollection");
-        if (requestCollection == null) {
-            Collection<Request> children = wrappedObject.getRequestCollection();
-            if (children != null) {
-                requestCollection = new ArrayList<RequestWrapper>();
-                for (Request request : children) {
-                    if (request.getState().equals(RequestState.SHIPPED.getId()))
-                        requestCollection.add(new RequestWrapper(appService,
-                            request));
-                }
-                propertiesMap
-                    .put("shippedRequestCollection", requestCollection);
-            }
-        }
-        return requestCollection;
-
+        return getRequestCollection(RequestState.SHIPPED);
     }
 
-    @SuppressWarnings("unchecked")
     public List<StudyWrapper> getStudyCollection(boolean sort) {
-        List<StudyWrapper> studyCollection = (List<StudyWrapper>) propertiesMap
-            .get("studyCollection");
-        if (studyCollection == null) {
-            Collection<Study> children = wrappedObject.getStudyCollection();
-            if (children != null) {
-                studyCollection = new ArrayList<StudyWrapper>();
-                for (Study study : children) {
-                    studyCollection.add(new StudyWrapper(appService, study));
-                }
-                propertiesMap.put("studyCollection", studyCollection);
-            }
-        }
-        if ((studyCollection != null) && sort)
-            Collections.sort(studyCollection);
-        return studyCollection;
+        return getWrapperCollection(SitePeer.STUDY_COLLECTION,
+            StudyWrapper.class, sort);
     }
 
     public List<StudyWrapper> getStudyCollection() {
@@ -341,82 +246,29 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return studyWrappers;
     }
 
-    private void setStudyCollection(Collection<Study> allStudyObjects,
-        List<StudyWrapper> allStudyWrappers) {
-        Collection<Study> oldStudys = wrappedObject.getStudyCollection();
-        wrappedObject.setStudyCollection(allStudyObjects);
-        propertyChangeSupport.firePropertyChange("contactCollection",
-            oldStudys, allStudyObjects);
-        propertiesMap.put("studyCollection", allStudyWrappers);
-    }
-
     public void addStudies(List<StudyWrapper> studies) {
-        if ((studies == null) || (studies.size() == 0))
-            return;
-
-        Collection<Study> allStudyObjects = new HashSet<Study>();
-        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
-        // already added studies
-        List<StudyWrapper> currentList = getStudyCollection();
-        if (currentList != null) {
-            for (StudyWrapper study : currentList) {
-                allStudyObjects.add(study.getWrappedObject());
-                allStudyWrappers.add(study);
-            }
-        }
-        // new studies added
-        for (StudyWrapper study : studies) {
-            allStudyObjects.add(study.getWrappedObject());
-            allStudyWrappers.add(study);
-        }
-        setStudyCollection(allStudyObjects, allStudyWrappers);
+        addToWrapperCollection(SitePeer.STUDY_COLLECTION, studies);
     }
 
     public void removeStudies(List<StudyWrapper> studiesToRemove)
         throws BiobankCheckException {
-        if ((studiesToRemove == null) || (studiesToRemove.size() == 0))
+        if (studiesToRemove == null || studiesToRemove.isEmpty()) {
             return;
+        }
 
         List<StudyWrapper> currentList = getStudyCollection();
-        if (!currentList.containsAll(studiesToRemove)) {
+
+        if (currentList == null || !currentList.containsAll(studiesToRemove)) {
             throw new BiobankCheckException(
                 "studies are not associated with site " + getNameShort());
         }
 
-        Collection<Study> allStudyObjects = new HashSet<Study>();
-        List<StudyWrapper> allStudyWrappers = new ArrayList<StudyWrapper>();
-        // already added studies
-        if (currentList != null) {
-            for (StudyWrapper study : currentList) {
-                if (!studiesToRemove.contains(study)) {
-                    allStudyObjects.add(study.getWrappedObject());
-                    allStudyWrappers.add(study);
-                }
-            }
-        }
-        setStudyCollection(allStudyObjects, allStudyWrappers);
+        removeFromWrapperCollection(SitePeer.STUDY_COLLECTION, studiesToRemove);
     }
 
-    @SuppressWarnings("unchecked")
     public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
-        List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
-            .get("containerTypeCollection");
-        if (containerTypeCollection == null) {
-            Collection<ContainerType> children = wrappedObject
-                .getContainerTypeCollection();
-            if (children != null) {
-                containerTypeCollection = new ArrayList<ContainerTypeWrapper>();
-                for (ContainerType type : children) {
-                    containerTypeCollection.add(new ContainerTypeWrapper(
-                        appService, type));
-                }
-                propertiesMap.put("containerTypeCollection",
-                    containerTypeCollection);
-            }
-        }
-        if ((containerTypeCollection != null) && sort)
-            Collections.sort(containerTypeCollection);
-        return containerTypeCollection;
+        return getWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION,
+            ContainerTypeWrapper.class, sort);
     }
 
     public List<ContainerTypeWrapper> getContainerTypeCollection() {
@@ -424,74 +276,16 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public void addContainerTypes(List<ContainerTypeWrapper> types) {
-        if (types != null && types.size() > 0) {
-            Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
-            List<ContainerTypeWrapper> allTypeWrappers = new ArrayList<ContainerTypeWrapper>();
-            // already added types
-            List<ContainerTypeWrapper> currentList = getContainerTypeCollection();
-            if (currentList != null) {
-                for (ContainerTypeWrapper type : currentList) {
-                    allTypeObjects.add(type.getWrappedObject());
-                    allTypeWrappers.add(type);
-                }
-            }
-            // new types
-            for (ContainerTypeWrapper type : types) {
-                allTypeObjects.add(type.getWrappedObject());
-                allTypeWrappers.add(type);
-            }
-            Collection<ContainerType> oldTypes = wrappedObject
-                .getContainerTypeCollection();
-            wrappedObject.setContainerTypeCollection(allTypeObjects);
-            propertyChangeSupport.firePropertyChange("containerTypeCollection",
-                oldTypes, allTypeObjects);
-            propertiesMap.put("containerTypeCollection", allTypeWrappers);
-        }
+        addToWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION, types);
     }
 
-    @SuppressWarnings("unchecked")
     public List<ContainerWrapper> getContainerCollection() {
-        List<ContainerWrapper> containerCollection = (List<ContainerWrapper>) propertiesMap
-            .get("containerCollection");
-        if (containerCollection == null) {
-            Collection<Container> children = wrappedObject
-                .getContainerCollection();
-            if (children != null) {
-                containerCollection = new ArrayList<ContainerWrapper>();
-                for (Container container : children) {
-                    containerCollection.add(new ContainerWrapper(appService,
-                        container));
-                }
-                propertiesMap.put("containerCollection", containerCollection);
-            }
-        }
-        return containerCollection;
+        return getWrapperCollection(SitePeer.CONTAINER_COLLECTION,
+            ContainerWrapper.class, false);
     }
 
     public void addContainers(List<ContainerWrapper> containers) {
-        if (containers != null && containers.size() > 0) {
-            Collection<Container> allContainerObjects = new HashSet<Container>();
-            List<ContainerWrapper> allContainerWrappers = new ArrayList<ContainerWrapper>();
-            // already added containers
-            List<ContainerWrapper> currentList = getContainerCollection();
-            if (currentList != null) {
-                for (ContainerWrapper container : currentList) {
-                    allContainerObjects.add(container.getWrappedObject());
-                    allContainerWrappers.add(container);
-                }
-            }
-            // new containers
-            for (ContainerWrapper container : containers) {
-                allContainerObjects.add(container.getWrappedObject());
-                allContainerWrappers.add(container);
-            }
-            Collection<Container> oldContainers = wrappedObject
-                .getContainerCollection();
-            wrappedObject.setContainerCollection(allContainerObjects);
-            propertyChangeSupport.firePropertyChange("containerCollection",
-                oldContainers, allContainerObjects);
-            propertiesMap.put("containerCollection", allContainerWrappers);
-        }
+        addToWrapperCollection(SitePeer.CONTAINER_COLLECTION, containers);
     }
 
     @SuppressWarnings("unchecked")
@@ -525,24 +319,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
         propertiesMap.put("topContainerCollection", null);
     }
 
-    @SuppressWarnings("unchecked")
     public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
-        List<ShipmentWrapper> pvCollection = (List<ShipmentWrapper>) propertiesMap
-            .get("shipmentCollection");
-        if (pvCollection == null) {
-            Collection<Shipment> children = wrappedObject
-                .getShipmentCollection();
-            if (children != null) {
-                pvCollection = new ArrayList<ShipmentWrapper>();
-                for (Shipment pv : children) {
-                    pvCollection.add(new ShipmentWrapper(appService, pv));
-                }
-                propertiesMap.put("shipmentCollection", pvCollection);
-            }
-        }
-        if ((pvCollection != null) && sort)
-            Collections.sort(pvCollection);
-        return pvCollection;
+        return getWrapperCollection(SitePeer.SHIPMENT_COLLECTION,
+            ShipmentWrapper.class, sort);
     }
 
     public List<ShipmentWrapper> getShipmentCollection() {
@@ -769,41 +548,14 @@ public class SiteWrapper extends ModelWrapper<Site> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getReceivedDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("receivedDispatchCollection");
-        if (shipCollection == null) {
-            Collection<Dispatch> children = wrappedObject
-                .getReceivedDispatchCollection();
-
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (Dispatch ship : children) {
-                    shipCollection.add(new DispatchWrapper(appService, ship));
-                }
-                propertiesMap.put("receivedDispatchCollection", shipCollection);
-            }
-        }
-        return shipCollection;
+        return getWrapperCollection(SitePeer.RECEIVED_DISPATCH_COLLECTION,
+            DispatchWrapper.class, false);
     }
 
-    @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getSentDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("sentDispatchCollection");
-        if (shipCollection == null) {
-            Collection<Dispatch> children = wrappedObject
-                .getSentDispatchCollection();
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (Dispatch ship : children) {
-                    shipCollection.add(new DispatchWrapper(appService, ship));
-                }
-                propertiesMap.put("sentDispatchCollection", shipCollection);
-            }
-        }
-        return shipCollection;
+        return getWrapperCollection(SitePeer.SENT_DISPATCH_COLLECTION,
+            DispatchWrapper.class, false);
     }
 
     @SuppressWarnings("unchecked")
