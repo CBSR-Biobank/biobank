@@ -53,7 +53,7 @@ public enum SearchType {
         public List<? extends ModelWrapper<?>> search(String searchString,
             SiteWrapper site) throws Exception {
             List<AliquotWrapper> aliquots = AliquotWrapper
-                .getAliquotsNonActive(SessionManager.getAppService(), site);
+                .getAliquotsNonActiveInSite(SessionManager.getAppService(), site);
             return aliquots;
         }
 
