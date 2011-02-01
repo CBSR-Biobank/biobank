@@ -471,8 +471,7 @@
     </exec>
   </target>
 
-  <target name="build-modelpeer" depends="check-cacore-sdk-uptodate,sdk"
-    unless="cacore.sdk.uptodate">
+  <target name="build-modelpeer" depends="sdk">
     <echo message="Building model peer tool" />
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <javac debug="on" debuglevel="source,lines,vars"
@@ -495,8 +494,7 @@
 
   <target name="modelpeer"
     description="Builds wrapper peer classes based on UML logical model."
-    depends="check-cacore-sdk-uptodate,build-modelpeer"
-    unless="cacore.sdk.uptodate">
+    depends="build-modelpeer">
     <java classname="edu.ualberta.med.biobank.tools.modelpeer.ModelPeerBuilder"
       failonerror="true" fork="true">
       <jvmarg
@@ -549,8 +547,7 @@
     </java>
   </target>
 
-  <target name="build-hbmstrings" depends="check-cacore-sdk-uptodate,sdk"
-    unless="cacore.sdk.uptodate">
+  <target name="build-hbmstrings" depends="sdk">
     <echo message="Building HBM string fixing tool" />
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <javac debug="on" debuglevel="source,lines,vars"
@@ -573,8 +570,7 @@
 
   <target name="hbmstrings"
     description="Adds the length='#' field into *.hbm.xml files, references the biobank.uml file for the VARCHAR(#)"
-    depends="check-cacore-sdk-uptodate,build-hbmstrings"
-    unless="cacore.sdk.uptodate">
+    depends="build-hbmstrings">
     <java classname="edu.ualberta.med.biobank.tools.strfields.StrFields"
       failonerror="true" fork="true">
       <jvmarg
@@ -591,8 +587,7 @@
     </java>
   </target>
 
-  <target name="build-common-project" depends="check-cacore-sdk-uptodate,sdk-files,hbmstrings,modelpeer"
-    unless="cacore.sdk.uptodate">
+  <target name="build-common-project" depends="sdk-files,hbmstrings,modelpeer">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
