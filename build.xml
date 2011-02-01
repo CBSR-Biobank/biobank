@@ -58,7 +58,7 @@
   <condition property="debugFileExtension" value="-debug" else="">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
-  <condition property="LOG4J_LEVEL" value="debug" else="error">
+  <condition property="LOG4J_LEVEL" value="info" else="error">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="isHostAicmlMed">
@@ -800,7 +800,6 @@
     </delete>
   </target>
 
-
   <target name="clean"
           depends="tests-clean,clean-jars, clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
@@ -828,9 +827,12 @@
     <pathelement location="${test.build.dir}" />
   </path>
 
-  <target name="tests-clean">
-    <delete dir="${test.build.dir}" />
+  <target name="tests-clean-results">
     <delete dir="${test.output}" />
+  </target>
+
+  <target name="tests-clean" depends="tests-clean-results">
+    <delete dir="${test.build.dir}" />
   </target>
 
   <target name="prepare">

@@ -37,12 +37,12 @@
   </category>
 
   <category name="com.mchange.v2.c3p0">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="warn" />
     <appender-ref ref="CONSOLE" />
   </category>
 
   <logger name="org.hibernate">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="warn" />
   </logger>
 
   <logger name="org.apache">
@@ -54,7 +54,7 @@
   </logger>
 
   <logger name="org.hibernate.type">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="warn" />
   </logger>
 
   <logger name="org.hibernate.tool.hbm2ddl">
