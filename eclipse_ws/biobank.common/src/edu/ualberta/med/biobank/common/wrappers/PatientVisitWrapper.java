@@ -440,18 +440,10 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        checkHasShipment();
         checkPatientInShipment();
         // patient to clinic relationship tested by shipment, so no need to
         // test it again here
         checkShipmentPatient();
-    }
-
-    private void checkHasShipment() throws BiobankCheckException {
-        if (getShipment() == null) {
-            throw new BiobankCheckException(
-                "This visit should contain a shipment");
-        }
     }
 
     private void checkPatientInShipment() throws BiobankCheckException {

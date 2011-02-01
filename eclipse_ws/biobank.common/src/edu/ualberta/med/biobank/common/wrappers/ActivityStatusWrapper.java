@@ -93,14 +93,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-        checkNoDuplicates(ActivityStatus.class, "name", getName(),
-            "An activity status with name \"" + getName()
-                + "\" already exists.", true);
-    }
-
-    @Override
     public boolean equals(Object object) {
         if (object instanceof ActivityStatusWrapper)
             return ((ActivityStatusWrapper) object).getName().equals(

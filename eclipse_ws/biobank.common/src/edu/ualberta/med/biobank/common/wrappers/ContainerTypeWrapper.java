@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -48,27 +49,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException, WrapperException {
-        checkSite();
-        checkNotEmpty(getName(), "Name");
-        checkNoDuplicatesInSite(ContainerType.class, "name", getName(),
-            getSite().getId(), "A container type with name \"" + getName()
-                + "\" already exists.");
-        checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicatesInSite(ContainerType.class, "nameShort",
-            getNameShort(), getSite().getId(),
-            "A container type with short name \"" + getNameShort()
-                + "\" already exists.");
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the container type does not have an activity status");
-        }
         if (getCapacity() == null) {
-            throw new BiobankCheckException("Capacity should be set");
+            throw new ValueNotSetException("capacity");
         }
-        getCapacity().persistChecks();
-        if (getChildLabelingScheme() == null) {
-            throw new BiobankCheckException("Labeling scheme should be set");
-        } else {
+        if (getChildLabelingScheme() != null) {
             // should throw error if labeling scheme too small for container
             if (!ContainerLabelingSchemeWrapper.checkBounds(appService,
                 getChildLabelingScheme(), getCapacity().getRowCapacity(),
@@ -147,13 +131,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
                         + "exists in database. Remove all instances before attempting to "
                         + "delete a child type.");
             }
-        }
-    }
-
-    private void checkSite() throws BiobankCheckException {
-        if (getSite() == null) {
-            throw new BiobankCheckException(
-                "Should assign a site to this container type");
         }
     }
 

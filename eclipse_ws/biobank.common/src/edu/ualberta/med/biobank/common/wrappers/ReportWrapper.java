@@ -8,7 +8,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ReportPeer;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
@@ -16,7 +15,6 @@ import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ReportWrapper extends ModelWrapper<Report> {
@@ -250,11 +248,6 @@ public class ReportWrapper extends ModelWrapper<Report> {
     @Override
     public Class<Report> getWrappedClass() {
         return Report.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
     }
 
     @Override

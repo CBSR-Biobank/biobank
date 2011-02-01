@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.util.RequestState;
@@ -53,13 +52,6 @@ public class RequestWrapper extends ModelWrapper<Request> {
     @Override
     public Class<Request> getWrappedClass() {
         return Request.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

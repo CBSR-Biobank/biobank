@@ -52,12 +52,6 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
                 "Source vessel is in use. Please remove from all corresponding studies and patient visits before deleting.");
     }
 
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        checkUnique();
-    }
-
     public static List<SourceVesselWrapper> getAllSourceVessels(
         WritableApplicationService appService) throws ApplicationException {
         List<SourceVessel> list = appService.search(SourceVessel.class,
@@ -127,32 +121,9 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
 
     public void checkUnique() throws ApplicationException,
         BiobankCheckException {
-        String globalMsg = "global";
-        checkNoDuplicates("name", getName(), "A " + globalMsg
-            + " source vessel with name \"" + getName() + "\" already exists.");
+        checkNoDuplicates(SourceVessel.class, SourceVesselPeer.NAME.getName(),
+            getName(), "A source vessel with name \"" + getName()
+                + "\" already exists.");
     }
 
-    private void checkNoDuplicates(String propertyName, String value,
-        String errorMessage) throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(
-            Arrays.asList(new Object[] { value }));
-
-        // if global type, check the name is use nowhere
-
-        String notSameObject = "";
-        if (!isNew()) {
-            notSameObject = " and id <> ?";
-            parameters.add(getId());
-        }
-        HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + SourceVessel.class.getName() + " where " + propertyName + "=? "
-            + notSameObject, parameters);
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        if (result.get(0) > 0) {
-            throw new BiobankCheckException(errorMessage);
-        }
-    }
 }

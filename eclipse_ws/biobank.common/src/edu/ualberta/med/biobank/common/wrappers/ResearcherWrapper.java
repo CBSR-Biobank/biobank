@@ -5,10 +5,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Researcher;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ResearcherWrapper extends ModelWrapper<Researcher> {
@@ -64,13 +62,6 @@ public class ResearcherWrapper extends ModelWrapper<Researcher> {
     public Class<Researcher> getWrappedClass() {
         // TODO Auto-generated method stub
         return null;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-        // TODO Auto-generated method stub
-
     }
 
     @Override

@@ -181,26 +181,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return Study.class;
     }
 
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        checkNotEmpty(getName(), "Name");
-        checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicates(Study.class, "name", getName(),
-            "A study with name \"" + getName() + "\" already exists.");
-        checkNoDuplicates(Study.class, "nameShort", getNameShort(),
-            "A study with short name \"" + getNameShort()
-                + "\" already exists.");
-        checkValidActivityStatus();
-    }
-
-    private void checkValidActivityStatus() throws BiobankCheckException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the clinic does not have an activity status");
-        }
-    }
-
     @SuppressWarnings("unchecked")
     public List<ContactWrapper> getContactCollection(boolean sort) {
         List<ContactWrapper> contactCollection = (List<ContactWrapper>) propertiesMap

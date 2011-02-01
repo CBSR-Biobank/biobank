@@ -104,20 +104,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the aliquot does not have an activity status");
-        }
-        checkPatientVisitNotNull();
-        checkInventoryIdUnique();
         checkParentAcceptSampleType();
         objectWithPositionManagement.persistChecks();
-    }
-
-    private void checkPatientVisitNotNull() throws BiobankCheckException {
-        if (getPatientVisit() == null) {
-            throw new BiobankCheckException("patient visit should be set");
-        }
     }
 
     public String getInventoryId() {
@@ -133,19 +121,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public void checkInventoryIdUnique() throws BiobankCheckException,
         ApplicationException {
-        AliquotWrapper existingAliquot = getAliquot(appService,
-            getInventoryId());
-        boolean alreadyExists = false;
-        if (existingAliquot != null && isNew()) {
-            alreadyExists = true;
-        } else if (existingAliquot != null
-            && !existingAliquot.getId().equals(getId())) {
-            alreadyExists = true;
-        }
-        if (alreadyExists) {
-            throw new BiobankCheckException("An aliquot with inventory id \""
-                + getInventoryId() + "\" already exists.");
-        }
+        checkNoDuplicates(Aliquot.class, AliquotPeer.INVENTORY_ID.getName(),
+            getInventoryId(), AliquotPeer.INVENTORY_ID.getName(), true);
     }
 
     private void checkParentAcceptSampleType() throws BiobankCheckException {

@@ -10,6 +10,8 @@ import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEve
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -24,11 +26,15 @@ import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.sql.BatchUpdateException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+
+import org.hibernate.PropertyValueException;
+import org.springframework.dao.DataIntegrityViolationException;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
@@ -193,9 +199,36 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             eventType = WrapperEventType.UPDATE;
         }
         persistDependencies(origObject);
-        SDKQueryResult result = ((BiobankApplicationService) appService)
-            .executeQuery(query);
-        wrappedObject = ((E) result.getObjectResult());
+        try {
+            SDKQueryResult result = ((BiobankApplicationService) appService)
+                .executeQuery(query);
+            wrappedObject = ((E) result.getObjectResult());
+        } catch (DataIntegrityViolationException dive) {
+            Throwable e = dive;
+            while (e.getCause() != null
+                && !(e.getCause() instanceof BatchUpdateException || e
+                    .getCause() instanceof PropertyValueException)) {
+                e = e.getCause();
+            }
+            if (e.getCause() instanceof BatchUpdateException) {
+                BatchUpdateException bue = (BatchUpdateException) e.getCause();
+                // FIXME check the message to be sure this is the right
+                // exception ?
+                // FIXME add interceptor for that ?
+                if (bue.getMessage().contains("Duplicate entry"))
+                    throw new DuplicateEntryException(bue.getMessage(), dive);
+            }
+            if (e.getCause() instanceof PropertyValueException) {
+                PropertyValueException pve = (PropertyValueException) e
+                    .getCause();
+                // FIXME check the message to be sure this is the right
+                // exception ?
+                throw new ValueNotSetException(pve.getPropertyName(), dive);
+            } else {
+                throw dive;
+            }
+        }
+
         Log logMessage = null;
         try {
             logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
@@ -221,8 +254,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected void persistDependencies(E origObject) throws Exception {
     }
 
-    protected abstract void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException;
+    @SuppressWarnings("unused")
+    protected void persistChecks() throws BiobankCheckException,
+        ApplicationException, WrapperException {
+
+    }
 
     protected void checkFieldLimits() throws BiobankCheckException,
         BiobankStringLengthException {
@@ -398,13 +434,6 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         List<Object> results = appService.query(criteria);
         if (results.size() > 0) {
             throw new BiobankCheckException(errorMessage);
-        }
-    }
-
-    protected void checkNotEmpty(String value, String errorName)
-        throws BiobankCheckException {
-        if (value == null || value.isEmpty()) {
-            throw new BiobankCheckException(errorName + " can't be empty");
         }
     }
 

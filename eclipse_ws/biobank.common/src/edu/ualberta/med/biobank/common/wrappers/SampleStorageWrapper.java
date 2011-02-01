@@ -129,15 +129,6 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the sample storage does not have an activity status");
-        }
-    }
-
-    @Override
     public int compareTo(ModelWrapper<SampleStorage> wrapper) {
         if (wrapper instanceof SampleStorageWrapper) {
             String name1 = wrappedObject.getSampleType().getName();

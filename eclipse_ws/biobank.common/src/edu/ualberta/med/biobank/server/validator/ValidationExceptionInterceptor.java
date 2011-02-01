@@ -4,13 +4,23 @@ import org.hibernate.validator.InvalidStateException;
 import org.hibernate.validator.InvalidValue;
 import org.springframework.aop.ThrowsAdvice;
 
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
+
+/**
+ * Intercept hibernate validation errors to throw an exception with a better
+ * message.
+ */
 public class ValidationExceptionInterceptor implements ThrowsAdvice {
 
     public void afterThrowing(InvalidStateException ise) {
         String message = "";
-        for (InvalidValue iv : ise.getInvalidValues()) {
-            message += iv.getMessage() + " - ";
+        for (int i = 0; i < ise.getInvalidValues().length; i++) {
+            InvalidValue iv = ise.getInvalidValues()[i];
+            message += iv.getBeanClass().getSimpleName() + ": "
+                + iv.getPropertyName() + " " + iv.getMessage();
+            if (i != ise.getInvalidValues().length - 1)
+                message += ". ";
         }
-        throw new RuntimeException(message, ise);
+        throw new ValidationException(message, ise);
     }
 }

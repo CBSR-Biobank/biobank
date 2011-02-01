@@ -11,12 +11,10 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShipmentPatient;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class ShipmentPatientWrapper extends ModelWrapper<ShipmentPatient> {
@@ -137,11 +135,6 @@ public class ShipmentPatientWrapper extends ModelWrapper<ShipmentPatient> {
     @Override
     protected List<String> getPropertyChangeNames() {
         return ShipmentPatientPeer.PROP_NAMES;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
     }
 
     @Override

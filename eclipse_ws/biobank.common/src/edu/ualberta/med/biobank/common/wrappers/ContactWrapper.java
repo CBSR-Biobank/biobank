@@ -173,11 +173,6 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-    }
-
-    @Override
     public int compareTo(ModelWrapper<Contact> c2) {
         if (c2 instanceof ContactWrapper) {
             String myName = wrappedObject.getName();

@@ -88,17 +88,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     @Override
     protected void persistChecks() throws BiobankCheckException,
         ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the container does not have an activity status");
-        }
-        checkContainerTypeNotNull();
-        checkSiteNotNull();
-        checkLabelUniqueForType();
-        checkNoDuplicatesInSite(Container.class, "productBarcode",
-            getProductBarcode(), getSite().getId(),
-            "A container with product barcode \"" + getProductBarcode()
-                + "\" already exists.");
         checkTopAndParent();
         checkParentAcceptContainerType();
         checkContainerTypeSameSite();
@@ -111,12 +100,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         if (getParent() != null && !getParent().getSite().equals(getSite())) {
             throw new BiobankCheckException(
                 "Parent should be part of the same site");
-        }
-    }
-
-    private void checkContainerTypeNotNull() throws BiobankCheckException {
-        if (getContainerType() == null) {
-            throw new BiobankCheckException("This container type should be set");
         }
     }
 
@@ -286,13 +269,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             throw new BiobankCheckException("A container with label \""
                 + getLabel() + "\" and type \"" + getContainerType().getName()
                 + "\" already exists.");
-        }
-    }
-
-    private void checkSiteNotNull() throws BiobankCheckException {
-        if (getSite() == null) {
-            throw new BiobankCheckException(
-                "This container should be associated to a site");
         }
     }
 

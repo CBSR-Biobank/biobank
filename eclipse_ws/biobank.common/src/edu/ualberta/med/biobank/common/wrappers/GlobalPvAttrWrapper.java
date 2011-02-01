@@ -37,11 +37,6 @@ public class GlobalPvAttrWrapper extends ModelWrapper<GlobalPvAttr> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
         // FIXME if used by any study then it cannot be deleted
