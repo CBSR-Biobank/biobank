@@ -10,7 +10,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AddressWrapper extends ModelWrapper<Address> {
-
     public AddressWrapper(WritableApplicationService appService,
         Address wrappedObject) {
         super(appService, wrappedObject);
