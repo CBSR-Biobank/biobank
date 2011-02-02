@@ -5,7 +5,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
-import edu.ualberta.med.biobank.common.exception.ExceptionUtils;
+import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
@@ -13,8 +13,6 @@ import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEve
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.SDKQuery;
@@ -34,9 +32,6 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
-
-import org.hibernate.PropertyValueException;
-import org.springframework.dao.DataIntegrityViolationException;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
@@ -201,21 +196,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             eventType = WrapperEventType.UPDATE;
         }
         persistDependencies(origObject);
-        try {
-            SDKQueryResult result = ((BiobankApplicationService) appService)
-                .executeQuery(query);
-            wrappedObject = ((E) result.getObjectResult());
-        } catch (DataIntegrityViolationException dive) {
-            Throwable cause = ExceptionUtils.findCauseInThrowable(dive,
-                PropertyValueException.class);
-            if (cause != null) {
-                PropertyValueException pve = (PropertyValueException) cause;
-                if (pve.getMessage().startsWith("not-null"))
-                    throw new ValueNotSetException(pve.getPropertyName(), dive);
-            }
-            throw dive;
-        }
-
+        SDKQueryResult result = ((BiobankApplicationService) appService)
+            .executeQuery(query);
+        wrappedObject = ((E) result.getObjectResult());
         Log logMessage = null;
         try {
             logMessage = getLogMessage(eventType.name().toLowerCase(), null, "");
