@@ -7,8 +7,15 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.AliquotPeer;
+import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
+import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
@@ -72,59 +79,64 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
+    private static final String DELETED_SAMPLE_TYPES_BASE_QRY = "from "
+        + AliquotPosition.class.getName()
+        + " as ap inner join ap."
+        + AliquotPositionPeer.CONTAINER.getName()
+        + " as aparent where aparent."
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.ID)
+        + "=? and ap."
+        + Property.concatNames(AliquotPositionPeer.ALIQUOT,
+            AliquotPeer.SAMPLE_TYPE, SampleTypePeer.ID)
+        + " in (select id from " + SampleType.class.getName()
+        + " as st where st." + SampleTypePeer.ID.getName() + " in (";
+
     private void checkDeletedSampleTypes() throws ApplicationException,
         BiobankCheckException {
-        if (deletedSampleTypes.size() > 0) {
-            String queryString = "from " + AliquotPosition.class.getName()
-                + " as sp inner join sp.container as sparent"
-                + " where sparent.containerType.id=? and "
-                + "sp.aliquot.sampleType.id in (select id from "
-                + SampleType.class.getName() + " as st where";
-            List<Object> params = new ArrayList<Object>();
-            params.add(getId());
-            int i = 0;
-            for (SampleTypeWrapper type : deletedSampleTypes) {
-                if (i != 0) {
-                    queryString += " OR";
-                }
-                queryString += " st.id=?";
-                params.add(type.getId());
-                i++;
-            }
-            queryString += ")";
-            List<Object> results = appService.query(new HQLCriteria(
-                queryString, params));
-            if (results.size() != 0) {
-                throw new BiobankCheckException(
-                    "Unable to remove sample type. This parent/child relationship "
-                        + "exists in database. Remove all instances before attempting to "
-                        + "delete a sample type.");
-            }
+        if (deletedSampleTypes.size() == 0)
+            return;
+
+        List<String> ids = new ArrayList<String>();
+        for (SampleTypeWrapper type : deletedSampleTypes) {
+            ids.add(Integer.toString(type.getId()));
+        }
+        StringBuilder sb = new StringBuilder(DELETED_SAMPLE_TYPES_BASE_QRY)
+            .append(StringUtils.join(ids, ',')).append("))");
+        List<Object> results = appService.query(new HQLCriteria(sb.toString(),
+            Arrays.asList(new Object[] { getId() })));
+        if (results.size() != 0) {
+            throw new BiobankCheckException(
+                "Unable to remove sample type. This parent/child relationship "
+                    + "exists in database. Remove all instances before attempting to "
+                    + "delete a sample type.");
         }
     }
+
+    private static final String DELETED_CHILD_CONTAINER_TYPES = "from "
+        + ContainerPosition.class.getName()
+        + " as cp inner join cp."
+        + ContainerPositionPeer.PARENT_CONTAINER.getName()
+        + " as cparent where cparent."
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.ID)
+        + "=? and cp."
+        + Property.concatNames(ContainerPositionPeer.CONTAINER,
+            ContainerPeer.CONTAINER_TYPE, ContainerTypePeer.ID)
+        + " in (select id from " + ContainerType.class.getName()
+        + " as ct where ct." + ContainerTypePeer.ID.getName() + " in (";
 
     private void checkDeletedChildContainerTypes()
         throws BiobankCheckException, ApplicationException {
         if (deletedChildTypes.size() > 0) {
-            String queryString = "from " + ContainerPosition.class.getName()
-                + " as cp inner join cp.parentContainer as cparent"
-                + " where cparent.containerType.id=? and "
-                + "cp.container.containerType.id in (select id from "
-                + ContainerType.class.getName() + " as ct where";
-            List<Object> params = new ArrayList<Object>();
-            params.add(getId());
-            int i = 0;
+            List<Integer> ids = new ArrayList<Integer>();
             for (ContainerTypeWrapper type : deletedChildTypes) {
-                if (i != 0) {
-                    queryString += " OR";
-                }
-                queryString += " ct.id=?";
-                params.add(type.getId());
-                i++;
+                ids.add(type.getId());
             }
-            queryString += ")";
-            List<Object> results = appService.query(new HQLCriteria(
-                queryString, params));
+            StringBuilder sb = new StringBuilder(DELETED_CHILD_CONTAINER_TYPES)
+                .append(StringUtils.join(ids, ',')).append("))");
+            List<Object> results = appService.query(new HQLCriteria(sb
+                .toString(), Arrays.asList(new Object[] { getId() })));
             if (results.size() != 0) {
                 throw new BiobankCheckException(
                     "Unable to remove child type. This parent/child relationship "

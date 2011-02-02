@@ -5,6 +5,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ContainerPathPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -127,14 +128,18 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         return getPath();
     }
 
+    private static final String CONTAINER_PATH_QRY = "from "
+        + ContainerPath.class.getName() + " where "
+        + Property.concatNames(ContainerPathPeer.CONTAINER, ContainerPeer.ID)
+        + "=?";
+
     public static ContainerPathWrapper getContainerPath(
         WritableApplicationService appService, ContainerWrapper container)
         throws BiobankCheckException, ApplicationException {
         if (container.isNew())
             return null;
 
-        HQLCriteria criteria = new HQLCriteria("from "
-            + ContainerPath.class.getName() + " where container.id = ?",
+        HQLCriteria criteria = new HQLCriteria(CONTAINER_PATH_QRY,
             Arrays.asList(new Object[] { container.getId() }));
         List<ContainerPath> paths = appService.query(criteria);
         if (paths.size() > 1) {
