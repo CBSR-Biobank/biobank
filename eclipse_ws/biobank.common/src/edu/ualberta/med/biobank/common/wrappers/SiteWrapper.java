@@ -24,14 +24,14 @@ import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.DispatchInfo;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Source;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SiteWrapper extends ModelWrapper<Site> {
+public class SiteWrapper extends CenterWrapper<Site> {
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
     private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();
 
@@ -50,47 +50,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         names.addAll(SitePeer.PROP_NAMES);
         names.addAll(AddressPeer.PROP_NAMES);
         return names;
-    }
-
-    public String getName() {
-        return getProperty(SitePeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(SitePeer.NAME, name);
-    }
-
-    public String getNameShort() {
-        return getProperty(SitePeer.NAME_SHORT);
-    }
-
-    public void setNameShort(String nameShort) {
-        setProperty(SitePeer.NAME_SHORT, nameShort);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(SitePeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(SitePeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public String getComment() {
-        return getProperty(SitePeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(SitePeer.COMMENT, comment);
-    }
-
-    private AddressWrapper getAddress() {
-        return getWrappedProperty(SitePeer.ADDRESS, AddressWrapper.class);
-    }
-
-    private void setAddress(AddressWrapper address) {
-        setWrappedProperty(SitePeer.ADDRESS, address);
     }
 
     private AddressWrapper initAddress() {
@@ -172,8 +131,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             .size() > 0)
             || (getContainerTypeCollection() != null && getContainerTypeCollection()
                 .size() > 0)
-            || (getShipmentCollection() != null && getShipmentCollection()
-                .size() > 0)) {
+            || (getSourceCollection() != null && getSourceCollection().size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
@@ -312,13 +270,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
         propertiesMap.put("topContainerCollection", null);
     }
 
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.SHIPMENT_COLLECTION,
-            ShipmentWrapper.class, sort);
+    public List<SourceWrapper> getSourceCollection(boolean sort) {
+        return getWrapperCollection(SitePeer.SOURCE_COLLECTION,
+            SourceWrapper.class, sort);
     }
 
-    public List<ShipmentWrapper> getShipmentCollection() {
-        return getShipmentCollection(true);
+    public List<SourceWrapper> getSourceCollection() {
+        return getSourceCollection(true);
     }
 
     @Override
@@ -337,10 +295,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * 
      * @throws BiobankCheckException
      */
-    public Long getShipmentCount() throws ApplicationException,
-        BiobankException {
+    public Long getSourceCount() throws ApplicationException, BiobankException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + Shipment.class.getName() + " where site.id = ?",
+            + Source.class.getName() + " where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -662,7 +619,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             .get("srcDispatchInfoCollection");
         if (infos == null) {
             Collection<DispatchInfo> children = wrappedObject
-                .getSrcDispatchInfoCollection();
+                .getSrcDispatchInfoCollection(false);
             if (children != null) {
                 infos = new HashMap<Integer, DispatchInfoWrapper>();
                 for (DispatchInfo di : children) {
