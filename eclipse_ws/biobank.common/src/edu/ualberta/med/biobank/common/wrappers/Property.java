@@ -26,6 +26,15 @@ public class Property<T, W> {
         return type.getType();
     }
 
+    public static String concatNames(Property<?, ?>... props) {
+        String[] propNames = new String[props.length];
+        int count = 0;
+        for (Property<?, ?> prop : props) {
+            propNames[count++] = prop.getName();
+        }
+        return StringUtils.join(propNames, '.');
+    }
+
     public static <E, W> Property<E, W> create(String name,
         TypeReference<E> type) {
         return new Property<E, W>(name, type);
@@ -54,13 +63,5 @@ public class Property<T, W> {
         } else if (!name.equals(other.name))
             return false;
         return true;
-
-    public static String concatNames(Property<?>... props) {
-        String[] propNames = new String[props.length];
-        int count = 0;
-        for (Property<?> prop : props) {
-            propNames[count++] = prop.getName();
-        }
-        return StringUtils.join(propNames, '.');
     }
 }
