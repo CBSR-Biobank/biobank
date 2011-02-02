@@ -26,10 +26,10 @@ public class Property<T, W> {
         return type.getType();
     }
 
-    public static String concatNames(Property<?>... props) {
+    public static String concatNames(Property<?, ?>... props) {
         String[] propNames = new String[props.length];
         int count = 0;
-        for (Property<?> prop : props) {
+        for (Property<?, ?> prop : props) {
             propNames[count++] = prop.getName();
         }
         return StringUtils.join(propNames, '.');
