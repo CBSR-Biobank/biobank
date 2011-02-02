@@ -10,6 +10,9 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DateCompare;
@@ -70,21 +73,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             newStudyRaw);
     }
 
-    public boolean checkPatientNumberUnique() throws ApplicationException {
-        String isSamePatient = "";
-        List<Object> params = new ArrayList<Object>();
-        params.add(getPnumber());
-        if (!isNew()) {
-            isSamePatient = " and id <> ?";
-            params.add(getId());
-        }
-        HQLCriteria c = new HQLCriteria("from " + Patient.class.getName()
-            + " where pnumber = ?" + isSamePatient, params);
-
-        List<Object> results = appService.query(c);
-        return results.size() == 0;
-    }
-
     /**
      * When retrieve the values from the database, need to fire the
      * modifications for the different objects contained in the wrapped object
@@ -92,27 +80,20 @@ public class PatientWrapper extends ModelWrapper<Patient> {
      * @throws Exception
      */
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "pnumber", "study", "patientVisitCollection",
-            "shptSourceVesselCollection", "shipmentCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return PatientPeer.PROP_NAMES;
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
+    protected void persistChecks() throws BiobankException,
         ApplicationException {
-        if (getPnumber() == null || getPnumber().isEmpty()) {
-            throw new BiobankCheckException(
-                "Pnumber of patient should not be empty");
-        }
-        if (!checkPatientNumberUnique()) {
-            throw new BiobankCheckException("A patient with number \""
-                + getPnumber() + "\" already exists.");
-        }
+        checkNoDuplicates(Patient.class, PatientPeer.PNUMBER.getName(),
+            getPnumber(), "A patient with PNumber");
         checkVisitsFromLinkedShipment();
     }
 
     private void checkVisitsFromLinkedShipment() throws BiobankCheckException {
-        List<ShipmentWrapper> shipments = getShipmentCollection();
+        List<ShipmentWrapper> shipments = getShipmentCollection(null);
         List<PatientVisitWrapper> visits = getPatientVisitCollection();
         if (visits != null && visits.size() > 0) {
             if (shipments == null || shipments.size() == 0) {
@@ -285,15 +266,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patient;
     }
 
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort,
-        final boolean ascending) {
-        return getShipmentCollection(sort, ascending, null);
-    }
-
     /**
      * Get the shipment collection. To link patients and shipments, use
      * Shipment.setPatientCollection method If user is not null, will return
-     * only shipments that are linked to a site this user can update
+     * only shipments that are linked to a site this user can update, unless
+     * user is null
      */
     public List<ShipmentWrapper> getShipmentCollection(boolean sort,
         final boolean ascending, User user) {
@@ -302,7 +279,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         if (csps != null) {
             for (ShipmentPatientWrapper csp : csps) {
                 ShipmentWrapper ship = csp.getShipment();
-                if (user != null && user.canUpdateSite(ship.getSite())) {
+                if (user == null || user.canUpdateSite(ship.getSite())) {
                     shipmentCollection.add(ship);
                 }
             }
@@ -324,8 +301,11 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return shipmentCollection;
     }
 
-    public List<ShipmentWrapper> getShipmentCollection() {
-        return getShipmentCollection(false, true);
+    /**
+     * if user is no null, will return only shipment this user can update.
+     */
+    public List<ShipmentWrapper> getShipmentCollection(User user) {
+        return getShipmentCollection(false, true, user);
     }
 
     @Override
@@ -344,8 +324,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMorePatientVisits();
         if (getAliquotsCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
@@ -358,8 +337,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private boolean hasShipments() {
-        if (getShipmentCollection() != null
-            && getShipmentCollection().size() > 0)
+        if (getShipmentCollection(null) != null
+            && getShipmentCollection(null).size() > 0)
             return true;
         return false;
     }
@@ -373,7 +352,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
     }
 
-    public long getAliquotsCount(boolean fast) throws BiobankCheckException,
+    public long getAliquotsCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(
@@ -384,8 +363,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             return results.get(0);
         }
@@ -413,7 +391,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     public boolean canBeAddedToShipment(ShipmentWrapper shipment)
-        throws ApplicationException, BiobankCheckException {
+        throws ApplicationException, BiobankException {
         if (shipment.getClinic() == null) {
             return true;
         }

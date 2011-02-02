@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview.request;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
@@ -67,8 +68,18 @@ public class ShippedRequestNode extends AdapterBase {
         return null;
     }
 
+    // FIXME merge
+    // @Override
+    // <<<<<<<
+    // HEAD:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/treeview/order/NewOrderNode.java
+    // public void rebuild() {
+    // for (AdapterBase adaper : getChildren()) {
+    // adaper.rebuild();
+    // }
+    // }
+
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 

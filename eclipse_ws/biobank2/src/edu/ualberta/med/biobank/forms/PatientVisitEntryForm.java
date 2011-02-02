@@ -26,6 +26,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -91,8 +92,10 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private BasicSiteCombo siteCombo;
 
+    private ComboViewer activityStatusComboViewer;
+
     @Override
-    public void init() {
+    public void init() throws Exception {
         Assert.isTrue(adapter instanceof PatientVisitAdapter,
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
@@ -109,9 +112,12 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         String tabName;
         if (patientVisit.isNew()) {
             tabName = "New Patient Visit";
+            patientVisit.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         } else {
             tabName = "Visit " + patientVisit.getFormattedDateProcessed();
         }
+
         setPartName(tabName);
     }
 
@@ -194,6 +200,23 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
             .getStudy().getName());
+
+        activityStatusComboViewer = createComboViewer(client,
+            "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            patientVisit.getActivityStatus(),
+            "Patient visit must have an activity status",
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    patientVisit
+                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                }
+            });
+        if (patientVisit.getActivityStatus() != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                patientVisit.getActivityStatus()));
+        }
 
         createReadOnlyLabelledField(client, SWT.NONE, "Patient",
             patient.getPnumber());
@@ -397,10 +420,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     @Override
     protected void saveForm() throws Exception {
         patientVisit.persist();
-        PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
-            .getParent();
-        if (patientAdapter != null)
-            patientAdapter.performExpand();
+        SessionManager.updateAllSimilarNodes(patientVisitAdapter, true);
     }
 
     private void savePvCustomInfo() throws Exception {
@@ -455,6 +475,14 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
         pvSourceVesseltable.reload();
         resetPvCustomInfo();
+
+        ActivityStatusWrapper activity = patientVisit.getActivityStatus();
+        if (activity != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                activity));
+        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
+            activityStatusComboViewer.getCombo().deselectAll();
+        }
     }
 
     private void resetPvCustomInfo() throws Exception {

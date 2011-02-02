@@ -64,9 +64,12 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public String getTooltipText() {
         ContainerWrapper container = getContainer();
-        SiteWrapper site = container.getSite();
-        if (site != null) {
-            return site.getNameShort() + " - " + getTooltipText("Container");
+        if (container != null) {
+            SiteWrapper site = container.getSite();
+            if (site != null) {
+                return site.getNameShort() + " - "
+                    + getTooltipText("Container");
+            }
         }
         return getTooltipText("Container");
     }
@@ -140,7 +143,7 @@ public class ContainerAdapter extends AdapterBase {
                     }
                 });
                 ContainerAdapter newContainerAdapter = (ContainerAdapter) SessionManager
-                    .searchNode(newContainer);
+                    .searchFirstNode(newContainer);
                 if (newContainerAdapter != null) {
                     getContainer().reload();
                     newContainerAdapter.performDoubleClick();
@@ -175,7 +178,7 @@ public class ContainerAdapter extends AdapterBase {
                     ContainerWrapper newParentContainer = getContainer()
                         .getParent();
                     ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
-                        .searchNode(newParentContainer);
+                        .searchFirstNode(newParentContainer);
                     if (parentAdapter != null) {
                         parentAdapter.getContainer().reload();
                         parentAdapter.performExpand();
@@ -254,7 +257,8 @@ public class ContainerAdapter extends AdapterBase {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
+        List<AdapterBase> res = new ArrayList<AdapterBase>();
         if (searchedObject instanceof ContainerWrapper) {
             ContainerWrapper containerWrapper = (ContainerWrapper) searchedObject;
             List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
@@ -263,34 +267,9 @@ public class ContainerAdapter extends AdapterBase {
                 currentContainer = currentContainer.getParent();
                 parents.add(currentContainer);
             }
-            return acceptChildContainers(searchedObject, this, parents);
+            res = searchChildContainers(searchedObject, this, parents);
         }
-        return null;
-    }
-
-    private AdapterBase acceptChildContainers(Object searchedObject,
-        ContainerAdapter container, final List<ContainerWrapper> parents) {
-        if (parents.contains(container.getContainer())) {
-            AdapterBase child = container.getChild(
-                (ModelWrapper<?>) searchedObject, true);
-            if (child == null) {
-                for (AdapterBase childContainer : container.getChildren()) {
-                    AdapterBase foundChild;
-                    if (childContainer instanceof ContainerAdapter) {
-                        foundChild = acceptChildContainers(searchedObject,
-                            (ContainerAdapter) childContainer, parents);
-                    } else {
-                        foundChild = childContainer.search(searchedObject);
-                    }
-                    if (foundChild != null) {
-                        return foundChild;
-                    }
-                }
-            } else {
-                return child;
-            }
-        }
-        return null;
+        return res;
     }
 
     @Override

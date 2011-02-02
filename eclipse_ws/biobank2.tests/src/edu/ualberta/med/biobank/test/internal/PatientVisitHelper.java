@@ -5,12 +5,14 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class PatientVisitHelper extends DbHelper {
+    private static ActivityStatusWrapper activeActivityStatus = null;
 
     /**
      * Creates a new patient visit wrapper. It is not saved to the database.
@@ -21,13 +23,26 @@ public class PatientVisitHelper extends DbHelper {
      * @return A new patient visit wrapper.
      */
     public static PatientVisitWrapper newPatientVisit(PatientWrapper patient,
-        ShipmentWrapper shipment, Date dateProcessed, Date dateDrawn) {
+        ShipmentWrapper shipment, Date dateProcessed, Date dateDrawn)
+        throws Exception {
         PatientVisitWrapper pv = new PatientVisitWrapper(appService);
         pv.setPatient(patient);
         pv.setDateProcessed(dateProcessed);
         pv.setDateDrawn(dateDrawn);
         pv.setShipment(shipment);
+        pv.setActivityStatus(getActiveActivityStatus());
+
         return pv;
+    }
+
+    private static ActivityStatusWrapper getActiveActivityStatus()
+        throws Exception {
+        if (activeActivityStatus == null) {
+            activeActivityStatus = ActivityStatusWrapper.getActivityStatus(
+                appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+        }
+
+        return activeActivityStatus;
     }
 
     /**
@@ -59,8 +74,8 @@ public class PatientVisitHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static List<PatientVisitWrapper> addPatientVisits(
-        PatientWrapper patient, ShipmentWrapper shipment,
-        int minimumNumber, int maxNumber) throws ParseException, Exception {
+        PatientWrapper patient, ShipmentWrapper shipment, int minimumNumber,
+        int maxNumber) throws ParseException, Exception {
         int count = r.nextInt(maxNumber - minimumNumber + 1) + minimumNumber;
         List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
         for (int i = 0; i < count; i++) {
@@ -71,8 +86,8 @@ public class PatientVisitHelper extends DbHelper {
     }
 
     public static List<PatientVisitWrapper> addPatientVisits(
-        PatientWrapper patient, ShipmentWrapper shipment,
-        int minimumNumber) throws ParseException, Exception {
+        PatientWrapper patient, ShipmentWrapper shipment, int minimumNumber)
+        throws ParseException, Exception {
         return addPatientVisits(patient, shipment, minimumNumber, 15);
     }
 

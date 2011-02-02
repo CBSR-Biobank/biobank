@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.test.internal;
 
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Arrays;
@@ -57,8 +57,8 @@ public class DbHelper {
         }
     }
 
-    public static void deleteDispatchs(
-        Collection<DispatchWrapper> shipments) throws Exception {
+    public static void deleteDispatchs(Collection<DispatchWrapper> shipments)
+        throws Exception {
         Assert.assertNotNull("appService is null", appService);
         if ((shipments == null) || (shipments.size() == 0))
             return;
@@ -79,7 +79,7 @@ public class DbHelper {
             patient.reload();
             deletePatientVisits(patient.getPatientVisitCollection());
             patient.reload();
-            for (ShipmentWrapper ship : patient.getShipmentCollection()) {
+            for (ShipmentWrapper ship : patient.getShipmentCollection(null)) {
                 ship.reload();
                 ship.removePatients(Arrays.asList(patient));
                 if (ship.getPatientCollection().size() == 0) {

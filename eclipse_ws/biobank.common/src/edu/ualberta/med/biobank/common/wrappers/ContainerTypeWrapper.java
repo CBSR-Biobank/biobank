@@ -8,6 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
@@ -20,6 +23,7 @@ import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -40,37 +44,25 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "comment", "nameShort", "topLevel",
-            "defaultTemperature", "activityStatus", "sampleTypeCollection",
-            "childContainerTypeCollection", "site", "capacity",
-            "childLabelingScheme", "rowCapacity", "colCapacity" };
+    protected List<String> getPropertyChangeNames() {
+        return ContainerTypePeer.PROP_NAMES;
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-        checkSite();
-        checkNotEmpty(getName(), "Name");
-        checkNoDuplicatesInSite(ContainerType.class, "name", getName(),
-            getSite().getId(), "A container type with name \"" + getName()
-                + "\" already exists.");
-        checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicatesInSite(ContainerType.class, "nameShort",
-            getNameShort(), getSite().getId(),
-            "A container type with short name \"" + getNameShort()
-                + "\" already exists.");
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the container type does not have an activity status");
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        if (getSite() != null) {
+            checkNoDuplicatesInSite(ContainerType.class,
+                ContainerTypePeer.NAME.getName(), getName(), getSite().getId(),
+                ContainerTypePeer.NAME.getName());
+            checkNoDuplicatesInSite(ContainerType.class,
+                ContainerTypePeer.NAME_SHORT.getName(), getNameShort(),
+                getSite().getId(), ContainerTypePeer.NAME_SHORT.getName());
         }
         if (getCapacity() == null) {
-            throw new BiobankCheckException("Capacity should be set");
+            throw new ValueNotSetException("capacity");
         }
-        getCapacity().persistChecks();
-        if (getChildLabelingScheme() == null) {
-            throw new BiobankCheckException("Labeling scheme should be set");
-        } else {
+        if (getChildLabelingScheme() != null) {
             // should throw error if labeling scheme too small for container
             if (!ContainerLabelingSchemeWrapper.checkBounds(appService,
                 getChildLabelingScheme(), getCapacity().getRowCapacity(),
@@ -152,13 +144,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    private void checkSite() throws BiobankCheckException {
-        if (getSite() == null) {
-            throw new BiobankCheckException(
-                "Should assign a site to this container type");
-        }
-    }
-
     @Override
     public Class<ContainerType> getWrappedClass() {
         return ContainerType.class;
@@ -187,8 +172,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsedByContainers()) {
             throw new BiobankCheckException("Unable to delete container type "
                 + getName() + ". A container of this type exists in storage."
@@ -197,14 +181,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public boolean isUsedByContainers() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         String queryString = "select count(c) from "
             + Container.class.getName() + " as c where c.containerType=?)";
         HQLCriteria c = new HQLCriteria(queryString,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0) > 0;
     }
@@ -701,13 +685,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
      * get count of container which type is this
      */
     public long getContainersCount() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         HQLCriteria c = new HQLCriteria("select count(*) from "
             + Container.class.getName() + " where containerType.id=?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
     }

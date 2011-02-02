@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.treeview;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
@@ -24,9 +26,11 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
 import edu.ualberta.med.biobank.treeview.util.DeltaEvent;
@@ -623,23 +627,47 @@ public abstract class AdapterBase {
 
     public abstract String getEntryFormId();
 
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         if (modelObject != null && modelObject.equals(searchedObject))
-            return this;
-        return null;
+            return Arrays.asList(this);
+        return new ArrayList<AdapterBase>();
     }
 
-    protected AdapterBase searchChildren(Object searchedObject) {
+    protected List<AdapterBase> searchChildren(Object searchedObject) {
         // FIXME children are loading in background most of the time:
         // they are not loaded then the objects are not found
         loadChildren(false);
+        List<AdapterBase> result = new ArrayList<AdapterBase>();
         for (AdapterBase child : getChildren()) {
-            AdapterBase foundChild = child.search(searchedObject);
-            if (foundChild != null) {
-                return foundChild;
+            List<AdapterBase> tmpRes = child.search(searchedObject);
+            if (tmpRes.size() > 0)
+                result.addAll(tmpRes);
+        }
+        return result;
+    }
+
+    protected List<AdapterBase> findChildFromClass(Object searchedObject,
+        Class<?>... clazzList) {
+        if (searchedObject != null) {
+            for (Class<?> clazz : clazzList) {
+                if (clazz.isAssignableFrom(searchedObject.getClass())) {
+                    List<AdapterBase> res = new ArrayList<AdapterBase>();
+                    AdapterBase child = null;
+                    if (ModelWrapper.class.isAssignableFrom(clazz))
+                        child = getChild((ModelWrapper<?>) searchedObject, true);
+                    else if (Date.class.isAssignableFrom(clazz))
+                        child = getChild((int) ((Date) searchedObject)
+                            .getTime());
+                    else if (Integer.class.isAssignableFrom(clazz))
+                        child = getChild((Integer) searchedObject);
+                    if (child != null) {
+                        res.add(child);
+                    }
+                    return res;
+                }
             }
         }
-        return null;
+        return searchChildren(searchedObject);
     }
 
     public RootNode getRootNode() {
@@ -730,6 +758,30 @@ public abstract class AdapterBase {
 
     protected String getConfirmDeleteMessage() {
         return null;
+    }
+
+    protected List<AdapterBase> searchChildContainers(Object searchedObject,
+        ContainerAdapter container, final List<ContainerWrapper> parents) {
+        List<AdapterBase> res = new ArrayList<AdapterBase>();
+        if (parents.contains(container.getContainer())) {
+            AdapterBase child = container.getChild(
+                (ModelWrapper<?>) searchedObject, true);
+            if (child == null) {
+                for (AdapterBase childContainer : container.getChildren()) {
+                    if (childContainer instanceof ContainerAdapter) {
+                        res = searchChildContainers(searchedObject,
+                            (ContainerAdapter) childContainer, parents);
+                    } else {
+                        res = childContainer.search(searchedObject);
+                    }
+                    if (res.size() > 0)
+                        break;
+                }
+            } else {
+                res.add(child);
+            }
+        }
+        return res;
     }
 
 }

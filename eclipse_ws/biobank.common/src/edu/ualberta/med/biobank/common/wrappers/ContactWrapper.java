@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
@@ -162,20 +163,13 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "title", "mobileNumber", "pagerNumber",
-            "officeNumber", "faxNumber", "emailAddress", "clinic",
-            "studyCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return ContactPeer.PROP_NAMES;
     }
 
     @Override
     public Class<Contact> getWrappedClass() {
         return Contact.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
     }
 
     @Override
@@ -195,11 +189,14 @@ public class ContactWrapper extends ModelWrapper<Contact> {
         return getName() + " (" + getMobileNumber() + ")";
     }
 
+    private static final String ALL_CONTACTS_QRY = "from "
+        + Contact.class.getName();
+
     public static List<ContactWrapper> getAllContacts(
         WritableApplicationService appService) throws ApplicationException {
         List<Contact> contacts = new ArrayList<Contact>();
         List<ContactWrapper> wrappers = new ArrayList<ContactWrapper>();
-        HQLCriteria c = new HQLCriteria("from " + Contact.class.getName());
+        HQLCriteria c = new HQLCriteria(ALL_CONTACTS_QRY);
         contacts = appService.query(c);
         for (Contact contact : contacts) {
             wrappers.add(new ContactWrapper(appService, contact));

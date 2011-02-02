@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ContainerPathPeer;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -22,12 +23,8 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
-    }
-
-    @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "path", "container" };
+    protected List<String> getPropertyChangeNames() {
+        return ContainerPathPeer.PROP_NAMES;
     }
 
     @Override
@@ -57,12 +54,12 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
 
             wrappedObject.setPath(path);
 
-            Container topContainer = container.getTop().getWrappedObject();
+            ContainerWrapper topContainer = container.getTop();
             if (topContainer == null) {
                 throw new Exception("no top container");
             }
 
-            wrappedObject.setTopContainer(topContainer);
+            wrappedObject.setTopContainer(topContainer.getWrappedObject());
 
             propertyChangeSupport.firePropertyChange("path", oldLabel, path);
         }
@@ -100,7 +97,6 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         if (container == null) {
             throw new BiobankCheckException("container is null");
         }
-
         if (container.isNew()) {
             throw new BiobankCheckException("container is not in database");
         }

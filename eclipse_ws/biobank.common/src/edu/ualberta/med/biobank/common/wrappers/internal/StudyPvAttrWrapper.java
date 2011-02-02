@@ -6,6 +6,9 @@ import java.util.Collection;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.StudyPvAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -33,9 +36,8 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "label", "permissible", "activityStatus",
-            "pvAttrType", "study" };
+    protected List<String> getPropertyChangeNames() {
+        return StudyPvAttrPeer.PROP_NAMES;
     }
 
     @Override
@@ -44,17 +46,7 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the study pv attribute does not have an activity status");
-        }
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsedByPatientVisits()) {
             throw new BiobankCheckException("Unable to delete PvAttr with id "
                 + getId() + ". A patient visit using it exists in storage."
@@ -63,13 +55,13 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
     }
 
     public boolean isUsedByPatientVisits() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         HQLCriteria c = new HQLCriteria("select count(pva) from "
             + PvAttr.class.getName() + " as pva where pva.studyPvAttr = ?)",
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0) > 0;
     }

@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.SampleStoragePeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -111,9 +114,8 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "study", "sampleType", "quantity", "volume",
-            "activityStatus" };
+    protected List<String> getPropertyChangeNames() {
+        return SampleStoragePeer.PROP_NAMES;
     }
 
     @Override
@@ -124,15 +126,6 @@ public class SampleStorageWrapper extends ModelWrapper<SampleStorage> {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the sample storage does not have an activity status");
-        }
     }
 
     @Override

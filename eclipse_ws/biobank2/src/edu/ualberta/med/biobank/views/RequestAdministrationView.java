@@ -32,7 +32,7 @@ public class RequestAdministrationView extends AbstractAdministrationView {
 
     public RequestAdministrationView() {
         currentInstance = this;
-        SessionManager.addView(ID, this);
+        SessionManager.addView(this);
     }
 
     @Override
@@ -123,16 +123,16 @@ public class RequestAdministrationView extends AbstractAdministrationView {
     protected void showSearchedObjectsInTree(
         List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
         for (ModelWrapper<?> searchedObject : searchedObjects) {
-            AdapterBase node = rootNode.search(searchedObject);
-            if (node == null) {
+            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
+            if (nodeRes.size() == 0) {
                 searchedNode.addSearchObject(searchedObject);
                 searchedNode.performExpand();
-                node = searchedNode.search(searchedObject);
+                nodeRes = searchedNode.search(searchedObject);
             }
-            if (node != null) {
-                setSelectedNode(node);
+            if (nodeRes.size() > 0) {
+                setSelectedNode(nodeRes.get(0));
                 if (doubleClick) {
-                    node.performDoubleClick();
+                    nodeRes.get(0).performDoubleClick();
                 }
             }
         }
@@ -150,10 +150,6 @@ public class RequestAdministrationView extends AbstractAdministrationView {
     @Override
     public String getId() {
         return ID;
-    }
-
-    public void clear() {
-        rootNode.removeAll();
     }
 
 }

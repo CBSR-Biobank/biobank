@@ -1,10 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.peer.StudySourceVesselPeer;
 import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudySourceVessel;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
@@ -19,23 +20,13 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
-    }
-
-    @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "sourceVessel", "study", "needTimeDrawn",
-            "needOriginalVolume" };
+    protected List<String> getPropertyChangeNames() {
+        return StudySourceVesselPeer.PROP_NAMES;
     }
 
     @Override
     public Class<StudySourceVessel> getWrappedClass() {
         return StudySourceVessel.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
     }
 
     @Override

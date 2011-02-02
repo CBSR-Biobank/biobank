@@ -7,6 +7,9 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
 import edu.ualberta.med.biobank.model.AbstractShipment;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
@@ -30,8 +33,7 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
 
     @SuppressWarnings("rawtypes")
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         List<AbstractShipmentWrapper> shipments = getShipmentCollection();
         if (shipments != null && shipments.size() > 0) {
             throw new BiobankCheckException(
@@ -41,8 +43,8 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "shipmentCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return ShippingMethodPeer.PROP_NAMES;
     }
 
     @Override
@@ -60,8 +62,8 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
         checkUnique();
     }
 
@@ -141,51 +143,19 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         return getName();
     }
 
-    public boolean isUsed() throws ApplicationException, BiobankCheckException {
+    public boolean isUsed() throws ApplicationException, BiobankException {
         String queryString = "select count(s) from " + Shipment.class.getName()
             + " as s where s.shippingMethod=?)";
         HQLCriteria c = new HQLCriteria(queryString,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         if (results.get(0) > 0) {
             return true;
         }
         return false;
-    }
-
-    public void checkUnique() throws BiobankCheckException,
-        ApplicationException {
-        String globalMsg = "global";
-        checkNoDuplicates("name", getName(), "A " + globalMsg
-            + " shipping method with name \"" + getName()
-            + "\" already exists.");
-    }
-
-    private void checkNoDuplicates(String propertyName, String value,
-        String errorMessage) throws ApplicationException, BiobankCheckException {
-        List<Object> parameters = new ArrayList<Object>(
-            Arrays.asList(new Object[] { value }));
-
-        // if global type, check the name is use nowhere
-
-        String notSameObject = "";
-        if (!isNew()) {
-            notSameObject = " and id <> ?";
-            parameters.add(getId());
-        }
-        HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + ShippingMethod.class.getName() + " where " + propertyName + "=? "
-            + notSameObject, parameters);
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        if (result.get(0) > 0) {
-            throw new BiobankCheckException(errorMessage);
-        }
     }
 
     public static void persistShippingMethods(
@@ -208,5 +178,11 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         String name = getName();
         return name != null && !name.equals(PICK_UP_NAME)
             && !name.equals(DROP_OFF_NAME);
+    }
+
+    public void checkUnique() throws BiobankException, ApplicationException {
+        checkNoDuplicates(ShippingMethod.class,
+            ShippingMethodPeer.NAME.getName(), getName(),
+            "A shipping method with name");
     }
 }

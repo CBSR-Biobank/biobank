@@ -49,13 +49,15 @@ public class PatientVisitAdapter extends AdapterBase {
     @Override
     public String getTooltipText() {
         PatientVisitWrapper visit = getWrapper();
-        PatientWrapper patient = visit.getPatient();
-        if (patient != null) {
-            StudyWrapper study = patient.getStudy();
-            Assert.isNotNull(study, "study is null");
-            return study.getNameShort() + " - " + patient.getPnumber() + " - "
-                + getTooltipText("Patient Visit");
+        if (visit != null) {
+            PatientWrapper patient = visit.getPatient();
+            if (patient != null) {
+                StudyWrapper study = patient.getStudy();
+                Assert.isNotNull(study, "study is null");
+                return study.getNameShort() + " - " + patient.getPnumber()
+                    + " - " + getTooltipText("Patient Visit");
 
+            }
         }
         return getTooltipText("Patient Visit");
     }

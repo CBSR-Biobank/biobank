@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.treeview.report;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
@@ -62,7 +64,7 @@ public abstract class AbstractReportsGroup extends AdapterBase {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 

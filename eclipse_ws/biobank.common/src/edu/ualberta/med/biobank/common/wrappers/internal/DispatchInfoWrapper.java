@@ -6,14 +6,13 @@ import java.util.HashSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.DispatchInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
@@ -36,24 +35,13 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "study", "fromSite", "destSiteCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return DispatchInfoPeer.PROP_NAMES;
     }
 
     @Override
     public Class<DispatchInfo> getWrappedClass() {
         return DispatchInfo.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-
-    }
-
-    @Override
-    protected void deleteChecks() throws Exception {
-
     }
 
     public StudyWrapper getStudy() {

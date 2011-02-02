@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.LogPeer;
 import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -21,23 +21,13 @@ public class LogWrapper extends ModelWrapper<Log> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
-    }
-
-    @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "username", "createdAt", "site", "action",
-            "patientNumber", "inventoryId", "positionLabel", "details", "type" };
+    protected List<String> getPropertyChangeNames() {
+        return LogPeer.PROP_NAMES;
     }
 
     @Override
     public Class<Log> getWrappedClass() {
         return Log.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        WrapperException {
     }
 
     @Override

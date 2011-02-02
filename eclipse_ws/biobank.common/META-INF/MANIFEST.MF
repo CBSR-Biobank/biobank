@@ -80,6 +80,7 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.debug;uses:="gov.nih.nci.system.applicationservice",
  edu.ualberta.med.biobank.common.exception,
  edu.ualberta.med.biobank.common.formatters,
+ edu.ualberta.med.biobank.common.peer,
  edu.ualberta.med.biobank.common.reports,
  edu.ualberta.med.biobank.common.reports.filters,
  edu.ualberta.med.biobank.common.security;uses:="gov.nih.nci.system.applicationservice",
@@ -93,8 +94,8 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.common.wrappers.listener,
  edu.ualberta.med.biobank.model,
  edu.ualberta.med.biobank.server.applicationservice;uses:="edu.ualberta.med.biobank.server.query,gov.nih.nci.system.applicationservice",
- edu.ualberta.med.biobank.server.query,
  edu.ualberta.med.biobank.server.applicationservice.exceptions,
+ edu.ualberta.med.biobank.server.query,
  edu.ualberta.med.biobank.server.reports,
  gov.nih.nci.system.applicationservice;
   uses:="gov.nih.nci.system.query,

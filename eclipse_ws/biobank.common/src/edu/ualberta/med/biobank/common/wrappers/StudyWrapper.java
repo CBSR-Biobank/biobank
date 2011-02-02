@@ -13,6 +13,16 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.ClinicPeer;
+import edu.ualberta.med.biobank.common.peer.ContactPeer;
+import edu.ualberta.med.biobank.common.peer.DispatchInfoPeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentPatientPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
+import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
@@ -155,8 +165,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (hasPatients()) {
             throw new BiobankCheckException("Unable to delete study "
                 + getName() + ". All defined patients must be removed first.");
@@ -164,36 +173,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "activityStatus", "comment",
-            "contactCollection", "sampleStorageCollection",
-            "sourceVesselCollection", "studyPvAttrCollection",
-            "patientCollection", "dispatchInfoCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return StudyPeer.PROP_NAMES;
     }
 
     @Override
     public Class<Study> getWrappedClass() {
         return Study.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        checkNotEmpty(getName(), "Name");
-        checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicates(Study.class, "name", getName(),
-            "A study with name \"" + getName() + "\" already exists.");
-        checkNoDuplicates(Study.class, "nameShort", getNameShort(),
-            "A study with short name \"" + getNameShort()
-                + "\" already exists.");
-        checkValidActivityStatus();
-    }
-
-    private void checkValidActivityStatus() throws BiobankCheckException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the clinic does not have an activity status");
-        }
     }
 
     @SuppressWarnings("unchecked")
@@ -682,11 +668,14 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getPatientCollection(false);
     }
 
+    private static final String PATIENT_QRY = "select patients from "
+        + Study.class.getName() + " as study inner join study."
+        + StudyPeer.PATIENT_COLLECTION.getName()
+        + " as patients where patients." + PatientPeer.PNUMBER.getName()
+        + " = ? and study." + StudyPeer.ID.getName() + " = ?";
+
     public PatientWrapper getPatient(String patientNumber) throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select patients from "
-            + Study.class.getName()
-            + " as study inner join study.patientCollection"
-            + " as patients where patients.pnumber = ? and study.id = ?",
+        HQLCriteria criteria = new HQLCriteria(PATIENT_QRY,
             Arrays.asList(new Object[] { patientNumber, getId() }));
         List<Patient> result = appService.query(criteria);
         if (result.size() > 1) {
@@ -697,41 +686,46 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return null;
     }
 
-    public boolean hasPatients() throws ApplicationException,
-        BiobankCheckException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select count(patient) from "
-                + Study.class.getName()
-                + " as study inner join study.patientCollection as patient where study.id = ?",
+    private static final String HAS_PATIENTS_QRY = "select count(patient) from "
+        + Study.class.getName()
+        + " as study inner join study."
+        + StudyPeer.PATIENT_COLLECTION.getName()
+        + " as patient where study."
+        + StudyPeer.ID.getName() + " = ?";
+
+    public boolean hasPatients() throws ApplicationException, BiobankException {
+        HQLCriteria criteria = new HQLCriteria(HAS_PATIENTS_QRY,
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0) > 0;
     }
 
-    public long getPatientCount() throws ApplicationException,
-        BiobankCheckException {
+    public long getPatientCount() throws ApplicationException, BiobankException {
         return getPatientCount(false);
     }
+
+    public static final String PATIENT_COUNT_QRY = "select count(patients) from "
+        + Study.class.getName()
+        + " as study inner join study."
+        + StudyPeer.PATIENT_COLLECTION.getName()
+        + " as patients where study."
+        + StudyPeer.ID.getName() + "= ?";
 
     /**
      * fast = true will execute a hql query. fast = false will call the
      * getpatientCollection method
      */
     public long getPatientCount(boolean fast) throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(
-                "select count(patient) from "
-                    + Study.class.getName()
-                    + " as study inner join study.patientCollection as patient where study.id = ?",
+            HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             return results.get(0);
         }
@@ -812,85 +806,140 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return 0;
     }
 
+    private static final String PATIENT_COUNT_FOR_SITE_QRY = "select count(distinct patients) from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.SHIPMENT_COLLECTION.getName()
+        + " as shipments join shipments."
+        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
+        + " as sps join sps."
+        + ShipmentPatientPeer.PATIENT.getName()
+        + " as patients where site."
+        + SitePeer.ID.getName()
+        + "=? and "
+        + "patients."
+        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID)
+        + "=?";
+
     public long getPatientCountForSite(SiteWrapper site)
-        throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
-            + Site.class.getName() + " as site"
-            + " join site.shipmentCollection as shipments"
-            + " join shipments.shipmentPatientCollection as csps"
-            + " join csps.patient as patients"
-            + " where site.id=? and patients.study.id=?",
+        throws ApplicationException, BiobankException {
+        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_SITE_QRY,
             Arrays.asList(new Object[] { site.getId(), getId() }));
         List<Long> result = appService.query(c);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
+
+    private static final String VISIT_COUNT_FOR_SITE_QRY = "select count(distinct visits) from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.SHIPMENT_COLLECTION.getName()
+        + " as shipments join shipments."
+        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
+        + " as sps join sps."
+        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
+        + " as visits where site."
+        + SitePeer.ID.getName()
+        + "=? and sps."
+        + Property.concatNames(ShipmentPatientPeer.PATIENT, PatientPeer.STUDY,
+            StudyPeer.ID) + "=?";
 
     public long getPatientVisitCountForSite(SiteWrapper site)
-        throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(distinct visits) from "
-            + Site.class.getName() + " as site"
-            + " join site.shipmentCollection as shipments"
-            + " join shipments.shipmentPatientCollection as csps"
-            + " join csps.patientVisitCollection as visits"
-            + " where site.id=? and csps.patient.study.id=?",
+        throws ApplicationException, BiobankException {
+        HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_SITE_QRY,
             Arrays.asList(new Object[] { site.getId(), getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
     }
 
+    public static final String PATIENT_COUNT_FOR_CLINIC_QRY = "select count(distinct patients) from "
+        + Study.class.getName()
+        + " as study join study."
+        + StudyPeer.PATIENT_COLLECTION.getName()
+        + " as patients join patients."
+        + PatientPeer.SHIPMENT_PATIENT_COLLECTION.getName()
+        + " as sps join sps."
+        + Property.concatNames(ShipmentPatientPeer.SHIPMENT,
+            ShipmentPeer.CLINIC)
+        + " as clinic where study."
+        + StudyPeer.ID.getName()
+        + "=? and clinic."
+        + ClinicPeer.ID.getName()
+        + "=?";
+
     public long getPatientCountForClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(distinct patients) from "
-            + Study.class.getName() + " as study"
-            + " join study.patientCollection as patients"
-            + " join patients.shipmentPatientCollection as csps"
-            + " join csps.shipment.clinic as clinic"
-            + " where study.id=? and clinic.id=?", Arrays.asList(new Object[] {
-            getId(), clinic.getId() }));
+        throws ApplicationException, BiobankException {
+        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_CLINIC_QRY,
+            Arrays.asList(new Object[] { getId(), clinic.getId() }));
         List<Long> result = appService.query(c);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
 
+    public static final String VISIT_COUNT_FOR_CLINIC_QRY = "select count(distinct visits) from "
+        + Study.class.getName()
+        + " as study join study."
+        + StudyPeer.PATIENT_COLLECTION.getName()
+        + " as patients join patients."
+        + PatientPeer.SHIPMENT_PATIENT_COLLECTION.getName()
+        + " as sps join sps."
+        + Property.concatNames(ShipmentPatientPeer.SHIPMENT,
+            ShipmentPeer.CLINIC)
+        + " as clinic join sps."
+        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
+        + " as visits where study."
+        + StudyPeer.ID.getName()
+        + "=? and clinic."
+        + ClinicPeer.ID.getName()
+        + "=? and sps."
+        + Property.concatNames(ShipmentPatientPeer.PATIENT, PatientPeer.STUDY)
+        + "=study";
+
     public long getPatientVisitCountForClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(distinct visits) from "
-            + Study.class.getName() + " as study"
-            + " join study.patientCollection as patients"
-            + " join patients.shipmentPatientCollection as csps"
-            + " join csps.shipment.clinic as clinic"
-            + " join csps.patientVisitCollection as visits"
-            + " where study.id=? and clinic.id=?"
-            + " and csps.patient.study=study", Arrays.asList(new Object[] {
-            getId(), clinic.getId() }));
+        throws ApplicationException, BiobankException {
+        HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_CLINIC_QRY,
+            Arrays.asList(new Object[] { getId(), clinic.getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
     }
 
+    public static final String VISIT_COUNT_QRY = "select count(visits) from "
+        + Study.class.getName() + " as study inner join study."
+        + StudyPeer.PATIENT_COLLECTION.getName()
+        + " as patients inner join patients."
+        + PatientPeer.SHIPMENT_PATIENT_COLLECTION.getName()
+        + " as sps inner join sps."
+        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
+        + " as visits where study." + StudyPeer.ID.getName() + "=? ";
+
     public long getPatientVisitCount() throws ApplicationException,
-        BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(visits) from "
-            + Study.class.getName() + " as study"
-            + " inner join study.patientCollection as patients"
-            + " inner join patients.shipmentPatientCollection as csps"
-            + " inner join csps.patientVisitCollection as visits"
-            + " where study.id=? ", Arrays.asList(new Object[] { getId() }));
+        BiobankException {
+        HQLCriteria c = new HQLCriteria(VISIT_COUNT_QRY,
+            Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        checkNoDuplicates(Study.class, StudyPeer.NAME.getName(), getName(),
+            "A study with name");
+        checkNoDuplicates(Study.class, StudyPeer.NAME_SHORT.getName(),
+            getNameShort(), "A study with short name");
     }
 
     @Override
@@ -914,20 +963,25 @@ public class StudyWrapper extends ModelWrapper<Study> {
         deleteStudyPvAttrs();
     }
 
+    public static final String IS_LINKED_TO_CLINIC_QRY = "select count(clinics) from "
+        + Contact.class.getName()
+        + " as contacts join contacts."
+        + ContactPeer.CLINIC.getName()
+        + " as clinics where contacts."
+        + Property.concatNames(ContactPeer.STUDY_COLLECTION, StudyPeer.ID)
+        + " = ? and clinics." + ClinicPeer.ID.getName() + " = ?";
+
     /**
      * return true if this study is linked to the given clinic (through
      * contacts)
      */
     public boolean isLinkedToClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankCheckException {
-        HQLCriteria c = new HQLCriteria("select count(clinics) from "
-            + Contact.class.getName() + " as contacts"
-            + " join contacts.clinic as clinics"
-            + " where contacts.studyCollection.id = ? and clinics.id = ?",
+        throws ApplicationException, BiobankException {
+        HQLCriteria c = new HQLCriteria(IS_LINKED_TO_CLINIC_QRY,
             Arrays.asList(new Object[] { getId(), clinic.getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0) != 0;
     }
@@ -940,15 +994,31 @@ public class StudyWrapper extends ModelWrapper<Study> {
         deletedStudyPvAttr.clear();
     }
 
+    public static final String ALL_STUDIES_QRY = "from "
+        + Study.class.getName();
+
     public static List<StudyWrapper> getAllStudies(
         WritableApplicationService appService) throws ApplicationException {
         List<Study> studies = new ArrayList<Study>();
         List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
-        HQLCriteria c = new HQLCriteria("from " + Study.class.getName());
+        HQLCriteria c = new HQLCriteria(ALL_STUDIES_QRY);
         studies = appService.query(c);
         for (Study study : studies)
             wrappers.add(new StudyWrapper(appService, study));
         return wrappers;
+    }
+
+    public static final String COUNT_QRY = "select count (*) from "
+        + Study.class.getName();
+
+    public static long getCount(WritableApplicationService appService)
+        throws BiobankException, ApplicationException {
+        HQLCriteria c = new HQLCriteria(COUNT_QRY);
+        List<Long> results = appService.query(c);
+        if (results.size() != 1) {
+            throw new BiobankQueryResultSizeException();
+        }
+        return results.get(0);
     }
 
     @Override
@@ -956,12 +1026,16 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getName();
     }
 
+    public static final String DISP_DEST_SITE_COLL_QRY = "select info.destSiteCollection from "
+        + DispatchInfo.class.getName()
+        + " as info where info."
+        + Property.concatNames(DispatchInfoPeer.STUDY, StudyPeer.ID)
+        + " = ? and info"
+        + Property.concatNames(DispatchInfoPeer.SRC_SITE, SitePeer.ID) + "=?";
+
     public List<SiteWrapper> getDispatchDestSiteCollection(SiteWrapper site)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select info.destSiteCollection from "
-                + DispatchInfo.class.getName()
-                + " as info where info.study.id = ? and info.site.id=?",
+        HQLCriteria criteria = new HQLCriteria(DISP_DEST_SITE_COLL_QRY,
             Arrays.asList(new Object[] { getId(), site.getId() }));
         List<Site> results = appService.query(criteria);
         List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();

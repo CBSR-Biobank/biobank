@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
@@ -246,7 +247,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
         if (profilesCombo == null
             || profilesCombo.getCombo().getItemCount() <= 0
             || profilesCombo.getCombo().getSelectionIndex() < 0)
-            return "All";
+            return ProfileManager.ALL_PROFILE_NAME;
         else
             return profilesCombo.getCombo().getItem(
                 profilesCombo.getCombo().getSelectionIndex());

@@ -135,7 +135,7 @@ public abstract class BiobankFormBase extends EditorPart implements
             // if selection fails, then the adapter needs to be matched at the
             // id level
             if (SessionManager.getSelectedNode() == null) {
-                AdapterBase node = SessionManager.searchNode(adapter
+                AdapterBase node = SessionManager.searchFirstNode(adapter
                     .getModelObject());
                 SessionManager.setSelectedNode(node);
             }

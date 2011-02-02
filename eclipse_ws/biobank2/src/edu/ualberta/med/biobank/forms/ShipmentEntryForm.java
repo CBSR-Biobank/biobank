@@ -8,8 +8,6 @@ import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -66,8 +64,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     private static final String WAYBILL_BINDING = "shipment-waybill-binding";
 
     private static final String DATE_SHIPPED_BINDING = "shipment-date-shipped-binding";
-
-    private boolean dateReceivedModified;
 
     private DateTimeWidget departedWidget;
 
@@ -224,12 +220,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         dateReceivedWidget = createDateTimeWidget(client, "Date Received",
             shipment.getDateReceived(), shipment, "dateReceived",
             new NotNullValidator("Date received should be set"));
-        dateReceivedWidget.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                dateReceivedModified = true;
-            }
-        });
 
         activityStatusComboViewer = createComboViewer(client,
             "Activity Status",
@@ -323,38 +313,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             shipment.setDeparted(null);
         }
 
-        final boolean newShipment = shipment.isNew();
         shipment.persist();
 
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                if (newShipment) {
-                    if (shipmentAdapter.getWrapper().isReceivedToday()) {
-                        if (shipmentAdapter.getParent() != null)
-                            shipmentAdapter.getParent().removeChild(
-                                shipmentAdapter, false);
-                        ShipmentAdministrationView.getCurrent().reload();
-                        if (PatientAdministrationView.getCurrent() != null) {
-                            PatientAdministrationView.getCurrent().reload();
-                        }
-                    } else {
-                        ShipmentAdministrationView.showShipment(shipment);
-                    }
-                } else {
-                    if (dateReceivedModified) {
-                        if (shipmentAdapter.getParent() != null)
-                            shipmentAdapter.getParent().removeChild(
-                                shipmentAdapter, false);
-                        ShipmentAdministrationView.getCurrent().reload();
-                        if (PatientAdministrationView.getCurrent() != null) {
-                            PatientAdministrationView.getCurrent().reload();
-                        }
-                        if (!shipment.isReceivedToday()) {
-                            ShipmentAdministrationView.showShipment(shipment);
-                        }
-                    }
-                }
+                ShipmentAdministrationView.reloadCurrent();
+                PatientAdministrationView.reloadCurrent();
+                if (!shipment.isReceivedToday())
+                    ShipmentAdministrationView.showShipment(shipment);
             }
         });
     }

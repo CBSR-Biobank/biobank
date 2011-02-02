@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -33,6 +35,6 @@ public abstract class AbstractViewWithTree<T> extends ViewPart {
         }
     }
 
-    public abstract AdapterBase searchNode(ModelWrapper<?> wrapper);
+    public abstract List<AdapterBase> searchNode(ModelWrapper<?> wrapper);
 
 }

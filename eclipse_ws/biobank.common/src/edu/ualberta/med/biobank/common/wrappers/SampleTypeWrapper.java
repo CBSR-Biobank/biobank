@@ -9,6 +9,9 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -28,8 +31,8 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "name", "nameShort", "containerTypeCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return SampleTypePeer.PROP_NAMES;
     }
 
     public String getName() {
@@ -59,12 +62,11 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
      */
     @SuppressWarnings("unchecked")
     public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
-        List<ContainerTypeWrapper> containerTypeCollection =
-            (List<ContainerTypeWrapper>) propertiesMap
-                .get("containerTypeCollection");
+        List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
+            .get("containerTypeCollection");
         if (containerTypeCollection == null) {
-            Collection<ContainerType> children =
-                wrappedObject.getContainerTypeCollection();
+            Collection<ContainerType> children = wrappedObject
+                .getContainerTypeCollection();
             if (children != null) {
                 containerTypeCollection = new ArrayList<ContainerTypeWrapper>();
                 for (ContainerType type : children) {
@@ -89,47 +91,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         return SampleType.class;
     }
 
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        checkNotEmpty(getName(), "Name");
-        checkNotEmpty(getNameShort(), "Short Name");
-        checkNameAndShortNameUnique();
-    }
-
-    public void checkNameAndShortNameUnique() throws ApplicationException,
-        BiobankCheckException {
-        checkNoDuplicates("name", getName(), "A sample type with name \""
-            + getName() + "\" already exists");
-
-        checkNoDuplicates("nameShort", getNameShort(),
-            "A sample type with short name \"" + getNameShort()
-                + "\" already exists");
-    }
-
-    private void checkNoDuplicates(String propertyName, String value,
-        String errorMessage) throws ApplicationException, BiobankCheckException {
-        List<Object> parameters =
-            new ArrayList<Object>(Arrays.asList(new Object[] { value }));
-
-        String notSameObject = "";
-        if (!isNew()) {
-            notSameObject = " and id <> ?";
-            parameters.add(getId());
-        }
-        HQLCriteria criteria =
-            new HQLCriteria("select count(*) from "
-                + SampleType.class.getName() + " where " + propertyName + "=? "
-                + notSameObject, parameters);
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
-        }
-        if (result.get(0) > 0) {
-            throw new BiobankCheckException(errorMessage);
-        }
-    }
-
     /**
      * get all sample types in a site for containers which type name contains
      * "typeNameContains" (go recursively inside found containers)
@@ -137,9 +98,9 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     public static List<SampleTypeWrapper> getSampleTypeForContainerTypes(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String typeNameContains) throws ApplicationException {
-        List<ContainerTypeWrapper> containerTypes =
-            ContainerTypeWrapper.getContainerTypesInSite(appService,
-                siteWrapper, typeNameContains, false);
+        List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
+            .getContainerTypesInSite(appService, siteWrapper, typeNameContains,
+                false);
         Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
         for (ContainerTypeWrapper containerType : containerTypes) {
             sampleTypes.addAll(containerType.getSampleTypesRecursively());
@@ -154,9 +115,8 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     public static List<SampleTypeWrapper> getSampleTypeForPallet96(
         WritableApplicationService appService, SiteWrapper siteWrapper)
         throws ApplicationException {
-        List<ContainerTypeWrapper> containerTypes =
-            ContainerTypeWrapper.getContainerTypesPallet96(appService,
-                siteWrapper);
+        List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
+            .getContainerTypesPallet96(appService, siteWrapper);
         Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
         for (ContainerTypeWrapper containerType : containerTypes) {
             sampleTypes.addAll(containerType.getSampleTypesRecursively());
@@ -170,8 +130,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsedBySamples()) {
             throw new BiobankCheckException("Unable to delete sample type "
                 + getName() + ". Aliquots of this type exists in storage."
@@ -192,6 +151,12 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         if (sort)
             Collections.sort(list);
         return list;
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        checkNameAndShortNameUnique();
     }
 
     /**
@@ -231,16 +196,14 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     public boolean isUsedBySamples() throws ApplicationException,
-        BiobankCheckException {
-        String queryString =
-            "select count(s) from " + Aliquot.class.getName()
-                + " as s where s.sampleType=?)";
-        HQLCriteria c =
-            new HQLCriteria(queryString,
-                Arrays.asList(new Object[] { wrappedObject }));
+        BiobankException {
+        String queryString = "select count(s) from " + Aliquot.class.getName()
+            + " as s where s.sampleType=?)";
+        HQLCriteria c = new HQLCriteria(queryString,
+            Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0) > 0;
     }
@@ -248,6 +211,15 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     @Override
     public void reload() throws Exception {
         super.reload();
+    }
+
+    public void checkNameAndShortNameUnique() throws ApplicationException,
+        BiobankException {
+        checkNoDuplicates(SampleType.class, SampleTypePeer.NAME.getName(),
+            getName(), "A sample type with name");
+        checkNoDuplicates(SampleType.class,
+            SampleTypePeer.NAME_SHORT.getName(), getNameShort(),
+            "A sample type with name short");
     }
 
 }

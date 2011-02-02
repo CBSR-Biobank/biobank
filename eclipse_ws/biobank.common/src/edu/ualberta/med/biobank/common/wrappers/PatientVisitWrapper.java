@@ -12,10 +12,14 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ShipmentPatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
+import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
@@ -30,6 +34,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     private static final String PROP_KEY_CSP = "shipmentPatient";
+    private static final String PROP_KEY_ACTIVITY_STATUS = "activityStatus";
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
@@ -47,10 +52,33 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "patient", "dateProcessed", "dateDrawn",
-            "comment", "pvAttrCollection", "aliquotCollection", "shipment",
-            "pvSourceVesselCollection" };
+    protected List<String> getPropertyChangeNames() {
+        return PatientVisitPeer.PROP_NAMES;
+    }
+
+    public ActivityStatusWrapper getActivityStatus() {
+        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
+            .get(PROP_KEY_ACTIVITY_STATUS);
+        if (activity == null) {
+            ActivityStatus a = wrappedObject.getActivityStatus();
+            if (a == null)
+                return null;
+            activity = new ActivityStatusWrapper(appService, a);
+            propertiesMap.put(PROP_KEY_ACTIVITY_STATUS, activity);
+        }
+        return activity;
+    }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        propertiesMap.put(PROP_KEY_ACTIVITY_STATUS, activityStatus);
+        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
+        ActivityStatus rawObject = null;
+        if (activityStatus != null) {
+            rawObject = activityStatus.getWrappedObject();
+        }
+        wrappedObject.setActivityStatus(rawObject);
+        propertyChangeSupport.firePropertyChange(PROP_KEY_ACTIVITY_STATUS,
+            oldActivityStatus, activityStatus);
     }
 
     public Date getDateProcessed() {
@@ -412,20 +440,12 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-        checkHasShipment();
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
         checkPatientInShipment();
         // patient to clinic relationship tested by shipment, so no need to
         // test it again here
         checkShipmentPatient();
-    }
-
-    private void checkHasShipment() throws BiobankCheckException {
-        if (getShipment() == null) {
-            throw new BiobankCheckException(
-                "This visit should contain a shipment");
-        }
     }
 
     private void checkPatientInShipment() throws BiobankCheckException {
@@ -592,8 +612,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (getAliquotsCount(false) > 0) {
             throw new BiobankCheckException("Unable to delete patient visit "
                 + getDateProcessed()
@@ -601,7 +620,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
-    public long getAliquotsCount(boolean fast) throws BiobankCheckException,
+    public long getAliquotsCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(
@@ -610,8 +629,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             return results.get(0);
         }

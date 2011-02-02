@@ -11,6 +11,8 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.ShipmentPatientWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -40,11 +42,11 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMorePatientVisits();
     }
 
-    private void checkNoMorePatientVisits() throws Exception {
+    private void checkNoMorePatientVisits() throws BiobankCheckException {
         List<PatientVisitWrapper> visits = getPatientVisitCollection();
         if (visits != null && visits.size() > 0) {
             throw new BiobankCheckException(
@@ -53,12 +55,8 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        String[] properties = super.getPropertyChangeNames();
-        List<String> list = new ArrayList<String>(Arrays.asList(properties));
-        list.addAll(Arrays.asList("clinic", "patientVisitCollection",
-            "patientCollection", "activityStatus"));
-        return list.toArray(new String[list.size()]);
+    protected List<String> getPropertyChangeNames() {
+        return ShipmentPeer.PROP_NAMES;
     }
 
     @Override
@@ -67,9 +65,8 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-        super.persistChecks();
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
         if (getClinic() == null) {
             throw new BiobankCheckException("A clinic should be set");
         }
@@ -150,7 +147,7 @@ public class ShipmentWrapper extends AbstractShipmentWrapper<Shipment> {
         }
     }
 
-    public void checkPatientsStudy() throws BiobankCheckException,
+    public void checkPatientsStudy() throws BiobankException,
         ApplicationException {
         String patientsInError = "";
         for (PatientWrapper patient : patientsAdded) {

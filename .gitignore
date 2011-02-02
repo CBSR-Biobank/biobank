@@ -15,11 +15,13 @@ eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/test/
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/VarCharLengths.java
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/VarCharLengths.properties
 eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/server/applicationservice/version.properties
+eclipse_ws/biobank.common/src/edu/ualberta/med/biobank/common/peer/*.java
 eclipse_ws/biobank2.importer/bin
 eclipse_ws/biobank2.importer/conf
 eclipse_ws/biobank2.importer/lib/*
 eclipse_ws/biobank2.tools/bin
 eclipse_ws/biobank2.tools/lib
+eclipse_ws/biobank2.tools/output
 eclipse_ws/biobank2.tests/bin
 eclipse_ws/biobank2.tests/build
 eclipse_ws/biobank2.tests/conf

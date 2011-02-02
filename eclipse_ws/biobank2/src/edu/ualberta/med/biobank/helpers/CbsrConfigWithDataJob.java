@@ -10,10 +10,10 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class CbsrConfigWithDataJob extends CbsrConfigJob {
@@ -121,8 +121,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
 
             patient = patients.get(r.nextInt(patients.size()));
 
-            ShipmentWrapper shipment = new ShipmentWrapper(
-                appService);
+            ShipmentWrapper shipment = new ShipmentWrapper(appService);
             String dateStr = String.format("2009-%02d-%02d %02d:%02d",
                 r.nextInt(12) + 1, r.nextInt(28), r.nextInt(24), r.nextInt(60));
             shipment.setDeparted(DateFormatter.parseToDateTime(dateStr));
@@ -174,7 +173,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
     }
 
     private PatientVisitWrapper addPatientVisit(PatientWrapper patient) {
-        List<ShipmentWrapper> shipments = patient.getShipmentCollection();
+        List<ShipmentWrapper> shipments = patient.getShipmentCollection(null);
         if (shipments.size() == 0) {
             return null;
         }

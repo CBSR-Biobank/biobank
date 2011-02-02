@@ -67,13 +67,17 @@ public class ContainerGroup extends AdapterBase {
     }
 
     @Override
-    public AdapterBase search(Object searchedObject) {
+    public List<AdapterBase> search(Object searchedObject) {
+        List<AdapterBase> res = new ArrayList<AdapterBase>();
         if (searchedObject instanceof ContainerWrapper) {
             ContainerWrapper container = (ContainerWrapper) searchedObject;
             if (container.getContainerType() != null) {
                 if (Boolean.TRUE.equals(container.getContainerType()
                     .getTopLevel())) {
-                    return getChild((ModelWrapper<?>) searchedObject, true);
+                    AdapterBase child = getChild(
+                        (ModelWrapper<?>) searchedObject, true);
+                    if (child != null)
+                        res.add(child);
                 } else {
                     List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
                     ContainerWrapper currentContainer = container;
@@ -83,46 +87,20 @@ public class ContainerGroup extends AdapterBase {
                     }
                     for (AdapterBase child : getChildren()) {
                         if (child instanceof ContainerAdapter) {
-                            acceptChildContainers(searchedObject,
+                            res = searchChildContainers(searchedObject,
                                 (ContainerAdapter) child, parents);
                         } else {
-                            AdapterBase foundChild = child
-                                .search(searchedObject);
-                            if (foundChild != null) {
-                                return foundChild;
-                            }
+                            res = child.search(searchedObject);
                         }
+                        if (res.size() > 0)
+                            break;
                     }
-                    return searchChildren(searchedObject);
+                    if (res.size() == 0)
+                        res = searchChildren(searchedObject);
                 }
             }
         }
-        return null;
-    }
-
-    private AdapterBase acceptChildContainers(Object searchedObject,
-        ContainerAdapter container, final List<ContainerWrapper> parents) {
-        if (parents.contains(container.getContainer())) {
-            AdapterBase child = container.getChild(
-                (ModelWrapper<?>) searchedObject, true);
-            if (child == null) {
-                for (AdapterBase childContainer : container.getChildren()) {
-                    AdapterBase foundChild;
-                    if (childContainer instanceof ContainerAdapter) {
-                        foundChild = acceptChildContainers(searchedObject,
-                            (ContainerAdapter) childContainer, parents);
-                    } else {
-                        foundChild = childContainer.search(searchedObject);
-                    }
-                    if (foundChild != null) {
-                        return foundChild;
-                    }
-                }
-            } else {
-                return child;
-            }
-        }
-        return null;
+        return res;
     }
 
     @Override

@@ -1,6 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
+import java.util.List;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.AbstractPositionPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
@@ -20,8 +23,8 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "row", "col" };
+    protected List<String> getPropertyChangeNames() {
+        return AbstractPositionPeer.PROP_NAMES;
     }
 
     public void setRow(Integer row) {
@@ -63,16 +66,6 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
 
     public void checkPositionValid(ContainerWrapper parent)
         throws BiobankCheckException {
-        if (getRow() == null) {
-            throw new BiobankCheckException("Position row can't be null");
-        }
-        if (getCol() == null) {
-            throw new BiobankCheckException("Position col can't be null");
-        }
-        if (getRow() < 0 || getCol() < 0) {
-            throw new BiobankCheckException("Position " + getRow() + ":"
-                + getCol() + " is invalid. Need positive numbers.");
-        }
         int rowCapacity = parent.getRowCapacity();
         int colCapacity = parent.getColCapacity();
         if (getRow() >= rowCapacity || getCol() >= colCapacity) {

@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.treeview.AbstractClinicGroup;
 public class ClinicMasterGroup extends AbstractClinicGroup {
 
     public ClinicMasterGroup(SessionAdapter sessionAdapter, int id) {
-        super(sessionAdapter, id, "Clinics Master");
+        super(sessionAdapter, id, "All Clinics");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+        return (int) ClinicWrapper.getCount(SessionManager.getAppService());
     }
 
 }

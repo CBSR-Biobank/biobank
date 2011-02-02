@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.GlobalPvAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.GlobalPvAttr;
 import edu.ualberta.med.biobank.model.PvAttrType;
@@ -26,18 +27,13 @@ public class GlobalPvAttrWrapper extends ModelWrapper<GlobalPvAttr> {
     }
 
     @Override
-    protected String[] getPropertyChangeNames() {
-        return new String[] { "label", "pvAttrType", "site" };
+    protected List<String> getPropertyChangeNames() {
+        return GlobalPvAttrPeer.PROP_NAMES;
     }
 
     @Override
     public Class<GlobalPvAttr> getWrappedClass() {
         return GlobalPvAttr.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
     }
 
     @Override

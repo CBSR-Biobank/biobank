@@ -10,11 +10,12 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.model.PalletCell;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public class PalletScanManagement {
 
@@ -22,7 +23,8 @@ public class PalletScanManagement {
     private int successfulScansCount = 0;
 
     public void launchScanAndProcessResult(final String plateToScan) {
-        launchScanAndProcessResult(plateToScan, "All", false);
+        launchScanAndProcessResult(plateToScan,
+            ProfileManager.ALL_PROFILE_NAME, false);
     }
 
     public void launchScanAndProcessResult(final String plateToScan,

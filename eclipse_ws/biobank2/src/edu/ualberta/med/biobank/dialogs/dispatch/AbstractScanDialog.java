@@ -25,12 +25,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
-import edu.ualberta.med.biobank.forms.Messages;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -38,6 +38,7 @@ import edu.ualberta.med.biobank.validators.ScannerBarcodeValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
+import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     BiobankDialog {
@@ -201,8 +202,8 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
 
     private void launchScan() {
         setScanOkValue(false);
-        palletScanManagement.launchScanAndProcessResult(plateToScan, "All",
-            isRescanMode());
+        palletScanManagement.launchScanAndProcessResult(plateToScan,
+            ProfileManager.ALL_PROFILE_NAME, isRescanMode());
     }
 
     protected void startNewPallet() {
