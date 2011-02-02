@@ -55,6 +55,7 @@
 							<constructor-arg value="false"/>
 						</bean>
 						@ATTRIBUTE_LEVEL_SECURITY_END@
+						<bean class="edu.ualberta.med.biobank.server.applicationservice.BiobankObjectStateInterceptor"/>
 					</list>		
 				</constructor-arg>
 			</bean>
@@ -95,7 +96,7 @@
 		<property name="transactionAttributes">
 			<props>
 				<prop key="execute*">
-					PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException
+					PROPAGATION_REQUIRED,-gov.nih.nci.system.applicationservice.ApplicationException,-gov.nih.nci.system.dao.DAOException,-edu.ualberta.med.biobank.common.exception.BiobankException
 				</prop>
 				<prop key="*">PROPAGATION_REQUIRED,readOnly</prop>
 			</props>
@@ -107,7 +108,7 @@
 		<property name="interfaces" value="@SERVICE_INTERFACE@" />
 		<property name="interceptorNames">
 			<list>
-				<idref local="exceptionHandler" />
+				<idref local="ExceptionInterceptor" />
 				<idref local="TxInterceptor" />
 				<idref local="LogInterceptor" />
 			</list>
@@ -116,5 +117,5 @@
 
 	<bean id="LogInterceptor" class="edu.ualberta.med.biobank.server.logging.user.BiobankLogProxy"/>
 
-	<bean id="exceptionHandler" class="edu.ualberta.med.biobank.server.validator.ValidationExceptionInterceptor"/>
+	<bean id="ExceptionInterceptor" class="edu.ualberta.med.biobank.server.interceptor.ExceptionInterceptor"/>
 </beans>

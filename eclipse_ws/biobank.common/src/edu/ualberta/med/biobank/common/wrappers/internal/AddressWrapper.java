@@ -84,12 +84,6 @@ public class AddressWrapper extends ModelWrapper<Address> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        // no checks required for address
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
         // no checks required for address

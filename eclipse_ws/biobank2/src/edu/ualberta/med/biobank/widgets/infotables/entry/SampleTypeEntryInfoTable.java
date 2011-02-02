@@ -12,6 +12,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
@@ -181,7 +182,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                     throw new BiobankCheckException(
                         "That sample type has already been added.");
             type.checkNameAndShortNameUnique();
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);
             return false;
         } catch (ApplicationException e) {

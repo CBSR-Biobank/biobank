@@ -533,3 +533,57 @@ UNLOCK TABLES;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
 -- Dump completed on 2011-01-12 14:16:56
+
+
+-- update constraints (unique and not-null):
+-- also update ContainerType -> ContainerLabelingScheme relation replace 0..1 by 1 (so cannot be null)
+
+alter table Abstract_Position
+ change column row row integer not null,
+ change column col col integer not null;
+alter table Capacity
+ change column ROW_CAPACITY ROW_CAPACITY integer not null,
+ change column COL_CAPACITY COL_CAPACITY integer not null;
+alter table Abstract_Shipment
+ change column DATE_RECEIVED DATE_RECEIVED datetime not null;
+alter table Activity_Status
+ change column NAME NAME varchar(50) not null unique;
+alter table Aliquot
+ change column INVENTORY_ID INVENTORY_ID varchar(100) not null unique;
+alter table Clinic
+ change column NAME NAME varchar(255) not null unique, 
+ change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
+alter table Container
+ change column LABEL LABEL varchar(255) not null;
+alter table Container_Type
+ change column NAME NAME varchar(255) not null, 
+ change column NAME_SHORT NAME_SHORT varchar(50) not null,
+ change column CHILD_LABELING_SCHEME_ID CHILD_LABELING_SCHEME_ID integer not null;
+alter table Patient
+ change column PNUMBER PNUMBER varchar(100) not null unique;
+alter table Sample_Type
+ change column NAME NAME varchar(100) not null unique, 
+ change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
+alter table Shipping_Method
+ change column NAME NAME varchar(255) not null unique;
+alter table Site
+ change column NAME NAME varchar(255) not null unique,
+ change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
+alter table Source_Vessel
+ change column NAME NAME varchar(100) not null unique;
+alter table Study
+ change column NAME NAME varchar(255) not null unique, 
+ change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
+
+-- unique constraint on multiple columns
+ALTER TABLE container
+  ADD CONSTRAINT uc_label UNIQUE (label,container_type_id),
+  ADD CONSTRAINT uc_productbarcode UNIQUE (product_barcode,site_id);
+
+ALTER TABLE container_type
+  ADD CONSTRAINT uc_name UNIQUE (name,site_id),
+  ADD CONSTRAINT uc_nameshort UNIQUE (name_short,site_id);
+
+ALTER TABLE Study_Pv_Attr
+  ADD CONSTRAINT uc_label UNIQUE (label,study_id);
+

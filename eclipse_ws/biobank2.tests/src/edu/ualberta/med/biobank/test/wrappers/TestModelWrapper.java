@@ -7,15 +7,12 @@ import java.util.List;
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.WrapperException;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class TestModelWrapper extends TestDatabase {
@@ -27,10 +24,6 @@ public class TestModelWrapper extends TestDatabase {
         }
 
         @Override
-        protected void deleteChecks() throws Exception {
-        }
-
-        @Override
         protected List<String> getPropertyChangeNames() {
             return null;
         }
@@ -38,11 +31,6 @@ public class TestModelWrapper extends TestDatabase {
         @Override
         public Class<Object> getWrappedClass() {
             return null;
-        }
-
-        @Override
-        protected void persistChecks() throws BiobankCheckException,
-            ApplicationException, WrapperException {
         }
 
         @Override
@@ -59,10 +47,6 @@ public class TestModelWrapper extends TestDatabase {
         }
 
         @Override
-        protected void deleteChecks() throws Exception {
-        }
-
-        @Override
         protected List<String> getPropertyChangeNames() {
             return null;
         }
@@ -70,11 +54,6 @@ public class TestModelWrapper extends TestDatabase {
         @Override
         public Class<Site> getWrappedClass() {
             return Site.class;
-        }
-
-        @Override
-        protected void persistChecks() throws BiobankCheckException,
-            ApplicationException, WrapperException {
         }
 
         @Override

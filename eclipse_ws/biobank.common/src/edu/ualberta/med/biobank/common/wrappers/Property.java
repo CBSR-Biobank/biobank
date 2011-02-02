@@ -2,6 +2,8 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.lang.reflect.Type;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.common.util.TypeReference;
 
 public class Property<T, W> {
@@ -52,5 +54,13 @@ public class Property<T, W> {
         } else if (!name.equals(other.name))
             return false;
         return true;
+
+    public static String concatNames(Property<?>... props) {
+        String[] propNames = new String[props.length];
+        int count = 0;
+        for (Property<?> prop : props) {
+            propNames[count++] = prop.getName();
+        }
+        return StringUtils.join(propNames, '.');
     }
 }

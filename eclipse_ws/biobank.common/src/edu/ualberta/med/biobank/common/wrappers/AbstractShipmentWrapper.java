@@ -4,14 +4,12 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.AbstractShipmentPeer;
 import edu.ualberta.med.biobank.model.AbstractShipment;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
@@ -28,18 +26,6 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     @Override
     protected List<String> getPropertyChangeNames() {
         return AbstractShipmentPeer.PROP_NAMES;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-        checkDateReceivedNotNull();
-    }
-
-    private void checkDateReceivedNotNull() throws BiobankCheckException {
-        if (getDateReceived() == null)
-            throw new BiobankCheckException(
-                "'Date Received' is a required field. You must set this value before saving a shipment.");
     }
 
     public Date getDeparted() {

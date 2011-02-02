@@ -89,8 +89,8 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                 for (ActivityStatusWrapper activity : localActivityStatuses) {
                     if (activity.getName().equals(newName)) {
                         throw new BiobankCheckException(
-                            "Activity status with name " + newName
-                                + " already exists.");
+                            "Activity status with name \"" + newName
+                                + "\" already exists.");
                     }
                 }
                 ActivityStatusWrapper noMoreDeletedStatus = null;

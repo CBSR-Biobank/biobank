@@ -7,8 +7,15 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.AliquotPeer;
+import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
+import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentPatientPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
+import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -96,22 +103,11 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
+    protected void persistChecks() throws BiobankException,
         ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the aliquot does not have an activity status");
-        }
-        checkPatientVisitNotNull();
         checkInventoryIdUnique();
         checkParentAcceptSampleType();
         objectWithPositionManagement.persistChecks();
-    }
-
-    private void checkPatientVisitNotNull() throws BiobankCheckException {
-        if (getPatientVisit() == null) {
-            throw new BiobankCheckException("patient visit should be set");
-        }
     }
 
     public String getInventoryId() {
@@ -125,21 +121,10 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             inventoryId);
     }
 
-    public void checkInventoryIdUnique() throws BiobankCheckException,
+    public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
-        AliquotWrapper existingAliquot = getAliquot(appService,
-            getInventoryId());
-        boolean alreadyExists = false;
-        if (existingAliquot != null && isNew()) {
-            alreadyExists = true;
-        } else if (existingAliquot != null
-            && !existingAliquot.getId().equals(getId())) {
-            alreadyExists = true;
-        }
-        if (alreadyExists) {
-            throw new BiobankCheckException("An aliquot with inventory id \""
-                + getInventoryId() + "\" already exists.");
-        }
+        checkNoDuplicates(Aliquot.class, AliquotPeer.INVENTORY_ID.getName(),
+            getInventoryId(), "An aliquot with inventoryId");
     }
 
     private void checkParentAcceptSampleType() throws BiobankCheckException {
@@ -253,6 +238,18 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         }
     }
 
+    private static final String POSITION_FREE_QRY = "from "
+        + Aliquot.class.getName()
+        + " where "
+        + Property.concatNames(AliquotPeer.ALIQUOT_POSITION,
+            AliquotPositionPeer.ROW)
+        + "=? and "
+        + Property.concatNames(AliquotPeer.ALIQUOT_POSITION,
+            AliquotPositionPeer.COL)
+        + "=? and "
+        + Property.concatNames(AliquotPeer.ALIQUOT_POSITION,
+            AliquotPositionPeer.CONTAINER) + "=?";
+
     /**
      * Method used to check if the current position of this aliquot is available
      * on the container. Return true if the position is free, false otherwise
@@ -261,10 +258,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         throws ApplicationException {
         RowColPos position = getPosition();
         if (position != null) {
-            HQLCriteria criteria = new HQLCriteria("from "
-                + Aliquot.class.getName()
-                + " where aliquotPosition.row=? and aliquotPosition.col=?"
-                + " and aliquotPosition.container=?",
+            HQLCriteria criteria = new HQLCriteria(POSITION_FREE_QRY,
                 Arrays.asList(new Object[] { position.row, position.col,
                     parentContainer.getWrappedObject() }));
 
@@ -452,14 +446,16 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         ApplicationException {
     }
 
+    private static final String ALIQUOT_QRY = "from " + Aliquot.class.getName()
+        + " where " + AliquotPeer.INVENTORY_ID.getName() + " = ?";
+
     /**
      * search in all aliquots list. No matter which site added it.
      */
     protected static AliquotWrapper getAliquot(
         WritableApplicationService appService, String inventoryId)
         throws ApplicationException, BiobankCheckException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Aliquot.class.getName() + " where inventoryId = ?",
+        HQLCriteria criteria = new HQLCriteria(ALIQUOT_QRY,
             Arrays.asList(new Object[] { inventoryId }));
         List<Aliquot> aliquots = appService.query(criteria);
         if (aliquots == null || aliquots.size() == 0)
@@ -495,14 +491,21 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return aliquot;
     }
 
+    private static final String ALIQUOTS_NON_ACTIVE_QRY = "from "
+        + Aliquot.class.getName()
+        + " a where a."
+        + Property.concatNames(AliquotPeer.PATIENT_VISIT,
+            PatientVisitPeer.SHIPMENT_PATIENT, ShipmentPatientPeer.SHIPMENT,
+            ShipmentPeer.SITE, SitePeer.ID)
+        + " = ? and "
+        + Property.concatNames(AliquotPeer.ACTIVITY_STATUS,
+            ActivityStatusPeer.NAME) + " != ?";
+
     // FIXME : do we want this search to be specific to a site ?
-    public static List<AliquotWrapper> getAliquotsNonActive(
+    public static List<AliquotWrapper> getAliquotsNonActiveInSite(
         WritableApplicationService appService, SiteWrapper site)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Aliquot.class.getName()
-                + " a where a.patientVisit.shipmentPatient.shipment.site.id = ? and activityStatus.name != ?",
+        HQLCriteria criteria = new HQLCriteria(ALIQUOTS_NON_ACTIVE_QRY,
             Arrays.asList(new Object[] { site.getId(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Aliquot> aliquots = appService.query(criteria);

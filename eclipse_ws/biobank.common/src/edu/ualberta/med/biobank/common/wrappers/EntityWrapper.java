@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.EntityPeer;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
@@ -136,12 +135,4 @@ public class EntityWrapper extends ModelWrapper<Entity> {
         return Entity.class;
     }
 
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-    }
-
-    @Override
-    protected void deleteChecks() throws Exception {
-    }
 }

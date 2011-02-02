@@ -12,6 +12,8 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.Predicate;
@@ -141,21 +143,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
+    protected void persistChecks() throws BiobankException,
         ApplicationException {
-        if (getAddress() == null) {
-            throw new BiobankCheckException("the site does not have an address");
-        }
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the site does not have an activity status");
-        }
-        checkNotEmpty(getName(), "Name");
-        checkNoDuplicates(Site.class, "name", getName(), "A site with name \""
-            + getName() + "\" already exists.");
-        checkNotEmpty(getNameShort(), "Short Name");
-        checkNoDuplicates(Site.class, "nameShort", getNameShort(),
-            "A site with short name \"" + getNameShort() + "\" already exists.");
+        checkNoDuplicates(Site.class, SitePeer.NAME.getName(), getName(),
+            "A site with name");
+        checkNoDuplicates(Site.class, SitePeer.NAME_SHORT.getName(),
+            getNameShort(), "A site with name short");
     }
 
     @Override
@@ -345,13 +338,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
      * @throws BiobankCheckException
      */
     public Long getShipmentCount() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         HQLCriteria criteria = new HQLCriteria("select count(*) from "
             + Shipment.class.getName() + " where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -365,7 +358,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -379,7 +372,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -394,7 +387,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -471,9 +464,9 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
-        throws WrapperException {
+        throws BiobankException {
         if (study == null) {
-            throw new WrapperException("study is null");
+            throw new BiobankException("study is null");
         }
         Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
         if (srcMap == null)
