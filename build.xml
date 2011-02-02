@@ -801,7 +801,7 @@
   </target>
 
   <target name="clean"
-          depends="tests-clean,clean-jars, clean-caCore"
+          depends="clean-tests,clean-jars, clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
@@ -827,11 +827,11 @@
     <pathelement location="${test.build.dir}" />
   </path>
 
-  <target name="tests-clean-results">
+  <target name="clean-tests-results">
     <delete dir="${test.output}" />
   </target>
 
-  <target name="tests-clean" depends="tests-clean-results">
+  <target name="clean-tests" depends="clean-tests-results">
     <delete dir="${test.build.dir}" />
   </target>
 
