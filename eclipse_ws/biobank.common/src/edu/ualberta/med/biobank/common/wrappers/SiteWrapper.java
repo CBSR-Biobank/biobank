@@ -270,15 +270,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
         propertiesMap.put("topContainerCollection", null);
     }
 
-    public List<SourceWrapper> getSourceCollection(boolean sort) {
-        return getWrapperCollection(CenterPeer.SOURCE_COLLECTION,
-            SourceWrapper.class, sort);
-    }
-
-    public List<SourceWrapper> getSourceCollection() {
-        return getSourceCollection(true);
-    }
-
     @Override
     public int compareTo(ModelWrapper<Site> wrapper) {
         if (wrapper instanceof SiteWrapper) {
@@ -391,120 +382,13 @@ public class SiteWrapper extends CenterWrapper<Site> {
         removedDispatchInfoWrapper.clear();
     }
 
-    public List<StudyWrapper> getDispatchStudiesAsSender() {
-        Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
-        if (srcMap == null)
-            return null;
-        List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
-        for (DispatchInfoWrapper diw : srcMap.values()) {
-            wrappers.add(diw.getStudy());
-        }
-        return wrappers;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<StudyWrapper> getDispatchStudiesAsReceiver() {
-        List<StudyWrapper> studies = (List<StudyWrapper>) propertiesMap
-            .get("dispatchStudiesAsReceiver");
-        if (studies == null) {
-            Collection<DispatchInfo> children = wrappedObject
-                .getDestDispatchInfoCollection();
-            if (children != null) {
-                studies = new ArrayList<StudyWrapper>();
-                for (DispatchInfo di : children) {
-                    studies.add(new StudyWrapper(appService, di.getStudy()));
-                }
-                propertiesMap.put("dispatchStudiesAsReceiver", studies);
-            }
-        }
-        return studies;
-    }
-
-    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
-        throws BiobankException {
-        if (study == null) {
-            throw new BiobankException("study is null");
-        }
-        Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
-        if (srcMap == null)
-            return null;
-        DispatchInfoWrapper info = srcMap.get(study.getId());
-        if (info == null)
-            return null;
-        return info.getDestSiteCollection();
-    }
-
-    public void addStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> sites) throws BiobankCheckException {
-        if ((sites == null) || (sites.size() == 0))
-            return;
-        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
-        DispatchInfoWrapper diw = null;
-        if (infos != null) {
-            diw = infos.get(study.getId());
-        }
-        if (diw == null) {
-            List<StudyWrapper> studies = getStudyCollection();
-            if (studies == null || !studies.contains(study)) {
-                throw new BiobankCheckException("Site " + getNameShort()
-                    + " cannot dispatch aliquots from study "
-                    + study.getNameShort()
-                    + ": this study is not part of its current studies list.");
-            }
-            diw = new DispatchInfoWrapper(appService);
-            diw.setStudy(study);
-            diw.setSrcSite(this);
-            if (infos != null) {
-                infos.put(study.getId(), diw);
-            }
-            Collection<DispatchInfo> allsInfoObjects = wrappedObject
-                .getSrcDispatchInfoCollection();
-            if (allsInfoObjects == null) {
-                allsInfoObjects = new HashSet<DispatchInfo>();
-            } else {
-                allsInfoObjects = new HashSet<DispatchInfo>(allsInfoObjects);
-            }
-            allsInfoObjects.add(diw.wrappedObject);
-            wrappedObject.setSrcDispatchInfoCollection(allsInfoObjects);
-        }
-        diw.addDestSites(sites);
-    }
-
-    public void removeStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> sites) {
-        if ((sites == null) || (sites.size() == 0))
-            return;
-        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
-        if (infos != null) {
-            DispatchInfoWrapper diw = infos.get(study.getId());
-            if (diw != null) {
-                diw.removeDestSites(sites);
-                if (diw.getDestSiteCollection().size() == 0) {
-                    infos.remove(study.getId());
-                    removedDispatchInfoWrapper.add(diw);
-                    Collection<DispatchInfo> diList = wrappedObject
-                        .getSrcDispatchInfoCollection();
-                    DispatchInfo diToRemove = null;
-                    for (DispatchInfo di : diList) {
-                        if (di.getId().equals(diw.getId())) {
-                            diToRemove = di;
-                            break;
-                        }
-                    }
-                    diList.remove(diToRemove);
-                    wrappedObject.setSrcDispatchInfoCollection(diList);
-                }
-            }
-        }
-    }
-
     public List<DispatchWrapper> getReceivedDispatchCollection() {
-        return getWrapperCollection(SitePeer.RECEIVED_DISPATCH_COLLECTION,
+        return getWrapperCollection(CenterPeer.DST_DISPATCH_COLLECTION,
             DispatchWrapper.class, false);
     }
 
     public List<DispatchWrapper> getSentDispatchCollection() {
-        return getWrapperCollection(SitePeer.SENT_DISPATCH_COLLECTION,
+        return getWrapperCollection(CenterPeer.SRC_DISPATCH_COLLECTION,
             DispatchWrapper.class, false);
     }
 
@@ -606,30 +490,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
             }
         }
         return shipCollection;
-    }
-
-    /**
-     * For one study, this site has one source dispatch info associated.
-     * 
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private Map<Integer, DispatchInfoWrapper> getSrcDispatchInfoCollection() {
-        Map<Integer, DispatchInfoWrapper> infos = (Map<Integer, DispatchInfoWrapper>) propertiesMap
-            .get("srcDispatchInfoCollection");
-        if (infos == null) {
-            Collection<DispatchInfo> children = wrappedObject
-                .getSrcDispatchInfoCollection(false);
-            if (children != null) {
-                infos = new HashMap<Integer, DispatchInfoWrapper>();
-                for (DispatchInfo di : children) {
-                    Integer studyId = di.getStudy().getId();
-                    infos.put(studyId, new DispatchInfoWrapper(appService, di));
-                }
-                propertiesMap.put("srcDispatchInfoCollection", infos);
-            }
-        }
-        return infos;
     }
 
     public Set<ClinicWrapper> getWorkingClinicCollection() {

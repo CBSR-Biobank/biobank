@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -14,23 +13,17 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
-import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentPatientPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
-import edu.ualberta.med.biobank.common.util.DateCompare;
+import edu.ualberta.med.biobank.common.peer.SourcePeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Address;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ClinicWrapper extends ModelWrapper<Clinic> {
+public class ClinicWrapper extends CenterWrapper<Clinic> {
 
     private Set<ContactWrapper> deletedContacts = new HashSet<ContactWrapper>();
     private AddressWrapper address;
@@ -49,94 +42,8 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return ClinicPeer.PROP_NAMES;
     }
 
-    private AddressWrapper getAddress() {
-        if (address == null) {
-            Address a = wrappedObject.getAddress();
-            if (a == null)
-                return null;
-            address = new AddressWrapper(appService, a);
-        }
-        return address;
-    }
-
     private void setAddress(Address address) {
-        if (address == null)
-            this.address = null;
-        else
-            this.address = new AddressWrapper(appService, address);
-        Address oldAddress = wrappedObject.getAddress();
-        wrappedObject.setAddress(address);
-        propertyChangeSupport
-            .firePropertyChange("address", oldAddress, address);
-    }
-
-    public String getName() {
-        return wrappedObject.getName();
-    }
-
-    public void setName(String name) {
-        String oldName = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
-    }
-
-    public String getNameShort() {
-        return wrappedObject.getNameShort();
-    }
-
-    public void setNameShort(String nameShort) {
-        String oldNameShort = getNameShort();
-        wrappedObject.setNameShort(nameShort);
-        propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
-            nameShort);
-    }
-
-    public void setSendsShipments(Boolean sendsShipments) {
-        Boolean oldSendsShipments = wrappedObject.getSendsShipments();
-        wrappedObject.setSendsShipments(sendsShipments);
-        propertyChangeSupport.firePropertyChange("sendsShipments",
-            oldSendsShipments, sendsShipments);
-    }
-
-    public Boolean getSendsShipments() {
-        Boolean b = wrappedObject.getSendsShipments();
-        return b == null ? Boolean.FALSE : b;
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
-            .get("activityStatus");
-        if (activityStatus == null) {
-            ActivityStatus a = wrappedObject.getActivityStatus();
-            if (a == null)
-                return null;
-            activityStatus = new ActivityStatusWrapper(appService, a);
-            propertiesMap.put("activityStatus", activityStatus);
-        }
-        return activityStatus;
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        propertiesMap.put("activityStatus", activityStatus);
-        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        ActivityStatus rawObject = null;
-        if (activityStatus != null) {
-            rawObject = activityStatus.getWrappedObject();
-        }
-        wrappedObject.setActivityStatus(rawObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
-    }
-
-    public String getComment() {
-        return wrappedObject.getComment();
-    }
-
-    public void setComment(String comment) {
-        String oldComment = getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
+        setProperty(ClinicPeer.ADDRESS, address);
     }
 
     @Deprecated
@@ -365,7 +272,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (getShipmentCount() > 0) {
+        if (getSourceCount() > 0) {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName() + ". All defined shipments must be removed first.");
         }
@@ -374,113 +281,6 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName() + ". No more study reference should exist.");
         }
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<ShipmentWrapper> getShipmentCollection() {
-        List<ShipmentWrapper> shipmentCollection = (List<ShipmentWrapper>) propertiesMap
-            .get("shipmentCollection");
-        if (shipmentCollection == null) {
-            Collection<Shipment> children = wrappedObject
-                .getShipmentCollection();
-            if (children != null) {
-                shipmentCollection = new ArrayList<ShipmentWrapper>();
-                for (Shipment s : children) {
-                    shipmentCollection.add(new ShipmentWrapper(appService, s));
-                }
-                propertiesMap.put("shipmentCollection", shipmentCollection);
-            } else
-                return new ArrayList<ShipmentWrapper>();
-        }
-        return shipmentCollection;
-    }
-
-    public long getShipmentCount() throws ApplicationException,
-        BiobankException {
-        return getShipmentCount(false);
-    }
-
-    public static final String SHIPMENT_COUNT_QRY = "select count(shipment) from "
-        + Shipment.class.getName()
-        + " as shipment where "
-        + Property.concatNames(ShipmentPeer.CLINIC, ClinicPeer.ID) + " = ?";
-
-    /**
-     * fast = true will execute a hql query. fast = false will call the
-     * getShipmentCollection().size method
-     */
-    public long getShipmentCount(boolean fast) throws ApplicationException,
-        BiobankException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SHIPMENT_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            List<Long> results = appService.query(criteria);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            return results.get(0);
-        }
-        List<ShipmentWrapper> list = getShipmentCollection();
-        if (list == null) {
-            return 0;
-        }
-        return list.size();
-    }
-
-    public void addShipments(Collection<ShipmentWrapper> newShipments) {
-        if (newShipments != null && newShipments.size() > 0) {
-            Collection<Shipment> allShipmentObjects = new HashSet<Shipment>();
-            List<ShipmentWrapper> allShipmentWrappers = new ArrayList<ShipmentWrapper>();
-            // already added shipments
-            List<ShipmentWrapper> currentList = getShipmentCollection();
-            if (currentList != null) {
-                for (ShipmentWrapper ship : currentList) {
-                    allShipmentObjects.add(ship.getWrappedObject());
-                    allShipmentWrappers.add(ship);
-                }
-            }
-            for (ShipmentWrapper ship : newShipments) {
-                allShipmentObjects.add(ship.getWrappedObject());
-                allShipmentWrappers.add(ship);
-            }
-            Collection<Shipment> oldCollection = wrappedObject
-                .getShipmentCollection();
-            wrappedObject.setShipmentCollection(allShipmentObjects);
-            propertyChangeSupport.firePropertyChange("shipmentCollection",
-                oldCollection, allShipmentObjects);
-            propertiesMap.put("shipmentCollection", allShipmentWrappers);
-        }
-    }
-
-    /**
-     * Search for a shipment in the clinic with the given date received
-     */
-    public ShipmentWrapper getShipment(Date dateReceived) {
-        List<ShipmentWrapper> shipments = getShipmentCollection();
-        if (shipments != null) {
-            for (ShipmentWrapper ship : shipments) {
-                if (DateCompare.compare(ship.getDateReceived(), dateReceived) == 0)
-                    return ship;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Search for a shipment in the clinic with the given date received and
-     * patient number.
-     */
-    public ShipmentWrapper getShipment(Date dateReceived, String patientNumber) {
-        List<ShipmentWrapper> shipments = getShipmentCollection();
-        if (shipments != null)
-            for (ShipmentWrapper ship : shipments)
-                if (DateCompare.compare(ship.getDateReceived(), dateReceived) == 0) {
-                    List<PatientWrapper> patients = ship.getPatientCollection();
-                    for (PatientWrapper p : patients)
-                        if (p.getPnumber().equals(patientNumber))
-                            return ship;
-                }
-        return null;
     }
 
     @Override
@@ -494,18 +294,14 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
         return 0;
     }
 
-    @Override
-    public String toString() {
-        return getName();
-    }
-
-    public static final String PATIENT_COUNT_QRY = "select count(distinct csps.patient) from "
+    public static final String PATIENT_COUNT_QRY = "select count(distinct svs.patient) from "
         + Clinic.class.getName()
         + " as clinic join clinic."
-        + ClinicPeer.SHIPMENT_COLLECTION.getName()
+        + ClinicPeer.SOURCE_COLLECTION.getName()
         + " as shipments join shipments."
-        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as csps where clinic." + ClinicPeer.ID.getName() + " = ?";
+        + SourcePeer.SOURCE_VESSEL_COLLECTION.getName()
+        + " as svs"
+        + " where clinic." + ClinicPeer.ID.getName() + " = ?";
 
     /**
      * fast = true will execute a hql query. fast = false will call the
@@ -526,47 +322,17 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
             return results.get(0);
         }
         HashSet<PatientWrapper> uniquePatients = new HashSet<PatientWrapper>();
-        List<ShipmentWrapper> ships = getShipmentCollection();
+        List<SourceWrapper> ships = getSourceCollection();
         if (ships != null)
-            for (ShipmentWrapper ship : ships) {
-                if (ship.getPatientCollection() != null)
-                    uniquePatients.addAll(ship.getPatientCollection());
+            for (SourceWrapper ship : ships) {
+                if (ship.getPatientCollection() != null) {
+                    Collection<SourceVesselWrapper> svCollection = ship
+                        .getSourceVessels();
+                    for (SourceVesselWrapper sv : svCollection)
+                        uniquePatients.addAll(sv.getPatient());
+                }
             }
         return uniquePatients.size();
-    }
-
-    public static final String VISIT_COLLECTION_QRY = "select distinct pv from "
-        + PatientVisit.class.getName()
-        + " as pv where pv."
-        + Property.concatNames(PatientVisitPeer.SHIPMENT_PATIENT,
-            ShipmentPatientPeer.SHIPMENT, ShipmentPeer.CLINIC, ClinicPeer.ID)
-        + " = ?";
-
-    @SuppressWarnings("unchecked")
-    public List<PatientVisitWrapper> getPatientVisitCollection()
-        throws ApplicationException {
-        List<PatientVisitWrapper> pvCollection = (List<PatientVisitWrapper>) propertiesMap
-            .get("patientVisitCollection");
-
-        if (pvCollection == null) {
-            pvCollection = new ArrayList<PatientVisitWrapper>();
-            HQLCriteria c = new HQLCriteria(VISIT_COLLECTION_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            List<PatientVisit> collection = appService.query(c);
-            for (PatientVisit pv : collection) {
-                pvCollection.add(new PatientVisitWrapper(appService, pv));
-            }
-            propertiesMap.put("patientVisitCollection", pvCollection);
-        }
-        return pvCollection;
-    }
-
-    public long getPatientVisitCount() throws ApplicationException {
-        List<PatientVisitWrapper> list = getPatientVisitCollection();
-        if (list == null) {
-            return 0;
-        }
-        return list.size();
     }
 
     public static List<ClinicWrapper> getAllClinics(
