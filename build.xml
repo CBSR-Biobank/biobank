@@ -70,10 +70,17 @@
     <equals arg1="${host.name}" arg2="cbsr.med.ualberta.ca"
             casesensitive="true" trim="true" />
   </condition>
+  <condition property="isHostCbsrTraining">
+    <equals arg1="${host.name}"
+            arg2="cbsr-training.med.ualberta.ca"
+            casesensitive="true"
+            trim="true" />
+  </condition>
   <condition property="isHostLocal">
     <and>
       <isfalse value="${isHostAicmlMed}" />
       <isfalse value="${isHostCbsr}" />
+      <isfalse value="${isHostCbsrTraining}" />
     </and>
   </condition>
   <condition property="cacore.sdk.tar.available">
@@ -314,6 +321,11 @@
           overwrite="true" />
   </target>
   <target name="hostCbsr" if="isHostCbsr">
+    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
+  <target name="hostCbsrTraining" if="isHostCbsrTraining">
     <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
