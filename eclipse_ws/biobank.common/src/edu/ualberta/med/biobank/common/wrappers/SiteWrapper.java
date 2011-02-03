@@ -11,15 +11,10 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-<<<<<<< HEAD
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
-=======
-import edu.ualberta.med.biobank.common.peer.AddressPeer;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
->>>>>>> 42f6ab11218151cf3468d590f0a81d68fcc5a868
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.Predicate;
@@ -29,7 +24,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Source;
 import edu.ualberta.med.biobank.model.Study;
@@ -277,7 +271,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
     }
 
     public List<SourceWrapper> getSourceCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.SOURCE_COLLECTION,
+        return getWrapperCollection(CenterPeer.SOURCE_COLLECTION,
             SourceWrapper.class, sort);
     }
 
