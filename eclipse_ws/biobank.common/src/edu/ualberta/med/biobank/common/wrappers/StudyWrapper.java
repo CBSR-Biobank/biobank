@@ -936,11 +936,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        checkNoDuplicates(Study.class, "name", getName(),
-            "A study with name \"" + getName() + "\" already exists.");
-        checkNoDuplicates(Study.class, "nameShort", getNameShort(),
-            "A study with short name \"" + getNameShort()
-                + "\" already exists.");
+        checkNoDuplicates(Study.class, StudyPeer.NAME.getName(), getName(),
+            "A study with name");
+        checkNoDuplicates(Study.class, StudyPeer.NAME_SHORT.getName(),
+            getNameShort(), "A study with short name");
     }
 
     @Override

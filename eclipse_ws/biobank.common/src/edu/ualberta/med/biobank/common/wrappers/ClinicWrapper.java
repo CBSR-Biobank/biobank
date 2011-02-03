@@ -233,9 +233,9 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Clinic.class, ClinicPeer.NAME.getName(), getName(),
-            ClinicPeer.NAME.getName());
+            "A clinic with name");
         checkNoDuplicates(Clinic.class, ClinicPeer.NAME_SHORT.getName(),
-            getNameShort(), ClinicPeer.NAME_SHORT.getName());
+            getNameShort(), "A clinic with name short");
     }
 
     @Override

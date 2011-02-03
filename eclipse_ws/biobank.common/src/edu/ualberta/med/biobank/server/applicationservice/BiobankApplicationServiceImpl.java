@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
-import edu.ualberta.med.biobank.common.exception.ExceptionUtils;
 import edu.ualberta.med.biobank.common.reports.QueryCommand;
 import edu.ualberta.med.biobank.common.reports.QueryHandle;
 import edu.ualberta.med.biobank.common.reports.QueryHandleRequest;
@@ -9,22 +8,18 @@ import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.server.logging.MessageGenerator;
 import edu.ualberta.med.biobank.server.query.BiobankSQLCriteria;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.impl.WritableApplicationServiceImpl;
 import gov.nih.nci.system.dao.Request;
 import gov.nih.nci.system.dao.Response;
-import gov.nih.nci.system.query.SDKQuery;
-import gov.nih.nci.system.query.SDKQueryResult;
 import gov.nih.nci.system.util.ClassCache;
 
 import java.util.List;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.hibernate.PropertyValueException;
 
 /**
  * Implementation of the BiobankApplicationService interface. This class will be
@@ -47,23 +42,6 @@ public class BiobankApplicationServiceImpl extends
     public <E> List<E> query(BiobankSQLCriteria sqlCriteria,
         String targetClassName) throws ApplicationException {
         return privateQuery(sqlCriteria, targetClassName);
-    }
-
-    @Override
-    public SDKQueryResult executeQuery(SDKQuery query)
-        throws ApplicationException {
-        try {
-            return super.executeQuery(query);
-        } catch (ApplicationException ae) {
-            Throwable cause = ExceptionUtils.findCauseInThrowable(ae,
-                PropertyValueException.class);
-            if (cause != null) {
-                PropertyValueException pve = (PropertyValueException) cause;
-                if (pve.getMessage().startsWith("not-null"))
-                    throw new ValueNotSetException(pve.getPropertyName(), ae);
-            }
-            throw ae;
-        }
     }
 
     @Override
