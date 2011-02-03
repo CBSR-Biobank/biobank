@@ -151,7 +151,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<R>, R> void addToWrapperCollection(
-        Property<? extends Collection<R>, E> property, List<W> newWrappers) {
+        Property<? extends Collection<R>, ? super E> property,
+        List<W> newWrappers) {
         if (newWrappers == null || newWrappers.size() == 0) {
             return;
         }
@@ -174,7 +175,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<R>, R> void removeFromWrapperCollection(
-        Property<? extends Collection<R>, E> property, List<W> wrappersToRemove) {
+        Property<? extends Collection<R>, ? super E> property,
+        List<W> wrappersToRemove) {
         if (wrappersToRemove == null || wrappersToRemove.size() == 0) {
             return;
         }

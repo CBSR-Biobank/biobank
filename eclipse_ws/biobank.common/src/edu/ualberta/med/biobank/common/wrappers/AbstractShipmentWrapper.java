@@ -8,7 +8,6 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.AbstractShipmentPeer;
 import edu.ualberta.med.biobank.model.AbstractShipment;
 import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -29,7 +28,7 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public Date getDeparted() {
-        return wrappedObject.getDeparted();
+        return getProperty(AbstractShipmentPeer.DEPARTED);
     }
 
     public String getFormattedDeparted() {
@@ -37,9 +36,7 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public void setDeparted(Date date) {
-        Date oldDate = getDeparted();
-        wrappedObject.setDeparted(date);
-        propertyChangeSupport.firePropertyChange("departed", oldDate, date);
+        setProperty(AbstractShipmentPeer.DEPARTED, date);
     }
 
     public Date getDateReceived() {
