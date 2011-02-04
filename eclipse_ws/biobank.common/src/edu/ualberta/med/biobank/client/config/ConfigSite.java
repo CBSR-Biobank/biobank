@@ -25,13 +25,13 @@ public class ConfigSite {
 
     public static SiteWrapper site = null;
 
-    private static Map<String, SampleTypeWrapper> sampleTypeMap;
+    private static Map<String, SampleTypeWrapper> sampleTypeMap = null;
 
     public static SiteWrapper getSite() {
         return site;
     }
 
-    public static void getSampleTypeMap(WritableApplicationService appService)
+    public static void populateSampleTypeMap(WritableApplicationService appService)
         throws Exception {
         if (sampleTypeMap != null)
             return;

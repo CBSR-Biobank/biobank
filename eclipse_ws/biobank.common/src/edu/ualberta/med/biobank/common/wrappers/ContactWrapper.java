@@ -199,10 +199,9 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     public static List<ContactWrapper> getAllContacts(
         WritableApplicationService appService) throws ApplicationException {
-        List<Contact> contacts = new ArrayList<Contact>();
         List<ContactWrapper> wrappers = new ArrayList<ContactWrapper>();
         HQLCriteria c = new HQLCriteria(ALL_CONTACTS_QRY);
-        contacts = appService.query(c);
+        List<Contact> contacts = appService.query(c);
         for (Contact contact : contacts) {
             wrappers.add(new ContactWrapper(appService, contact));
         }

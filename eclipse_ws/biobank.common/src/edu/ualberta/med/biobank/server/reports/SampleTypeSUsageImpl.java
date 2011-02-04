@@ -30,10 +30,10 @@ public class SampleTypeSUsageImpl extends AbstractReport {
     @Override
     public List<Object> executeQuery(WritableApplicationService appService)
         throws ApplicationException {
-        List<Object> results = new ArrayList<Object>();
         List<Object> parameters = report.getParams();
         HQLCriteria c1 = new HQLCriteria(QUERY1, parameters);
-        results = ((ListProxy) appService.query(c1)).getListChunk();
+        List<Object> results = ((ListProxy) appService.query(c1))
+            .getListChunk();
         HQLCriteria c2 = new HQLCriteria(QUERY2, parameters);
         results.addAll(specialPostProcess(appService.query(c2)));
         return results;

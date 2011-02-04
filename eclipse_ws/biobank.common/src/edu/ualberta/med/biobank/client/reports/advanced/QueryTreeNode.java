@@ -10,7 +10,7 @@ import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 
-public class QueryTreeNode extends Object {
+public class QueryTreeNode extends Object implements Cloneable {
     private HQLField nodeInfo;
     private List<HQLField> fieldData;
     private QueryTreeNode parent;
@@ -90,7 +90,8 @@ public class QueryTreeNode extends Object {
     }
 
     @Override
-    public QueryTreeNode clone() {
+    public QueryTreeNode clone() throws CloneNotSupportedException {
+        super.clone();
         QueryTreeNode node = new QueryTreeNode(new HQLField(this.getNodeInfo()));
         List<HQLField> fields = this.getFieldData();
         for (HQLField field : fields)
@@ -113,11 +114,12 @@ public class QueryTreeNode extends Object {
         XStream xStream = new XStream();
         xStream.alias("QueryTreeNode", QueryTreeNode.class);
         File file = new File(path);
-        file.mkdirs();
-        FileWriter fw = new FileWriter(file + "/" + name + ".xml");
+        if (file.mkdirs()) {
+            FileWriter fw = new FileWriter(file + "/" + name + ".xml");
 
-        fw.write(xStream.toXML(this));
-        fw.close();
+            fw.write(xStream.toXML(this));
+            fw.close();
+        }
     }
 
     public static QueryTreeNode getTreeFromFile(File file) throws IOException {

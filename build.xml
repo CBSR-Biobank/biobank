@@ -747,12 +747,17 @@
       <exclude name="**/TestReportsOnExistingData.java" />
       <exclude name="**/AllTests.java" />
     </fileset>
+	
+	  <condition property="sysprop.server" value="${server}" else="http://localhost:8080">
+	    <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+	  </condition>
 
   <target name="test" depends="tests-compile"
     description="executes test cases">
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
       <classpath refid="biobank.common.run.classpath" />
+    	<sysproperty key="server" value="http://localhost:8080"/>
       <formatter usefile="yes" type="xml" />
       <test name="${testcase}" todir="${test.output.raw}" if="testcase"/>
       <batchtest todir="${test.output.raw}" unless="testcase">

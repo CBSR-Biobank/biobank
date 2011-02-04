@@ -35,7 +35,7 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ";
 
-    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes;
+    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes = null;
 
     public ContainerLabelingSchemeWrapper(
         WritableApplicationService appService,
@@ -67,7 +67,7 @@ public class ContainerLabelingSchemeWrapper extends
         return wrappedObject.getName();
     }
 
-    public void setMaxRows(Integer maxRows) {
+    public final void setMaxRows(Integer maxRows) {
         Integer oldMaxRows = wrappedObject.getMaxRows();
         wrappedObject.setMaxRows(maxRows);
         propertyChangeSupport.firePropertyChange("name", oldMaxRows, maxRows);
