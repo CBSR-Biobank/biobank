@@ -153,10 +153,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public void addSampleStorage(List<SampleStorageWrapper> newSampleStorages) {
         addToWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION,
             newSampleStorages);
+
+        // make sure previously deleted ones, that have been re-added, are
+        // no longer deleted
+        deletedSampleStorages.removeAll(newSampleStorages);
     }
 
     public void removeSampleStorages(
         List<SampleStorageWrapper> sampleStoragesToRemove) {
+        deletedSampleStorages.addAll(sampleStoragesToRemove);
         removeFromWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION,
             sampleStoragesToRemove);
     }
@@ -210,10 +215,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
         List<StudySourceVesselWrapper> newStudySourceVessels) {
         addToWrapperCollection(StudyPeer.STUDY_SOURCE_VESSEL_COLLECTION,
             newStudySourceVessels);
+
+        // make sure previously deleted ones, that have been re-added, are
+        // no longer deleted
+        deletedStudySourceVessels.removeAll(newStudySourceVessels);
     }
 
     public void removeStudySourceVessels(
         List<StudySourceVesselWrapper> studySourceVesselsToDelete) {
+        deletedStudySourceVessels.addAll(studySourceVesselsToDelete);
         removeFromWrapperCollection(StudyPeer.STUDY_SOURCE_VESSEL_COLLECTION,
             studySourceVesselsToDelete);
     }
@@ -232,8 +242,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
 
-        for (StudyPvAttrWrapper studyPvAttr : getWrapperCollection(
-            StudyPeer.STUDY_PV_ATTR_COLLECTION, StudyPvAttrWrapper.class, false)) {
+        List<StudyPvAttrWrapper> pvAttrList = StudyPvAttrWrapper
+            .getStudyPvAttrCollection(this);
+
+        for (StudyPvAttrWrapper studyPvAttr : pvAttrList) {
             studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
         }
         return studyPvAttrMap;
@@ -483,7 +495,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void addPatients(List<PatientWrapper> newPatients) {
-        removeFromWrapperCollection(StudyPeer.PATIENT_COLLECTION, newPatients);
+        addToWrapperCollection(StudyPeer.PATIENT_COLLECTION, newPatients);
     }
 
     public List<DispatchInfoWrapper> getDispatchInfoCollection() {

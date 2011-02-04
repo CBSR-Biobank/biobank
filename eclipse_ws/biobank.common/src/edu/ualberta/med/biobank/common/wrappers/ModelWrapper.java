@@ -82,7 +82,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public <W extends ModelWrapper<R>, R, M> void setWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, M> property, W wrapper) {
-        R newValue = wrapper.getWrappedObject();
+        R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
         setProperty(modelWrapper, property, newValue);
         cache(property, wrapper);
     }
