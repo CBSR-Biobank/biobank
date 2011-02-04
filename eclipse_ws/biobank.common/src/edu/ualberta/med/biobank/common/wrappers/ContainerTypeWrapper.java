@@ -731,7 +731,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    public SiteWrapper getSiteLinkedToObject() {
+    public SiteWrapper getCenterLinkedToObject() {
         return getSite();
     }
 
