@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Source;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -165,14 +164,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return getRequestCollection(RequestState.APPROVED);
     }
 
-    public List<RequestWrapper> getAcceptedRequestCollection() {
-        return getRequestCollection(RequestState.ACCEPTED);
-    }
-
-    public List<RequestWrapper> getFilledRequestCollection() {
-        return getRequestCollection(RequestState.FILLED);
-    }
-
     public List<RequestWrapper> getShippedRequestCollection() {
         return getRequestCollection(RequestState.SHIPPED);
     }
@@ -279,22 +270,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
                 : -1));
         }
         return 0;
-    }
-
-    /**
-     * Search for shipments in the site with the given waybill
-     * 
-     * @throws BiobankCheckException
-     */
-    public Long getSourceCount() throws ApplicationException, BiobankException {
-        HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + Source.class.getName() + " where site.id = ?",
-            Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
     }
 
     public Long getPatientCount() throws Exception {
