@@ -75,7 +75,7 @@
   </condition>
   <condition property="isHostCbsrTraining">
     <equals arg1="${host.name}"
-            arg2="cbsr-training.med.ualberta.ca"
+            arg2="cbsr-training"
             casesensitive="true"
             trim="true" />
   </condition>
@@ -438,7 +438,7 @@
           message="JBOSS_HOME environment variable not defined" />
   </target>
   <target name="deploy-jboss"
-          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostLocal,server-manifest"
+          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -866,23 +866,6 @@
       <classpath refid="biobank.common.build.classpath" />
     </javac>
   </target>
-<<<<<<< HEAD
-	
-    <fileset id="testcase.files" dir="${eclipse.proj.dir.junit}/src">
-      <include name="**/Test*.java" />
-      <exclude name="**/speed/**" />
-      <exclude name="**/TestCommon.java" />
-      <exclude name="**/TestDatabase.java" />
-      <exclude name="**/TestFunctionalities.java" />
-      <exclude name="**/TestReportsOnExistingData.java" />
-      <exclude name="**/AllTests.java" />
-    </fileset>
-	
-	  <condition property="sysprop.server" value="${server}" else="http://localhost:8080">
-	    <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
-	  </condition>
-=======
->>>>>>> 99951b52ce06977ab1512a53791dd278734ae25a
 
   <fileset id="testcase.files" dir="${eclipse.proj.dir.junit}/src">
     <include name="**/Test*.java" />
