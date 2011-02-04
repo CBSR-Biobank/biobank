@@ -27,7 +27,7 @@
 		<property name="interfaces" value="@SERVICE_INTERFACE@" />
 		<property name="interceptorNames">
 			<list>
-				<idref local="exceptionHandler" />
+				<idref local="ExceptionInterceptor" />
 				<idref local="Interceptor" />
 				<idref bean="TxInterceptor" />
 				@ENABLE_CLM_LOGGER_CFG_GENERATION_START@<idref bean="CLMInterceptor" />@ENABLE_CLM_LOGGER_CFG_GENERATION_END@
@@ -35,6 +35,6 @@
 		</property>		
 	</bean>
 
-	<bean id="exceptionHandler" class="edu.ualberta.med.biobank.server.validator.ValidationExceptionInterceptor"/>
+	<bean id="ExceptionInterceptor" class="edu.ualberta.med.biobank.server.interceptor.ExceptionInterceptor"/>
 
 </beans>

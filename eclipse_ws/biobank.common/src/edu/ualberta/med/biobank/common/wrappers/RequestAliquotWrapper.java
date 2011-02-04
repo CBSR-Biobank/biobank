@@ -2,13 +2,11 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.RequestAliquotPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestAliquot;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class RequestAliquotWrapper extends ModelWrapper<RequestAliquot> {
@@ -30,17 +28,6 @@ public class RequestAliquotWrapper extends ModelWrapper<RequestAliquot> {
     @Override
     public Class<RequestAliquot> getWrappedClass() {
         return RequestAliquot.class;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
-
-    }
-
-    @Override
-    protected void deleteChecks() throws Exception {
-
     }
 
     public AliquotWrapper getAliquot() {

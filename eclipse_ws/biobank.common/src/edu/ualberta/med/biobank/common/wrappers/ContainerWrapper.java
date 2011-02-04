@@ -9,6 +9,9 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -86,19 +89,13 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
+    protected void persistChecks() throws BiobankException,
         ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the container does not have an activity status");
-        }
-        checkContainerTypeNotNull();
-        checkSiteNotNull();
         checkLabelUniqueForType();
-        checkNoDuplicatesInSite(Container.class, "productBarcode",
-            getProductBarcode(), getSite().getId(),
-            "A container with product barcode \"" + getProductBarcode()
-                + "\" already exists.");
+        checkNoDuplicatesInSite(Container.class,
+            ContainerPeer.PRODUCT_BARCODE.getName(), getProductBarcode(),
+            getSite().getId(), "A container with product barcode \""
+                + getProductBarcode() + "\" already exists.");
         checkTopAndParent();
         checkParentAcceptContainerType();
         checkContainerTypeSameSite();
@@ -111,12 +108,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         if (getParent() != null && !getParent().getSite().equals(getSite())) {
             throw new BiobankCheckException(
                 "Parent should be part of the same site");
-        }
-    }
-
-    private void checkContainerTypeNotNull() throws BiobankCheckException {
-        if (getContainerType() == null) {
-            throw new BiobankCheckException("This container type should be set");
         }
     }
 
@@ -268,7 +259,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         containerPath.persist();
     }
 
-    private void checkLabelUniqueForType() throws BiobankCheckException,
+    private void checkLabelUniqueForType() throws BiobankException,
         ApplicationException {
         String notSameContainer = "";
         List<Object> parameters = new ArrayList<Object>(
@@ -278,21 +269,16 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             notSameContainer = " and id <> ?";
             parameters.add(getId());
         }
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where site.id=? and label=? "
+        HQLCriteria criteria = new HQLCriteria("select count(c) from "
+            + Container.class.getName() + " as c where site.id=? and label=? "
             + "and containerType=?" + notSameContainer, parameters);
-        List<Object> results = appService.query(criteria);
-        if (results.size() > 0) {
-            throw new BiobankCheckException("A container with label \""
+        List<Long> results = appService.query(criteria);
+        if (results.size() != 1)
+            throw new BiobankQueryResultSizeException();
+        if (results.get(0) > 0) {
+            throw new DuplicateEntryException("A container with label \""
                 + getLabel() + "\" and type \"" + getContainerType().getName()
                 + "\" already exists.");
-        }
-    }
-
-    private void checkSiteNotNull() throws BiobankCheckException {
-        if (getSite() == null) {
-            throw new BiobankCheckException(
-                "This container should be associated to a site");
         }
     }
 
@@ -552,7 +538,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @SuppressWarnings("unchecked")
-    public long getChildCount(boolean fast) throws BiobankCheckException,
+    public long getChildCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria("select count(pos) from "
@@ -561,8 +547,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             return results.get(0);
         }
@@ -720,7 +705,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public boolean canHoldAliquot(AliquotWrapper aliquot) throws Exception {
         SampleTypeWrapper type = aliquot.getSampleType();
         if (type == null) {
-            throw new WrapperException("sample type is null");
+            throw new BiobankCheckException("sample type is null");
         }
         return getContainerType().getSampleTypeCollection().contains(type);
     }
@@ -1090,7 +1075,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
      * @throws ApplicationException
      * @throws BiobankCheckException
      */
-    public boolean isContainerFull() throws BiobankCheckException,
+    public boolean isContainerFull() throws BiobankException,
         ApplicationException {
         return (this.getChildCount(true) == this.getContainerType()
             .getRowCapacity() * this.getContainerType().getColCapacity());

@@ -10,7 +10,6 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AddressWrapper extends ModelWrapper<Address> {
-
     public AddressWrapper(WritableApplicationService appService,
         Address wrappedObject) {
         super(appService, wrappedObject);
@@ -82,12 +81,6 @@ public class AddressWrapper extends ModelWrapper<Address> {
     @Override
     protected List<String> getPropertyChangeNames() {
         return AddressPeer.PROP_NAMES;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-        // no checks required for address
     }
 
     @Override

@@ -14,6 +14,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -249,7 +250,7 @@ public class TestPatient extends TestDatabase {
             patient2.persist();
             Assert
                 .fail("should not be allowed to add patient because of duplicate name");
-        } catch (BiobankCheckException e) {
+        } catch (DuplicateEntryException e) {
             Assert.assertTrue(true);
         }
     }

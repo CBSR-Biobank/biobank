@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.AliquotPeer;
@@ -102,22 +103,11 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
+    protected void persistChecks() throws BiobankException,
         ApplicationException {
-        if (getActivityStatus() == null) {
-            throw new BiobankCheckException(
-                "the aliquot does not have an activity status");
-        }
-        checkPatientVisitNotNull();
         checkInventoryIdUnique();
         checkParentAcceptSampleType();
         objectWithPositionManagement.persistChecks();
-    }
-
-    private void checkPatientVisitNotNull() throws BiobankCheckException {
-        if (getPatientVisit() == null) {
-            throw new BiobankCheckException("patient visit should be set");
-        }
     }
 
     public String getInventoryId() {
@@ -131,21 +121,10 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             inventoryId);
     }
 
-    public void checkInventoryIdUnique() throws BiobankCheckException,
+    public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
-        AliquotWrapper existingAliquot = getAliquot(appService,
-            getInventoryId());
-        boolean alreadyExists = false;
-        if (existingAliquot != null && isNew()) {
-            alreadyExists = true;
-        } else if (existingAliquot != null
-            && !existingAliquot.getId().equals(getId())) {
-            alreadyExists = true;
-        }
-        if (alreadyExists) {
-            throw new BiobankCheckException("An aliquot with inventory id \""
-                + getInventoryId() + "\" already exists.");
-        }
+        checkNoDuplicates(Aliquot.class, AliquotPeer.INVENTORY_ID.getName(),
+            getInventoryId(), "An aliquot with inventoryId");
     }
 
     private void checkParentAcceptSampleType() throws BiobankCheckException {

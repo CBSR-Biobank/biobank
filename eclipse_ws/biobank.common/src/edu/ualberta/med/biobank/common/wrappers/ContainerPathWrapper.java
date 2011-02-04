@@ -23,10 +23,6 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
-    }
-
-    @Override
     protected List<String> getPropertyChangeNames() {
         return ContainerPathPeer.PROP_NAMES;
     }
@@ -101,7 +97,6 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
         if (container == null) {
             throw new BiobankCheckException("container is null");
         }
-
         if (container.isNew()) {
             throw new BiobankCheckException("container is not in database");
         }

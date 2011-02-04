@@ -9,8 +9,8 @@ import org.apache.log4j.Layout;
 import org.apache.log4j.spi.LoggingEvent;
 
 import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.server.logging.user.BiobankThreadVariable;
-import edu.ualberta.med.biobank.server.logging.user.UserInfo;
+import edu.ualberta.med.biobank.server.BiobankThreadVariable;
+import edu.ualberta.med.biobank.server.LocalInfo;
 
 /**
  * A custom Apache Log4J Appender will be responsible for formatting and
@@ -50,9 +50,9 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
 
     @Override
     public void append(LoggingEvent le) {
-        UserInfo userInfo = BiobankThreadVariable.get();
+        LocalInfo userInfo = BiobankThreadVariable.get();
         if (null == userInfo) {
-            userInfo = new UserInfo();
+            userInfo = new LocalInfo();
         }
 
         // Determine Log Type

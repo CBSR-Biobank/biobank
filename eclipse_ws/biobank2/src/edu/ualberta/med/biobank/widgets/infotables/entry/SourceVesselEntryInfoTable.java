@@ -12,6 +12,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.dialogs.SourceVesselDialog;
@@ -174,7 +175,7 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
                     throw new BiobankCheckException(
                         "That source vessel has already been added.");
             type.checkUnique();
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankException bce) {
             BioBankPlugin.openAsyncError("Check error", bce);
             return false;
         } catch (ApplicationException e) {

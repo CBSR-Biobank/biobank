@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.ClassUtils;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -261,7 +262,7 @@ public class TestActivityStatus extends TestDatabase {
             newAs.persist();
             Assert.fail("Cannot have 2 statuses with same name");
             addedstatus.add(newAs);
-        } catch (BiobankCheckException bce) {
+        } catch (DuplicateEntryException dee) {
             Assert.assertTrue(true);
         }
     }

@@ -13,6 +13,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -30,6 +31,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
@@ -116,12 +118,48 @@ public class TestAliquot extends TestDatabase {
         try {
             pAliquot.persist();
             Assert.fail("Should not insert the aliquot : no activity status");
-        } catch (BiobankCheckException bce) {
+        } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
         pAliquot.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
         pAliquot.persist();
+    }
+
+    @Test
+    public void testCheckInventoryIdUnique() throws BiobankCheckException,
+        Exception {
+        aliquot.persist();
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), aliquot.getParent(),
+            aliquot.getPatientVisit(), 2, 2);
+
+        duplicate.setInventoryId(aliquot.getInventoryId());
+        try {
+            duplicate.checkInventoryIdUnique();
+            Assert.fail("The check should detect that this is the same");
+        } catch (DuplicateEntryException e) {
+            Assert.assertTrue(true);
+        }
+    }
+
+    @Test
+    public void testCheckInventoryIdUniqueCaseSensitive()
+        throws BiobankCheckException, Exception {
+        int i = r.nextInt();
+        aliquot.setInventoryId("toto" + i);
+        aliquot.persist();
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), aliquot.getParent(),
+            aliquot.getPatientVisit(), 2, 2);
+
+        duplicate.setInventoryId("TOTO" + i);
+        try {
+            duplicate.checkInventoryIdUnique();
+            Assert.assertTrue(true);
+        } catch (BiobankCheckException bce) {
+            Assert.fail("InventoryId is case sensitive. Should not fail");
+        }
     }
 
     @Test
@@ -137,7 +175,7 @@ public class TestAliquot extends TestDatabase {
         try {
             duplicate.persist();
             Assert.fail("same inventory id !");
-        } catch (BiobankCheckException bce) {
+        } catch (DuplicateEntryException dee) {
             Assert.assertTrue(true);
         }
 
@@ -149,9 +187,32 @@ public class TestAliquot extends TestDatabase {
             duplicate.persist();
             Assert
                 .fail("still can't save it with  the same inventoryId after a first add with anotehr inventoryId!");
-        } catch (BiobankCheckException bce) {
+        } catch (DuplicateEntryException dee) {
             Assert.assertTrue(true);
         }
+    }
+
+    @Test
+    public void testPersistCheckInventoryIdUniqueCaseSensitive()
+        throws BiobankCheckException, Exception {
+        int i = r.nextInt();
+        aliquot.setInventoryId("toto" + i);
+        aliquot.persist();
+
+        AliquotWrapper duplicate = AliquotHelper.newAliquot(
+            aliquot.getSampleType(), aliquot.getParent(),
+            aliquot.getPatientVisit(), 2, 2);
+        duplicate.setInventoryId("toto" + i);
+
+        try {
+            duplicate.persist();
+            Assert.fail("same inventory id !");
+        } catch (DuplicateEntryException dee) {
+            Assert.assertTrue(true);
+        }
+
+        duplicate.setInventoryId("TOTO" + r.nextInt());
+        duplicate.persist();
     }
 
     @Test
@@ -215,7 +276,7 @@ public class TestAliquot extends TestDatabase {
         try {
             aliquot.persist();
             Assert.fail("Patient visit should be set!");
-        } catch (BiobankCheckException bce) {
+        } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
         }
     }

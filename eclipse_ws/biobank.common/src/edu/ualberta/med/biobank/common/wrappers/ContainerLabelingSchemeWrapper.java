@@ -115,10 +115,6 @@ public class ContainerLabelingSchemeWrapper extends
         }
     }
 
-    @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException {
-    }
 
     private static final String HAS_CONTAINER_TYPES_QRY = "from "
         + ContainerType.class.getName() + " where "
@@ -222,9 +218,10 @@ public class ContainerLabelingSchemeWrapper extends
      * Check labeling scheme limits for a given gridsize
      **/
     public static boolean checkBounds(WritableApplicationService appService,
-        Integer labelingScheme, int totalRows, int totalCols) {
+        Integer labelingScheme, Integer totalRows, Integer totalCols) {
 
-        if (totalRows <= 0 || totalCols <= 0) {
+        if (totalRows == null || totalRows <= 0 || totalCols == null
+            || totalCols <= 0) {
             return false;
         }
 
