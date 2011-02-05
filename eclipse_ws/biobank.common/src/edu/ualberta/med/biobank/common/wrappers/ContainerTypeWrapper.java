@@ -7,14 +7,20 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import org.apache.commons.lang.StringUtils;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.AliquotPeer;
+import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
+import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
@@ -82,28 +88,28 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
+    private static final String DELETED_SAMPLE_TYPES_QRY = "from "
+        + AliquotPosition.class.getName()
+        + " as ap inner join ap."
+        + AliquotPositionPeer.CONTAINER.getName()
+        + " as aparent where aparent."
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.ID)
+        + "=? and ap."
+        + Property.concatNames(AliquotPositionPeer.ALIQUOT,
+            AliquotPeer.SAMPLE_TYPE, SampleTypePeer.ID) + " in (";
+
     private void checkDeletedSampleTypes() throws ApplicationException,
         BiobankCheckException {
         if (deletedSampleTypes.size() > 0) {
-            String queryString = "from " + AliquotPosition.class.getName()
-                + " as sp inner join sp.container as sparent"
-                + " where sparent.containerType.id=? and "
-                + "sp.aliquot.sampleType.id in (select id from "
-                + SampleType.class.getName() + " as st where";
-            List<Object> params = new ArrayList<Object>();
-            params.add(getId());
-            int i = 0;
+            List<Integer> ids = new ArrayList<Integer>();
             for (SampleTypeWrapper type : deletedSampleTypes) {
-                if (i != 0) {
-                    queryString += " OR";
-                }
-                queryString += " st.id=?";
-                params.add(type.getId());
-                i++;
+                ids.add(type.getId());
             }
-            queryString += ")";
-            List<Object> results = appService.query(new HQLCriteria(
-                queryString, params));
+            StringBuffer sb = new StringBuffer(DELETED_SAMPLE_TYPES_QRY)
+                .append(StringUtils.join(ids, ',')).append(")");
+            List<Object> results = appService.query(new HQLCriteria(sb
+                .toString(), Arrays.asList(new Object[] { getId() })));
             if (results.size() != 0) {
                 throw new BiobankCheckException(
                     "Unable to remove sample type. This parent/child relationship "
@@ -113,28 +119,28 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
+    private static final String DELETED_CONTAINER_TYPES_QRY = "from "
+        + ContainerPosition.class.getName()
+        + " as cp inner join cp."
+        + ContainerPositionPeer.PARENT_CONTAINER.getName()
+        + " as cparent where cparent."
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.ID)
+        + "=? and cp."
+        + Property.concatNames(ContainerPositionPeer.CONTAINER,
+            ContainerPeer.CONTAINER_TYPE, ContainerTypePeer.ID) + " in (";
+
     private void checkDeletedChildContainerTypes()
         throws BiobankCheckException, ApplicationException {
         if (deletedChildTypes.size() > 0) {
-            String queryString = "from " + ContainerPosition.class.getName()
-                + " as cp inner join cp.parentContainer as cparent"
-                + " where cparent.containerType.id=? and "
-                + "cp.container.containerType.id in (select id from "
-                + ContainerType.class.getName() + " as ct where";
-            List<Object> params = new ArrayList<Object>();
-            params.add(getId());
-            int i = 0;
+            List<Integer> ids = new ArrayList<Integer>();
             for (ContainerTypeWrapper type : deletedChildTypes) {
-                if (i != 0) {
-                    queryString += " OR";
-                }
-                queryString += " ct.id=?";
-                params.add(type.getId());
-                i++;
+                ids.add(type.getId());
             }
-            queryString += ")";
-            List<Object> results = appService.query(new HQLCriteria(
-                queryString, params));
+            StringBuffer sb = new StringBuffer(DELETED_CONTAINER_TYPES_QRY)
+                .append(StringUtils.join(ids, ',')).append(")");
+            List<Object> results = appService.query(new HQLCriteria(sb
+                .toString(), Arrays.asList(new Object[] { getId() })));
             if (results.size() != 0) {
                 throw new BiobankCheckException(
                     "Unable to remove child type. This parent/child relationship "
@@ -180,11 +186,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
+    private static final String IS_USED_BY_CONTAINERS_QRY = "select count(c) from "
+        + Container.class.getName()
+        + " as c where c."
+        + ContainerPeer.CONTAINER_TYPE.getName() + "=?";
+
     public boolean isUsedByContainers() throws ApplicationException,
         BiobankException {
-        String queryString = "select count(c) from "
-            + Container.class.getName() + " as c where c.containerType=?)";
-        HQLCriteria c = new HQLCriteria(queryString,
+        HQLCriteria c = new HQLCriteria(IS_USED_BY_CONTAINERS_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
@@ -193,94 +202,66 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return results.get(0) > 0;
     }
 
+    private static final String PARENT_CONTAINER_TYPES_QRY = "select ct from "
+        + ContainerType.class.getName() + " as ct inner join ct."
+        + ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION.getName()
+        + " as child where child." + ContainerTypePeer.ID.getName() + "=?";
+
     public List<ContainerTypeWrapper> getParentContainerTypes()
         throws ApplicationException {
-        String queryString = "select ct from "
-            + ContainerType.class.getName()
-            + " as ct inner join ct.childContainerTypeCollection as child where child.id = ?)";
-        HQLCriteria c = new HQLCriteria(queryString,
+        HQLCriteria c = new HQLCriteria(PARENT_CONTAINER_TYPES_QRY,
             Arrays.asList(new Object[] { wrappedObject.getId() }));
         List<ContainerType> results = appService.query(c);
         return transformToWrapperList(appService, results);
     }
 
-    public void setName(String name) {
-        String oldName = wrappedObject.getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
-    }
-
     public String getName() {
-        return wrappedObject.getName();
+        return getProperty(ContainerTypePeer.NAME);
     }
 
-    public void setComment(String comment) {
-        String oldComment = wrappedObject.getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
-    }
-
-    public String getComment() {
-        return wrappedObject.getComment();
-    }
-
-    public void setNameShort(String nameShort) {
-        String oldNameShort = wrappedObject.getNameShort();
-        wrappedObject.setNameShort(nameShort);
-        propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
-            nameShort);
+    public void setName(String name) {
+        setProperty(ContainerTypePeer.NAME, name);
     }
 
     public String getNameShort() {
-        return wrappedObject.getNameShort();
+        return getProperty(ContainerTypePeer.NAME_SHORT);
     }
 
-    public void setTopLevel(Boolean topLevel) {
-        Boolean oldTopLevel = wrappedObject.getTopLevel();
-        wrappedObject.setTopLevel(topLevel);
-        propertyChangeSupport.firePropertyChange("topLevel", oldTopLevel,
-            topLevel);
+    public void setNameShort(String nameShort) {
+        setProperty(ContainerTypePeer.NAME_SHORT, nameShort);
+    }
+
+    public String getComment() {
+        return getProperty(ContainerTypePeer.COMMENT);
+    }
+
+    public void setComment(String comment) {
+        setProperty(ContainerTypePeer.COMMENT, comment);
     }
 
     public Boolean getTopLevel() {
-        return wrappedObject.getTopLevel();
+        return getProperty(ContainerTypePeer.TOP_LEVEL);
     }
 
-    public void setDefaultTemperature(Double temperature) {
-        Double oldTemp = wrappedObject.getDefaultTemperature();
-        wrappedObject.setDefaultTemperature(temperature);
-        propertyChangeSupport.firePropertyChange("defaultTemperature", oldTemp,
-            temperature);
+    public void setTopLevel(Boolean topLevel) {
+        setProperty(ContainerTypePeer.TOP_LEVEL, topLevel);
     }
 
     public Double getDefaultTemperature() {
-        return wrappedObject.getDefaultTemperature();
+        return getProperty(ContainerTypePeer.DEFAULT_TEMPERATURE);
+    }
+
+    public void setDefaultTemperature(Double temperature) {
+        setProperty(ContainerTypePeer.DEFAULT_TEMPERATURE, temperature);
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
-            .get("activityStatus");
-        if (activityStatus == null) {
-            ActivityStatus a = wrappedObject.getActivityStatus();
-            if (a == null)
-                return null;
-            activityStatus = new ActivityStatusWrapper(appService, a);
-            propertiesMap.put("activityStatus", activityStatus);
-        }
-        return activityStatus;
+        return getWrappedProperty(ContainerTypePeer.ACTIVITY_STATUS,
+            ActivityStatusWrapper.class);
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        propertiesMap.put("activityStatus", activityStatus);
-        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        ActivityStatus rawObject = null;
-        if (activityStatus != null) {
-            rawObject = activityStatus.getWrappedObject();
-        }
-        wrappedObject.setActivityStatus(rawObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
+        setWrappedProperty(ContainerTypePeer.ACTIVITY_STATUS, activityStatus);
     }
 
     private void setSampleTypeCollection(Collection<SampleType> allTypeObjects,
