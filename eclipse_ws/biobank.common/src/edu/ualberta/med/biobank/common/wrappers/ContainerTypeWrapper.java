@@ -261,6 +261,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        // / TODO: HERE HERE HERE
         setWrappedProperty(ContainerTypePeer.ACTIVITY_STATUS, activityStatus);
     }
 
