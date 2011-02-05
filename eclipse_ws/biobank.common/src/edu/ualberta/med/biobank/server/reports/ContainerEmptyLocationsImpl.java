@@ -53,7 +53,7 @@ public class ContainerEmptyLocationsImpl extends AbstractReport {
                                 + ContainerLabelingSchemeWrapper
                                     .getPositionString(pos, container
                                         .getContainerType()
-                                        .getChildLabelingScheme(), rows, cols),
+                                        .getChildLabelingSchemeId(), rows, cols),
                             container.getContainerType().getNameShort() });
                 }
             }
