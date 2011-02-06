@@ -960,7 +960,7 @@
   </target>
 
 
-  <target name="product" depends="eclipse.home.env">
+  <target name="product" depends="eclipse.home.env,bild-common-project">
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <delete dir="${buildDirectory}" />
     <copy todir="${buildDirectory}/plugins/biobank2">
