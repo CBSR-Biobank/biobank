@@ -720,7 +720,7 @@ public class TestContainer extends TestDatabase {
     private void testGetPositionFromLabelingScheme(ContainerWrapper container)
         throws Exception {
         ContainerTypeWrapper type = container.getContainerType();
-        int labelingScheme = type.getChildLabelingScheme();
+        int labelingScheme = type.getChildLabelingSchemeId();
         int maxRows = type.getRowCapacity();
         int maxCols = type.getColCapacity();
 
@@ -761,7 +761,7 @@ public class TestContainer extends TestDatabase {
 
     private void testAddChildrenByLabel(ContainerWrapper parent,
         ContainerTypeWrapper childType) throws Exception {
-        int labelingScheme = parent.getContainerType().getChildLabelingScheme();
+        int labelingScheme = parent.getContainerType().getChildLabelingSchemeId();
         int maxRows = parent.getRowCapacity();
         int maxCols = parent.getColCapacity();
         String label;
@@ -1146,7 +1146,7 @@ public class TestContainer extends TestDatabase {
 
         String label;
         int labelingScheme = container.getContainerType()
-            .getChildLabelingScheme();
+            .getChildLabelingSchemeId();
 
         for (int row = 0, maxRow = container.getRowCapacity(); row < maxRow; ++row) {
             for (int col = 0, maxCol = container.getColCapacity(); col < maxCol; ++col) {

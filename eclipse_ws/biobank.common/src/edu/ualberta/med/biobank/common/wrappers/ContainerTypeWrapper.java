@@ -14,6 +14,8 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
+import edu.ualberta.med.biobank.common.peer.CapacityPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerLabelingSchemePeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
@@ -24,11 +26,8 @@ import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -68,10 +67,10 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         if (getCapacity() == null) {
             throw new ValueNotSetException("capacity");
         }
-        if (getChildLabelingScheme() != null) {
+        if (getChildLabelingSchemeId() != null) {
             // should throw error if labeling scheme too small for container
             if (!ContainerLabelingSchemeWrapper.checkBounds(appService,
-                getChildLabelingScheme(), getCapacity().getRowCapacity(),
+                getChildLabelingSchemeId(), getCapacity().getRowCapacity(),
                 getCapacity().getColCapacity()))
                 throw new BiobankCheckException("Labeling scheme cannot label "
                     + getCapacity().getRowCapacity() + " rows and "
@@ -261,78 +260,27 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        // / TODO: HERE HERE HERE
         setWrappedProperty(ContainerTypePeer.ACTIVITY_STATUS, activityStatus);
     }
 
-    private void setSampleTypeCollection(Collection<SampleType> allTypeObjects,
-        List<SampleTypeWrapper> allTypeWrappers) {
-        Collection<SampleType> oldTypes = wrappedObject
-            .getSampleTypeCollection();
-        wrappedObject.setSampleTypeCollection(allTypeObjects);
-        propertyChangeSupport.firePropertyChange("sampleTypeCollection",
-            oldTypes, allTypeObjects);
-        propertiesMap.put("sampleTypeCollection", allTypeWrappers);
-    }
-
     public void addSampleTypes(List<SampleTypeWrapper> newSampleTypes) {
-        if (newSampleTypes != null && newSampleTypes.size() > 0) {
-            Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
-            List<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
-            // already added types
-            List<SampleTypeWrapper> currentList = getSampleTypeCollection();
-            if (currentList != null) {
-                for (SampleTypeWrapper type : currentList) {
-                    allTypeObjects.add(type.getWrappedObject());
-                    allTypeWrappers.add(type);
-                }
-            }
-            // new types
-            for (SampleTypeWrapper type : newSampleTypes) {
-                allTypeObjects.add(type.getWrappedObject());
-                allTypeWrappers.add(type);
-                deletedSampleTypes.remove(type);
-            }
-            setSampleTypeCollection(allTypeObjects, allTypeWrappers);
-        }
+        addToWrapperCollection(ContainerTypePeer.SAMPLE_TYPE_COLLECTION,
+            newSampleTypes);
+
+        // make sure previously deleted ones, that have been re-added, are
+        // no longer deleted
+        deletedSampleTypes.removeAll(newSampleTypes);
     }
 
     public void removeSampleTypes(List<SampleTypeWrapper> typesToRemove) {
-        if (typesToRemove != null && typesToRemove.size() > 0) {
-            deletedSampleTypes.addAll(typesToRemove);
-            Collection<SampleType> allTypeObjects = new HashSet<SampleType>();
-            List<SampleTypeWrapper> allTypeWrappers = new ArrayList<SampleTypeWrapper>();
-            // already added types
-            List<SampleTypeWrapper> currentList = getSampleTypeCollection();
-            if (currentList != null) {
-                for (SampleTypeWrapper type : currentList) {
-                    if (!deletedSampleTypes.contains(type)) {
-                        allTypeObjects.add(type.getWrappedObject());
-                        allTypeWrappers.add(type);
-                    }
-                }
-            }
-            setSampleTypeCollection(allTypeObjects, allTypeWrappers);
-        }
+        deletedSampleTypes.addAll(typesToRemove);
+        removeFromWrapperCollection(ContainerTypePeer.SAMPLE_TYPE_COLLECTION,
+            typesToRemove);
     }
 
-    @SuppressWarnings("unchecked")
     public List<SampleTypeWrapper> getSampleTypeCollection() {
-        List<SampleTypeWrapper> sampleTypeCollection = (List<SampleTypeWrapper>) propertiesMap
-            .get("sampleTypeCollection");
-        if (sampleTypeCollection == null) {
-            Collection<SampleType> children = wrappedObject
-                .getSampleTypeCollection();
-            if (children != null) {
-                sampleTypeCollection = new ArrayList<SampleTypeWrapper>();
-                for (SampleType type : children) {
-                    sampleTypeCollection.add(new SampleTypeWrapper(appService,
-                        type));
-                }
-                propertiesMap.put("sampleTypeCollection", sampleTypeCollection);
-            }
-        }
-        return sampleTypeCollection;
+        return getWrapperCollection(ContainerTypePeer.SAMPLE_TYPE_COLLECTION,
+            SampleTypeWrapper.class, true);
     }
 
     public Set<SampleTypeWrapper> getSampleTypesRecursively()
@@ -347,160 +295,99 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         return sampleTypes;
     }
 
-    private void setChildContainerTypes(
-        Collection<ContainerType> allTypeObjects,
-        List<ContainerTypeWrapper> allTypeWrappers) {
-        Collection<ContainerType> oldContainerTypes = wrappedObject
-            .getChildContainerTypeCollection();
-        wrappedObject.setChildContainerTypeCollection(allTypeObjects);
-        propertyChangeSupport.firePropertyChange(
-            "childContainerTypeCollection", oldContainerTypes, allTypeObjects);
-        propertiesMap.put("childContainerTypeCollection", allTypeWrappers);
-    }
-
     public void addChildContainerTypes(
         List<ContainerTypeWrapper> newContainerTypes) {
-        if (newContainerTypes != null && newContainerTypes.size() > 0) {
-            Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
-            List<ContainerTypeWrapper> allTypesWrappers = new ArrayList<ContainerTypeWrapper>();
-            // already added types
-            List<ContainerTypeWrapper> currentList = getChildContainerTypeCollection();
-            if (currentList != null) {
-                for (ContainerTypeWrapper type : currentList) {
-                    allTypeObjects.add(type.getWrappedObject());
-                    allTypesWrappers.add(type);
-                }
-            }
-            // new types
-            for (ContainerTypeWrapper type : newContainerTypes) {
-                allTypeObjects.add(type.getWrappedObject());
-                allTypesWrappers.add(type);
-                deletedChildTypes.remove(type);
-            }
-            setChildContainerTypes(allTypeObjects, allTypesWrappers);
-        }
+        addToWrapperCollection(
+            ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION,
+            newContainerTypes);
+
+        // make sure previously deleted ones, that have been re-added, are
+        // no longer deleted
+        deletedChildTypes.removeAll(newContainerTypes);
     }
 
     public void removeChildContainers(List<ContainerTypeWrapper> typesToRemove) {
-        if (typesToRemove != null && typesToRemove.size() > 0) {
-            deletedChildTypes.addAll(typesToRemove);
-            Collection<ContainerType> allTypeObjects = new HashSet<ContainerType>();
-            List<ContainerTypeWrapper> allTypesWrappers = new ArrayList<ContainerTypeWrapper>();
-            // already added types
-            List<ContainerTypeWrapper> currentList = getChildContainerTypeCollection();
-            if (currentList != null) {
-                for (ContainerTypeWrapper type : currentList) {
-                    if (!deletedChildTypes.contains(type)) {
-                        allTypeObjects.add(type.getWrappedObject());
-                        allTypesWrappers.add(type);
-                    }
-                }
-            }
-            setChildContainerTypes(allTypeObjects, allTypesWrappers);
-        }
+        deletedChildTypes.addAll(typesToRemove);
+        removeFromWrapperCollection(
+            ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, typesToRemove);
     }
 
-    @SuppressWarnings("unchecked")
     public List<ContainerTypeWrapper> getChildContainerTypeCollection() {
-        List<ContainerTypeWrapper> childContainerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
-            .get("childContainerTypeCollection");
-        if (childContainerTypeCollection == null) {
-            Collection<ContainerType> children = wrappedObject
-                .getChildContainerTypeCollection();
-            if (children != null) {
-                childContainerTypeCollection = transformToWrapperList(
-                    appService, children);
-                propertiesMap.put("childContainerTypeCollection",
-                    childContainerTypeCollection);
-            }
-        }
-        return childContainerTypeCollection;
-    }
-
-    public void setSite(SiteWrapper site) {
-        propertiesMap.put("site", site);
-        Site oldSite = wrappedObject.getSite();
-        Site newSite = site.getWrappedObject();
-        wrappedObject.setSite(newSite);
-        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
+        return getWrapperCollection(
+            ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION,
+            ContainerTypeWrapper.class, true);
     }
 
     public SiteWrapper getSite() {
-        SiteWrapper site = (SiteWrapper) propertiesMap.get("site");
-        if (site == null) {
-            Site s = wrappedObject.getSite();
-            if (s == null)
-                return null;
-            site = new SiteWrapper(appService, s);
-            propertiesMap.put("site", site);
-        }
-        return site;
+        return getWrappedProperty(ContainerTypePeer.SITE, SiteWrapper.class);
+    }
+
+    public void setSite(SiteWrapper site) {
+        setWrappedProperty(ContainerTypePeer.SITE, site);
     }
 
     private CapacityWrapper getCapacity() {
-        Capacity capacity = wrappedObject.getCapacity();
-        if (capacity == null) {
-            return null;
-        }
-        return new CapacityWrapper(appService, capacity);
+        return getWrappedProperty(ContainerTypePeer.CAPACITY,
+            CapacityWrapper.class);
     }
 
     private void setCapacity(CapacityWrapper capacity) {
-        Capacity oldCapacity = wrappedObject.getCapacity();
-        Capacity newCapacity = capacity.wrappedObject;
-        wrappedObject.setCapacity(newCapacity);
-        propertyChangeSupport.firePropertyChange("capacity", oldCapacity,
-            newCapacity);
+        setWrappedProperty(ContainerTypePeer.CAPACITY, capacity);
     }
 
     public Integer getRowCapacity() {
-        CapacityWrapper capacity = getCapacity();
-        if (capacity == null) {
-            return null;
-        }
-        return capacity.getRowCapacity();
+        return getProperty(getCapacity(), CapacityPeer.ROW_CAPACITY);
     }
 
     public Integer getColCapacity() {
+        return getProperty(getCapacity(), CapacityPeer.COL_CAPACITY);
+    }
+
+    private CapacityWrapper initCapacity() {
         CapacityWrapper capacity = getCapacity();
         if (capacity == null) {
-            return null;
+            capacity = new CapacityWrapper(appService);
+            setCapacity(capacity);
         }
-        return capacity.getColCapacity();
+        return capacity;
     }
 
     public void setRowCapacity(Integer maxRows) {
-        Integer old = getRowCapacity();
-        CapacityWrapper capacity = getCapacity();
-        if (capacity == null) {
-            capacity = new CapacityWrapper(appService, new Capacity());
-        }
-        capacity.setRow(maxRows);
-        setCapacity(capacity);
-        propertyChangeSupport.firePropertyChange("rowCapacity", old, maxRows);
+        setProperty(initCapacity(), CapacityPeer.ROW_CAPACITY, maxRows);
     }
 
     public void setColCapacity(Integer maxCols) {
-        Integer old = getColCapacity();
-        CapacityWrapper capacity = getCapacity();
-        if (capacity == null) {
-            capacity = new CapacityWrapper(appService, new Capacity());
-        }
-        capacity.setCol(maxCols);
-        setCapacity(capacity);
-        propertyChangeSupport.firePropertyChange("colCapacity", old, maxCols);
+        setProperty(initCapacity(), CapacityPeer.COL_CAPACITY, maxCols);
     }
 
+    private ContainerLabelingSchemeWrapper getChildLabelingScheme() {
+        return getWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME,
+            ContainerLabelingSchemeWrapper.class);
+    }
+
+    public Integer getChildLabelingSchemeId() {
+        return getProperty(getChildLabelingScheme(),
+            ContainerLabelingSchemePeer.ID);
+    }
+
+    public String getChildLabelingSchemeName() {
+        return getProperty(getChildLabelingScheme(),
+            ContainerLabelingSchemePeer.NAME);
+    }
+
+    // TODO: stopped here
+
     public void setChildLabelingScheme(Integer id) throws ApplicationException {
-        if (id == null)
-            return;
-        setChildLabelingScheme(ContainerLabelingSchemeWrapper
-            .getLabelingSchemeById(appService, id));
+        setWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME,
+            ContainerLabelingSchemeWrapper
+                .getLabelingSchemeById(appService, id));
     }
 
     public void setChildLabelingSchemeName(String name) throws Exception {
-        if (name == null)
-            return;
+        if (name == null) {
+            throw new Exception("name is null");
+        }
+
         for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
             .getAllLabelingSchemesMap(appService).values()) {
             if (scheme.getName().equals(name)) {
@@ -513,30 +400,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     private void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
-        ContainerLabelingScheme oldLbl = wrappedObject.getChildLabelingScheme();
-        ContainerLabelingScheme newLbl = null;
-        if (scheme != null) {
-            newLbl = scheme.getWrappedObject();
-        }
-        wrappedObject.setChildLabelingScheme(newLbl);
-        propertyChangeSupport.firePropertyChange("childLabelingScheme", oldLbl,
-            newLbl);
-    }
-
-    public Integer getChildLabelingScheme() {
-        ContainerLabelingScheme scheme = wrappedObject.getChildLabelingScheme();
-        if (scheme == null) {
-            return null;
-        }
-        return scheme.getId();
-    }
-
-    public String getChildLabelingSchemeName() {
-        ContainerLabelingScheme scheme = wrappedObject.getChildLabelingScheme();
-        if (scheme == null) {
-            return null;
-        }
-        return scheme.getName();
+        setWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME, scheme);
     }
 
     /**
@@ -574,14 +438,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         boolean existsContainersWithType) throws BiobankCheckException {
         ContainerTypeWrapper oldWrapper = new ContainerTypeWrapper(appService,
             oldObject);
-        if (getChildLabelingScheme() == null
-            && oldWrapper.getChildLabelingScheme() == null) {
+        if (getChildLabelingSchemeId() == null
+            && oldWrapper.getChildLabelingSchemeId() == null) {
             return;
         }
-        if (getChildLabelingScheme() == null
-            || oldWrapper.getChildLabelingScheme() == null
-            || !getChildLabelingScheme().equals(
-                oldWrapper.getChildLabelingScheme())
+        if (getChildLabelingSchemeId() == null
+            || oldWrapper.getChildLabelingSchemeId() == null
+            || !getChildLabelingSchemeId().equals(
+                oldWrapper.getChildLabelingSchemeId())
             && existsContainersWithType) {
             throw new BiobankCheckException(
                 "Unable to change the \"Child Labeling scheme\" property. "
@@ -702,13 +566,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public String getPositionString(RowColPos position) {
         return ContainerLabelingSchemeWrapper.getPositionString(position,
-            getChildLabelingScheme(), getRowCapacity(), getColCapacity());
+            getChildLabelingSchemeId(), getRowCapacity(), getColCapacity());
     }
 
     public RowColPos getRowColFromPositionString(String position)
         throws Exception {
         return ContainerLabelingSchemeWrapper.getRowColFromPositionString(
-            getAppService(), position, getChildLabelingScheme(),
+            getAppService(), position, getChildLabelingSchemeId(),
             getRowCapacity(), getColCapacity());
     }
 

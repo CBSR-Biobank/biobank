@@ -964,7 +964,7 @@ public class TestContainerType extends TestDatabase {
         topType2 = ContainerTypeHelper.newContainerType(site,
             "Top Container Type 2", "TCT2", null, CONTAINER_TOP_ROWS,
             CONTAINER_TOP_COLS, true);
-        Assert.assertEquals(null, topType2.getChildLabelingScheme());
+        Assert.assertEquals(null, topType2.getChildLabelingSchemeId());
         Assert.assertEquals(null, topType2.getChildLabelingSchemeName());
 
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
@@ -972,19 +972,19 @@ public class TestContainerType extends TestDatabase {
         childTypeL2 = containerTypeMap.get("ChildCtL2");
         childTypeL3 = containerTypeMap.get("ChildCtL3");
 
-        Assert.assertEquals(2, topType.getChildLabelingScheme().intValue());
+        Assert.assertEquals(2, topType.getChildLabelingSchemeId().intValue());
         Assert.assertTrue(topType.getChildLabelingSchemeName().equals(
             "CBSR 2 char alphabetic"));
 
-        Assert.assertEquals(3, childTypeL1.getChildLabelingScheme().intValue());
+        Assert.assertEquals(3, childTypeL1.getChildLabelingSchemeId().intValue());
         Assert.assertTrue(childTypeL1.getChildLabelingSchemeName().equals(
             "2 char numeric"));
 
-        Assert.assertEquals(3, childTypeL2.getChildLabelingScheme().intValue());
+        Assert.assertEquals(3, childTypeL2.getChildLabelingSchemeId().intValue());
         Assert.assertTrue(childTypeL2.getChildLabelingSchemeName().equals(
             "2 char numeric"));
 
-        Assert.assertEquals(1, childTypeL3.getChildLabelingScheme().intValue());
+        Assert.assertEquals(1, childTypeL3.getChildLabelingSchemeId().intValue());
         Assert.assertTrue(childTypeL3.getChildLabelingSchemeName().equals(
             "SBS Standard"));
     }
