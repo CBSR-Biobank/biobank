@@ -676,6 +676,7 @@
             <include name="*.jar" />
           </fileset>
         </path>
+        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
       </classpath>
     </javac>
     <touch file="${eclipse.proj.dir.tools}/output/build.timestamp" />
