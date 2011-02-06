@@ -961,7 +961,7 @@
   </target>
 
 
-  <target name="product" depends="eclipse.home.env,build-common-project">
+  <target name="product" depends="eclipse.home.env,deploy-eclipse">
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <delete dir="${buildDirectory}" />
     <copy todir="${buildDirectory}/plugins/biobank2">
