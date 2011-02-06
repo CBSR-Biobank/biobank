@@ -6,7 +6,7 @@ public class ValueNotSetException extends BiobankDataErrorException {
 
     private static final long serialVersionUID = 1L;
 
-    private static final String MSG_PATTERN = "Value {0}  has not been set.";
+    private static final String MSG_PATTERN = "Value {0} has not been set.";
 
     public ValueNotSetException(String propertyName) {
         super(MessageFormat.format(MSG_PATTERN, propertyName));

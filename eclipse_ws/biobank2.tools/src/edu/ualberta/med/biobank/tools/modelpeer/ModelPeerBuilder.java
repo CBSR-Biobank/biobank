@@ -134,6 +134,11 @@ public class ModelPeerBuilder {
                 sb.append("import ").append(toClass.getPkg()).append(".")
                     .append(toClass.getName()).append(";\n");
             }
+            
+            // import the model class itself
+            if (!importCount.containsKey(mc.getName())) {
+                sb.append("import ").append(mc.getPkg()).append(".").append(mc.getName()).append(";\n");
+            }
 
             if (hasCollections) {
                 sb.append("import ").append(Collection.class.getName())
@@ -150,7 +155,7 @@ public class ModelPeerBuilder {
             // Member property fields
             for (String attr : mc.getAttrMap().keySet()) {
                 sb.append("   public static final Property<")
-                    .append(mc.getAttrMap().get(attr).getType()).append("> ")
+                    .append(mc.getAttrMap().get(attr).getType()).append(", ").append(mc.getName()).append("> ")
                     .append(CamelCase.toTitleCase(attr))
                     .append(" = Property.create(\"").append(attr)
                     .append("\", new TypeReference<")
@@ -164,7 +169,7 @@ public class ModelPeerBuilder {
                 if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
                     || (assoc.getAssociationType() == ClassAssociationType.ONE_TO_MANY)) {
                     sb.append("   public static final Property<Collection<")
-                        .append(assoc.getToClass().getName()).append(">> ")
+                        .append(assoc.getToClass().getName()).append(">, ").append(mc.getName()).append("> ")
                         .append(CamelCase.toTitleCase(assocName))
                         .append(" = Property.create(\"").append(assocName)
                         .append("\", new TypeReference<Collection<")
@@ -172,7 +177,7 @@ public class ModelPeerBuilder {
                         .append(">>() {});\n\n");
                 } else {
                     sb.append("   public static final Property<")
-                        .append(assoc.getToClass().getName()).append("> ")
+                        .append(assoc.getToClass().getName()).append(", ").append(mc.getName()).append("> ")
                         .append(CamelCase.toTitleCase(assocName))
                         .append(" = Property.create(\"").append(assocName)
                         .append("\", new TypeReference<")

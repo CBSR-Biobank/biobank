@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.model.PvSourceVessel;
 import edu.ualberta.med.biobank.model.SourceVessel;
@@ -45,11 +47,16 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsed())
             throw new BiobankCheckException(
                 "Source vessel is in use. Please remove from all corresponding studies and patient visits before deleting.");
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        checkUnique();
     }
 
     public static List<SourceVesselWrapper> getAllSourceVessels(
@@ -95,7 +102,7 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         }
     }
 
-    public boolean isUsed() throws ApplicationException, BiobankCheckException {
+    public boolean isUsed() throws ApplicationException, BiobankException {
         String queryString = "select count(s) from "
             + StudySourceVessel.class.getName()
             + " as s where s.sourceVessel=?)";
@@ -103,7 +110,7 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         if (results.get(0) > 0) {
             return true;
@@ -114,16 +121,13 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results2 = appService.query(c2);
         if (results2.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results2.get(0) > 0;
     }
 
-    public void checkUnique() throws ApplicationException,
-        BiobankCheckException {
+    public void checkUnique() throws ApplicationException, BiobankException {
         checkNoDuplicates(SourceVessel.class, SourceVesselPeer.NAME.getName(),
-            getName(), "A source vessel with name \"" + getName()
-                + "\" already exists.");
+            getName(), "A source vessel with name");
     }
-
 }

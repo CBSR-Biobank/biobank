@@ -1,23 +1,16 @@
 package edu.ualberta.med.biobank.server.logging.user;
 
+import edu.ualberta.med.biobank.server.BiobankThreadVariable;
+import edu.ualberta.med.biobank.server.LocalInfo;
+
 public class UserInfoHelper {
 
     public static void setUserName(String userName) {
-        UserInfo userInfo = BiobankThreadVariable.get();
+        LocalInfo userInfo = BiobankThreadVariable.get();
         if (null == userInfo)
-            userInfo = new UserInfo();
+            userInfo = new LocalInfo();
         if (!(null == userName || userName.trim().length() == 0)) {
             userInfo.setUsername(userName);
-        }
-        BiobankThreadVariable.set(userInfo);
-    }
-
-    public static void setObjectID(String objectIDKey) {
-        UserInfo userInfo = BiobankThreadVariable.get();
-        if (null == userInfo)
-            userInfo = new UserInfo();
-        if (!(null == objectIDKey || objectIDKey.trim().length() == 0)) {
-            userInfo.setObjectIDKey(objectIDKey);
         }
         BiobankThreadVariable.set(userInfo);
     }

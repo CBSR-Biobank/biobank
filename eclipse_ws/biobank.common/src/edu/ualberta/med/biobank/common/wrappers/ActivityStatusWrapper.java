@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -55,7 +57,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     @Override
-    public void deleteChecks() throws Exception {
+    public void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsed()) {
             throw new BiobankCheckException("Unable to delete activity status "
                 + getName()
@@ -63,7 +65,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         }
     }
 
-    public boolean isUsed() throws ApplicationException, BiobankCheckException {
+    public boolean isUsed() throws ApplicationException, BiobankException {
         long usedCount = 0;
 
         Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
@@ -78,8 +80,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
                 Arrays.asList(new Object[] { wrappedObject }));
             List<Long> results = appService.query(c);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             usedCount += results.get(0);
         }
@@ -90,6 +91,14 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     @Override
     public Class<ActivityStatus> getWrappedClass() {
         return ActivityStatus.class;
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        checkNoDuplicates(ActivityStatus.class,
+            ActivityStatusPeer.NAME.getName(), getName(),
+            "An activity status with name");
     }
 
     @Override

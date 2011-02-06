@@ -10,10 +10,8 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.peer.AliquotPeer;
-import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
-import edu.ualberta.med.biobank.common.peer.ContainerPeer;
-import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -54,8 +52,16 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        if (getSite() != null) {
+            checkNoDuplicatesInSite(ContainerType.class,
+                ContainerTypePeer.NAME.getName(), getName(), getSite().getId(),
+                ContainerTypePeer.NAME.getName());
+            checkNoDuplicatesInSite(ContainerType.class,
+                ContainerTypePeer.NAME_SHORT.getName(), getNameShort(),
+                getSite().getId(), ContainerTypePeer.NAME_SHORT.getName());
+        }
         if (getCapacity() == null) {
             throw new ValueNotSetException("capacity");
         }
@@ -174,8 +180,7 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsedByContainers()) {
             throw new BiobankCheckException("Unable to delete container type "
                 + getName() + ". A container of this type exists in storage."
@@ -184,14 +189,14 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     }
 
     public boolean isUsedByContainers() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         String queryString = "select count(c) from "
             + Container.class.getName() + " as c where c.containerType=?)";
         HQLCriteria c = new HQLCriteria(queryString,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0) > 0;
     }
@@ -688,13 +693,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
      * get count of container which type is this
      */
     public long getContainersCount() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         HQLCriteria c = new HQLCriteria("select count(*) from "
             + Container.class.getName() + " where containerType.id=?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
     }

@@ -44,11 +44,6 @@ public class DispatchInfoWrapper extends ModelWrapper<DispatchInfo> {
         return DispatchInfo.class;
     }
 
-    @Override
-    protected void deleteChecks() throws Exception {
-
-    }
-
     public StudyWrapper getStudy() {
         if (study == null) {
             Study s = wrappedObject.getStudy();

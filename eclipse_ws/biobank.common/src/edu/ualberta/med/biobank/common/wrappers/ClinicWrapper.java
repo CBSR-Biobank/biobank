@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
@@ -228,6 +230,15 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        checkNoDuplicates(Clinic.class, ClinicPeer.NAME.getName(), getName(),
+            "A clinic with name");
+        checkNoDuplicates(Clinic.class, ClinicPeer.NAME_SHORT.getName(),
+            getNameShort(), "A clinic with name short");
+    }
+
+    @Override
     protected void persistDependencies(Clinic origObject) throws Exception {
         for (ContactWrapper cw : deletedContacts) {
             if (!cw.isNew()) {
@@ -353,8 +364,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (getShipmentCount() > 0) {
             throw new BiobankCheckException("Unable to delete clinic "
                 + getName() + ". All defined shipments must be removed first.");
@@ -386,7 +396,7 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public long getShipmentCount() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         return getShipmentCount(false);
     }
 
@@ -400,14 +410,13 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      * getShipmentCollection().size method
      */
     public long getShipmentCount(boolean fast) throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(SHIPMENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             return results.get(0);
         }
@@ -505,15 +514,14 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
      * @throws BiobankCheckException
      * @throws ApplicationException
      */
-    public long getPatientCount(boolean fast) throws BiobankCheckException,
+    public long getPatientCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             return results.get(0);
         }
@@ -572,12 +580,12 @@ public class ClinicWrapper extends ModelWrapper<Clinic> {
     }
 
     public static long getCount(WritableApplicationService appService)
-        throws BiobankCheckException, ApplicationException {
+        throws BiobankException, ApplicationException {
         HQLCriteria c = new HQLCriteria("select count (*) from "
             + Clinic.class.getName());
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
     }

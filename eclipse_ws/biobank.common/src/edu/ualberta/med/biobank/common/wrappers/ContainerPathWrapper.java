@@ -24,10 +24,6 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
     }
 
     @Override
-    protected void deleteChecks() throws Exception {
-    }
-
-    @Override
     protected List<String> getPropertyChangeNames() {
         return ContainerPathPeer.PROP_NAMES;
     }

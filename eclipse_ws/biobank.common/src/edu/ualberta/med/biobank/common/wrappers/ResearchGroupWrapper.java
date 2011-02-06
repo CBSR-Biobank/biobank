@@ -110,10 +110,4 @@ public class ResearchGroupWrapper extends ModelWrapper<ResearchGroup> {
         return null;
     }
 
-    @Override
-    protected void deleteChecks() throws Exception {
-        // TODO Auto-generated method stub
-
-    }
-
 }

@@ -1,7 +1,6 @@
-package edu.ualberta.med.biobank.server.applicationservice.exceptions;
+package edu.ualberta.med.biobank.common.exception;
 
-
-public class DuplicateEntryException extends BiobankDataErrorException {
+public class DuplicateEntryException extends BiobankCheckException {
     private static final long serialVersionUID = 1L;
 
     public DuplicateEntryException(String message) {

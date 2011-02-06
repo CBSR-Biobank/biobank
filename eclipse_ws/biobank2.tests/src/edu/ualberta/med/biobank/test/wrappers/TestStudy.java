@@ -11,6 +11,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -26,7 +27,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
@@ -987,6 +988,8 @@ public class TestStudy extends TestDatabase {
             Assert.fail("Should not insert the study : name empty");
         } catch (ValueNotSetException e) {
             Assert.assertTrue(true);
+        } catch (ValidationException e) {
+            Assert.assertTrue(true);
         }
     }
 
@@ -999,6 +1002,8 @@ public class TestStudy extends TestDatabase {
             s1.persist();
             Assert.fail("Should not insert the study : name short empty");
         } catch (ValueNotSetException e) {
+            Assert.assertTrue(true);
+        } catch (ValidationException e) {
             Assert.assertTrue(true);
         }
     }

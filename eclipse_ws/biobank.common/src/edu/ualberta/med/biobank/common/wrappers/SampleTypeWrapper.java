@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -128,8 +130,7 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsedBySamples()) {
             throw new BiobankCheckException("Unable to delete sample type "
                 + getName() + ". Aliquots of this type exists in storage."
@@ -150,6 +151,12 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         if (sort)
             Collections.sort(list);
         return list;
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        checkNameAndShortNameUnique();
     }
 
     /**
@@ -189,14 +196,14 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     public boolean isUsedBySamples() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         String queryString = "select count(s) from " + Aliquot.class.getName()
             + " as s where s.sampleType=?)";
         HQLCriteria c = new HQLCriteria(queryString,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0) > 0;
     }
@@ -207,15 +214,12 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
     }
 
     public void checkNameAndShortNameUnique() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         checkNoDuplicates(SampleType.class, SampleTypePeer.NAME.getName(),
-            getName(), "A sample type with name \"" + getName()
-                + "\" already exists");
-
+            getName(), "A sample type with name");
         checkNoDuplicates(SampleType.class,
             SampleTypePeer.NAME_SHORT.getName(), getNameShort(),
-            "A sample type with short name \"" + getNameShort()
-                + "\" already exists");
+            "A sample type with name short");
     }
 
 }

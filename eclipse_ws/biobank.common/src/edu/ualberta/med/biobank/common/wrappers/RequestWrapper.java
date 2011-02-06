@@ -54,12 +54,6 @@ public class RequestWrapper extends ModelWrapper<Request> {
         return Request.class;
     }
 
-    @Override
-    protected void deleteChecks() throws Exception {
-        // TODO Auto-generated method stub
-
-    }
-
     public StudyWrapper getStudy() {
         StudyWrapper study = (StudyWrapper) propertiesMap.get("study");
         if (study == null) {

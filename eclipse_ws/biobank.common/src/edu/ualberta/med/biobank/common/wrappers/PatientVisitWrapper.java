@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
@@ -438,8 +440,8 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
         checkPatientInShipment();
         // patient to clinic relationship tested by shipment, so no need to
         // test it again here
@@ -610,8 +612,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (getAliquotsCount(false) > 0) {
             throw new BiobankCheckException("Unable to delete patient visit "
                 + getDateProcessed()
@@ -619,7 +620,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
         }
     }
 
-    public long getAliquotsCount(boolean fast) throws BiobankCheckException,
+    public long getAliquotsCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(
@@ -628,8 +629,7 @@ public class PatientVisitWrapper extends ModelWrapper<PatientVisit> {
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             return results.get(0);
         }

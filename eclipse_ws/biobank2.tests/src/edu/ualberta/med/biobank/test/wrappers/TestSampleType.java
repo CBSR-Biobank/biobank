@@ -9,11 +9,12 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.SampleType;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.DuplicateEntryException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -192,6 +193,8 @@ public class TestSampleType extends TestDatabase {
             Assert.fail("name should be set");
         } catch (ValueNotSetException e) {
             Assert.assertTrue(true);
+        } catch (ValidationException e) {
+            Assert.assertTrue(true);
         }
 
         type.setName(name);
@@ -208,6 +211,8 @@ public class TestSampleType extends TestDatabase {
             type.persist();
             Assert.fail("nameshort should be set");
         } catch (ValueNotSetException e) {
+            Assert.assertTrue(true);
+        } catch (ValidationException e) {
             Assert.assertTrue(true);
         }
 

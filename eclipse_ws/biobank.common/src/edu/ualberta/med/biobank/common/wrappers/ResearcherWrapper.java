@@ -64,10 +64,4 @@ public class ResearcherWrapper extends ModelWrapper<Researcher> {
         return null;
     }
 
-    @Override
-    protected void deleteChecks() throws Exception {
-        // TODO Auto-generated method stub
-
-    }
-
 }

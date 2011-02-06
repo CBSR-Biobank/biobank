@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
@@ -63,8 +64,8 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     }
 
     @Override
-    protected void persistChecks() throws BiobankCheckException,
-        ApplicationException, WrapperException {
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
         if (getSender() == null) {
             throw new BiobankCheckException("Sender should be set");
         }
@@ -124,8 +125,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         }
     }
 
-    private void checkSenderCanSendToReceiver() throws BiobankCheckException,
-        WrapperException {
+    private void checkSenderCanSendToReceiver() throws BiobankException {
         if (getSender() != null && getReceiver() != null && getStudy() != null) {
             List<SiteWrapper> possibleReceivers = getSender()
                 .getStudyDispachSites(getStudy());
@@ -496,11 +496,6 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
             }
         }
         setDispatchAliquotCollection(allDsaObjects, allDsaWrappers);
-    }
-
-    @Override
-    protected void deleteChecks() throws Exception {
-
     }
 
     public void receiveAliquots(List<AliquotWrapper> aliquotsToReceive) {

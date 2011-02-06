@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
-
 public class BiobankDataErrorException extends RuntimeException {
     private static final long serialVersionUID = 1L;
 

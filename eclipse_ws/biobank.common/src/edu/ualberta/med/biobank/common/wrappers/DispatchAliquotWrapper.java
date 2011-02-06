@@ -30,11 +30,6 @@ public class DispatchAliquotWrapper extends ModelWrapper<DispatchAliquot> {
         return DispatchAliquot.class;
     }
 
-    @Override
-    protected void deleteChecks() throws Exception {
-
-    }
-
     public AliquotWrapper getAliquot() {
         AliquotWrapper aliquot = (AliquotWrapper) propertiesMap.get("aliquot");
         if (aliquot == null) {

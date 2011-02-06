@@ -13,6 +13,8 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchInfoPeer;
@@ -163,8 +165,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
+    protected void deleteChecks() throws BiobankException, ApplicationException {
         if (hasPatients()) {
             throw new BiobankCheckException("Unable to delete study "
                 + getName() + ". All defined patients must be removed first.");
@@ -692,19 +693,17 @@ public class StudyWrapper extends ModelWrapper<Study> {
         + " as patient where study."
         + StudyPeer.ID.getName() + " = ?";
 
-    public boolean hasPatients() throws ApplicationException,
-        BiobankCheckException {
+    public boolean hasPatients() throws ApplicationException, BiobankException {
         HQLCriteria criteria = new HQLCriteria(HAS_PATIENTS_QRY,
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0) > 0;
     }
 
-    public long getPatientCount() throws ApplicationException,
-        BiobankCheckException {
+    public long getPatientCount() throws ApplicationException, BiobankException {
         return getPatientCount(false);
     }
 
@@ -720,14 +719,13 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * getpatientCollection method
      */
     public long getPatientCount(boolean fast) throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
-                throw new BiobankCheckException(
-                    "Invalid size for HQL query result");
+                throw new BiobankQueryResultSizeException();
             }
             return results.get(0);
         }
@@ -824,12 +822,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
         + "=?";
 
     public long getPatientCountForSite(SiteWrapper site)
-        throws ApplicationException, BiobankCheckException {
+        throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_SITE_QRY,
             Arrays.asList(new Object[] { site.getId(), getId() }));
         List<Long> result = appService.query(c);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -849,12 +847,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
             StudyPeer.ID) + "=?";
 
     public long getPatientVisitCountForSite(SiteWrapper site)
-        throws ApplicationException, BiobankCheckException {
+        throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_SITE_QRY,
             Arrays.asList(new Object[] { site.getId(), getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
     }
@@ -875,12 +873,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
         + "=?";
 
     public long getPatientCountForClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankCheckException {
+        throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_CLINIC_QRY,
             Arrays.asList(new Object[] { getId(), clinic.getId() }));
         List<Long> result = appService.query(c);
         if (result.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return result.get(0);
     }
@@ -905,12 +903,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
         + "=study";
 
     public long getPatientVisitCountForClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankCheckException {
+        throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_CLINIC_QRY,
             Arrays.asList(new Object[] { getId(), clinic.getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
     }
@@ -925,14 +923,23 @@ public class StudyWrapper extends ModelWrapper<Study> {
         + " as visits where study." + StudyPeer.ID.getName() + "=? ";
 
     public long getPatientVisitCount() throws ApplicationException,
-        BiobankCheckException {
+        BiobankException {
         HQLCriteria c = new HQLCriteria(VISIT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        checkNoDuplicates(Study.class, StudyPeer.NAME.getName(), getName(),
+            "A study with name");
+        checkNoDuplicates(Study.class, StudyPeer.NAME_SHORT.getName(),
+            getNameShort(), "A study with short name");
     }
 
     @Override
@@ -969,12 +976,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
      * contacts)
      */
     public boolean isLinkedToClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankCheckException {
+        throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(IS_LINKED_TO_CLINIC_QRY,
             Arrays.asList(new Object[] { getId(), clinic.getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0) != 0;
     }
@@ -1005,11 +1012,11 @@ public class StudyWrapper extends ModelWrapper<Study> {
         + Study.class.getName();
 
     public static long getCount(WritableApplicationService appService)
-        throws BiobankCheckException, ApplicationException {
+        throws BiobankException, ApplicationException {
         HQLCriteria c = new HQLCriteria(COUNT_QRY);
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         }
         return results.get(0);
     }

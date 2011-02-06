@@ -73,10 +73,17 @@
             casesensitive="true"
             trim="true" />
   </condition>
+  <condition property="isHostCbsrTraining">
+    <equals arg1="${host.name}"
+            arg2="cbsr-training"
+            casesensitive="true"
+            trim="true" />
+  </condition>
   <condition property="isHostLocal">
     <and>
       <isfalse value="${isHostAicmlMed}" />
       <isfalse value="${isHostCbsr}" />
+      <isfalse value="${isHostCbsrTraining}" />
     </and>
   </condition>
   <condition property="cacore.sdk.tar.available">
@@ -401,6 +408,11 @@
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
+  <target name="hostCbsrTraining" if="isHostCbsrTraining">
+    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
   <target name="hostLocal" if="isHostLocal">
     <copy file="${secu-log.dir}/jboss/localhost.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
@@ -426,7 +438,7 @@
           message="JBOSS_HOME environment variable not defined" />
   </target>
   <target name="deploy-jboss"
-          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostLocal,server-manifest"
+          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -664,6 +676,7 @@
             <include name="*.jar" />
           </fileset>
         </path>
+        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
       </classpath>
     </javac>
     <touch file="${eclipse.proj.dir.tools}/output/build.timestamp" />
@@ -801,7 +814,7 @@
   </target>
 
   <target name="clean"
-          depends="tests-clean,clean-jars, clean-caCore"
+          depends="clean-tests,clean-jars, clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
@@ -827,11 +840,11 @@
     <pathelement location="${test.build.dir}" />
   </path>
 
-  <target name="tests-clean-results">
+  <target name="clean-tests-results">
     <delete dir="${test.output}" />
   </target>
 
-  <target name="tests-clean" depends="tests-clean-results">
+  <target name="clean-tests" depends="clean-tests-results">
     <delete dir="${test.build.dir}" />
   </target>
 
@@ -948,7 +961,7 @@
   </target>
 
 
-  <target name="product" depends="eclipse.home.env">
+  <target name="product" depends="eclipse.home.env,deploy-eclipse">
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <delete dir="${buildDirectory}" />
     <copy todir="${buildDirectory}/plugins/biobank2">
