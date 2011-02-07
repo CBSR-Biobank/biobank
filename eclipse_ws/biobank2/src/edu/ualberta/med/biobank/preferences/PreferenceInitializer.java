@@ -41,6 +41,6 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store
             .setDefault(
                 PreferenceConstants.SERVER_LIST,
-                "cbsr.med.ualberta.ca\10.8.31.50\nncbsr-training.med.ualberta.ca\n10.8.31.51\naicml-med.cs.ualberta.ca");
+                "cbsr.med.ualberta.ca\n10.8.31.50\ncbsr-training.med.ualberta.ca\n10.8.31.51\naicml-med.cs.ualberta.ca");
     }
 }
