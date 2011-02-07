@@ -3,21 +3,19 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.DispatchAliquotPeer;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchAliquot;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class DispatchAliquotWrapper extends ModelWrapper<DispatchAliquot> {
+public class DispatchAliquotWrapper extends
+    DispatchItemWrapper<DispatchAliquot> {
 
     public DispatchAliquotWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
     public DispatchAliquotWrapper(WritableApplicationService appService,
-        DispatchAliquot dsa) {
-        super(appService, dsa);
+        DispatchAliquot dispatchAliquot) {
+        super(appService, dispatchAliquot);
     }
 
     @Override
@@ -31,82 +29,30 @@ public class DispatchAliquotWrapper extends ModelWrapper<DispatchAliquot> {
     }
 
     public AliquotWrapper getAliquot() {
-        AliquotWrapper aliquot = (AliquotWrapper) propertiesMap.get("aliquot");
-        if (aliquot == null) {
-            Aliquot a = wrappedObject.getAliquot();
-            if (a != null) {
-                aliquot = new AliquotWrapper(appService, a);
-            }
-        }
-        return aliquot;
+        return getWrappedProperty(DispatchAliquotPeer.ALIQUOT,
+            AliquotWrapper.class);
     }
 
     public void setAliquot(AliquotWrapper aliquot) {
-        propertiesMap.put("aliquot", aliquot);
-        Aliquot oldAliquot = wrappedObject.getAliquot();
-        Aliquot newAliquot = null;
-        if (aliquot != null) {
-            newAliquot = aliquot.getWrappedObject();
-        }
-        wrappedObject.setAliquot(newAliquot);
-        propertyChangeSupport.firePropertyChange("aliquot", oldAliquot,
-            newAliquot);
+        setWrappedProperty(DispatchAliquotPeer.ALIQUOT, aliquot);
     }
 
     public DispatchWrapper getDispatch() {
-        DispatchWrapper ship = (DispatchWrapper) propertiesMap.get("dispatch");
-        if (ship == null) {
-            Dispatch s = wrappedObject.getDispatch();
-            if (s != null) {
-                ship = new DispatchWrapper(appService, s);
-            }
-        }
-        return ship;
+        return getWrappedProperty(DispatchAliquotPeer.DISPATCH,
+            DispatchWrapper.class);
     }
 
-    public void setDispatch(DispatchWrapper ship) {
-        propertiesMap.put("dispatch", ship);
-        Dispatch oldShip = wrappedObject.getDispatch();
-        Dispatch newShip = null;
-        if (ship != null) {
-            newShip = ship.getWrappedObject();
-        }
-        wrappedObject.setDispatch(newShip);
-        propertyChangeSupport.firePropertyChange("dispatch", oldShip, newShip);
-    }
-
-    public Integer getState() {
-        return wrappedObject.getState();
-    }
-
-    public void setState(Integer newState) {
-        Integer oldState = wrappedObject.getState();
-        wrappedObject.setState(newState);
-        propertyChangeSupport.firePropertyChange("state", oldState, newState);
-    }
-
-    public String getComment() {
-        return wrappedObject.getComment();
-    }
-
-    public void setComment(String newComment) {
-        String oldComment = wrappedObject.getComment();
-        wrappedObject.setComment(newComment);
-        propertyChangeSupport.firePropertyChange("comment", oldComment,
-            newComment);
+    public void setDispatch(DispatchWrapper dispatch) {
+        setWrappedProperty(DispatchAliquotPeer.DISPATCH, dispatch);
     }
 
     @Override
     public int compareTo(ModelWrapper<DispatchAliquot> object) {
         if (object instanceof DispatchAliquotWrapper) {
-            DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) object;
-            return getAliquot().compareTo(dsa.getAliquot());
+            DispatchAliquotWrapper da = (DispatchAliquotWrapper) object;
+            return getAliquot().compareTo(da.getAliquot());
         }
         return super.compareTo(object);
-    }
-
-    public String getStateDescription() {
-        return DispatchAliquotState.getState(getState()).getLabel();
     }
 
     @Override

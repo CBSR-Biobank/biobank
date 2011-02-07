@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
+import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -163,10 +163,10 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         } else {
             // dispatched aliquot?
             for (DispatchAliquotWrapper da : dsac) {
-                DispatchAliquotState state = DispatchAliquotState.getState(da
+                DispatchItemState state = DispatchItemState.getState(da
                     .getState());
                 if (da.getDispatch().isInTransitState()
-                    && DispatchAliquotState.NONE_STATE == state) {
+                    && DispatchItemState.NONE == state) {
                     // aliquot is in transit
                     // FIXME what if can't read sender or receiver
                     SiteWrapper fakeSite = new SiteWrapper(appService);
@@ -182,8 +182,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                     case MISSING:
                         // aliquot is missing
                         return da.getDispatch().getSender();
-                    case RECEIVED_STATE:
-                    case NONE_STATE:
+                    case RECEIVED:
+                    case NONE:
                         // aliquot has been intentionally dispatched and
                         // received
                         return da.getDispatch().getReceiver();
@@ -622,7 +622,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                 DispatchWrapper ship = dsa.getDispatch();
                 if (!ship.equals(excludedShipment)
                     && (ship.isInTransitState() || ship.isInCreationState())) {
-                    if (DispatchAliquotState.MISSING.isEquals(dsa.getState())) {
+                    if (DispatchItemState.MISSING.isEquals(dsa.getState())) {
                         return false;
                     }
                     return true;

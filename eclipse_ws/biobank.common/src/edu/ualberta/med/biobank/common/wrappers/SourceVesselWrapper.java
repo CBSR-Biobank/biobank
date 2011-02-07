@@ -8,7 +8,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
-import edu.ualberta.med.biobank.model.PvSourceVessel;
 import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.StudySourceVessel;
 import gov.nih.nci.system.applicationservice.ApplicationException;

@@ -119,7 +119,7 @@ public class RequestWrapper extends ModelWrapper<Request> {
         return getProperty(RequestPeer.REQUESTER);
     }
 
-    public void setRequester(CenterWrapper center) {
+    public void setRequester(CenterWrapper<?> center) {
         setWrappedProperty(RequestPeer.REQUESTER, center);
     }
 
