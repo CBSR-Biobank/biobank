@@ -12,10 +12,8 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentPatientPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
-import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -24,7 +22,6 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.DispatchAliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -148,17 +145,17 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         }
     }
 
-    public String getSiteString() {
-        SiteWrapper site = getLocation();
-        if (site != null) {
-            return site.getNameShort();
+    public String getCenterString() {
+        CenterWrapper center = getLocation();
+        if (center != null) {
+            return center.getNameShort();
         }
         // FIXME should never see that ? should never retrieve an aliquot which
         // site cannot be displayed ?
         return "CANNOT DISPLAY INFORMATION";
     }
 
-    private SiteWrapper getLocation() {
+    private CenterWrapper getLocation() {
         List<DispatchAliquotWrapper> dsac = this.getDispatchAliquotCollection();
         // if in a container, use the container's site
         if (getParent() != null) {
@@ -194,7 +191,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                 }
             }
             // if not in a container or a dispatch, use the originating shipment
-            return getPatientVisit().getShipment().getSite();
+            return getPatientVisit().getCenter();
         }
     }
 
@@ -478,9 +475,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         throws ApplicationException, BiobankCheckException {
         AliquotWrapper aliquot = getAliquot(appService, inventoryId);
         if (aliquot != null && user != null) {
-            SiteWrapper site = aliquot.getLocation();
+            CenterWrapper center = aliquot.getLocation();
             // site might be null if can't access it !
-            if (site == null) {
+            if (center == null) {
                 throw new ApplicationException(
                     "Aliquot "
                         + inventoryId
@@ -495,8 +492,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         + Aliquot.class.getName()
         + " a where a."
         + Property.concatNames(AliquotPeer.PATIENT_VISIT,
-            PatientVisitPeer.SHIPMENT_PATIENT, ShipmentPatientPeer.SHIPMENT,
-            ShipmentPeer.SITE, SitePeer.ID)
+            PatientVisitPeer.CENTER, CenterPeer.ID)
         + " = ? and "
         + Property.concatNames(AliquotPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + " != ?";
@@ -579,14 +575,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @Override
-    protected Log getLogMessage(String action, String site, String details) {
+    protected Log getLogMessage(String action, String center, String details) {
         Log log = new Log();
         PatientVisitWrapper visit = getPatientVisit();
         log.setAction(action);
-        if (site == null) {
-            log.setSite(visit.getShipment().getSite().getNameShort());
+        if (center == null) {
+            log.setSite(visit.getCenter().getNameShort());
         } else {
-            log.setSite(site);
+            log.setSite(center);
         }
         log.setPatientNumber(visit.getPatient().getPnumber());
         log.setInventoryId(getInventoryId());
@@ -610,23 +606,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return objectWithPositionManagement.getTop();
     }
 
-    @SuppressWarnings("unchecked")
     public List<DispatchAliquotWrapper> getDispatchAliquotCollection() {
-        List<DispatchAliquotWrapper> dsaCollection = (List<DispatchAliquotWrapper>) propertiesMap
-            .get("dispatchAliquotCollection");
-        if (dsaCollection == null) {
-            Collection<DispatchAliquot> children = wrappedObject
-                .getDispatchAliquotCollection();
-            if (children != null) {
-                dsaCollection = new ArrayList<DispatchAliquotWrapper>();
-                for (DispatchAliquot dsa : children) {
-                    dsaCollection.add(new DispatchAliquotWrapper(appService,
-                        dsa));
-                }
-                propertiesMap.put("dispatchAliquotCollection", dsaCollection);
-            }
-        }
-        return dsaCollection;
+        return getWrapperCollection(AliquotPeer.DISPATCH_ALIQUOT_COLLECTION,
+            DispatchAliquotWrapper.class, false);
     }
 
     public boolean isUsedInDispatch() {

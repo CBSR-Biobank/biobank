@@ -2,17 +2,14 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
-import edu.ualberta.med.biobank.model.AbstractShipment;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.ShippingMethod;
+import edu.ualberta.med.biobank.model.Source;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -31,10 +28,9 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         super(appService, sc);
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        List<AbstractShipmentWrapper> shipments = getShipmentCollection();
+        List<SourceWrapper> shipments = getSourceCollection();
         if (shipments != null && shipments.size() > 0) {
             throw new BiobankCheckException(
                 "Cannot delete this shipping company: shipments are still using it");
@@ -68,13 +64,11 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     public String getName() {
-        return wrappedObject.getName();
+        return getProperty(ShippingMethodPeer.NAME);
     }
 
     public void setName(String name) {
-        String old = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", old, name);
+        setProperty(ShippingMethodPeer.NAME, name);
     }
 
     @Override
@@ -85,43 +79,23 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         return 0;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<AbstractShipmentWrapper> getAllShipmentCollection(boolean sort) {
-        List<AbstractShipmentWrapper> shipmentCollection = (List<AbstractShipmentWrapper>) propertiesMap
-            .get("shipmentCollection");
-        if (shipmentCollection == null) {
-            Collection<AbstractShipment> children = wrappedObject
-                .getShipmentCollection();
-            if (children != null) {
-                shipmentCollection = new ArrayList<AbstractShipmentWrapper>();
-                for (AbstractShipment ship : children) {
-                    shipmentCollection.add(AbstractShipmentWrapper
-                        .createInstance(appService, ship));
-                }
-                propertiesMap.put("shipmentCollection", shipmentCollection);
-            }
-        }
-        if ((shipmentCollection != null) && sort)
-            Collections.sort(shipmentCollection);
-        return shipmentCollection;
+    @SuppressWarnings("unchecked")
+    public List<AbstractShipmentWrapper<?>> getAllShipmentCollection(
+        boolean sort) {
+        return getWrapperCollection(ShippingMethodPeer.SHIPMENT_COLLECTION,
+            AbstractShipmentWrapper.class, sort);
     }
 
-    @SuppressWarnings("rawtypes")
-    public List<AbstractShipmentWrapper> getShipmentCollection() {
-        return getShipmentCollection(false);
+    public List<SourceWrapper> getSourceCollection() {
+        return getSourceCollection(false);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<AbstractShipmentWrapper> getShipmentCollection(boolean sort) {
-        List<AbstractShipmentWrapper> shipmentCollection = (List<AbstractShipmentWrapper>) propertiesMap
-            .get("shipmentCollection");
-        if (shipmentCollection == null) {
-            List<AbstractShipmentWrapper> allShipmentCollection = getAllShipmentCollection(sort);
-            shipmentCollection = new ArrayList<AbstractShipmentWrapper>();
-            for (AbstractShipmentWrapper ship : allShipmentCollection) {
-                if (ship instanceof ShipmentWrapper) {
-                    shipmentCollection.add(ship);
-                }
+    public List<SourceWrapper> getSourceCollection(boolean sort) {
+        List<AbstractShipmentWrapper<?>> allShipmentCollection = getAllShipmentCollection(sort);
+        List<SourceWrapper> shipmentCollection = new ArrayList<SourceWrapper>();
+        for (AbstractShipmentWrapper<?> ship : allShipmentCollection) {
+            if (ship instanceof SourceWrapper) {
+                shipmentCollection.add((SourceWrapper) ship);
             }
         }
         return shipmentCollection;
@@ -144,7 +118,7 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     public boolean isUsed() throws ApplicationException, BiobankException {
-        String queryString = "select count(s) from " + Shipment.class.getName()
+        String queryString = "select count(s) from " + Source.class.getName()
             + " as s where s.shippingMethod=?)";
         HQLCriteria c = new HQLCriteria(queryString,
             Arrays.asList(new Object[] { wrappedObject }));

@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.Predicate;
@@ -23,15 +24,13 @@ import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
-import edu.ualberta.med.biobank.model.DispatchInfo;
-import edu.ualberta.med.biobank.model.Shipment;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SiteWrapper extends ModelWrapper<Site> {
+public class SiteWrapper extends CenterWrapper<Site> {
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
     private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();
 
@@ -50,47 +49,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         names.addAll(SitePeer.PROP_NAMES);
         names.addAll(AddressPeer.PROP_NAMES);
         return names;
-    }
-
-    public String getName() {
-        return getProperty(SitePeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(SitePeer.NAME, name);
-    }
-
-    public String getNameShort() {
-        return getProperty(SitePeer.NAME_SHORT);
-    }
-
-    public void setNameShort(String nameShort) {
-        setProperty(SitePeer.NAME_SHORT, nameShort);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(SitePeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(SitePeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public String getComment() {
-        return getProperty(SitePeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(SitePeer.COMMENT, comment);
-    }
-
-    private AddressWrapper getAddress() {
-        return getWrappedProperty(SitePeer.ADDRESS, AddressWrapper.class);
-    }
-
-    private void setAddress(AddressWrapper address) {
-        setWrappedProperty(SitePeer.ADDRESS, address);
     }
 
     private AddressWrapper initAddress() {
@@ -172,8 +130,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
             .size() > 0)
             || (getContainerTypeCollection() != null && getContainerTypeCollection()
                 .size() > 0)
-            || (getShipmentCollection() != null && getShipmentCollection()
-                .size() > 0)) {
+            || (getSourceCollection() != null && getSourceCollection().size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
@@ -205,14 +162,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public List<RequestWrapper> getApprovedRequestCollection() {
         return getRequestCollection(RequestState.APPROVED);
-    }
-
-    public List<RequestWrapper> getAcceptedRequestCollection() {
-        return getRequestCollection(RequestState.ACCEPTED);
-    }
-
-    public List<RequestWrapper> getFilledRequestCollection() {
-        return getRequestCollection(RequestState.FILLED);
     }
 
     public List<RequestWrapper> getShippedRequestCollection() {
@@ -312,15 +261,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         propertiesMap.put("topContainerCollection", null);
     }
 
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.SHIPMENT_COLLECTION,
-            ShipmentWrapper.class, sort);
-    }
-
-    public List<ShipmentWrapper> getShipmentCollection() {
-        return getShipmentCollection(true);
-    }
-
     @Override
     public int compareTo(ModelWrapper<Site> wrapper) {
         if (wrapper instanceof SiteWrapper) {
@@ -330,23 +270,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
                 : -1));
         }
         return 0;
-    }
-
-    /**
-     * Search for shipments in the site with the given waybill
-     * 
-     * @throws BiobankCheckException
-     */
-    public Long getShipmentCount() throws ApplicationException,
-        BiobankException {
-        HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + Shipment.class.getName() + " where site.id = ?",
-            Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
     }
 
     public Long getPatientCount() throws Exception {
@@ -434,120 +357,13 @@ public class SiteWrapper extends ModelWrapper<Site> {
         removedDispatchInfoWrapper.clear();
     }
 
-    public List<StudyWrapper> getDispatchStudiesAsSender() {
-        Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
-        if (srcMap == null)
-            return null;
-        List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
-        for (DispatchInfoWrapper diw : srcMap.values()) {
-            wrappers.add(diw.getStudy());
-        }
-        return wrappers;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<StudyWrapper> getDispatchStudiesAsReceiver() {
-        List<StudyWrapper> studies = (List<StudyWrapper>) propertiesMap
-            .get("dispatchStudiesAsReceiver");
-        if (studies == null) {
-            Collection<DispatchInfo> children = wrappedObject
-                .getDestDispatchInfoCollection();
-            if (children != null) {
-                studies = new ArrayList<StudyWrapper>();
-                for (DispatchInfo di : children) {
-                    studies.add(new StudyWrapper(appService, di.getStudy()));
-                }
-                propertiesMap.put("dispatchStudiesAsReceiver", studies);
-            }
-        }
-        return studies;
-    }
-
-    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study)
-        throws BiobankException {
-        if (study == null) {
-            throw new BiobankException("study is null");
-        }
-        Map<Integer, DispatchInfoWrapper> srcMap = getSrcDispatchInfoCollection();
-        if (srcMap == null)
-            return null;
-        DispatchInfoWrapper info = srcMap.get(study.getId());
-        if (info == null)
-            return null;
-        return info.getDestSiteCollection();
-    }
-
-    public void addStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> sites) throws BiobankCheckException {
-        if ((sites == null) || (sites.size() == 0))
-            return;
-        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
-        DispatchInfoWrapper diw = null;
-        if (infos != null) {
-            diw = infos.get(study.getId());
-        }
-        if (diw == null) {
-            List<StudyWrapper> studies = getStudyCollection();
-            if (studies == null || !studies.contains(study)) {
-                throw new BiobankCheckException("Site " + getNameShort()
-                    + " cannot dispatch aliquots from study "
-                    + study.getNameShort()
-                    + ": this study is not part of its current studies list.");
-            }
-            diw = new DispatchInfoWrapper(appService);
-            diw.setStudy(study);
-            diw.setSrcSite(this);
-            if (infos != null) {
-                infos.put(study.getId(), diw);
-            }
-            Collection<DispatchInfo> allsInfoObjects = wrappedObject
-                .getSrcDispatchInfoCollection();
-            if (allsInfoObjects == null) {
-                allsInfoObjects = new HashSet<DispatchInfo>();
-            } else {
-                allsInfoObjects = new HashSet<DispatchInfo>(allsInfoObjects);
-            }
-            allsInfoObjects.add(diw.wrappedObject);
-            wrappedObject.setSrcDispatchInfoCollection(allsInfoObjects);
-        }
-        diw.addDestSites(sites);
-    }
-
-    public void removeStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> sites) {
-        if ((sites == null) || (sites.size() == 0))
-            return;
-        Map<Integer, DispatchInfoWrapper> infos = getSrcDispatchInfoCollection();
-        if (infos != null) {
-            DispatchInfoWrapper diw = infos.get(study.getId());
-            if (diw != null) {
-                diw.removeDestSites(sites);
-                if (diw.getDestSiteCollection().size() == 0) {
-                    infos.remove(study.getId());
-                    removedDispatchInfoWrapper.add(diw);
-                    Collection<DispatchInfo> diList = wrappedObject
-                        .getSrcDispatchInfoCollection();
-                    DispatchInfo diToRemove = null;
-                    for (DispatchInfo di : diList) {
-                        if (di.getId().equals(diw.getId())) {
-                            diToRemove = di;
-                            break;
-                        }
-                    }
-                    diList.remove(diToRemove);
-                    wrappedObject.setSrcDispatchInfoCollection(diList);
-                }
-            }
-        }
-    }
-
     public List<DispatchWrapper> getReceivedDispatchCollection() {
-        return getWrapperCollection(SitePeer.RECEIVED_DISPATCH_COLLECTION,
+        return getWrapperCollection(CenterPeer.DST_DISPATCH_COLLECTION,
             DispatchWrapper.class, false);
     }
 
     public List<DispatchWrapper> getSentDispatchCollection() {
-        return getWrapperCollection(SitePeer.SENT_DISPATCH_COLLECTION,
+        return getWrapperCollection(CenterPeer.SRC_DISPATCH_COLLECTION,
             DispatchWrapper.class, false);
     }
 
@@ -649,30 +465,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
             }
         }
         return shipCollection;
-    }
-
-    /**
-     * For one study, this site has one source dispatch info associated.
-     * 
-     * @return
-     */
-    @SuppressWarnings("unchecked")
-    private Map<Integer, DispatchInfoWrapper> getSrcDispatchInfoCollection() {
-        Map<Integer, DispatchInfoWrapper> infos = (Map<Integer, DispatchInfoWrapper>) propertiesMap
-            .get("srcDispatchInfoCollection");
-        if (infos == null) {
-            Collection<DispatchInfo> children = wrappedObject
-                .getSrcDispatchInfoCollection();
-            if (children != null) {
-                infos = new HashMap<Integer, DispatchInfoWrapper>();
-                for (DispatchInfo di : children) {
-                    Integer studyId = di.getStudy().getId();
-                    infos.put(studyId, new DispatchInfoWrapper(appService, di));
-                }
-                propertiesMap.put("srcDispatchInfoCollection", infos);
-            }
-        }
-        return infos;
     }
 
     public Set<ClinicWrapper> getWorkingClinicCollection() {

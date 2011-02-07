@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.peer.AbstractShipmentPeer;
 import edu.ualberta.med.biobank.model.AbstractShipment;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.Source;
+import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractShipmentWrapper<E extends AbstractShipment>

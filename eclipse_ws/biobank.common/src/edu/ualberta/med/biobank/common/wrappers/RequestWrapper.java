@@ -12,12 +12,9 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
-import edu.ualberta.med.biobank.model.Address;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestAliquot;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -32,12 +29,8 @@ public class RequestWrapper extends ModelWrapper<Request> {
 
     private static final String ALL_ALIQUOTS_KEY = "requestAliquotCollection";
 
-    private AddressWrapper address;
-
     public RequestWrapper(WritableApplicationService appService) {
         super(appService);
-        this.address = new AddressWrapper(appService,
-            wrappedObject.getAddress());
     }
 
     public RequestWrapper(WritableApplicationService appService, Request request) {
@@ -55,31 +48,15 @@ public class RequestWrapper extends ModelWrapper<Request> {
     }
 
     public StudyWrapper getStudy() {
-        StudyWrapper study = (StudyWrapper) propertiesMap.get("study");
-        if (study == null) {
-            Study s = wrappedObject.getStudy();
-            if (s == null)
-                return null;
-            study = new StudyWrapper(appService, s);
-            propertiesMap.put("study", study);
-        }
-        return study;
+        return getWrappedProperty(RequestPeer.STUDY, StudyWrapper.class);
     }
 
     public void setStudy(StudyWrapper study) {
-        propertiesMap.put("study", study);
-        Study oldStudyRaw = wrappedObject.getStudy();
-        Study newStudyRaw = null;
-        if (study != null) {
-            newStudyRaw = study.wrappedObject;
-        }
-        wrappedObject.setStudy(newStudyRaw);
-        propertyChangeSupport.firePropertyChange("study", oldStudyRaw,
-            newStudyRaw);
+        setWrappedProperty(RequestPeer.STUDY, study);
     }
 
     public Date getDateCreated() {
-        return wrappedObject.getSubmitted();
+        return getProperty(RequestPeer.CREATED);
     }
 
     public boolean isInLostState() {
@@ -88,14 +65,6 @@ public class RequestWrapper extends ModelWrapper<Request> {
 
     public boolean isInApprovedState() {
         return RequestState.APPROVED.isEquals(getState());
-    }
-
-    public boolean isInAcceptedState() {
-        return RequestState.ACCEPTED.isEquals(getState());
-    }
-
-    public boolean isInFilledState() {
-        return RequestState.FILLED.isEquals(getState());
     }
 
     public boolean isInShippedState() {
@@ -111,7 +80,7 @@ public class RequestWrapper extends ModelWrapper<Request> {
     }
 
     private void setState(RequestState state) {
-        wrappedObject.setState(state.getId());
+        setProperty(RequestPeer.STATE, state.getId());
     }
 
     public void setInLostState() {
@@ -122,90 +91,36 @@ public class RequestWrapper extends ModelWrapper<Request> {
         setState(RequestState.APPROVED);
     }
 
-    public void setInFilledState() {
-        setState(RequestState.FILLED);
-    }
-
-    public void setInAcceptedState() {
-        wrappedObject.setAccepted(new Date());
-        setState(RequestState.ACCEPTED);
-    }
-
     public void setInShippedState() {
         setState(RequestState.SHIPPED);
     }
 
     public Date getSubmitted() {
-        return wrappedObject.getSubmitted();
+        return getProperty(RequestPeer.SUBMITTED);
     }
 
     public void setSubmitted(Date submitted) {
-        wrappedObject.setSubmitted(submitted);
+        setProperty(RequestPeer.SUBMITTED, submitted);
     }
 
     public Date getAccepted() {
-        return wrappedObject.getAccepted();
-    }
-
-    public void setAccepted(Date accepted) {
-        wrappedObject.setAccepted(accepted);
-    }
-
-    public Date getShipped() {
-        return wrappedObject.getShipped();
-    }
-
-    public void setShipped(Date shipped) {
-        wrappedObject.setShipped(shipped);
-    }
-
-    public String getWaybill() {
-        return wrappedObject.getWaybill();
-    }
-
-    public void setWaybill(String waybill) {
-        wrappedObject.setWaybill(waybill);
+        return getProperty(RequestPeer.CREATED);
     }
 
     public Integer getState() {
-        return wrappedObject.getState();
+        return getProperty(RequestPeer.STATE);
     }
 
     public void setState(Integer state) {
-        wrappedObject.setState(state);
+        setProperty(RequestPeer.STATE, state);
     }
 
-    public AddressWrapper getAddress() {
-        if (address == null) {
-            Address a = wrappedObject.getAddress();
-            if (a == null)
-                return null;
-            address = new AddressWrapper(appService, a);
-        }
-        return address;
+    public Center getRequester() {
+        return getProperty(RequestPeer.REQUESTER);
     }
 
-    public void setAddress(Address address) {
-        if (address == null)
-            this.address = null;
-        else
-            this.address = new AddressWrapper(appService, address);
-        Address oldAddress = wrappedObject.getAddress();
-        wrappedObject.setAddress(address);
-        propertyChangeSupport
-            .firePropertyChange("address", oldAddress, address);
-    }
-
-    public SiteWrapper getSite() {
-        SiteWrapper site = (SiteWrapper) propertiesMap.get("site");
-        if (site == null) {
-            Site s = wrappedObject.getSite();
-            if (s == null)
-                return null;
-            site = new SiteWrapper(appService, s);
-            propertiesMap.put("site", site);
-        }
-        return site;
+    public void setRequester(CenterWrapper center) {
+        setWrappedProperty(RequestPeer.REQUESTER, center);
     }
 
     public void receiveAliquots(List<AliquotWrapper> aliquots) throws Exception {
@@ -241,33 +156,9 @@ public class RequestWrapper extends ModelWrapper<Request> {
 
     }
 
-    public void setSite(SiteWrapper site) {
-        propertiesMap.put("site", site);
-        Site oldSite = wrappedObject.getSite();
-        Site newSite = site.getWrappedObject();
-        wrappedObject.setSite(newSite);
-        propertyChangeSupport.firePropertyChange("site", oldSite, newSite);
-    }
-
-    @SuppressWarnings("unchecked")
     public List<RequestAliquotWrapper> getRequestAliquotCollection(boolean sort) {
-        List<RequestAliquotWrapper> requestAliquotCollection = (List<RequestAliquotWrapper>) propertiesMap
-            .get(ALL_ALIQUOTS_KEY);
-        if (requestAliquotCollection == null) {
-            Collection<RequestAliquot> children = wrappedObject
-                .getRequestAliquotCollection();
-            if (children != null) {
-                requestAliquotCollection = new ArrayList<RequestAliquotWrapper>();
-                for (RequestAliquot aliquot : children) {
-                    requestAliquotCollection.add(new RequestAliquotWrapper(
-                        appService, aliquot));
-                }
-                propertiesMap.put(ALL_ALIQUOTS_KEY, requestAliquotCollection);
-            }
-            if ((requestAliquotCollection != null) && sort)
-                Collections.sort(requestAliquotCollection);
-        }
-        return requestAliquotCollection;
+        return getWrapperCollection(RequestPeer.REQUEST_ALIQUOT_COLLECTION,
+            RequestAliquotWrapper.class, sort);
     }
 
     public void setRequestAliquotCollection(

@@ -31,7 +31,7 @@ public class RequestSearchedNode extends AbstractSearchedNode {
     protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
         if (child instanceof RequestWrapper) {
             return parent.equals(((RequestWrapper) child)
-                .getSiteLinkedToObject());
+                .getCenterLinkedToObject());
         }
         return false;
     }

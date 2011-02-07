@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -15,27 +14,21 @@ import org.apache.commons.lang.StringUtils;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
-import edu.ualberta.med.biobank.common.peer.DispatchInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentPatientPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
+import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.ResearchGroup;
-import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyPvAttr;
-import edu.ualberta.med.biobank.model.StudySourceVessel;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -60,104 +53,50 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public String getName() {
-        return wrappedObject.getName();
+        return getProperty(StudyPeer.NAME);
     }
 
     public void setName(String name) {
-        String oldName = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
+        setProperty(StudyPeer.NAME, name);
     }
 
     public String getNameShort() {
-        return wrappedObject.getNameShort();
+        return getProperty(StudyPeer.NAME_SHORT);
     }
 
     public void setNameShort(String nameShort) {
-        String oldNameShort = getNameShort();
-        wrappedObject.setNameShort(nameShort);
-        propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
-            nameShort);
+        setProperty(StudyPeer.NAME_SHORT, nameShort);
     }
 
     public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
-            .get("activityStatus");
-        if (activityStatus == null) {
-            ActivityStatus a = wrappedObject.getActivityStatus();
-            if (a == null)
-                return null;
-            activityStatus = new ActivityStatusWrapper(appService, a);
-            propertiesMap.put("activityStatus", activityStatus);
-        }
-        return activityStatus;
+        return getWrappedProperty(StudyPeer.ACTIVITY_STATUS,
+            ActivityStatusWrapper.class);
     }
 
     public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        propertiesMap.put("activityStatus", activityStatus);
-        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        ActivityStatus rawObject = null;
-        if (activityStatus != null) {
-            rawObject = activityStatus.getWrappedObject();
-        }
-        wrappedObject.setActivityStatus(rawObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
+        setWrappedProperty(StudyPeer.ACTIVITY_STATUS, activityStatus);
     }
 
     public ResearchGroupWrapper getResearchGroup() {
-        ResearchGroupWrapper researchGroup = (ResearchGroupWrapper) propertiesMap
-            .get("ResearchGroup");
-        if (researchGroup == null) {
-            ResearchGroup a = wrappedObject.getResearchGroup();
-            if (a == null)
-                return null;
-            researchGroup = new ResearchGroupWrapper(appService, a);
-            propertiesMap.put("ResearchGroup", researchGroup);
-        }
-        return researchGroup;
+        return getWrappedProperty(StudyPeer.RESEARCH_GROUP,
+            ResearchGroupWrapper.class);
     }
 
     public void setResearchGroup(ResearchGroupWrapper researchGroup) {
-        propertiesMap.put("researchGroup", researchGroup);
-        ResearchGroup oldResearchGroup = wrappedObject.getResearchGroup();
-        ResearchGroup rawObject = null;
-        if (researchGroup != null) {
-            rawObject = researchGroup.getWrappedObject();
-        }
-        wrappedObject.setResearchGroup(rawObject);
-        propertyChangeSupport.firePropertyChange("researchGroup",
-            oldResearchGroup, researchGroup);
+        setWrappedProperty(StudyPeer.RESEARCH_GROUP, researchGroup);
     }
 
     public String getComment() {
-        return wrappedObject.getComment();
+        return getProperty(StudyPeer.COMMENT);
     }
 
     public void setComment(String comment) {
-        String oldComment = getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
+        setProperty(StudyPeer.COMMENT, comment);
     }
 
-    @SuppressWarnings("unchecked")
     public List<SiteWrapper> getSiteCollection(boolean sort) {
-        List<SiteWrapper> siteCollection = (List<SiteWrapper>) propertiesMap
-            .get("siteCollection");
-        if (siteCollection == null) {
-            siteCollection = new ArrayList<SiteWrapper>();
-            Collection<Site> children = wrappedObject.getSiteCollection();
-            if (children != null) {
-                for (Site type : children) {
-                    siteCollection.add(new SiteWrapper(appService, type));
-                }
-                propertiesMap.put("siteCollection", siteCollection);
-            }
-        }
-        if ((siteCollection != null) && sort)
-            Collections.sort(siteCollection);
-        return siteCollection;
+        return getWrapperCollection(StudyPeer.SITE_COLLECTION,
+            SiteWrapper.class, sort);
     }
 
     public List<SiteWrapper> getSiteCollection() {
@@ -182,104 +121,31 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return Study.class;
     }
 
-    @SuppressWarnings("unchecked")
     public List<ContactWrapper> getContactCollection(boolean sort) {
-        List<ContactWrapper> contactCollection = (List<ContactWrapper>) propertiesMap
-            .get("contactCollection");
-        if (contactCollection == null) {
-            contactCollection = new ArrayList<ContactWrapper>();
-            Collection<Contact> children = wrappedObject.getContactCollection();
-            if (children != null) {
-                for (Contact type : children) {
-                    contactCollection.add(new ContactWrapper(appService, type));
-                }
-                propertiesMap.put("contactCollection", contactCollection);
-            }
-        }
-        if ((contactCollection != null) && sort)
-            Collections.sort(contactCollection);
-        return contactCollection;
+        return getWrapperCollection(StudyPeer.CONTACT_COLLECTION,
+            ContactWrapper.class, sort);
     }
 
     public List<ContactWrapper> getContactCollection() {
         return getContactCollection(false);
     }
 
-    private void setContactCollection(Collection<Contact> allContactObjects,
-        List<ContactWrapper> allContactWrappers) {
-        Collection<Contact> oldContacts = wrappedObject.getContactCollection();
-        wrappedObject.setContactCollection(allContactObjects);
-        propertyChangeSupport.firePropertyChange("contactCollection",
-            oldContacts, allContactObjects);
-        propertiesMap.put("contactCollection", allContactWrappers);
+    public void setContactCollection(List<ContactWrapper> allContactWrappers) {
+        setWrapperCollection(StudyPeer.CONTACT_COLLECTION, allContactWrappers);
     }
 
     public void addContacts(List<ContactWrapper> newContacts) {
-        if ((newContacts == null) || (newContacts.size() == 0))
-            return;
-
-        Collection<Contact> allContactObjects = new HashSet<Contact>();
-        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
-        // already added contacts
-        List<ContactWrapper> currentList = getContactCollection();
-        if (currentList != null) {
-            for (ContactWrapper contact : currentList) {
-                allContactObjects.add(contact.getWrappedObject());
-                allContactWrappers.add(contact);
-            }
-        }
-        // new contacts added
-        for (ContactWrapper contact : newContacts) {
-            allContactObjects.add(contact.getWrappedObject());
-            allContactWrappers.add(contact);
-        }
-        setContactCollection(allContactObjects, allContactWrappers);
+        addToWrapperCollection(StudyPeer.CONTACT_COLLECTION, newContacts);
     }
 
-    public void removeContacts(List<ContactWrapper> contactsToRemove)
-        throws BiobankCheckException {
-        if ((contactsToRemove == null) || (contactsToRemove.size() == 0))
-            return;
-
-        List<ContactWrapper> currentList = getContactCollection();
-        if (!currentList.containsAll(contactsToRemove)) {
-            throw new BiobankCheckException(
-                "studies are not associated with study " + getNameShort());
-        }
-
-        Collection<Contact> allContactObjects = new HashSet<Contact>();
-        List<ContactWrapper> allContactWrappers = new ArrayList<ContactWrapper>();
-        // already added contacts
-        if (currentList != null) {
-            for (ContactWrapper contact : currentList) {
-                if (!contactsToRemove.contains(contact)) {
-                    allContactObjects.add(contact.getWrappedObject());
-                    allContactWrappers.add(contact);
-                }
-            }
-        }
-        setContactCollection(allContactObjects, allContactWrappers);
+    public void removeContacts(List<ContactWrapper> contactsToRemove) {
+        removeFromWrapperCollection(StudyPeer.CONTACT_COLLECTION,
+            contactsToRemove);
     }
 
-    @SuppressWarnings("unchecked")
     public List<SampleStorageWrapper> getSampleStorageCollection(boolean sort) {
-        List<SampleStorageWrapper> ssCollection = (List<SampleStorageWrapper>) propertiesMap
-            .get("sampleStorageCollection");
-        if (ssCollection == null) {
-            Collection<SampleStorage> children = wrappedObject
-                .getSampleStorageCollection();
-            if (children != null) {
-                ssCollection = new ArrayList<SampleStorageWrapper>();
-                for (SampleStorage study : children) {
-                    ssCollection
-                        .add(new SampleStorageWrapper(appService, study));
-                }
-                propertiesMap.put("sampleStorageCollection", ssCollection);
-            }
-        }
-        if ((ssCollection != null) && sort)
-            Collections.sort(ssCollection);
-        return ssCollection;
+        return getWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION,
+            SampleStorageWrapper.class, sort);
     }
 
     public List<SampleStorageWrapper> getSampleStorageCollection() {
@@ -287,56 +153,18 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public void addSampleStorage(List<SampleStorageWrapper> newSampleStorages) {
-        if (newSampleStorages != null && newSampleStorages.size() > 0) {
-            Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
-            List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
-            // already in list
-            List<SampleStorageWrapper> currentList = getSampleStorageCollection();
-            if (currentList != null) {
-                for (SampleStorageWrapper ss : currentList) {
-                    allSsObjects.add(ss.getWrappedObject());
-                    allSsWrappers.add(ss);
-                }
-            }
-            // new
-            for (SampleStorageWrapper ss : newSampleStorages) {
-                ss.setStudy(this);
-                allSsObjects.add(ss.getWrappedObject());
-                allSsWrappers.add(ss);
-                deletedSampleStorages.remove(ss);
-            }
-            setSampleStorages(allSsObjects, allSsWrappers);
-        }
+        addToWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION,
+            newSampleStorages);
     }
 
     public void removeSampleStorages(
         List<SampleStorageWrapper> sampleStoragesToRemove) {
-        if (sampleStoragesToRemove != null && sampleStoragesToRemove.size() > 0) {
-            deletedSampleStorages.addAll(sampleStoragesToRemove);
-            Collection<SampleStorage> allSsObjects = new HashSet<SampleStorage>();
-            List<SampleStorageWrapper> allSsWrappers = new ArrayList<SampleStorageWrapper>();
-            // already in list
-            List<SampleStorageWrapper> currentList = getSampleStorageCollection();
-            if (currentList != null) {
-                for (SampleStorageWrapper ss : currentList) {
-                    if (!sampleStoragesToRemove.contains(ss)) {
-                        allSsObjects.add(ss.getWrappedObject());
-                        allSsWrappers.add(ss);
-                    }
-                }
-            }
-            setSampleStorages(allSsObjects, allSsWrappers);
-        }
+        removeFromWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION,
+            sampleStoragesToRemove);
     }
 
-    private void setSampleStorages(Collection<SampleStorage> allSsObjects,
-        List<SampleStorageWrapper> allSsWrappers) {
-        Collection<SampleStorage> oldSampleStorage = wrappedObject
-            .getSampleStorageCollection();
-        wrappedObject.setSampleStorageCollection(allSsObjects);
-        propertyChangeSupport.firePropertyChange("sampleStorageCollection",
-            oldSampleStorage, allSsObjects);
-        propertiesMap.put("sampleStorageCollection", allSsWrappers);
+    public void setSampleStorages(List<SampleStorageWrapper> allSsWrappers) {
+        setWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION, allSsWrappers);
     }
 
     /*
@@ -374,26 +202,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
-    @SuppressWarnings("unchecked")
     public List<StudySourceVesselWrapper> getStudySourceVesselCollection(
         boolean sort) {
-        List<StudySourceVesselWrapper> ssCollection = (List<StudySourceVesselWrapper>) propertiesMap
-            .get("studySourceVesselCollection");
-        if (ssCollection == null) {
-            Collection<StudySourceVessel> children = wrappedObject
-                .getStudySourceVesselCollection();
-            if (children != null) {
-                ssCollection = new ArrayList<StudySourceVesselWrapper>();
-                for (StudySourceVessel study : children) {
-                    ssCollection.add(new StudySourceVesselWrapper(appService,
-                        study));
-                }
-                propertiesMap.put("sourceVesselCollection", ssCollection);
-            }
-        }
-        if ((ssCollection != null) && sort)
-            Collections.sort(ssCollection);
-        return ssCollection;
+        return getWrapperCollection(StudyPeer.STUDY_SOURCE_VESSEL_COLLECTION,
+            StudySourceVesselWrapper.class, sort);
     }
 
     public List<StudySourceVesselWrapper> getStudySourceVesselCollection() {
@@ -401,36 +213,28 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     private void setStudySourceVessels(
-        Collection<StudySourceVessel> allSsObject,
         List<StudySourceVesselWrapper> allSsWrappers) {
-        Collection<StudySourceVessel> oldSourceVessels = wrappedObject
-            .getStudySourceVesselCollection();
-        wrappedObject.setStudySourceVesselCollection(allSsObject);
-        propertyChangeSupport.firePropertyChange("studySourceVesselCollection",
-            oldSourceVessels, allSsObject);
-        propertiesMap.put("studySourceVesselCollection", allSsWrappers);
+        setWrapperCollection(StudyPeer.STUDY_SOURCE_VESSEL_COLLECTION,
+            allSsWrappers);
     }
 
     public void addStudySourceVessels(
         List<StudySourceVesselWrapper> newStudySourceVessels) {
         if (newStudySourceVessels != null && newStudySourceVessels.size() > 0) {
-            Collection<StudySourceVessel> allSsObjects = new HashSet<StudySourceVessel>();
             List<StudySourceVesselWrapper> allSsWrappers = new ArrayList<StudySourceVesselWrapper>();
             // already in list
             List<StudySourceVesselWrapper> currentList = getStudySourceVesselCollection();
             if (currentList != null) {
                 for (StudySourceVesselWrapper ss : currentList) {
-                    allSsObjects.add(ss.getWrappedObject());
                     allSsWrappers.add(ss);
                 }
             }
             // new
             for (StudySourceVesselWrapper ss : newStudySourceVessels) {
-                allSsObjects.add(ss.getWrappedObject());
                 allSsWrappers.add(ss);
                 deletedStudySourceVessels.remove(ss);
             }
-            setStudySourceVessels(allSsObjects, allSsWrappers);
+            setStudySourceVessels(allSsWrappers);
         }
     }
 
@@ -439,19 +243,17 @@ public class StudyWrapper extends ModelWrapper<Study> {
         if (studySourceVesselsToDelete != null
             && studySourceVesselsToDelete.size() > 0) {
             deletedStudySourceVessels.addAll(studySourceVesselsToDelete);
-            Collection<StudySourceVessel> allSsObjects = new HashSet<StudySourceVessel>();
             List<StudySourceVesselWrapper> allSsWrappers = new ArrayList<StudySourceVesselWrapper>();
             // already in list
             List<StudySourceVesselWrapper> currentList = getStudySourceVesselCollection();
             if (currentList != null) {
                 for (StudySourceVesselWrapper ss : currentList) {
                     if (!deletedStudySourceVessels.contains(ss)) {
-                        allSsObjects.add(ss.getWrappedObject());
                         allSsWrappers.add(ss);
                     }
                 }
             }
-            setStudySourceVessels(allSsObjects, allSsWrappers);
+            setStudySourceVessels(allSsWrappers);
         }
     }
 
@@ -644,24 +446,9 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return false;
     }
 
-    @SuppressWarnings("unchecked")
     public List<PatientWrapper> getPatientCollection(boolean sort) {
-        List<PatientWrapper> patientCollection = (List<PatientWrapper>) propertiesMap
-            .get("patientCollection");
-        if (patientCollection == null) {
-            Collection<Patient> children = wrappedObject.getPatientCollection();
-            if (children != null) {
-                patientCollection = new ArrayList<PatientWrapper>();
-                for (Patient patient : children) {
-                    patientCollection.add(new PatientWrapper(appService,
-                        patient));
-                }
-                propertiesMap.put("patientCollection", patientCollection);
-            }
-        }
-        if ((patientCollection != null) && sort)
-            Collections.sort(patientCollection);
-        return patientCollection;
+        return getWrapperCollection(StudyPeer.PATIENT_COLLECTION,
+            PatientWrapper.class, sort);
     }
 
     public List<PatientWrapper> getPatientCollection() {
@@ -736,53 +523,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return list.size();
     }
 
-    private void setPatientCollection(Collection<Patient> allPatientObjects,
-        List<PatientWrapper> allPatientWrappers) {
-        Collection<Patient> oldPatients = wrappedObject.getPatientCollection();
-        wrappedObject.setPatientCollection(allPatientObjects);
-        propertyChangeSupport.firePropertyChange("patientCollection",
-            oldPatients, allPatientObjects);
-        propertiesMap.put("patientCollection", allPatientWrappers);
+    public void setPatientCollection(List<PatientWrapper> allPatientWrappers) {
+        setWrapperCollection(StudyPeer.PATIENT_COLLECTION, allPatientWrappers);
     }
 
     public void addPatients(List<PatientWrapper> newPatients) {
-        if (newPatients != null && newPatients.size() > 0) {
-            Collection<Patient> allPatientObjects = new HashSet<Patient>();
-            List<PatientWrapper> allPatientWrappers = new ArrayList<PatientWrapper>();
-            // already added patients
-            List<PatientWrapper> currentList = getPatientCollection();
-            if (currentList != null) {
-                for (PatientWrapper patient : currentList) {
-                    allPatientObjects.add(patient.getWrappedObject());
-                    allPatientWrappers.add(patient);
-                }
-            }
-            // new patients added
-            for (PatientWrapper patient : newPatients) {
-                allPatientObjects.add(patient.getWrappedObject());
-                allPatientWrappers.add(patient);
-            }
-            setPatientCollection(allPatientObjects, allPatientWrappers);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DispatchInfoWrapper> getDispatchInfoCollection() {
-        List<DispatchInfoWrapper> infoCollection = (List<DispatchInfoWrapper>) propertiesMap
-            .get("dispatchInfoCollection");
-        if (infoCollection == null) {
-            Collection<DispatchInfo> children = wrappedObject
-                .getDispatchInfoCollection();
-            if (children != null) {
-                infoCollection = new ArrayList<DispatchInfoWrapper>();
-                for (DispatchInfo info : children) {
-                    infoCollection
-                        .add(new DispatchInfoWrapper(appService, info));
-                }
-                propertiesMap.put("dispatchInfoCollection", infoCollection);
-            }
-        }
-        return infoCollection;
+        addToWrapperCollection(StudyPeer.PATIENT_COLLECTION, newPatients);
     }
 
     @Override
@@ -809,17 +555,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
     private static final String PATIENT_COUNT_FOR_SITE_QRY = "select count(distinct patients) from "
         + Site.class.getName()
         + " as site join site."
-        + SitePeer.SHIPMENT_COLLECTION.getName()
-        + " as shipments join shipments."
-        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps join sps."
-        + ShipmentPatientPeer.PATIENT.getName()
-        + " as patients where site."
+        + CenterPeer.PATIENT_VISIT_COLLECTION
+        + " as pvs join pvs.patient as patients where site."
         + SitePeer.ID.getName()
         + "=? and "
         + "patients."
-        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID)
-        + "=?";
+        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
     public long getPatientCountForSite(SiteWrapper site)
         throws ApplicationException, BiobankException {
@@ -835,16 +576,17 @@ public class StudyWrapper extends ModelWrapper<Study> {
     private static final String VISIT_COUNT_FOR_SITE_QRY = "select count(distinct visits) from "
         + Site.class.getName()
         + " as site join site."
-        + SitePeer.SHIPMENT_COLLECTION.getName()
-        + " as shipments join shipments."
-        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps join sps."
-        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
-        + " as visits where site."
-        + SitePeer.ID.getName()
-        + "=? and sps."
-        + Property.concatNames(ShipmentPatientPeer.PATIENT, PatientPeer.STUDY,
-            StudyPeer.ID) + "=?";
+        + CenterPeer.PATIENT_VISIT_COLLECTION
+        + " as visits join visits."
+        + PatientVisitPeer.SOURCE_VESSEL_COLLECTION
+        + " as svs join svs."
+        + SourceVesselPeer.PATIENT
+        + "."
+        + PatientPeer.STUDY
+        + " as study where study."
+        + StudyPeer.ID
+        + "=? and site."
+        + SitePeer.ID + "=?";
 
     public long getPatientVisitCountForSite(SiteWrapper site)
         throws ApplicationException, BiobankException {
@@ -857,70 +599,15 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return results.get(0);
     }
 
-    public static final String PATIENT_COUNT_FOR_CLINIC_QRY = "select count(distinct patients) from "
-        + Study.class.getName()
-        + " as study join study."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patients join patients."
-        + PatientPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps join sps."
-        + Property.concatNames(ShipmentPatientPeer.SHIPMENT,
-            ShipmentPeer.CLINIC)
-        + " as clinic where study."
-        + StudyPeer.ID.getName()
-        + "=? and clinic."
-        + ClinicPeer.ID.getName()
-        + "=?";
-
-    public long getPatientCountForClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_CLINIC_QRY,
-            Arrays.asList(new Object[] { getId(), clinic.getId() }));
-        List<Long> result = appService.query(c);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
-    }
-
-    public static final String VISIT_COUNT_FOR_CLINIC_QRY = "select count(distinct visits) from "
-        + Study.class.getName()
-        + " as study join study."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patients join patients."
-        + PatientPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps join sps."
-        + Property.concatNames(ShipmentPatientPeer.SHIPMENT,
-            ShipmentPeer.CLINIC)
-        + " as clinic join sps."
-        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
-        + " as visits where study."
-        + StudyPeer.ID.getName()
-        + "=? and clinic."
-        + ClinicPeer.ID.getName()
-        + "=? and sps."
-        + Property.concatNames(ShipmentPatientPeer.PATIENT, PatientPeer.STUDY)
-        + "=study";
-
-    public long getPatientVisitCountForClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_CLINIC_QRY,
-            Arrays.asList(new Object[] { getId(), clinic.getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
-    }
-
-    public static final String VISIT_COUNT_QRY = "select count(visits) from "
-        + Study.class.getName() + " as study inner join study."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patients inner join patients."
-        + PatientPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps inner join sps."
-        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
-        + " as visits where study." + StudyPeer.ID.getName() + "=? ";
+    private static final String VISIT_COUNT_QRY = "select count(distinct visits) from "
+        + PatientVisit.class.getName()
+        + " as visits join visits."
+        + PatientVisitPeer.SOURCE_VESSEL_COLLECTION
+        + " as svs join svs."
+        + SourceVesselPeer.PATIENT
+        + "."
+        + PatientPeer.STUDY
+        + " as study where study." + StudyPeer.ID + "=?";
 
     public long getPatientVisitCount() throws ApplicationException,
         BiobankException {
@@ -945,18 +632,12 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     protected void persistDependencies(Study origObject) throws Exception {
         if (studyPvAttrMap != null) {
-            Collection<StudyPvAttr> allStudyPvAttrObjects = new HashSet<StudyPvAttr>();
             List<StudyPvAttrWrapper> allStudyPvAttrWrappers = new ArrayList<StudyPvAttrWrapper>();
             for (StudyPvAttrWrapper ss : studyPvAttrMap.values()) {
-                allStudyPvAttrObjects.add(ss.getWrappedObject());
                 allStudyPvAttrWrappers.add(ss);
             }
-            Collection<StudyPvAttr> oldStudyPvAttrs = wrappedObject
-                .getStudyPvAttrCollection();
-            wrappedObject.setStudyPvAttrCollection(allStudyPvAttrObjects);
-            propertyChangeSupport.firePropertyChange("studyPvAttrCollection",
-                oldStudyPvAttrs, allStudyPvAttrObjects);
-            propertiesMap.put("studyPvAttrCollection", allStudyPvAttrWrappers);
+            setWrapperCollection(StudyPeer.STUDY_PV_ATTR_COLLECTION,
+                allStudyPvAttrWrappers);
         }
         deleteSampleStorages();
         deleteStudySourceVessels();
@@ -1026,36 +707,4 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return getName();
     }
 
-    public static final String DISP_DEST_SITE_COLL_QRY = "select info.destSiteCollection from "
-        + DispatchInfo.class.getName()
-        + " as info where info."
-        + Property.concatNames(DispatchInfoPeer.STUDY, StudyPeer.ID)
-        + " = ? and info"
-        + Property.concatNames(DispatchInfoPeer.SRC_SITE, SitePeer.ID) + "=?";
-
-    public List<SiteWrapper> getDispatchDestSiteCollection(SiteWrapper site)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(DISP_DEST_SITE_COLL_QRY,
-            Arrays.asList(new Object[] { getId(), site.getId() }));
-        List<Site> results = appService.query(criteria);
-        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
-        for (Site res : results) {
-            wrappers.add(new SiteWrapper(appService, res));
-        }
-        return wrappers;
-    }
-
-    public List<SiteWrapper> getDispatchAllSrcSites()
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select info.srcSite from " + DispatchInfo.class.getName()
-                + " as info where info.study.id = ?",
-            Arrays.asList(new Object[] { getId() }));
-        List<Site> results = appService.query(criteria);
-        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
-        for (Site res : results) {
-            wrappers.add(new SiteWrapper(appService, res));
-        }
-        return wrappers;
-    }
 }
