@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
+import edu.ualberta.med.biobank.common.wrappers.util.ModelWrapperHelper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -27,6 +28,7 @@ import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -151,7 +153,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<R>, R> void addToWrapperCollection(
-        Property<? extends Collection<R>, E> property, List<W> newWrappers) {
+        Property<? extends Collection<R>, ? super E> property,
+        List<W> newWrappers) {
         if (newWrappers == null || newWrappers.size() == 0) {
             return;
         }
@@ -174,7 +177,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     public <W extends ModelWrapper<R>, R> void removeFromWrapperCollection(
-        Property<? extends Collection<R>, E> property, List<W> wrappersToRemove) {
+        Property<? extends Collection<R>, ? super E> property,
+        List<W> wrappersToRemove) {
         if (wrappersToRemove == null || wrappersToRemove.size() == 0) {
             return;
         }
@@ -853,6 +857,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             // superclass should be the real (non-proxied/non-enhanced) model
             // class
             modelKlazz = modelKlazz.getSuperclass();
+        }
+
+        if (wrapperKlazz == null
+            || Modifier.isAbstract(wrapperKlazz.getModifiers())) {
+            @SuppressWarnings("unchecked")
+            Class<W> tmp = (Class<W>) ModelWrapperHelper
+                .getWrapperClass(modelKlazz);
+            wrapperKlazz = tmp;
         }
 
         Class<?>[] params = new Class[] { WritableApplicationService.class,

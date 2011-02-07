@@ -8,8 +8,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.AbstractShipmentPeer;
 import edu.ualberta.med.biobank.model.AbstractShipment;
 import edu.ualberta.med.biobank.model.Dispatch;
-import edu.ualberta.med.biobank.model.Shipment;
-import edu.ualberta.med.biobank.model.ShippingMethod;
+import edu.ualberta.med.biobank.model.Source;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
@@ -29,7 +28,7 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public Date getDeparted() {
-        return wrappedObject.getDeparted();
+        return getProperty(AbstractShipmentPeer.DEPARTED);
     }
 
     public String getFormattedDeparted() {
@@ -37,13 +36,11 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public void setDeparted(Date date) {
-        Date oldDate = getDeparted();
-        wrappedObject.setDeparted(date);
-        propertyChangeSupport.firePropertyChange("departed", oldDate, date);
+        setProperty(AbstractShipmentPeer.DEPARTED, date);
     }
 
     public Date getDateReceived() {
-        return wrappedObject.getDateReceived();
+        return getProperty(AbstractShipmentPeer.DATE_RECEIVED);
     }
 
     public String getFormattedDateReceived() {
@@ -52,9 +49,7 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public void setDateReceived(Date date) {
-        Date oldDate = getDateReceived();
-        wrappedObject.setDateReceived(date);
-        propertyChangeSupport.firePropertyChange("dateReceived", oldDate, date);
+        setProperty(AbstractShipmentPeer.DATE_RECEIVED, date);
     }
 
     @Override
@@ -70,34 +65,27 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public String getComment() {
-        return wrappedObject.getComment();
+        return getProperty(AbstractShipmentPeer.COMMENT);
     }
 
     public void setComment(String comment) {
-        String oldComment = getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
+        setProperty(AbstractShipmentPeer.COMMENT, comment);
     }
 
     public String getWaybill() {
-        return wrappedObject.getWaybill();
+        return getProperty(AbstractShipmentPeer.WAYBILL);
     }
 
     public void setWaybill(String waybill) {
-        String old = getWaybill();
-        wrappedObject.setWaybill(waybill);
-        propertyChangeSupport.firePropertyChange("waybill", old, waybill);
+        setProperty(AbstractShipmentPeer.WAYBILL, waybill);
     }
 
     public String getBoxNumber() {
-        return wrappedObject.getBoxNumber();
+        return getProperty(AbstractShipmentPeer.BOX_NUMBER);
     }
 
     public void setBoxNumber(String boxNumber) {
-        String old = getBoxNumber();
-        wrappedObject.setBoxNumber(boxNumber);
-        propertyChangeSupport.firePropertyChange("boxNumber", old, boxNumber);
+        setProperty(AbstractShipmentPeer.BOX_NUMBER, boxNumber);
     }
 
     @Override
@@ -127,21 +115,21 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
     }
 
     public ShippingMethodWrapper getShippingMethod() {
-        ShippingMethod sc = wrappedObject.getShippingMethod();
-        if (sc == null) {
-            return null;
-        }
-        return new ShippingMethodWrapper(appService, sc);
+        return getWrappedProperty(AbstractShipmentPeer.SHIPPING_METHOD,
+            ShippingMethodWrapper.class);
     }
 
-    public void setShippingMethod(ShippingMethodWrapper sc) {
-        ShippingMethod old = wrappedObject.getShippingMethod();
-        ShippingMethod newSh = null;
-        if (sc != null) {
-            newSh = sc.getWrappedObject();
-        }
-        wrappedObject.setShippingMethod(newSh);
-        propertyChangeSupport.firePropertyChange("shippingMethod", old, newSh);
+    public void setShippingMethod(ShippingMethodWrapper method) {
+        setWrappedProperty(AbstractShipmentPeer.SHIPPING_METHOD, method);
+    }
+
+    public ActivityStatusWrapper getActivityStatus() {
+        return getWrappedProperty(AbstractShipmentPeer.ACTIVITY_STATUS,
+            ActivityStatusWrapper.class);
+    }
+
+    public void getActivityStatus(ActivityStatusWrapper activityStatus) {
+        setWrappedProperty(AbstractShipmentPeer.ACTIVITY_STATUS, activityStatus);
     }
 
     public static AbstractShipmentWrapper<?> createInstance(
@@ -149,10 +137,9 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
         if (ship instanceof Dispatch) {
             return new DispatchWrapper(appService, (Dispatch) ship);
         }
-        if (ship instanceof Shipment) {
-            return new ShipmentWrapper(appService, (Shipment) ship);
+        if (ship instanceof Source) {
+            return new SourceWrapper(appService, (Source) ship);
         }
         return null;
     }
-
 }

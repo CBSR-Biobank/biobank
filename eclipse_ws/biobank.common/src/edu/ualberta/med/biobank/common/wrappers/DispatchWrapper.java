@@ -6,9 +6,15 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import javax.xml.ws.Dispatch;
+
+import org.omg.CORBA.portable.ApplicationException;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -16,11 +22,7 @@ import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
-import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.model.DispatchAliquot;
-import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -28,6 +30,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * @see DispatchState
  */
 public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
+    private static final Map<EnumSet<DispatchAliquotState>, List<DispatchAliquot>> aliquotCache = null;
 
     private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedDispatchAliquotCollection";
 
@@ -72,9 +75,9 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         if (getReceiver() == null) {
             throw new BiobankCheckException("Receiver should be set");
         }
-        if (getStudy() == null) {
-            throw new BiobankCheckException("Study should be set");
-        }
+        // if (getStudy() == null) {
+        // throw new BiobankCheckException("Study should be set");
+        // }
         if (!checkWaybillUniqueForSender()) {
             throw new BiobankCheckException("A dispatch with waybill "
                 + getWaybill() + " already exists for sending site "
@@ -125,26 +128,16 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         }
     }
 
+    @SuppressWarnings("unused")
     private void checkSenderCanSendToReceiver() throws BiobankException {
-        if (getSender() != null && getReceiver() != null && getStudy() != null) {
-            List<SiteWrapper> possibleReceivers = getSender()
-                .getStudyDispachSites(getStudy());
-            if (possibleReceivers == null
-                || !possibleReceivers.contains(getReceiver())) {
-                throw new BiobankCheckException("site "
-                    + getSender().getNameShort()
-                    + " cannot dispatch aliquots to site "
-                    + getReceiver().getNameShort() + " for study "
-                    + getStudy().getNameShort());
-            }
-        }
+        // TODO: for now, anyone can send to anyone.
     }
 
     private boolean checkWaybillUniqueForSender() throws ApplicationException,
         BiobankCheckException {
         String isSameShipment = "";
         List<Object> params = new ArrayList<Object>();
-        SiteWrapper sender = getSender();
+        CenterWrapper sender = getSender();
         if (sender == null) {
             throw new BiobankCheckException("sender site cannot be null");
         }
@@ -161,105 +154,34 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         return results.size() == 0;
     }
 
-    public SiteWrapper getSender() {
-        SiteWrapper sender = (SiteWrapper) propertiesMap.get("sender");
-        if (sender == null) {
-            Site s = wrappedObject.getSender();
-            if (s == null)
-                return null;
-            sender = new SiteWrapper(appService, s);
-            propertiesMap.put("sender", sender);
-        }
-        return sender;
+    public CenterWrapper getSender() {
+        return getWrappedProperty(DispatchPeer.SENDER, CenterWrapper.class);
     }
 
-    public void setSender(SiteWrapper sender) {
-        propertiesMap.put("sender", sender);
-        Site oldSender = wrappedObject.getSender();
-        Site newSender = null;
-        if (sender != null) {
-            newSender = sender.getWrappedObject();
-        }
-        wrappedObject.setSender(newSender);
-        propertyChangeSupport
-            .firePropertyChange("sender", oldSender, newSender);
+    public void setSender(CenterWrapper sender) {
+        setWrappedProperty(DispatchPeer.SENDER, sender);
     }
 
-    public SiteWrapper getReceiver() {
-        SiteWrapper receiver = (SiteWrapper) propertiesMap.get("receiver");
-        if (receiver == null) {
-            Site r = wrappedObject.getReceiver();
-            if (r == null)
-                return null;
-            receiver = new SiteWrapper(appService, r);
-            propertiesMap.put("receiver", receiver);
-        }
-        return receiver;
+    public CenterWrapper getReceiver() {
+        return getWrappedProperty(DispatchPeer.RECEIVER, CenterWrapper.class);
     }
 
-    public void setReceiver(SiteWrapper receiver) {
-        propertiesMap.put("receiver", receiver);
-        Site oldReceiver = wrappedObject.getReceiver();
-        Site newReceiver = null;
-        if (receiver != null) {
-            newReceiver = receiver.getWrappedObject();
-        }
-        wrappedObject.setReceiver(newReceiver);
-        propertyChangeSupport.firePropertyChange("receiver", oldReceiver,
-            newReceiver);
+    public void setReceiver(CenterWrapper center) {
+        setWrappedProperty(DispatchPeer.RECEIVER, center);
     }
 
     public String getStateDescription() {
-        DispatchState state = DispatchState.getState(wrappedObject.getState());
+        DispatchState state = DispatchState
+            .getState(getProperty(DispatchPeer.STATE));
         if (state == null)
             return "";
         return state.getLabel();
     }
 
-    public StudyWrapper getStudy() {
-        StudyWrapper study = (StudyWrapper) propertiesMap.get("study");
-        if (study == null) {
-            Study s = wrappedObject.getStudy();
-            if (s == null)
-                return null;
-            study = new StudyWrapper(appService, s);
-            propertiesMap.put("study", study);
-        }
-        return study;
-    }
-
-    public void setStudy(StudyWrapper study) {
-        propertiesMap.put("study", study);
-        Study oldStudy = wrappedObject.getStudy();
-        Study newStudy = null;
-        if (study != null) {
-            newStudy = study.getWrappedObject();
-        }
-        wrappedObject.setStudy(newStudy);
-        propertyChangeSupport.firePropertyChange("study", oldStudy, newStudy);
-    }
-
-    @SuppressWarnings("unchecked")
     public List<DispatchAliquotWrapper> getDispatchAliquotCollection(
         boolean sort) {
-        List<DispatchAliquotWrapper> aliquotCollection = (List<DispatchAliquotWrapper>) propertiesMap
-            .get("dispatchAliquotCollection");
-        if (aliquotCollection == null) {
-            Collection<DispatchAliquot> children = wrappedObject
-                .getDispatchAliquotCollection();
-            if (children != null) {
-                aliquotCollection = new ArrayList<DispatchAliquotWrapper>();
-                for (DispatchAliquot dsa : children) {
-                    aliquotCollection.add(new DispatchAliquotWrapper(
-                        appService, dsa));
-                }
-                propertiesMap.put("dispatchAliquotCollection",
-                    aliquotCollection);
-            }
-        }
-        if ((aliquotCollection != null) && sort)
-            Collections.sort(aliquotCollection);
-        return aliquotCollection;
+        return getWrapperCollection(DispatchPeer.DISPATCH_ALIQUOT_COLLECTION,
+            DispatchAliquotWrapper.class, sort);
     }
 
     public List<DispatchAliquotWrapper> getDispatchAliquotCollection() {
@@ -423,7 +345,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         }
         if (aliquot.getPosition() == null) {
             return new CheckStatus(false, "Cannot add aliquot "
-                + aliquot.getInventoryId()
+                + aliquot.getInventoryIgetExtraDispatchAliquotsd()
                 + ": it has no position. A position should be first assigned.");
         }
         if (aliquot.getParent() != null
@@ -436,13 +358,13 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         }
         StudyWrapper aliquotStudy = aliquot.getPatientVisit().getPatient()
             .getStudy();
-        if (!aliquotStudy.equals(getStudy())) {
-            return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
-                + " is linked to study " + aliquotStudy.getNameShort()
-                + ". The study of this shipment is "
-                + ((getStudy() == null) ? "none" : getStudy().getNameShort())
-                + ".");
-        }
+        // if (!aliquotStudy.equals(getStudy())) {
+        // return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
+        // + " is linked to study " + aliquotStudy.getNameShort()
+        // + ". The study of this shipment is "
+        // + ((getStudy() == null) ? "none" : getStudy().getNameShort())
+        // + ".");
+        // }
         if (checkAlreadyAdded && currentAliquots != null
             && currentAliquots.contains(aliquot)) {
             return new CheckStatus(false, aliquot.getInventoryId()
@@ -627,8 +549,8 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     public String toString() {
         StringBuffer sb = new StringBuffer();
         sb.append(getSender() == null ? "" : getSender().getNameShort() + "/");
-        sb.append(getReceiver() == null ? "" : getReceiver().getNameShort()
-            + "/");
+        // sb.append(getReceiver() == null ? "" : getReceiver().getNameShort()
+        // + "/");
         sb.append(getFormattedDeparted() + "/");
         sb.append(getFormattedDateReceived());
         return sb.toString();
@@ -672,18 +594,18 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
             && getAliquotCollection().size() > 0;
     }
 
-    public boolean canBeReceivedBy(User user) throws Exception {
-        return getReceiver() != null && canUpdate(user)
-            && SiteWrapper.getSites(appService).contains(getReceiver())
-            && isInTransitState() && user.canUpdateSite(getReceiver());
-    }
+    // public boolean canBeReceivedBy(User user) throws Exception {
+    // return getReceiver() != null && canUpdate(user)
+    // && SiteWrapper.getSites(appService).contains(getReceiver())
+    // && isInTransitState() && user.canUpdateSite(getReceiver());
+    // }
 
-    public boolean canBeClosedBy(User user) throws Exception {
-        return getReceiver() != null && canUpdate(user)
-            && SiteWrapper.getSites(appService).contains(getReceiver())
-            && isInReceivedState() && !hasPendingAliquots()
-            && user.canUpdateSite(getReceiver());
-    }
+    // public boolean canBeClosedBy(User user) throws Exception {
+    // return getReceiver() != null && canUpdate(user)
+    // && SiteWrapper.getSites(appService).contains(getReceiver())
+    // && isInReceivedState() && !hasPendingAliquots()
+    // && user.canUpdateSite(getReceiver());
+    // }
 
     private boolean hasPendingAliquots() {
         List<DispatchAliquotWrapper> dsaList = getNonProcessedDispatchAliquotCollection();
