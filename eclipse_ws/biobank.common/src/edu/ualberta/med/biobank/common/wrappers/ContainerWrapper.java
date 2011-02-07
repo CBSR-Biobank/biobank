@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
@@ -15,15 +16,17 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
+import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
+import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -316,6 +319,64 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         setProperty(ContainerPeer.LABEL, label);
     }
 
+    public Double getTemperature() {
+        return getProperty(ContainerPeer.TEMPERATURE);
+    }
+
+    public void setTemperature(Double temperature) {
+        setProperty(ContainerPeer.TEMPERATURE, temperature);
+    }
+
+    public ContainerTypeWrapper getContainerType() {
+        return getWrappedProperty(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypeWrapper.class);
+    }
+
+    public void setContainerType(ContainerTypeWrapper containerType) {
+        setWrappedProperty(ContainerPeer.CONTAINER_TYPE, containerType);
+    }
+
+    public ActivityStatusWrapper getActivityStatus() {
+        return getWrappedProperty(ContainerPeer.ACTIVITY_STATUS,
+            ActivityStatusWrapper.class);
+    }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        setWrappedProperty(ContainerPeer.ACTIVITY_STATUS, activityStatus);
+    }
+
+    public String getComment() {
+        return getProperty(ContainerPeer.COMMENT);
+    }
+
+    public void setComment(String comment) {
+        setProperty(ContainerPeer.COMMENT, comment);
+    }
+
+    public String getProductBarcode() {
+        return getProperty(ContainerPeer.PRODUCT_BARCODE);
+    }
+
+    public void setProductBarcode(String barcode) {
+        setProperty(ContainerPeer.PRODUCT_BARCODE, barcode);
+    }
+
+    public Integer getRowCapacity() {
+        ContainerTypeWrapper type = getContainerType();
+        if (type == null) {
+            return null;
+        }
+        return type.getRowCapacity();
+    }
+
+    public Integer getColCapacity() {
+        ContainerTypeWrapper type = getContainerType();
+        if (type == null) {
+            return null;
+        }
+        return type.getColCapacity();
+    }
+
     public String getPath() {
         StringBuilder sb = new StringBuilder();
         ContainerWrapper container = this;
@@ -462,7 +523,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-                AliquotWrapper aliquot = getWrappedProperty(position,
+                AliquotWrapper aliquot = position.getWrappedProperty(
                     AliquotPositionPeer.ALIQUOT, AliquotWrapper.class);
                 aliquots.put(
                     new RowColPos(position.getRow(), position.getCol()),
@@ -538,24 +599,17 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return getLabel() + " (" + getContainerType().getNameShort() + ")";
     }
 
-    public void setTemperature(Double temperature) {
-        Double oldTemp = getTemperature();
-        wrappedObject.setTemperature(temperature);
-        propertyChangeSupport.firePropertyChange("temperature", oldTemp,
-            temperature);
-    }
-
-    public Double getTemperature() {
-        return getWrappedObject().getTemperature();
-    }
+    private static final String CHILD_COUNT_QRY = "select count(pos) from "
+        + ContainerPosition.class.getName()
+        + " as pos where pos."
+        + Property.concatNames(ContainerPositionPeer.PARENT_CONTAINER,
+            ContainerTypePeer.ID) + "=?";
 
     @SuppressWarnings("unchecked")
     public long getChildCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria("select count(pos) from "
-                + ContainerPosition.class.getName()
-                + " as pos where pos.parentContainer.id = ?",
+            HQLCriteria criteria = new HQLCriteria(CHILD_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
@@ -580,25 +634,24 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) propertiesMap
             .get("children");
         if (children == null) {
-            Collection<ContainerPosition> positions = wrappedObject
-                .getChildPositionCollection();
-            if (positions != null) {
-                children = new TreeMap<RowColPos, ContainerWrapper>();
-                for (ContainerPosition position : positions) {
-                    ContainerWrapper child = new ContainerWrapper(appService,
-                        position.getContainer());
-                    try {
-                        // try to reload - will start with a fresh ModelObject
-                        // not containing the whole object hierarchy it can hold
-                        // child.reload();
-                    } catch (Exception e) {
-                    }
-                    children.put(
-                        new RowColPos(position.getRow(), position.getCol()),
-                        child);
+            Collection<ContainerPositionWrapper> positions = getWrapperCollection(
+                ContainerPeer.CHILD_POSITION_COLLECTION,
+                ContainerPositionWrapper.class, false);
+            children = new TreeMap<RowColPos, ContainerWrapper>();
+
+            for (ContainerPositionWrapper position : positions) {
+                ContainerWrapper child = position.getWrappedProperty(
+                    ContainerPositionPeer.CONTAINER, ContainerWrapper.class);
+                try {
+                    // try to reload - will start with a fresh ModelObject
+                    // not containing the whole object hierarchy it can hold
+                    // child.reload();
+                } catch (Exception e) {
                 }
-                propertiesMap.put("children", children);
+                children.put(
+                    new RowColPos(position.getRow(), position.getCol()), child);
             }
+            propertiesMap.put("children", children);
         }
         return children;
     }
@@ -724,9 +777,9 @@ public class ContainerWrapper extends ModelWrapper<Container> {
 
     public void moveAliquots(ContainerWrapper destination) throws Exception {
         Map<RowColPos, AliquotWrapper> aliquots = getAliquots();
-        for (RowColPos rcp : aliquots.keySet()) {
-            AliquotWrapper aliquot = aliquots.get(rcp);
-            destination.addAliquot(rcp.row, rcp.col, aliquot);
+        for (Entry<RowColPos, AliquotWrapper> e : aliquots.entrySet()) {
+            destination
+                .addAliquot(e.getKey().row, e.getKey().col, e.getValue());
         }
         destination.persist();
     }
@@ -777,6 +830,16 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return getPossibleParents(appService, childLabel, getSite(), this);
     }
 
+    private static final String POSSIBLE_PARENTS_BASE_QRY = "select distinct(c) from "
+        + Container.class.getName()
+        + " as c left join c."
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION)
+        + " as ct where c."
+        + ContainerPeer.SITE.getName()
+        + "=? and c."
+        + ContainerPeer.LABEL.getName() + " in (";
+
     /**
      * Get containers with a given label that can have a child (container or
      * aliquot) with label 'childLabel'. If child is not null and is a
@@ -789,29 +852,29 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         List<Integer> validLengths = ContainerLabelingSchemeWrapper
             .getPossibleLabelLength(appService);
         List<String> validParents = new ArrayList<String>();
+
         for (Integer crop : validLengths)
             if (crop < childLabel.length())
-                validParents.add(childLabel.substring(0, childLabel.length()
-                    - crop));
+                validParents
+                    .add(new StringBuilder("'")
+                        .append(
+                            childLabel.substring(0, childLabel.length() - crop))
+                        .append("'").toString());
+
         List<ContainerWrapper> filteredWrappers = new ArrayList<ContainerWrapper>();
         if (validParents.size() > 0) {
             List<Object> params = new ArrayList<Object>();
             params.add(site.getWrappedObject());
-            String parentQuery = "select distinct(c) from "
-                + Container.class.getName()
-                + " as c left join c.containerType.childContainerTypeCollection "
-                + "as ct where c.site = ? and c.label in ('";
-            for (String validParent : validParents) {
-                parentQuery += validParent + "','";
-            }
-            parentQuery = parentQuery.substring(0, parentQuery.length() - 2);
-            parentQuery += ")";
+            StringBuilder parentQuery = new StringBuilder(
+                POSSIBLE_PARENTS_BASE_QRY).append(
+                StringUtils.join(validParents, ',')).append(")");
             if (child != null && child instanceof ContainerWrapper) {
-                parentQuery += " and ct=?";
+                parentQuery.append(" and ct=?");
                 params.add(((ContainerWrapper) child).getContainerType()
                     .getWrappedObject());
             }
-            HQLCriteria criteria = new HQLCriteria(parentQuery, params);
+            HQLCriteria criteria = new HQLCriteria(parentQuery.toString(),
+                params);
             List<Container> containers = appService.query(criteria);
             for (Container c : containers) {
                 ContainerTypeWrapper ct = new ContainerTypeWrapper(appService,
@@ -830,6 +893,27 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return filteredWrappers;
     }
 
+    private static final String CONTAINERS_HOLDING_CONTAINER_TYPES_BASE_QRY = "from "
+        + Container.class.getName()
+        + " where "
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
+        + "=? and "
+        + ContainerPeer.LABEL.getName()
+        + "=? and "
+        + ContainerPeer.CONTAINER_TYPE.getName()
+        + " in (select parent from "
+        + ContainerType.class.getName()
+        + " as parent where "
+        + ContainerTypePeer.ID.getName()
+        + " in (select ct."
+        + ContainerTypePeer.ID.getName()
+        + " from "
+        + ContainerType.class.getName()
+        + " as ct"
+        + " left join ct."
+        + ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION.getName()
+        + " as child where child." + ContainerTypePeer.ID.getName() + " in (";
+
     /**
      * get containers with label label in site which can have children of types
      * container type
@@ -839,25 +923,31 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         List<ContainerTypeWrapper> types) throws ApplicationException {
         if (site == null)
             return new ArrayList<ContainerWrapper>();
-        String typeIds = "";
+        List<Integer> typeIds = new ArrayList<Integer>();
         for (ContainerTypeWrapper type : types) {
-            typeIds += "," + type.getId();
+            typeIds.add(type.getId());
         }
-        typeIds = typeIds.replaceFirst(",", "");
-        HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Container.class.getName()
-                + " where site.id = ? and label = ? and containerType in (select parent from "
-                + ContainerType.class.getName()
-                + " as parent where parent.id in (select ct.id" + " from "
-                + ContainerType.class.getName() + " as ct"
-                + " left join ct.childContainerTypeCollection as child "
-                + " where child.id in (" + typeIds + ")))",
-            Arrays.asList(new Object[] { site.getId(), label }));
+        String qry = new StringBuilder(
+            CONTAINERS_HOLDING_CONTAINER_TYPES_BASE_QRY)
+            .append(StringUtils.join(typeIds, ',')).append(")))").toString();
+        HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
+            site.getId(), label }));
         List<Container> containers = appService.query(criteria);
         return wrapModelCollection(appService, containers,
             ContainerWrapper.class);
     }
+
+    private static final String CONTAINERS_HOLDING_SAMPLE_TYPES_QRY = "from "
+        + Container.class.getName() + " where "
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
+        + ContainerPeer.LABEL.getName() + "=? and "
+        + ContainerPeer.CONTAINER_TYPE.getName() + " in (select parent from "
+        + ContainerType.class.getName() + " as parent where parent."
+        + ContainerTypePeer.ID.getName() + " in (select ct."
+        + ContainerTypePeer.ID.getName() + " from "
+        + ContainerType.class.getName() + " as ct" + " left join ct."
+        + ContainerTypePeer.SAMPLE_TYPE_COLLECTION.getName()
+        + " as sampleType where sampleType = ?))";
 
     /**
      * get the containers with label label and site siteWrapper and holding
@@ -867,19 +957,37 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String label, SampleTypeWrapper sampleType) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Container.class.getName()
-                + " where site.id = ? and label = ? and containerType in (select parent from "
-                + ContainerType.class.getName()
-                + " as parent where parent.id in (select ct.id" + " from "
-                + ContainerType.class.getName() + " as ct"
-                + " left join ct.sampleTypeCollection as sampleType "
-                + " where sampleType = ?))", Arrays.asList(new Object[] {
+            CONTAINERS_HOLDING_SAMPLE_TYPES_QRY, Arrays.asList(new Object[] {
                 siteWrapper.getId(), label, sampleType.getWrappedObject() }));
         List<Container> containers = appService.query(criteria);
         return wrapModelCollection(appService, containers,
             ContainerWrapper.class);
     }
+
+    private static final String EMPTY_CONTAINERS_HOLDING_SAMPLE_TYPE_BASE_QRY = "from "
+        + Container.class.getName()
+        + " where "
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
+        + "=? and "
+        + ContainerPeer.ALIQUOT_POSITION_COLLECTION.getName()
+        + ".size = 0 and "
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
+        + " >= ? and "
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.CAPACITY, CapacityPeer.COL_CAPACITY)
+        + " >= ? and "
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.ID)
+        + " in (select ct."
+        + ContainerTypePeer.ID.getName()
+        + " from "
+        + ContainerType.class.getName()
+        + " as ct left join ct."
+        + ContainerTypePeer.SAMPLE_TYPE_COLLECTION.getName()
+        + " as sampleType where sampleType."
+        + SampleTypePeer.ID.getName()
+        + " in (";
 
     /**
      * Retrieve a list of empty containers in a specific site. These containers
@@ -898,30 +1006,25 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         WritableApplicationService appService, SiteWrapper siteWrapper,
         List<SampleTypeWrapper> sampleTypes, Integer minRowCapacity,
         Integer minColCapacity) throws ApplicationException {
-        String typesIds = "(";
+        List<Integer> typeIds = new ArrayList<Integer>();
         for (int i = 0; i < sampleTypes.size(); i++) {
             SampleTypeWrapper st = sampleTypes.get(i);
-            typesIds += st.getId();
-            if (i != sampleTypes.size() - 1) {
-                typesIds += ", ";
-            }
+            typeIds.add(st.getId());
         }
-        typesIds += ")";
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where site.id = ?"
-            + " and aliquotPositionCollection.size = 0"
-            + " and containerType.capacity.rowCapacity >= ?"
-            + " and containerType.capacity.colCapacity >= ?"
-            + " and containerType.id in (select ct.id" + " from "
-            + ContainerType.class.getName() + " as ct"
-            + " left join ct.sampleTypeCollection as sampleType"
-            + " where sampleType.id in " + typesIds + ")",
-            Arrays.asList(new Object[] { siteWrapper.getId(), minRowCapacity,
-                minColCapacity }));
+        String qry = new StringBuilder(
+            EMPTY_CONTAINERS_HOLDING_SAMPLE_TYPE_BASE_QRY)
+            .append(StringUtils.join(typeIds, ',')).append("))").toString();
+        HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
+            siteWrapper.getId(), minRowCapacity, minColCapacity }));
         List<Container> containers = appService.query(criteria);
         return wrapModelCollection(appService, containers,
             ContainerWrapper.class);
     }
+
+    private static final String CONTAINERS_IN_SITE_QRY = "from "
+        + Container.class.getName() + " where "
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
+        + ContainerPeer.LABEL.getName() + "=?";
 
     /**
      * Get all containers form a given site with a given label
@@ -929,13 +1032,16 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public static List<ContainerWrapper> getContainersInSite(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String label) throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where site.id = ? and label = ?",
+        HQLCriteria criteria = new HQLCriteria(CONTAINERS_IN_SITE_QRY,
             Arrays.asList(new Object[] { siteWrapper.getId(), label }));
         List<Container> containers = appService.query(criteria);
         return wrapModelCollection(appService, containers,
             ContainerWrapper.class);
     }
+
+    private static final String CONTAINERS_BY_LABEL = "from "
+        + Container.class.getName() + " where " + ContainerPeer.LABEL.getName()
+        + "=?";
 
     /**
      * Get all containers with a given label
@@ -943,13 +1049,19 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public static List<ContainerWrapper> getContainersByLabel(
         WritableApplicationService appService, String label)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName() + " where label = ?",
+        HQLCriteria criteria = new HQLCriteria(CONTAINERS_BY_LABEL,
             Arrays.asList(new Object[] { label }));
         List<Container> containers = appService.query(criteria);
         return wrapModelCollection(appService, containers,
             ContainerWrapper.class);
     }
+
+    private static final String CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY = "from "
+        + Container.class.getName()
+        + " where "
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
+        + "=? and "
+        + ContainerPeer.PRODUCT_BARCODE.getName() + "=?";
 
     /**
      * Get the container with the given productBarcode in a site
@@ -957,9 +1069,8 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     public static ContainerWrapper getContainerWithProductBarcodeInSite(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String productBarcode) throws Exception {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Container.class.getName()
-            + " where site.id = ? and productBarcode = ?",
+        HQLCriteria criteria = new HQLCriteria(
+            CONTAINER_WITH_PRODUCT_BARCODE_IN_SITE_QRY,
             Arrays.asList(new Object[] { siteWrapper.getId(), productBarcode }));
         List<Container> containers = appService.query(criteria);
         if (containers.size() == 0) {
@@ -1087,94 +1198,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         ApplicationException {
         return (this.getChildCount(true) == this.getContainerType()
             .getRowCapacity() * this.getContainerType().getColCapacity());
-    }
-
-    public Integer getRowCapacity() {
-        ContainerTypeWrapper type = getContainerType();
-        if (type == null) {
-            return null;
-        }
-        return type.getRowCapacity();
-    }
-
-    public Integer getColCapacity() {
-        ContainerTypeWrapper type = getContainerType();
-        if (type == null) {
-            return null;
-        }
-        return type.getColCapacity();
-    }
-
-    public void setContainerType(ContainerTypeWrapper containerType) {
-        propertiesMap.put("containerType", containerType);
-        ContainerType oldType = wrappedObject.getContainerType();
-        ContainerType newType = null;
-        if (containerType != null) {
-            newType = containerType.getWrappedObject();
-        }
-        wrappedObject.setContainerType(newType);
-        propertyChangeSupport.firePropertyChange("containerType", oldType,
-            newType);
-    }
-
-    public ContainerTypeWrapper getContainerType() {
-        ContainerTypeWrapper containerType = (ContainerTypeWrapper) propertiesMap
-            .get("containerType");
-        if (containerType == null) {
-            ContainerType c = wrappedObject.getContainerType();
-            if (c == null)
-                return null;
-            containerType = new ContainerTypeWrapper(appService, c);
-            propertiesMap.put("containerType", containerType);
-        }
-        return containerType;
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activityStatus = (ActivityStatusWrapper) propertiesMap
-            .get("activityStatus");
-        if (activityStatus == null) {
-            ActivityStatus a = wrappedObject.getActivityStatus();
-            if (a == null)
-                return null;
-            activityStatus = new ActivityStatusWrapper(appService, a);
-            propertiesMap.put("activityStatus", activityStatus);
-        }
-        return activityStatus;
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        propertiesMap.put("activityStatus", activityStatus);
-        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        ActivityStatus rawObject = null;
-        if (activityStatus != null) {
-            rawObject = activityStatus.getWrappedObject();
-        }
-        wrappedObject.setActivityStatus(rawObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
-    }
-
-    public String getComment() {
-        return wrappedObject.getComment();
-    }
-
-    public void setComment(String comment) {
-        String oldComment = wrappedObject.getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
-    }
-
-    public String getProductBarcode() {
-        return wrappedObject.getProductBarcode();
-    }
-
-    public void setProductBarcode(String barcode) {
-        String oldBarcode = getProductBarcode();
-        wrappedObject.setProductBarcode(barcode);
-        propertyChangeSupport.firePropertyChange("productBarcode", oldBarcode,
-            barcode);
     }
 
     public ContainerWrapper getTop() {

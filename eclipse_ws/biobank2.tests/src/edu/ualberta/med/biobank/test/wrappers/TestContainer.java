@@ -1193,6 +1193,11 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
+    public void testGetContainersByLabel() {
+        Assert.fail("missing test case");
+    }
+
+    @Test
     public void testGetContainerWithProductBarcodeInSite() throws Exception {
         ContainerWrapper top;
 
