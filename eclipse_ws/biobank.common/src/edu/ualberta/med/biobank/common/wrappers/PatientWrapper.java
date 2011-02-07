@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -66,29 +66,31 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             getPnumber(), "A patient with PNumber");
     }
 
-    public List<PatientVisitWrapper> getPatientVisitCollection() {
-        return getPatientVisitCollection(false);
+    public List<ProcessingEventWrapper> getProcessingEventCollection() {
+        return getProcessingEventCollection(false);
     }
 
-    public List<PatientVisitWrapper> getPatientVisitCollection(boolean sort) {
-        return getWrapperCollection(PatientPeer.PATIENT_VISIT_COLLECTION,
-            PatientVisitWrapper.class, sort);
+    public List<ProcessingEventWrapper> getProcessingEventCollection(
+        boolean sort) {
+        return getWrapperCollection(PatientPeer.PROCESSING_EVENT_COLLECTION,
+            ProcessingEventWrapper.class, sort);
     }
 
-    public void addPatientVisits(List<PatientVisitWrapper> newPatientVisits) {
-        addToWrapperCollection(PatientPeer.PATIENT_VISIT_COLLECTION,
-            newPatientVisits);
+    public void addProcessingEvents(
+        List<ProcessingEventWrapper> newProcessingEvents) {
+        addToWrapperCollection(PatientPeer.PROCESSING_EVENT_COLLECTION,
+            newProcessingEvents);
     }
 
     /**
      * Search patient visits with the given date processed.
      */
-    public List<PatientVisitWrapper> getVisits(Date dateProcessed,
+    public List<ProcessingEventWrapper> getVisits(Date dateProcessed,
         Date dateDrawn) {
-        List<PatientVisitWrapper> visits = getPatientVisitCollection();
-        List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
+        List<ProcessingEventWrapper> visits = getProcessingEventCollection();
+        List<ProcessingEventWrapper> result = new ArrayList<ProcessingEventWrapper>();
         if (visits != null)
-            for (PatientVisitWrapper visit : visits) {
+            for (ProcessingEventWrapper visit : visits) {
                 if ((DateCompare.compare(visit.getDateDrawn(), dateDrawn) == 0)
                     && (DateCompare.compare(visit.getDateProcessed(),
                         dateProcessed) == 0))
@@ -149,9 +151,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     @Override
     protected void deleteDependencies() throws Exception {
-        List<PatientVisitWrapper> visits = getPatientVisitCollection();
+        List<ProcessingEventWrapper> visits = getProcessingEventCollection();
         if (visits != null) {
-            for (PatientVisitWrapper visit : visits) {
+            for (ProcessingEventWrapper visit : visits) {
                 visit.delete();
             }
         }
@@ -159,15 +161,15 @@ public class PatientWrapper extends ModelWrapper<Patient> {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        checkNoMorePatientVisits();
+        checkNoMoreProcessingEvents();
         if (getAliquotsCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
                 + " because patient has samples stored in database.");
     }
 
-    private void checkNoMorePatientVisits() throws BiobankCheckException {
-        List<PatientVisitWrapper> pvs = getPatientVisitCollection();
+    private void checkNoMoreProcessingEvents() throws BiobankCheckException {
+        List<ProcessingEventWrapper> pvs = getProcessingEventCollection();
         if (pvs != null && pvs.size() > 0) {
             throw new BiobankCheckException(
                 "Visits are still linked to this patient."
@@ -179,7 +181,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(
-                "select count(aliquots) from " + PatientVisit.class.getName()
+                "select count(aliquots) from "
+                    + ProcessingEvent.class.getName()
                     + " as pv join pv.aliquotCollection as aliquots "
                     + "join pv.shipmentPatient as csp "
                     + "where csp.patient.id = ? ",
@@ -191,9 +194,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             return results.get(0);
         }
         long total = 0;
-        List<PatientVisitWrapper> pvs = getPatientVisitCollection();
+        List<ProcessingEventWrapper> pvs = getProcessingEventCollection();
         if (pvs != null)
-            for (PatientVisitWrapper pv : pvs)
+            for (ProcessingEventWrapper pv : pvs)
                 total += pv.getAliquotsCount(false);
         return total;
     }
@@ -239,8 +242,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patients;
     }
 
-    public List<PatientVisitWrapper> getLast7DaysPatientVisits(SiteWrapper site)
-        throws ApplicationException {
+    public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
+        SiteWrapper site) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // today midnight
         cal.add(Calendar.DATE, 1);
@@ -256,14 +259,14 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             "select visits from "
                 + Patient.class.getName()
                 + " as p join p.shipmentPatientCollection as csps"
-                + " join csps.patientVisitCollection as visits"
+                + " join csps.processingEventCollection as visits"
                 + " where p.id = ? and csps.shipment.site.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
             Arrays.asList(new Object[] { getId(), site.getId(), startDate,
                 endDate }));
-        List<PatientVisit> res = appService.query(criteria);
-        List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
-        for (PatientVisit v : res) {
-            visits.add(new PatientVisitWrapper(appService, v));
+        List<ProcessingEvent> res = appService.query(criteria);
+        List<ProcessingEventWrapper> visits = new ArrayList<ProcessingEventWrapper>();
+        for (ProcessingEvent v : res) {
+            visits.add(new ProcessingEventWrapper(appService, v));
         }
         return visits;
     }
@@ -335,7 +338,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         removeFromWrapperCollection(PatientPeer.SOURCE_VESSEL_COLLECTION, svs);
     }
 
-    private List<SourceVesselWrapper> getSourceVesselCollection() {
+    public List<SourceVesselWrapper> getSourceVesselCollection() {
         return getWrapperCollection(PatientPeer.SOURCE_VESSEL_COLLECTION,
             SourceVesselWrapper.class, false);
     }

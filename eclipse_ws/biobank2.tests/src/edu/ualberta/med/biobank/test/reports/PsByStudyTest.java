@@ -18,7 +18,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class PsByStudyTest extends AbstractReportTest {
     @Test
@@ -33,19 +33,19 @@ public class PsByStudyTest extends AbstractReportTest {
 
     @Test
     public void testSmallDatePoint() throws Exception {
-        List<PatientVisitWrapper> patientVisits = getPatientVisits();
+        List<ProcessingEventWrapper> patientVisits = getPatientVisits();
         Assert.assertTrue(patientVisits.size() > 0);
 
-        PatientVisitWrapper visit = patientVisits.get(patientVisits.size() / 2);
+        ProcessingEventWrapper visit = patientVisits.get(patientVisits.size() / 2);
         checkResults(visit.getDateProcessed(), visit.getDateProcessed());
     }
 
     @Test
     public void testSmallDateRange() throws Exception {
-        List<PatientVisitWrapper> patientVisits = getPatientVisits();
+        List<ProcessingEventWrapper> patientVisits = getPatientVisits();
         Assert.assertTrue(patientVisits.size() > 0);
 
-        PatientVisitWrapper visit = patientVisits.get(patientVisits.size() / 2);
+        ProcessingEventWrapper visit = patientVisits.get(patientVisits.size() / 2);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(visit.getDateProcessed());
@@ -60,9 +60,9 @@ public class PsByStudyTest extends AbstractReportTest {
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
 
-        Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
+        Collection<ProcessingEventWrapper> allPatientVisits = getPatientVisits();
 
-        Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
+        Collection<ProcessingEventWrapper> filteredPatientVisits = PredicateUtil
             .filter(allPatientVisits, PredicateUtil.andPredicate(
                 patientVisitProcessedBetween(after, before),
                 patientVisitSite(isInSite(), getSiteId())));
@@ -96,11 +96,11 @@ public class PsByStudyTest extends AbstractReportTest {
         }
     }
 
-    private static Mapper<PatientVisitWrapper, List<Object>, Set<Integer>> groupPvsByStudyAndDateField(
+    private static Mapper<ProcessingEventWrapper, List<Object>, Set<Integer>> groupPvsByStudyAndDateField(
         final String dateField) {
         final Calendar calendar = Calendar.getInstance();
-        return new Mapper<PatientVisitWrapper, List<Object>, Set<Integer>>() {
-            public List<Object> getKey(PatientVisitWrapper visit) {
+        return new Mapper<ProcessingEventWrapper, List<Object>, Set<Integer>>() {
+            public List<Object> getKey(ProcessingEventWrapper visit) {
                 calendar.setTime(visit.getDateProcessed());
 
                 List<Object> key = new ArrayList<Object>();
@@ -111,7 +111,7 @@ public class PsByStudyTest extends AbstractReportTest {
                 return key;
             }
 
-            public Set<Integer> getValue(PatientVisitWrapper visit,
+            public Set<Integer> getValue(ProcessingEventWrapper visit,
                 Set<Integer> uniquePatientIds) {
                 if (uniquePatientIds == null) {
                     uniquePatientIds = new HashSet<Integer>();

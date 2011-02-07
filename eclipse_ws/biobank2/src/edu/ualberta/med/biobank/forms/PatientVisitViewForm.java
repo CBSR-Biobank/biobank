@@ -9,7 +9,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -27,7 +27,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private PatientVisitAdapter patientVisitAdapter;
 
-    private PatientVisitWrapper patientVisit;
+    private ProcessingEventWrapper patientVisit;
 
     private BiobankText siteLabel;
 

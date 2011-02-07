@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
@@ -24,18 +24,18 @@ public class PatientVisitAdapter extends AdapterBase {
     private AliquotWrapper selectedAliquot;
 
     public PatientVisitAdapter(AdapterBase parent,
-        PatientVisitWrapper patientVisitWrapper) {
+        ProcessingEventWrapper patientVisitWrapper) {
         super(parent, patientVisitWrapper);
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
-    public PatientVisitWrapper getWrapper() {
-        return (PatientVisitWrapper) modelObject;
+    public ProcessingEventWrapper getWrapper() {
+        return (ProcessingEventWrapper) modelObject;
     }
 
     @Override
     protected String getLabelInternal() {
-        PatientVisitWrapper wrapper = getWrapper();
+        ProcessingEventWrapper wrapper = getWrapper();
         Assert.isNotNull(wrapper, "patientVisit is null");
         String name = wrapper.getFormattedDateProcessed();
         Collection<AliquotWrapper> samples = wrapper.getAliquotCollection();
@@ -48,7 +48,7 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        PatientVisitWrapper visit = getWrapper();
+        ProcessingEventWrapper visit = getWrapper();
         if (visit != null) {
             PatientWrapper patient = visit.getPatient();
             if (patient != null) {

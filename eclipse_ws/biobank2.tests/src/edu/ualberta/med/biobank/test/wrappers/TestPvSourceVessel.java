@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -42,7 +42,7 @@ public class TestPvSourceVessel extends TestDatabase {
             .addShipmentWithRandomPatient(site, clinic,
                 Utils.getRandomString(10));
         PatientWrapper patient = shipment.getPatientCollection().get(0);
-        PatientVisitWrapper pvw = PatientVisitHelper.addPatientVisit(patient,
+        ProcessingEventWrapper pvw = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         pvSourceVessel = PvSourceVesselHelper.addPvSourceVessel(
@@ -77,8 +77,8 @@ public class TestPvSourceVessel extends TestDatabase {
         PvSourceVesselWrapper pvss = new PvSourceVesselWrapper(appService);
         Assert.assertNull(pvss.getPatientVisit());
 
-        PatientVisitWrapper oldPv = pvSourceVessel.getPatientVisit();
-        PatientVisitWrapper newPv = PatientVisitHelper.addPatientVisit(
+        ProcessingEventWrapper oldPv = pvSourceVessel.getPatientVisit();
+        ProcessingEventWrapper newPv = PatientVisitHelper.addPatientVisit(
             oldPv.getPatient(), oldPv.getShipment(), Utils.getRandomDate(),
             Utils.getRandomDate());
         pvSourceVessel.setPatientVisit(newPv);

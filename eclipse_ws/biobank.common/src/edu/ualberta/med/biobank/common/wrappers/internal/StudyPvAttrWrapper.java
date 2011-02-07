@@ -47,14 +47,14 @@ public class StudyPvAttrWrapper extends ModelWrapper<StudyPvAttr> {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (isUsedByPatientVisits()) {
+        if (isUsedByProcessingEvents()) {
             throw new BiobankCheckException("Unable to delete PvAttr with id "
                 + getId() + ". A patient visit using it exists in storage."
                 + " Remove all instances before deleting this type.");
         }
     }
 
-    public boolean isUsedByPatientVisits() throws ApplicationException,
+    public boolean isUsedByProcessingEvents() throws ApplicationException,
         BiobankException {
         HQLCriteria c = new HQLCriteria("select count(pva) from "
             + PvAttr.class.getName() + " as pva where pva.studyPvAttr = ?)",

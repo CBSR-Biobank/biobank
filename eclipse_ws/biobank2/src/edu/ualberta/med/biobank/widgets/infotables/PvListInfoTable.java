@@ -6,16 +6,16 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
+public class PvListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 24;
 
     protected class TableRowData {
-        PatientVisitWrapper pv;
+        ProcessingEventWrapper pv;
         public String pnumber;
         public String studyNameShort;
         public String waybill;
@@ -35,7 +35,7 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
     private static final String[] HEADINGS = new String[] { "Patient Number",
         "Study", "Waybill", "Departed", "Clinic", "Source Vessels", "Aliquots" };
 
-    public PvListInfoTable(Composite parent, List<PatientVisitWrapper> pvs) {
+    public PvListInfoTable(Composite parent, List<ProcessingEventWrapper> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS);
     }
 
@@ -74,7 +74,7 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(PatientVisitWrapper pv)
+    public TableRowData getCollectionModelObject(ProcessingEventWrapper pv)
         throws Exception {
         TableRowData info = new TableRowData();
         info.pv = pv;
@@ -103,7 +103,7 @@ public class PvListInfoTable extends InfoTableWidget<PatientVisitWrapper> {
     }
 
     @Override
-    public PatientVisitWrapper getSelection() {
+    public ProcessingEventWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

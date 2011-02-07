@@ -5,16 +5,14 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -104,31 +102,26 @@ public class ConfigSite {
 
     private static void patientDeleteSubObjects(PatientWrapper patient)
         throws Exception {
-        List<PatientVisitWrapper> visits = patient.getPatientVisitCollection();
+        List<ProcessingEventWrapper> visits = patient.getPatientVisitCollection();
         if (visits == null)
             return;
-        for (PatientVisitWrapper visit : visits) {
+        for (ProcessingEventWrapper visit : visits) {
             patientVisitDeleteSubObjects(visit);
         }
-        for (ShipmentWrapper ship : patient.getShipmentCollection(null)) {
-            ship.removePatients(Arrays.asList(patient));
-            if (ship.getPatientCollection().size() == 0) {
-                ship.delete();
-            } else {
-                ship.persist();
-            }
+        for (SourceVesselWrapper sv : patient.getSourceVesselCollection()) {
+            sv.delete();
         }
         patient.reload();
         patient.reload();
         patient.delete();
     }
 
-    private static void patientVisitDeleteSubObjects(PatientVisitWrapper visit)
+    private static void patientVisitDeleteSubObjects(ProcessingEventWrapper visit)
         throws Exception {
-        List<PvSourceVesselWrapper> sourceVessels = visit
-            .getPvSourceVesselCollection();
+        List<SourceVesselWrapper> sourceVessels = visit
+            .getSourceVesselCollection();
         if (sourceVessels != null) {
-            for (PvSourceVesselWrapper sourceVessel : sourceVessels) {
+            for (SourceVesselWrapper sourceVessel : sourceVessels) {
                 sourceVessel.delete();
             }
         }

@@ -27,13 +27,12 @@ public class ConfigClinics {
     }
 
     protected ClinicWrapper addClinic(String name, String nameShort,
-        boolean sendsShipments, String activityStatusName, String comment,
-        String street1, String street2, String city, String province,
-        String postalCode) throws Exception {
+        String activityStatusName, String comment, String street1,
+        String street2, String city, String province, String postalCode)
+        throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(site.getAppService());
         clinic.setName(name);
         clinic.setNameShort(nameShort);
-        clinic.setSendsShipments(sendsShipments);
         clinic.setActivityStatus(CalgarySite
             .getActivityStatus(activityStatusName));
         clinic.setComment(comment);

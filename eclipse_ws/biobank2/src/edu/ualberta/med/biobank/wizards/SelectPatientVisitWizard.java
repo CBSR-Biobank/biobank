@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.wizards;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.wizards.pages.EnterPnumberPage;
 import edu.ualberta.med.biobank.wizards.pages.SelectPatientVisitPage;
@@ -13,13 +13,13 @@ public class SelectPatientVisitWizard extends BiobankWizard {
     private final WritableApplicationService appService;
     private EnterPnumberPage pnumberPage;
     private SelectPatientVisitPage pvPage;
-    private PatientVisitWrapper visit;
+    private ProcessingEventWrapper visit;
 
     public SelectPatientVisitWizard(WritableApplicationService appService) {
         this.appService = appService;
     }
 
-    public PatientVisitWrapper getPatientVisit() {
+    public ProcessingEventWrapper getPatientVisit() {
         return visit;
     }
 

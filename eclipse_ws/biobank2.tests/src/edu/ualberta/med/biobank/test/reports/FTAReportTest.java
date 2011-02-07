@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
@@ -29,13 +29,13 @@ public class FTAReportTest extends AbstractReportTest {
                 .equals(AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
         }
     };
-    private static final Mapper<PatientVisitWrapper, String, PatientVisitWrapper> GROUP_PATIENT_VISITS_BY_PNUMBER = new Mapper<PatientVisitWrapper, String, PatientVisitWrapper>() {
-        public String getKey(PatientVisitWrapper patientVisit) {
+    private static final Mapper<ProcessingEventWrapper, String, ProcessingEventWrapper> GROUP_PATIENT_VISITS_BY_PNUMBER = new Mapper<ProcessingEventWrapper, String, ProcessingEventWrapper>() {
+        public String getKey(ProcessingEventWrapper patientVisit) {
             return patientVisit.getPatient().getPnumber();
         }
 
-        public PatientVisitWrapper getValue(PatientVisitWrapper patientVisit,
-            PatientVisitWrapper oldValue) {
+        public ProcessingEventWrapper getValue(ProcessingEventWrapper patientVisit,
+            ProcessingEventWrapper oldValue) {
             // keep the earliest patient visit (according to date processed)
             return (oldValue == null)
                 || patientVisit.getDateProcessed().before(
@@ -110,7 +110,7 @@ public class FTAReportTest extends AbstractReportTest {
     @Test
     public void testMiddleDates() throws Exception {
         Calendar calendar = Calendar.getInstance();
-        List<PatientVisitWrapper> patientVisits;
+        List<ProcessingEventWrapper> patientVisits;
 
         for (StudyWrapper study : getStudies()) {
             for (PatientWrapper patient : study.getPatientCollection()) {
@@ -135,8 +135,8 @@ public class FTAReportTest extends AbstractReportTest {
         final String studyNameShort = (String) getReport().getParams().get(0);
         final Date firstPvDateProcessed = (Date) getReport().getParams().get(1);
 
-        Predicate<PatientVisitWrapper> patientInStudy = new Predicate<PatientVisitWrapper>() {
-            public boolean evaluate(PatientVisitWrapper patientVisit) {
+        Predicate<ProcessingEventWrapper> patientInStudy = new Predicate<ProcessingEventWrapper>() {
+            public boolean evaluate(ProcessingEventWrapper patientVisit) {
                 return patientVisit.getPatient().getStudy().getNameShort()
                     .equals(studyNameShort);
             }
@@ -149,10 +149,10 @@ public class FTAReportTest extends AbstractReportTest {
             }
         };
 
-        Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
-        Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
+        Collection<ProcessingEventWrapper> allPatientVisits = getPatientVisits();
+        Collection<ProcessingEventWrapper> filteredPatientVisits = PredicateUtil
             .filter(allPatientVisits, patientInStudy);
-        Map<String, PatientVisitWrapper> groupedPatientVisits = MapperUtil.map(
+        Map<String, ProcessingEventWrapper> groupedPatientVisits = MapperUtil.map(
             filteredPatientVisits, GROUP_PATIENT_VISITS_BY_PNUMBER);
 
         Collection<AliquotWrapper> allAliquots = getAliquots();
@@ -170,7 +170,7 @@ public class FTAReportTest extends AbstractReportTest {
         List<Object> expectedResults = new ArrayList<Object>();
 
         for (AliquotWrapper aliquot : filteredAndGroupedAliquots) {
-            for (PatientVisitWrapper patientVisit : groupedPatientVisits
+            for (ProcessingEventWrapper patientVisit : groupedPatientVisits
                 .values()) {
                 if (patientVisit.getId().equals(
                     aliquot.getPatientVisit().getId())) {

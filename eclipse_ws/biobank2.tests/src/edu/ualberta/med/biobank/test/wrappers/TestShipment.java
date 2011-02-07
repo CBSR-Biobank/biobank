@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -145,7 +145,7 @@ public class TestShipment extends TestDatabase {
         }
         shipment.reload();
 
-        PatientVisitWrapper visit = PatientVisitHelper.newPatientVisit(shipment
+        ProcessingEventWrapper visit = PatientVisitHelper.newPatientVisit(shipment
             .getPatientCollection().get(0), shipment, Utils.getRandomDate(),
             Utils.getRandomDate());
         shipment.addPatientVisits(Arrays.asList(visit));
@@ -616,7 +616,7 @@ public class TestShipment extends TestDatabase {
             method, patient1);
         ShipmentHelper.addShipment(site, clinic, method, patient1);
 
-        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(
+        ProcessingEventWrapper visit = PatientVisitHelper.addPatientVisit(
             patient1, shipmentTest, Utils.getRandomDate(),
             Utils.getRandomDate());
         shipmentTest.reload();

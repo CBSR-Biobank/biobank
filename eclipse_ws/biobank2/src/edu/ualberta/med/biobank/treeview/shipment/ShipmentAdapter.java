@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
@@ -64,7 +64,7 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, PatientVisitWrapper.class);
+        return findChildFromClass(searchedObject, ProcessingEventWrapper.class);
     }
 
     @Override
@@ -74,8 +74,8 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        Assert.isTrue(child instanceof PatientVisitWrapper);
-        return new PatientVisitAdapter(this, (PatientVisitWrapper) child);
+        Assert.isTrue(child instanceof ProcessingEventWrapper);
+        return new PatientVisitAdapter(this, (ProcessingEventWrapper) child);
     }
 
     @Override

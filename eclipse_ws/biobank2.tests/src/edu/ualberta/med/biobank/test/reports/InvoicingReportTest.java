@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class InvoicingReportTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<String>, Long>() {
@@ -36,14 +36,14 @@ public class InvoicingReportTest extends AbstractReportTest {
                 aliquotCount + 1);
         }
     };
-    private static final Mapper<PatientVisitWrapper, List<String>, Long> GROUP_PVS_BY_STUDY_CLINIC = new Mapper<PatientVisitWrapper, List<String>, Long>() {
-        public List<String> getKey(PatientVisitWrapper patientVisit) {
+    private static final Mapper<ProcessingEventWrapper, List<String>, Long> GROUP_PVS_BY_STUDY_CLINIC = new Mapper<ProcessingEventWrapper, List<String>, Long>() {
+        public List<String> getKey(ProcessingEventWrapper patientVisit) {
             return Arrays.asList(patientVisit.getPatient().getStudy()
                 .getNameShort(), patientVisit.getShipment().getClinic()
                 .getNameShort());
         }
 
-        public Long getValue(PatientVisitWrapper patientVisit, Long pvCount) {
+        public Long getValue(ProcessingEventWrapper patientVisit, Long pvCount) {
             return pvCount == null ? new Long(1) : new Long(pvCount + 1);
         }
     };
@@ -108,8 +108,8 @@ public class InvoicingReportTest extends AbstractReportTest {
         Map<List<String>, Long> groupedAliquots = MapperUtil.map(
             filteredAliquots, GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE);
 
-        Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
-        Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
+        Collection<ProcessingEventWrapper> allPatientVisits = getPatientVisits();
+        Collection<ProcessingEventWrapper> filteredPatientVisits = PredicateUtil
             .filter(
                 allPatientVisits,
                 patientVisitProcessedBetween(processedAndLinkedAfter,

@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -63,7 +63,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private PatientVisitAdapter patientVisitAdapter;
 
-    private PatientVisitWrapper patientVisit;
+    private ProcessingEventWrapper patientVisit;
 
     private PatientWrapper patient;
 

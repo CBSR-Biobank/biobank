@@ -16,17 +16,17 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 
 public class NewPsByStudyClinicTest extends AbstractReportTest {
-    private static final Mapper<PatientVisitWrapper, Integer, PatientVisitWrapper> GROUP_BY_PATIENT = new Mapper<PatientVisitWrapper, Integer, PatientVisitWrapper>() {
-        public Integer getKey(PatientVisitWrapper patientVisit) {
+    private static final Mapper<ProcessingEventWrapper, Integer, ProcessingEventWrapper> GROUP_BY_PATIENT = new Mapper<ProcessingEventWrapper, Integer, ProcessingEventWrapper>() {
+        public Integer getKey(ProcessingEventWrapper patientVisit) {
             return patientVisit.getPatient().getId();
         }
 
-        public PatientVisitWrapper getValue(PatientVisitWrapper newPv,
-            PatientVisitWrapper oldPv) {
+        public ProcessingEventWrapper getValue(ProcessingEventWrapper newPv,
+            ProcessingEventWrapper oldPv) {
             if (oldPv == null) {
                 return newPv;
             }
@@ -36,11 +36,11 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
         }
     };
 
-    public static Mapper<PatientVisitWrapper, List<Object>, Long> groupPvsByStudyAndClinicAndDateField(
+    public static Mapper<ProcessingEventWrapper, List<Object>, Long> groupPvsByStudyAndClinicAndDateField(
         final String dateField) {
         final Calendar calendar = Calendar.getInstance();
-        return new Mapper<PatientVisitWrapper, List<Object>, Long>() {
-            public List<Object> getKey(PatientVisitWrapper patientVisit) {
+        return new Mapper<ProcessingEventWrapper, List<Object>, Long>() {
+            public List<Object> getKey(ProcessingEventWrapper patientVisit) {
                 calendar.setTime(patientVisit.getDateProcessed());
 
                 List<Object> key = new ArrayList<Object>();
@@ -52,7 +52,7 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
                 return key;
             }
 
-            public Long getValue(PatientVisitWrapper type, Long pvCount) {
+            public Long getValue(ProcessingEventWrapper type, Long pvCount) {
                 return pvCount == null ? new Long(1) : new Long(pvCount + 1);
             }
         };
@@ -70,10 +70,10 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
 
     @Test
     public void testSmallDatePoint() throws Exception {
-        List<PatientVisitWrapper> patientVisits = getPatientVisits();
+        List<ProcessingEventWrapper> patientVisits = getPatientVisits();
         Assert.assertTrue(patientVisits.size() > 0);
 
-        PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
+        ProcessingEventWrapper patientVisit = patientVisits.get(patientVisits
             .size() / 2);
         checkResults(patientVisit.getDateProcessed(),
             patientVisit.getDateProcessed());
@@ -82,10 +82,10 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
     @Test
     public void testSecondPatientVisitDateRange() throws Exception {
         for (PatientWrapper patient : getPatients()) {
-            List<PatientVisitWrapper> visits = patient
+            List<ProcessingEventWrapper> visits = patient
                 .getPatientVisitCollection(true, true, null);
             if (visits.size() >= 2) {
-                PatientVisitWrapper visit = visits.get(1);
+                ProcessingEventWrapper visit = visits.get(1);
 
                 Calendar calendar = Calendar.getInstance();
                 calendar.setTime(visit.getDateProcessed());
@@ -105,12 +105,12 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
 
-        Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
+        Collection<ProcessingEventWrapper> allPatientVisits = getPatientVisits();
 
-        Collection<PatientVisitWrapper> firstPatientVisits = MapperUtil.map(
+        Collection<ProcessingEventWrapper> firstPatientVisits = MapperUtil.map(
             allPatientVisits, GROUP_BY_PATIENT).values();
 
-        Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
+        Collection<ProcessingEventWrapper> filteredPatientVisits = PredicateUtil
             .filter(firstPatientVisits,
                 patientVisitProcessedBetween(after, before));
 

@@ -6,7 +6,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
@@ -32,7 +32,7 @@ public class AliquotHelper extends DbHelper {
 
     public static AliquotWrapper newAliquot(SampleTypeWrapper sampleType,
         String activityStatus, ContainerWrapper container,
-        PatientVisitWrapper pv, Integer row, Integer col) throws Exception {
+        ProcessingEventWrapper pv, Integer row, Integer col) throws Exception {
         AliquotWrapper aliquot = newAliquot(sampleType, activityStatus);
         if (container != null) {
             aliquot.setParent(container);
@@ -45,7 +45,7 @@ public class AliquotHelper extends DbHelper {
     }
 
     public static AliquotWrapper newAliquot(SampleTypeWrapper sampleType,
-        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
+        ContainerWrapper container, ProcessingEventWrapper pv, Integer row,
         Integer col) throws Exception {
         return newAliquot(sampleType,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, pv, row, col);
@@ -53,7 +53,7 @@ public class AliquotHelper extends DbHelper {
 
     public static AliquotWrapper addAliquot(SampleTypeWrapper sampleType,
         String activityStatus, ContainerWrapper container,
-        PatientVisitWrapper pv, Integer row, Integer col) throws Exception {
+        ProcessingEventWrapper pv, Integer row, Integer col) throws Exception {
         AliquotWrapper aliquot = newAliquot(sampleType, activityStatus,
             container, pv, row, col);
         aliquot.persist();
@@ -61,7 +61,7 @@ public class AliquotHelper extends DbHelper {
     }
 
     public static AliquotWrapper addAliquot(SampleTypeWrapper sampleType,
-        ContainerWrapper container, PatientVisitWrapper pv, Integer row,
+        ContainerWrapper container, ProcessingEventWrapper pv, Integer row,
         Integer col) throws Exception {
         AliquotWrapper aliquot = addAliquot(sampleType,
             ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, pv, row, col);

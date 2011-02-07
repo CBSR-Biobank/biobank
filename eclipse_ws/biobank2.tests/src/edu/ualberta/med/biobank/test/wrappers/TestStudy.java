@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -96,7 +96,7 @@ public class TestStudy extends TestDatabase {
         }
     }
 
-    private static List<PatientVisitWrapper> studyAddPatientVisits(
+    private static List<ProcessingEventWrapper> studyAddPatientVisits(
         StudyWrapper study) throws Exception {
         String name = study.getName();
         String randStr = Utils.getRandomString(5, 10);
@@ -379,8 +379,8 @@ public class TestStudy extends TestDatabase {
         study.setStudyPvAttr("Worksheet", "text");
         study.persist();
         study.reload();
-        List<PatientVisitWrapper> visits = studyAddPatientVisits(study);
-        PatientVisitWrapper visit = visits.get(0);
+        List<ProcessingEventWrapper> visits = studyAddPatientVisits(study);
+        ProcessingEventWrapper visit = visits.get(0);
         visit.setPvAttrValue("Worksheet", Utils.getRandomString(10, 15));
         visit.persist();
 
@@ -528,8 +528,8 @@ public class TestStudy extends TestDatabase {
                 ActivityStatusWrapper.CLOSED_STATUS_STRING));
         study.persist();
         study.reload();
-        List<PatientVisitWrapper> visits = studyAddPatientVisits(study);
-        PatientVisitWrapper visit = visits.get(0);
+        List<ProcessingEventWrapper> visits = studyAddPatientVisits(study);
+        ProcessingEventWrapper visit = visits.get(0);
         visit.reload();
 
         try {

@@ -11,7 +11,7 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -158,10 +158,10 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             }
 
             for (PatientWrapper patient : patients) {
-                List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
+                List<ProcessingEventWrapper> visits = new ArrayList<ProcessingEventWrapper>();
 
                 for (int j = 0, n = 1 + r.nextInt(5); j < n; ++j) {
-                    PatientVisitWrapper visit = addPatientVisit(patient);
+                    ProcessingEventWrapper visit = addPatientVisit(patient);
                     if (visit == null)
                         continue;
                     visits.add(visit);
@@ -172,13 +172,13 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
         }
     }
 
-    private PatientVisitWrapper addPatientVisit(PatientWrapper patient) {
+    private ProcessingEventWrapper addPatientVisit(PatientWrapper patient) {
         List<ShipmentWrapper> shipments = patient.getShipmentCollection(null);
         if (shipments.size() == 0) {
             return null;
         }
 
-        PatientVisitWrapper patientVisit = new PatientVisitWrapper(appService);
+        ProcessingEventWrapper patientVisit = new ProcessingEventWrapper(appService);
         String dateStr = String.format("2009-%02d-25 %02d:%02d",
             r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
         patientVisit.setDateProcessed(DateFormatter.parseToDateTime(dateStr));
@@ -189,7 +189,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
         return patientVisit;
     }
 
-    private AliquotWrapper addAliquot(PatientVisitWrapper patientVisit) {
+    private AliquotWrapper addAliquot(ProcessingEventWrapper patientVisit) {
         AliquotWrapper aliquot = new AliquotWrapper(appService);
         aliquot.setInventoryId(Integer.valueOf(r.nextInt(10000)).toString());
         aliquot.setPatientVisit(patientVisit);

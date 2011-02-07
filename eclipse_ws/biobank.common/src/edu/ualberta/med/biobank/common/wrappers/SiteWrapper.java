@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
@@ -31,7 +30,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends CenterWrapper<Site> {
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
-    private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
@@ -60,15 +58,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
     }
 
     @Override
-    protected void persistDependencies(Site origObject) throws Exception {
-        for (DispatchInfoWrapper diw : removedDispatchInfoWrapper) {
-            if (!diw.isNew()) {
-                diw.delete();
-            }
-        }
-    }
-
-    @Override
     public Class<Site> getWrappedClass() {
         return Site.class;
     }
@@ -80,7 +69,8 @@ public class SiteWrapper extends CenterWrapper<Site> {
             .size() > 0)
             || (getContainerTypeCollection() != null && getContainerTypeCollection()
                 .size() > 0)
-            || (getSourceCollection() != null && getSourceCollection().size() > 0)) {
+            || (getCollectionEventCollection() != null && getCollectionEventCollection()
+                .size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
@@ -236,26 +226,12 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return result.get(0);
     }
 
-    public Long getPatientVisitCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select count(visits) from "
-            + Site.class.getName() + " as site "
-            + "join site.shipmentCollection as shipments "
-            + "join shipments.shipmentPatientCollection as csps "
-            + "join csps.patientVisitCollection as visits "
-            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
-    }
-
     public Long getAliquotCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria("select count(aliquots) from "
             + Site.class.getName() + " as site "
             + "join site.shipmentCollection as shipments "
             + "join shipments.shipmentPatientCollection as csps "
-            + "join csps.patientVisitCollection as visits "
+            + "join csps.processingEventCollection as visits "
             + "join visits.aliquotCollection as aliquots where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
@@ -300,11 +276,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
     @Override
     public String toString() {
         return getName();
-    }
-
-    @Override
-    public void resetInternalFields() {
-        removedDispatchInfoWrapper.clear();
     }
 
     public List<DispatchWrapper> getReceivedDispatchCollection() {

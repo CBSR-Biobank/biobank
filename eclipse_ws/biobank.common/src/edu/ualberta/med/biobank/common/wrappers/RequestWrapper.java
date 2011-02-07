@@ -12,7 +12,6 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestAliquot;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -26,8 +25,6 @@ public class RequestWrapper extends ModelWrapper<Request> {
     private static final String PROCESSED_ALIQUOTS_KEY = "processedRequestAliquots";
 
     private static final String UNAVAILABLE_ALIQUOTS_KEY = "unavailableRequestAliquots";
-
-    private static final String ALL_ALIQUOTS_KEY = "requestAliquotCollection";
 
     public RequestWrapper(WritableApplicationService appService) {
         super(appService);
@@ -115,8 +112,8 @@ public class RequestWrapper extends ModelWrapper<Request> {
         setProperty(RequestPeer.STATE, state);
     }
 
-    public Center getRequester() {
-        return getProperty(RequestPeer.REQUESTER);
+    public CenterWrapper getRequester() {
+        return getWrappedProperty(RequestPeer.REQUESTER, CenterWrapper.class);
     }
 
     public void setRequester(CenterWrapper center) {

@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -621,7 +621,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
     protected void saveForm() throws Exception {
         Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
             .getCells();
-        PatientVisitWrapper patientVisit = linkFormPatientManagement
+        ProcessingEventWrapper patientVisit = linkFormPatientManagement
             .getSelectedPatientVisit();
 
         StringBuffer sb = new StringBuffer("ALIQUOTS LINKED:\n"); //$NON-NLS-1$

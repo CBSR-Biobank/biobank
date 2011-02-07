@@ -13,7 +13,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
 
@@ -27,11 +27,11 @@ public class SelectPatientVisitPage extends BiobankWizardPage {
         super(PAGE_NAME, "Select a patient visit", null);
     }
 
-    public void setPatientVisitList(List<PatientVisitWrapper> visits) {
+    public void setPatientVisitList(List<ProcessingEventWrapper> visits) {
         visitsTable.setCollection(visits);
     }
 
-    public PatientVisitWrapper getPatientVisit() {
+    public ProcessingEventWrapper getPatientVisit() {
         return visitsTable.getSelection();
     }
 
@@ -43,7 +43,7 @@ public class SelectPatientVisitPage extends BiobankWizardPage {
 
         final IObservableValue selection = new WritableValue(null, Object.class);
         visitsTable = new PatientVisitInfoTable(content,
-            new ArrayList<PatientVisitWrapper>()) {
+            new ArrayList<ProcessingEventWrapper>()) {
             @Override
             public boolean isEditMode() {
                 return true;
