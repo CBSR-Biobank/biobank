@@ -81,7 +81,7 @@ public class ConfigContainerTypes {
         ct.setSite(site);
         ct.setRowCapacity(rows);
         ct.setColCapacity(cols);
-        ct.setChildLabelingScheme(childLabelingScheme);
+        ct.setChildLabelingSchemeById(childLabelingScheme);
 
         if (children != null) {
             ct.addChildContainerTypes(children);
