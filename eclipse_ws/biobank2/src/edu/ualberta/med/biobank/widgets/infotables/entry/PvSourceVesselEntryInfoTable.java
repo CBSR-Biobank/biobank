@@ -18,7 +18,7 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
@@ -45,7 +45,7 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
     private IObservableValue sourceVesselsAdded = new WritableValue(
         Boolean.FALSE, Boolean.class);
 
-    private PatientVisitWrapper patientVisit;
+    private ProcessingEventWrapper patientVisit;
 
     private List<SourceVesselWrapper> allSourceVessels;
 
@@ -66,7 +66,7 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
      *            form this parameter should be null.
      */
     public PvSourceVesselEntryInfoTable(Composite parent,
-        PatientVisitWrapper visit) {
+        ProcessingEventWrapper visit) {
         super(parent, null);
         this.patientVisit = visit;
 

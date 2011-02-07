@@ -18,13 +18,13 @@ import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class SampleTypePvCountTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, List<Object>, Long> GROUP_BY_PV_AND_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<Object>, Long>() {
         public List<Object> getKey(AliquotWrapper aliquot) {
-            PatientVisitWrapper visit = aliquot.getPatientVisit();
+            ProcessingEventWrapper visit = aliquot.getPatientVisit();
             return Arrays.asList(new Object[] { visit.getId(),
                 visit.getPatient().getPnumber(), visit.getDateProcessed(),
                 visit.getDateDrawn(), aliquot.getSampleType().getName() });

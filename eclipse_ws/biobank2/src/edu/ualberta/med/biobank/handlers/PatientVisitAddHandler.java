@@ -5,7 +5,7 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
@@ -21,7 +21,7 @@ public class PatientVisitAddHandler extends AbstractHandler {
         try {
             PatientAdapter patientAdapter = PatientAdministrationView
                 .getCurrentPatient();
-            PatientVisitWrapper pvWrapper = new PatientVisitWrapper(
+            ProcessingEventWrapper pvWrapper = new ProcessingEventWrapper(
                 SessionManager.getAppService());
             pvWrapper.setPatient(patientAdapter.getWrapper());
             PatientVisitAdapter adapter = new PatientVisitAdapter(
@@ -36,6 +36,6 @@ public class PatientVisitAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(PatientVisitWrapper.class, null);
+        return SessionManager.canCreate(ProcessingEventWrapper.class, null);
     }
 }

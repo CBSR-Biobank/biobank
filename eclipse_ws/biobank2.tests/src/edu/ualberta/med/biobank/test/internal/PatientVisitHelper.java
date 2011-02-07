@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
@@ -22,10 +22,10 @@ public class PatientVisitHelper extends DbHelper {
      * @param dateProcessed The date the aliquot was processed.
      * @return A new patient visit wrapper.
      */
-    public static PatientVisitWrapper newPatientVisit(PatientWrapper patient,
+    public static ProcessingEventWrapper newPatientVisit(PatientWrapper patient,
         ShipmentWrapper shipment, Date dateProcessed, Date dateDrawn)
         throws Exception {
-        PatientVisitWrapper pv = new PatientVisitWrapper(appService);
+        ProcessingEventWrapper pv = new ProcessingEventWrapper(appService);
         pv.setPatient(patient);
         pv.setDateProcessed(dateProcessed);
         pv.setDateDrawn(dateDrawn);
@@ -54,10 +54,10 @@ public class PatientVisitHelper extends DbHelper {
      * @return A new patient visit wrapper.
      * @throws Exception if the object could not be saved to the database.
      */
-    public static PatientVisitWrapper addPatientVisit(PatientWrapper patient,
+    public static ProcessingEventWrapper addPatientVisit(PatientWrapper patient,
         ShipmentWrapper shipment, Date dateProcessed, Date dateDrawn)
         throws Exception {
-        PatientVisitWrapper pv = newPatientVisit(patient, shipment,
+        ProcessingEventWrapper pv = newPatientVisit(patient, shipment,
             dateProcessed, dateDrawn);
         pv.persist();
         return pv;
@@ -73,11 +73,11 @@ public class PatientVisitHelper extends DbHelper {
      * 
      * @throws Exception if the object could not be saved to the database.
      */
-    public static List<PatientVisitWrapper> addPatientVisits(
+    public static List<ProcessingEventWrapper> addPatientVisits(
         PatientWrapper patient, ShipmentWrapper shipment, int minimumNumber,
         int maxNumber) throws ParseException, Exception {
         int count = r.nextInt(maxNumber - minimumNumber + 1) + minimumNumber;
-        List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
+        List<ProcessingEventWrapper> visits = new ArrayList<ProcessingEventWrapper>();
         for (int i = 0; i < count; i++) {
             visits.add(addPatientVisit(patient, shipment,
                 TestCommon.getUniqueDate(r), TestCommon.getUniqueDate(r)));
@@ -85,13 +85,13 @@ public class PatientVisitHelper extends DbHelper {
         return visits;
     }
 
-    public static List<PatientVisitWrapper> addPatientVisits(
+    public static List<ProcessingEventWrapper> addPatientVisits(
         PatientWrapper patient, ShipmentWrapper shipment, int minimumNumber)
         throws ParseException, Exception {
         return addPatientVisits(patient, shipment, minimumNumber, 15);
     }
 
-    public static List<PatientVisitWrapper> addPatientVisits(
+    public static List<ProcessingEventWrapper> addPatientVisits(
         PatientWrapper patient, ShipmentWrapper shipment)
         throws ParseException, Exception {
         return addPatientVisits(patient, shipment, 1);

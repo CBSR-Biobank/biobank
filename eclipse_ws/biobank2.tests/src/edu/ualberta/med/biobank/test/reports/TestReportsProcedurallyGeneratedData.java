@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -98,7 +98,7 @@ public final class TestReportsProcedurallyGeneratedData implements
     private final List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
     private final List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
     private final List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
-    private final List<PatientVisitWrapper> patientVisits = new ArrayList<PatientVisitWrapper>();
+    private final List<ProcessingEventWrapper> patientVisits = new ArrayList<ProcessingEventWrapper>();
     private final List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
 
     private TestReportsProcedurallyGeneratedData() {
@@ -573,10 +573,10 @@ public final class TestReportsProcedurallyGeneratedData implements
         return shipments;
     }
 
-    private static List<PatientVisitWrapper> generatePatientVisits(
+    private static List<ProcessingEventWrapper> generatePatientVisits(
         List<ShipmentWrapper> shipments, List<PatientWrapper> allPatients)
         throws Exception {
-        List<PatientVisitWrapper> patientVisits = new ArrayList<PatientVisitWrapper>();
+        List<ProcessingEventWrapper> patientVisits = new ArrayList<ProcessingEventWrapper>();
 
         Calendar calendar = Calendar.getInstance();
 
@@ -594,7 +594,7 @@ public final class TestReportsProcedurallyGeneratedData implements
                 calendar.add(Calendar.DAY_OF_YEAR, 2);
                 Date processed = calendar.getTime();
 
-                PatientVisitWrapper patientVisit = PatientVisitHelper
+                ProcessingEventWrapper patientVisit = PatientVisitHelper
                     .addPatientVisit(patient, shipment, drawn, processed);
 
                 patientVisits.add(patientVisit);
@@ -612,7 +612,7 @@ public final class TestReportsProcedurallyGeneratedData implements
 
     private static List<AliquotWrapper> generateAliquots(
         List<ContainerWrapper> containers,
-        List<PatientVisitWrapper> patientVisits,
+        List<ProcessingEventWrapper> patientVisits,
         List<SampleTypeWrapper> allSampleTypes) throws Exception {
         List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
 
@@ -634,7 +634,7 @@ public final class TestReportsProcedurallyGeneratedData implements
                             .get(aliquotsAdded % sampleTypes.size());
 
                         // cycle through patient visits
-                        PatientVisitWrapper patientVisit = patientVisits
+                        ProcessingEventWrapper patientVisit = patientVisits
                             .get(aliquotsAdded % patientVisits.size());
 
                         AliquotWrapper aliquot = AliquotHelper
@@ -673,7 +673,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         // add an Aliquot of each SampleType that is not in a Container
         for (SampleTypeWrapper sampleType : allSampleTypes) {
             // cycle through patient visits
-            PatientVisitWrapper patientVisit = patientVisits.get(aliquotsAdded
+            ProcessingEventWrapper patientVisit = patientVisits.get(aliquotsAdded
                 % patientVisits.size());
 
             AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType);
@@ -738,7 +738,7 @@ public final class TestReportsProcedurallyGeneratedData implements
             List<ShipmentWrapper> shipments = generateShipments(site,
                 SHIPMENTS_PER_SITE, clinics);
 
-            List<PatientVisitWrapper> patientVisits = generatePatientVisits(
+            List<ProcessingEventWrapper> patientVisits = generatePatientVisits(
                 shipments, patients);
 
             List<AliquotWrapper> aliquots = generateAliquots(containers,
@@ -804,7 +804,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         return studies;
     }
 
-    public List<PatientVisitWrapper> getPatientVisits() {
+    public List<ProcessingEventWrapper> getPatientVisits() {
         return patientVisits;
     }
 

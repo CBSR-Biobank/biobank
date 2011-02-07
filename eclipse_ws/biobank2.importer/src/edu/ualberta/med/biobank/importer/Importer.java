@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -929,7 +929,7 @@ public class Importer {
             + PatientVisit.class.getName());
         List<PatientVisit> visits = appService.query(criteria);
         for (PatientVisit visit : visits) {
-            PatientVisitWrapper v = new PatientVisitWrapper(appService, visit);
+            ProcessingEventWrapper v = new ProcessingEventWrapper(appService, visit);
             v.delete();
         }
     }
@@ -944,7 +944,7 @@ public class Importer {
         Date dateProcessed;
         PatientWrapper patient;
         ShipmentWrapper shipment;
-        PatientVisitWrapper pv;
+        ProcessingEventWrapper pv;
 
         logger.info("importing patient visits ...");
 
@@ -1011,7 +1011,7 @@ public class Importer {
             }
 
             ++importCounts.visits;
-            pv = new PatientVisitWrapper(appService);
+            pv = new ProcessingEventWrapper(appService);
             pv.setDateProcessed(dateProcessed);
             pv.setPatient(patient);
             pv.setShipment(shipment);
@@ -1321,7 +1321,7 @@ public class Importer {
         Date dateProcessed = Importer.getDateFromStr(dateProcessedStr);
         Date dateTaken = Importer.getDateFromStr(dateTakenStr);
 
-        List<PatientVisitWrapper> visits = patient.getVisits(dateProcessed,
+        List<ProcessingEventWrapper> visits = patient.getVisits(dateProcessed,
             dateTaken);
         if (visits.size() == 0) {
             logger.error("patient/" + patientNr + " inventory_id/"
@@ -1331,9 +1331,9 @@ public class Importer {
             return null;
         }
 
-        PatientVisitWrapper visit = null;
+        ProcessingEventWrapper visit = null;
 
-        for (PatientVisitWrapper pv : visits) {
+        for (ProcessingEventWrapper pv : visits) {
             if (pv.getId() == visitId) {
                 visit = pv;
             }

@@ -7,13 +7,13 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> {
+public class PatientVisitInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
 
     class TableRowData {
-        PatientVisitWrapper visit;
+        ProcessingEventWrapper visit;
         String dateProcessed;
         String dateDrawn;
         Integer sampleCount;
@@ -32,7 +32,7 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
         "Date Drawn", "Num Samples", "Comment" };
 
     public PatientVisitInfoTable(Composite parent,
-        List<PatientVisitWrapper> collection) {
+        List<ProcessingEventWrapper> collection) {
         super(parent, collection, HEADINGS, 10);
     }
 
@@ -67,7 +67,7 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
     }
 
     @Override
-    public Object getCollectionModelObject(PatientVisitWrapper visit)
+    public Object getCollectionModelObject(ProcessingEventWrapper visit)
         throws Exception {
         TableRowData info = new TableRowData();
         info.visit = visit;
@@ -89,7 +89,7 @@ public class PatientVisitInfoTable extends InfoTableWidget<PatientVisitWrapper> 
     }
 
     @Override
-    public PatientVisitWrapper getSelection() {
+    public ProcessingEventWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

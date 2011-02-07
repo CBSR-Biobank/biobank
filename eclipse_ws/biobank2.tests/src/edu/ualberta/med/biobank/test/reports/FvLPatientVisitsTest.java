@@ -13,17 +13,17 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class FvLPatientVisitsTest extends AbstractReportTest {
-    private static final Mapper<PatientVisitWrapper, List<String>, List<Date>> GROUP_PVS_BY_STUDY_CLINIC = new Mapper<PatientVisitWrapper, List<String>, List<Date>>() {
-        public List<String> getKey(PatientVisitWrapper patientVisit) {
+    private static final Mapper<ProcessingEventWrapper, List<String>, List<Date>> GROUP_PVS_BY_STUDY_CLINIC = new Mapper<ProcessingEventWrapper, List<String>, List<Date>>() {
+        public List<String> getKey(ProcessingEventWrapper patientVisit) {
             return Arrays.asList(patientVisit.getPatient().getStudy()
                 .getNameShort(), patientVisit.getShipment().getClinic()
                 .getNameShort());
         }
 
-        public List<Date> getValue(PatientVisitWrapper patientVisit,
+        public List<Date> getValue(ProcessingEventWrapper patientVisit,
             List<Date> stats) {
             Date newDateReceived = patientVisit.getShipment().getDateReceived();
             if (stats == null) {
@@ -49,8 +49,8 @@ public class FvLPatientVisitsTest extends AbstractReportTest {
 
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
-        Collection<PatientVisitWrapper> allPatientVisits = getPatientVisits();
-        Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
+        Collection<ProcessingEventWrapper> allPatientVisits = getPatientVisits();
+        Collection<ProcessingEventWrapper> filteredPatientVisits = PredicateUtil
             .filter(allPatientVisits, patientVisitSite(isInSite(), getSiteId()));
         Map<List<String>, List<Date>> groupedPatientVisits = MapperUtil.map(
             filteredPatientVisits, GROUP_PVS_BY_STUDY_CLINIC);

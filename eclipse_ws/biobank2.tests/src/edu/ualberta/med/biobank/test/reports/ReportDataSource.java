@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -25,7 +25,7 @@ public interface ReportDataSource {
 
     public List<StudyWrapper> getStudies() throws Exception;
 
-    public List<PatientVisitWrapper> getPatientVisits() throws Exception;
+    public List<ProcessingEventWrapper> getPatientVisits() throws Exception;
 
     public List<PatientWrapper> getPatients() throws Exception;
 

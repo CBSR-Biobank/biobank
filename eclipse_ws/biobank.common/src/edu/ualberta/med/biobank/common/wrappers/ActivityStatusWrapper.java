@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
@@ -70,7 +70,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
         Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
             Container.class, ContainerType.class, SampleStorage.class,
-            Site.class, Study.class, StudyPvAttr.class, PatientVisit.class };
+            Site.class, Study.class, StudyPvAttr.class, ProcessingEvent.class };
 
         for (Class<?> clazz : classes) {
             StringBuilder sb = new StringBuilder("select count(x) from ")

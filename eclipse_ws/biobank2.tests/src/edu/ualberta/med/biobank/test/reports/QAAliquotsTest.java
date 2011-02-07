@@ -16,7 +16,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 
 public class QAAliquotsTest extends AbstractReportTest {
@@ -45,7 +45,7 @@ public class QAAliquotsTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        PatientVisitWrapper visit = aliquot.getPatientVisit();
+        ProcessingEventWrapper visit = aliquot.getPatientVisit();
         checkResults(getTopContainerIds(getContainers()),
             visit.getDateProcessed(), visit.getDateProcessed(), aliquot
                 .getSampleType().getNameShort());
@@ -57,7 +57,7 @@ public class QAAliquotsTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        PatientVisitWrapper visit = aliquot.getPatientVisit();
+        ProcessingEventWrapper visit = aliquot.getPatientVisit();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(visit.getDateProcessed());

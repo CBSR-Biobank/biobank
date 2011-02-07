@@ -5,8 +5,8 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.PvAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.model.StudyPvAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -15,7 +15,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 public class PvAttrWrapper extends ModelWrapper<PvAttr> {
 
     private StudyPvAttrWrapper studyPvAttr;
-    private PatientVisitWrapper pv;
+    private ProcessingEventWrapper pv;
 
     public PvAttrWrapper(WritableApplicationService appService,
         PvAttr wrappedObject) {
@@ -73,25 +73,26 @@ public class PvAttrWrapper extends ModelWrapper<PvAttr> {
         return wrappedObject.getValue();
     }
 
-    public PatientVisitWrapper getPatientVisit() {
+    public ProcessingEventWrapper getProcessingEvent() {
         if (pv == null) {
-            PatientVisit p = wrappedObject.getPatientVisit();
+            ProcessingEvent p = wrappedObject.getProcessingEvent();
             if (p == null)
                 return null;
-            pv = new PatientVisitWrapper(appService, p);
+            pv = new ProcessingEventWrapper(appService, p);
         }
         return pv;
     }
 
-    public void setPatientVisit(PatientVisitWrapper pv) {
+    public void setProcessingEvent(ProcessingEventWrapper pv) {
         this.pv = pv;
-        PatientVisit oldPv = wrappedObject.getPatientVisit();
-        PatientVisit newPv = null;
+        ProcessingEvent oldPv = wrappedObject.getProcessingEvent();
+        ProcessingEvent newPv = null;
         if (pv != null) {
             newPv = pv.getWrappedObject();
         }
-        wrappedObject.setPatientVisit(newPv);
-        propertyChangeSupport.firePropertyChange("patientVisit", oldPv, newPv);
+        wrappedObject.setProcessingEvent(newPv);
+        propertyChangeSupport.firePropertyChange("processingEvent", oldPv,
+            newPv);
     }
 
     @Override

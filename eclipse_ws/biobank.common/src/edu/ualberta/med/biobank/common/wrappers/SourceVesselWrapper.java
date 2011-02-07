@@ -26,13 +26,11 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
     }
 
     public String getName() {
-        return wrappedObject.getName();
+        return getProperty(SourceVesselPeer.NAME);
     }
 
     public void setName(String name) {
-        String oldName = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
+        setProperty(SourceVesselPeer.NAME, name);
     }
 
     @Override
@@ -72,7 +70,7 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
     @Override
     public int compareTo(ModelWrapper<SourceVessel> wrapper) {
         if (wrapper instanceof SourceVesselWrapper) {
-            String name1 = wrappedObject.getName();
+            String name1 = getName();
             String name2 = wrapper.wrappedObject.getName();
             return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
                 : -1));
@@ -115,7 +113,7 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
             return true;
         }
         String queryString2 = "select count(s) from "
-            + PvSourceVessel.class.getName() + " as s where s.sourceVessel=?)";
+            + SourceVessel.class.getName() + " as s where s.sourceVessel=?)";
         HQLCriteria c2 = new HQLCriteria(queryString2,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results2 = appService.query(c2);
@@ -128,5 +126,14 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
     public void checkUnique() throws ApplicationException, BiobankException {
         checkNoDuplicates(SourceVessel.class, SourceVesselPeer.NAME.getName(),
             getName(), "A source vessel with name");
+    }
+
+    public void setPatient(PatientWrapper patientWrapper) {
+        setWrappedProperty(SourceVesselPeer.PATIENT, patientWrapper);
+    }
+
+    public PatientWrapper getPatient() {
+        return getWrappedProperty(SourceVesselPeer.PATIENT,
+            PatientWrapper.class);
     }
 }

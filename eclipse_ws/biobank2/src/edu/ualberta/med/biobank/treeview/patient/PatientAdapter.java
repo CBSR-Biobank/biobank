@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
@@ -66,14 +66,14 @@ public class PatientAdapter extends AdapterBase {
         addDeleteMenu(menu, "Patient");
 
         if (isEditable()
-            && SessionManager.canCreate(PatientVisitWrapper.class, null)) {
+            && SessionManager.canCreate(ProcessingEventWrapper.class, null)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Patient Visit");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     PatientVisitAdapter adapter = new PatientVisitAdapter(
-                        PatientAdapter.this, new PatientVisitWrapper(
+                        PatientAdapter.this, new ProcessingEventWrapper(
                             getAppService()));
                     adapter.getWrapper().setPatient(getWrapper());
                     adapter.openEntryForm();
@@ -84,7 +84,7 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, PatientVisitWrapper.class);
+        return findChildFromClass(searchedObject, ProcessingEventWrapper.class);
     }
 
     @Override
@@ -94,8 +94,8 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        Assert.isTrue(child instanceof PatientVisitWrapper);
-        return new PatientVisitAdapter(this, (PatientVisitWrapper) child);
+        Assert.isTrue(child instanceof ProcessingEventWrapper);
+        return new PatientVisitAdapter(this, (ProcessingEventWrapper) child);
     }
 
     @Override

@@ -1,7 +1,7 @@
 package edu.ualberta.med.biobank.tools.patientvisits;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.tools.sentaliquots.AppArgs;
@@ -84,7 +84,7 @@ public class PatientVisitsFromCsv {
                 PatientWrapper patient = PatientWrapper.getPatient(appService,
                     pnumber);
                 if (patient != null) {
-                    List<PatientVisitWrapper> visits = patient
+                    List<ProcessingEventWrapper> visits = patient
                         .getPatientVisitCollection();
                     if (visits != null) {
                         System.out.println(pnumber + "," + visits.size());

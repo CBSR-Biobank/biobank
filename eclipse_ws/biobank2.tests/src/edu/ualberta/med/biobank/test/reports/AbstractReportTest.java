@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -81,8 +81,8 @@ public abstract class AbstractReportTest {
         final Integer siteId) {
         return new Predicate<AliquotWrapper>() {
             public boolean evaluate(AliquotWrapper aliquot) {
-                return isIn == aliquot.getPatientVisit().getShipment()
-                    .getSite().getId().equals(siteId);
+                return isIn == aliquot.getPatientVisit().getCenter().getId()
+                    .equals(siteId);
             }
         };
     }
@@ -96,13 +96,11 @@ public abstract class AbstractReportTest {
         };
     }
 
-    public static Predicate<PatientVisitWrapper> patientVisitSite(
+    public static Predicate<ProcessingEventWrapper> patientVisitSite(
         final boolean isIn, final Integer siteId) {
-        return new Predicate<PatientVisitWrapper>() {
-            public boolean evaluate(PatientVisitWrapper patientVisit) {
-                return !isIn
-                    || patientVisit.getShipment().getSite().getId()
-                        .equals(siteId);
+        return new Predicate<ProcessingEventWrapper>() {
+            public boolean evaluate(ProcessingEventWrapper patientVisit) {
+                return !isIn || patientVisit.getCenter().getId().equals(siteId);
             }
         };
     }
@@ -148,10 +146,10 @@ public abstract class AbstractReportTest {
         };
     }
 
-    public static Predicate<PatientVisitWrapper> patientVisitProcessedBetween(
+    public static Predicate<ProcessingEventWrapper> patientVisitProcessedBetween(
         final Date after, final Date before) {
-        return new Predicate<PatientVisitWrapper>() {
-            public boolean evaluate(PatientVisitWrapper patientVisit) {
+        return new Predicate<ProcessingEventWrapper>() {
+            public boolean evaluate(ProcessingEventWrapper patientVisit) {
                 Date processed = patientVisit.getDateProcessed();
                 return (DateCompare.compare(processed, after) <= 0)
                     && (DateCompare.compare(processed, before) >= 0);
@@ -325,7 +323,7 @@ public abstract class AbstractReportTest {
         return dataSource.getStudies();
     }
 
-    protected final List<PatientVisitWrapper> getPatientVisits()
+    protected final List<ProcessingEventWrapper> getPatientVisits()
         throws Exception {
         return dataSource.getPatientVisits();
     }

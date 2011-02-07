@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -109,7 +109,7 @@ public class TestActivityStatus extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0),
             patient);
-        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+        ProcessingEventWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         AliquotWrapper aliquot = AliquotHelper.addAliquot(sampleType,

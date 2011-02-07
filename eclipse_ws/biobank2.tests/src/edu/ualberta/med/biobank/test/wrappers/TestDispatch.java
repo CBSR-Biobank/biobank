@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -388,7 +388,7 @@ public class TestDispatch extends TestDatabase {
     }
 
     private List<AliquotWrapper> addAliquotsToContainerRow(
-        PatientVisitWrapper visit, ContainerWrapper container, int row,
+        ProcessingEventWrapper visit, ContainerWrapper container, int row,
         List<SampleTypeWrapper> sampleTypes) throws Exception {
         int numSampletypes = sampleTypes.size();
         int colCapacity = container.getColCapacity();
@@ -448,7 +448,7 @@ public class TestDispatch extends TestDatabase {
             clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0),
             patient);
-        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+        ProcessingEventWrapper visit = PatientVisitHelper.addPatientVisit(patient,
             clinicShipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         List<AliquotWrapper> aliquotSet1 = addAliquotsToContainerRow(visit,

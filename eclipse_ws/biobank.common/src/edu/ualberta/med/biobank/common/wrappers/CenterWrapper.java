@@ -7,13 +7,14 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
-import edu.ualberta.med.biobank.common.peer.SourcePeer;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
-import edu.ualberta.med.biobank.model.Source;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -48,8 +49,57 @@ public abstract class CenterWrapper<E extends Center> extends ModelWrapper<E> {
         return getWrappedProperty(CenterPeer.ADDRESS, AddressWrapper.class);
     }
 
+    private AddressWrapper initAddress() {
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            address = new AddressWrapper(appService);
+            setAddress(address);
+        }
+        return address;
+    }
+
     public void setAddress(AddressWrapper address) {
         setWrappedProperty(CenterPeer.ADDRESS, address);
+    }
+
+    public String getStreet1() {
+        return getProperty(getAddress(), AddressPeer.STREET1);
+    }
+
+    public void setStreet1(String street1) {
+        setProperty(initAddress(), AddressPeer.STREET1, street1);
+    }
+
+    public String getStreet2() {
+        return getProperty(getAddress(), AddressPeer.STREET2);
+    }
+
+    public void setStreet2(String street2) {
+        setProperty(initAddress(), AddressPeer.STREET2, street2);
+    }
+
+    public String getCity() {
+        return getProperty(getAddress(), AddressPeer.CITY);
+    }
+
+    public void setCity(String city) {
+        setProperty(initAddress(), AddressPeer.CITY, city);
+    }
+
+    public String getProvince() {
+        return getProperty(getAddress(), AddressPeer.PROVINCE);
+    }
+
+    public void setProvince(String province) {
+        setProperty(initAddress(), AddressPeer.PROVINCE, province);
+    }
+
+    public String getPostalCode() {
+        return getProperty(getAddress(), AddressPeer.POSTAL_CODE);
+    }
+
+    public void setPostalCode(String postalCode) {
+        setProperty(initAddress(), AddressPeer.POSTAL_CODE, postalCode);
     }
 
     public ActivityStatusWrapper getActivityStatus() {
@@ -96,23 +146,26 @@ public abstract class CenterWrapper<E extends Center> extends ModelWrapper<E> {
         setWrapperCollection(CenterPeer.REQUEST_COLLECTION, collection);
     }
 
-    public static final String SOURCE_COUNT_QRY = "select count(source) from "
-        + Source.class.getName() + " as source where "
-        + Property.concatNames(SourcePeer.SOURCE_CENTER, ClinicPeer.ID)
+    public static final String COLLECTION_EVENT_COUNT_QRY = "select count(source) from "
+        + CollectionEvent.class.getName()
+        + " as source where "
+        + Property
+            .concatNames(CollectionEventPeer.SOURCE_CENTER, ClinicPeer.ID)
         + " = ?";
 
-    public long getSourceCount() throws ApplicationException, BiobankException {
-        return getSourceCount(false);
+    public long getCollectionEventCount() throws ApplicationException,
+        BiobankException {
+        return getCollectionEventCount(false);
     }
 
     /**
      * fast = true will execute a hql query. fast = false will call the
      * getShipmentCollection().size method
      */
-    public long getSourceCount(boolean fast) throws ApplicationException,
-        BiobankException {
+    public long getCollectionEventCount(boolean fast)
+        throws ApplicationException, BiobankException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SOURCE_COUNT_QRY,
+            HQLCriteria criteria = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
@@ -120,38 +173,41 @@ public abstract class CenterWrapper<E extends Center> extends ModelWrapper<E> {
             }
             return results.get(0);
         }
-        List<SourceWrapper> list = getSourceCollection();
+        List<CollectionEventWrapper> list = getCollectionEventCollection();
         if (list == null) {
             return 0;
         }
         return list.size();
     }
 
-    public List<SourceWrapper> getSourceCollection(boolean sort) {
-        return getWrapperCollection(CenterPeer.SOURCE_COLLECTION,
-            SourceWrapper.class, sort);
+    public List<CollectionEventWrapper> getCollectionEventCollection(
+        boolean sort) {
+        return getWrapperCollection(CenterPeer.COLLECTION_EVENT_COLLECTION,
+            CollectionEventWrapper.class, sort);
     }
 
-    public List<SourceWrapper> getSourceCollection() {
-        return getSourceCollection(true);
+    public List<CollectionEventWrapper> getCollectionEventCollection() {
+        return getCollectionEventCollection(true);
     }
 
-    public void addSources(List<SourceWrapper> newSources) {
-        addToWrapperCollection(CenterPeer.SOURCE_COLLECTION, newSources);
+    public void addCollectionEvents(
+        List<CollectionEventWrapper> newCollectionEvents) {
+        addToWrapperCollection(CenterPeer.COLLECTION_EVENT_COLLECTION,
+            newCollectionEvents);
     }
 
-    public void removeSources(List<SourceWrapper> removedSources) {
-        removeFromWrapperCollection(CenterPeer.SOURCE_COLLECTION,
-            removedSources);
+    public void removeCollectionEvents(List<CollectionEventWrapper> removedCEs) {
+        removeFromWrapperCollection(CenterPeer.COLLECTION_EVENT_COLLECTION,
+            removedCEs);
     }
 
     /**
      * Search for a source in the center with the given date received
      */
-    public SourceWrapper getSource(Date dateReceived) {
-        List<SourceWrapper> sources = getSourceCollection();
+    public CollectionEventWrapper getCollectionEvent(Date dateReceived) {
+        List<CollectionEventWrapper> sources = getCollectionEventCollection();
         if (sources != null) {
-            for (SourceWrapper ship : sources) {
+            for (CollectionEventWrapper ship : sources) {
                 if (DateCompare.compare(ship.getDateReceived(), dateReceived) == 0)
                     return ship;
             }
@@ -163,10 +219,11 @@ public abstract class CenterWrapper<E extends Center> extends ModelWrapper<E> {
      * Search for a source in the center with the given date received and
      * patient number.
      */
-    public SourceWrapper getSource(Date dateReceived, String patientNumber) {
-        List<SourceWrapper> sources = getSourceCollection();
+    public CollectionEventWrapper getCollectionEvent(Date dateReceived,
+        String patientNumber) {
+        List<CollectionEventWrapper> sources = getCollectionEventCollection();
         if (sources != null)
-            for (SourceWrapper source : sources)
+            for (CollectionEventWrapper source : sources)
                 if (DateCompare.compare(source.getDateReceived(), dateReceived) == 0) {
                     List<PatientWrapper> patients = source
                         .getPatientCollection();

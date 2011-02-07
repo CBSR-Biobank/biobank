@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
@@ -58,7 +58,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     private PvSourceVesselEntryInfoTable infotable;
 
-    private PatientVisitWrapper patientVisit;
+    private ProcessingEventWrapper patientVisit;
 
     private boolean addMode;
 
@@ -325,7 +325,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
         }
     }
 
-    public void setPatientVisit(PatientVisitWrapper patientVisit) {
+    public void setPatientVisit(ProcessingEventWrapper patientVisit) {
         this.patientVisit = patientVisit;
     }
 }

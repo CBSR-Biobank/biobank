@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -419,7 +419,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     public void deleteStudyPvAttr(String label) throws Exception {
         getStudyPvAttrMap();
         StudyPvAttrWrapper studyPvAttr = getStudyPvAttr(label);
-        if (studyPvAttr.isUsedByPatientVisits()) {
+        if (studyPvAttr.isUsedByProcessingEvents()) {
             throw new BiobankCheckException("StudyPvAttr with label \"" + label
                 + "\" is in use by patient visits");
         }
@@ -555,7 +555,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     private static final String PATIENT_COUNT_FOR_SITE_QRY = "select count(distinct patients) from "
         + Site.class.getName()
         + " as site join site."
-        + CenterPeer.PATIENT_VISIT_COLLECTION
+        + CenterPeer.PROCESSING_EVENT_COLLECTION
         + " as pvs join pvs.patient as patients where site."
         + SitePeer.ID.getName()
         + "=? and "
@@ -576,9 +576,9 @@ public class StudyWrapper extends ModelWrapper<Study> {
     private static final String VISIT_COUNT_FOR_SITE_QRY = "select count(distinct visits) from "
         + Site.class.getName()
         + " as site join site."
-        + CenterPeer.PATIENT_VISIT_COLLECTION
+        + CenterPeer.PROCESSING_EVENT_COLLECTION
         + " as visits join visits."
-        + PatientVisitPeer.SOURCE_VESSEL_COLLECTION
+        + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION
         + " as svs join svs."
         + SourceVesselPeer.PATIENT
         + "."
@@ -588,7 +588,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         + "=? and site."
         + SitePeer.ID + "=?";
 
-    public long getPatientVisitCountForSite(SiteWrapper site)
+    public long getProcessingEventCountForSite(SiteWrapper site)
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_SITE_QRY,
             Arrays.asList(new Object[] { site.getId(), getId() }));
@@ -600,16 +600,16 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     private static final String VISIT_COUNT_QRY = "select count(distinct visits) from "
-        + PatientVisit.class.getName()
+        + ProcessingEvent.class.getName()
         + " as visits join visits."
-        + PatientVisitPeer.SOURCE_VESSEL_COLLECTION
+        + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION
         + " as svs join svs."
         + SourceVesselPeer.PATIENT
         + "."
         + PatientPeer.STUDY
         + " as study where study." + StudyPeer.ID + "=?";
 
-    public long getPatientVisitCount() throws ApplicationException,
+    public long getProcessingEventCount() throws ApplicationException,
         BiobankException {
         HQLCriteria c = new HQLCriteria(VISIT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));

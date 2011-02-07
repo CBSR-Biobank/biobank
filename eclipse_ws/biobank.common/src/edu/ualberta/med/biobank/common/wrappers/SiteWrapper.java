@@ -21,8 +21,6 @@ import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
@@ -33,7 +31,6 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SiteWrapper extends CenterWrapper<Site> {
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
-    private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
@@ -52,55 +49,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return names;
     }
 
-    private AddressWrapper initAddress() {
-        AddressWrapper address = getAddress();
-        if (address == null) {
-            address = new AddressWrapper(appService);
-            setAddress(address);
-        }
-        return address;
-    }
-
-    public String getStreet1() {
-        return getProperty(getAddress(), AddressPeer.STREET1);
-    }
-
-    public void setStreet1(String street1) {
-        setProperty(initAddress(), AddressPeer.STREET1, street1);
-    }
-
-    public String getStreet2() {
-        return getProperty(getAddress(), AddressPeer.STREET2);
-    }
-
-    public void setStreet2(String street2) {
-        setProperty(initAddress(), AddressPeer.STREET2, street2);
-    }
-
-    public String getCity() {
-        return getProperty(getAddress(), AddressPeer.CITY);
-    }
-
-    public void setCity(String city) {
-        setProperty(initAddress(), AddressPeer.CITY, city);
-    }
-
-    public String getProvince() {
-        return getProperty(getAddress(), AddressPeer.PROVINCE);
-    }
-
-    public void setProvince(String province) {
-        setProperty(initAddress(), AddressPeer.PROVINCE, province);
-    }
-
-    public String getPostalCode() {
-        return getProperty(getAddress(), AddressPeer.POSTAL_CODE);
-    }
-
-    public void setPostalCode(String postalCode) {
-        setProperty(initAddress(), AddressPeer.POSTAL_CODE, postalCode);
-    }
-
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
@@ -108,15 +56,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
             "A site with name");
         checkNoDuplicates(Site.class, SitePeer.NAME_SHORT.getName(),
             getNameShort(), "A site with name short");
-    }
-
-    @Override
-    protected void persistDependencies(Site origObject) throws Exception {
-        for (DispatchInfoWrapper diw : removedDispatchInfoWrapper) {
-            if (!diw.isNew()) {
-                diw.delete();
-            }
-        }
     }
 
     @Override
@@ -131,7 +70,8 @@ public class SiteWrapper extends CenterWrapper<Site> {
             .size() > 0)
             || (getContainerTypeCollection() != null && getContainerTypeCollection()
                 .size() > 0)
-            || (getSourceCollection() != null && getSourceCollection().size() > 0)) {
+            || (getCollectionEventCollection() != null && getCollectionEventCollection()
+                .size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
@@ -287,26 +227,12 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return result.get(0);
     }
 
-    public Long getPatientVisitCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select count(visits) from "
-            + Site.class.getName() + " as site "
-            + "join site.shipmentCollection as shipments "
-            + "join shipments.shipmentPatientCollection as csps "
-            + "join csps.patientVisitCollection as visits "
-            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
-    }
-
     public Long getAliquotCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria("select count(aliquots) from "
             + Site.class.getName() + " as site "
             + "join site.shipmentCollection as shipments "
             + "join shipments.shipmentPatientCollection as csps "
-            + "join csps.patientVisitCollection as visits "
+            + "join csps.processingEventCollection as visits "
             + "join visits.aliquotCollection as aliquots where site.id = ?",
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
@@ -351,11 +277,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
     @Override
     public String toString() {
         return getName();
-    }
-
-    @Override
-    public void resetInternalFields() {
-        removedDispatchInfoWrapper.clear();
     }
 
     public List<DispatchWrapper> getReceivedDispatchCollection() {

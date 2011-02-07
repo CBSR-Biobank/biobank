@@ -70,7 +70,6 @@ Export-Package: antlr;
  edu.ualberta.med.biobank.client.config,
  edu.ualberta.med.biobank.client.config.calgary,
  edu.ualberta.med.biobank.client.config.cbsr,
- edu.ualberta.med.biobank.client.reports.advanced,
  edu.ualberta.med.biobank.client.util,
  edu.ualberta.med.biobank.common;
   uses:="edu.ualberta.med.biobank.model,

@@ -10,7 +10,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class PatientWBCTest extends AbstractReportTest {
     private static final Predicate<AliquotWrapper> ALIQUOT_IS_DNA_SAMPLE_TYPE = new Predicate<AliquotWrapper>() {
@@ -43,7 +43,7 @@ public class PatientWBCTest extends AbstractReportTest {
         List<Object> expectedResults = new ArrayList<Object>();
 
         for (AliquotWrapper aliquot : filteredAliquots) {
-            PatientVisitWrapper visit = aliquot.getPatientVisit();
+            ProcessingEventWrapper visit = aliquot.getPatientVisit();
             List<Object> objects = new ArrayList<Object>();
             objects.add(visit.getPatient().getStudy().getNameShort());
             objects.add(visit.getShipment().getClinic().getNameShort());

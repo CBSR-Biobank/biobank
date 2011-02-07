@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -23,7 +23,6 @@ import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -191,33 +190,17 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                 }
             }
             // if not in a container or a dispatch, use the originating shipment
-            return getPatientVisit().getCenter();
+            return getProcessingEvent().getCenter();
         }
     }
 
-    public void setPatientVisit(PatientVisitWrapper patientVisit) {
-        propertiesMap.put("patientVisit", patientVisit);
-        PatientVisit oldPvRaw = wrappedObject.getPatientVisit();
-        PatientVisit newPvRaw = null;
-        if (patientVisit != null) {
-            newPvRaw = patientVisit.getWrappedObject();
-        }
-        wrappedObject.setPatientVisit(newPvRaw);
-        propertyChangeSupport.firePropertyChange("patientVisit", oldPvRaw,
-            newPvRaw);
+    public ProcessingEventWrapper getProcessingEvent() {
+        return getWrappedProperty(AliquotPeer.PROCESSING_EVENT,
+            ProcessingEventWrapper.class);
     }
 
-    public PatientVisitWrapper getPatientVisit() {
-        PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
-            .get("patientVisit");
-        if (patientVisit == null) {
-            PatientVisit pv = wrappedObject.getPatientVisit();
-            if (pv == null)
-                return null;
-            patientVisit = new PatientVisitWrapper(appService, pv);
-            propertiesMap.put("patientVisit", patientVisit);
-        }
-        return patientVisit;
+    public void setProcessingEvent(ProcessingEventWrapper pe) {
+        setWrappedProperty(AliquotPeer.PROCESSING_EVENT, pe);
     }
 
     /**
@@ -414,9 +397,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
 
     public void setQuantityFromType() {
         if (getSampleType() != null) {
-            PatientVisitWrapper patientVisit = (PatientVisitWrapper) propertiesMap
-                .get("patientVisit");
-            StudyWrapper study = patientVisit.getPatient().getStudy();
+            ProcessingEventWrapper processingEvent = (ProcessingEventWrapper) propertiesMap
+                .get("processingEvent");
+            StudyWrapper study = processingEvent.getPatient().getStudy();
             Double volume = null;
             Collection<SampleStorageWrapper> sampleStorageCollection = study
                 .getSampleStorageCollection();
@@ -491,8 +474,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     private static final String ALIQUOTS_NON_ACTIVE_QRY = "from "
         + Aliquot.class.getName()
         + " a where a."
-        + Property.concatNames(AliquotPeer.PATIENT_VISIT,
-            PatientVisitPeer.CENTER, CenterPeer.ID)
+        + Property.concatNames(AliquotPeer.PROCESSING_EVENT,
+            ProcessingEventPeer.CENTER, CenterPeer.ID)
         + " = ? and "
         + Property.concatNames(AliquotPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + " != ?";
@@ -577,7 +560,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     @Override
     protected Log getLogMessage(String action, String center, String details) {
         Log log = new Log();
-        PatientVisitWrapper visit = getPatientVisit();
+        ProcessingEventWrapper visit = getProcessingEvent();
         log.setAction(action);
         if (center == null) {
             log.setSite(visit.getCenter().getNameShort());

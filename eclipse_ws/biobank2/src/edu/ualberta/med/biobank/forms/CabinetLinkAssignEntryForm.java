@@ -40,7 +40,7 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -640,7 +640,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             public void run() {
                 try {
                     appendLog("----"); //$NON-NLS-1$
-                    PatientVisitWrapper pv = linkFormPatientManagement
+                    ProcessingEventWrapper pv = linkFormPatientManagement
                         .getSelectedPatientVisit();
                     aliquot.setPatientVisit(pv);
                     if (radioNew.getSelection()) {

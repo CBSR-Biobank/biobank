@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
@@ -97,7 +97,7 @@ public class TestAliquot extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0),
             patient);
-        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+        ProcessingEventWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, null, Utils.getRandomDate());
         aliquot = AliquotHelper.newAliquot(sampleType, container, pv, 0, 0);
         container.reload();
@@ -304,7 +304,7 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testGetSetPatientVisit() {
-        PatientVisitWrapper pvw = new PatientVisitWrapper(appService,
+        ProcessingEventWrapper pvw = new ProcessingEventWrapper(appService,
             new PatientVisit());
         aliquot.setPatientVisit(pvw);
         Assert.assertTrue(aliquot.getPatientVisit().getId() == pvw.getId());
@@ -482,7 +482,7 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquot() throws Exception {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        PatientVisitWrapper pv = aliquot.getPatientVisit();
+        ProcessingEventWrapper pv = aliquot.getPatientVisit();
         SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
             .get(0);
         Assert.assertNotNull(sampleType);
@@ -500,7 +500,7 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquotsNonActive() throws Exception {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        PatientVisitWrapper pv = aliquot.getPatientVisit();
+        ProcessingEventWrapper pv = aliquot.getPatientVisit();
         SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
             .get(0);
         Assert.assertNotNull(sampleType);
@@ -543,7 +543,7 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquotsInSiteWithPositionLabel() throws Exception {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        PatientVisitWrapper pv = aliquot.getPatientVisit();
+        ProcessingEventWrapper pv = aliquot.getPatientVisit();
         SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
             .get(0);
         Assert.assertNotNull(sampleType);
@@ -597,7 +597,7 @@ public class TestAliquot extends TestDatabase {
     public void testDebugRandomMethods() throws Exception {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        PatientVisitWrapper pv = aliquot.getPatientVisit();
+        ProcessingEventWrapper pv = aliquot.getPatientVisit();
         SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
             .get(0);
         Assert.assertNotNull(sampleType);

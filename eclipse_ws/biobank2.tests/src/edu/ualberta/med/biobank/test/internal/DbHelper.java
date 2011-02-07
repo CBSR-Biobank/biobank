@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -93,13 +93,13 @@ public class DbHelper {
         }
     }
 
-    public static void deletePatientVisits(List<PatientVisitWrapper> visits)
+    public static void deletePatientVisits(List<ProcessingEventWrapper> visits)
         throws Exception {
         Assert.assertNotNull("appService is null", appService);
         if (visits == null)
             return;
 
-        for (PatientVisitWrapper visit : visits) {
+        for (ProcessingEventWrapper visit : visits) {
             deleteFromList(visit.getAliquotCollection());
             visit.reload();
             visit.delete();

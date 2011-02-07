@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -749,7 +749,7 @@ public class TestSite extends TestDatabase {
 
         // delete patient 1 visits
         patient1.reload();
-        for (PatientVisitWrapper visit : patient1.getPatientVisitCollection()) {
+        for (ProcessingEventWrapper visit : patient1.getPatientVisitCollection()) {
             visit.delete();
         }
         site.reload();
@@ -815,7 +815,7 @@ public class TestSite extends TestDatabase {
         int sampleTypeCount = allSampleTypes.size();
         int sampleCount = 0;
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
-            for (PatientVisitWrapper visit : patient
+            for (ProcessingEventWrapper visit : patient
                 .getPatientVisitCollection()) {
                 for (int i = 0; i < 2; ++i) {
                     AliquotHelper.addAliquot(
@@ -831,7 +831,7 @@ public class TestSite extends TestDatabase {
             .longValue());
 
         // delete patient 1 and all it's visits and samples
-        for (PatientVisitWrapper visit : patient1.getPatientVisitCollection()) {
+        for (ProcessingEventWrapper visit : patient1.getPatientVisitCollection()) {
             for (AliquotWrapper aliquot : visit.getAliquotCollection()) {
                 aliquot.delete();
             }

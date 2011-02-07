@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.AliquotListViewForm;
 import edu.ualberta.med.biobank.forms.PvListViewForm;
@@ -104,7 +104,7 @@ public enum SearchType {
         public List<? extends ModelWrapper<?>> search(String searchString,
             SiteWrapper site) throws Exception {
 
-            List<PatientVisitWrapper> pvs = PatientVisitWrapper
+            List<ProcessingEventWrapper> pvs = ProcessingEventWrapper
                 .getPatientVisitsWithWorksheet(SessionManager.getAppService(),
                     searchString);
 

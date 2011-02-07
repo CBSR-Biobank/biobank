@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
@@ -866,7 +866,7 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(containerMap.get("ChildL3").hasParent());
     }
 
-    private PatientVisitWrapper addPatientVisit() throws Exception {
+    private ProcessingEventWrapper addPatientVisit() throws Exception {
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
         ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
@@ -874,7 +874,7 @@ public class TestContainer extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0),
             patient);
-        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+        ProcessingEventWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
         return pv;
     }
@@ -895,7 +895,7 @@ public class TestContainer extends TestDatabase {
 
         // reload because we changed container type
         childL3.reload();
-        PatientVisitWrapper pv = addPatientVisit();
+        ProcessingEventWrapper pv = addPatientVisit();
         AliquotWrapper aliquot;
 
         for (SampleTypeWrapper st : allSampleTypes) {
@@ -942,7 +942,7 @@ public class TestContainer extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0),
             patient);
-        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+        ProcessingEventWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         ContainerWrapper top = containerMap.get("Top");
@@ -1403,7 +1403,7 @@ public class TestContainer extends TestDatabase {
         // add a aliquot to childL4
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getAllSampleTypes(appService, true);
-        PatientVisitWrapper pv = addPatientVisit();
+        ProcessingEventWrapper pv = addPatientVisit();
         ContainerWrapper childL4 = containerMap.get("ChildL4");
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
         childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
@@ -1742,7 +1742,7 @@ public class TestContainer extends TestDatabase {
         ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0),
             patient);
-        PatientVisitWrapper pv = PatientVisitHelper.addPatientVisit(patient,
+        ProcessingEventWrapper pv = PatientVisitHelper.addPatientVisit(patient,
             shipment, Utils.getRandomDate(), Utils.getRandomDate());
 
         SampleTypeWrapper st = SampleTypeWrapper.getAllSampleTypes(appService,

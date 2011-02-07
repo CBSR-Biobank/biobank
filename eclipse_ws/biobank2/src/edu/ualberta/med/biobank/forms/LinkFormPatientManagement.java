@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.Messages;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
@@ -56,7 +56,7 @@ public class LinkFormPatientManagement {
     private Label visitTextLabel;
     private BiobankText visitText;
     private Label visitComboLabel;
-    protected PatientVisitWrapper currentVisitSelected;
+    protected ProcessingEventWrapper currentVisitSelected;
     private BiobankText visitProcessedText;
 
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
@@ -112,7 +112,7 @@ public class LinkFormPatientManagement {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    currentVisitSelected = (PatientVisitWrapper) selectedObject;
+                    currentVisitSelected = (ProcessingEventWrapper) selectedObject;
                     if (currentVisitSelected == null) {
                         visitProcessedText.setText("");
                     } else {
@@ -124,8 +124,8 @@ public class LinkFormPatientManagement {
         viewerVisits.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                if (element instanceof PatientVisitWrapper)
-                    return ((PatientVisitWrapper) element)
+                if (element instanceof ProcessingEventWrapper)
+                    return ((ProcessingEventWrapper) element)
                         .getFormattedDateDrawn();
                 return element.toString();
             }
@@ -141,7 +141,7 @@ public class LinkFormPatientManagement {
                 IStructuredSelection selection = (IStructuredSelection) viewerVisits
                     .getSelection();
                 if (selection != null && selection.size() > 0) {
-                    PatientVisitWrapper pv = (PatientVisitWrapper) selection
+                    ProcessingEventWrapper pv = (ProcessingEventWrapper) selection
                         .getFirstElement();
                     if (pv != null) {
                         aliquotAdminForm.appendLogNLS(
@@ -191,7 +191,7 @@ public class LinkFormPatientManagement {
         visitProcessedText.setLayoutData(gd);
     }
 
-    protected PatientVisitWrapper getSelectedPatientVisit() {
+    protected ProcessingEventWrapper getSelectedPatientVisit() {
         return currentVisitSelected;
     }
 
@@ -216,7 +216,7 @@ public class LinkFormPatientManagement {
         if (viewerVisits != null) {
             if (currentPatient != null) {
                 // show visits list
-                List<PatientVisitWrapper> collection = null;
+                List<ProcessingEventWrapper> collection = null;
                 if (visitsListCheck.getSelection()) {
                     try {
                         collection = currentPatient
@@ -275,12 +275,12 @@ public class LinkFormPatientManagement {
     }
 
     public void setCurrentPatientAndVisit(PatientWrapper patient,
-        PatientVisitWrapper patientVisit) throws Exception {
+        ProcessingEventWrapper patientVisit) throws Exception {
         // FIXME need to reload otherwise get a database access problem ??
         patient.reload();
         this.currentPatient = patient;
         patientNumberText.setText(patient.getPnumber());
-        List<PatientVisitWrapper> collection = patient
+        List<ProcessingEventWrapper> collection = patient
             .getPatientVisitCollection();
         viewerVisits.setInput(collection);
         viewerVisits.setSelection(new StructuredSelection(patientVisit));

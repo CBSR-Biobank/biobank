@@ -42,7 +42,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -949,7 +949,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
         AliquotWrapper aliquot, String posStr) {
-        PatientVisitWrapper visit = aliquot.getPatientVisit();
+        ProcessingEventWrapper visit = aliquot.getPatientVisit();
         sb.append(Messages.getFormattedString(
             "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
             posStr, currentSiteSelected.getNameShort(), cell.getValue(),
