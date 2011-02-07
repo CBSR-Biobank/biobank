@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.reports;
 
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
@@ -85,8 +86,8 @@ public class CachedReportDataSource implements ReportDataSource {
             HQLCriteria criteria = new HQLCriteria("from "
                 + Container.class.getName());
             List<Container> tmp = appService.query(criteria);
-            containers = ContainerWrapper.transformToWrapperList(appService,
-                tmp);
+            containers = ModelWrapper.wrapModelCollection(appService, tmp,
+                ContainerWrapper.class);
         }
         return containers;
     }

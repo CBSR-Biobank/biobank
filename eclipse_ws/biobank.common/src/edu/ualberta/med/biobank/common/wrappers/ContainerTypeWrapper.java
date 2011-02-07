@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
+import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
@@ -211,7 +212,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         HQLCriteria c = new HQLCriteria(PARENT_CONTAINER_TYPES_QRY,
             Arrays.asList(new Object[] { wrappedObject.getId() }));
         List<ContainerType> results = appService.query(c);
-        return transformToWrapperList(appService, results);
+        return wrapModelCollection(appService, results,
+            ContainerTypeWrapper.class);
     }
 
     public String getName() {
@@ -360,9 +362,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         setProperty(initCapacity(), CapacityPeer.COL_CAPACITY, maxCols);
     }
 
-    private ContainerLabelingSchemeWrapper getChildLabelingScheme() {
+    public ContainerLabelingSchemeWrapper getChildLabelingScheme() {
         return getWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME,
             ContainerLabelingSchemeWrapper.class);
+    }
+
+    public void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
+        setWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME, scheme);
     }
 
     public Integer getChildLabelingSchemeId() {
@@ -370,24 +376,22 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             ContainerLabelingSchemePeer.ID);
     }
 
+    public void setChildLabelingSchemeById(Integer id) throws Exception {
+        ContainerLabelingSchemeWrapper scheme = ContainerLabelingSchemeWrapper
+            .getLabelingSchemeById(appService, id);
+        if (scheme == null) {
+            throw new Exception("labeling scheme with id \"" + id
+                + "\" does not exist");
+        }
+        setChildLabelingScheme(scheme);
+    }
+
     public String getChildLabelingSchemeName() {
         return getProperty(getChildLabelingScheme(),
             ContainerLabelingSchemePeer.NAME);
     }
 
-    // TODO: stopped here
-
-    public void setChildLabelingScheme(Integer id) throws ApplicationException {
-        setWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME,
-            ContainerLabelingSchemeWrapper
-                .getLabelingSchemeById(appService, id));
-    }
-
     public void setChildLabelingSchemeName(String name) throws Exception {
-        if (name == null) {
-            throw new Exception("name is null");
-        }
-
         for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
             .getAllLabelingSchemesMap(appService).values()) {
             if (scheme.getName().equals(name)) {
@@ -397,10 +401,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
         throw new Exception("labeling scheme with name \"" + name
             + "\" does not exist");
-    }
-
-    private void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
-        setWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME, scheme);
     }
 
     /**
@@ -455,26 +455,24 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
+    private static final String TOP_CONTAINERS_IN_SITE_QRY = "from "
+        + ContainerType.class.getName() + " where "
+        + Property.concatNames(ContainerTypePeer.SITE, SitePeer.ID) + "=? and "
+        + ContainerTypePeer.TOP_LEVEL.getName() + "=true";
+
     public static List<ContainerTypeWrapper> getTopContainerTypesInSite(
         WritableApplicationService appService, SiteWrapper site)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + ContainerType.class.getName()
-            + " where site.id = ? and topLevel=true",
+        HQLCriteria criteria = new HQLCriteria(TOP_CONTAINERS_IN_SITE_QRY,
             Arrays.asList(new Object[] { site.getId() }));
         List<ContainerType> types = appService.query(criteria);
-        return transformToWrapperList(appService, types);
+        return wrapModelCollection(appService, types,
+            ContainerTypeWrapper.class);
     }
 
-    public static List<ContainerTypeWrapper> transformToWrapperList(
-        WritableApplicationService appService,
-        Collection<ContainerType> containerTypes) {
-        List<ContainerTypeWrapper> list = new ArrayList<ContainerTypeWrapper>();
-        for (ContainerType type : containerTypes) {
-            list.add(new ContainerTypeWrapper(appService, type));
-        }
-        return new ArrayList<ContainerTypeWrapper>(list);
-    }
+    private static final String SITE_CONTAINER_TYPES_QRY = "from "
+        + ContainerType.class.getName() + " where "
+        + ContainerTypePeer.SITE.getName() + "=? and ";
 
     /**
      * Get containers types defined in a site. if useStrictName is true, then
@@ -489,16 +487,34 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         String containerNameParameter = containerName;
         if (!useStrictName) {
             nameComparison = "lower(name) like";
-            containerNameParameter = "%" + containerName.toLowerCase() + "%";
+            containerNameParameter = new StringBuilder("%")
+                .append(containerName.toLowerCase()).append("%").toString();
         }
-        String query = "from " + ContainerType.class.getName()
-            + " where site = ? and " + nameComparison + " ?";
-        HQLCriteria criteria = new HQLCriteria(query,
+        StringBuilder query = new StringBuilder(SITE_CONTAINER_TYPES_QRY)
+            .append(nameComparison).append(" ?");
+        HQLCriteria criteria = new HQLCriteria(query.toString(),
             Arrays.asList(new Object[] { siteWrapper.getWrappedObject(),
-                containerNameParameter }));
+                containerNameParameter.toString() }));
         List<ContainerType> containerTypes = appService.query(criteria);
-        return transformToWrapperList(appService, containerTypes);
+        return wrapModelCollection(appService, containerTypes,
+            ContainerTypeWrapper.class);
     }
+
+    private static final String CONTAINER_TYPES_BY_CAPACITY_QRY = "select ct from "
+        + ContainerType.class.getName()
+        + " as ct join ct."
+        + ContainerTypePeer.CAPACITY.getName()
+        + " as cap where ct."
+        + ContainerTypePeer.SITE.getName()
+        + "=? and cap."
+        + CapacityPeer.ROW_CAPACITY.getName()
+        + "=? and cap."
+        + CapacityPeer.COL_CAPACITY.getName()
+        + "=? and ct."
+        + ContainerTypePeer.SAMPLE_TYPE_COLLECTION.getName()
+        + " is not empty and ct."
+        + ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION.getName()
+        + " is empty";
 
     /**
      * Get containers types with the given capacity in the given site. The
@@ -507,17 +523,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
     public static List<ContainerTypeWrapper> getContainerTypesByCapacity(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         int maxRows, int maxCols) throws ApplicationException {
-        String query = "select ct from "
-            + ContainerType.class.getName()
-            + " as ct join ct.capacity as cap"
-            + " where ct.site = ? and cap.rowCapacity = ?"
-            + " and cap.colCapacity = ? and ct.sampleTypeCollection is not empty"
-            + " and ct.childContainerTypeCollection is empty";
-        HQLCriteria criteria = new HQLCriteria(query,
+        HQLCriteria criteria = new HQLCriteria(CONTAINER_TYPES_BY_CAPACITY_QRY,
             Arrays.asList(new Object[] { siteWrapper.getWrappedObject(),
                 maxRows, maxCols }));
         List<ContainerType> containerTypes = appService.query(criteria);
-        return transformToWrapperList(appService, containerTypes);
+        return wrapModelCollection(appService, containerTypes,
+            ContainerTypeWrapper.class);
     }
 
     public static List<ContainerTypeWrapper> getContainerTypesPallet96(
@@ -527,13 +538,15 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             RowColPos.PALLET_96_ROW_MAX, RowColPos.PALLET_96_COL_MAX);
     }
 
+    private static final String CONTAINER_COUNT_QRY = "select count(*) from "
+        + Container.class.getName() + " where containerType.id=?";
+
     /**
      * get count of container which type is this
      */
     public long getContainersCount() throws ApplicationException,
         BiobankException {
-        HQLCriteria c = new HQLCriteria("select count(*) from "
-            + Container.class.getName() + " where containerType.id=?",
+        HQLCriteria c = new HQLCriteria(CONTAINER_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
