@@ -5,9 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
@@ -159,19 +157,9 @@ public class RequestWrapper extends ModelWrapper<Request> {
     }
 
     public void setRequestAliquotCollection(
-        Collection<RequestAliquot> allAliquotObjects,
         List<RequestAliquotWrapper> allAliquotWrappers) {
-        Collection<RequestAliquot> oldAliquots = wrappedObject
-            .getRequestAliquotCollection();
-        if (allAliquotObjects instanceof Set)
-            wrappedObject.setRequestAliquotCollection(allAliquotObjects);
-        else
-            wrappedObject
-                .setRequestAliquotCollection(new HashSet<RequestAliquot>(
-                    allAliquotObjects));
-        propertyChangeSupport.firePropertyChange("requestAliquotCollection",
-            oldAliquots, allAliquotObjects);
-        propertiesMap.put("requestAliquotCollection", allAliquotWrappers);
+        setWrapperCollection(RequestPeer.REQUEST_ALIQUOT_COLLECTION,
+            allAliquotWrappers);
     }
 
     public List<RequestAliquotWrapper> getNonProcessedRequestAliquotCollection() {

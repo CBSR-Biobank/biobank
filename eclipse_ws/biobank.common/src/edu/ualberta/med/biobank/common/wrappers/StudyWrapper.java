@@ -534,7 +534,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     @Override
     public int compareTo(ModelWrapper<Study> wrapper) {
         if (wrapper instanceof StudyWrapper) {
-            String nameShort1 = wrappedObject.getNameShort();
+            String nameShort1 = getNameShort();
             String nameShort2 = wrapper.wrappedObject.getNameShort();
 
             int compare = 0;
@@ -542,7 +542,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
                 compare = nameShort1.compareTo(nameShort2);
             }
             if (compare == 0) {
-                String name1 = wrappedObject.getName();
+                String name1 = getName();
                 String name2 = wrapper.wrappedObject.getName();
 
                 return name1.compareTo(name2);
