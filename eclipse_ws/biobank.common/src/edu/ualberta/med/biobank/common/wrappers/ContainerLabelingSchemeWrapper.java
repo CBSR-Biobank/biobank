@@ -181,8 +181,8 @@ public class ContainerLabelingSchemeWrapper extends
         getAllLabelingSchemesMap(appService);
         ContainerLabelingSchemeWrapper scheme = allSchemes.get(id);
         if (scheme == null) {
-            throw new ApplicationException("labeling scheme with id " + id
-                + " does not exist");
+            throw new ApplicationException("labeling scheme with id" + id
+                + "does not exist");
         }
         return scheme;
     }
