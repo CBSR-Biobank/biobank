@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
@@ -49,55 +48,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
         names.addAll(SitePeer.PROP_NAMES);
         names.addAll(AddressPeer.PROP_NAMES);
         return names;
-    }
-
-    private AddressWrapper initAddress() {
-        AddressWrapper address = getAddress();
-        if (address == null) {
-            address = new AddressWrapper(appService);
-            setAddress(address);
-        }
-        return address;
-    }
-
-    public String getStreet1() {
-        return getProperty(getAddress(), AddressPeer.STREET1);
-    }
-
-    public void setStreet1(String street1) {
-        setProperty(initAddress(), AddressPeer.STREET1, street1);
-    }
-
-    public String getStreet2() {
-        return getProperty(getAddress(), AddressPeer.STREET2);
-    }
-
-    public void setStreet2(String street2) {
-        setProperty(initAddress(), AddressPeer.STREET2, street2);
-    }
-
-    public String getCity() {
-        return getProperty(getAddress(), AddressPeer.CITY);
-    }
-
-    public void setCity(String city) {
-        setProperty(initAddress(), AddressPeer.CITY, city);
-    }
-
-    public String getProvince() {
-        return getProperty(getAddress(), AddressPeer.PROVINCE);
-    }
-
-    public void setProvince(String province) {
-        setProperty(initAddress(), AddressPeer.PROVINCE, province);
-    }
-
-    public String getPostalCode() {
-        return getProperty(getAddress(), AddressPeer.POSTAL_CODE);
-    }
-
-    public void setPostalCode(String postalCode) {
-        setProperty(initAddress(), AddressPeer.POSTAL_CODE, postalCode);
     }
 
     @Override

@@ -7,6 +7,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.SourcePeer;
@@ -48,8 +49,57 @@ public abstract class CenterWrapper<E extends Center> extends ModelWrapper<E> {
         return getWrappedProperty(CenterPeer.ADDRESS, AddressWrapper.class);
     }
 
+    private AddressWrapper initAddress() {
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            address = new AddressWrapper(appService);
+            setAddress(address);
+        }
+        return address;
+    }
+
     public void setAddress(AddressWrapper address) {
         setWrappedProperty(CenterPeer.ADDRESS, address);
+    }
+
+    public String getStreet1() {
+        return getProperty(getAddress(), AddressPeer.STREET1);
+    }
+
+    public void setStreet1(String street1) {
+        setProperty(initAddress(), AddressPeer.STREET1, street1);
+    }
+
+    public String getStreet2() {
+        return getProperty(getAddress(), AddressPeer.STREET2);
+    }
+
+    public void setStreet2(String street2) {
+        setProperty(initAddress(), AddressPeer.STREET2, street2);
+    }
+
+    public String getCity() {
+        return getProperty(getAddress(), AddressPeer.CITY);
+    }
+
+    public void setCity(String city) {
+        setProperty(initAddress(), AddressPeer.CITY, city);
+    }
+
+    public String getProvince() {
+        return getProperty(getAddress(), AddressPeer.PROVINCE);
+    }
+
+    public void setProvince(String province) {
+        setProperty(initAddress(), AddressPeer.PROVINCE, province);
+    }
+
+    public String getPostalCode() {
+        return getProperty(getAddress(), AddressPeer.POSTAL_CODE);
+    }
+
+    public void setPostalCode(String postalCode) {
+        setProperty(initAddress(), AddressPeer.POSTAL_CODE, postalCode);
     }
 
     public ActivityStatusWrapper getActivityStatus() {

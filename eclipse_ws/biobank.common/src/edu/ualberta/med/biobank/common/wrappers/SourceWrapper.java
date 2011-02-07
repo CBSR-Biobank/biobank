@@ -12,6 +12,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.SourcePeer;
 import edu.ualberta.med.biobank.common.wrappers.internal.ShipmentPatientWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -608,6 +609,11 @@ public class SourceWrapper extends AbstractShipmentWrapper<Source> {
     public Boolean needDeparted() {
         ShippingMethodWrapper shippingMethod = getShippingMethod();
         return shippingMethod == null || shippingMethod.needDate();
+    }
+
+    public Collection<SourceVesselWrapper> getSourceVesselCollection() {
+        return getWrapperCollection(SourcePeer.SOURCE_VESSEL_COLLECTION,
+            SourceVesselWrapper.class, false);
     }
 
 }
