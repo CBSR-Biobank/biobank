@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
+import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -216,7 +216,7 @@ public class DispatchReceiveScanDialog extends
                 .getDispatchAliquotCollection()) {
                 int row = i / 12;
                 int col = i % 12;
-                if (!DispatchAliquotState.MISSING.isEquals(dsa.getState()))
+                if (!DispatchItemState.MISSING.isEquals(dsa.getState()))
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
                         new ScanCell(row, col, dsa.getAliquot()
                             .getInventoryId())));

@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
@@ -296,9 +297,9 @@ public class SiteWrapper extends CenterWrapper<Site> {
             List<DispatchWrapper> children = getSentDispatchCollection();
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper ship : children) {
-                    if (ship.isInTransitState()) {
-                        shipCollection.add(ship);
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.IN_TRANSIT.equals(dispatch.getState())) {
+                        shipCollection.add(dispatch);
                     }
                 }
                 propertiesMap.put("inTransitSentDispatchCollection",
@@ -316,9 +317,9 @@ public class SiteWrapper extends CenterWrapper<Site> {
             List<DispatchWrapper> children = getReceivedDispatchCollection();
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper ship : children) {
-                    if (ship.isInTransitState()) {
-                        shipCollection.add(ship);
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.IN_TRANSIT.equals(dispatch.getState())) {
+                        shipCollection.add(dispatch);
                     }
                 }
                 propertiesMap.put("inTransitReceiveDispatchCollection",
@@ -336,9 +337,10 @@ public class SiteWrapper extends CenterWrapper<Site> {
             List<DispatchWrapper> children = getReceivedDispatchCollection();
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper ship : children) {
-                    if (ship.isInReceivedState() && !ship.hasErrors()) {
-                        shipCollection.add(ship);
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.RECEIVED.equals(dispatch.getState())
+                        && !dispatch.hasErrors()) {
+                        shipCollection.add(dispatch);
                     }
                 }
                 propertiesMap
@@ -356,9 +358,10 @@ public class SiteWrapper extends CenterWrapper<Site> {
             List<DispatchWrapper> children = getReceivedDispatchCollection();
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper ship : children) {
-                    if (ship.isInReceivedState() && ship.hasErrors()) {
-                        shipCollection.add(ship);
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.RECEIVED.equals(dispatch.getState())
+                        && dispatch.hasErrors()) {
+                        shipCollection.add(dispatch);
                     }
                 }
                 propertiesMap.put("receivingWithErrorsDispatchCollection",
@@ -376,9 +379,9 @@ public class SiteWrapper extends CenterWrapper<Site> {
             List<DispatchWrapper> children = getSentDispatchCollection();
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper ship : children) {
-                    if (ship.isInCreationState()) {
-                        shipCollection.add(ship);
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.CREATION.equals(dispatch.getState())) {
+                        shipCollection.add(dispatch);
                     }
                 }
                 propertiesMap.put("inCreationDispatchCollection",

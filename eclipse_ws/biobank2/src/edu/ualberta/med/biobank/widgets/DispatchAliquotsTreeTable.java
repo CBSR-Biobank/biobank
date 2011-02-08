@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.TreeColumn;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
+import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.ModifyStateDispatchDialog;
@@ -161,7 +161,7 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
                     DispatchAliquotWrapper dsa = getSelectedAliquot();
                     if (dsa != null) {
                         if (editAliquotsState
-                            && DispatchAliquotState.getState(dsa.getState()) == DispatchAliquotState.NONE_STATE)
+                            && DispatchItemState.getState(dsa.getState()) == DispatchItemState.NONE)
                             addSetMissingMenu(menu);
                         if (editAliquotsComment)
                             addModifyCommentMenu(menu);
@@ -202,13 +202,13 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 modifyCommentAndState((IStructuredSelection) tv.getSelection(),
-                    DispatchAliquotState.MISSING);
+                    DispatchItemState.MISSING);
             }
         });
     }
 
     private void modifyCommentAndState(
-        IStructuredSelection iStructuredSelection, DispatchAliquotState newState) {
+        IStructuredSelection iStructuredSelection, DispatchItemState newState) {
         ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             newState);
