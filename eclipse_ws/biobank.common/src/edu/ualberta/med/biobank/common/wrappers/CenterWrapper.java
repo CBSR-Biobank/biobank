@@ -9,12 +9,13 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -146,11 +147,65 @@ public abstract class CenterWrapper<E extends Center> extends ModelWrapper<E> {
         setWrapperCollection(CenterPeer.REQUEST_COLLECTION, collection);
     }
 
+    public static final String PROCESSING_EVENT_COUNT_QRY = "select count(proc) from "
+        + ProcessingEvent.class.getName()
+        + " as proc where "
+        + Property.concatNames(ProcessingEventPeer.CENTER, CenterPeer.ID)
+        + " = ?";
+
+    public long getProcessingEventCount() throws ApplicationException,
+        BiobankException {
+        return getProcessingEventCount(false);
+    }
+
+    /**
+     * fast = true will execute a hql query. fast = false will call the
+     * getShipmentCollection().size method
+     */
+    public long getProcessingEventCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(PROCESSING_EVENT_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            List<Long> results = appService.query(criteria);
+            if (results.size() != 1) {
+                throw new BiobankQueryResultSizeException();
+            }
+            return results.get(0);
+        }
+        List<CollectionEventWrapper> list = getCollectionEventCollection();
+        if (list == null) {
+            return 0;
+        }
+        return list.size();
+    }
+
+    public List<ProcessingEventWrapper> getProcessingEventCollection(
+        boolean sort) {
+        return getWrapperCollection(CenterPeer.PROCESSING_EVENT_COLLECTION,
+            ProcessingEventWrapper.class, sort);
+    }
+
+    public List<ProcessingEventWrapper> getProcessingEventCollection() {
+        return getProcessingEventCollection(true);
+    }
+
+    public void addProcessingEvents(
+        List<ProcessingEventWrapper> newProcessingEvents) {
+        addToWrapperCollection(CenterPeer.PROCESSING_EVENT_COLLECTION,
+            newProcessingEvents);
+    }
+
+    public void removeProcessingEvents(List<ProcessingEventWrapper> removedPEs) {
+        removeFromWrapperCollection(CenterPeer.PROCESSING_EVENT_COLLECTION,
+            removedPEs);
+    }
+
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(source) from "
         + CollectionEvent.class.getName()
         + " as source where "
         + Property
-            .concatNames(CollectionEventPeer.SOURCE_CENTER, ClinicPeer.ID)
+            .concatNames(CollectionEventPeer.SOURCE_CENTER, CenterPeer.ID)
         + " = ?";
 
     public long getCollectionEventCount() throws ApplicationException,

@@ -37,7 +37,7 @@ public class AliquotHelper extends DbHelper {
         if (container != null) {
             aliquot.setParent(container);
         }
-        aliquot.setPatientVisit(pv);
+        aliquot.setProcessingEvent(pv);
         if ((row != null) && (col != null)) {
             aliquot.setPosition(new RowColPos(row, col));
         }

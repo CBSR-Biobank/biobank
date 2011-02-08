@@ -342,4 +342,5 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return getWrapperCollection(PatientPeer.SOURCE_VESSEL_COLLECTION,
             SourceVesselWrapper.class, false);
     }
+
 }

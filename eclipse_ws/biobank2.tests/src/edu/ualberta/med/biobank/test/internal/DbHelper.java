@@ -4,12 +4,11 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Random;
@@ -77,16 +76,11 @@ public class DbHelper {
         // visites liees au ship avec patient de la visit non lie au shipment
         for (PatientWrapper patient : patients) {
             patient.reload();
-            deletePatientVisits(patient.getPatientVisitCollection());
+            deletePatientVisits(patient.getProcessingEventCollection());
             patient.reload();
-            for (ShipmentWrapper ship : patient.getShipmentCollection(null)) {
-                ship.reload();
-                ship.removePatients(Arrays.asList(patient));
-                if (ship.getPatientCollection().size() == 0) {
-                    ship.delete();
-                } else {
-                    ship.persist();
-                }
+            for (SourceVesselWrapper s : patient.getSourceVesselCollection()) {
+                s.reload();
+                s.delete();
             }
             patient.reload();
             patient.delete();

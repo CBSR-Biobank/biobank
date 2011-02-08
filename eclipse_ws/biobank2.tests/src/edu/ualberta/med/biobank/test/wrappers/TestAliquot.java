@@ -18,32 +18,32 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -94,11 +94,11 @@ public class TestAliquot extends TestDatabase {
         site.persist();
         site.reload();
 
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0),
-            patient);
-        ProcessingEventWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, null, Utils.getRandomDate());
+        CollectionEventWrapper shipment = CollectionEventHelper
+            .addCollectionEvent(site, clinic, ShippingMethodWrapper
+                .getShippingMethods(appService).get(0), patient);
+        ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
+            patient, shipment, null, Utils.getRandomDate());
         aliquot = AliquotHelper.newAliquot(sampleType, container, pv, 0, 0);
         container.reload();
     }
@@ -113,7 +113,7 @@ public class TestAliquot extends TestDatabase {
     public void testPersistFailActivityStatusNull() throws Exception {
         AliquotWrapper pAliquot = AliquotHelper.newAliquot(
             aliquot.getSampleType(), null);
-        pAliquot.setPatientVisit(aliquot.getPatientVisit());
+        pAliquot.setProcessingEvent(aliquot.getProcessingEvent());
 
         try {
             pAliquot.persist();
@@ -132,7 +132,7 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
         AliquotWrapper duplicate = AliquotHelper.newAliquot(
             aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getPatientVisit(), 2, 2);
+            aliquot.getProcessingEvent(), 2, 2);
 
         duplicate.setInventoryId(aliquot.getInventoryId());
         try {
@@ -151,7 +151,7 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
         AliquotWrapper duplicate = AliquotHelper.newAliquot(
             aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getPatientVisit(), 2, 2);
+            aliquot.getProcessingEvent(), 2, 2);
 
         duplicate.setInventoryId("TOTO" + i);
         try {
@@ -169,7 +169,7 @@ public class TestAliquot extends TestDatabase {
 
         AliquotWrapper duplicate = AliquotHelper.newAliquot(
             aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getPatientVisit(), 2, 2);
+            aliquot.getProcessingEvent(), 2, 2);
         duplicate.setInventoryId(aliquot.getInventoryId());
 
         try {
@@ -201,7 +201,7 @@ public class TestAliquot extends TestDatabase {
 
         AliquotWrapper duplicate = AliquotHelper.newAliquot(
             aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getPatientVisit(), 2, 2);
+            aliquot.getProcessingEvent(), 2, 2);
         duplicate.setInventoryId("toto" + i);
 
         try {
@@ -223,7 +223,7 @@ public class TestAliquot extends TestDatabase {
 
         AliquotWrapper duplicate = AliquotHelper.newAliquot(
             aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getPatientVisit(), pos.row, pos.col);
+            aliquot.getProcessingEvent(), pos.row, pos.col);
 
         try {
             duplicate.persist();
@@ -270,9 +270,9 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testCheckPatientVisitNotNull() throws BiobankCheckException,
+    public void testCheckProcessingEventNotNull() throws BiobankCheckException,
         Exception {
-        aliquot.setPatientVisit(null);
+        aliquot.setProcessingEvent(null);
         try {
             aliquot.persist();
             Assert.fail("Patient visit should be set!");
@@ -303,11 +303,11 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testGetSetPatientVisit() {
+    public void testGetSetProcessingEvent() {
         ProcessingEventWrapper pvw = new ProcessingEventWrapper(appService,
-            new PatientVisit());
-        aliquot.setPatientVisit(pvw);
-        Assert.assertTrue(aliquot.getPatientVisit().getId() == pvw.getId());
+            new ProcessingEvent());
+        aliquot.setProcessingEvent(pvw);
+        Assert.assertTrue(aliquot.getProcessingEvent().getId() == pvw.getId());
     }
 
     @Test
@@ -430,22 +430,22 @@ public class TestAliquot extends TestDatabase {
         SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
         ss1.setSampleType(SampleTypeHelper.addSampleType("ss1"));
         ss1.setVolume(1.0);
-        ss1.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
+        ss1.setStudy(aliquot.getProcessingEvent().getPatient().getStudy());
         ss1.setActivityStatus(activeStatus);
         ss1.persist();
         SampleStorageWrapper ss2 = new SampleStorageWrapper(appService);
         ss2.setSampleType(SampleTypeHelper.addSampleType("ss2"));
         ss2.setVolume(2.0);
-        ss2.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
+        ss2.setStudy(aliquot.getProcessingEvent().getPatient().getStudy());
         ss2.setActivityStatus(activeStatus);
         ss2.persist();
         SampleStorageWrapper ss3 = new SampleStorageWrapper(appService);
         ss3.setSampleType(aliquot.getSampleType());
         ss3.setVolume(3.0);
-        ss3.setStudy(aliquot.getPatientVisit().getPatient().getStudy());
+        ss3.setStudy(aliquot.getProcessingEvent().getPatient().getStudy());
         ss3.setActivityStatus(activeStatus);
         ss3.persist();
-        aliquot.getPatientVisit().getPatient().getStudy()
+        aliquot.getProcessingEvent().getPatient().getStudy()
             .addSampleStorage(Arrays.asList(ss1, ss2, ss3));
         // should be 3
         aliquot.setQuantityFromType();
@@ -468,7 +468,7 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
         AliquotWrapper sample2 = AliquotHelper.newAliquot(
             aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getPatientVisit(), 2, 3);
+            aliquot.getProcessingEvent(), 2, 3);
         sample2.setInventoryId("awert");
         sample2.persist();
         Assert.assertTrue(aliquot.compareTo(sample2) > 0);
@@ -482,7 +482,7 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquot() throws Exception {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        ProcessingEventWrapper pv = aliquot.getPatientVisit();
+        ProcessingEventWrapper pv = aliquot.getProcessingEvent();
         SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
             .get(0);
         Assert.assertNotNull(sampleType);
@@ -500,7 +500,7 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquotsNonActive() throws Exception {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        ProcessingEventWrapper pv = aliquot.getPatientVisit();
+        ProcessingEventWrapper pv = aliquot.getProcessingEvent();
         SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
             .get(0);
         Assert.assertNotNull(sampleType);
@@ -532,8 +532,8 @@ public class TestAliquot extends TestDatabase {
             nonActiveAliquots.add(a);
         }
 
-        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsNonActiveInSite(
-            appService, site);
+        List<AliquotWrapper> aliquots = AliquotWrapper
+            .getAliquotsNonActiveInSite(appService, site);
         Assert.assertEquals(nonActiveAliquots.size(), aliquots.size());
         Assert.assertTrue(aliquots.containsAll(nonActiveAliquots));
         Assert.assertFalse(aliquots.containsAll(activeAliquots));
@@ -543,7 +543,7 @@ public class TestAliquot extends TestDatabase {
     public void testGetAliquotsInSiteWithPositionLabel() throws Exception {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        ProcessingEventWrapper pv = aliquot.getPatientVisit();
+        ProcessingEventWrapper pv = aliquot.getProcessingEvent();
         SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
             .get(0);
         Assert.assertNotNull(sampleType);
@@ -597,7 +597,7 @@ public class TestAliquot extends TestDatabase {
     public void testDebugRandomMethods() throws Exception {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        ProcessingEventWrapper pv = aliquot.getPatientVisit();
+        ProcessingEventWrapper pv = aliquot.getProcessingEvent();
         SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
             .get(0);
         Assert.assertNotNull(sampleType);
@@ -619,21 +619,21 @@ public class TestAliquot extends TestDatabase {
     public void testGetDispatchs() throws Exception {
         String name = "testGetDispatchs" + r.nextInt();
         SiteWrapper destSite = SiteHelper.addSite(name);
-        StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
+        StudyWrapper study = aliquot.getProcessingEvent().getPatient()
+            .getStudy();
         destSite.addStudies(Arrays.asList(study));
         destSite.persist();
         destSite.reload();
-        site.addStudyDispatchSites(study, Arrays.asList(destSite));
         site.persist();
         site.reload();
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        DispatchWrapper dShipment = DispatchHelper.newDispatch(site, destSite,
-            study, method);
+        DispatchWrapper dCollectionEvent = DispatchHelper.newDispatch(site,
+            destSite, study, method);
 
         // add an aliquot that has not been persisted
         try {
-            dShipment.addNewAliquots(Arrays.asList(aliquot), true);
+            dCollectionEvent.addNewAliquots(Arrays.asList(aliquot), true);
             Assert.fail("Should not be allowed to add aliquots not yet in DB");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -642,41 +642,41 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
         aliquot.reload();
 
-        dShipment = DispatchHelper.newDispatch(site, destSite, study, method);
-        dShipment.addNewAliquots(Arrays.asList(aliquot), true);
-        dShipment.persist();
+        dCollectionEvent = DispatchHelper.newDispatch(site, destSite, study,
+            method);
+        dCollectionEvent.addNewAliquots(Arrays.asList(aliquot), true);
+        dCollectionEvent.persist();
         aliquot.reload();
 
         List<DispatchWrapper> aliquotDispatchs = aliquot.getDispatchs();
         Assert.assertEquals(1, aliquotDispatchs.size());
-        Assert.assertTrue(aliquotDispatchs.contains(dShipment));
+        Assert.assertTrue(aliquotDispatchs.contains(dCollectionEvent));
 
-        Assert.assertTrue(dShipment.isInCreationState());
+        Assert.assertTrue(dCollectionEvent.isInCreationState());
 
         // site send aliquots
-        dShipment.setInTransitState();
-        dShipment.persist();
-        Assert.assertTrue(dShipment.isInTransitState());
+        dCollectionEvent.setInTransitState();
+        dCollectionEvent.persist();
+        Assert.assertTrue(dCollectionEvent.isInTransitState());
 
         // dest site receive aliquot
-        dShipment.setInReceivedState();
-        dShipment.receiveAliquots(Arrays.asList(aliquot));
-        dShipment.persist();
-        Assert.assertTrue(dShipment.isInReceivedState());
+        dCollectionEvent.setInReceivedState();
+        dCollectionEvent.receiveAliquots(Arrays.asList(aliquot));
+        dCollectionEvent.persist();
+        Assert.assertTrue(dCollectionEvent.isInReceivedState());
 
         // dispatch aliquot to second site
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
         destSite2.addStudies(Arrays.asList(study));
         destSite2.persist();
         destSite2.reload();
-        destSite.addStudyDispatchSites(study, Arrays.asList(destSite2));
         destSite.persist();
 
         destSite.reload();
-        DispatchWrapper dShipment2 = DispatchHelper.newDispatch(destSite,
-            destSite2, study, method);
+        DispatchWrapper dCollectionEvent2 = DispatchHelper.newDispatch(
+            destSite, destSite2, study, method);
         try {
-            dShipment2.addNewAliquots(Arrays.asList(aliquot), true);
+            dCollectionEvent2.addNewAliquots(Arrays.asList(aliquot), true);
             Assert
                 .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Active' status)");
         } catch (BiobankCheckException bce) {
@@ -702,13 +702,13 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
 
         // add to new shipment
-        dShipment2.addNewAliquots(Arrays.asList(aliquot), true);
-        dShipment2.persist();
+        dCollectionEvent2.addNewAliquots(Arrays.asList(aliquot), true);
+        dCollectionEvent2.persist();
 
         aliquot.reload();
         aliquotDispatchs = aliquot.getDispatchs();
         Assert.assertEquals(2, aliquotDispatchs.size());
-        Assert.assertTrue(aliquotDispatchs.contains(dShipment));
-        Assert.assertTrue(aliquotDispatchs.contains(dShipment2));
+        Assert.assertTrue(aliquotDispatchs.contains(dCollectionEvent));
+        Assert.assertTrue(aliquotDispatchs.contains(dCollectionEvent2));
     }
 }

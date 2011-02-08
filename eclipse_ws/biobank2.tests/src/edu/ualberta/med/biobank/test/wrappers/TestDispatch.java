@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -444,7 +444,7 @@ public class TestDispatch extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         study.reload();
-        ShipmentWrapper clinicShipment = ShipmentHelper.addShipment(senderSite,
+        ShipmentWrapper clinicShipment = CollectionEventHelper.addShipment(senderSite,
             clinic,
             ShippingMethodWrapper.getShippingMethods(appService).get(0),
             patient);

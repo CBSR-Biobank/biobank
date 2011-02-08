@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -62,77 +61,26 @@ public class ClinicWrapper extends CenterWrapper<Clinic> {
         return Clinic.class;
     }
 
-    @SuppressWarnings("unchecked")
     public List<ContactWrapper> getContactCollection(boolean sort) {
-        List<ContactWrapper> contactCollection = (List<ContactWrapper>) propertiesMap
-            .get("contactCollection");
-        if (contactCollection == null) {
-            Collection<Contact> children = wrappedObject.getContactCollection();
-            if (children != null) {
-                contactCollection = new ArrayList<ContactWrapper>();
-                for (Contact type : children) {
-                    contactCollection.add(new ContactWrapper(appService, type));
-                }
-                propertiesMap.put("contactCollection", contactCollection);
-            }
-        }
-        if ((contactCollection != null) && sort)
-            Collections.sort(contactCollection);
-        return contactCollection;
+        return getWrapperCollection(ClinicPeer.CONTACT_COLLECTION,
+            ContactWrapper.class, sort);
     }
 
     public List<ContactWrapper> getContactCollection() {
         return getContactCollection(true);
     }
 
-    private void setContacts(Collection<Contact> allContactsObjects,
-        List<ContactWrapper> allContactsWrappers) {
-        Collection<Contact> oldContacts = wrappedObject.getContactCollection();
-        wrappedObject.setContactCollection(allContactsObjects);
-        propertyChangeSupport.firePropertyChange("contactCollection",
-            oldContacts, allContactsObjects);
-        propertiesMap.put("contactCollection", allContactsWrappers);
+    private void setContacts(List<ContactWrapper> allContactsWrappers) {
+        setWrapperCollection(ClinicPeer.CONTACT_COLLECTION, allContactsWrappers);
     }
 
     public void addContacts(List<ContactWrapper> newContacts) {
-        if (newContacts != null && newContacts.size() > 0) {
-            Collection<Contact> allContactsObjects = new HashSet<Contact>();
-            List<ContactWrapper> allContactsWrappers = new ArrayList<ContactWrapper>();
-            // already added contacts
-            List<ContactWrapper> currentList = getContactCollection();
-            if (currentList != null) {
-                for (ContactWrapper contact : currentList) {
-                    allContactsObjects.add(contact.getWrappedObject());
-                    allContactsWrappers.add(contact);
-                }
-            }
-            // new contacts added
-            for (ContactWrapper contact : newContacts) {
-                allContactsObjects.add(contact.getWrappedObject());
-                allContactsWrappers.add(contact);
-                deletedContacts.remove(contact);
-            }
-            setContacts(allContactsObjects, allContactsWrappers);
-        }
+        addToWrapperCollection(ClinicPeer.CONTACT_COLLECTION, newContacts);
     }
 
     public void removeContacts(List<ContactWrapper> contactsToDelete) {
-        if (contactsToDelete != null && contactsToDelete.size() > 0) {
-            deletedContacts.addAll(contactsToDelete);
-            Collection<Contact> allContactsObjects = new HashSet<Contact>();
-            List<ContactWrapper> allContactsWrappers = new ArrayList<ContactWrapper>();
-            // already added contacts
-            List<ContactWrapper> currentList = getContactCollection();
-            if (currentList != null) {
-                for (ContactWrapper contact : currentList) {
-                    if (!deletedContacts.contains(contact)) {
-                        allContactsObjects.add(contact.getWrappedObject());
-                        allContactsWrappers.add(contact);
-                    }
-                }
-            }
-            setContacts(allContactsObjects, allContactsWrappers);
-        }
+        removeFromWrapperCollection(ClinicPeer.CONTACT_COLLECTION,
+            contactsToDelete);
     }
 
     /**

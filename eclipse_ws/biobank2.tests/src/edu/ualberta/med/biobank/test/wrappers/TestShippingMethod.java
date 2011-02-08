@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.AbstractShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
@@ -53,14 +53,17 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod(name + "_2");
 
-        ShipmentHelper.addShipment(site, clinic, method1, patient1);
-        ShipmentHelper.addShipment(site, clinic, method2, patient1);
-        ShipmentHelper.addShipment(site, clinic, method2, patient1);
+        CollectionEventHelper.addCollectionEvent(site, clinic, method1,
+            patient1);
+        CollectionEventHelper.addCollectionEvent(site, clinic, method2,
+            patient1);
+        CollectionEventHelper.addCollectionEvent(site, clinic, method2,
+            patient1);
 
         method1.reload();
         method2.reload();
-        Assert.assertEquals(1, method1.getShipmentCollection().size());
-        Assert.assertEquals(2, method2.getShipmentCollection().size());
+        Assert.assertEquals(1, method1.getCollectionEventCollection().size());
+        Assert.assertEquals(2, method2.getCollectionEventCollection().size());
     }
 
     @SuppressWarnings({ "rawtypes", "unchecked" })
@@ -78,22 +81,22 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodHelper
             .addShippingMethod(name);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
-            site, clinic, method, patient1);
+        CollectionEventWrapper shipment1 = CollectionEventHelper
+            .addCollectionEvent(site, clinic, method, patient1);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(
-            site, clinic, method, patient1);
+        CollectionEventWrapper shipment2 = CollectionEventHelper
+            .addCollectionEvent(site, clinic, method, patient1);
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
-        ShipmentWrapper shipment3 = ShipmentHelper.addShipment(
-            site, clinic, method, patient1);
+        CollectionEventWrapper shipment3 = CollectionEventHelper
+            .addCollectionEvent(site, clinic, method, patient1);
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
 
         method.reload();
-        List<AbstractShipmentWrapper> shipments = method
-            .getShipmentCollection(true);
+        List<CollectionEventWrapper> shipments = method
+            .getCollectionEventCollection(true);
         if (shipments.size() > 1) {
             for (int i = 0; i < shipments.size() - 1; i++) {
                 AbstractShipmentWrapper s1 = shipments.get(i);
@@ -202,8 +205,8 @@ public class TestShippingMethod extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
-            site, clinic, method, patient1);
+        CollectionEventWrapper shipment1 = CollectionEventHelper
+            .addCollectionEvent(site, clinic, method, patient1);
         shipment1.persist();
         method.reload();
 
@@ -281,16 +284,16 @@ public class TestShippingMethod extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(
-            site, clinic, methods[0], patient1);
+        CollectionEventWrapper shipment1 = CollectionEventHelper
+            .addCollectionEvent(site, clinic, methods[0], patient1);
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
 
         Assert.assertTrue(methods[0].isUsed());
         Assert.assertFalse(methods[1].isUsed());
 
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(
-            site, clinic, methods[1], patient1);
+        CollectionEventWrapper shipment2 = CollectionEventHelper
+            .addCollectionEvent(site, clinic, methods[1], patient1);
         shipment2.setWaybill(name + "QWERTY");
         shipment2.persist();
 

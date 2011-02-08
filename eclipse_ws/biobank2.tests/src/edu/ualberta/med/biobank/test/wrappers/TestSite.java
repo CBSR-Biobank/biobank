@@ -12,13 +12,13 @@ import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -27,13 +27,13 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSet
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -554,22 +554,26 @@ public class TestSite extends TestDatabase {
         Assert.assertTrue(site.compareTo(site) == 0);
     }
 
-    private List<ShipmentWrapper> createShipments(SiteWrapper site)
+    private List<CollectionEventWrapper> createShipments(SiteWrapper site)
         throws Exception {
         String name = site.getName();
 
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
         ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
 
-        List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
-        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
-            clinic1, name + "Study1"));
-        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
-            clinic1, name + "Study2"));
-        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
-            clinic2, name + "Study3"));
-        shipments.add(ShipmentHelper.addShipmentWithRandomPatient(site,
-            clinic2, name + "Study4"));
+        List<CollectionEventWrapper> shipments = new ArrayList<CollectionEventWrapper>();
+        shipments
+            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
+                site, clinic1, name + "Study1"));
+        shipments
+            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
+                site, clinic1, name + "Study2"));
+        shipments
+            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
+                site, clinic2, name + "Study3"));
+        shipments
+            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
+                site, clinic2, name + "Study4"));
 
         site.reload();
         return shipments;
@@ -579,14 +583,15 @@ public class TestSite extends TestDatabase {
     public void testGetShipmentCollectionSorted() throws Exception {
         String name = "testGetShipmentCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        List<ShipmentWrapper> shipments = createShipments(site);
+        List<CollectionEventWrapper> shipments = createShipments(site);
 
-        List<ShipmentWrapper> savedShipments = site.getShipmentCollection(true);
+        List<CollectionEventWrapper> savedShipments = site
+            .getCollectionEventCollection(true);
         Assert.assertTrue(savedShipments.size() > 1);
         Assert.assertEquals(shipments.size(), savedShipments.size());
         for (int i = 0, n = savedShipments.size() - 1; i < n; i++) {
-            ShipmentWrapper s1 = savedShipments.get(i);
-            ShipmentWrapper s2 = savedShipments.get(i + 1);
+            CollectionEventWrapper s1 = savedShipments.get(i);
+            CollectionEventWrapper s2 = savedShipments.get(i + 1);
             Assert.assertTrue(s1.compareTo(s2) <= 0);
             Assert.assertTrue(s2.compareTo(s1) >= 0);
         }
@@ -594,18 +599,18 @@ public class TestSite extends TestDatabase {
 
     @Test
     public void testGetShipmentCollection() throws Exception {
-        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
+        String name = "testGetProcessingEventCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        List<ShipmentWrapper> shipments = createShipments(site);
+        List<CollectionEventWrapper> shipments = createShipments(site);
 
-        List<ShipmentWrapper> savedShipments = site
-            .getShipmentCollection(false);
+        List<CollectionEventWrapper> savedShipments = site
+            .getCollectionEventCollection(false);
         Assert.assertTrue(savedShipments.containsAll(shipments));
     }
 
     @Test
     public void testGetShipmentCountForSite() throws Exception {
-        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
+        String name = "testGetProcessingEventCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
@@ -632,27 +637,29 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
-            method, patient1, patient3);
-        ShipmentHelper.addShipment(site, clinic2, method, patient2, patient3);
+        CollectionEventWrapper shipment1 = CollectionEventHelper
+            .addCollectionEvent(site, clinic1, method, patient1, patient3);
+        CollectionEventHelper.addCollectionEvent(site, clinic2, method,
+            patient2, patient3);
 
         site.reload();
-        Assert.assertEquals(2, site.getShipmentCount().longValue());
+        Assert.assertEquals(2, site.getCollectionEventCount());
 
         // delete shipment 1
         shipment1.delete();
-        Assert.assertEquals(1, site.getShipmentCount().longValue());
+        Assert.assertEquals(1, site.getCollectionEventCount());
 
         // add shipment again
-        shipment1 = ShipmentHelper.addShipment(site, clinic1, method, patient3);
+        shipment1 = CollectionEventHelper.addCollectionEvent(site, clinic1,
+            method, patient3);
 
         site.reload();
-        Assert.assertEquals(2, site.getShipmentCount().longValue());
+        Assert.assertEquals(2, site.getCollectionEventCount());
     }
 
     @Test
     public void testGetPatientCountForSite() throws Exception {
-        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
+        String name = "testGetProcessingEventCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
@@ -679,9 +686,10 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
-            method, patient1, patient3);
-        ShipmentHelper.addShipment(site, clinic2, method, patient2, patient3);
+        CollectionEventWrapper shipment1 = CollectionEventHelper
+            .addCollectionEvent(site, clinic1, method, patient1, patient3);
+        CollectionEventHelper.addCollectionEvent(site, clinic2, method,
+            patient2, patient3);
 
         site.reload();
         Assert.assertEquals(3, site.getPatientCount().longValue());
@@ -691,15 +699,16 @@ public class TestSite extends TestDatabase {
         patient1.reload();
         patient1.delete();
 
-        shipment1 = ShipmentHelper.addShipment(site, clinic1, method, patient3);
+        shipment1 = CollectionEventHelper.addCollectionEvent(site, clinic1,
+            method, patient3);
 
         site.reload();
         Assert.assertEquals(2, site.getPatientCount().longValue());
     }
 
     @Test
-    public void testGetPatientVisitCountForSite() throws Exception {
-        String name = "testGetPatientVisitCountForClinic" + r.nextInt();
+    public void testGetProcessingEventCountForSite() throws Exception {
+        String name = "testGetProcessingEventCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
@@ -726,35 +735,35 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
-            method, patient1, patient3);
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
-            method, patient1, patient2);
+        CollectionEventWrapper shipment1 = CollectionEventHelper
+            .addCollectionEvent(site, clinic1, method, patient1, patient3);
+        CollectionEventWrapper shipment2 = CollectionEventHelper
+            .addCollectionEvent(site, clinic2, method, patient1, patient2);
 
         // shipment1 has patient visits for patient1 and patient3
-        int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1)
-            .size();
-        int nber2 = PatientVisitHelper.addPatientVisits(patient3, shipment1)
-            .size();
+        int nber = ProcessingEventHelper.addProcessingEvents(patient1,
+            shipment1).size();
+        int nber2 = ProcessingEventHelper.addProcessingEvents(patient3,
+            shipment1).size();
 
         // shipment 2 has patient visits for patient1 and patient2
-        int nber3 = PatientVisitHelper.addPatientVisits(patient1, shipment2)
-            .size();
-        int nber4 = PatientVisitHelper.addPatientVisits(patient2, shipment2)
-            .size();
+        int nber3 = ProcessingEventHelper.addProcessingEvents(patient1,
+            shipment2).size();
+        int nber4 = ProcessingEventHelper.addProcessingEvents(patient2,
+            shipment2).size();
 
         site.reload();
-        Assert.assertEquals(nber + nber2 + nber3 + nber4, site
-            .getPatientVisitCount().longValue());
+        Assert.assertEquals(nber + nber2 + nber3 + nber4,
+            site.getProcessingEventCount());
 
         // delete patient 1 visits
         patient1.reload();
-        for (ProcessingEventWrapper visit : patient1.getPatientVisitCollection()) {
+        for (ProcessingEventWrapper visit : patient1
+            .getProcessingEventCollection()) {
             visit.delete();
         }
         site.reload();
-        Assert.assertEquals(nber2 + nber4, site.getPatientVisitCount()
-            .longValue());
+        Assert.assertEquals(nber2 + nber4, site.getProcessingEventCount());
     }
 
     @Test
@@ -794,17 +803,17 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        ShipmentWrapper shipment1 = ShipmentHelper.addShipment(site, clinic1,
-            method, patient1);
+        CollectionEventWrapper shipment1 = CollectionEventHelper
+            .addCollectionEvent(site, clinic1, method, patient1);
 
-        ShipmentWrapper shipment2 = ShipmentHelper.addShipment(site, clinic2,
-            method, patient2);
+        CollectionEventWrapper shipment2 = CollectionEventHelper
+            .addCollectionEvent(site, clinic2, method, patient2);
 
         // shipment 1 has patient visits for patient1 and patient2
-        int nber = PatientVisitHelper.addPatientVisits(patient1, shipment1, 10,
-            24).size();
-        int nber2 = PatientVisitHelper.addPatientVisits(patient2, shipment2,
-            10, 24).size();
+        int nber = ProcessingEventHelper.addProcessingEvents(patient1,
+            shipment1, 10, 24).size();
+        int nber2 = ProcessingEventHelper.addProcessingEvents(patient2,
+            shipment2, 10, 24).size();
 
         // add 2 samples to each patient visit
         //
@@ -816,7 +825,7 @@ public class TestSite extends TestDatabase {
         int sampleCount = 0;
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
             for (ProcessingEventWrapper visit : patient
-                .getPatientVisitCollection()) {
+                .getProcessingEventCollection()) {
                 for (int i = 0; i < 2; ++i) {
                     AliquotHelper.addAliquot(
                         allSampleTypes.get(r.nextInt(sampleTypeCount)),
@@ -831,7 +840,8 @@ public class TestSite extends TestDatabase {
             .longValue());
 
         // delete patient 1 and all it's visits and samples
-        for (ProcessingEventWrapper visit : patient1.getPatientVisitCollection()) {
+        for (ProcessingEventWrapper visit : patient1
+            .getProcessingEventCollection()) {
             for (AliquotWrapper aliquot : visit.getAliquotCollection()) {
                 aliquot.delete();
             }
@@ -842,127 +852,6 @@ public class TestSite extends TestDatabase {
 
         site.reload();
         Assert.assertEquals(2 * nber2, site.getAliquotCount().longValue());
-    }
-
-    @Test
-    public void testAddDispatchStudies() throws Exception {
-        String name = "testGetDispatchStudies" + r.nextInt();
-        SiteWrapper srcSite = SiteHelper.addSite(name);
-        List<SiteWrapper> destSites = SiteHelper.addSites(name + "_dest_",
-            r.nextInt(5) + 1);
-        List<StudyWrapper> studies = StudyHelper.addStudies(name,
-            r.nextInt(5) + 1);
-        srcSite.addStudies(studies);
-        srcSite.persist();
-        for (SiteWrapper site : destSites) {
-            site.addStudies(studies);
-            site.persist();
-        }
-        for (StudyWrapper study : studies) {
-            srcSite.addStudyDispatchSites(study, destSites);
-        }
-        srcSite.persist();
-        srcSite.reload();
-
-        List<StudyWrapper> siteDispatchStudies = srcSite
-            .getDispatchStudiesAsSender();
-        Assert.assertNotNull(siteDispatchStudies);
-        Assert.assertEquals(studies.size(), siteDispatchStudies.size());
-        Assert.assertTrue(siteDispatchStudies.containsAll(studies));
-
-        // remove studies
-        for (StudyWrapper study : studies) {
-            srcSite.removeStudyDispatchSites(study, destSites);
-        }
-        srcSite.persist();
-        srcSite.reload();
-        siteDispatchStudies = srcSite.getDispatchStudiesAsSender();
-        Assert.assertNotNull(siteDispatchStudies);
-        Assert.assertEquals(0, siteDispatchStudies.size());
-
-        // now add all studies again and remove one by one
-        for (StudyWrapper study : studies) {
-            srcSite.addStudyDispatchSites(study, destSites);
-        }
-        srcSite.persist();
-        srcSite.reload();
-        int count = 0;
-        for (StudyWrapper study : studies) {
-            srcSite.removeStudyDispatchSites(study, destSites);
-            ++count;
-
-            srcSite.persist();
-            srcSite.reload();
-            siteDispatchStudies = srcSite.getDispatchStudiesAsSender();
-            Assert.assertNotNull(siteDispatchStudies);
-            Assert.assertEquals(studies.size() - count,
-                siteDispatchStudies.size());
-        }
-    }
-
-    @Test
-    public void testAddDispatchSites() throws Exception {
-        String name = "testAddDispatchSites" + r.nextInt();
-        SiteWrapper srcSite = SiteHelper.addSite(name);
-        List<SiteWrapper> destSitesSet1 = SiteHelper.addSites(name + "_s1_",
-            r.nextInt(5) + 1);
-        List<SiteWrapper> destSitesSet2 = SiteHelper.addSites(name + "_s2_",
-            r.nextInt(5) + 1);
-
-        StudyWrapper study = StudyHelper.addStudy(name);
-        List<StudyWrapper> studies = Arrays.asList(study);
-        srcSite.addStudies(studies);
-        srcSite.persist();
-        for (SiteWrapper site : destSitesSet1) {
-            site.addStudies(studies);
-            site.persist();
-        }
-        for (SiteWrapper site : destSitesSet2) {
-            site.addStudies(studies);
-            site.persist();
-        }
-
-        // add dest site set 1
-        srcSite.addStudyDispatchSites(study, destSitesSet1);
-        List<SiteWrapper> srcSiteDispatchSites = srcSite
-            .getStudyDispachSites(study);
-        srcSite.persist();
-        srcSite.reload();
-        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
-        Assert.assertNotNull(srcSiteDispatchSites);
-        Assert.assertEquals(destSitesSet1.size(), srcSiteDispatchSites.size());
-        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
-
-        // add dest site set 2
-        srcSite.addStudyDispatchSites(study, destSitesSet2);
-        srcSite.persist();
-        srcSite.reload();
-        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
-
-        Assert.assertNotNull(srcSiteDispatchSites);
-        Assert.assertEquals(destSitesSet1.size() + destSitesSet2.size(),
-            srcSiteDispatchSites.size());
-        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet1));
-        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet2));
-
-        // remove set 1
-        srcSite.removeStudyDispatchSites(study, destSitesSet1);
-        srcSite.persist();
-        srcSite.reload();
-        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
-
-        Assert.assertNotNull(srcSiteDispatchSites);
-        Assert.assertEquals(destSitesSet2.size(), srcSiteDispatchSites.size());
-        Assert.assertTrue(srcSiteDispatchSites.containsAll(destSitesSet2));
-
-        // remove set 2
-        srcSite.removeStudyDispatchSites(study, destSitesSet2);
-        srcSite.persist();
-        srcSite.reload();
-        srcSiteDispatchSites = srcSite.getStudyDispachSites(study);
-
-        Assert.assertTrue((srcSiteDispatchSites == null)
-            || (srcSiteDispatchSites.size() == 0));
     }
 
 }
