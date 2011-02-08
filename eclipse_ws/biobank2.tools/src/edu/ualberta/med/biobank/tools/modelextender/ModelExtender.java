@@ -59,7 +59,7 @@ public class ModelExtender {
                     .generateFiles();
             }
 
-            if (!appArgs.wrapperBase) {
+            if (appArgs.wrapperBase) {
                 new BaseWrapperBuilder(appArgs.outDir, WRAPPER_BASE_PACKAGE,
                     PEER_PACKAGE, modelClasses).generateFiles();
             }
