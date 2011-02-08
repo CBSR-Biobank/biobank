@@ -16,7 +16,9 @@ public class ModelExtender {
 
     private static String USAGE = "Usage: bbpeerbuilder UMLFILE OUTDIR";
 
-    private static String PACKAGE = "edu.ualberta.med.biobank.common.peer";
+    private static String PEER_PACKAGE = "edu.ualberta.med.biobank.common.peer";
+
+    private static String WRAPPER_BASE_PACKAGE = "edu.ualberta.med.biobank.common.wrappers.base";
 
     private static final Logger LOGGER = Logger.getLogger(ModelExtender.class
         .getName());
@@ -45,14 +47,20 @@ public class ModelExtender {
     }
 
     public void doWork(final AppArgs appArgs) {
-
         LOGGER.info("UML file: " + appArgs.modelFileName);
         LOGGER.info("output dir:  " + appArgs.outDir);
 
         try {
             modelClasses = ModelUmlParser.getInstance().geLogicalModel(
                 appArgs.modelFileName);
-            new PeerBuilder(appArgs.outDir, PACKAGE, modelClasses);
+
+            if (!appArgs.wrapperBase) {
+                new PeerBuilder(appArgs.outDir, PEER_PACKAGE, modelClasses)
+                    .generateFiles();
+            }
+
+            new BaseWrapperBuilder(appArgs.outDir, WRAPPER_BASE_PACKAGE,
+                PEER_PACKAGE, modelClasses).generateFiles();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -64,6 +72,7 @@ public class ModelExtender {
         AppArgs appArgs = new AppArgs();
 
         CmdLineParser parser = new CmdLineParser();
+        Option wrapperBaseOpt = parser.addBooleanOption('w', "wrapperbase");
         Option verboseOpt = parser.addBooleanOption('v', "verbose");
 
         try {
@@ -71,6 +80,11 @@ public class ModelExtender {
         } catch (OptionException e) {
             System.out.println(e.getMessage());
             System.exit(-1);
+        }
+
+        Boolean wrapperBase = (Boolean) parser.getOptionValue(wrapperBaseOpt);
+        if (wrapperBase != null) {
+            appArgs.wrapperBase = wrapperBase.booleanValue();
         }
 
         Boolean verbose = (Boolean) parser.getOptionValue(verboseOpt);
@@ -93,7 +107,8 @@ public class ModelExtender {
 }
 
 class AppArgs {
-    boolean verbose = false;
     String modelFileName = null;
     String outDir = null;
+    boolean wrapperBase = false;
+    boolean verbose = false;
 }
