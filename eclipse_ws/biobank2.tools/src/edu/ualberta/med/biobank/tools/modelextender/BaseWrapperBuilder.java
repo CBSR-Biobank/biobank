@@ -12,23 +12,25 @@ import java.util.Map;
 
 import org.apache.log4j.Logger;
 
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociation;
 import edu.ualberta.med.biobank.tools.modelumlparser.ClassAssociationType;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelClass;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
-import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class BaseWrapperBuilder extends BaseBuilder {
 
     protected final String peerpackagename;
 
+    protected final String wrapperPackageName;
+
     public BaseWrapperBuilder(String outputdir, String packagename,
         String peerpackagename, Map<String, ModelClass> modelClasses) {
         super(outputdir, packagename, modelClasses);
         this.peerpackagename = peerpackagename;
+
+        wrapperPackageName = packagename.replace(".base", "");
     }
 
     private static final Logger LOGGER = Logger
@@ -41,13 +43,22 @@ public class BaseWrapperBuilder extends BaseBuilder {
         FileOutputStream fos = new FileOutputStream(f);
 
         StringBuilder contents = new StringBuilder("package ")
-            .append(packagename).append(";\n").append("\nimport ")
-            .append(Collections.class.getName()).append(";\n")
-            .append("import ").append(List.class.getName()).append(";\n")
-            .append("import ").append(Property.class.getName()).append(";\n")
-            .append("import ").append(ModelWrapper.class.getName())
-            .append(";\n").append("import ")
-            .append(WritableApplicationService.class.getName()).append(";\n");
+            .append(packagename)
+            .append(";\n")
+            .append("\nimport ")
+            .append(Collections.class.getName())
+            .append(";\n")
+            .append("import ")
+            .append(List.class.getName())
+            .append(";\n")
+            .append("import ")
+            .append(Property.class.getName())
+            .append(";\n")
+            .append("import ")
+            .append(wrapperPackageName)
+            .append("ModelWrapper;\n")
+            .append(
+                "import gov.nih.nci.system.applicationservice.WritableApplicationService;\n");
 
         contents.append(getWrapperImports(mc));
 
@@ -156,8 +167,6 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 sb.append("import ").append(Date.class.getName()).append(";\n");
             }
         }
-
-        String wrapperPackageName = packagename.replace(".base", "");
 
         boolean hasCollections = false;
         Map<String, ClassAssociation> assocMap = mc.getAssocMap();

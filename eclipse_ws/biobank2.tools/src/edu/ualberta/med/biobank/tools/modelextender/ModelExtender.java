@@ -59,8 +59,10 @@ public class ModelExtender {
                     .generateFiles();
             }
 
-            new BaseWrapperBuilder(appArgs.outDir, WRAPPER_BASE_PACKAGE,
-                PEER_PACKAGE, modelClasses).generateFiles();
+            if (!appArgs.wrapperBase) {
+                new BaseWrapperBuilder(appArgs.outDir, WRAPPER_BASE_PACKAGE,
+                    PEER_PACKAGE, modelClasses).generateFiles();
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
