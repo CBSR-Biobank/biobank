@@ -265,9 +265,11 @@ public class TestStudy extends TestDatabase {
         study.persist();
 
         study.reload();
-        // one storage added
-        Assert
-            .assertEquals(nber - 1, study.getSampleStorageCollection().size());
+        // one storage removed
+        List<SampleStorageWrapper> ssList = study
+            .getSampleStorageCollection(false);
+        Assert.assertEquals(nber - 1, ssList.size());
+        Assert.assertTrue(!ssList.contains(storage));
     }
 
     @Test

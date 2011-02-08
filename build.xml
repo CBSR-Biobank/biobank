@@ -840,11 +840,11 @@
     <pathelement location="${test.build.dir}" />
   </path>
 
-  <target name="clean-tests-results">
+  <target name="clean-test-results">
     <delete dir="${test.output}" />
   </target>
 
-  <target name="clean-tests" depends="clean-tests-results">
+  <target name="clean-tests" depends="clean-test-results">
     <delete dir="${test.build.dir}" />
   </target>
 
@@ -882,6 +882,7 @@
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
       <classpath refid="biobank.common.run.classpath" />
+    	<sysproperty key="server" value="http://localhost:8080"/>
       <formatter usefile="yes" type="xml" />
       <test name="${testcase}" todir="${test.output.raw}" if="testcase" />
       <batchtest todir="${test.output.raw}" unless="testcase">

@@ -11,7 +11,7 @@ public class CalgarySite extends ConfigSite {
 
     public static SiteWrapper addSite(WritableApplicationService appService)
         throws Exception {
-        getSampleTypeMap(appService);
+        populateSampleTypeMap(appService);
         site = new SiteWrapper(appService);
         site.setName("Calgary Foothills");
         site.setNameShort("Calgary-F");

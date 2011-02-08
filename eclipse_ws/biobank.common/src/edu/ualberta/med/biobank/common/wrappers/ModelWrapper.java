@@ -82,7 +82,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     public <W extends ModelWrapper<R>, R, M> void setWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, M> property, W wrapper) {
-        R newValue = wrapper.getWrappedObject();
+        R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
         setProperty(modelWrapper, property, newValue);
         cache(property, wrapper);
     }
@@ -123,21 +123,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (wrappers == null && !isCached(property)) {
             Collection<R> raw = getModelProperty(modelWrapper, property);
-
-            if (raw != null) {
-                wrappers = new ArrayList<W>();
-
-                for (R element : raw) {
-                    try {
-                        W wrapper = ModelWrapper.wrapModel(appService, element,
-                            wrapperKlazz);
-                        wrappers.add(wrapper);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e.getMessage());
-                    }
-                }
-            }
-
+            wrappers = wrapModelCollection(appService, (List<R>) raw,
+                wrapperKlazz);
             cache(property, wrappers);
         }
 
@@ -145,6 +132,26 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             Collections.sort(wrappers);
         }
 
+        return wrappers;
+    }
+
+    public static <W extends ModelWrapper<R>, R, M> List<W> wrapModelCollection(
+        WritableApplicationService appService, List<R> modelCollection,
+        Class<W> wrapperKlazz) {
+        List<W> wrappers = new ArrayList<W>();
+
+        if (modelCollection != null) {
+
+            for (R element : modelCollection) {
+                try {
+                    W wrapper = ModelWrapper.wrapModel(appService, element,
+                        wrapperKlazz);
+                    wrappers.add(wrapper);
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
+        }
         return wrappers;
     }
 

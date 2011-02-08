@@ -34,61 +34,46 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
     }
 
     public String getPath() {
-        return wrappedObject.getPath();
+        return getProperty(ContainerPathPeer.PATH);
     }
 
     private void setPath() throws Exception {
-        String oldLabel = getPath();
         ContainerWrapper container = getContainer();
-        if ((container != null) && !container.isNew()) {
-            String path;
-            ContainerWrapper parent = container.getParent();
-            if (parent == null) {
-                path = "" + container.getId();
-            } else {
-                String parentPath = container.getParent().getPath();
-                if (parentPath == null) {
-                    throw new Exception("parent container does not have a path");
-                }
-                path = parentPath + "/" + container.getId();
+        if ((container == null) || container.isNew())
+            return;
+
+        String path;
+        ContainerWrapper parent = container.getParent();
+        if (parent == null) {
+            path = "" + container.getId();
+        } else {
+            String parentPath = container.getParent().getPath();
+            if (parentPath == null) {
+                throw new Exception("parent container does not have a path");
             }
-
-            wrappedObject.setPath(path);
-
-            ContainerWrapper topContainer = container.getTop();
-            if (topContainer == null) {
-                throw new Exception("no top container");
-            }
-
-            wrappedObject.setTopContainer(topContainer.getWrappedObject());
-
-            propertyChangeSupport.firePropertyChange("path", oldLabel, path);
+            path = parentPath + "/" + container.getId();
         }
+
+        setProperty(ContainerPathPeer.PATH, path);
+        ContainerWrapper topContainer = container.getTop();
+        if (topContainer == null) {
+            throw new Exception("no top container");
+        }
+        setWrappedProperty(ContainerPathPeer.TOP_CONTAINER, topContainer);
     }
 
     public ContainerWrapper getContainer() {
-        ContainerWrapper container = (ContainerWrapper) propertiesMap
-            .get("container");
-        if (container == null) {
-            Container c = wrappedObject.getContainer();
-            if (c == null)
-                return null;
-            container = new ContainerWrapper(appService, c);
-            propertiesMap.put("container", container);
-        }
-        return container;
+        return getWrappedProperty(ContainerPathPeer.CONTAINER,
+            ContainerWrapper.class);
     }
 
     public void setContainer(ContainerWrapper container) {
-        propertiesMap.put("container", container);
-        Container oldContainer = wrappedObject.getContainer();
-        Container newContainer = null;
-        if (container != null) {
-            newContainer = container.getWrappedObject();
-        }
-        wrappedObject.setContainer(newContainer);
-        propertyChangeSupport.firePropertyChange("container", oldContainer,
-            newContainer);
+        setWrappedProperty(ContainerPathPeer.CONTAINER, container);
+    }
+
+    public ContainerWrapper getTopContainer() {
+        return getWrappedProperty(ContainerPathPeer.TOP_CONTAINER,
+            ContainerWrapper.class);
     }
 
     @Override

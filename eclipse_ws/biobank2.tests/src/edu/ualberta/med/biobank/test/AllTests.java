@@ -45,9 +45,10 @@ public class AllTests {
 
     @BeforeClass
     public static void setUp() throws Exception {
-        appService = ServiceConnection.getAppService(
-            System.getProperty("server", "https://localhost:8443")
-                + "/biobank2", "testuser", "test");
+        appService = ServiceConnection
+            .getAppService(
+                System.getProperty("server", "http://localhost:8080")
+                    + "/biobank2", "testuser", "test");
         DbHelper.setAppService(appService);
     }
 

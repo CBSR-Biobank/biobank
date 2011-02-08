@@ -720,7 +720,7 @@ public class TestContainer extends TestDatabase {
     private void testGetPositionFromLabelingScheme(ContainerWrapper container)
         throws Exception {
         ContainerTypeWrapper type = container.getContainerType();
-        int labelingScheme = type.getChildLabelingScheme();
+        int labelingScheme = type.getChildLabelingSchemeId();
         int maxRows = type.getRowCapacity();
         int maxCols = type.getColCapacity();
 
@@ -761,7 +761,8 @@ public class TestContainer extends TestDatabase {
 
     private void testAddChildrenByLabel(ContainerWrapper parent,
         ContainerTypeWrapper childType) throws Exception {
-        int labelingScheme = parent.getContainerType().getChildLabelingScheme();
+        int labelingScheme = parent.getContainerType()
+            .getChildLabelingSchemeId();
         int maxRows = parent.getRowCapacity();
         int maxCols = parent.getColCapacity();
         String label;
@@ -1146,7 +1147,7 @@ public class TestContainer extends TestDatabase {
 
         String label;
         int labelingScheme = container.getContainerType()
-            .getChildLabelingScheme();
+            .getChildLabelingSchemeId();
 
         for (int row = 0, maxRow = container.getRowCapacity(); row < maxRow; ++row) {
             for (int col = 0, maxCol = container.getColCapacity(); col < maxCol; ++col) {
@@ -1189,6 +1190,11 @@ public class TestContainer extends TestDatabase {
         testGetChilddByLabel(top);
         testGetChilddByLabel(top.getChild(0, 0));
         testGetChilddByLabel(top.getChild(0, 0).getChild(0, 0));
+    }
+
+    @Test
+    public void testGetContainersByLabel() {
+        Assert.fail("missing test case");
     }
 
     @Test
@@ -1445,6 +1451,7 @@ public class TestContainer extends TestDatabase {
             .getChildContainerTypeCollection().get(0);
         ContainerWrapper newContainer = ContainerHelper.newContainer(null,
             "testaddNew", null, site, type);
+
         // expect position 1:5
         String label = "01AA01B6";
         newContainer.setPositionAndParentFromLabel(label, Arrays.asList(type));
@@ -1453,6 +1460,32 @@ public class TestContainer extends TestDatabase {
         Assert.assertEquals(new RowColPos(1, 5), newContainer.getPosition());
         newContainer.persist();
         Assert.assertEquals(label, newContainer.getLabel());
+
+        // test for invalid parents
+        try {
+            newContainer.setPositionAndParentFromLabel("01AA01", Arrays.asList(
+                type, containerMap.get("ChildL3").getContainerType()));
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
+
+        // test for multiple parents
+        ContainerTypeWrapper topType2 = ContainerTypeHelper.newContainerType(
+            site, "Top Container Type 2", "TCT2", 2, CONTAINER_TOP_ROWS - 1,
+            CONTAINER_TOP_COLS + 1, true);
+        topType2.addChildContainerTypes(Arrays.asList(containerTypeMap
+            .get("ChildCtL1")));
+        topType2.persist();
+        containerTypeMap.put("TopCT", topType2);
+
+        ContainerHelper.addContainer("01", TestCommon.getNewBarcode(r), null,
+            site, topType2);
+        try {
+            newContainer.setPositionAndParentFromLabel("01AB",
+                Arrays.asList(containerMap.get("ChildL1").getContainerType()));
+        } catch (BiobankCheckException e) {
+            Assert.assertTrue(true);
+        }
     }
 
     @Test

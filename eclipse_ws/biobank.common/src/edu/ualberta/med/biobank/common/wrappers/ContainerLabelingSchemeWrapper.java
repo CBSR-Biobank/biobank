@@ -35,7 +35,7 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ";
 
-    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes;
+    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes = null;
 
     public ContainerLabelingSchemeWrapper(
         WritableApplicationService appService,
@@ -57,53 +57,44 @@ public class ContainerLabelingSchemeWrapper extends
         return ContainerLabelingSchemePeer.PROP_NAMES;
     }
 
-    public void setName(String name) {
-        String oldName = wrappedObject.getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
-    }
-
     public String getName() {
-        return wrappedObject.getName();
+        return getProperty(ContainerLabelingSchemePeer.NAME);
     }
 
-    public void setMaxRows(Integer maxRows) {
-        Integer oldMaxRows = wrappedObject.getMaxRows();
-        wrappedObject.setMaxRows(maxRows);
-        propertyChangeSupport.firePropertyChange("name", oldMaxRows, maxRows);
+    public void setName(String name) {
+        setProperty(ContainerLabelingSchemePeer.NAME, name);
     }
 
     public Integer getMaxRows() {
-        return wrappedObject.getMaxRows();
+        return getProperty(ContainerLabelingSchemePeer.MAX_ROWS);
     }
 
-    public Integer getMaxChars() {
-        return wrappedObject.getMaxChars();
-    }
-
-    public void setMaxCols(Integer maxCols) {
-        Integer oldMaxCols = wrappedObject.getMaxCols();
-        wrappedObject.setMaxCols(maxCols);
-        propertyChangeSupport.firePropertyChange("name", oldMaxCols, maxCols);
+    public final void setMaxRows(Integer maxRows) {
+        setProperty(ContainerLabelingSchemePeer.MAX_ROWS, maxRows);
     }
 
     public Integer getMaxCols() {
-        return wrappedObject.getMaxCols();
+        return getProperty(ContainerLabelingSchemePeer.MAX_COLS);
+    }
+
+    public void setMaxCols(Integer maxCols) {
+        setProperty(ContainerLabelingSchemePeer.MAX_COLS, maxCols);
+    }
+
+    public Integer getMaxChars() {
+        return getProperty(ContainerLabelingSchemePeer.MAX_CHARS);
     }
 
     public Integer getMinChars() {
-        return wrappedObject.getMinChars();
-    }
-
-    public void setMaxCapacity(Integer maxCapacity) {
-        Integer oldMaxCapacity = wrappedObject.getMaxCapacity();
-        wrappedObject.setMaxCapacity(maxCapacity);
-        propertyChangeSupport.firePropertyChange("name", oldMaxCapacity,
-            maxCapacity);
+        return getProperty(ContainerLabelingSchemePeer.MIN_CHARS);
     }
 
     public Integer getMaxCapacity() {
-        return wrappedObject.getMaxCapacity();
+        return getProperty(ContainerLabelingSchemePeer.MAX_CAPACITY);
+    }
+
+    public void setMaxCapacity(Integer maxCapacity) {
+        setProperty(ContainerLabelingSchemePeer.MAX_CAPACITY, maxCapacity);
     }
 
     @Override
@@ -114,7 +105,6 @@ public class ContainerLabelingSchemeWrapper extends
                 "Can't delete this ContainerLabelingScheme: container types are using it.");
         }
     }
-
 
     private static final String HAS_CONTAINER_TYPES_QRY = "from "
         + ContainerType.class.getName() + " where "
@@ -191,8 +181,8 @@ public class ContainerLabelingSchemeWrapper extends
         getAllLabelingSchemesMap(appService);
         ContainerLabelingSchemeWrapper scheme = allSchemes.get(id);
         if (scheme == null) {
-            throw new ApplicationException("labeling scheme with id" + id
-                + "does not exist");
+            throw new ApplicationException("labeling scheme with id " + id
+                + " does not exist");
         }
         return scheme;
     }

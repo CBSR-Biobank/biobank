@@ -10,7 +10,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectClinicContactDialog;
@@ -82,13 +81,9 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                         return;
                     }
 
-                    try {
-                        study.removeContacts(Arrays.asList(contact));
-                        setCollection(study.getContactCollection(true));
-                        notifyListeners();
-                    } catch (BiobankCheckException e) {
-                        BioBankPlugin.openAsyncError("Delete failed", e);
-                    }
+                    study.removeContacts(Arrays.asList(contact));
+                    setCollection(study.getContactCollection(true));
+                    notifyListeners();
                 }
             }
         });

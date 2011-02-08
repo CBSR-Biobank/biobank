@@ -53,7 +53,11 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     public String getName() {
-        return wrappedObject.getName();
+        return getProperty(ActivityStatusPeer.NAME);
+    }
+
+    public void setName(String name) {
+        setProperty(ActivityStatusPeer.NAME, name);
     }
 
     @Override
@@ -63,29 +67,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
                 + getName()
                 + " since it is being used by other objects in the database.");
         }
-    }
-
-    public boolean isUsed() throws ApplicationException, BiobankException {
-        long usedCount = 0;
-
-        Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
-            Container.class, ContainerType.class, SampleStorage.class,
-            Site.class, Study.class, StudyPvAttr.class, PatientVisit.class };
-
-        for (Class<?> clazz : classes) {
-            StringBuilder sb = new StringBuilder("select count(x) from ")
-                .append(clazz.getName()).append(
-                    " as x where x.activityStatus=?");
-            HQLCriteria c = new HQLCriteria(sb.toString(),
-                Arrays.asList(new Object[] { wrappedObject }));
-            List<Long> results = appService.query(c);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            usedCount += results.get(0);
-        }
-
-        return usedCount > 0;
     }
 
     @Override
@@ -123,6 +104,29 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         return 0;
     }
 
+    public boolean isUsed() throws ApplicationException, BiobankException {
+        long usedCount = 0;
+
+        Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
+            Container.class, ContainerType.class, SampleStorage.class,
+            Site.class, Study.class, StudyPvAttr.class, PatientVisit.class };
+
+        for (Class<?> clazz : classes) {
+            StringBuilder sb = new StringBuilder("select count(x) from ")
+                .append(clazz.getName()).append(
+                    " as x where x.activityStatus=?");
+            HQLCriteria c = new HQLCriteria(sb.toString(),
+                Arrays.asList(new Object[] { wrappedObject }));
+            List<Long> results = appService.query(c);
+            if (results.size() != 1) {
+                throw new BiobankQueryResultSizeException();
+            }
+            usedCount += results.get(0);
+        }
+
+        return usedCount > 0;
+    }
+
     private static final String ALL_ACTIVITY_STATUSES_QRY = "from "
         + ActivityStatus.class.getName();
 
@@ -158,7 +162,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         } else if (result.size() == 0) {
             throw new BiobankCheckException("activity status \"" + name
                 + "\" does not exist");
-
         } else if (result.size() > 1) {
             throw new BiobankCheckException(" Too many instances of \"" + name
                 + "\"");
@@ -196,19 +199,13 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         }
     }
 
-    public void setName(String name) {
-        String old = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", old, name);
-    }
-
     /**
      * return true if this Activity status name is "Active". Facility method to
      * avoid using "Active" string everywhere
      */
     public boolean isActive() {
         String name = getName();
-        return name != null && name.equals(ACTIVE_STATUS_STRING);
+        return ((name != null) && name.equals(ACTIVE_STATUS_STRING));
     }
 
     public boolean isClosed() {
