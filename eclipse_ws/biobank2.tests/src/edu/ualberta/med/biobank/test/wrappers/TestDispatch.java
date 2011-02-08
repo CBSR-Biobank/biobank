@@ -405,7 +405,7 @@ public class TestDispatch extends TestDatabase {
     }
 
     @Test
-    public void testGetSetAliquotCollection() throws Exception {
+    public void testGetSetAliqutotCollection() throws Exception {
         String name = "testGetSetAliquotCollection" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
@@ -479,6 +479,16 @@ public class TestDispatch extends TestDatabase {
 
         shipmentAliquots = shipment.getAliquotCollection();
         Assert.assertEquals(aliquotSet2.size(), shipmentAliquots.size());
+    }
+
+    @Test
+    public void testRemoveDispatchAliquots() {
+        Assert.fail("testcase missing");
+    }
+
+    @Test
+    public void testGetDispatchesInSite() {
+        Assert.fail("testcase missing");
     }
 
 }
