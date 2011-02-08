@@ -457,8 +457,6 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
             && DispatchState.LOST.isEquals(wrappedObject.getState());
     }
 
-    // TODO: stoped here
-
     private static final String DISPATCHES_IN_SITE_QRY = "from "
         + Dispatch.class.getName() + " where ("
         + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID) + "=? or "
@@ -482,6 +480,13 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         return wrappers;
     }
 
+    private static final String DISPATCHES_IN_SITE_BY_DATE_SENT_QRY = "from "
+        + Dispatch.class.getName() + " where ("
+        + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID) + "=? or "
+        + Property.concatNames(DispatchPeer.RECEIVER, SitePeer.ID) + "=?) and "
+        + DispatchPeer.DEPARTED.getName() + " >=? and "
+        + DispatchPeer.DEPARTED.getName() + " <= ?";
+
     /**
      * Search for shipments with the given date sent. Don't use hour and minute.
      * Site can be the sender or the receiver.
@@ -501,11 +506,8 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
         HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Dispatch.class.getName()
-                + " where (sender.id = ? or receiver.id = ?) and departed >= ? and departed <= ?",
-            Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
-                endDate }));
+            DISPATCHES_IN_SITE_BY_DATE_SENT_QRY, Arrays.asList(new Object[] {
+                site.getId(), site.getId(), startDate, endDate }));
         List<Dispatch> shipments = appService.query(criteria);
         List<DispatchWrapper> wrappers = new ArrayList<DispatchWrapper>();
         for (Dispatch s : shipments) {
@@ -513,6 +515,17 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         }
         return wrappers;
     }
+
+    private static final String DISPATCHES_IN_SITE_BY_DATE_RECEIVED_QRY = "from "
+        + Dispatch.class.getName()
+        + " where ("
+        + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID)
+        + "=? or "
+        + Property.concatNames(DispatchPeer.RECEIVER, SitePeer.ID)
+        + "=?) and "
+        + DispatchPeer.DATE_RECEIVED.getName()
+        + " >=? and "
+        + DispatchPeer.DATE_RECEIVED.getName() + " <= ?";
 
     /**
      * Search for shipments with the given date received. Don't use hour and
@@ -533,9 +546,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
         HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Dispatch.class.getName()
-                + " where (sender.id = ? or receiver.id = ?) and dateReceived >= ? and dateReceived <= ?",
+            DISPATCHES_IN_SITE_BY_DATE_RECEIVED_QRY,
             Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
                 endDate }));
         List<Dispatch> shipments = appService.query(criteria);
@@ -558,9 +569,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     }
 
     private void setState(DispatchState state) {
-        Integer oldState = wrappedObject.getState();
-        wrappedObject.setState(state.getId());
-        stateModified = ((oldState == null) || !oldState.equals(state.getId()));
+        setProperty(DispatchPeer.STATE, state.getId());
     }
 
     public void setInCreationState() {

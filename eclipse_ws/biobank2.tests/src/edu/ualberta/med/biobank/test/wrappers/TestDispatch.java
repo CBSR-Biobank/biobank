@@ -491,4 +491,9 @@ public class TestDispatch extends TestDatabase {
         Assert.fail("testcase missing");
     }
 
+    @Test
+    public void testGetDispatchesInSiteByDateSent() {
+        Assert.fail("testcase missing");
+    }
+
 }
