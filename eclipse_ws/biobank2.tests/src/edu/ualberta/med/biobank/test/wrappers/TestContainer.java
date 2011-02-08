@@ -21,16 +21,14 @@ import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -43,9 +41,9 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestContainer extends TestDatabase {
@@ -866,16 +864,15 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(containerMap.get("ChildL3").hasParent());
     }
 
-    private ProcessingEventWrapper addPatientVisit() throws Exception {
+    private ProcessingEventWrapper addProcessingEvent() throws Exception {
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
-        ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel("gg",
+            PatientHelper.newPatient("testP"), Utils.getRandomDate(), 0.01);
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ShipmentWrapper shipment = CollectionEventHelper.addShipment(site, clinic,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0),
-            patient);
-        ProcessingEventWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate());
+        ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
+            site, patient, Utils.getRandomDate(), Utils.getRandomDate());
+        pv.addSourceVessels(Arrays.asList(new SourceVesselWrapper[] { sv }));
         return pv;
     }
 
@@ -895,7 +892,7 @@ public class TestContainer extends TestDatabase {
 
         // reload because we changed container type
         childL3.reload();
-        ProcessingEventWrapper pv = addPatientVisit();
+        ProcessingEventWrapper pv = addProcessingEvent();
         AliquotWrapper aliquot;
 
         for (SampleTypeWrapper st : allSampleTypes) {
@@ -937,13 +934,9 @@ public class TestContainer extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
-        ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ShipmentWrapper shipment = CollectionEventHelper.addShipment(site, clinic,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0),
-            patient);
-        ProcessingEventWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate());
+        ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
+            site, patient, Utils.getRandomDate(), Utils.getRandomDate());
 
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
@@ -975,7 +968,7 @@ public class TestContainer extends TestDatabase {
                 childL3.addAliquot(row, col, AliquotHelper.newAliquot(
                     sampleType, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
                 AliquotWrapper aliquot = childL3.getAliquot(row, col);
-                aliquot.setPatientVisit(pv);
+                aliquot.setProcessingEvent(pv);
                 aliquot.persist();
             }
         }
@@ -1403,7 +1396,7 @@ public class TestContainer extends TestDatabase {
         // add a aliquot to childL4
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getAllSampleTypes(appService, true);
-        ProcessingEventWrapper pv = addPatientVisit();
+        ProcessingEventWrapper pv = addProcessingEvent();
         ContainerWrapper childL4 = containerMap.get("ChildL4");
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
         childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
@@ -1737,13 +1730,9 @@ public class TestContainer extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
-        ClinicWrapper clinic = study.getContactCollection().get(0).getClinic();
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
-        ShipmentWrapper shipment = CollectionEventHelper.addShipment(site, clinic,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0),
-            patient);
-        ProcessingEventWrapper pv = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate());
+        ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
+            site, patient, Utils.getRandomDate(), Utils.getRandomDate());
 
         SampleTypeWrapper st = SampleTypeWrapper.getAllSampleTypes(appService,
             false).get(0);

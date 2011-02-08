@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
@@ -23,9 +23,10 @@ public class ProcessingEventHelper extends DbHelper {
      * @return A new patient visit wrapper.
      */
     public static ProcessingEventWrapper newProcessingEvent(
-        PatientWrapper patient, CollectionEventWrapper shipment,
-        Date dateProcessed, Date dateDrawn) throws Exception {
+        CenterWrapper center, PatientWrapper patient, Date dateProcessed,
+        Date dateDrawn) throws Exception {
         ProcessingEventWrapper pv = new ProcessingEventWrapper(appService);
+        pv.setCenter(center);
         pv.setPatient(patient);
         pv.setDateProcessed(dateProcessed);
         pv.setDateDrawn(dateDrawn);
@@ -54,9 +55,9 @@ public class ProcessingEventHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static ProcessingEventWrapper addProcessingEvent(
-        PatientWrapper patient, CollectionEventWrapper shipment,
-        Date dateProcessed, Date dateDrawn) throws Exception {
-        ProcessingEventWrapper pv = newProcessingEvent(patient, shipment,
+        CenterWrapper center, PatientWrapper patient, Date dateProcessed,
+        Date dateDrawn) throws Exception {
+        ProcessingEventWrapper pv = newProcessingEvent(center, patient,
             dateProcessed, dateDrawn);
         pv.persist();
         return pv;
@@ -73,27 +74,27 @@ public class ProcessingEventHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static List<ProcessingEventWrapper> addProcessingEvents(
-        PatientWrapper patient, CollectionEventWrapper shipment,
-        int minimumNumber, int maxNumber) throws ParseException, Exception {
+        CenterWrapper center, PatientWrapper patient, int minimumNumber,
+        int maxNumber) throws ParseException, Exception {
         int count = r.nextInt(maxNumber - minimumNumber + 1) + minimumNumber;
         List<ProcessingEventWrapper> visits = new ArrayList<ProcessingEventWrapper>();
         for (int i = 0; i < count; i++) {
-            visits.add(addProcessingEvent(patient, shipment,
+            visits.add(addProcessingEvent(center, patient,
                 TestCommon.getUniqueDate(r), TestCommon.getUniqueDate(r)));
         }
         return visits;
     }
 
     public static List<ProcessingEventWrapper> addProcessingEvents(
-        PatientWrapper patient, CollectionEventWrapper shipment,
-        int minimumNumber) throws ParseException, Exception {
-        return addProcessingEvents(patient, shipment, minimumNumber, 15);
+        CenterWrapper center, PatientWrapper patient, int minimumNumber)
+        throws ParseException, Exception {
+        return addProcessingEvents(center, patient, minimumNumber, 15);
     }
 
     public static List<ProcessingEventWrapper> addProcessingEvents(
-        PatientWrapper patient, CollectionEventWrapper shipment)
-        throws ParseException, Exception {
-        return addProcessingEvents(patient, shipment, 1);
+        CenterWrapper center, PatientWrapper patient) throws ParseException,
+        Exception {
+        return addProcessingEvents(center, patient, 1);
 
     }
 }

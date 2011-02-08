@@ -124,4 +124,13 @@ public class CollectionEventWrapper extends
         }
         return new ArrayList<PatientWrapper>(patients);
     }
+
+    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
+        setWrappedProperty(CollectionEventPeer.ACTIVITY_STATUS, activityStatus);
+    }
+
+    public void addSourceVessels(List<SourceVesselWrapper> svs) {
+        addToWrapperCollection(CollectionEventPeer.SOURCE_VESSEL_COLLECTION,
+            svs);
+    }
 }

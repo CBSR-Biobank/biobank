@@ -90,6 +90,14 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
             AliquotWrapper.class, false);
     }
 
+    public CenterWrapper getCenter() {
+        return getProperty(ProcessingEventPeer.CENTER);
+    }
+
+    public void setCenter(CenterWrapper center) {
+        setWrappedProperty(ProcessingEventPeer.CENTER, center);
+    }
+
     /**
      * will set the adequate volume to the added aliquots
      * 
@@ -378,7 +386,7 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
             allPvWrappers);
     }
 
-    public void removePvSourceVessels(
+    public void removeSourceVessels(
         List<SourceVesselWrapper> sourceVesselsToRemove) {
         removeFromWrapperCollection(
             ProcessingEventPeer.SOURCE_VESSEL_COLLECTION, sourceVesselsToRemove);
@@ -467,11 +475,6 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
         log.setDetails(details);
         log.setType("Visit");
         return log;
-    }
-
-    public CenterWrapper getCenter() {
-        return getWrappedProperty(ProcessingEventPeer.CENTER,
-            CenterWrapper.class);
     }
 
     public static List<ProcessingEventWrapper> getProcessingEventsWithWorksheet(

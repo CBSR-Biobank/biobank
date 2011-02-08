@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -39,6 +40,7 @@ import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestPatient extends TestDatabase {
@@ -172,10 +174,12 @@ public class TestPatient extends TestDatabase {
         addContainers();
         addClinic(patient);
         patient.persist();
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel("asdf",
+            patient, Utils.getRandomDate(), 0.1);
         CollectionEventWrapper shipment = CollectionEventHelper
-            .newCollectionEvent(site, clinic, ShippingMethodWrapper
-                .getShippingMethods(appService).get(0));
-        shipment.addPatients(Arrays.asList(patient));
+            .newCollectionEvent(site,
+                ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        shipment.addSourceVessels(Arrays.asList(sv));
         shipment.persist();
         patient.reload();
 
