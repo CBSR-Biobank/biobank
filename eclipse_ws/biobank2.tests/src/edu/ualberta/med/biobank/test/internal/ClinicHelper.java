@@ -21,7 +21,6 @@ public class ClinicHelper extends DbHelper {
             }
         }
         clinic.setCity("");
-        clinic.setSendsShipments(true);
         clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
 

@@ -27,7 +27,7 @@
       <fontsize>12</fontsize>
       <defaultstereotypeview>0</defaultstereotypeview>
       <generationoutputdir>/tmp</generationoutputdir>
-      <activediagram>DM-SHIPMENT</activediagram>
+      <activediagram>DM-PROCESSING_EVENT</activediagram>
     </settings>
     <searchpath href="PROJECT_DIR" />
     <members>
@@ -177,7 +177,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Feb 07 14:16:05 MST 2011'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Mon Feb 07 16:41:39 MST 2011'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -11727,13 +11727,13 @@
                   isAbstract = 'false'>
                   <UML:Association.connection>
                     <UML:AssociationEnd xmi.id = '10-13-7--5-156fc7f3:12decd0e909:-8000:0000000000001BE6'
-                      name = 'FK_CENTER_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'false'
+                      name = 'FK_CENTER_ID' visibility = 'public' isSpecification = 'false' isNavigable = 'true'
                       ordering = 'unordered' aggregation = 'none' targetScope = 'instance' changeability = 'changeable'>
                       <UML:AssociationEnd.multiplicity>
-                        <UML:Multiplicity xmi.id = '10-13-7--5-156fc7f3:12decd0e909:-8000:0000000000001BE7'>
+                        <UML:Multiplicity xmi.id = '10-13-7--5--9894fdc:12e01f25c90:-8000:0000000000001BD0'>
                           <UML:Multiplicity.range>
-                            <UML:MultiplicityRange xmi.id = '10-13-7--5-156fc7f3:12decd0e909:-8000:0000000000001BE8'
-                              lower = '1' upper = '1'/>
+                            <UML:MultiplicityRange xmi.id = '10-13-7--5--9894fdc:12e01f25c90:-8000:0000000000001BCF'
+                              lower = '0' upper = '-1'/>
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:AssociationEnd.multiplicity>

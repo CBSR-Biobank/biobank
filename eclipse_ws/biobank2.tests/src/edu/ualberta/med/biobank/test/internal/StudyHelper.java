@@ -54,7 +54,6 @@ public class StudyHelper extends DbHelper {
         Assert.assertNotNull("appService is null", appService);
         for (StudyWrapper study : createdStudies) {
             study.reload();
-            deleteFromList(study.getDispatchInfoCollection());
             deletePatients(study.getPatientCollection());
             deleteFromList(study.getSampleStorageCollection());
             study.reload();

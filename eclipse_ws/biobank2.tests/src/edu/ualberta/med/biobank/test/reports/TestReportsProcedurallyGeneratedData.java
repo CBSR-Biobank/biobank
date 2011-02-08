@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.server.reports.AbstractReport;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -527,7 +527,7 @@ public final class TestReportsProcedurallyGeneratedData implements
                 patientLimit = Math.min(patientLimit, patients.size());
 
                 if (patientLimit > 0) {
-                    ShipmentWrapper shipment = ShipmentHelper
+                    ShipmentWrapper shipment = CollectionEventHelper
                         .addShipment(site, clinic, ShippingMethodWrapper
                             .getShippingMethods(getInstance().getAppService())
                             .get(0), patients.get(patientIndex));

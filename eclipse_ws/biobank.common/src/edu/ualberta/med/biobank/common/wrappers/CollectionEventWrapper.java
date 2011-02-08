@@ -1,5 +1,15 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -11,16 +21,6 @@ import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 public class CollectionEventWrapper extends
     AbstractShipmentWrapper<CollectionEvent> {
@@ -34,7 +34,7 @@ public class CollectionEventWrapper extends
     }
 
     public CollectionEventWrapper(WritableApplicationService appService,
-        Shipment wrappedObject) {
+        CollectionEvent wrappedObject) {
         super(appService, wrappedObject);
     }
 

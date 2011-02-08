@@ -562,10 +562,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
         + "patients."
         + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
-    public long getPatientCountForSite(SiteWrapper site)
+    public long getPatientCountForCenter(CenterWrapper center)
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_SITE_QRY,
-            Arrays.asList(new Object[] { site.getId(), getId() }));
+            Arrays.asList(new Object[] { center.getId(), getId() }));
         List<Long> result = appService.query(c);
         if (result.size() != 1) {
             throw new BiobankQueryResultSizeException();
@@ -588,7 +588,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
         + "=? and site."
         + SitePeer.ID + "=?";
 
-    public long getProcessingEventCountForSite(SiteWrapper site)
+    public long getProcessingEventCountForCenter(CenterWrapper site)
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_SITE_QRY,
             Arrays.asList(new Object[] { site.getId(), getId() }));
