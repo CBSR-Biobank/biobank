@@ -1,7 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -110,5 +113,15 @@ public class CollectionEventWrapper extends
     public Boolean needDeparted() {
         ShippingMethodWrapper shippingMethod = getShippingMethod();
         return shippingMethod == null || shippingMethod.needDate();
+    }
+
+    public List<PatientWrapper> getPatientCollection() {
+        Collection<SourceVesselWrapper> sourceVessels = getSourceVesselCollection();
+        Set<PatientWrapper> patients = new HashSet<PatientWrapper>();
+        for (SourceVesselWrapper sourceVessel : sourceVessels) {
+            PatientWrapper patient = sourceVessel.getPatient();
+            patients.add(patient);
+        }
+        return new ArrayList<PatientWrapper>(patients);
     }
 }
