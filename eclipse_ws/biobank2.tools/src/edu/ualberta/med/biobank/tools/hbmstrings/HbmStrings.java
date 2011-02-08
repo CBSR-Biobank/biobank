@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.strfields;
+package edu.ualberta.med.biobank.tools.hbmstrings;
 
 import jargs.gnu.CmdLineParser;
 import jargs.gnu.CmdLineParser.Option;
@@ -25,20 +25,20 @@ import edu.ualberta.med.biobank.tools.modelumlparser.Attribute;
 import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
-public class StrFields {
+public class HbmStrings {
     private static final String NOT_EMPTY_STEREOTYPE = "not-empty";
 
     private static final String NOT_NULL_STEREOTYPE = "not-null";
 
     private static final String UNIQUE_STEREOTYPE = "unique";
 
-    private static final Logger LOGGER = Logger.getLogger(StrFields.class
+    private static final Logger LOGGER = Logger.getLogger(HbmStrings.class
         .getName());
 
     private static String USAGE = "Usage: strfields [options] UMLFILE HBMDIR TEMPLATE\n\n"
         + "Options\n" + "  -v, --verbose    Shows verbose output";
 
-    private static StrFields instance = null;
+    private static HbmStrings instance = null;
 
     private static String HBM_FILE_EXTENSION = ".hbm.xml";
 
@@ -46,13 +46,13 @@ public class StrFields {
 
     private AppArgs appArgs = null;
 
-    private StrFields() {
+    private HbmStrings() {
 
     }
 
-    public static StrFields getInstance() {
+    public static HbmStrings getInstance() {
         if (instance == null) {
-            instance = new StrFields();
+            instance = new HbmStrings();
         }
         return instance;
     }
@@ -215,7 +215,7 @@ public class StrFields {
 
     public static void main(String argv[]) {
         try {
-            StrFields.getInstance().doWork(parseCommandLine(argv));
+            HbmStrings.getInstance().doWork(parseCommandLine(argv));
         } catch (Exception e) {
             e.printStackTrace();
         }
