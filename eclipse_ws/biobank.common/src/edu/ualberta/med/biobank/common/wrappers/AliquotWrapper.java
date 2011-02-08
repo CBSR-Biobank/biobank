@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -16,6 +17,7 @@ import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchItemState;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -162,9 +164,9 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         } else {
             // dispatched aliquot?
             for (DispatchAliquotWrapper da : dsac) {
-                DispatchItemState state = DispatchItemState.getState(da
-                    .getState());
-                if (da.getDispatch().isInTransitState()
+                DispatchItemState state = da.getState();
+                if (DispatchState.IN_TRANSIT
+                    .equals(da.getDispatch().getState())
                     && DispatchItemState.NONE == state) {
                     // aliquot is in transit
                     // FIXME what if can't read sender or receiver
@@ -173,7 +175,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                         + da.getDispatch().getSender().getNameShort() + " to "
                         + da.getDispatch().getReceiver().getNameShort() + ")");
                     return fakeSite;
-                } else if (da.getDispatch().isInReceivedState()) {
+                } else if (DispatchState.RECEIVED.equals(da.getDispatch()
+                    .getState())) {
                     switch (state) {
                     case EXTRA:
                         // aliquot has been accidentally dispatched
@@ -602,10 +605,11 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         List<DispatchAliquotWrapper> dsas = getDispatchAliquotCollection();
         if (dsas != null)
             for (DispatchAliquotWrapper dsa : dsas) {
-                DispatchWrapper ship = dsa.getDispatch();
-                if (!ship.equals(excludedShipment)
-                    && (ship.isInTransitState() || ship.isInCreationState())) {
-                    if (DispatchItemState.MISSING.isEquals(dsa.getState())) {
+                DispatchWrapper dispatch = dsa.getDispatch();
+                if (!dispatch.equals(excludedShipment)
+                    && (EnumSet.of(DispatchState.CREATION,
+                        DispatchState.IN_TRANSIT).contains(dispatch.getState()))) {
+                    if (DispatchItemState.MISSING.equals(dsa.getState())) {
                         return false;
                     }
                     return true;

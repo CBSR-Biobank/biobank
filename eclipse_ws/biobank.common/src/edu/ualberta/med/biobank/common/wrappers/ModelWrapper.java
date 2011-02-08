@@ -764,7 +764,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        CenterWrapper site = getCenterLinkedToObject();
+        CenterWrapper<?> site = getCenterLinkedToObject();
         return user.hasPrivilegeOnObject(Privilege.UPDATE, site == null ? null
             : site.getId(), this);
     }
@@ -773,7 +773,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can delete this object
      */
     public boolean canDelete(User user) {
-        CenterWrapper site = getCenterLinkedToObject();
+        CenterWrapper<?> site = getCenterLinkedToObject();
         return user.hasPrivilegeOnObject(Privilege.DELETE, site == null ? null
             : site.getId(), this);
     }
@@ -836,7 +836,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return this.getId().compareTo(arg0.getId());
     }
 
-    public CenterWrapper getCenterLinkedToObject() {
+    public CenterWrapper<?> getCenterLinkedToObject() {
         return null;
     }
 
