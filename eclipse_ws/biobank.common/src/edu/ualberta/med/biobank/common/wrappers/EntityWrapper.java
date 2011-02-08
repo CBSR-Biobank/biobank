@@ -36,7 +36,6 @@ public class EntityWrapper extends ModelWrapper<Entity> {
     }
 
     public Collection<EntityProperty> getEntityPropertyCollection() {
-        return get
         if (properties == null) {
             Collection<EntityProperty> properties = new ArrayList<EntityProperty>();
             Collection<EntityProperty> epc = wrappedObject
