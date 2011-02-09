@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
@@ -25,12 +26,23 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
     protected final String wrapperPackageName;
 
+    protected Map<String, ModelClass> modelBaseClasses;
+
     public BaseWrapperBuilder(String outputdir, String packagename,
         String peerpackagename, Map<String, ModelClass> modelClasses) {
         super(outputdir, packagename, modelClasses);
         this.peerpackagename = peerpackagename;
 
         wrapperPackageName = packagename.replace(".base", "");
+
+        // find all base classes
+        modelBaseClasses = new HashMap<String, ModelClass>();
+        for (Entry<String, ModelClass> e : modelClasses.entrySet()) {
+            ModelClass ec = e.getValue().getExtendsClass();
+            if (ec != null) {
+                modelBaseClasses.put(ec.getName(), ec);
+            }
+        }
     }
 
     private static final Logger LOGGER = Logger
@@ -56,7 +68,10 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append(";\n")
             .append("import ")
             .append(wrapperPackageName)
-            .append("ModelWrapper;\n")
+            .append(".*;\n")
+            .append("import ")
+            .append(wrapperPackageName)
+            .append(".internal.*;\n")
             .append(
                 "import gov.nih.nci.system.applicationservice.WritableApplicationService;\n");
 
@@ -66,15 +81,14 @@ public class BaseWrapperBuilder extends BaseBuilder {
         contents.append("import ").append(peerpackagename).append(".")
             .append(mc.getName()).append("Peer;\n");
 
-        contents.append("\npublic class ").append(mc.getName())
-            .append("BaseWrapper ");
-        ModelClass ec = mc.getExtendsClass();
-        if (ec != null) {
-            contents.append("extends ").append(ec.getName())
-                .append("BaseWrapper ");
+        if (modelBaseClasses.containsKey(mc.getName())) {
+            contents.append("\npublic abstract class ").append(mc.getName())
+                .append("BaseWrapper").append("<E extends ")
+                .append(mc.getName()).append("> extends ModelWrapper<E> ");
         } else {
-            contents.append("extends ModelWrapper<").append(mc.getName())
-                .append("> ");
+            contents.append("\npublic class ").append(mc.getName())
+                .append("BaseWrapper").append(" extends ModelWrapper<")
+                .append(mc.getName()).append("> ");
         }
         contents.append("{\n\n");
         contents.append(createContructors(mc));
@@ -100,13 +114,18 @@ public class BaseWrapperBuilder extends BaseBuilder {
     }
 
     private String createContructors(ModelClass mc) {
+        String wrappedObjectType = mc.getName();
+        if (modelBaseClasses.containsKey(mc.getName())) {
+            wrappedObjectType = "E";
+        }
+
         StringBuilder result = new StringBuilder("    public ")
             .append(mc.getName())
             .append("BaseWrapper(WritableApplicationService appService) {\n")
             .append("        super(appService);\n").append("    }\n\n")
             .append("    public ").append(mc.getName())
             .append("BaseWrapper(WritableApplicationService appService,\n")
-            .append("        ").append(mc.getName())
+            .append("        ").append(wrappedObjectType)
             .append(" wrappedObject) {\n")
             .append("        super(appService, wrappedObject);\n")
             .append("    }\n\n");
@@ -114,11 +133,25 @@ public class BaseWrapperBuilder extends BaseBuilder {
     }
 
     private String createRequiredMethods(ModelClass mc) {
-        StringBuilder result = new StringBuilder(
-            "    @Override\n    public Class<").append(mc.getName())
-            .append("> getWrappedClass() {\n").append("        return ")
-            .append(mc.getName()).append(".class;\n").append("    }\n\n")
-            .append("    @Override\n")
+        StringBuilder result = new StringBuilder();
+
+        if (!modelBaseClasses.containsKey(mc.getName())) {
+            // wrappers for model base classes do not implement the
+            // getWrappedClass() method
+            result.append("    @Override\n    public Class<");
+
+            ModelClass ec = mc.getExtendsClass();
+            if (ec != null) {
+                result.append(ec.getName());
+            } else {
+                result.append(mc.getName());
+            }
+
+            result.append("> getWrappedClass() {\n").append("        return ")
+                .append(mc.getName()).append(".class;\n").append("    }\n\n");
+        }
+
+        result.append("    @Override\n")
             .append("   protected List<String> getPropertyChangeNames() {\n")
             .append("        return ").append(mc.getName())
             .append("Peer.PROP_NAMES;\n").append("    }\n\n");
@@ -139,12 +172,16 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
     private String createWrappedPropertyGetterAndSetter(ModelClass mc,
         ClassAssociation assoc) {
+
         String assocClassName = assoc.getToClass().getName();
+        String assocName = assoc.getAssocName();
+
         StringBuilder result = new StringBuilder();
         result.append("   public ").append(assocClassName)
-            .append("Wrapper get").append(assocClassName).append("() {\n")
+            .append("Wrapper get")
+            .append(CamelCase.toCamelCase(assocName, true)).append("() {\n")
             .append("      return getWrappedProperty(").append(mc.getName())
-            .append("Peer.").append(CamelCase.toTitleCase(assocClassName))
+            .append("Peer.").append(CamelCase.toTitleCase(assocName))
             .append(", ").append(assocClassName).append("Wrapper.class")
             .append(");\n").append("   }\n\n");
         return result.toString();
@@ -184,8 +221,8 @@ public class BaseWrapperBuilder extends BaseBuilder {
             }
 
             importCount.put(toClass.getName(), 1);
-            sb.append("import ").append(wrapperPackageName).append(".")
-                .append(toClass.getName()).append("Wrapper;\n");
+            // sb.append("import ").append(wrapperPackageName).append(".")
+            // .append(toClass.getName()).append("Wrapper;\n");
         }
 
         if (hasCollections) {
@@ -197,6 +234,13 @@ public class BaseWrapperBuilder extends BaseBuilder {
         if (!importCount.containsKey(mc.getName())) {
             sb.append("import ").append(mc.getPkg()).append(".")
                 .append(mc.getName()).append(";\n");
+        }
+
+        // import the model base class
+        ModelClass ec = mc.getExtendsClass();
+        if (ec != null) {
+            sb.append("import ").append(ec.getPkg()).append(".")
+                .append(ec.getName()).append(";\n");
         }
 
         return sb.toString();
