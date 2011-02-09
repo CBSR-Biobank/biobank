@@ -1,19 +1,15 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.model.SourceVessel;
-import edu.ualberta.med.biobank.model.StudySourceVessel;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
 
@@ -26,12 +22,18 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         super(appService);
     }
 
-    public String getName() {
-        return getProperty(SourceVesselPeer.NAME);
+    public SourceVesselTypeWrapper getSourceVesselType() {
+        return getWrappedProperty(SourceVesselPeer.SOURCE_VESSEL_TYPE,
+            SourceVesselTypeWrapper.class);
     }
 
-    public void setName(String name) {
-        setProperty(SourceVesselPeer.NAME, name);
+    public void setSourceVesselType(SourceVesselTypeWrapper sourceVesselType) {
+        setWrappedProperty(SourceVesselPeer.SOURCE_VESSEL_TYPE,
+            sourceVesselType);
+    }
+
+    public String getName() {
+        return getSourceVesselType().getName();
     }
 
     public Date getTimeDrawn() {
@@ -50,27 +52,22 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         setProperty(SourceVesselPeer.VOLUME, vol);
     }
 
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return SourceVesselPeer.PROP_NAMES;
+    public void setPatient(PatientWrapper patientWrapper) {
+        setWrappedProperty(SourceVesselPeer.PATIENT, patientWrapper);
     }
 
-    @Override
-    public Class<SourceVessel> getWrappedClass() {
-        return SourceVessel.class;
+    public PatientWrapper getPatient() {
+        return getWrappedProperty(SourceVesselPeer.PATIENT,
+            PatientWrapper.class);
     }
 
-    @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (isUsed())
-            throw new BiobankCheckException(
-                "Source vessel is in use. Please remove from all corresponding studies and patient visits before deleting.");
+    public CollectionEventWrapper getCollectionEvent() {
+        return getWrappedProperty(SourceVesselPeer.COLLECTION_EVENT,
+            CollectionEventWrapper.class);
     }
 
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        checkUnique();
+    public void setCollectionEvent(CollectionEventWrapper ce) {
+        setWrappedProperty(SourceVesselPeer.COLLECTION_EVENT, ce);
     }
 
     public static List<SourceVesselWrapper> getAllSourceVessels(
@@ -85,12 +82,31 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
     }
 
     @Override
+    protected List<String> getPropertyChangeNames() {
+        return SourceVesselPeer.PROP_NAMES;
+    }
+
+    @Override
+    public Class<SourceVessel> getWrappedClass() {
+        return SourceVessel.class;
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        if (getSourceVesselType() == null) {
+            throw new BiobankCheckException("A SourceVesselType is required.");
+        }
+    }
+
+    @Override
     public int compareTo(ModelWrapper<SourceVessel> wrapper) {
         if (wrapper instanceof SourceVesselWrapper) {
+            SourceVesselWrapper svWrapper = (SourceVesselWrapper) wrapper;
             String name1 = getName();
-            String name2 = wrapper.wrappedObject.getName();
-            return ((name1.compareTo(name2) > 0) ? 1 : (name1.equals(name2) ? 0
-                : -1));
+            String name2 = svWrapper.getName();
+
+            return nullSafeComparator(name1, name2);
         }
         return 0;
     }
@@ -115,52 +131,4 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
             }
         }
     }
-
-    public boolean isUsed() throws ApplicationException, BiobankException {
-        String queryString = "select count(s) from "
-            + StudySourceVessel.class.getName()
-            + " as s where s.sourceVessel=?)";
-        HQLCriteria c = new HQLCriteria(queryString,
-            Arrays.asList(new Object[] { wrappedObject }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        if (results.get(0) > 0) {
-            return true;
-        }
-        String queryString2 = "select count(s) from "
-            + SourceVessel.class.getName() + " as s where s.sourceVessel=?)";
-        HQLCriteria c2 = new HQLCriteria(queryString2,
-            Arrays.asList(new Object[] { wrappedObject }));
-        List<Long> results2 = appService.query(c2);
-        if (results2.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results2.get(0) > 0;
-    }
-
-    public void checkUnique() throws ApplicationException, BiobankException {
-        checkNoDuplicates(SourceVessel.class, SourceVesselPeer.NAME.getName(),
-            getName(), "A source vessel with name");
-    }
-
-    public void setPatient(PatientWrapper patientWrapper) {
-        setWrappedProperty(SourceVesselPeer.PATIENT, patientWrapper);
-    }
-
-    public PatientWrapper getPatient() {
-        return getWrappedProperty(SourceVesselPeer.PATIENT,
-            PatientWrapper.class);
-    }
-
-    public CollectionEventWrapper getCollectionEvent() {
-        return getWrappedProperty(SourceVesselPeer.COLLECTION_EVENT,
-            CollectionEventWrapper.class);
-    }
-
-    public void setCollectionEvent(CollectionEventWrapper ce) {
-        setWrappedProperty(SourceVesselPeer.COLLECTION_EVENT, ce);
-    }
-
 }
