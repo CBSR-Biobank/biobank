@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent.WrapperEventType;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListener;
+import edu.ualberta.med.biobank.common.wrappers.util.ModelWrapperHelper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -27,6 +28,7 @@ import java.beans.PropertyChangeSupport;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -41,13 +43,13 @@ import net.sf.cglib.proxy.Enhancer;
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final Map<Property<?, ?>, Object> propertyMap = new HashMap<Property<?, ?>, Object>();
 
-    public <W extends ModelWrapper<R>, R> W getWrappedProperty(
-        Property<R, E> property, Class<W> wrapperKlazz) {
+    public <W extends ModelWrapper<? extends R>, R> W getWrappedProperty(
+        Property<R, ? super E> property, Class<W> wrapperKlazz) {
         return getWrappedProperty(this, property, wrapperKlazz);
     }
 
-    public <W extends ModelWrapper<R>, R, M> W getWrappedProperty(
-        ModelWrapper<M> modelWrapper, Property<R, M> property,
+    public <W extends ModelWrapper<? extends R>, R, M> W getWrappedProperty(
+        ModelWrapper<M> modelWrapper, Property<R, ? super M> property,
         Class<W> wrapperKlazz) {
         if (modelWrapper == null) {
             return null;
@@ -75,26 +77,28 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return wrapper;
     }
 
-    public <W extends ModelWrapper<R>, R> void setWrappedProperty(
-        Property<R, E> property, W wrapper) {
+    public <W extends ModelWrapper<? extends R>, R> void setWrappedProperty(
+        Property<R, ? super E> property, W wrapper) {
         setWrappedProperty(this, property, wrapper);
     }
 
-    public <W extends ModelWrapper<R>, R, M> void setWrappedProperty(
-        ModelWrapper<M> modelWrapper, Property<R, M> property, W wrapper) {
-        R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
+    public <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
+        ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
+        R newValue = wrapper.getWrappedObject();
         setProperty(modelWrapper, property, newValue);
         cache(property, wrapper);
     }
 
-    public <W extends ModelWrapper<R>, R> void setWrapperCollection(
-        Property<? extends Collection<R>, E> property, Collection<W> wrappers) {
+    public <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
+        Property<? extends Collection<R>, ? super E> property,
+        Collection<W> wrappers) {
         setWrapperCollection(this, property, wrappers);
     }
 
-    public <W extends ModelWrapper<R>, R, M> void setWrapperCollection(
+    public <W extends ModelWrapper<? extends R>, R, M> void setWrapperCollection(
         ModelWrapper<M> modelWrapper,
-        Property<? extends Collection<R>, M> property, Collection<W> wrappers) {
+        Property<? extends Collection<R>, ? super M> property,
+        Collection<W> wrappers) {
         Collection<R> newValues = new HashSet<R>();
         for (W element : wrappers) {
             newValues.add(element.getWrappedObject());
@@ -104,16 +108,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         cache(property, wrappers);
     }
 
-    public <W extends ModelWrapper<R>, R> List<W> getWrapperCollection(
-        Property<? extends Collection<R>, E> property, Class<W> wrapperKlazz,
-        boolean sort) {
+    public <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
+        Property<? extends Collection<R>, ? super E> property,
+        Class<W> wrapperKlazz, boolean sort) {
         return getWrapperCollection(this, property, wrapperKlazz, sort);
     }
 
-    public <W extends ModelWrapper<R>, R, M> List<W> getWrapperCollection(
+    public <W extends ModelWrapper<? extends R>, R, M> List<W> getWrapperCollection(
         ModelWrapper<M> modelWrapper,
-        Property<? extends Collection<R>, M> property, Class<W> wrapperKlazz,
-        boolean sort) {
+        Property<? extends Collection<R>, ? super M> property,
+        Class<W> wrapperKlazz, boolean sort) {
         if (modelWrapper == null) {
             return null;
         }
@@ -123,40 +127,35 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (wrappers == null && !isCached(property)) {
             Collection<R> raw = getModelProperty(modelWrapper, property);
-            wrappers = wrapModelCollection(appService, (List<R>) raw,
-                wrapperKlazz);
+
+            if (raw != null) {
+                wrappers = new ArrayList<W>();
+
+                for (R element : raw) {
+                    try {
+                        W wrapper = ModelWrapper.wrapModel(appService, element,
+                            wrapperKlazz);
+                        wrappers.add(wrapper);
+                    } catch (Exception e) {
+                        throw new RuntimeException(e.getMessage());
+                    }
+                }
+            }
+
             cache(property, wrappers);
         }
 
         if (wrappers != null && sort) {
+            // TODO: should do this once per property?
             Collections.sort(wrappers);
         }
 
         return wrappers;
     }
 
-    public static <W extends ModelWrapper<R>, R, M> List<W> wrapModelCollection(
-        WritableApplicationService appService, List<R> modelCollection,
-        Class<W> wrapperKlazz) {
-        List<W> wrappers = new ArrayList<W>();
-
-        if (modelCollection != null) {
-
-            for (R element : modelCollection) {
-                try {
-                    W wrapper = ModelWrapper.wrapModel(appService, element,
-                        wrapperKlazz);
-                    wrappers.add(wrapper);
-                } catch (Exception e) {
-                    throw new RuntimeException(e.getMessage());
-                }
-            }
-        }
-        return wrappers;
-    }
-
-    public <W extends ModelWrapper<R>, R> void addToWrapperCollection(
-        Property<? extends Collection<R>, E> property, List<W> newWrappers) {
+    public <W extends ModelWrapper<? extends R>, R> void addToWrapperCollection(
+        Property<? extends Collection<R>, ? super E> property,
+        List<W> newWrappers) {
         if (newWrappers == null || newWrappers.size() == 0) {
             return;
         }
@@ -178,8 +177,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrapperCollection(property, allWrappers);
     }
 
-    public <W extends ModelWrapper<R>, R> void removeFromWrapperCollection(
-        Property<? extends Collection<R>, E> property, List<W> wrappersToRemove) {
+    public <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollection(
+        Property<? extends Collection<R>, ? super E> property,
+        List<W> wrappersToRemove) {
         if (wrappersToRemove == null || wrappersToRemove.size() == 0) {
             return;
         }
@@ -198,12 +198,12 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrapperCollection(property, allWrappers);
     }
 
-    protected <T> T getProperty(Property<T, E> property) {
+    protected <T> T getProperty(Property<T, ? super E> property) {
         return getProperty(this, property);
     }
 
     protected <T, M> T getProperty(ModelWrapper<M> modelWrapper,
-        Property<T, M> property) {
+        Property<T, ? super M> property) {
         if (modelWrapper == null) {
             return null;
         }
@@ -219,18 +219,18 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return value;
     }
 
-    protected <T> void setProperty(Property<T, E> property, T newValue) {
+    protected <T> void setProperty(Property<T, ? super E> property, T newValue) {
         setProperty(this, property, newValue);
     }
 
     protected <T, M> void setProperty(ModelWrapper<M> modelWrapper,
-        Property<T, M> property, T newValue) {
+        Property<T, ? super M> property, T newValue) {
         setModelProperty(modelWrapper, property, newValue);
         cache(property, newValue);
     }
 
     private <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
-        Property<T, M> property) {
+        Property<T, ? super M> property) {
         T value = null;
 
         try {
@@ -251,7 +251,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     }
 
     private <T, M> void setModelProperty(ModelWrapper<M> modelWrapper,
-        Property<? extends T, M> property, T newValue) {
+        Property<? extends T, ? super M> property, T newValue) {
         try {
             M model = modelWrapper.getWrappedObject();
             Class<?> modelKlazz = model.getClass();
@@ -764,7 +764,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        SiteWrapper site = getSiteLinkedToObject();
+        CenterWrapper<?> site = getCenterLinkedToObject();
         return user.hasPrivilegeOnObject(Privilege.UPDATE, site == null ? null
             : site.getId(), this);
     }
@@ -773,7 +773,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can delete this object
      */
     public boolean canDelete(User user) {
-        SiteWrapper site = getSiteLinkedToObject();
+        CenterWrapper<?> site = getCenterLinkedToObject();
         return user.hasPrivilegeOnObject(Privilege.DELETE, site == null ? null
             : site.getId(), this);
     }
@@ -836,7 +836,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return this.getId().compareTo(arg0.getId());
     }
 
-    public SiteWrapper getSiteLinkedToObject() {
+    public CenterWrapper<?> getCenterLinkedToObject() {
         return null;
     }
 
@@ -848,7 +848,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return true;
     }
 
-    public static <W extends ModelWrapper<M>, M> W wrapModel(
+    public static <W extends ModelWrapper<? extends M>, M> W wrapModel(
         WritableApplicationService appService, M model, Class<W> wrapperKlazz)
         throws Exception {
 
@@ -858,6 +858,14 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             // superclass should be the real (non-proxied/non-enhanced) model
             // class
             modelKlazz = modelKlazz.getSuperclass();
+        }
+
+        if (wrapperKlazz == null
+            || Modifier.isAbstract(wrapperKlazz.getModifiers())) {
+            @SuppressWarnings("unchecked")
+            Class<W> tmp = (Class<W>) ModelWrapperHelper
+                .getWrapperClass(modelKlazz);
+            wrapperKlazz = tmp;
         }
 
         Class<?>[] params = new Class[] { WritableApplicationService.class,

@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.tools.modelextender;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -27,7 +26,7 @@ public abstract class BaseBuilder {
         this.modelClasses = modelClasses;
     }
 
-    public void generateFiles() throws IOException {
+    public void generateFiles() throws Exception {
         File f = new File(outputdir);
         if (!f.exists()) {
             f.mkdir();
@@ -38,7 +37,7 @@ public abstract class BaseBuilder {
         }
     }
 
-    protected abstract void generateClassFile(ModelClass mc) throws IOException;
+    protected abstract void generateClassFile(ModelClass mc) throws Exception;
 
     protected String getImports(ModelClass mc) {
         Map<String, Integer> importCount = new HashMap<String, Integer>();

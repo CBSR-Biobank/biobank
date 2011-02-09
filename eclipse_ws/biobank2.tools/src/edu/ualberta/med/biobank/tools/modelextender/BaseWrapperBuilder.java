@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.tools.modelextender;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -48,13 +47,17 @@ public class BaseWrapperBuilder extends BaseBuilder {
     private static final Logger LOGGER = Logger
         .getLogger(BaseWrapperBuilder.class.getName());
 
-    protected void generateClassFile(ModelClass mc) throws IOException {
+    protected void generateClassFile(ModelClass mc) throws Exception {
         LOGGER.info("generating peer class for " + mc.getName());
 
         File f = new File(outputdir + "/" + mc.getName() + "BaseWrapper.java");
         FileOutputStream fos = new FileOutputStream(f);
 
-        StringBuilder contents = new StringBuilder("package ")
+        StringBuilder contents = new StringBuilder("/*\n")
+            .append(
+                " * This code is automatically generated. Please do not edit.\n")
+            .append(" */\n\n")
+            .append("package ")
             .append(packagename)
             .append(";\n")
             .append("\nimport ")
@@ -102,15 +105,19 @@ public class BaseWrapperBuilder extends BaseBuilder {
         for (Attribute attr : mc.getAttrMap().values()) {
             if (attr.getName().equals("id"))
                 continue;
-            contents.append(createPropertyGetterAndSetter(mc, attr));
+            contents.append(createPropertyGetter(mc, attr));
+            contents.append(createPropertySetter(mc, attr));
         }
 
         for (ClassAssociation assoc : mc.getAssocMap().values()) {
             ClassAssociationType assocType = assoc.getAssociationType();
             if ((assocType == ClassAssociationType.ZERO_OR_ONE_TO_ONE)
                 || (assocType == ClassAssociationType.ONE_TO_ONE)) {
-                contents
-                    .append(createWrappedPropertyGetterAndSetter(mc, assoc));
+                contents.append(createWrappedPropertyGetter(mc, assoc));
+                contents.append(createWrappedPropertySetter(mc, assoc));
+            } else {
+                contents.append(createCollectionGetter(mc, assoc));
+                contents.append(createCollectionSetter(mc, assoc));
             }
         }
 
@@ -157,32 +164,169 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
     }
 
-    private String createPropertyGetterAndSetter(ModelClass mc, Attribute member) {
+    private String createPropertyGetter(ModelClass mc, Attribute member) {
         StringBuilder result = new StringBuilder();
+
+        boolean isBaseClass = modelBaseClasses.containsKey(mc.getName());
+
+        // getter first
+        // if (isBaseClass) {
+        // result.append("   @SuppressWarnings(\"unchecked\")\n");
+        // }
+
         result.append("   public ").append(member.getType()).append(" get")
             .append(CamelCase.toCamelCase(member.getName(), true))
-            .append("() {\n").append("      return getProperty(")
-            .append(mc.getName()).append("Peer.")
+            .append("() {\n").append("      return getProperty(");
+
+        // if (isBaseClass) {
+        // result.append("(Property<").append(member.getType())
+        // .append(", E>) ");
+        // }
+
+        result.append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(member.getName())).append(");\n")
             .append("   }\n\n");
         return result.toString();
     }
 
-    private String createWrappedPropertyGetterAndSetter(ModelClass mc,
-        ClassAssociation assoc) {
+    private String createPropertySetter(ModelClass mc, Attribute member) {
+        StringBuilder result = new StringBuilder();
 
+        boolean isBaseClass = modelBaseClasses.containsKey(mc.getName());
+
+        // setter
+        // if (isBaseClass) {
+        // result.append("   @SuppressWarnings(\"unchecked\")\n");
+        // }
+
+        result.append("   public void set")
+            .append(CamelCase.toCamelCase(member.getName(), true)).append("(")
+            .append(member.getType()).append(" ").append(member.getName())
+            .append(") {\n").append("      setProperty(");
+
+        // if (isBaseClass) {
+        // result.append("(Property<").append(member.getType())
+        // .append(", E>) ");
+        // }
+
+        result.append(mc.getName()).append("Peer.")
+            .append(CamelCase.toTitleCase(member.getName())).append(", ")
+            .append(member.getName()).append(");\n").append("   }\n\n");
+
+        return result.toString();
+    }
+
+    private String createWrappedPropertyGetter(ModelClass mc,
+        ClassAssociation assoc) throws Exception {
+        ClassAssociationType assocType = assoc.getAssociationType();
+
+        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_ONE)
+            && (assocType != ClassAssociationType.ONE_TO_ONE)) {
+            throw new Exception("class " + mc.getName() + " does not have a "
+                + "zero to one or one to one relationship with class"
+                + assoc.getClass());
+        }
+
+        // boolean isBaseClass = modelBaseClasses.containsKey(mc.getName());
         String assocClassName = assoc.getToClass().getName();
         String assocName = assoc.getAssocName();
-
         StringBuilder result = new StringBuilder();
+
+        // if (isBaseClass) {
+        // result.append("   @SuppressWarnings(\"unchecked\")\n");
+        // }
+
         result.append("   public ").append(assocClassName)
             .append("Wrapper get")
             .append(CamelCase.toCamelCase(assocName, true)).append("() {\n")
-            .append("      return getWrappedProperty(").append(mc.getName())
-            .append("Peer.").append(CamelCase.toTitleCase(assocName))
-            .append(", ").append(assocClassName).append("Wrapper.class")
-            .append(");\n").append("   }\n\n");
+            .append("      return getWrappedProperty(");
+
+        // if (isBaseClass) {
+        // result.append("(Property<").append(assocClassName).append(", E>) ");
+        // }
+
+        result.append(mc.getName()).append("Peer.")
+            .append(CamelCase.toTitleCase(assocName)).append(", ")
+            .append(assocClassName).append("Wrapper.class").append(");\n")
+            .append("   }\n\n");
         return result.toString();
+    }
+
+    private String createWrappedPropertySetter(ModelClass mc,
+        ClassAssociation assoc) throws Exception {
+        ClassAssociationType assocType = assoc.getAssociationType();
+
+        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_ONE)
+            && (assocType != ClassAssociationType.ONE_TO_ONE)) {
+            throw new Exception("class " + mc.getName() + " does not have a "
+                + "zero to one or one to one relationship with class"
+                + assoc.getClass());
+        }
+
+        boolean isBaseClass = modelBaseClasses.containsKey(mc.getName());
+        String assocClassName = assoc.getToClass().getName();
+        String assocName = assoc.getAssocName();
+        StringBuilder result = new StringBuilder();
+
+        // if (isBaseClass) {
+        // result.append("   @SuppressWarnings(\"unchecked\")\n");
+        // }
+
+        result.append("   public void set")
+            .append(CamelCase.toCamelCase(assocName, true)).append("(")
+            .append(assocClassName).append("Wrapper ").append(assocName)
+            .append(") {\n").append("      setWrappedProperty(");
+
+        // if (isBaseClass) {
+        // result.append("(Property<").append(assocClassName).append(", E>) ");
+        // }
+
+        result.append(mc.getName()).append("Peer.")
+            .append(CamelCase.toTitleCase(assocName)).append(", ")
+            .append(assocName).append(");\n").append("   }\n\n");
+        return result.toString();
+    }
+
+    private String createCollectionGetter(ModelClass mc, ClassAssociation assoc)
+        throws Exception {
+        ClassAssociationType assocType = assoc.getAssociationType();
+
+        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+            && (assocType != ClassAssociationType.ONE_TO_MANY)) {
+            throw new Exception("class " + mc.getName() + " does not have a "
+                + "zero to many or one to many relationship with class"
+                + assoc.getClass());
+        }
+
+        boolean isBaseClass = modelBaseClasses.containsKey(mc.getName());
+        String assocClassName = assoc.getToClass().getName();
+        String assocName = assoc.getAssocName();
+        StringBuilder result = new StringBuilder();
+
+        // if (isBaseClass) {
+        // result.append("   @SuppressWarnings(\"unchecked\")\n");
+        // }
+
+        result.append("   public List<").append(assocClassName)
+            .append("Wrapper> get")
+            .append(CamelCase.toCamelCase(assocName, true))
+            .append("(boolean sort) {\n")
+            .append("      return getWrappedProperty(");
+
+        // if (isBaseClass) {
+        // result.append("(Property<").append(assocClassName).append(", E>) ");
+        // }
+
+        result.append(mc.getName()).append("Peer.")
+            .append(CamelCase.toTitleCase(assocName)).append(", ")
+            .append(assocClassName).append("Wrapper.class").append(");\n")
+            .append("   }\n\n");
+        return result.toString();
+    }
+
+    private Object createCollectionSetter(ModelClass mc, ClassAssociation assoc) {
+        // TODO Auto-generated method stub
+        return null;
     }
 
     protected String getWrapperImports(ModelClass mc) {
