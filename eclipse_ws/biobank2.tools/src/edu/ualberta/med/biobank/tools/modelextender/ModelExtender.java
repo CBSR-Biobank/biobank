@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 
 public class ModelExtender {
 
-    private static String USAGE = "Usage: bbpeerbuilder UMLFILE OUTDIR";
+    private static String USAGE = "Usage: bbpeerbuilder UMLFILE PEER_OUTDIR WRAPPER_BASE_OUTDIR";
 
     private static String PEER_PACKAGE = "edu.ualberta.med.biobank.common.peer";
 
@@ -48,21 +48,20 @@ public class ModelExtender {
 
     public void doWork(final AppArgs appArgs) {
         LOGGER.info("UML file: " + appArgs.modelFileName);
-        LOGGER.info("output dir:  " + appArgs.outDir);
+        LOGGER.info("peer class output dir:  " + appArgs.peerOutDir);
+        LOGGER.info("wrapper base class output dir:  "
+            + appArgs.wrapperBaseOutDir);
 
         try {
             modelClasses = ModelUmlParser.getInstance().geLogicalModel(
                 appArgs.modelFileName);
 
-            if (!appArgs.wrapperBase) {
-                new PeerBuilder(appArgs.outDir, PEER_PACKAGE, modelClasses)
-                    .generateFiles();
-            }
+            new PeerBuilder(appArgs.peerOutDir, PEER_PACKAGE, modelClasses)
+                .generateFiles();
 
-            if (appArgs.wrapperBase) {
-                new BaseWrapperBuilder(appArgs.outDir, WRAPPER_BASE_PACKAGE,
-                    PEER_PACKAGE, modelClasses).generateFiles();
-            }
+            new BaseWrapperBuilder(appArgs.wrapperBaseOutDir,
+                WRAPPER_BASE_PACKAGE, PEER_PACKAGE, modelClasses)
+                .generateFiles();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -74,7 +73,6 @@ public class ModelExtender {
         AppArgs appArgs = new AppArgs();
 
         CmdLineParser parser = new CmdLineParser();
-        Option wrapperBaseOpt = parser.addBooleanOption('w', "wrapperbase");
         Option verboseOpt = parser.addBooleanOption('v', "verbose");
 
         try {
@@ -84,24 +82,20 @@ public class ModelExtender {
             System.exit(-1);
         }
 
-        Boolean wrapperBase = (Boolean) parser.getOptionValue(wrapperBaseOpt);
-        if (wrapperBase != null) {
-            appArgs.wrapperBase = wrapperBase.booleanValue();
-        }
-
         Boolean verbose = (Boolean) parser.getOptionValue(verboseOpt);
         if (verbose != null) {
             appArgs.verbose = verbose.booleanValue();
         }
 
         String[] args = parser.getRemainingArgs();
-        if (args.length != 2) {
+        if (args.length != 3) {
             System.out.println("Error: invalid arguments\n" + USAGE);
             System.exit(-1);
         }
 
         appArgs.modelFileName = args[0];
-        appArgs.outDir = args[1];
+        appArgs.peerOutDir = args[1];
+        appArgs.wrapperBaseOutDir = args[2];
 
         return appArgs;
     }
@@ -110,7 +104,7 @@ public class ModelExtender {
 
 class AppArgs {
     String modelFileName = null;
-    String outDir = null;
-    boolean wrapperBase = false;
+    String peerOutDir = null;
+    String wrapperBaseOutDir = null;
     boolean verbose = false;
 }

@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;

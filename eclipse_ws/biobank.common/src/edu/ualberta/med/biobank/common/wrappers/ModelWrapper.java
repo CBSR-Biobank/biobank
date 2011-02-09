@@ -127,21 +127,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (wrappers == null && !isCached(property)) {
             Collection<R> raw = getModelProperty(modelWrapper, property);
-
-            if (raw != null) {
-                wrappers = new ArrayList<W>();
-
-                for (R element : raw) {
-                    try {
-                        W wrapper = ModelWrapper.wrapModel(appService, element,
-                            wrapperKlazz);
-                        wrappers.add(wrapper);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e.getMessage());
-                    }
-                }
-            }
-
+            wrappers = wrapModelCollection(appService, (List<R>) raw,
+                wrapperKlazz);
             cache(property, wrappers);
         }
 
@@ -764,7 +751,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        CenterWrapper<?> site = getCenterLinkedToObject();
+        SiteWrapper site = getSiteLinkedToObject();
         return user.hasPrivilegeOnObject(Privilege.UPDATE, site == null ? null
             : site.getId(), this);
     }
@@ -773,7 +760,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      * return true if the user can delete this object
      */
     public boolean canDelete(User user) {
-        CenterWrapper<?> site = getCenterLinkedToObject();
+        SiteWrapper site = getSiteLinkedToObject();
         return user.hasPrivilegeOnObject(Privilege.DELETE, site == null ? null
             : site.getId(), this);
     }
@@ -836,7 +823,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return this.getId().compareTo(arg0.getId());
     }
 
-    public CenterWrapper<?> getCenterLinkedToObject() {
+    public SiteWrapper getSiteLinkedToObject() {
         return null;
     }
 
@@ -900,5 +887,25 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             throw new Exception("cannot find or create expected Wrapper ("
                 + wrapperClassName + ") for " + nakedKlazz.getName(), e);
         }
+    }
+
+    public static <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollection(
+        WritableApplicationService appService, List<R> modelCollection,
+        Class<W> wrapperKlazz) {
+        List<W> wrappers = new ArrayList<W>();
+
+        if (modelCollection != null) {
+
+            for (R element : modelCollection) {
+                try {
+                    W wrapper = ModelWrapper.wrapModel(appService, element,
+                        wrapperKlazz);
+                    wrappers.add(wrapper);
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
+        }
+        return wrappers;
     }
 }

@@ -19,6 +19,9 @@ import edu.ualberta.med.biobank.tools.utils.CamelCase;
 
 public class BaseWrapperBuilder extends BaseBuilder {
 
+    private static final Logger LOGGER = Logger
+        .getLogger(BaseWrapperBuilder.class.getName());
+
     protected final String peerpackagename;
 
     protected final String wrapperPackageName;
@@ -42,11 +45,8 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
     }
 
-    private static final Logger LOGGER = Logger
-        .getLogger(BaseWrapperBuilder.class.getName());
-
     protected void generateClassFile(ModelClass mc) throws Exception {
-        LOGGER.info("generating peer class for " + mc.getName());
+        LOGGER.info("generating wrapper base class for " + mc.getName());
 
         File f = new File(outputdir + "/" + mc.getName() + "BaseWrapper.java");
         FileOutputStream fos = new FileOutputStream(f);
@@ -57,24 +57,37 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append(" */\n\n")
             .append("package ")
             .append(packagename)
-            .append(";\n")
+            .append(";\n\n")
             .append("import ")
             .append(List.class.getName())
             .append(";\n")
-            .append("import ")
-            .append(wrapperPackageName)
-            .append(".*;\n")
-            .append("import ")
-            .append(wrapperPackageName)
-            .append(".internal.*;\n")
             .append(
                 "import gov.nih.nci.system.applicationservice.WritableApplicationService;\n")
             .append("import ").append(mc.getPkg()).append(".")
             .append(mc.getName()).append(";\n");
 
+        if (mc.getExtendsClass() == null) {
+            contents.append("import ").append(wrapperPackageName)
+                .append(".ModelWrapper;\n");
+
+        }
+
         // import the peer class
         contents.append("import ").append(peerpackagename).append(".")
             .append(mc.getName()).append("Peer;\n");
+
+        // if this class uses the Date class then add an import
+        boolean usesDate = false;
+        for (Attribute attr : mc.getAttrMap().values()) {
+            if (attr.getType().equals("Date")) {
+                usesDate = true;
+            }
+        }
+
+        if (usesDate) {
+            contents.append("import ").append(Date.class.getName())
+                .append(";\n");
+        }
 
         if (modelBaseClasses.containsKey(mc.getName())) {
             contents.append("\npublic abstract class ").append(mc.getName())
@@ -198,12 +211,12 @@ public class BaseWrapperBuilder extends BaseBuilder {
         StringBuilder result = new StringBuilder();
 
         result.append("   public ").append(assocClassName)
-            .append("Wrapper get")
+            .append("BaseWrapper get")
             .append(CamelCase.toCamelCase(assocName, true)).append("() {\n")
             .append("      return getWrappedProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(assocName))
-            .append(", ").append(assocClassName).append("Wrapper.class);\n")
-            .append("   }\n\n");
+            .append(", ").append(assocClassName)
+            .append("BaseWrapper.class);\n").append("   }\n\n");
         return result.toString();
     }
 
@@ -224,7 +237,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         result.append("   public void set")
             .append(CamelCase.toCamelCase(assocName, true)).append("(")
-            .append(assocClassName).append("Wrapper ").append(assocName)
+            .append(assocClassName).append("BaseWrapper ").append(assocName)
             .append(") {\n").append("      setWrappedProperty(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
@@ -247,14 +260,20 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
+        // fix warnings
+        if (mc.getName().equals("ShippingMethod")) {
+            result
+                .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        }
+
         result.append("   public List<").append(assocClassName)
-            .append("Wrapper> get")
+            .append("BaseWrapper> get")
             .append(CamelCase.toCamelCase(assocName, true))
             .append("(boolean sort) {\n")
             .append("      return getWrapperCollection(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(assocName))
             .append(", ").append(assocClassName)
-            .append("Wrapper.class, sort);\n").append("   }\n\n");
+            .append("BaseWrapper.class, sort);\n").append("   }\n\n");
         return result.toString();
     }
 
@@ -275,9 +294,15 @@ public class BaseWrapperBuilder extends BaseBuilder {
         StringBuilder paramName = new StringBuilder("new").append(CamelCase
             .toCamelCase(assocName, true));
 
+        // fix warnings
+        if (mc.getName().equals("ShippingMethod")) {
+            result
+                .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        }
+
         result.append("   public void addTo")
             .append(CamelCase.toCamelCase(assocName, true)).append("(List<")
-            .append(assocClassName).append("Wrapper> ").append(paramName)
+            .append(assocClassName).append("BaseWrapper> ").append(paramName)
             .append(") {\n").append("      addToWrapperCollection(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
@@ -302,9 +327,15 @@ public class BaseWrapperBuilder extends BaseBuilder {
         StringBuilder paramName = new StringBuilder("remove").append(CamelCase
             .toCamelCase(assocName, true));
 
+        // fix warnings
+        if (mc.getName().equals("ShippingMethod")) {
+            result
+                .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        }
+
         result.append("   public void removeFrom")
             .append(CamelCase.toCamelCase(assocName, true)).append("(List<")
-            .append(assocClassName).append("Wrapper> ").append(paramName)
+            .append(assocClassName).append("BaseWrapper> ").append(paramName)
             .append(") {\n").append("      removeFromWrapperCollection(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
@@ -346,8 +377,6 @@ public class BaseWrapperBuilder extends BaseBuilder {
             }
 
             importCount.put(toClass.getName(), 1);
-            // sb.append("import ").append(wrapperPackageName).append(".")
-            // .append(toClass.getName()).append("Wrapper;\n");
         }
 
         if (hasCollections) {
