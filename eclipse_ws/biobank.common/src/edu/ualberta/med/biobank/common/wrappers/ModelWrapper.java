@@ -43,12 +43,12 @@ import net.sf.cglib.proxy.Enhancer;
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final Map<Property<?, ?>, Object> propertyMap = new HashMap<Property<?, ?>, Object>();
 
-    public <W extends ModelWrapper<? extends R>, R> W getWrappedProperty(
+    protected <W extends ModelWrapper<? extends R>, R> W getWrappedProperty(
         Property<R, ? super E> property, Class<W> wrapperKlazz) {
         return getWrappedProperty(this, property, wrapperKlazz);
     }
 
-    public <W extends ModelWrapper<? extends R>, R, M> W getWrappedProperty(
+    protected <W extends ModelWrapper<? extends R>, R, M> W getWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property,
         Class<W> wrapperKlazz) {
         if (modelWrapper == null) {
@@ -77,25 +77,25 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return wrapper;
     }
 
-    public <W extends ModelWrapper<? extends R>, R> void setWrappedProperty(
+    protected <W extends ModelWrapper<? extends R>, R> void setWrappedProperty(
         Property<R, ? super E> property, W wrapper) {
         setWrappedProperty(this, property, wrapper);
     }
 
-    public <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
+    protected <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
         R newValue = wrapper.getWrappedObject();
         setProperty(modelWrapper, property, newValue);
         cache(property, wrapper);
     }
 
-    public <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
+    protected <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
         Property<? extends Collection<R>, ? super E> property,
         Collection<W> wrappers) {
         setWrapperCollection(this, property, wrappers);
     }
 
-    public <W extends ModelWrapper<? extends R>, R, M> void setWrapperCollection(
+    protected <W extends ModelWrapper<? extends R>, R, M> void setWrapperCollection(
         ModelWrapper<M> modelWrapper,
         Property<? extends Collection<R>, ? super M> property,
         Collection<W> wrappers) {
@@ -108,13 +108,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         cache(property, wrappers);
     }
 
-    public <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
+    protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
         Property<? extends Collection<R>, ? super E> property,
         Class<W> wrapperKlazz, boolean sort) {
         return getWrapperCollection(this, property, wrapperKlazz, sort);
     }
 
-    public <W extends ModelWrapper<? extends R>, R, M> List<W> getWrapperCollection(
+    protected <W extends ModelWrapper<? extends R>, R, M> List<W> getWrapperCollection(
         ModelWrapper<M> modelWrapper,
         Property<? extends Collection<R>, ? super M> property,
         Class<W> wrapperKlazz, boolean sort) {
@@ -153,7 +153,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return wrappers;
     }
 
-    public <W extends ModelWrapper<? extends R>, R> void addToWrapperCollection(
+    protected <W extends ModelWrapper<? extends R>, R> void addToWrapperCollection(
         Property<? extends Collection<R>, ? super E> property,
         List<W> newWrappers) {
         if (newWrappers == null || newWrappers.size() == 0) {
@@ -177,7 +177,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrapperCollection(property, allWrappers);
     }
 
-    public <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollection(
+    protected <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollection(
         Property<? extends Collection<R>, ? super E> property,
         List<W> wrappersToRemove) {
         if (wrappersToRemove == null || wrappersToRemove.size() == 0) {

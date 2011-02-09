@@ -153,4 +153,14 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         return getWrappedProperty(SourceVesselPeer.PATIENT,
             PatientWrapper.class);
     }
+
+    public CollectionEventWrapper getCollectionEvent() {
+        return getWrappedProperty(SourceVesselPeer.COLLECTION_EVENT,
+            CollectionEventWrapper.class);
+    }
+
+    public void setCollectionEvent(CollectionEventWrapper ce) {
+        setWrappedProperty(SourceVesselPeer.COLLECTION_EVENT, ce);
+    }
+
 }

@@ -108,10 +108,9 @@ public class TestActivityStatus extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         CollectionEventWrapper shipment = CollectionEventHelper
             .addCollectionEvent(site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                patient);
+                ShippingMethodWrapper.getShippingMethods(appService).get(0));
         ProcessingEventWrapper visit = ProcessingEventHelper
-            .addProcessingEvent(patient, Utils.getRandomDate(),
+            .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
 
         AliquotWrapper aliquot = AliquotHelper.addAliquot(sampleType,

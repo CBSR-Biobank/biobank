@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.StudySourceVesselPeer;
-import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudySourceVessel;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -33,7 +32,7 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     public int compareTo(ModelWrapper<StudySourceVessel> o) {
         if (o instanceof StudySourceVesselWrapper) {
             return getSourceVessel().compareTo(
-                ((StudySourceVesselWrapper) o).getSourceVessel());
+                ((StudySourceVesselWrapper) o).getSourceVesselType());
         }
         return 0;
     }
@@ -58,30 +57,13 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
         propertyChangeSupport.firePropertyChange("study", oldStudy, newStudy);
     }
 
-    public SourceVesselWrapper getSourceVessel() {
-        SourceVesselWrapper ss = (SourceVesselWrapper) propertiesMap
-            .get("sourceVessel");
-        if (ss == null) {
-            SourceVessel s = wrappedObject.getSourceVessel();
-            if (s == null) {
-                return null;
-            }
-            ss = new SourceVesselWrapper(appService, s);
-            propertiesMap.put("sourceVessel", ss);
-        }
-
-        return ss;
+    public SourceVesselTypeWrapper getSourceVesselType() {
+        return getWrappedProperty(StudySourceVesselPeer.SOURCE_VESSEL_TYPE,
+            SourceVesselTypeWrapper.class);
     }
 
-    public void setSourceVessel(SourceVesselWrapper ss) {
-        propertiesMap.put("sourceVessel", ss);
-        SourceVessel oldSs = wrappedObject.getSourceVessel();
-        SourceVessel newSs = null;
-        if (ss != null) {
-            newSs = ss.getWrappedObject();
-        }
-        wrappedObject.setSourceVessel(newSs);
-        propertyChangeSupport.firePropertyChange("sourceVessel", oldSs, newSs);
+    public void setSourceVesselType(SourceVesselTypeWrapper ss) {
+        setWrappedProperty(StudySourceVesselPeer.SOURCE_VESSEL_TYPE, ss);
     }
 
     public void setNeedTimeDrawn(Boolean needTimeDrawn) {

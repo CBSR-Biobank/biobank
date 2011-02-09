@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -36,7 +35,6 @@ import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -94,11 +92,8 @@ public class TestAliquot extends TestDatabase {
         site.persist();
         site.reload();
 
-        CollectionEventWrapper shipment = CollectionEventHelper
-            .addCollectionEvent(site, clinic, ShippingMethodWrapper
-                .getShippingMethods(appService).get(0), patient);
         ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
-            patient, shipment, null, Utils.getRandomDate());
+            site, patient, Utils.getRandomDate(), Utils.getRandomDate());
         aliquot = AliquotHelper.newAliquot(sampleType, container, pv, 0, 0);
         container.reload();
     }
