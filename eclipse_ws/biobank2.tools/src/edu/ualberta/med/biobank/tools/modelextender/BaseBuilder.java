@@ -57,6 +57,15 @@ public abstract class BaseBuilder {
             }
         }
 
+        sb.append(getModelImports(mc));
+        return sb.toString();
+    }
+
+    protected String getModelImports(ModelClass mc) {
+        Map<String, Integer> importCount = new HashMap<String, Integer>();
+
+        StringBuilder sb = new StringBuilder();
+
         boolean hasCollections = false;
         Map<String, ClassAssociation> assocMap = mc.getAssocMap();
         for (ClassAssociation assoc : assocMap.values()) {

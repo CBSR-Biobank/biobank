@@ -6,13 +6,14 @@ public class CamelCase {
         StringBuffer sb = new StringBuffer();
         String[] splitStr = str.split("_");
         boolean firstTime = true;
+
         for (String temp : splitStr) {
             if (firstTime && !firstCharUpperCase) {
                 sb.append(temp.toLowerCase());
                 firstTime = false;
             } else {
                 sb.append(Character.toUpperCase(temp.charAt(0)));
-                sb.append(temp.substring(1).toLowerCase());
+                sb.append(temp.substring(1));
             }
         }
         return sb.toString();
