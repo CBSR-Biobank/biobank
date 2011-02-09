@@ -300,8 +300,7 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactHelper.addContact(clinic, name);
 
-        CollectionEventHelper.addCollectionEventWithRandomPatient(site, clinic,
-            name);
+        CollectionEventHelper.addCollectionEventWithRandomPatient(site, name);
 
         clinic.reload();
         try {

@@ -91,7 +91,8 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
     }
 
     public CenterWrapper getCenter() {
-        return getProperty(ProcessingEventPeer.CENTER);
+        return getWrappedProperty(ProcessingEventPeer.CENTER,
+            CenterWrapper.class);
     }
 
     public void setCenter(CenterWrapper center) {

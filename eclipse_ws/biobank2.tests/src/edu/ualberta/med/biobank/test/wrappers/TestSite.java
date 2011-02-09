@@ -564,18 +564,14 @@ public class TestSite extends TestDatabase {
         ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
 
         List<CollectionEventWrapper> shipments = new ArrayList<CollectionEventWrapper>();
-        shipments
-            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-                site, clinic1, name + "Study1"));
-        shipments
-            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-                site, clinic1, name + "Study2"));
-        shipments
-            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-                site, clinic2, name + "Study3"));
-        shipments
-            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-                site, clinic2, name + "Study4"));
+        shipments.add(CollectionEventHelper
+            .addCollectionEventWithRandomPatient(site, name + "Study1"));
+        shipments.add(CollectionEventHelper
+            .addCollectionEventWithRandomPatient(site, name + "Study2"));
+        shipments.add(CollectionEventHelper
+            .addCollectionEventWithRandomPatient(site, name + "Study3"));
+        shipments.add(CollectionEventHelper
+            .addCollectionEventWithRandomPatient(site, name + "Study4"));
 
         site.reload();
         return shipments;
