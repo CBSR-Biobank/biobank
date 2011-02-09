@@ -10,4 +10,16 @@ public class SourceVesselTypeHelper extends DbHelper {
         return svt;
     }
 
+    public static SourceVesselTypeWrapper addSourceVesselType(String name) {
+        SourceVesselTypeWrapper svt = new SourceVesselTypeWrapper(appService);
+        svt.setName(name);
+        try {
+            svt.persist();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return svt;
+    }
+
 }

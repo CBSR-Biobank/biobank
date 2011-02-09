@@ -25,6 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
@@ -35,6 +36,7 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
@@ -609,7 +611,7 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetShipmentCountForSite() throws Exception {
+    public void testGetCollectionEventCountForSite() throws Exception {
         String name = "testGetProcessingEventCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
@@ -638,9 +640,20 @@ public class TestSite extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic1, method, patient1, patient3);
-        CollectionEventHelper.addCollectionEvent(site, clinic2, method,
-            patient2, patient3);
+            .addCollectionEvent(
+                site,
+                method,
+                SourceVesselHelper.newSourceVessel("test1", patient1,
+                    Utils.getRandomDate(), 0.1),
+                SourceVesselHelper.newSourceVessel("test2", patient3,
+                    Utils.getRandomDate(), 0.1));
+        CollectionEventHelper.addCollectionEvent(
+            site,
+            method,
+            SourceVesselHelper.newSourceVessel("test3", patient2,
+                Utils.getRandomDate(), 0.1),
+            SourceVesselHelper.newSourceVessel("test4", patient3,
+                Utils.getRandomDate(), 0.1));
 
         site.reload();
         Assert.assertEquals(2, site.getCollectionEventCount());
@@ -650,8 +663,13 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(1, site.getCollectionEventCount());
 
         // add shipment again
-        shipment1 = CollectionEventHelper.addCollectionEvent(site, clinic1,
-            method, patient3);
+        shipment1 = CollectionEventHelper.addCollectionEvent(
+            site,
+            method,
+            SourceVesselHelper.newSourceVessel("test1", patient1,
+                Utils.getRandomDate(), 0.1),
+            SourceVesselHelper.newSourceVessel("test2", patient3,
+                Utils.getRandomDate(), 0.1));
 
         site.reload();
         Assert.assertEquals(2, site.getCollectionEventCount());
@@ -687,9 +705,20 @@ public class TestSite extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic1, method, patient1, patient3);
-        CollectionEventHelper.addCollectionEvent(site, clinic2, method,
-            patient2, patient3);
+            .addCollectionEvent(
+                site,
+                method,
+                SourceVesselHelper.newSourceVessel("test1", patient1,
+                    Utils.getRandomDate(), 0.1),
+                SourceVesselHelper.newSourceVessel("test2", patient3,
+                    Utils.getRandomDate(), 0.1));
+        CollectionEventHelper.addCollectionEvent(
+            site,
+            method,
+            SourceVesselHelper.newSourceVessel("test1", patient2,
+                Utils.getRandomDate(), 0.1),
+            SourceVesselHelper.newSourceVessel("test2", patient3,
+                Utils.getRandomDate(), 0.1));
 
         site.reload();
         Assert.assertEquals(3, site.getPatientCount().longValue());
@@ -699,8 +728,11 @@ public class TestSite extends TestDatabase {
         patient1.reload();
         patient1.delete();
 
-        shipment1 = CollectionEventHelper.addCollectionEvent(site, clinic1,
-            method, patient3);
+        shipment1 = CollectionEventHelper.addCollectionEvent(
+            site,
+            method,
+            SourceVesselHelper.newSourceVessel("test2", patient3,
+                Utils.getRandomDate(), 0.1));
 
         site.reload();
         Assert.assertEquals(2, site.getPatientCount().longValue());
@@ -736,21 +768,32 @@ public class TestSite extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic1, method, patient1, patient3);
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, clinic2, method, patient1, patient2);
+            .addCollectionEvent(
+                site,
+                method,
+                SourceVesselHelper.newSourceVessel("test1", patient1,
+                    Utils.getRandomDate(), 0.1),
+                SourceVesselHelper.newSourceVessel("test2", patient3,
+                    Utils.getRandomDate(), 0.1));
+        CollectionEventHelper.addCollectionEvent(
+            site,
+            method,
+            SourceVesselHelper.newSourceVessel("test1", patient1,
+                Utils.getRandomDate(), 0.1),
+            SourceVesselHelper.newSourceVessel("test2", patient2,
+                Utils.getRandomDate(), 0.1));
 
         // shipment1 has patient visits for patient1 and patient3
-        int nber = ProcessingEventHelper.addProcessingEvents(patient1,
-            shipment1).size();
-        int nber2 = ProcessingEventHelper.addProcessingEvents(patient3,
-            shipment1).size();
+        int nber = ProcessingEventHelper.addProcessingEvents(site, patient1)
+            .size();
+        int nber2 = ProcessingEventHelper.addProcessingEvents(site, patient3)
+            .size();
 
         // shipment 2 has patient visits for patient1 and patient2
-        int nber3 = ProcessingEventHelper.addProcessingEvents(patient1,
-            shipment2).size();
-        int nber4 = ProcessingEventHelper.addProcessingEvents(patient2,
-            shipment2).size();
+        int nber3 = ProcessingEventHelper.addProcessingEvents(site, patient1)
+            .size();
+        int nber4 = ProcessingEventHelper.addProcessingEvents(site, patient2)
+            .size();
 
         site.reload();
         Assert.assertEquals(nber + nber2 + nber3 + nber4,
@@ -803,17 +846,11 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic1, method, patient1);
-
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, clinic2, method, patient2);
-
         // shipment 1 has patient visits for patient1 and patient2
-        int nber = ProcessingEventHelper.addProcessingEvents(patient1,
-            shipment1, 10, 24).size();
-        int nber2 = ProcessingEventHelper.addProcessingEvents(patient2,
-            shipment2, 10, 24).size();
+        int nber = ProcessingEventHelper.addProcessingEvents(site, patient1,
+            10, 24).size();
+        int nber2 = ProcessingEventHelper.addProcessingEvents(site, patient2,
+            10, 24).size();
 
         // add 2 samples to each patient visit
         //
@@ -847,11 +884,9 @@ public class TestSite extends TestDatabase {
             }
             visit.delete();
         }
-        shipment1.delete();
         patient1.delete();
 
         site.reload();
         Assert.assertEquals(2 * nber2, site.getAliquotCount().longValue());
     }
-
 }

@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.wrappers.TestActivityStatus;
 import edu.ualberta.med.biobank.test.wrappers.TestAliquot;
 import edu.ualberta.med.biobank.test.wrappers.TestClinic;
+import edu.ualberta.med.biobank.test.wrappers.TestCollectionEvent;
 import edu.ualberta.med.biobank.test.wrappers.TestContact;
 import edu.ualberta.med.biobank.test.wrappers.TestContainer;
 import edu.ualberta.med.biobank.test.wrappers.TestContainerLabelingScheme;

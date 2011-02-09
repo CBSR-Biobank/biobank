@@ -14,6 +14,8 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
+import edu.ualberta.med.biobank.common.util.DispatchItemState;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -624,11 +626,12 @@ public class TestAliquot extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         DispatchWrapper dCollectionEvent = DispatchHelper.newDispatch(site,
-            destSite, study, method);
+            destSite, method);
 
         // add an aliquot that has not been persisted
         try {
-            dCollectionEvent.addNewAliquots(Arrays.asList(aliquot), true);
+            dCollectionEvent.addAliquots(Arrays.asList(aliquot),
+                DispatchItemState.NONE);
             Assert.fail("Should not be allowed to add aliquots not yet in DB");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
@@ -637,9 +640,9 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
         aliquot.reload();
 
-        dCollectionEvent = DispatchHelper.newDispatch(site, destSite, study,
-            method);
-        dCollectionEvent.addNewAliquots(Arrays.asList(aliquot), true);
+        dCollectionEvent = DispatchHelper.newDispatch(site, destSite, method);
+        dCollectionEvent.addAliquots(Arrays.asList(aliquot),
+            DispatchItemState.NONE);
         dCollectionEvent.persist();
         aliquot.reload();
 
@@ -650,12 +653,12 @@ public class TestAliquot extends TestDatabase {
         Assert.assertTrue(dCollectionEvent.isInCreationState());
 
         // site send aliquots
-        dCollectionEvent.setInTransitState();
+        dCollectionEvent.setState(DispatchState.IN_TRANSIT);
         dCollectionEvent.persist();
         Assert.assertTrue(dCollectionEvent.isInTransitState());
 
         // dest site receive aliquot
-        dCollectionEvent.setInReceivedState();
+        dCollectionEvent.setState(DispatchState.RECEIVED);
         dCollectionEvent.receiveAliquots(Arrays.asList(aliquot));
         dCollectionEvent.persist();
         Assert.assertTrue(dCollectionEvent.isInReceivedState());
@@ -669,9 +672,10 @@ public class TestAliquot extends TestDatabase {
 
         destSite.reload();
         DispatchWrapper dCollectionEvent2 = DispatchHelper.newDispatch(
-            destSite, destSite2, study, method);
+            destSite, destSite2, method);
         try {
-            dCollectionEvent2.addNewAliquots(Arrays.asList(aliquot), true);
+            dCollectionEvent2.addAliquots(Arrays.asList(aliquot),
+                DispatchItemState.NONE);
             Assert
                 .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Active' status)");
         } catch (BiobankCheckException bce) {
@@ -697,7 +701,8 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
 
         // add to new shipment
-        dCollectionEvent2.addNewAliquots(Arrays.asList(aliquot), true);
+        dCollectionEvent2.addAliquots(Arrays.asList(aliquot),
+            DispatchItemState.NONE);
         dCollectionEvent2.persist();
 
         aliquot.reload();

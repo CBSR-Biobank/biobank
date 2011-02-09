@@ -3,26 +3,26 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.test.Utils;
 
 public class StudySourceVesselHelper extends DbHelper {
 
     public static StudySourceVesselWrapper newStudySourceVessel(
-        StudyWrapper study, SourceVesselWrapper sourceVessel) {
+        StudyWrapper study, SourceVesselTypeWrapper sourceVessel) {
         StudySourceVesselWrapper source = new StudySourceVesselWrapper(
             appService);
         source.setStudy(study);
-        source.setSourceVessel(sourceVessel);
+        source.setSourceVesselType(sourceVessel);
         return source;
     }
 
     public static StudySourceVesselWrapper addStudySourceVessel(
-        StudyWrapper study, SourceVesselWrapper sourceVessel) throws Exception {
+        StudyWrapper study, SourceVesselTypeWrapper sourceVesselT)
+        throws Exception {
         StudySourceVesselWrapper source = newStudySourceVessel(study,
-            sourceVessel);
+            sourceVesselT);
         source.persist();
         return source;
     }
@@ -40,10 +40,9 @@ public class StudySourceVesselHelper extends DbHelper {
         int nber = r.nextInt(15) + 1;
         List<StudySourceVesselWrapper> sources = new ArrayList<StudySourceVesselWrapper>();
         for (int i = 0; i < nber; i++) {
-            SourceVesselWrapper sourceVessel = SourceVesselHelper
-                .addSourceVessel(name + i, PatientHelper.newPatient("testP"),
-                    Utils.getRandomDate(), 0.01);
-            sources.add(addStudySourceVessel(study, sourceVessel));
+            SourceVesselTypeWrapper sourceVesselT = SourceVesselTypeHelper
+                .newSourceVesselType("newST");
+            sources.add(addStudySourceVessel(study, sourceVesselT));
         }
         study.addStudySourceVessels(sources);
         study.persist();

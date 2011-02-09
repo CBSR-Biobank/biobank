@@ -5,9 +5,7 @@ import java.util.Date;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -64,10 +62,8 @@ public class CollectionEventHelper extends DbHelper {
     }
 
     public static CollectionEventWrapper addCollectionEventWithRandomPatient(
-        CenterWrapper site, ClinicWrapper clinic, String name) throws Exception {
+        CenterWrapper site, String name) throws Exception {
         StudyWrapper study = StudyHelper.addStudy(name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addContacts(Arrays.asList(contact));
         study.persist();
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);

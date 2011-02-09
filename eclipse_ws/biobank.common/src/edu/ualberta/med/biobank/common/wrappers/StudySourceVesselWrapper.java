@@ -31,7 +31,7 @@ public class StudySourceVesselWrapper extends ModelWrapper<StudySourceVessel> {
     @Override
     public int compareTo(ModelWrapper<StudySourceVessel> o) {
         if (o instanceof StudySourceVesselWrapper) {
-            return getSourceVessel().compareTo(
+            return getSourceVesselType().compareTo(
                 ((StudySourceVesselWrapper) o).getSourceVesselType());
         }
         return 0;

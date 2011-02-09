@@ -133,4 +133,11 @@ public class CollectionEventWrapper extends
         addToWrapperCollection(CollectionEventPeer.SOURCE_VESSEL_COLLECTION,
             svs);
     }
+
+    public void removeSourceVessels(
+        List<SourceVesselWrapper> sourceVesselCollection) {
+        removeFromWrapperCollection(
+            CollectionEventPeer.SOURCE_VESSEL_COLLECTION,
+            sourceVesselCollection);
+    }
 }
