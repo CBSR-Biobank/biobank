@@ -341,15 +341,15 @@ public class TestClinic extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        SourceVesselWrapper sv1 = SourceVesselHelper.newSourceVessel("testSv",
-            patient1, Utils.getRandomDate(), 0.1);
+        SourceVesselWrapper sv1 = SourceVesselHelper.newSourceVessel(patient1,
+            Utils.getRandomDate(), 0.1);
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addContacts(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
-        SourceVesselWrapper sv2 = SourceVesselHelper.newSourceVessel("testSv",
-            patient2, Utils.getRandomDate(), 0.1);
+        SourceVesselWrapper sv2 = SourceVesselHelper.newSourceVessel(patient2,
+            Utils.getRandomDate(), 0.1);
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
@@ -379,15 +379,15 @@ public class TestClinic extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        SourceVesselWrapper sv1 = SourceVesselHelper.newSourceVessel("testSv",
-            patient1, Utils.getRandomDate(), 0.1);
+        SourceVesselWrapper sv1 = SourceVesselHelper.newSourceVessel(patient1,
+            Utils.getRandomDate(), 0.1);
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addContacts(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
-        SourceVesselWrapper sv2 = SourceVesselHelper.newSourceVessel("testSv",
-            patient2, Utils.getRandomDate(), 0.1);
+        SourceVesselWrapper sv2 = SourceVesselHelper.newSourceVessel(patient2,
+            Utils.getRandomDate(), 0.1);
 
         Assert.assertEquals(0, clinic.getCollectionEventCount());
         Assert.assertEquals(0, clinic.getCollectionEventCount(true));
@@ -474,15 +474,15 @@ public class TestClinic extends TestDatabase {
         study.addContacts(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        SourceVesselWrapper sv1 = SourceVesselHelper.newSourceVessel("testSv",
-            patient1, Utils.getRandomDate(), 0.1);
+        SourceVesselWrapper sv1 = SourceVesselHelper.newSourceVessel(patient1,
+            Utils.getRandomDate(), 0.1);
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addContacts(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
-        SourceVesselWrapper sv2 = SourceVesselHelper.newSourceVessel("testSv",
-            patient2, Utils.getRandomDate(), 0.1);
+        SourceVesselWrapper sv2 = SourceVesselHelper.newSourceVessel(patient2,
+            Utils.getRandomDate(), 0.1);
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
@@ -537,8 +537,8 @@ public class TestClinic extends TestDatabase {
             CollectionEventHelper.addCollectionEvent(
                 clinic,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel("testSV", patient,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient, Utils.getRandomDate(),
+                    0.1));
             Assert.assertEquals(patientMap.get(clinic).size(),
                 clinic.getPatientCount(true));
             Assert.assertEquals(patientMap.get(clinic).size(),

@@ -901,4 +901,25 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 + wrapperClassName + ") for " + nakedKlazz.getName(), e);
         }
     }
+
+    /**
+     * Compare two Comparable Object-s, even if either one is null.
+     * 
+     * @param <T>
+     * @param one
+     * @param two
+     * @return
+     */
+    protected static <T extends Comparable<T>> int nullSafeComparator(
+        final T one, final T two) {
+        if (one == null ^ two == null) {
+            return (one == null) ? -1 : 1;
+        }
+
+        if (one == null && two == null) {
+            return 0;
+        }
+
+        return one.compareTo(two);
+    }
 }

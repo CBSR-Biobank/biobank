@@ -174,8 +174,8 @@ public class TestPatient extends TestDatabase {
         addContainers();
         addClinic(patient);
         patient.persist();
-        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel("asdf",
-            patient, Utils.getRandomDate(), 0.1);
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
+            Utils.getRandomDate(), 0.1);
         CollectionEventWrapper shipment = CollectionEventHelper
             .newCollectionEvent(site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0));
@@ -338,8 +338,7 @@ public class TestPatient extends TestDatabase {
                     .getShippingMethods(appService).get(0));
             ship.addSourceVessels(Arrays
                 .asList(new SourceVesselWrapper[] { SourceVesselHelper
-                    .newSourceVessel("Asdf", patient, Utils.getRandomDate(),
-                        0.1) }));
+                    .newSourceVessel(patient, Utils.getRandomDate(), 0.1) }));
             ship.persist();
             shipments.add(ship);
         }
@@ -416,8 +415,7 @@ public class TestPatient extends TestDatabase {
         shipment
             .addSourceVessels(Arrays
                 .asList(new SourceVesselWrapper[] { SourceVesselHelper
-                    .newSourceVessel("Asdf", patient1, Utils.getRandomDate(),
-                        0.1) }));
+                    .newSourceVessel(patient1, Utils.getRandomDate(), 0.1) }));
         shipment.persist();
         patient1.reload();
         patient2.reload();
@@ -509,7 +507,7 @@ public class TestPatient extends TestDatabase {
         CollectionEventWrapper ship = CollectionEventHelper.newCollectionEvent(
             site, method);
         ship.addSourceVessels(Arrays.asList(new SourceVesselWrapper[] { SourceVesselHelper
-            .newSourceVessel("Asdf", patient1, Utils.getRandomDate(), 0.1) }));
+            .newSourceVessel(patient1, Utils.getRandomDate(), 0.1) }));
         ship.persist();
 
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
@@ -520,10 +518,10 @@ public class TestPatient extends TestDatabase {
             .newCollectionEvent(site, method);
         ship2.setDateReceived(new Date()); // today
         ship2.addSourceVessels(Arrays.asList(new SourceVesselWrapper[] {
-            SourceVesselHelper.newSourceVessel("Asdf", patient2,
-                Utils.getRandomDate(), 0.1),
-            SourceVesselHelper.newSourceVessel("Gsdf", patient3,
-                Utils.getRandomDate(), 0.2) }));
+            SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
+                0.1),
+            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
+                0.2) }));
         ship2.persist();
 
         List<PatientWrapper> todayPatients = PatientWrapper
@@ -542,8 +540,8 @@ public class TestPatient extends TestDatabase {
             .addCollectionEvent(
                 site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel("Asdf", patient,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient, Utils.getRandomDate(),
+                    0.1));
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -10); // 10 days ago
@@ -582,14 +580,14 @@ public class TestPatient extends TestDatabase {
             .addCollectionEvent(
                 site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel("Asdf", patient,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient, Utils.getRandomDate(),
+                    0.1));
         CollectionEventWrapper shipment2 = CollectionEventHelper
             .addCollectionEvent(
                 site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel("Asdf", patient2,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
+                    0.1));
 
         ProcessingEventWrapper visit1 = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
@@ -637,14 +635,14 @@ public class TestPatient extends TestDatabase {
             .addCollectionEvent(
                 site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel("Asdf", patient,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient, Utils.getRandomDate(),
+                    0.1));
         CollectionEventWrapper shipment2 = CollectionEventHelper
             .addCollectionEvent(
                 site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel("Asdf", patient2,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
+                    0.1));
 
         ProcessingEventWrapper visit1 = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),

@@ -90,12 +90,11 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
             AliquotWrapper.class, false);
     }
 
-    public CenterWrapper getCenter() {
-        return getWrappedProperty(ProcessingEventPeer.CENTER,
-            CenterWrapper.class);
+    public CenterWrapper<?> getCenter() {
+        return getWrappedProperty(ProcessingEventPeer.CENTER, null);
     }
 
-    public void setCenter(CenterWrapper center) {
+    public void setCenter(CenterWrapper<?> center) {
         setWrappedProperty(ProcessingEventPeer.CENTER, center);
     }
 
@@ -495,9 +494,7 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
     }
 
     @Override
-    public CenterWrapper getCenterLinkedToObject() {
-        if (getCenter() != null)
-            return getCenter();
-        return null;
+    public CenterWrapper<?> getCenterLinkedToObject() {
+        return getCenter();
     }
 }
