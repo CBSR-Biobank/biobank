@@ -39,4 +39,12 @@ public abstract class DispatchItemWrapper<E extends DispatchItem> extends
     public String getStateDescription() {
         return getState().getLabel();
     }
+
+    public abstract DispatchWrapper getDispatch();
+
+    public abstract void setDispatch(DispatchWrapper dispatch);
+
+    public abstract Object getItem();
+
+    public abstract void setItem(Object item);
 }

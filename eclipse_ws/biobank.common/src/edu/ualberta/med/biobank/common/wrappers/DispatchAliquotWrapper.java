@@ -37,11 +37,13 @@ public class DispatchAliquotWrapper extends
         setWrappedProperty(DispatchAliquotPeer.ALIQUOT, aliquot);
     }
 
+    @Override
     public DispatchWrapper getDispatch() {
         return getWrappedProperty(DispatchAliquotPeer.DISPATCH,
             DispatchWrapper.class);
     }
 
+    @Override
     public void setDispatch(DispatchWrapper dispatch) {
         setWrappedProperty(DispatchAliquotPeer.DISPATCH, dispatch);
     }
@@ -67,5 +69,17 @@ public class DispatchAliquotWrapper extends
             }
         }
         return super.equals(object);
+    }
+
+    @Override
+    public Object getItem() {
+        return getAliquot();
+    }
+
+    @Override
+    public void setItem(Object item) {
+        if (item instanceof AliquotWrapper) {
+            setAliquot((AliquotWrapper) item);
+        }
     }
 }
