@@ -85,6 +85,11 @@ public class BaseWrapperBuilder extends BaseBuilder {
             contents.append("\npublic abstract class ").append(mc.getName())
                 .append("BaseWrapper").append("<E extends ")
                 .append(mc.getName()).append("> extends ModelWrapper<E> ");
+        } else if (mc.getExtendsClass() != null) {
+            contents.append("\npublic class ").append(mc.getName())
+                .append("BaseWrapper").append(" extends ")
+                .append(mc.getExtendsClass().getName()).append("BaseWrapper<")
+                .append(mc.getName()).append("> ");
         } else {
             contents.append("\npublic class ").append(mc.getName())
                 .append("BaseWrapper").append(" extends ModelWrapper<")
@@ -138,17 +143,10 @@ public class BaseWrapperBuilder extends BaseBuilder {
         if (!modelBaseClasses.containsKey(mc.getName())) {
             // wrappers for model base classes do not implement the
             // getWrappedClass() method
-            result.append("    @Override\n    public Class<");
-
-            ModelClass ec = mc.getExtendsClass();
-            if (ec != null) {
-                result.append(ec.getName());
-            } else {
-                result.append(mc.getName());
-            }
-
-            result.append("> getWrappedClass() {\n").append("        return ")
-                .append(mc.getName()).append(".class;\n").append("    }\n\n");
+            result.append("    @Override\n    public Class<")
+                .append(mc.getName()).append("> getWrappedClass() {\n")
+                .append("        return ").append(mc.getName())
+                .append(".class;\n").append("    }\n\n");
         }
 
         result.append("    @Override\n")
