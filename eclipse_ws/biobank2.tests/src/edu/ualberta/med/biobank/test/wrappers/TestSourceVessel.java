@@ -6,9 +6,12 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -17,19 +20,23 @@ public class TestSourceVessel extends TestDatabase {
 
     SourceVesselWrapper ssw;
     SiteWrapper defaultSite;
+    PatientWrapper p1;
 
     @Override
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        ssw = SourceVesselHelper.addSourceVessel("SourceVesselName");
+        p1 = PatientHelper.newPatient("444");
+        ssw = SourceVesselHelper.addSourceVessel("SourceVesselName", p1,
+            Utils.getRandomDate(), 0.1);
         defaultSite = SiteHelper.addSite("Default");
     }
 
     @Test
     public void testCompareTo() throws Exception {
         SourceVesselWrapper newSourceVessel = SourceVesselHelper
-            .addSourceVessel(ssw.getName() + "1");
+            .addSourceVessel(ssw.getName() + "1", p1, Utils.getRandomDate(),
+                0.1);
         Assert.assertTrue(newSourceVessel.compareTo(ssw) > 0);
         Assert.assertTrue(ssw.compareTo(newSourceVessel) < 0);
         newSourceVessel.setName(ssw.getName());
@@ -46,8 +53,8 @@ public class TestSourceVessel extends TestDatabase {
 
     @Test
     public void testResetNew() throws Exception {
-        SourceVesselWrapper ssw = SourceVesselHelper
-            .newSourceVessel("testResetNew");
+        SourceVesselWrapper ssw = SourceVesselHelper.newSourceVessel(
+            "testResetNew", p1, Utils.getRandomDate(), 0.1);
         ssw.setName("toto");
         ssw.reset();
         Assert.assertEquals(null, ssw.getName());

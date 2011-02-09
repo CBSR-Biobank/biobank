@@ -14,7 +14,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -22,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
@@ -32,7 +30,6 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSet
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
@@ -41,7 +38,6 @@ import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import edu.ualberta.med.biobank.test.internal.StudySourceVesselHelper;
 
@@ -304,16 +300,12 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         int nber = StudySourceVesselHelper.addStudySourceVessels(study, name);
 
-        SourceVesselTypeWrapper sourceVessel = SourceVesselTypeHelper
-            .newSourceVesselType("name");
-        study.addStudySourceVesselTypes(Arrays.asList(StudySourceVesselHelper
-            .addStudySourceVesselType(study, sourceVessel)));
         study.persist();
 
         study.reload();
         // one storage added
-        Assert.assertEquals(nber + 1, study.getStudySourceVesselCollection()
-            .size());
+        Assert
+            .assertEquals(nber, study.getStudySourceVesselCollection().size());
     }
 
     @Test
@@ -708,24 +700,17 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site1, clinic1, method, patient1, patient3);
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site2, clinic2, method, patient1, patient2);
-
         // shipment1 has patient visits for patient1 and patient3
-        long nber = ProcessingEventHelper.addProcessingEvents(patient1,
-            shipment1).size();
-        long nber2 = ProcessingEventHelper.addProcessingEvents(patient3,
-            shipment1).size();
+        long nber = ProcessingEventHelper.addProcessingEvents(site1, patient1)
+            .size();
+        long nber2 = ProcessingEventHelper.addProcessingEvents(site1, patient3)
+            .size();
 
         // shipment 2 has patient visits for patient1 and patient2
-        long nber3 = ProcessingEventHelper.addProcessingEvents(patient1,
-            shipment2).size();
-        long nber4 = ProcessingEventHelper.addProcessingEvents(patient2,
-            shipment2).size();
+        long nber3 = ProcessingEventHelper.addProcessingEvents(site2, patient1)
+            .size();
+        long nber4 = ProcessingEventHelper.addProcessingEvents(site2, patient2)
+            .size();
 
         site1.reload();
         site2.reload();
@@ -765,17 +750,13 @@ public class TestStudy extends TestDatabase {
             .getShippingMethods(appService).get(0);
         PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
             study1);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic1, method, patient1);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
             study1);
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, clinic2, method, patient1, patient2);
         // clinic 1 = 1 patient for study 1
-        ProcessingEventHelper.addProcessingEvents(patient1, shipment1);
-        ProcessingEventHelper.addProcessingEvents(patient1, shipment2);
+        ProcessingEventHelper.addProcessingEvents(clinic1, patient1);
+        ProcessingEventHelper.addProcessingEvents(clinic1, patient1);
         // clinic 2 = 2 patients for study 1
-        ProcessingEventHelper.addProcessingEvents(patient2, shipment2);
+        ProcessingEventHelper.addProcessingEvents(clinic2, patient2);
 
         study1.reload();
         clinic1.reload();
@@ -811,24 +792,17 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic1, method, patient1, patient3);
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, clinic2, method, patient1, patient2);
-
         // shipment1 has patient visits for patient1 and patient3
-        int nber = ProcessingEventHelper.addProcessingEvents(patient1,
-            shipment1).size();
-        int nber2 = ProcessingEventHelper.addProcessingEvents(patient3,
-            shipment1).size();
+        int nber = ProcessingEventHelper.addProcessingEvents(clinic1, patient1)
+            .size();
+        int nber2 = ProcessingEventHelper
+            .addProcessingEvents(clinic1, patient3).size();
 
         // shipment 2 has patient visits for patient1 and patient2
-        int nber3 = ProcessingEventHelper.addProcessingEvents(patient1,
-            shipment2).size();
-        int nber4 = ProcessingEventHelper.addProcessingEvents(patient2,
-            shipment2).size();
+        int nber3 = ProcessingEventHelper
+            .addProcessingEvents(clinic2, patient1).size();
+        int nber4 = ProcessingEventHelper
+            .addProcessingEvents(clinic2, patient2).size();
 
         study1.reload();
         clinic1.reload();
@@ -868,19 +842,12 @@ public class TestStudy extends TestDatabase {
         study2.addContacts(contacts);
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "2", study2);
-
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic1, method, patient1, patient2);
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, clinic2, method, patient1, patient2);
-        int nber = ProcessingEventHelper.addProcessingEvents(patient1,
-            shipment1).size();
-        int nber2 = ProcessingEventHelper.addProcessingEvents(patient1,
-            shipment2).size();
-        ProcessingEventHelper.addProcessingEvents(patient2, shipment1);
-        ProcessingEventHelper.addProcessingEvents(patient2, shipment2);
+        int nber = ProcessingEventHelper.addProcessingEvents(clinic1, patient1)
+            .size();
+        int nber2 = ProcessingEventHelper
+            .addProcessingEvents(clinic1, patient1).size();
+        ProcessingEventHelper.addProcessingEvents(clinic1, patient2);
+        ProcessingEventHelper.addProcessingEvents(clinic2, patient2);
 
         study1.reload();
         Assert.assertEquals(nber + nber2, study1.getProcessingEventCount());
