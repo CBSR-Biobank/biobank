@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.Arrays;
 import java.util.Date;
 
+import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -27,7 +28,8 @@ public class DispatchHelper extends DbHelper {
         shipment.setDeparted(Utils.getRandomDate());
 
         if (aliquots != null) {
-            shipment.addNewAliquots(Arrays.asList(aliquots), true);
+            shipment.addAliquots(Arrays.asList(aliquots),
+                DispatchItemState.NONE);
         }
 
         return shipment;
