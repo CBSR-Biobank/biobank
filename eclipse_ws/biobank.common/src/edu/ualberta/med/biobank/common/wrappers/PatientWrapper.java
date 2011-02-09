@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -216,7 +218,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return getPnumber();
     }
 
-    public static List<PatientWrapper> getPatientsInTodayShipments(
+    public static List<PatientWrapper> getPatientsInTodayCollectionEvents(
         WritableApplicationService appService) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // yesterday midnight
@@ -341,6 +343,18 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     public List<SourceVesselWrapper> getSourceVesselCollection() {
         return getWrapperCollection(PatientPeer.SOURCE_VESSEL_COLLECTION,
             SourceVesselWrapper.class, false);
+    }
+
+    public void setSourceVesselCollection(List<SourceVesselWrapper> sources) {
+        setWrapperCollection(PatientPeer.SOURCE_VESSEL_COLLECTION, sources);
+    }
+
+    public List<CollectionEventWrapper> getCollectionEventCollection() {
+        Set<CollectionEventWrapper> collectionEvents = new HashSet<CollectionEventWrapper>();
+        List<SourceVesselWrapper> svs = getSourceVesselCollection();
+        for (SourceVesselWrapper sv : svs)
+            collectionEvents.add(sv.getCollectionEvent());
+        return new ArrayList<CollectionEventWrapper>(collectionEvents);
     }
 
 }

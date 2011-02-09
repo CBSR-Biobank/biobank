@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -31,6 +32,22 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
 
     public void setName(String name) {
         setProperty(SourceVesselPeer.NAME, name);
+    }
+
+    public Date getTimeDrawn() {
+        return getProperty(SourceVesselPeer.TIME_DRAWN);
+    }
+
+    public void setTimeDrawn(Date time) {
+        setProperty(SourceVesselPeer.TIME_DRAWN, time);
+    }
+
+    public Double getVolume() {
+        return getProperty(SourceVesselPeer.VOLUME);
+    }
+
+    public void setVolume(Double vol) {
+        setProperty(SourceVesselPeer.VOLUME, vol);
     }
 
     @Override
@@ -136,4 +153,14 @@ public class SourceVesselWrapper extends ModelWrapper<SourceVessel> {
         return getWrappedProperty(SourceVesselPeer.PATIENT,
             PatientWrapper.class);
     }
+
+    public CollectionEventWrapper getCollectionEvent() {
+        return getWrappedProperty(SourceVesselPeer.COLLECTION_EVENT,
+            CollectionEventWrapper.class);
+    }
+
+    public void setCollectionEvent(CollectionEventWrapper ce) {
+        setWrappedProperty(SourceVesselPeer.COLLECTION_EVENT, ce);
+    }
+
 }

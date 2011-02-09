@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
@@ -41,6 +41,7 @@ import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import edu.ualberta.med.biobank.test.internal.StudySourceVesselHelper;
 
@@ -111,10 +112,7 @@ public class TestStudy extends TestDatabase {
         study.persist();
         study.reload();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        CollectionEventWrapper shipment = CollectionEventHelper
-            .addCollectionEvent(site, clinic, ShippingMethodWrapper
-                .getShippingMethods(appService).get(0), patient);
-        return ProcessingEventHelper.addProcessingEvents(patient, shipment);
+        return ProcessingEventHelper.addProcessingEvents(site, patient);
 
     }
 
@@ -306,10 +304,10 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         int nber = StudySourceVesselHelper.addStudySourceVessels(study, name);
 
-        SourceVesselWrapper sourceVessel = SourceVesselHelper
-            .addSourceVessel(name);
-        study.addStudySourceVessels(Arrays.asList(StudySourceVesselHelper
-            .addStudySourceVessel(study, sourceVessel)));
+        SourceVesselTypeWrapper sourceVessel = SourceVesselTypeHelper
+            .newSourceVesselType("name");
+        study.addStudySourceVesselTypes(Arrays.asList(StudySourceVesselHelper
+            .addStudySourceVesselType(study, sourceVessel)));
         study.persist();
 
         study.reload();
@@ -679,51 +677,6 @@ public class TestStudy extends TestDatabase {
             Assert.assertEquals(0, study.getPatientCount(false));
         }
 
-    }
-
-    @Test
-    public void testGetPatientCountForSite() throws Exception {
-        String name = "testGetPatientCountForSite" + r.nextInt();
-        SiteWrapper site1 = SiteHelper.addSite(name + "s1");
-        SiteWrapper site2 = SiteHelper.addSite(name + "s2");
-
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
-        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name
-            + "CONTACT1");
-
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
-        ContactWrapper contact2 = ContactHelper.addContact(clinic2, name
-            + "CONTACT2");
-
-        List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
-        contacts.add(contact1);
-        contacts.add(contact2);
-
-        StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(contacts);
-        study1.persist();
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        PatientWrapper patient1 = PatientHelper.addPatient(name + "PATIENT1",
-            study1);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site1, clinic1, method, patient1);
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "PATIENT2",
-            study1);
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site2, clinic2, method, patient1, patient2);
-        // clinic 1 = 1 patient for study 1
-        ProcessingEventHelper.addProcessingEvents(patient1, shipment1);
-        ProcessingEventHelper.addProcessingEvents(patient1, shipment2);
-        // clinic 2 = 2 patients for study 1
-        ProcessingEventHelper.addProcessingEvents(patient2, shipment2);
-
-        site1.reload();
-        site2.reload();
-        study1.reload();
-
-        Assert.assertEquals(1, study1.getPatientCountForCenter(site1));
-        Assert.assertEquals(2, study1.getPatientCountForCenter(site2));
     }
 
     @Test

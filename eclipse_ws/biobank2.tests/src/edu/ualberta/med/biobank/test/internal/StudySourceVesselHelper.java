@@ -6,6 +6,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.test.Utils;
 
 public class StudySourceVesselHelper extends DbHelper {
 
@@ -40,7 +41,8 @@ public class StudySourceVesselHelper extends DbHelper {
         List<StudySourceVesselWrapper> sources = new ArrayList<StudySourceVesselWrapper>();
         for (int i = 0; i < nber; i++) {
             SourceVesselWrapper sourceVessel = SourceVesselHelper
-                .addSourceVessel(name + i);
+                .addSourceVessel(name + i, PatientHelper.newPatient("testP"),
+                    Utils.getRandomDate(), 0.01);
             sources.add(addStudySourceVessel(study, sourceVessel));
         }
         study.addStudySourceVessels(sources);

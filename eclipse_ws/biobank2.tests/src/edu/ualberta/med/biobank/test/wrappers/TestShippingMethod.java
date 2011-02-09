@@ -19,12 +19,14 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestShippingMethod extends TestDatabase {
@@ -53,12 +55,21 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod(name + "_2");
 
-        CollectionEventHelper.addCollectionEvent(site, clinic, method1,
-            patient1);
-        CollectionEventHelper.addCollectionEvent(site, clinic, method2,
-            patient1);
-        CollectionEventHelper.addCollectionEvent(site, clinic, method2,
-            patient1);
+        CollectionEventHelper.addCollectionEvent(
+            site,
+            method1,
+            SourceVesselHelper.newSourceVessel("Asdfa", patient1,
+                Utils.getRandomDate(), 0.1));
+        CollectionEventHelper.addCollectionEvent(
+            site,
+            method2,
+            SourceVesselHelper.newSourceVessel("Asdfb", patient1,
+                Utils.getRandomDate(), 0.1));
+        CollectionEventHelper.addCollectionEvent(
+            site,
+            method2,
+            SourceVesselHelper.newSourceVessel("Asdfc", patient1,
+                Utils.getRandomDate(), 0.1));
 
         method1.reload();
         method2.reload();
@@ -82,15 +93,27 @@ public class TestShippingMethod extends TestDatabase {
             .addShippingMethod(name);
 
         CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic, method, patient1);
+            .addCollectionEvent(
+                site,
+                method,
+                SourceVesselHelper.newSourceVessel("Asdf", patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
         CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, clinic, method, patient1);
+            .addCollectionEvent(
+                site,
+                method,
+                SourceVesselHelper.newSourceVessel("Asdf", patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
         CollectionEventWrapper shipment3 = CollectionEventHelper
-            .addCollectionEvent(site, clinic, method, patient1);
+            .addCollectionEvent(
+                site,
+                method,
+                SourceVesselHelper.newSourceVessel("Asdf", patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
 
@@ -206,7 +229,11 @@ public class TestShippingMethod extends TestDatabase {
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic, method, patient1);
+            .addCollectionEvent(
+                site,
+                method,
+                SourceVesselHelper.newSourceVessel("Asdf", patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.persist();
         method.reload();
 
@@ -285,7 +312,11 @@ public class TestShippingMethod extends TestDatabase {
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
 
         CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, clinic, methods[0], patient1);
+            .addCollectionEvent(
+                site,
+                methods[0],
+                SourceVesselHelper.newSourceVessel("Asdf", patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
 
@@ -293,7 +324,11 @@ public class TestShippingMethod extends TestDatabase {
         Assert.assertFalse(methods[1].isUsed());
 
         CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, clinic, methods[1], patient1);
+            .addCollectionEvent(
+                site,
+                methods[1],
+                SourceVesselHelper.newSourceVessel("Asdf", patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment2.setWaybill(name + "QWERTY");
         shipment2.persist();
 
@@ -310,5 +345,4 @@ public class TestShippingMethod extends TestDatabase {
         Assert.assertFalse(methods[0].isUsed());
         Assert.assertFalse(methods[1].isUsed());
     }
-
 }
