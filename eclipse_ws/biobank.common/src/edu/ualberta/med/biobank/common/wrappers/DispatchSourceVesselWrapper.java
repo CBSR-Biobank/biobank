@@ -37,11 +37,13 @@ public class DispatchSourceVesselWrapper extends
         setWrappedProperty(DispatchSourceVesselPeer.SOURCE_VESSEL, sourceVessel);
     }
 
+    @Override
     public DispatchWrapper getDispatch() {
         return getWrappedProperty(DispatchSourceVesselPeer.DISPATCH,
             DispatchWrapper.class);
     }
 
+    @Override
     public void setDispatch(DispatchWrapper dispatch) {
         setWrappedProperty(DispatchSourceVesselPeer.DISPATCH, dispatch);
     }
@@ -68,5 +70,17 @@ public class DispatchSourceVesselWrapper extends
             }
         }
         return super.equals(object);
+    }
+
+    @Override
+    public Object getItem() {
+        return getSourceVessel();
+    }
+
+    @Override
+    public void setItem(Object item) {
+        if (item instanceof SourceVesselWrapper) {
+            setSourceVessel((SourceVesselWrapper) item);
+        }
     }
 }
