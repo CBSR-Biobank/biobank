@@ -101,7 +101,7 @@ public class TestActivityStatus extends TestDatabase {
             appService, false).get(0);
 
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         study.reload();
 

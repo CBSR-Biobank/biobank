@@ -85,7 +85,7 @@ public class ConfigStudies {
             ss.getAppService());
         studySourceVessel.setStudy(study);
         studySourceVessel.setSourceVessel(ss);
-        study.addStudySourceVessels(Arrays.asList(studySourceVessel));
+        study.addToStudySourceVesselCollection(Arrays.asList(studySourceVessel));
         study.persist();
         study.reload();
     }
@@ -112,7 +112,7 @@ public class ConfigStudies {
 
         ss.setActivityStatus(CalgarySite.getActivityStatus(activityStatusName));
 
-        study.addSampleStorage(Arrays.asList(ss));
+        study.addToSampleStorageCollection(Arrays.asList(ss));
         study.persist();
         study.reload();
 
@@ -148,7 +148,7 @@ public class ConfigStudies {
         }
         StudyWrapper study = getStudy(studyNameShort);
 
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         study.reload();
     }

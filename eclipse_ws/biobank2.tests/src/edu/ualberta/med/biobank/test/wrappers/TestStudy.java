@@ -107,7 +107,7 @@ public class TestStudy extends TestDatabase {
             + "CONTACT1");
         List<ContactWrapper> contacts = new ArrayList<ContactWrapper>();
         contacts.add(contact);
-        study.addContacts(contacts);
+        study.addToContactCollection(contacts);
         study.persist();
         study.reload();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
@@ -172,7 +172,7 @@ public class TestStudy extends TestDatabase {
         ClinicWrapper clinicNotAdded = DbHelper.chooseRandomlyInList(clinics);
         ContactWrapper contactToAdd = DbHelper
             .chooseRandomlyInList(clinicNotAdded.getContactCollection());
-        study.addContacts(Arrays.asList(contactToAdd));
+        study.addToContactCollection(Arrays.asList(contactToAdd));
         study.persist();
 
         study.reload();
@@ -192,7 +192,7 @@ public class TestStudy extends TestDatabase {
         List<ContactWrapper> contacts = study.getContactCollection();
         ContactWrapper contact = DbHelper.chooseRandomlyInList(contacts);
         // don't have to delete contact because this is a *..* relation
-        study.removeContacts(Arrays.asList(contact));
+        study.removeFromContactCollection(Arrays.asList(contact));
         study.persist();
 
         study.reload();
@@ -242,7 +242,7 @@ public class TestStudy extends TestDatabase {
         SampleTypeWrapper type = SampleTypeHelper.addSampleType(name);
         SampleStorageWrapper newStorage = SampleStorageHelper.newSampleStorage(
             study, type);
-        study.addSampleStorage(Arrays.asList(newStorage));
+        study.addToSampleStorageCollection(Arrays.asList(newStorage));
         study.persist();
 
         study.reload();
@@ -261,7 +261,7 @@ public class TestStudy extends TestDatabase {
         List<SampleStorageWrapper> storages = study
             .getSampleStorageCollection();
         SampleStorageWrapper storage = DbHelper.chooseRandomlyInList(storages);
-        study.removeSampleStorages(Arrays.asList(storage));
+        study.removeFromSampleStorageCollection(Arrays.asList(storage));
         study.persist();
 
         study.reload();
@@ -310,7 +310,7 @@ public class TestStudy extends TestDatabase {
 
         SourceVesselWrapper sourceVessel = SourceVesselHelper
             .addSourceVessel(name);
-        study.addStudySourceVessels(Arrays.asList(StudySourceVesselHelper
+        study.addToStudySourceVesselCollection(Arrays.asList(StudySourceVesselHelper
             .addStudySourceVessel(study, sourceVessel)));
         study.persist();
 
@@ -333,7 +333,7 @@ public class TestStudy extends TestDatabase {
         // don't have to delete the storage thanks to
         // deleteSourceVesselDifference method
         SourceVesselHelper.createdSourceVessels.remove(source);
-        study.removeStudySourceVessels(Arrays.asList(source));
+        study.removeFromStudySourceVesselCollection(Arrays.asList(source));
         study.persist();
 
         study.reload();
@@ -619,7 +619,7 @@ public class TestStudy extends TestDatabase {
         PatientWrapper newPatient = PatientHelper.newPatient(name
             + "newPatient");
         newPatient.setStudy(study);
-        study.addPatients(Arrays.asList(newPatient));
+        study.addToPatientCollection(Arrays.asList(newPatient));
         study.persist();
 
         study.reload();
@@ -702,7 +702,7 @@ public class TestStudy extends TestDatabase {
         contacts.add(contact2);
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(contacts);
+        study1.addToContactCollection(contacts);
         study1.persist();
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
@@ -743,11 +743,11 @@ public class TestStudy extends TestDatabase {
             + "CONTACT2");
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.addToContactCollection(Arrays.asList(contact1, contact2));
         study1.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addContacts(Arrays.asList(contact2));
+        study2.addToContactCollection(Arrays.asList(contact2));
         study2.persist();
 
         PatientWrapper patient1 = PatientHelper
@@ -806,7 +806,7 @@ public class TestStudy extends TestDatabase {
         contacts.add(contact2);
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(contacts);
+        study1.addToContactCollection(contacts);
         study1.persist();
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
@@ -845,11 +845,11 @@ public class TestStudy extends TestDatabase {
             + "CONTACT2");
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.addToContactCollection(Arrays.asList(contact1, contact2));
         study1.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addContacts(Arrays.asList(contact2));
+        study2.addToContactCollection(Arrays.asList(contact2));
         study2.persist();
 
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
@@ -907,12 +907,12 @@ public class TestStudy extends TestDatabase {
         contacts.add(contact2);
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(contacts);
+        study1.addToContactCollection(contacts);
         study1.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addContacts(contacts);
+        study2.addToContactCollection(contacts);
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "2", study2);
 
@@ -945,11 +945,11 @@ public class TestStudy extends TestDatabase {
             + "CONTACT2");
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(Arrays.asList(contact1));
+        study1.addToContactCollection(Arrays.asList(contact1));
         study1.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addContacts(Arrays.asList(contact2));
+        study2.addToContactCollection(Arrays.asList(contact2));
         study2.persist();
 
         Assert.assertTrue(study1.isLinkedToClinic(clinic1));
@@ -1119,7 +1119,7 @@ public class TestStudy extends TestDatabase {
         ContactHelper.addContact(clinic2, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
-        study.addContacts(Arrays.asList(contact1));
+        study.addToContactCollection(Arrays.asList(contact1));
         study.persist();
 
         study.reload();

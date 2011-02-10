@@ -441,7 +441,7 @@ public class TestDispatch extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         study.reload();
         ShipmentWrapper clinicShipment = ShipmentHelper.addShipment(senderSite,

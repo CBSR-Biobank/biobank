@@ -87,7 +87,7 @@ public class TestAliquot extends TestDatabase {
             + r.nextInt());
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
 
         site.addStudies(Arrays.asList(study));
@@ -446,7 +446,7 @@ public class TestAliquot extends TestDatabase {
         ss3.setActivityStatus(activeStatus);
         ss3.persist();
         aliquot.getPatientVisit().getPatient().getStudy()
-            .addSampleStorage(Arrays.asList(ss1, ss2, ss3));
+            .addToSampleStorageCollection(Arrays.asList(ss1, ss2, ss3));
         // should be 3
         aliquot.setQuantityFromType();
         Assert.assertTrue(aliquot.getQuantity().equals(3.0));

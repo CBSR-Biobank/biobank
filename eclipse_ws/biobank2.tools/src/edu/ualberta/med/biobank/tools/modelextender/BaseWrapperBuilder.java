@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.tools.modelextender;
 
 import java.io.File;
 import java.io.FileOutputStream;
-import java.util.Collection;
+import java.io.FilenameFilter;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -26,7 +26,11 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
     protected final String wrapperPackageName;
 
+    protected final String internalWrapperPackageName;
+
     protected Map<String, ModelClass> modelBaseClasses;
+
+    protected Map<String, String> wrapperMap;
 
     public BaseWrapperBuilder(String outputdir, String packagename,
         String peerpackagename, Map<String, ModelClass> modelClasses) {
@@ -34,7 +38,11 @@ public class BaseWrapperBuilder extends BaseBuilder {
         this.peerpackagename = peerpackagename;
 
         wrapperPackageName = packagename.replace(".base", "");
+        internalWrapperPackageName = packagename.replace(".base", ".internal");
+    }
 
+    @Override
+    public void generateFiles() throws Exception {
         // find all base classes
         modelBaseClasses = new HashMap<String, ModelClass>();
         for (Entry<String, ModelClass> e : modelClasses.entrySet()) {
@@ -43,12 +51,51 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 modelBaseClasses.put(ec.getName(), ec);
             }
         }
+
+        wrapperMap = new HashMap<String, String>();
+
+        populateWrapperPackageNameMap(outputdir, wrapperPackageName);
+        populateWrapperPackageNameMap(outputdir + "/internal",
+            internalWrapperPackageName);
+
+        super.generateFiles();
+    }
+
+    private Map<String, String> populateWrapperPackageNameMap(String dirname,
+        String packagename) throws Exception {
+
+        // get list of internal wrappers
+        File dir = new File(dirname);
+        if (!dir.exists()) {
+            throw new Exception("directory does not exist " + dirname);
+        }
+
+        FilenameFilter filter = new FilenameFilter() {
+            public boolean accept(File dir, String name) {
+                return name.contains("Wrapper.java");
+            }
+        };
+
+        // remove ".java"
+        for (String filename : dir.list(filter)) {
+            LOGGER.debug("filename: " + filename);
+            wrapperMap.put(filename.replace(".java", ""), packagename);
+        }
+        return wrapperMap;
     }
 
     protected void generateClassFile(ModelClass mc) throws Exception {
+        String className = mc.getName();
+        String wrapperName = new StringBuilder(className).append("Wrapper")
+            .toString();
+
+        if (!wrapperMap.containsKey(wrapperName))
+            return;
+
         LOGGER.info("generating wrapper base class for " + mc.getName());
 
-        File f = new File(outputdir + "/" + mc.getName() + "BaseWrapper.java");
+        File f = new File(outputdir + "/base/" + mc.getName()
+            + "BaseWrapper.java");
         FileOutputStream fos = new FileOutputStream(f);
 
         StringBuilder contents = new StringBuilder("/*\n")
@@ -76,18 +123,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         contents.append("import ").append(peerpackagename).append(".")
             .append(mc.getName()).append("Peer;\n");
 
-        // if this class uses the Date class then add an import
-        boolean usesDate = false;
-        for (Attribute attr : mc.getAttrMap().values()) {
-            if (attr.getType().equals("Date")) {
-                usesDate = true;
-            }
-        }
-
-        if (usesDate) {
-            contents.append("import ").append(Date.class.getName())
-                .append(";\n");
-        }
+        contents.append(getWrapperImports(mc));
 
         if (modelBaseClasses.containsKey(mc.getName())) {
             contents.append("\npublic abstract class ").append(mc.getName())
@@ -211,12 +247,12 @@ public class BaseWrapperBuilder extends BaseBuilder {
         StringBuilder result = new StringBuilder();
 
         result.append("   public ").append(assocClassName)
-            .append("BaseWrapper get")
+            .append("Wrapper get")
             .append(CamelCase.toCamelCase(assocName, true)).append("() {\n")
             .append("      return getWrappedProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(assocName))
-            .append(", ").append(assocClassName)
-            .append("BaseWrapper.class);\n").append("   }\n\n");
+            .append(", ").append(assocClassName).append("Wrapper.class);\n")
+            .append("   }\n\n");
         return result.toString();
     }
 
@@ -237,7 +273,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         result.append("   public void set")
             .append(CamelCase.toCamelCase(assocName, true)).append("(")
-            .append(assocClassName).append("BaseWrapper ").append(assocName)
+            .append(assocClassName).append("Wrapper ").append(assocName)
             .append(") {\n").append("      setWrappedProperty(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
@@ -247,6 +283,13 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
     private String createCollectionGetter(ModelClass mc, ClassAssociation assoc)
         throws Exception {
+        String assocClassName = assoc.getToClass().getName();
+        String assocWrapperName = new StringBuilder(assocClassName).append(
+            "Wrapper").toString();
+
+        if (!wrapperMap.containsKey(assocWrapperName))
+            return "";
+
         ClassAssociationType assocType = assoc.getAssociationType();
 
         if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_MANY)
@@ -256,7 +299,6 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 + assoc.getClass());
         }
 
-        String assocClassName = assoc.getToClass().getName();
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
@@ -267,18 +309,25 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
 
         result.append("   public List<").append(assocClassName)
-            .append("BaseWrapper> get")
+            .append("Wrapper> get")
             .append(CamelCase.toCamelCase(assocName, true))
             .append("(boolean sort) {\n")
             .append("      return getWrapperCollection(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(assocName))
             .append(", ").append(assocClassName)
-            .append("BaseWrapper.class, sort);\n").append("   }\n\n");
+            .append("Wrapper.class, sort);\n").append("   }\n\n");
         return result.toString();
     }
 
     private Object createCollectionAdder(ModelClass mc, ClassAssociation assoc)
         throws Exception {
+        String assocClassName = assoc.getToClass().getName();
+        String assocWrapperName = new StringBuilder(assocClassName).append(
+            "Wrapper").toString();
+
+        if (!wrapperMap.containsKey(assocWrapperName))
+            return "";
+
         ClassAssociationType assocType = assoc.getAssociationType();
 
         if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_MANY)
@@ -288,11 +337,8 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 + assoc.getClass());
         }
 
-        String assocClassName = assoc.getToClass().getName();
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
-        StringBuilder paramName = new StringBuilder("new").append(CamelCase
-            .toCamelCase(assocName, true));
 
         // fix warnings
         if (mc.getName().equals("ShippingMethod")) {
@@ -302,16 +348,23 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         result.append("   public void addTo")
             .append(CamelCase.toCamelCase(assocName, true)).append("(List<")
-            .append(assocClassName).append("BaseWrapper> ").append(paramName)
+            .append(assocClassName).append("Wrapper> ").append(assocName)
             .append(") {\n").append("      addToWrapperCollection(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
-            .append(paramName).append(");\n").append("   }\n\n");
+            .append(assocName).append(");\n").append("   }\n\n");
         return result.toString();
     }
 
     private Object createCollectionRemover(ModelClass mc, ClassAssociation assoc)
         throws Exception {
+        String assocClassName = assoc.getToClass().getName();
+        String assocWrapperName = new StringBuilder(assocClassName).append(
+            "Wrapper").toString();
+
+        if (!wrapperMap.containsKey(assocWrapperName))
+            return "";
+
         ClassAssociationType assocType = assoc.getAssociationType();
 
         if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_MANY)
@@ -321,11 +374,8 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 + assoc.getClass());
         }
 
-        String assocClassName = assoc.getToClass().getName();
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
-        StringBuilder paramName = new StringBuilder("remove").append(CamelCase
-            .toCamelCase(assocName, true));
 
         // fix warnings
         if (mc.getName().equals("ShippingMethod")) {
@@ -335,17 +385,16 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         result.append("   public void removeFrom")
             .append(CamelCase.toCamelCase(assocName, true)).append("(List<")
-            .append(assocClassName).append("BaseWrapper> ").append(paramName)
+            .append(assocClassName).append("Wrapper> ").append(assocName)
             .append(") {\n").append("      removeFromWrapperCollection(")
             .append(mc.getName()).append("Peer.")
             .append(CamelCase.toTitleCase(assocName)).append(", ")
-            .append(paramName).append(");\n").append("   }\n\n");
+            .append(assocName).append(");\n").append("   }\n\n");
         return result.toString();
     }
 
-    protected String getWrapperImports(ModelClass mc) {
+    private String getWrapperImports(ModelClass mc) {
         Map<String, Integer> importCount = new HashMap<String, Integer>();
-
         StringBuilder sb = new StringBuilder();
 
         for (Attribute attr : mc.getAttrMap().values()) {
@@ -361,40 +410,29 @@ public class BaseWrapperBuilder extends BaseBuilder {
             }
         }
 
-        boolean hasCollections = false;
         Map<String, ClassAssociation> assocMap = mc.getAssocMap();
         for (ClassAssociation assoc : assocMap.values()) {
             ModelClass toClass = assoc.getToClass();
-
-            if ((assoc.getAssociationType() == ClassAssociationType.ZERO_OR_ONE_TO_MANY)
-                || (assoc.getAssociationType() == ClassAssociationType.ONE_TO_MANY)) {
-                hasCollections = true;
-            }
 
             if (importCount.get(toClass.getName()) != null) {
                 // already added an import for this class
                 continue;
             }
 
+            StringBuilder wrapperName = new StringBuilder(toClass.getName())
+                .append("Wrapper");
+
+            String packagename = wrapperMap.get(wrapperName.toString());
+
+            if (packagename == null) {
+                // this wrapper does not exist
+                continue;
+            }
+
             importCount.put(toClass.getName(), 1);
-        }
 
-        if (hasCollections) {
-            sb.append("import ").append(Collection.class.getName())
-                .append(";\n");
-        }
-
-        // import the model class itself
-        if (!importCount.containsKey(mc.getName())) {
-            sb.append("import ").append(mc.getPkg()).append(".")
-                .append(mc.getName()).append(";\n");
-        }
-
-        // import the model base class
-        ModelClass ec = mc.getExtendsClass();
-        if (ec != null) {
-            sb.append("import ").append(ec.getPkg()).append(".")
-                .append(ec.getName()).append(";\n");
+            sb.append("import ").append(packagename).append(".")
+                .append(wrapperName).append(";\n");
         }
 
         return sb.toString();

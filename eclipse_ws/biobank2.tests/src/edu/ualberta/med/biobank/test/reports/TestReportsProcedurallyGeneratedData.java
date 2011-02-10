@@ -246,7 +246,7 @@ public final class TestReportsProcedurallyGeneratedData implements
                 ContactWrapper contact = contacts.get(contactsAdded
                     % contacts.size());
 
-                study.addContacts(Arrays.asList(contact));
+                study.addToContactCollection(Arrays.asList(contact));
 
                 contactsAdded++;
             }

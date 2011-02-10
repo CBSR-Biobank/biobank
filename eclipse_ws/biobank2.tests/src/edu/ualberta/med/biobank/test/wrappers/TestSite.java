@@ -617,11 +617,11 @@ public class TestSite extends TestDatabase {
             + "CONTACT2");
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.addToContactCollection(Arrays.asList(contact1, contact2));
         study1.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addContacts(Arrays.asList(contact2));
+        study2.addToContactCollection(Arrays.asList(contact2));
         study2.persist();
 
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
@@ -664,11 +664,11 @@ public class TestSite extends TestDatabase {
             + "CONTACT2");
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.addToContactCollection(Arrays.asList(contact1, contact2));
         study1.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addContacts(Arrays.asList(contact2));
+        study2.addToContactCollection(Arrays.asList(contact2));
         study2.persist();
 
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
@@ -711,11 +711,11 @@ public class TestSite extends TestDatabase {
             + "CONTACT2");
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.addToContactCollection(Arrays.asList(contact1, contact2));
         study1.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addContacts(Arrays.asList(contact2));
+        study2.addToContactCollection(Arrays.asList(contact2));
         study2.persist();
 
         PatientWrapper patient1 = PatientHelper.addPatient(name, study1);
@@ -771,11 +771,11 @@ public class TestSite extends TestDatabase {
             + "CONTACT2");
 
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
-        study1.addContacts(Arrays.asList(contact1, contact2));
+        study1.addToContactCollection(Arrays.asList(contact1, contact2));
         study1.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addContacts(Arrays.asList(contact2));
+        study2.addToContactCollection(Arrays.asList(contact2));
         study2.persist();
 
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper

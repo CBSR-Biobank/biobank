@@ -51,7 +51,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                 if (contact != null) {
                     List<ContactWrapper> dummyList = new ArrayList<ContactWrapper>();
                     dummyList.add(contact);
-                    study.addContacts(dummyList);
+                    study.addToContactCollection(dummyList);
                     setCollection(study.getContactCollection(true));
                 }
             }
@@ -81,7 +81,7 @@ public class ClinicAddInfoTable extends StudyContactEntryInfoTable {
                         return;
                     }
 
-                    study.removeContacts(Arrays.asList(contact));
+                    study.removeFromContactCollection(Arrays.asList(contact));
                     setCollection(study.getContactCollection(true));
                     notifyListeners();
                 }
