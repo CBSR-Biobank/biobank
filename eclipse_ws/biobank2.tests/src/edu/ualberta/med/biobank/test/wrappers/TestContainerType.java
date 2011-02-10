@@ -56,7 +56,7 @@ public class TestContainerType extends TestDatabase {
 
     // the methods to skip in the getters and setters test
     private static final List<String> GETTER_SKIP_METHODS = Arrays.asList(
-        "getChildLabelingScheme", "getChildLabelingSchemeName",
+        "getChildLabelingSchemeId", "getChildLabelingSchemeName",
         "getRowCapacity", "getColCapacity");
 
     @Override
@@ -144,7 +144,7 @@ public class TestContainerType extends TestDatabase {
             site, "Bogus Top Container Type", "BTCT", 2, 1, 1, true);
 
         for (ContainerLabelingSchemeWrapper schemeWrapper : schemeWrappers) {
-            cTWrapper.setChildLabelingScheme(schemeWrapper.getId());
+            cTWrapper.setChildLabelingSchemeById(schemeWrapper.getId());
 
             maxRows = schemeWrapper.getMaxRows();
             maxCols = schemeWrapper.getMaxCols();
@@ -351,25 +351,24 @@ public class TestContainerType extends TestDatabase {
 
     @Test
     public void testChangeLabelingScheme() throws Exception {
-        ContainerTypeWrapper topType, topType2;
 
         // test null labeling scheme
-        topType2 = ContainerTypeHelper.newContainerType(site,
-            "Top Container Type 2", "TCT2", null, null, null, true);
-
         try {
-            topType2.persist();
+            ContainerTypeHelper.newContainerType(site, "Top Container Type 2",
+                "TCT2", null, null, null, true);
             Assert
                 .fail("should not be allowed to add container with null capacity");
-        } catch (ValueNotSetException e) {
+        } catch (ApplicationException e) {
             Assert.assertTrue(true);
         }
+
+        ContainerTypeWrapper topType;
 
         // test changing labeling scheme
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         ContainerHelper.addContainer(String.valueOf(r.nextInt()),
             TestCommon.getNewBarcode(r), null, site, topType);
-        topType.setChildLabelingScheme(3);
+        topType.setChildLabelingSchemeById(3);
 
         try {
             topType.persist();
@@ -675,7 +674,7 @@ public class TestContainerType extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic("clinicname");
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
             site, patient, Utils.getRandomDate(), Utils.getRandomDate());
@@ -952,33 +951,29 @@ public class TestContainerType extends TestDatabase {
 
     @Test
     public void testGetChildLabelingSchemeName() throws Exception {
-        ContainerTypeWrapper topType, topType2, childTypeL1, childTypeL2, childTypeL3;
-
-        // its important that topType2 is not saved to the database
-        topType2 = ContainerTypeHelper.newContainerType(site,
-            "Top Container Type 2", "TCT2", null, CONTAINER_TOP_ROWS,
-            CONTAINER_TOP_COLS, true);
-        Assert.assertEquals(null, topType2.getChildLabelingScheme());
-        Assert.assertEquals(null, topType2.getChildLabelingSchemeName());
+        ContainerTypeWrapper topType, childTypeL1, childTypeL2, childTypeL3;
 
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         childTypeL1 = containerTypeMap.get("ChildCtL1");
         childTypeL2 = containerTypeMap.get("ChildCtL2");
         childTypeL3 = containerTypeMap.get("ChildCtL3");
 
-        Assert.assertEquals(2, topType.getChildLabelingScheme().intValue());
+        Assert.assertEquals(2, topType.getChildLabelingSchemeId().intValue());
         Assert.assertTrue(topType.getChildLabelingSchemeName().equals(
             "CBSR 2 char alphabetic"));
 
-        Assert.assertEquals(3, childTypeL1.getChildLabelingScheme().intValue());
+        Assert.assertEquals(3, childTypeL1.getChildLabelingSchemeId()
+            .intValue());
         Assert.assertTrue(childTypeL1.getChildLabelingSchemeName().equals(
             "2 char numeric"));
 
-        Assert.assertEquals(3, childTypeL2.getChildLabelingScheme().intValue());
+        Assert.assertEquals(3, childTypeL2.getChildLabelingSchemeId()
+            .intValue());
         Assert.assertTrue(childTypeL2.getChildLabelingSchemeName().equals(
             "2 char numeric"));
 
-        Assert.assertEquals(1, childTypeL3.getChildLabelingScheme().intValue());
+        Assert.assertEquals(1, childTypeL3.getChildLabelingSchemeId()
+            .intValue());
         Assert.assertTrue(childTypeL3.getChildLabelingSchemeName().equals(
             "SBS Standard"));
     }

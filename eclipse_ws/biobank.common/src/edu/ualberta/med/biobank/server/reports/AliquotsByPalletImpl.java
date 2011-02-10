@@ -51,7 +51,7 @@ public class AliquotsByPalletImpl extends AbstractReport {
                 inventoryId, pnumber, stName });
         }
         if (parent != null
-            && parent.getContainerType().getChildLabelingScheme() != 1)
+            && parent.getContainerType().getChildLabelingSchemeId() != 1)
             ;
         else {
             // sort by location as an integer

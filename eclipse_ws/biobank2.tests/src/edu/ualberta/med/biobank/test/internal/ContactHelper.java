@@ -37,7 +37,7 @@ public class ContactHelper extends DbHelper {
                 .getContactCollection());
             contacts.add(contact);
         }
-        study.addContacts(contacts);
+        study.addToContactCollection(contacts);
         study.persist();
         return nber;
     }

@@ -26,6 +26,21 @@ public class ConfigClinics {
         site.reload();
     }
 
+    /**
+     * Adds a new clinic.
+     * 
+     * @param name Clinic name.
+     * @param nameShort Clinic short name
+     * @param activityStatusName Initial activity status.
+     * @param comment Any comments to add.
+     * @param street1 Street address.
+     * @param street2 Street address (cont).
+     * @param city The city the clinic is in.
+     * @param province The province the clinic is in.
+     * @param postalCode The postal code for the clinics mailing address.
+     * @return
+     * @throws Exception
+     */
     protected ClinicWrapper addClinic(String name, String nameShort,
         String activityStatusName, String comment, String street1,
         String street2, String city, String province, String postalCode)

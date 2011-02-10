@@ -38,7 +38,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
         store.setDefault(
             PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER_PASSWORD, "catissue");
 
-        store.setDefault(PreferenceConstants.SERVER_LIST,
-            "cbsr.med.ualberta.ca\n10.8.31.50\naicml-med.cs.ualberta.ca");
+        store
+            .setDefault(
+                PreferenceConstants.SERVER_LIST,
+                "cbsr.med.ualberta.ca\n10.8.31.50\ncbsr-training.med.ualberta.ca\n10.8.31.51\naicml-med.cs.ualberta.ca");
     }
 }

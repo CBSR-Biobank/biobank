@@ -13,6 +13,7 @@ import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
+import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -342,6 +343,12 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         return DispatchState.CLOSED.equals(getState());
     }
 
+    private static final String DISPATCHES_IN_SITE_QRY = "from "
+        + Dispatch.class.getName() + " where ("
+        + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID) + "=? or "
+        + Property.concatNames(DispatchPeer.RECEIVER, SitePeer.ID) + "=?) and "
+        + DispatchPeer.WAYBILL.getName() + "=?";
+
     /**
      * Search for shipments with the given waybill. Site can be the sender or
      * the receiver.
@@ -349,9 +356,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     public static List<DispatchWrapper> getShipmentsInSite(
         WritableApplicationService appService, String waybill, SiteWrapper site)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Dispatch.class.getName()
-            + " where (sender.id = ? or receiver.id = ?) and waybill = ?",
+        HQLCriteria criteria = new HQLCriteria(DISPATCHES_IN_SITE_QRY,
             Arrays.asList(new Object[] { site.getId(), site.getId(), waybill }));
         List<Dispatch> shipments = appService.query(criteria);
         List<DispatchWrapper> wrappers = new ArrayList<DispatchWrapper>();
@@ -360,6 +365,13 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         }
         return wrappers;
     }
+
+    private static final String DISPATCHES_IN_SITE_BY_DATE_SENT_QRY = "from "
+        + Dispatch.class.getName() + " where ("
+        + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID) + "=? or "
+        + Property.concatNames(DispatchPeer.RECEIVER, SitePeer.ID) + "=?) and "
+        + DispatchPeer.DEPARTED.getName() + " >=? and "
+        + DispatchPeer.DEPARTED.getName() + " <= ?";
 
     /**
      * Search for shipments with the given date sent. Don't use hour and minute.
@@ -393,6 +405,17 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         return wrappers;
     }
 
+    private static final String DISPATCHES_IN_SITE_BY_DATE_RECEIVED_QRY = "from "
+        + Dispatch.class.getName()
+        + " where ("
+        + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID)
+        + "=? or "
+        + Property.concatNames(DispatchPeer.RECEIVER, SitePeer.ID)
+        + "=?) and "
+        + DispatchPeer.DATE_RECEIVED.getName()
+        + " >=? and "
+        + DispatchPeer.DATE_RECEIVED.getName() + " <= ?";
+
     /**
      * Search for shipments with the given date received. Don't use hour and
      * minute. Site can be the sender or the receiver.
@@ -412,9 +435,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
         HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Dispatch.class.getName()
-                + " where (sender.id = ? or receiver.id = ?) and dateReceived >= ? and dateReceived <= ?",
+            DISPATCHES_IN_SITE_BY_DATE_RECEIVED_QRY,
             Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
                 endDate }));
         List<Dispatch> shipments = appService.query(criteria);

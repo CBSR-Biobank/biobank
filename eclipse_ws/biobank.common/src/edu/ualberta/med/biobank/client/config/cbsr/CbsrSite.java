@@ -11,7 +11,7 @@ public class CbsrSite extends ConfigSite {
 
     public static SiteWrapper addSite(WritableApplicationService appService)
         throws Exception {
-        getSampleTypeMap(appService);
+        populateSampleTypeMap(appService);
         site = new SiteWrapper(appService);
         site.setName("Canadian BioSample Repository");
         site.setNameShort("CBSR");

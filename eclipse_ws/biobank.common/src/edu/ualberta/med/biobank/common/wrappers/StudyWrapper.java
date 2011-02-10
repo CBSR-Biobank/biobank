@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Contact;
@@ -33,7 +34,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class StudyWrapper extends ModelWrapper<Study> {
+public class StudyWrapper extends StudyBaseWrapper {
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
@@ -52,55 +53,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
         super(appService);
     }
 
-    public String getName() {
-        return getProperty(StudyPeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(StudyPeer.NAME, name);
-    }
-
-    public String getNameShort() {
-        return getProperty(StudyPeer.NAME_SHORT);
-    }
-
-    public void setNameShort(String nameShort) {
-        setProperty(StudyPeer.NAME_SHORT, nameShort);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(StudyPeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(StudyPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public ResearchGroupWrapper getResearchGroup() {
-        return getWrappedProperty(StudyPeer.RESEARCH_GROUP,
-            ResearchGroupWrapper.class);
-    }
-
-    public void setResearchGroup(ResearchGroupWrapper researchGroup) {
-        setWrappedProperty(StudyPeer.RESEARCH_GROUP, researchGroup);
-    }
-
-    public String getComment() {
-        return getProperty(StudyPeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(StudyPeer.COMMENT, comment);
-    }
-
-    public List<SiteWrapper> getSiteCollection(boolean sort) {
-        return getWrapperCollection(StudyPeer.SITE_COLLECTION,
-            SiteWrapper.class, sort);
-    }
-
     public List<SiteWrapper> getSiteCollection() {
-        return getSiteCollection(false);
+        return getSiteCollection(true);
     }
 
     @Override
@@ -116,55 +70,29 @@ public class StudyWrapper extends ModelWrapper<Study> {
         return StudyPeer.PROP_NAMES;
     }
 
-    @Override
-    public Class<Study> getWrappedClass() {
-        return Study.class;
-    }
-
-    public List<ContactWrapper> getContactCollection(boolean sort) {
-        return getWrapperCollection(StudyPeer.CONTACT_COLLECTION,
-            ContactWrapper.class, sort);
-    }
-
     public List<ContactWrapper> getContactCollection() {
-        return getContactCollection(false);
-    }
-
-    public void setContactCollection(List<ContactWrapper> allContactWrappers) {
-        setWrapperCollection(StudyPeer.CONTACT_COLLECTION, allContactWrappers);
-    }
-
-    public void addContacts(List<ContactWrapper> newContacts) {
-        addToWrapperCollection(StudyPeer.CONTACT_COLLECTION, newContacts);
-    }
-
-    public void removeContacts(List<ContactWrapper> contactsToRemove) {
-        removeFromWrapperCollection(StudyPeer.CONTACT_COLLECTION,
-            contactsToRemove);
-    }
-
-    public List<SampleStorageWrapper> getSampleStorageCollection(boolean sort) {
-        return getWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION,
-            SampleStorageWrapper.class, sort);
+        return getContactCollection(true);
     }
 
     public List<SampleStorageWrapper> getSampleStorageCollection() {
-        return getSampleStorageCollection(false);
+        return getSampleStorageCollection(true);
     }
 
-    public void addSampleStorage(List<SampleStorageWrapper> newSampleStorages) {
-        addToWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION,
-            newSampleStorages);
+    @Override
+    public void addToSampleStorageCollection(
+        List<SampleStorageWrapper> sampleStorageCollection) {
+        super.addToSampleStorageCollection(sampleStorageCollection);
+
+        // make sure previously deleted ones, that have been re-added, are
+        // no longer deleted
+        deletedSampleStorages.removeAll(sampleStorageCollection);
     }
 
-    public void removeSampleStorages(
+    @Override
+    public void removeFromSampleStorageCollection(
         List<SampleStorageWrapper> sampleStoragesToRemove) {
-        removeFromWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION,
-            sampleStoragesToRemove);
-    }
-
-    public void setSampleStorages(List<SampleStorageWrapper> allSsWrappers) {
-        setWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION, allSsWrappers);
+        deletedSampleStorages.addAll(sampleStoragesToRemove);
+        super.removeFromSampleStorageCollection(sampleStoragesToRemove);
     }
 
     /*
@@ -202,59 +130,25 @@ public class StudyWrapper extends ModelWrapper<Study> {
         }
     }
 
-    public List<StudySourceVesselWrapper> getStudySourceVesselCollection(
-        boolean sort) {
-        return getWrapperCollection(StudyPeer.STUDY_SOURCE_VESSEL_COLLECTION,
-            StudySourceVesselWrapper.class, sort);
-    }
-
     public List<StudySourceVesselWrapper> getStudySourceVesselCollection() {
         return getStudySourceVesselCollection(false);
     }
 
-    private void setStudySourceVessels(
-        List<StudySourceVesselWrapper> allSsWrappers) {
-        setWrapperCollection(StudyPeer.STUDY_SOURCE_VESSEL_COLLECTION,
-            allSsWrappers);
-    }
-
-    public void addStudySourceVessels(
+    @Override
+    public void addToStudySourceVesselCollection(
         List<StudySourceVesselWrapper> newStudySourceVessels) {
-        if (newStudySourceVessels != null && newStudySourceVessels.size() > 0) {
-            List<StudySourceVesselWrapper> allSsWrappers = new ArrayList<StudySourceVesselWrapper>();
-            // already in list
-            List<StudySourceVesselWrapper> currentList = getStudySourceVesselCollection();
-            if (currentList != null) {
-                for (StudySourceVesselWrapper ss : currentList) {
-                    allSsWrappers.add(ss);
-                }
-            }
-            // new
-            for (StudySourceVesselWrapper ss : newStudySourceVessels) {
-                allSsWrappers.add(ss);
-                deletedStudySourceVessels.remove(ss);
-            }
-            setStudySourceVessels(allSsWrappers);
-        }
+        super.addToStudySourceVesselCollection(newStudySourceVessels);
+
+        // make sure previously deleted ones, that have been re-added, are
+        // no longer deleted
+        deletedStudySourceVessels.removeAll(newStudySourceVessels);
     }
 
-    public void removeStudySourceVessels(
+    @Override
+    public void removeFromStudySourceVesselCollection(
         List<StudySourceVesselWrapper> studySourceVesselsToDelete) {
-        if (studySourceVesselsToDelete != null
-            && studySourceVesselsToDelete.size() > 0) {
-            deletedStudySourceVessels.addAll(studySourceVesselsToDelete);
-            List<StudySourceVesselWrapper> allSsWrappers = new ArrayList<StudySourceVesselWrapper>();
-            // already in list
-            List<StudySourceVesselWrapper> currentList = getStudySourceVesselCollection();
-            if (currentList != null) {
-                for (StudySourceVesselWrapper ss : currentList) {
-                    if (!deletedStudySourceVessels.contains(ss)) {
-                        allSsWrappers.add(ss);
-                    }
-                }
-            }
-            setStudySourceVessels(allSsWrappers);
-        }
+        deletedStudySourceVessels.addAll(studySourceVesselsToDelete);
+        super.removeFromStudySourceVesselCollection(studySourceVesselsToDelete);
     }
 
     protected Collection<StudyPvAttrWrapper> getStudyPvAttrCollection() {
@@ -271,8 +165,10 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
         studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
 
-        for (StudyPvAttrWrapper studyPvAttr : StudyPvAttrWrapper
-            .getStudyPvAttrCollection(this)) {
+        List<StudyPvAttrWrapper> pvAttrList = StudyPvAttrWrapper
+            .getStudyPvAttrCollection(this);
+
+        for (StudyPvAttrWrapper studyPvAttr : pvAttrList) {
             studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
         }
         return studyPvAttrMap;
@@ -358,8 +254,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
             if ((studyPvAttr != null) && (permissibleValues == null)) {
                 deleteStudyPvAttr(label);
-                // studyPvAttr.delete();
-                // studyPvAttrMap.remove(label);
                 return;
             }
         }
@@ -371,8 +265,8 @@ public class StudyWrapper extends ModelWrapper<Study> {
             studyPvAttr.setPvAttrType(pvAttrType);
             studyPvAttr.setStudy(this);
         }
-        deletedStudyPvAttr.remove(studyPvAttr);
 
+        deletedStudyPvAttr.remove(studyPvAttr);
         studyPvAttr.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
         studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
@@ -428,6 +322,7 @@ public class StudyWrapper extends ModelWrapper<Study> {
     }
 
     public List<ClinicWrapper> getClinicCollection() {
+        // FIXME: is it faster to do an HQL query here?
         List<ContactWrapper> contacts = getContactCollection();
         List<ClinicWrapper> clinicWrappers = new ArrayList<ClinicWrapper>();
         if (contacts != null)
@@ -444,11 +339,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
                 if (c.getNameShort().equals(clinicNameShort))
                     return true;
         return false;
-    }
-
-    public List<PatientWrapper> getPatientCollection(boolean sort) {
-        return getWrapperCollection(StudyPeer.PATIENT_COLLECTION,
-            PatientWrapper.class, sort);
     }
 
     public List<PatientWrapper> getPatientCollection() {
@@ -521,14 +411,6 @@ public class StudyWrapper extends ModelWrapper<Study> {
             return 0;
         }
         return list.size();
-    }
-
-    public void setPatientCollection(List<PatientWrapper> allPatientWrappers) {
-        setWrapperCollection(StudyPeer.PATIENT_COLLECTION, allPatientWrappers);
-    }
-
-    public void addPatients(List<PatientWrapper> newPatients) {
-        addToWrapperCollection(StudyPeer.PATIENT_COLLECTION, newPatients);
     }
 
     @Override
@@ -680,10 +562,9 @@ public class StudyWrapper extends ModelWrapper<Study> {
 
     public static List<StudyWrapper> getAllStudies(
         WritableApplicationService appService) throws ApplicationException {
-        List<Study> studies = new ArrayList<Study>();
         List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
         HQLCriteria c = new HQLCriteria(ALL_STUDIES_QRY);
-        studies = appService.query(c);
+        List<Study> studies = appService.query(c);
         for (Study study : studies)
             wrappers.add(new StudyWrapper(appService, study));
         return wrappers;

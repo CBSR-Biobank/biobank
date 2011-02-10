@@ -260,15 +260,15 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        study.addStudySourceVessels(studySourceVesselEntryTable
+        study.addToStudySourceVesselCollection(studySourceVesselEntryTable
             .getAddedOrModifiedStudySourceVessels());
-        study.removeStudySourceVessels(studySourceVesselEntryTable
+        study.removeFromStudySourceVesselCollection(studySourceVesselEntryTable
             .getDeletedStudySourceVessels());
 
         // sample storage
-        study.addSampleStorage(sampleStorageEntryTable
+        study.addToSampleStorageCollection(sampleStorageEntryTable
             .getAddedOrModifiedSampleStorages());
-        study.removeSampleStorages(sampleStorageEntryTable
+        study.removeFromSampleStorageCollection(sampleStorageEntryTable
             .getDeletedSampleStorages());
         study.persist();
 

@@ -87,7 +87,7 @@ public class TestAliquot extends TestDatabase {
             + r.nextInt());
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
 
         site.addStudies(Arrays.asList(study));

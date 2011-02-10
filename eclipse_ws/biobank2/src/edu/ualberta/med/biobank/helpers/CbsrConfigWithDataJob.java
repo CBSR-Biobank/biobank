@@ -79,7 +79,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
                 studyPatients.add(patient);
                 ++patientCount;
             }
-            study.addPatients(studyPatients);
+            study.addToPatientCollection(studyPatients);
             study.persist();
             study.reload();
         }

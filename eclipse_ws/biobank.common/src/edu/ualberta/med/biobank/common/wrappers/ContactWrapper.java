@@ -1,15 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
-import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -26,122 +22,76 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     public String getName() {
-        return wrappedObject.getName();
+        return getProperty(ContactPeer.NAME);
     }
 
     public void setName(String name) {
-        String oldName = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
+        setProperty(ContactPeer.NAME, name);
     }
 
     public String getTitle() {
-        return wrappedObject.getTitle();
+        return getProperty(ContactPeer.TITLE);
     }
 
     public void setTitle(String title) {
-        String oldTitle = getTitle();
-        wrappedObject.setTitle(title);
-        propertyChangeSupport.firePropertyChange("title", oldTitle, title);
+        setProperty(ContactPeer.TITLE, title);
     }
 
     public String getMobileNumber() {
-        return wrappedObject.getMobileNumber();
+        return getProperty(ContactPeer.MOBILE_NUMBER);
     }
 
     public void setMobileNumber(String mobileNumber) {
-        String oldMobileNumber = getMobileNumber();
-        wrappedObject.setMobileNumber(mobileNumber);
-        propertyChangeSupport.firePropertyChange("mobileNumber",
-            oldMobileNumber, mobileNumber);
+        setProperty(ContactPeer.MOBILE_NUMBER, mobileNumber);
     }
 
     public String getPagerNumber() {
-        return wrappedObject.getPagerNumber();
+        return getProperty(ContactPeer.PAGER_NUMBER);
     }
 
     public void setPagerNumber(String pagerNumber) {
-        String oldPagerNumber = getPagerNumber();
-        wrappedObject.setPagerNumber(pagerNumber);
-        propertyChangeSupport.firePropertyChange("pagerNumber", oldPagerNumber,
-            pagerNumber);
+        setProperty(ContactPeer.PAGER_NUMBER, pagerNumber);
     }
 
     public String getOfficeNumber() {
-        return wrappedObject.getOfficeNumber();
+        return getProperty(ContactPeer.OFFICE_NUMBER);
     }
 
     public void setOfficeNumber(String officeNumber) {
-        String oldOfficeNumber = getOfficeNumber();
-        wrappedObject.setOfficeNumber(officeNumber);
-        propertyChangeSupport.firePropertyChange("officeNumber",
-            oldOfficeNumber, officeNumber);
+        setProperty(ContactPeer.OFFICE_NUMBER, officeNumber);
     }
 
     public String getFaxNumber() {
-        return wrappedObject.getFaxNumber();
+        return getProperty(ContactPeer.FAX_NUMBER);
     }
 
     public void setFaxNumber(String faxNumber) {
-        String oldFaxNumber = getFaxNumber();
-        wrappedObject.setFaxNumber(faxNumber);
-        propertyChangeSupport.firePropertyChange("faxNumber", oldFaxNumber,
-            faxNumber);
+        setProperty(ContactPeer.FAX_NUMBER, faxNumber);
     }
 
     public String getEmailAddress() {
-        return wrappedObject.getEmailAddress();
+        return getProperty(ContactPeer.EMAIL_ADDRESS);
     }
 
     public void setEmailAddress(String emailAddress) {
-        String oldEmailAddress = getEmailAddress();
-        wrappedObject.setEmailAddress(emailAddress);
-        propertyChangeSupport.firePropertyChange("emailAddress",
-            oldEmailAddress, emailAddress);
+        setProperty(ContactPeer.EMAIL_ADDRESS, emailAddress);
     }
 
     public ClinicWrapper getClinic() {
-        ClinicWrapper clinic = (ClinicWrapper) propertiesMap.get("clinic");
-        if (clinic == null) {
-            Clinic c = wrappedObject.getClinic();
-            if (c == null)
-                return null;
-            clinic = new ClinicWrapper(appService, c);
-            propertiesMap.put("clinic", clinic);
-        }
-        return clinic;
+        return getWrappedProperty(ContactPeer.CLINIC, ClinicWrapper.class);
     }
 
     public void setClinic(ClinicWrapper clinic) {
-        propertiesMap.put("clinic", clinic);
-        Clinic oldClinic = wrappedObject.getClinic();
-        Clinic newClinic = clinic.getWrappedObject();
-        wrappedObject.setClinic(newClinic);
-        propertyChangeSupport
-            .firePropertyChange("clinic", oldClinic, newClinic);
+        setWrappedProperty(ContactPeer.CLINIC, clinic);
     }
 
     /**
      * Get the studyCollection. Use Study.setContactCollection to link study and
      * contact
      */
-    @SuppressWarnings("unchecked")
     public List<StudyWrapper> getStudyCollection(boolean sort) {
-        List<StudyWrapper> clinicCollection = (List<StudyWrapper>) propertiesMap
-            .get("studyCollection");
-        if (clinicCollection == null) {
-            Collection<Study> children = wrappedObject.getStudyCollection();
-            if (children != null) {
-                clinicCollection = new ArrayList<StudyWrapper>();
-                for (Study study : children) {
-                    clinicCollection.add(new StudyWrapper(appService, study));
-                }
-                propertiesMap.put("studyCollection", clinicCollection);
-            }
-        }
-        if ((clinicCollection != null) && sort)
-            Collections.sort(clinicCollection);
-        return clinicCollection;
+        return getWrapperCollection(ContactPeer.STUDY_COLLECTION,
+            StudyWrapper.class, sort);
     }
 
     public List<StudyWrapper> getStudyCollection() {
@@ -194,10 +144,9 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     public static List<ContactWrapper> getAllContacts(
         WritableApplicationService appService) throws ApplicationException {
-        List<Contact> contacts = new ArrayList<Contact>();
         List<ContactWrapper> wrappers = new ArrayList<ContactWrapper>();
         HQLCriteria c = new HQLCriteria(ALL_CONTACTS_QRY);
-        contacts = appService.query(c);
+        List<Contact> contacts = appService.query(c);
         for (Contact contact : contacts) {
             wrappers.add(new ContactWrapper(appService, contact));
         }

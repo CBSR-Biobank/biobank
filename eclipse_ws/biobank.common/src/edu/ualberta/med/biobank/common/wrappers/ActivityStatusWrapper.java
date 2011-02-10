@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -53,7 +54,11 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     public String getName() {
-        return wrappedObject.getName();
+        return getProperty(ActivityStatusPeer.NAME);
+    }
+
+    public void setName(String name) {
+        setProperty(ActivityStatusPeer.NAME, name);
     }
 
     @Override
@@ -87,7 +92,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
         return usedCount > 0;
     }
-
     @Override
     public Class<ActivityStatus> getWrappedClass() {
         return ActivityStatus.class;
@@ -122,6 +126,7 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         }
         return 0;
     }
+
 
     private static final String ALL_ACTIVITY_STATUSES_QRY = "from "
         + ActivityStatus.class.getName();
@@ -158,7 +163,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         } else if (result.size() == 0) {
             throw new BiobankCheckException("activity status \"" + name
                 + "\" does not exist");
-
         } else if (result.size() > 1) {
             throw new BiobankCheckException(" Too many instances of \"" + name
                 + "\"");
@@ -196,19 +200,13 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         }
     }
 
-    public void setName(String name) {
-        String old = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", old, name);
-    }
-
     /**
      * return true if this Activity status name is "Active". Facility method to
      * avoid using "Active" string everywhere
      */
     public boolean isActive() {
         String name = getName();
-        return name != null && name.equals(ACTIVE_STATUS_STRING);
+        return ((name != null) && name.equals(ACTIVE_STATUS_STRING));
     }
 
     public boolean isClosed() {

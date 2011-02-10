@@ -32,7 +32,7 @@ public class EntityWrapper extends ModelWrapper<Entity> {
     }
 
     public String getClassName() {
-        return wrappedObject.getClassName();
+        return getProperty(EntityPeer.CLASS_NAME);
     }
 
     public Collection<EntityProperty> getEntityPropertyCollection() {

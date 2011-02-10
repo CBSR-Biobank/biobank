@@ -28,7 +28,7 @@ public class TestContact extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         contact.reload();
 
@@ -44,9 +44,9 @@ public class TestContact extends TestDatabase {
         StudyWrapper study2 = StudyHelper.addStudy("ASDFG" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
-        study2.addContacts(Arrays.asList(contact));
+        study2.addToContactCollection(Arrays.asList(contact));
         study2.persist();
         contact.reload();
 
@@ -140,7 +140,7 @@ public class TestContact extends TestDatabase {
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
         StudyWrapper study = StudyHelper.addStudy(name);
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         contact.reload();
 
@@ -151,7 +151,7 @@ public class TestContact extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        study.removeContacts(Arrays.asList(contact));
+        study.removeFromContactCollection(Arrays.asList(contact));
         study.persist();
         contact.reload();
         contact.delete();
