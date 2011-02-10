@@ -59,8 +59,12 @@ public class SiteWrapper extends CenterWrapper<Site> {
     }
 
     @Override
-    public Class<Site> getWrappedClass() {
-        return Site.class;
+    protected void persistDependencies(Site origObject) throws Exception {
+        for (DispatchInfoWrapper diw : removedDispatchInfoWrapper) {
+            if (!diw.isNew()) {
+                diw.delete();
+            }
+        }
     }
 
     @Override

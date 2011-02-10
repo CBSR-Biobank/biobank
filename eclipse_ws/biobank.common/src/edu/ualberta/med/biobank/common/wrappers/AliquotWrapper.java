@@ -28,7 +28,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class AliquotWrapper extends ModelWrapper<Aliquot> {
+public class AliquotWrapper extends AliquotBaseWrapper {
 
     private AbstractObjectWithPositionManagement<AliquotPosition, AliquotWrapper> objectWithPositionManagement;
 
@@ -70,16 +70,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return AliquotPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<Aliquot> getWrappedClass() {
-        return Aliquot.class;
-    }
-
-    @Override
     public void persist() throws Exception {
         // check if position was deleted
         if (getPosition() == null) {
@@ -106,64 +96,14 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         objectWithPositionManagement.persistChecks();
     }
 
-    public String getInventoryId() {
-        return getProperty(AliquotPeer.INVENTORY_ID);
-    }
-
-    public void setInventoryId(String inventoryId) {
-        setProperty(AliquotPeer.INVENTORY_ID, inventoryId);
-    }
-
-    public SampleTypeWrapper getSampleType() {
-        return getWrappedProperty(AliquotPeer.SAMPLE_TYPE,
-            SampleTypeWrapper.class);
-    }
-
-    public void setSampleType(SampleTypeWrapper type) {
-        setWrappedProperty(AliquotPeer.SAMPLE_TYPE, type);
-    }
-
-    public Date getLinkDate() {
-        return getProperty(AliquotPeer.LINK_DATE);
-    }
-
-    public void setLinkDate(Date date) {
-        setProperty(AliquotPeer.LINK_DATE, date);
-    }
-
-    public String getFormattedLinkDate() {
-        return DateFormatter.formatAsDateTime(wrappedObject.getLinkDate());
-    }
-
-    public Double getQuantity() {
-        return getProperty(AliquotPeer.QUANTITY);
-    }
-
-    public void setQuantity(Double quantity) {
-        setProperty(AliquotPeer.QUANTITY, quantity);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(AliquotPeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(AliquotPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public String getComment() {
-        return getProperty(AliquotPeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(AliquotPeer.COMMENT, comment);
-    }
-
     public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Aliquot.class, AliquotPeer.INVENTORY_ID.getName(),
             getInventoryId(), "An aliquot with inventoryId");
+    }
+
+    public String getFormattedLinkDate() {
+        return DateFormatter.formatAsDateTime(wrappedObject.getLinkDate());
     }
 
     public ContainerWrapper getParent() {
