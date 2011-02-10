@@ -1,13 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.peer.DispatchAliquotPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.DispatchAliquotBaseWrapper;
 import edu.ualberta.med.biobank.model.DispatchAliquot;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class DispatchAliquotWrapper extends
-    DispatchItemWrapper<DispatchAliquot> {
+public class DispatchAliquotWrapper extends DispatchAliquotBaseWrapper {
 
     public DispatchAliquotWrapper(WritableApplicationService appService) {
         super(appService);
@@ -16,36 +13,6 @@ public class DispatchAliquotWrapper extends
     public DispatchAliquotWrapper(WritableApplicationService appService,
         DispatchAliquot dispatchAliquot) {
         super(appService, dispatchAliquot);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return DispatchAliquotPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<DispatchAliquot> getWrappedClass() {
-        return DispatchAliquot.class;
-    }
-
-    public AliquotWrapper getAliquot() {
-        return getWrappedProperty(DispatchAliquotPeer.ALIQUOT,
-            AliquotWrapper.class);
-    }
-
-    public void setAliquot(AliquotWrapper aliquot) {
-        setWrappedProperty(DispatchAliquotPeer.ALIQUOT, aliquot);
-    }
-
-    @Override
-    public DispatchWrapper getDispatch() {
-        return getWrappedProperty(DispatchAliquotPeer.DISPATCH,
-            DispatchWrapper.class);
-    }
-
-    @Override
-    public void setDispatch(DispatchWrapper dispatch) {
-        setWrappedProperty(DispatchAliquotPeer.DISPATCH, dispatch);
     }
 
     @Override

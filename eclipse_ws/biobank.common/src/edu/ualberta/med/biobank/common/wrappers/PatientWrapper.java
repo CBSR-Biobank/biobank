@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DateCompare;
+import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -24,7 +25,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PatientWrapper extends ModelWrapper<Patient> {
+public class PatientWrapper extends PatientBaseWrapper {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
@@ -34,33 +35,6 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         super(appService);
     }
 
-    public String getPnumber() {
-        return getProperty(PatientPeer.PNUMBER);
-    }
-
-    public void setPnumber(String number) {
-        setProperty(PatientPeer.PNUMBER, number);
-    }
-
-    public StudyWrapper getStudy() {
-        return getWrappedProperty(PatientPeer.STUDY, StudyWrapper.class);
-    }
-
-    public void setStudy(StudyWrapper study) {
-        setWrappedProperty(PatientPeer.STUDY, study);
-    }
-
-    /**
-     * When retrieve the values from the database, need to fire the
-     * modifications for the different objects contained in the wrapped object
-     * 
-     * @throws Exception
-     */
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return PatientPeer.PROP_NAMES;
-    }
-
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
@@ -68,28 +42,12 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             getPnumber(), "A patient with PNumber");
     }
 
-    public List<ProcessingEventWrapper> getProcessingEventCollection() {
-        return getProcessingEventCollection(false);
-    }
-
-    public List<ProcessingEventWrapper> getProcessingEventCollection(
-        boolean sort) {
-        return getWrapperCollection(PatientPeer.PROCESSING_EVENT_COLLECTION,
-            ProcessingEventWrapper.class, sort);
-    }
-
-    public void addProcessingEvents(
-        List<ProcessingEventWrapper> newProcessingEvents) {
-        addToWrapperCollection(PatientPeer.PROCESSING_EVENT_COLLECTION,
-            newProcessingEvents);
-    }
-
     /**
      * Search patient visits with the given date processed.
      */
     public List<ProcessingEventWrapper> getVisits(Date dateProcessed,
         Date dateDrawn) {
-        List<ProcessingEventWrapper> visits = getProcessingEventCollection();
+        List<ProcessingEventWrapper> visits = getProcessingEventCollection(false);
         List<ProcessingEventWrapper> result = new ArrayList<ProcessingEventWrapper>();
         if (visits != null)
             for (ProcessingEventWrapper visit : visits) {
@@ -147,13 +105,8 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     @Override
-    public Class<Patient> getWrappedClass() {
-        return Patient.class;
-    }
-
-    @Override
     protected void deleteDependencies() throws Exception {
-        List<ProcessingEventWrapper> visits = getProcessingEventCollection();
+        List<ProcessingEventWrapper> visits = getProcessingEventCollection(false);
         if (visits != null) {
             for (ProcessingEventWrapper visit : visits) {
                 visit.delete();
@@ -171,7 +124,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     }
 
     private void checkNoMoreProcessingEvents() throws BiobankCheckException {
-        List<ProcessingEventWrapper> pvs = getProcessingEventCollection();
+        List<ProcessingEventWrapper> pvs = getProcessingEventCollection(false);
         if (pvs != null && pvs.size() > 0) {
             throw new BiobankCheckException(
                 "Visits are still linked to this patient."
@@ -196,7 +149,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
             return results.get(0);
         }
         long total = 0;
-        List<ProcessingEventWrapper> pvs = getProcessingEventCollection();
+        List<ProcessingEventWrapper> pvs = getProcessingEventCollection(false);
         if (pvs != null)
             for (ProcessingEventWrapper pv : pvs)
                 total += pv.getAliquotsCount(false);
@@ -312,10 +265,10 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         patient2.reload();
         if (getStudy().equals(patient2.getStudy())) {
             List<SourceVesselWrapper> svs = patient2
-                .getSourceVesselCollection();
+                .getSourceVesselCollection(false);
             if (svs != null) {
-                patient2.removeSourceVessels(svs);
-                addSourceVessels(svs);
+                patient2.removeFromSourceVesselCollection(svs);
+                addToSourceVesselCollection(svs);
             }
             patient2.delete();
             persist();
@@ -332,26 +285,9 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         }
     }
 
-    private void addSourceVessels(List<SourceVesselWrapper> svs) {
-        addToWrapperCollection(PatientPeer.SOURCE_VESSEL_COLLECTION, svs);
-    }
-
-    private void removeSourceVessels(List<SourceVesselWrapper> svs) {
-        removeFromWrapperCollection(PatientPeer.SOURCE_VESSEL_COLLECTION, svs);
-    }
-
-    public List<SourceVesselWrapper> getSourceVesselCollection() {
-        return getWrapperCollection(PatientPeer.SOURCE_VESSEL_COLLECTION,
-            SourceVesselWrapper.class, false);
-    }
-
-    public void setSourceVesselCollection(List<SourceVesselWrapper> sources) {
-        setWrapperCollection(PatientPeer.SOURCE_VESSEL_COLLECTION, sources);
-    }
-
     public List<CollectionEventWrapper> getCollectionEventCollection() {
         Set<CollectionEventWrapper> collectionEvents = new HashSet<CollectionEventWrapper>();
-        List<SourceVesselWrapper> svs = getSourceVesselCollection();
+        List<SourceVesselWrapper> svs = getSourceVesselCollection(false);
         for (SourceVesselWrapper sv : svs)
             collectionEvents.add(sv.getCollectionEvent());
         return new ArrayList<CollectionEventWrapper>(collectionEvents);

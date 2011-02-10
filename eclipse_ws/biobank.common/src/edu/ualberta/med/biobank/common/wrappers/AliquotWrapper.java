@@ -172,7 +172,7 @@ public class AliquotWrapper extends AliquotBaseWrapper {
         } else {
             // dispatched aliquot?
             for (DispatchAliquotWrapper da : dsac) {
-                DispatchItemState state = da.getState();
+                DispatchItemState state = da.getDispatchItemState();
                 if (DispatchState.IN_TRANSIT
                     .equals(da.getDispatch().getState())
                     && DispatchItemState.NONE == state) {
@@ -291,7 +291,7 @@ public class AliquotWrapper extends AliquotBaseWrapper {
             StudyWrapper study = processingEvent.getPatient().getStudy();
             Double volume = null;
             Collection<SampleStorageWrapper> sampleStorageCollection = study
-                .getSampleStorageCollection();
+                .getSampleStorageCollection(false);
             if (sampleStorageCollection != null) {
                 for (SampleStorageWrapper ss : sampleStorageCollection) {
                     if (getSampleType().equals(getSampleType())) {

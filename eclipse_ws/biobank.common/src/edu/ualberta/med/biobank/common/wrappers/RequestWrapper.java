@@ -4,19 +4,17 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
-import edu.ualberta.med.biobank.common.util.RequestState;
+import edu.ualberta.med.biobank.common.wrappers.base.RequestBaseWrapper;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestAliquot;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class RequestWrapper extends ModelWrapper<Request> {
+public class RequestWrapper extends RequestBaseWrapper {
 
     private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedRequestAliquotCollection";
 
@@ -30,92 +28,6 @@ public class RequestWrapper extends ModelWrapper<Request> {
 
     public RequestWrapper(WritableApplicationService appService, Request request) {
         super(appService, request);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return RequestPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<Request> getWrappedClass() {
-        return Request.class;
-    }
-
-    public StudyWrapper getStudy() {
-        return getWrappedProperty(RequestPeer.STUDY, StudyWrapper.class);
-    }
-
-    public void setStudy(StudyWrapper study) {
-        setWrappedProperty(RequestPeer.STUDY, study);
-    }
-
-    public Date getDateCreated() {
-        return getProperty(RequestPeer.CREATED);
-    }
-
-    public boolean isInLostState() {
-        return RequestState.LOST.isEquals(getState());
-    }
-
-    public boolean isInApprovedState() {
-        return RequestState.APPROVED.isEquals(getState());
-    }
-
-    public boolean isInShippedState() {
-        return RequestState.SHIPPED.isEquals(getState());
-    }
-
-    public boolean isInClosedState() {
-        return RequestState.CLOSED.isEquals(getState());
-    }
-
-    public void setInCloseState() {
-        setState(RequestState.CLOSED);
-    }
-
-    private void setState(RequestState state) {
-        setProperty(RequestPeer.STATE, state.getId());
-    }
-
-    public void setInLostState() {
-        setState(RequestState.LOST);
-    }
-
-    public void setInApprovedState() {
-        setState(RequestState.APPROVED);
-    }
-
-    public void setInShippedState() {
-        setState(RequestState.SHIPPED);
-    }
-
-    public Date getSubmitted() {
-        return getProperty(RequestPeer.SUBMITTED);
-    }
-
-    public void setSubmitted(Date submitted) {
-        setProperty(RequestPeer.SUBMITTED, submitted);
-    }
-
-    public Date getAccepted() {
-        return getProperty(RequestPeer.CREATED);
-    }
-
-    public Integer getState() {
-        return getProperty(RequestPeer.STATE);
-    }
-
-    public void setState(Integer state) {
-        setProperty(RequestPeer.STATE, state);
-    }
-
-    public CenterWrapper getRequester() {
-        return getWrappedProperty(RequestPeer.REQUESTER, CenterWrapper.class);
-    }
-
-    public void setRequester(CenterWrapper<?> center) {
-        setWrappedProperty(RequestPeer.REQUESTER, center);
     }
 
     public void receiveAliquots(List<AliquotWrapper> aliquots) throws Exception {
@@ -149,17 +61,6 @@ public class RequestWrapper extends ModelWrapper<Request> {
         throw new Exception("Aliquot " + text
             + " is not in the non-processed list.");
 
-    }
-
-    public List<RequestAliquotWrapper> getRequestAliquotCollection(boolean sort) {
-        return getWrapperCollection(RequestPeer.REQUEST_ALIQUOT_COLLECTION,
-            RequestAliquotWrapper.class, sort);
-    }
-
-    public void setRequestAliquotCollection(
-        List<RequestAliquotWrapper> allAliquotWrappers) {
-        setWrapperCollection(RequestPeer.REQUEST_ALIQUOT_COLLECTION,
-            allAliquotWrappers);
     }
 
     public List<RequestAliquotWrapper> getNonProcessedRequestAliquotCollection() {

@@ -66,19 +66,6 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return StudyPeer.PROP_NAMES;
-    }
-
-    public List<ContactWrapper> getContactCollection() {
-        return getContactCollection(true);
-    }
-
-    public List<SampleStorageWrapper> getSampleStorageCollection() {
-        return getSampleStorageCollection(true);
-    }
-
-    @Override
     public void addToSampleStorageCollection(
         List<SampleStorageWrapper> sampleStorageCollection) {
         super.addToSampleStorageCollection(sampleStorageCollection);
@@ -128,10 +115,6 @@ public class StudyWrapper extends StudyBaseWrapper {
                 st.delete();
             }
         }
-    }
-
-    public List<StudySourceVesselWrapper> getStudySourceVesselCollection() {
-        return getStudySourceVesselCollection(false);
     }
 
     @Override
@@ -323,7 +306,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public List<ClinicWrapper> getClinicCollection() {
         // FIXME: is it faster to do an HQL query here?
-        List<ContactWrapper> contacts = getContactCollection();
+        List<ContactWrapper> contacts = getContactCollection(false);
         List<ClinicWrapper> clinicWrappers = new ArrayList<ClinicWrapper>();
         if (contacts != null)
             for (ContactWrapper contact : contacts) {
@@ -444,7 +427,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         + "patients."
         + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
-    public long getPatientCountForCenter(CenterWrapper center)
+    public long getPatientCountForCenter(CenterWrapper<?> center)
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_SITE_QRY,
             Arrays.asList(new Object[] { center.getId(), getId() }));
@@ -470,7 +453,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         + "=? and site."
         + SitePeer.ID + "=?";
 
-    public long getProcessingEventCountForCenter(CenterWrapper site)
+    public long getProcessingEventCountForCenter(CenterWrapper<?> site)
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_SITE_QRY,
             Arrays.asList(new Object[] { site.getId(), getId() }));

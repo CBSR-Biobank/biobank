@@ -13,14 +13,13 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.peer.AddressPeer;
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
+import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
@@ -29,7 +28,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SiteWrapper extends CenterWrapper<Site> {
+public class SiteWrapper extends SiteBaseWrapper {
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
@@ -38,15 +37,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
 
     public SiteWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        // TODO: cache this?
-        List<String> names = new ArrayList<String>();
-        names.addAll(SitePeer.PROP_NAMES);
-        names.addAll(AddressPeer.PROP_NAMES);
-        return names;
     }
 
     @Override
@@ -59,23 +49,14 @@ public class SiteWrapper extends CenterWrapper<Site> {
     }
 
     @Override
-    protected void persistDependencies(Site origObject) throws Exception {
-        for (DispatchInfoWrapper diw : removedDispatchInfoWrapper) {
-            if (!diw.isNew()) {
-                diw.delete();
-            }
-        }
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if ((getContainerCollection() != null && getContainerCollection()
-            .size() > 0)
-            || (getContainerTypeCollection() != null && getContainerTypeCollection()
-                .size() > 0)
-            || (getCollectionEventCollection() != null && getCollectionEventCollection()
-                .size() > 0)) {
+        if ((getContainerCollection(false) != null && getContainerCollection(
+            false).size() > 0)
+            || (getContainerTypeCollection(false) != null && getContainerTypeCollection(
+                false).size() > 0)
+            || (getCollectionEventCollection(false) != null && getCollectionEventCollection(
+                false).size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
@@ -113,10 +94,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return getRequestCollection(RequestState.SHIPPED);
     }
 
-    public List<StudyWrapper> getStudyCollection() {
-        return getStudyCollection(true);
-    }
-
     public List<StudyWrapper> getStudiesNotAssoc() throws ApplicationException {
         List<StudyWrapper> studyWrappers = new ArrayList<StudyWrapper>();
         HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
@@ -126,14 +103,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
             studyWrappers.add(new StudyWrapper(appService, res));
         }
         return studyWrappers;
-    }
-
-    public List<ContainerTypeWrapper> getContainerTypeCollection() {
-        return getContainerTypeCollection(false);
-    }
-
-    public List<ContainerWrapper> getContainerCollection() {
-        return getContainerCollection(false);
     }
 
     @SuppressWarnings("unchecked")
@@ -157,14 +126,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
             propertiesMap.put("topContainerCollection", topContainerCollection);
         }
         return topContainerCollection;
-    }
-
-    public List<ContainerWrapper> getTopContainerCollection() throws Exception {
-        return getTopContainerCollection(false);
-    }
-
-    public void clearTopContainerCollection() {
-        propertiesMap.put("topContainerCollection", null);
     }
 
     @Override
@@ -244,22 +205,12 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return getName();
     }
 
-    public List<DispatchWrapper> getReceivedDispatchCollection() {
-        return getWrapperCollection(CenterPeer.DST_DISPATCH_COLLECTION,
-            DispatchWrapper.class, false);
-    }
-
-    public List<DispatchWrapper> getSentDispatchCollection() {
-        return getWrapperCollection(CenterPeer.SRC_DISPATCH_COLLECTION,
-            DispatchWrapper.class, false);
-    }
-
     @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getInTransitSentDispatchCollection() {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("inTransitSentDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getSentDispatchCollection();
+            List<DispatchWrapper> children = getSrcDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -279,7 +230,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("inTransitReceiveDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getReceivedDispatchCollection();
+            List<DispatchWrapper> children = getDstDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -299,7 +250,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("receivingDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getReceivedDispatchCollection();
+            List<DispatchWrapper> children = getDstDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -320,7 +271,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("receivingWithErrorsDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getReceivedDispatchCollection();
+            List<DispatchWrapper> children = getDstDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -341,7 +292,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("inCreationDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getSentDispatchCollection();
+            List<DispatchWrapper> children = getSrcDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -357,7 +308,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
     }
 
     public Set<ClinicWrapper> getWorkingClinicCollection() {
-        List<StudyWrapper> studies = getStudyCollection();
+        List<StudyWrapper> studies = getStudyCollection(false);
         Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
         for (StudyWrapper study : studies) {
             clinics.addAll(study.getClinicCollection());

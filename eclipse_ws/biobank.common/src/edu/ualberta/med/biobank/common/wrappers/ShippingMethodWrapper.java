@@ -8,13 +8,14 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.ShippingMethodBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
+public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
 
     public static final String DROP_OFF_NAME = "Drop-off";
     public static final String PICK_UP_NAME = "Pick-up";
@@ -39,16 +40,6 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return ShippingMethodPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<ShippingMethod> getWrappedClass() {
-        return ShippingMethod.class;
-    }
-
-    @Override
     public boolean equals(Object object) {
         if (object instanceof ShippingMethodWrapper)
             return ((ShippingMethodWrapper) object).getName().equals(
@@ -61,14 +52,6 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         checkUnique();
-    }
-
-    public String getName() {
-        return getProperty(ShippingMethodPeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(ShippingMethodPeer.NAME, name);
     }
 
     @Override

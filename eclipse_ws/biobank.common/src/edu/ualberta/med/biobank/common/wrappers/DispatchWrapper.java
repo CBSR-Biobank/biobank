@@ -17,12 +17,13 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
+public class DispatchWrapper extends DispatchBaseWrapper {
     private final Map<DispatchItemState, List<DispatchAliquotWrapper>> dispatchAliquotsMap = new HashMap<DispatchItemState, List<DispatchAliquotWrapper>>();
     private final Map<DispatchItemState, List<DispatchSourceVesselWrapper>> dispatchSourceVesselsMap = new HashMap<DispatchItemState, List<DispatchSourceVesselWrapper>>();
 
@@ -35,67 +36,12 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         super(appService, dispatch);
     }
 
-    @Override
-    public Class<Dispatch> getWrappedClass() {
-        return Dispatch.class;
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return DispatchPeer.PROP_NAMES;
-    }
-
-    public CenterWrapper<?> getSender() {
-        return getWrappedProperty(DispatchPeer.SENDER, null);
-    }
-
-    public void setSender(CenterWrapper<?> sender) {
-        setWrappedProperty(DispatchPeer.SENDER, sender);
-    }
-
-    public CenterWrapper<?> getReceiver() {
-        return getWrappedProperty(DispatchPeer.RECEIVER, null);
-    }
-
-    public void setReceiver(CenterWrapper<?> center) {
-        setWrappedProperty(DispatchPeer.RECEIVER, center);
-    }
-
-    public DispatchState getState() {
-        return DispatchState.getState(getProperty(DispatchPeer.STATE));
-    }
-
-    public void setState(DispatchState state) {
-        setProperty(DispatchPeer.STATE, state.getId());
-    }
-
     public String getStateDescription() {
         DispatchState state = DispatchState
             .getState(getProperty(DispatchPeer.STATE));
         if (state == null)
             return "";
         return state.getLabel();
-    }
-
-    public List<DispatchSourceVesselWrapper> getDispatchSourceVesselCollection(
-        boolean sort) {
-        return getWrapperCollection(
-            DispatchPeer.DISPATCH_SOURCE_VESSEL_COLLECTION,
-            DispatchSourceVesselWrapper.class, sort);
-    }
-
-    public List<DispatchSourceVesselWrapper> getDispatchSourceVesselCollection() {
-        return getDispatchSourceVesselCollection(true);
-    }
-
-    public List<DispatchAliquotWrapper> getDispatchAliquotCollection(
-        boolean sort) {
-        return getWrapperCollection(DispatchPeer.DISPATCH_ALIQUOT_COLLECTION,
-            DispatchAliquotWrapper.class, sort);
-    }
-
-    public List<DispatchAliquotWrapper> getDispatchAliquotCollection() {
-        return getDispatchAliquotCollection(true);
     }
 
     public boolean hasErrors() {
@@ -110,13 +56,13 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     private List<DispatchAliquotWrapper> getDispatchAliquotCollectionWithState(
         DispatchItemState... states) {
         return getDispatchItemCollectionWithState(dispatchAliquotsMap,
-            getDispatchAliquotCollection(), states);
+            getDispatchAliquotCollection(false), states);
     }
 
     private List<DispatchSourceVesselWrapper> getDispatchSourceVesselCollectionWithState(
         DispatchItemState... states) {
         return getDispatchItemCollectionWithState(dispatchSourceVesselsMap,
-            getDispatchSourceVesselCollection(), states);
+            getDispatchSourceVesselCollection(false), states);
     }
 
     private <T extends DispatchItemWrapper<?>> List<T> getDispatchItemCollectionWithState(
@@ -146,7 +92,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     public List<AliquotWrapper> getAliquotCollection(boolean sort) {
         // TODO: cache?
         List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        for (DispatchAliquotWrapper da : getDispatchAliquotCollection()) {
+        for (DispatchAliquotWrapper da : getDispatchAliquotCollection(false)) {
             list.add(da.getAliquot());
         }
         if (sort) {
@@ -162,7 +108,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     public List<SourceVesselWrapper> getSourceVesselCollection(boolean sort) {
         // TODO: cache?
         List<SourceVesselWrapper> list = new ArrayList<SourceVesselWrapper>();
-        for (DispatchSourceVesselWrapper da : getDispatchSourceVesselCollection()) {
+        for (DispatchSourceVesselWrapper da : getDispatchSourceVesselCollection(false)) {
             list.add(da.getSourceVessel());
         }
         if (sort) {
@@ -185,7 +131,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
 
             DispatchAliquotWrapper da = new DispatchAliquotWrapper(appService);
             da.setAliquot(aliquot);
-            da.setState(state);
+            da.setState(state.getId());
             da.setDispatch(this);
 
             newDispatchAliquots.add(da);
@@ -261,7 +207,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         List<DispatchAliquotWrapper> nonProcessedAliquots = getDispatchAliquotCollectionWithState(DispatchItemState.NONE);
         for (DispatchAliquotWrapper da : nonProcessedAliquots) {
             if (aliquotsToReceive.contains(da.getAliquot())) {
-                da.setState(DispatchItemState.RECEIVED);
+                da.setState(DispatchItemState.RECEIVED.getId());
             }
         }
 
@@ -269,8 +215,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     }
 
     public void addSourceVessels(List<SourceVesselWrapper> newSourceVessels,
-        DispatchItemState state) throws BiobankCheckException {
-        List<SourceVesselWrapper> currentSourceVessels = getSourceVesselCollection();
+        DispatchItemState state) {
         List<DispatchSourceVesselWrapper> newDispatchSourceVessels = new ArrayList<DispatchSourceVesselWrapper>();
 
         for (SourceVesselWrapper sourceVessel : newSourceVessels) {
@@ -280,7 +225,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
             DispatchSourceVesselWrapper da = new DispatchSourceVesselWrapper(
                 appService);
             da.setSourceVessel(sourceVessel);
-            da.setState(state);
+            da.setState(state.getId());
             da.setDispatch(this);
 
             newDispatchSourceVessels.add(da);
@@ -315,7 +260,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         List<DispatchSourceVesselWrapper> nonProcessedSourceVessels = getDispatchSourceVesselCollectionWithState(DispatchItemState.NONE);
         for (DispatchSourceVesselWrapper dsv : nonProcessedSourceVessels) {
             if (sourceVesselsToReceive.contains(dsv.getSourceVessel())) {
-                dsv.setState(DispatchItemState.RECEIVED);
+                dsv.setState(DispatchItemState.RECEIVED.getId());
             }
         }
 
@@ -366,18 +311,11 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         return wrappers;
     }
 
-    private static final String DISPATCHES_IN_SITE_BY_DATE_SENT_QRY = "from "
-        + Dispatch.class.getName() + " where ("
-        + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID) + "=? or "
-        + Property.concatNames(DispatchPeer.RECEIVER, SitePeer.ID) + "=?) and "
-        + DispatchPeer.DEPARTED.getName() + " >=? and "
-        + DispatchPeer.DEPARTED.getName() + " <= ?";
-
     /**
      * Search for shipments with the given date sent. Don't use hour and minute.
      * Site can be the sender or the receiver.
      */
-    public static List<DispatchWrapper> getShipmentsInSiteByDateSent(
+    public static List<DispatchWrapper> getDispatchesInSiteByDateSent(
         WritableApplicationService appService, Date dateReceived,
         SiteWrapper site) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
@@ -476,7 +414,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
     }
 
     public DispatchAliquotWrapper getDispatchAliquot(String inventoryId) {
-        for (DispatchAliquotWrapper dsa : getDispatchAliquotCollection()) {
+        for (DispatchAliquotWrapper dsa : getDispatchAliquotCollection(false)) {
             if (dsa.getAliquot().getInventoryId().equals(inventoryId))
                 return dsa;
         }

@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -25,7 +26,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
+public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
@@ -42,62 +43,6 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
         super(appService);
     }
 
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ProcessingEventPeer.PROP_NAMES;
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(ProcessingEventPeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(ProcessingEventPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public Date getDateProcessed() {
-        return getProperty(ProcessingEventPeer.DATE_PROCESSED);
-    }
-
-    public String getFormattedDateProcessed() {
-        return DateFormatter.formatAsDateTime(getDateProcessed());
-    }
-
-    public Date getDateDrawn() {
-        return getProperty(ProcessingEventPeer.DATE_DRAWN);
-    }
-
-    public String getFormattedDateDrawn() {
-        return DateFormatter.formatAsDateTime(getDateDrawn());
-    }
-
-    public String getComment() {
-        return getProperty(ProcessingEventPeer.COMMENT);
-    }
-
-    public PatientWrapper getPatient() {
-        return getWrappedProperty(ProcessingEventPeer.PATIENT,
-            PatientWrapper.class);
-    }
-
-    public void setPatient(PatientWrapper patient) {
-        setWrappedProperty(ProcessingEventPeer.PATIENT, patient);
-    }
-
-    public List<AliquotWrapper> getAliquotCollection() {
-        return getWrapperCollection(ProcessingEventPeer.ALIQUOT_COLLECTION,
-            AliquotWrapper.class, false);
-    }
-
-    public CenterWrapper<?> getCenter() {
-        return getWrappedProperty(ProcessingEventPeer.CENTER, null);
-    }
-
-    public void setCenter(CenterWrapper<?> center) {
-        setWrappedProperty(ProcessingEventPeer.CENTER, center);
-    }
-
     /**
      * will set the adequate volume to the added aliquots
      * 
@@ -107,7 +52,7 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
         throws BiobankCheckException {
         if (aliquots != null && aliquots.size() > 0) {
             List<SampleStorageWrapper> sampleStorages = getPatient().getStudy()
-                .getSampleStorageCollection();
+                .getSampleStorageCollection(false);
             if (sampleStorages == null || sampleStorages.size() == 0) {
                 throw new BiobankCheckException(
                     "Can only add aliquots in a visit which study has sample storages");
@@ -116,7 +61,7 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
             Collection<Aliquot> allAliquotObjects = new HashSet<Aliquot>();
             List<AliquotWrapper> allAliquotWrappers = new ArrayList<AliquotWrapper>();
             // already added
-            List<AliquotWrapper> currentList = getAliquotCollection();
+            List<AliquotWrapper> currentList = getAliquotCollection(false);
             if (currentList != null) {
                 for (AliquotWrapper aliquot : currentList) {
                     allAliquotObjects.add(aliquot.getWrappedObject());
@@ -142,16 +87,6 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
         }
     }
 
-    private List<PvAttrWrapper> getPvAttrCollection() {
-        return getWrapperCollection(ProcessingEventPeer.PV_ATTR_COLLECTION,
-            PvAttrWrapper.class, false);
-    }
-
-    private void setPvAttrCollection(Collection<PvAttrWrapper> pvAttrCollection) {
-        setWrapperCollection(ProcessingEventPeer.PV_ATTR_COLLECTION,
-            pvAttrCollection);
-    }
-
     private Map<String, StudyPvAttrWrapper> getStudyPvAttrMap() {
         if (studyPvAttrMap != null)
             return studyPvAttrMap;
@@ -175,7 +110,7 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
             return pvAttrMap;
 
         pvAttrMap = new HashMap<String, PvAttrWrapper>();
-        List<PvAttrWrapper> pvAttrCollection = getPvAttrCollection();
+        List<PvAttrWrapper> pvAttrCollection = getPvAttrCollection(false);
         if (pvAttrCollection != null) {
             for (PvAttrWrapper pvAttr : pvAttrCollection) {
                 pvAttrMap.put(pvAttr.getStudyPvAttr().getLabel(), pvAttr);
@@ -329,18 +264,6 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
         pvAttr.setValue(value);
     }
 
-    public void setDateProcessed(Date date) {
-        setProperty(ProcessingEventPeer.DATE_PROCESSED, date);
-    }
-
-    public void setDateDrawn(Date date) {
-        setProperty(ProcessingEventPeer.DATE_DRAWN, date);
-    }
-
-    public void setComment(String comment) {
-        setProperty(ProcessingEventPeer.COMMENT, comment);
-    }
-
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
@@ -353,7 +276,8 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
     protected void persistDependencies(ProcessingEvent origObject)
         throws Exception {
         if (pvAttrMap != null) {
-            setPvAttrCollection(pvAttrMap.values());
+            setWrapperCollection(ProcessingEventPeer.PV_ATTR_COLLECTION,
+                pvAttrMap.values());
         }
         deleteSourceVessels();
     }
@@ -364,37 +288,6 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
                 ss.delete();
             }
         }
-    }
-
-    public List<SourceVesselWrapper> getSourceVesselCollection(boolean sort) {
-        return getWrapperCollection(
-            ProcessingEventPeer.SOURCE_VESSEL_COLLECTION,
-            SourceVesselWrapper.class, sort);
-    }
-
-    public List<SourceVesselWrapper> getSourceVesselCollection() {
-        return getSourceVesselCollection(false);
-    }
-
-    public void addSourceVessels(List<SourceVesselWrapper> svs) {
-        addToWrapperCollection(ProcessingEventPeer.SOURCE_VESSEL_COLLECTION,
-            svs);
-    }
-
-    public void setSourceVessels(List<SourceVesselWrapper> allPvWrappers) {
-        setWrapperCollection(ProcessingEventPeer.SOURCE_VESSEL_COLLECTION,
-            allPvWrappers);
-    }
-
-    public void removeSourceVessels(
-        List<SourceVesselWrapper> sourceVesselsToRemove) {
-        removeFromWrapperCollection(
-            ProcessingEventPeer.SOURCE_VESSEL_COLLECTION, sourceVesselsToRemove);
-    }
-
-    @Override
-    public Class<ProcessingEvent> getWrappedClass() {
-        return ProcessingEvent.class;
     }
 
     @Override
@@ -419,10 +312,10 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
             }
             return results.get(0);
         }
-        List<AliquotWrapper> list = getAliquotCollection();
+        List<AliquotWrapper> list = getAliquotCollection(false);
         if (list == null)
             return 0;
-        return getAliquotCollection().size();
+        return getAliquotCollection(false).size();
     }
 
     @Override
@@ -448,6 +341,14 @@ public class ProcessingEventWrapper extends ModelWrapper<ProcessingEvent> {
     public String toString() {
         return "Date Processed:" + getFormattedDateProcessed()
             + " / Date Drawn: " + getFormattedDateDrawn();
+    }
+
+    public String getFormattedDateDrawn() {
+        return DateFormatter.formatAsDate(getDateDrawn());
+    }
+
+    public String getFormattedDateProcessed() {
+        return DateFormatter.formatAsDate(getDateProcessed());
     }
 
     @Override

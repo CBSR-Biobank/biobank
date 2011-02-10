@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.peer.LogPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.LogBaseWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class LogWrapper extends ModelWrapper<Log> {
+public class LogWrapper extends LogBaseWrapper {
 
     public LogWrapper(WritableApplicationService appService) {
         super(appService);
@@ -18,114 +18,6 @@ public class LogWrapper extends ModelWrapper<Log> {
 
     public LogWrapper(WritableApplicationService appService, Log log) {
         super(appService, log);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return LogPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<Log> getWrappedClass() {
-        return Log.class;
-    }
-
-    @Override
-    public int compareTo(ModelWrapper<Log> o) {
-        return 0;
-    }
-
-    public String getUsername() {
-        return wrappedObject.getUsername();
-    }
-
-    public void setUsername(String username) {
-        String old = getUsername();
-        wrappedObject.setUsername(username);
-        propertyChangeSupport.firePropertyChange("username", old, username);
-    }
-
-    public Date getCreatedAt() {
-        return wrappedObject.getCreatedAt();
-    }
-
-    public void setCreatedAt(Date date) {
-        Date old = getCreatedAt();
-        wrappedObject.setCreatedAt(date);
-        propertyChangeSupport.firePropertyChange("date", old, date);
-    }
-
-    public String getSite() {
-        return wrappedObject.getSite();
-    }
-
-    public void setSite(String site) {
-        String old = getSite();
-        wrappedObject.setSite(site);
-        propertyChangeSupport.firePropertyChange("date", old, site);
-    }
-
-    public String getAction() {
-        return wrappedObject.getAction();
-    }
-
-    public void setAction(String action) {
-        String old = getAction();
-        wrappedObject.setAction(action);
-        propertyChangeSupport.firePropertyChange("action", old, action);
-    }
-
-    public String getPatientNumber() {
-        return wrappedObject.getPatientNumber();
-    }
-
-    public void setPatientNumber(String patientNumber) {
-        String old = getPatientNumber();
-        wrappedObject.setPatientNumber(patientNumber);
-        propertyChangeSupport.firePropertyChange("patientNumber", old,
-            patientNumber);
-    }
-
-    public String getInventoryId() {
-        return wrappedObject.getInventoryId();
-    }
-
-    public void setInventoryId(String inventoryId) {
-        String old = getInventoryId();
-        wrappedObject.setInventoryId(inventoryId);
-        propertyChangeSupport.firePropertyChange("inventoryId", old,
-            inventoryId);
-    }
-
-    public String getLocationLabel() {
-        return wrappedObject.getLocationLabel();
-    }
-
-    public void setLocationLabel(String locationLabel) {
-        String old = getLocationLabel();
-        wrappedObject.setLocationLabel(locationLabel);
-        propertyChangeSupport.firePropertyChange("locationLabel", old,
-            locationLabel);
-    }
-
-    public String getDetails() {
-        return wrappedObject.getDetails();
-    }
-
-    public void setDetails(String details) {
-        String old = getDetails();
-        wrappedObject.setDetails(details);
-        propertyChangeSupport.firePropertyChange("details", old, details);
-    }
-
-    public String getType() {
-        return wrappedObject.getType();
-    }
-
-    public void setType(String type) {
-        String old = getType();
-        wrappedObject.setType(type);
-        propertyChangeSupport.firePropertyChange("type", old, type);
     }
 
     public static List<LogWrapper> getLogs(

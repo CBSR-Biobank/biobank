@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.common.peer.SourceVesselTypePeer;
 import edu.ualberta.med.biobank.common.peer.StudySourceVesselPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.SourceVesselTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.SourceVessel;
 import edu.ualberta.med.biobank.model.SourceVesselType;
 import edu.ualberta.med.biobank.model.StudySourceVessel;
@@ -16,28 +17,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SourceVesselTypeWrapper extends ModelWrapper<SourceVesselType> {
+public class SourceVesselTypeWrapper extends SourceVesselTypeBaseWrapper {
 
     public SourceVesselTypeWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return SourceVesselTypePeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<SourceVesselType> getWrappedClass() {
-        return SourceVesselType.class;
-    }
-
-    public String getName() {
-        return getProperty(SourceVesselTypePeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(SourceVesselTypePeer.NAME, name);
     }
 
     @Override

@@ -35,11 +35,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return ClinicPeer.PROP_NAMES;
-    }
-
-    @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Clinic.class, ClinicPeer.NAME.getName(), getName(),
@@ -55,11 +50,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
                 cw.delete();
             }
         }
-    }
-
-    @Override
-    public Class<Clinic> getWrappedClass() {
-        return Clinic.class;
     }
 
     /**

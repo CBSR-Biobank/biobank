@@ -194,14 +194,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         persistAliquots();
     }
 
-    public RowColPos getPosition() {
+    public RowColPos getRowColPosition() {
         return objectWithPositionManagement.getPosition();
     }
 
     public String getPositionString() {
         ContainerWrapper parent = getParent();
         if (parent != null) {
-            RowColPos pos = getPosition();
+            RowColPos pos = getRowColPosition();
             if (pos != null) {
                 return parent.getContainerType().getPositionString(pos);
             }
