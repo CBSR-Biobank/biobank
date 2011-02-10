@@ -9,7 +9,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -31,7 +31,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * statuses in the database is created.
  * 
  */
-public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
+public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
 
     public static final String ACTIVE_STATUS_STRING = "Active";
 
@@ -49,30 +49,12 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return ActivityStatusPeer.PROP_NAMES;
-    }
-
-    public String getName() {
-        return getProperty(ActivityStatusPeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(ActivityStatusPeer.NAME, name);
-    }
-
-    @Override
     public void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsed()) {
             throw new BiobankCheckException("Unable to delete activity status "
                 + getName()
                 + " since it is being used by other objects in the database.");
         }
-    }
-
-    @Override
-    public Class<ActivityStatus> getWrappedClass() {
-        return ActivityStatus.class;
     }
 
     @Override
@@ -88,9 +70,8 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         if (object instanceof ActivityStatusWrapper)
             return ((ActivityStatusWrapper) object).getName().equals(
                 this.getName());
-        else
 
-            return false;
+        return false;
     }
 
     @Override

@@ -123,11 +123,6 @@ public class SiteWrapper extends SiteBaseWrapper {
     }
 
     @Override
-    public Class<Site> getWrappedClass() {
-        return Site.class;
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
         if ((getContainerCollection() != null && getContainerCollection()
