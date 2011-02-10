@@ -5,12 +5,13 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.ContactBaseWrapper;
 import edu.ualberta.med.biobank.model.Contact;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContactWrapper extends ModelWrapper<Contact> {
+public class ContactWrapper extends ContactBaseWrapper {
 
     public ContactWrapper(WritableApplicationService appService,
         Contact wrappedObject) {
@@ -19,83 +20,6 @@ public class ContactWrapper extends ModelWrapper<Contact> {
 
     public ContactWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    public String getName() {
-        return getProperty(ContactPeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(ContactPeer.NAME, name);
-    }
-
-    public String getTitle() {
-        return getProperty(ContactPeer.TITLE);
-    }
-
-    public void setTitle(String title) {
-        setProperty(ContactPeer.TITLE, title);
-    }
-
-    public String getMobileNumber() {
-        return getProperty(ContactPeer.MOBILE_NUMBER);
-    }
-
-    public void setMobileNumber(String mobileNumber) {
-        setProperty(ContactPeer.MOBILE_NUMBER, mobileNumber);
-    }
-
-    public String getPagerNumber() {
-        return getProperty(ContactPeer.PAGER_NUMBER);
-    }
-
-    public void setPagerNumber(String pagerNumber) {
-        setProperty(ContactPeer.PAGER_NUMBER, pagerNumber);
-    }
-
-    public String getOfficeNumber() {
-        return getProperty(ContactPeer.OFFICE_NUMBER);
-    }
-
-    public void setOfficeNumber(String officeNumber) {
-        setProperty(ContactPeer.OFFICE_NUMBER, officeNumber);
-    }
-
-    public String getFaxNumber() {
-        return getProperty(ContactPeer.FAX_NUMBER);
-    }
-
-    public void setFaxNumber(String faxNumber) {
-        setProperty(ContactPeer.FAX_NUMBER, faxNumber);
-    }
-
-    public String getEmailAddress() {
-        return getProperty(ContactPeer.EMAIL_ADDRESS);
-    }
-
-    public void setEmailAddress(String emailAddress) {
-        setProperty(ContactPeer.EMAIL_ADDRESS, emailAddress);
-    }
-
-    public ClinicWrapper getClinic() {
-        return getWrappedProperty(ContactPeer.CLINIC, ClinicWrapper.class);
-    }
-
-    public void setClinic(ClinicWrapper clinic) {
-        setWrappedProperty(ContactPeer.CLINIC, clinic);
-    }
-
-    /**
-     * Get the studyCollection. Use Study.setContactCollection to link study and
-     * contact
-     */
-    public List<StudyWrapper> getStudyCollection(boolean sort) {
-        return getWrapperCollection(ContactPeer.STUDY_COLLECTION,
-            StudyWrapper.class, sort);
-    }
-
-    public List<StudyWrapper> getStudyCollection() {
-        return getStudyCollection(false);
     }
 
     @Override
@@ -108,7 +32,7 @@ public class ContactWrapper extends ModelWrapper<Contact> {
     }
 
     public boolean deleteAllowed() {
-        List<StudyWrapper> studies = getStudyCollection();
+        List<StudyWrapper> studies = getStudyCollection(false);
         return ((studies == null) || (studies.size() == 0));
     }
 

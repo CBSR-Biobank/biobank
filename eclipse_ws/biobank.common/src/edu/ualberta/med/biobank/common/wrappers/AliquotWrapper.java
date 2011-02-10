@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -19,6 +18,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.base.AliquotBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -28,7 +28,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class AliquotWrapper extends ModelWrapper<Aliquot> {
+public class AliquotWrapper extends AliquotBaseWrapper {
 
     private AbstractObjectWithPositionManagement<AliquotPosition, AliquotWrapper> objectWithPositionManagement;
 
@@ -70,16 +70,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return AliquotPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<Aliquot> getWrappedClass() {
-        return Aliquot.class;
-    }
-
-    @Override
     public void persist() throws Exception {
         // check if position was deleted
         if (getPosition() == null) {
@@ -106,58 +96,8 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         objectWithPositionManagement.persistChecks();
     }
 
-    public String getInventoryId() {
-        return getProperty(AliquotPeer.INVENTORY_ID);
-    }
-
-    public void setInventoryId(String inventoryId) {
-        setProperty(AliquotPeer.INVENTORY_ID, inventoryId);
-    }
-
-    public SampleTypeWrapper getSampleType() {
-        return getWrappedProperty(AliquotPeer.SAMPLE_TYPE,
-            SampleTypeWrapper.class);
-    }
-
-    public void setSampleType(SampleTypeWrapper type) {
-        setWrappedProperty(AliquotPeer.SAMPLE_TYPE, type);
-    }
-
-    public Date getLinkDate() {
-        return getProperty(AliquotPeer.LINK_DATE);
-    }
-
-    public void setLinkDate(Date date) {
-        setProperty(AliquotPeer.LINK_DATE, date);
-    }
-
     public String getFormattedLinkDate() {
         return DateFormatter.formatAsDateTime(wrappedObject.getLinkDate());
-    }
-
-    public Double getQuantity() {
-        return getProperty(AliquotPeer.QUANTITY);
-    }
-
-    public void setQuantity(Double quantity) {
-        setProperty(AliquotPeer.QUANTITY, quantity);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(AliquotPeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(AliquotPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public String getComment() {
-        return getProperty(AliquotPeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(AliquotPeer.COMMENT, comment);
     }
 
     public void checkInventoryIdUnique() throws BiobankException,
@@ -215,7 +155,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public String getCenterString() {
-        CenterWrapper center = getLocation();
+        CenterWrapper<?> center = getLocation();
         if (center != null) {
             return center.getNameShort();
         }
@@ -224,7 +164,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return "CANNOT DISPLAY INFORMATION";
     }
 
-    private CenterWrapper getLocation() {
+    private CenterWrapper<?> getLocation() {
         List<DispatchAliquotWrapper> dsac = this.getDispatchAliquotCollection();
         // if in a container, use the container's site
         if (getParent() != null) {
@@ -263,15 +203,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             // if not in a container or a dispatch, use the originating shipment
             return getProcessingEvent().getCenter();
         }
-    }
-
-    public ProcessingEventWrapper getProcessingEvent() {
-        return getWrappedProperty(AliquotPeer.PROCESSING_EVENT,
-            ProcessingEventWrapper.class);
-    }
-
-    public void setProcessingEvent(ProcessingEventWrapper pe) {
-        setWrappedProperty(AliquotPeer.PROCESSING_EVENT, pe);
     }
 
     /**
@@ -416,7 +347,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         throws ApplicationException, BiobankCheckException {
         AliquotWrapper aliquot = getAliquot(appService, inventoryId);
         if (aliquot != null && user != null) {
-            CenterWrapper center = aliquot.getLocation();
+            CenterWrapper<?> center = aliquot.getLocation();
             // site might be null if can't access it !
             if (center == null) {
                 throw new ApplicationException(

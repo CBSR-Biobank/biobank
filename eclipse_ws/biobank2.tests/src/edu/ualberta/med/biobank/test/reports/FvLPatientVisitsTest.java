@@ -19,13 +19,12 @@ public class FvLPatientVisitsTest extends AbstractReportTest {
     private static final Mapper<ProcessingEventWrapper, List<String>, List<Date>> GROUP_PVS_BY_STUDY_CLINIC = new Mapper<ProcessingEventWrapper, List<String>, List<Date>>() {
         public List<String> getKey(ProcessingEventWrapper patientVisit) {
             return Arrays.asList(patientVisit.getPatient().getStudy()
-                .getNameShort(), patientVisit.getShipment().getClinic()
-                .getNameShort());
+                .getNameShort(), patientVisit.getCenter().getNameShort());
         }
 
         public List<Date> getValue(ProcessingEventWrapper patientVisit,
             List<Date> stats) {
-            Date newDateReceived = patientVisit.getShipment().getDateReceived();
+            Date newDateReceived = patientVisit.getDateDrawn();
             if (stats == null) {
                 return Arrays.asList(newDateReceived, newDateReceived);
             } else {

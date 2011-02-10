@@ -19,7 +19,7 @@ public class SelectPatientVisitWizard extends BiobankWizard {
         this.appService = appService;
     }
 
-    public ProcessingEventWrapper getPatientVisit() {
+    public ProcessingEventWrapper getProcessingEvent() {
         return visit;
     }
 
@@ -39,7 +39,7 @@ public class SelectPatientVisitWizard extends BiobankWizard {
 
     @Override
     public boolean performFinish() {
-        visit = pvPage.getPatientVisit();
+        visit = pvPage.getProcessingEvent();
         return visit != null;
     }
 

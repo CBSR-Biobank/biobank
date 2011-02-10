@@ -590,10 +590,10 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     String palletPosition = ContainerLabelingSchemeWrapper
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                     appendLogNLS("ScanLink.activitylog.aliquot.existsError",
-                        palletPosition, value, foundAliquot.getPatientVisit()
+                        palletPosition, value, foundAliquot.getProcessingEvent()
                             .getFormattedDateProcessed(), foundAliquot
-                            .getPatientVisit().getPatient().getPnumber(),
-                        foundAliquot.getPatientVisit().getShipment().getSite()
+                            .getProcessingEvent().getPatient().getPnumber(),
+                        foundAliquot.getProcessingEvent().getCollectionEvent().getSite()
                             .getNameShort());
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);
@@ -629,7 +629,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
         List<AliquotWrapper> newAliquots = new ArrayList<AliquotWrapper>();
-        SiteWrapper site = patientVisit.getShipment().getSite();
+        SiteWrapper site = patientVisit.getCollectionEvent().getSite();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
                 && cell.getStatus() == CellStatus.TYPE) {
@@ -644,7 +644,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),
                     site.getNameShort(), patientVisit.getFormattedDateDrawn(),
-                    patientVisit.getShipment().getClinic().getName(), cell
+                    patientVisit.getCollectionEvent().getClinic().getName(), cell
                         .getType().getName()));
                 nber++;
             }

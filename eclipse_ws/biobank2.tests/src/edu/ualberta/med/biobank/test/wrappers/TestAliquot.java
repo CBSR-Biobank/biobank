@@ -443,7 +443,7 @@ public class TestAliquot extends TestDatabase {
         ss3.setActivityStatus(activeStatus);
         ss3.persist();
         aliquot.getProcessingEvent().getPatient().getStudy()
-            .addSampleStorage(Arrays.asList(ss1, ss2, ss3));
+            .addToSampleStorageCollection(Arrays.asList(ss1, ss2, ss3));
         // should be 3
         aliquot.setQuantityFromType();
         Assert.assertTrue(aliquot.getQuantity().equals(3.0));

@@ -114,7 +114,7 @@ public class AliquotListInfoTable extends InfoTableWidget<AliquotWrapper> {
         info.comment = aliquot.getComment();
 
         if (showPatientNumber) {
-            info.pnumber = aliquot.getPatientVisit().getPatient().getPnumber();
+            info.pnumber = aliquot.getProcessingEvent().getPatient().getPnumber();
         }
         return info;
     }

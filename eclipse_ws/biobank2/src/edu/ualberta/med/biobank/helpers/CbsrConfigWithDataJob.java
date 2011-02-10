@@ -173,7 +173,7 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
     }
 
     private ProcessingEventWrapper addPatientVisit(PatientWrapper patient) {
-        List<ShipmentWrapper> shipments = patient.getShipmentCollection(null);
+        List<CollectionEventWrapper> shipments = patient.getShipmentCollection(null);
         if (shipments.size() == 0) {
             return null;
         }

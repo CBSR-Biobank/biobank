@@ -66,7 +66,7 @@ public class RequestReceiveScanDialog extends
             currentShipment, cell.getValue());
         if (info.aliquot != null) {
             cell.setAliquot(info.aliquot);
-            cell.setTitle(info.aliquot.getPatientVisit().getPatient()
+            cell.setTitle(info.aliquot.getProcessingEvent().getPatient()
                 .getPnumber());
         }
         switch (info.type) {

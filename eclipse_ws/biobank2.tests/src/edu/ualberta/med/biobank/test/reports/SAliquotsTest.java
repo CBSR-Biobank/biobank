@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 public class SAliquotsTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, String, Long> GROUP_BY_STUDY = new Mapper<AliquotWrapper, String, Long>() {
         public String getKey(AliquotWrapper aliquot) {
-            return aliquot.getPatientVisit().getPatient().getStudy()
+            return aliquot.getProcessingEvent().getPatient().getStudy()
                 .getNameShort();
         }
 

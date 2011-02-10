@@ -267,3 +267,4 @@ public class TestDispatch extends TestDatabase {
 
         Assert.assertEquals(countBefore - 1, countAfter);
     }
+}

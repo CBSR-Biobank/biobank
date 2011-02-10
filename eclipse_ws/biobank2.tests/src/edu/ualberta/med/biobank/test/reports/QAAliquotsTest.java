@@ -45,7 +45,7 @@ public class QAAliquotsTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        ProcessingEventWrapper visit = aliquot.getPatientVisit();
+        ProcessingEventWrapper visit = aliquot.getProcessingEvent();
         checkResults(getTopContainerIds(getContainers()),
             visit.getDateProcessed(), visit.getDateProcessed(), aliquot
                 .getSampleType().getNameShort());
@@ -57,7 +57,7 @@ public class QAAliquotsTest extends AbstractReportTest {
         Assert.assertTrue(aliquots.size() > 0);
 
         AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
-        ProcessingEventWrapper visit = aliquot.getPatientVisit();
+        ProcessingEventWrapper visit = aliquot.getProcessingEvent();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(visit.getDateProcessed());

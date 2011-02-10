@@ -69,7 +69,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
+        StudyWrapper study = aliquot.getProcessingEvent().getPatient().getStudy();
         study.reload();
 
         List<SampleStorageWrapper> allowedSampleStorage = study
@@ -128,10 +128,10 @@ public class AliquotEntryForm extends BiobankEntryForm {
                 .getQuantity().toString());
 
         createReadOnlyLabelledField(client, SWT.NONE, "Shipment Waybill",
-            aliquot.getPatientVisit().getShipment().getWaybill());
+            aliquot.getProcessingEvent().getCollectionEvent().getWaybill());
 
         createReadOnlyLabelledField(client, SWT.NONE, "Study", aliquot
-            .getPatientVisit().getPatient().getStudy().getNameShort());
+            .getProcessingEvent().getPatient().getStudy().getNameShort());
 
         Label label = widgetCreator.createLabel(client, "Patient Number");
 
@@ -157,11 +157,11 @@ public class AliquotEntryForm extends BiobankEntryForm {
         toolkit.adapt(c);
 
         final BiobankText dateProcessed = createReadOnlyLabelledField(client,
-            SWT.NONE, "Date Processed", aliquot.getPatientVisit()
+            SWT.NONE, "Date Processed", aliquot.getProcessingEvent()
                 .getFormattedDateProcessed());
 
         final BiobankText dateDrawn = createReadOnlyLabelledField(client,
-            SWT.NONE, "Date Drawn", aliquot.getPatientVisit()
+            SWT.NONE, "Date Drawn", aliquot.getProcessingEvent()
                 .getFormattedDateDrawn());
 
         editPatientButton.addListener(SWT.MouseUp, new Listener() {
@@ -173,11 +173,11 @@ public class AliquotEntryForm extends BiobankEntryForm {
                     wizard);
                 int res = dialog.open();
                 if (res == Status.OK) {
-                    aliquot.setPatientVisit(wizard.getPatientVisit());
+                    aliquot.setPatientVisit(wizard.getProcessingEvent());
 
-                    dateProcessed.setText(aliquot.getPatientVisit()
+                    dateProcessed.setText(aliquot.getProcessingEvent()
                         .getFormattedDateProcessed());
-                    dateDrawn.setText(aliquot.getPatientVisit()
+                    dateDrawn.setText(aliquot.getProcessingEvent()
                         .getFormattedDateDrawn());
 
                     setDirty(true); // so changes can be saved

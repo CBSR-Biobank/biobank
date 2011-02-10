@@ -5,13 +5,13 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 import edu.ualberta.med.biobank.test.AllTests;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
@@ -26,7 +27,7 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
@@ -478,10 +479,10 @@ public final class TestReportsProcedurallyGeneratedData implements
         return patients;
     }
 
-    private static List<ShipmentWrapper> generateShipments(
+    private static List<CollectionEventWrapper> generateShipments(
         SiteWrapper site, final int shipmentLimit, List<ClinicWrapper> clinics)
         throws ApplicationException, Exception {
-        List<ShipmentWrapper> shipments = new ArrayList<ShipmentWrapper>();
+        List<CollectionEventWrapper> shipments = new ArrayList<CollectionEventWrapper>();
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date(0));
@@ -527,10 +528,12 @@ public final class TestReportsProcedurallyGeneratedData implements
                 patientLimit = Math.min(patientLimit, patients.size());
 
                 if (patientLimit > 0) {
-                    ShipmentWrapper shipment = CollectionEventHelper
-                        .addShipment(site, clinic, ShippingMethodWrapper
+                    CollectionEventWrapper shipment = CollectionEventHelper
+                        .addCollectionEvent(site, ShippingMethodWrapper
                             .getShippingMethods(getInstance().getAppService())
-                            .get(0), patients.get(patientIndex));
+                            .get(0), SourceVesselHelper.newSourceVessel(
+                            patients.get(patientIndex), Utils.getRandomDate(),
+                            0.1));
 
                     // TODO: more appropriate Date-s?
                     shipment.setDeparted(calendar.getTime());
@@ -542,7 +545,9 @@ public final class TestReportsProcedurallyGeneratedData implements
 
                     while (patientsAdded++ < patientLimit) {
                         PatientWrapper patient = patients.get(patientIndex);
-                        shipment.addPatients(Arrays.asList(patient));
+                        shipment.addSourceVessels(Arrays
+                            .asList(SourceVesselHelper.newSourceVessel(patient,
+                                Utils.getRandomDate(), 0.1)));
 
                         // advance to the next legal Patient index
                         patientIndex = (patientIndex + 1) % patients.size();
@@ -574,7 +579,7 @@ public final class TestReportsProcedurallyGeneratedData implements
     }
 
     private static List<ProcessingEventWrapper> generatePatientVisits(
-        List<ShipmentWrapper> shipments, List<PatientWrapper> allPatients)
+        List<CollectionEventWrapper> shipments, List<PatientWrapper> allPatients)
         throws Exception {
         List<ProcessingEventWrapper> patientVisits = new ArrayList<ProcessingEventWrapper>();
 
@@ -582,7 +587,7 @@ public final class TestReportsProcedurallyGeneratedData implements
 
         for (int shipmentIndex = 0, numShipments = shipments.size()
             - NUM_SHIPMENTS_WITHOUT_PVS; shipmentIndex < numShipments; shipmentIndex++) {
-            ShipmentWrapper shipment = shipments.get(shipmentIndex);
+            CollectionEventWrapper shipment = shipments.get(shipmentIndex);
             List<PatientWrapper> patients = shipment.getPatientCollection();
 
             for (PatientWrapper patient : patients) {
@@ -594,8 +599,9 @@ public final class TestReportsProcedurallyGeneratedData implements
                 calendar.add(Calendar.DAY_OF_YEAR, 2);
                 Date processed = calendar.getTime();
 
-                ProcessingEventWrapper patientVisit = PatientVisitHelper
-                    .addPatientVisit(patient, shipment, drawn, processed);
+                ProcessingEventWrapper patientVisit = ProcessingEventHelper
+                    .addProcessingEvent(shipment.getSourceCenter(), patient,
+                        drawn, processed);
 
                 patientVisits.add(patientVisit);
             }
@@ -648,7 +654,7 @@ public final class TestReportsProcedurallyGeneratedData implements
                             aliquot.setPosition(new RowColPos(row, col));
                         }
 
-                        aliquot.setPatientVisit(patientVisit);
+                        aliquot.setProcessingEvent(patientVisit);
                         aliquot.setInventoryId(getInstance().getRandString());
 
                         // base the link date on the date the patient visit
@@ -673,12 +679,12 @@ public final class TestReportsProcedurallyGeneratedData implements
         // add an Aliquot of each SampleType that is not in a Container
         for (SampleTypeWrapper sampleType : allSampleTypes) {
             // cycle through patient visits
-            ProcessingEventWrapper patientVisit = patientVisits.get(aliquotsAdded
-                % patientVisits.size());
+            ProcessingEventWrapper patientVisit = patientVisits
+                .get(aliquotsAdded % patientVisits.size());
 
             AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType);
 
-            aliquot.setPatientVisit(patientVisit);
+            aliquot.setProcessingEvent(patientVisit);
             aliquot.setInventoryId(getInstance().getRandString());
 
             // base the link date on the date the patient visit
@@ -735,7 +741,7 @@ public final class TestReportsProcedurallyGeneratedData implements
             List<PatientWrapper> patients = generatePatients(studies,
                 PATIENTS_PER_STUDY);
 
-            List<ShipmentWrapper> shipments = generateShipments(site,
+            List<CollectionEventWrapper> shipments = generateShipments(site,
                 SHIPMENTS_PER_SITE, clinics);
 
             List<ProcessingEventWrapper> patientVisits = generatePatientVisits(

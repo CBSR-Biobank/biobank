@@ -10,15 +10,14 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class CollectionEventWrapper extends
-    AbstractShipmentWrapper<CollectionEvent> {
+public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     public CollectionEventWrapper(WritableApplicationService appService) {
         super(appService);
@@ -35,21 +34,11 @@ public class CollectionEventWrapper extends
     }
 
     private void checkNoMoreSourceVessels() throws BiobankCheckException {
-        List<SourceVesselWrapper> sourceVessels = getSourceVesselCollection();
+        List<SourceVesselWrapper> sourceVessels = getSourceVesselCollection(false);
         if (sourceVessels != null && sourceVessels.size() > 0) {
             throw new BiobankCheckException(
                 "Source Vessels are still linked to this Collection Event. Delete them before attempting to remove this Collection Event");
         }
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return CollectionEventPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<CollectionEvent> getWrappedClass() {
-        return CollectionEvent.class;
     }
 
     @Override
@@ -66,32 +55,12 @@ public class CollectionEventWrapper extends
         throws Exception {
     }
 
-    public List<SourceVesselWrapper> getSourceVesselCollection() {
-        return getWrapperCollection(
-            CollectionEventPeer.SOURCE_VESSEL_COLLECTION,
-            SourceVesselWrapper.class, false);
-    }
-
-    public void setSourceVesselCollection(
-        Collection<SourceVesselWrapper> sourceVessels) {
-        setWrapperCollection(CollectionEventPeer.SOURCE_VESSEL_COLLECTION,
-            sourceVessels);
-    }
-
     public void checkAtLeastOneSouceVessel() throws BiobankCheckException {
-        List<SourceVesselWrapper> sourceVessels = getSourceVesselCollection();
+        List<SourceVesselWrapper> sourceVessels = getSourceVesselCollection(false);
         if (sourceVessels == null || sourceVessels.size() == 0) {
             throw new BiobankCheckException(
                 "At least one Source Vessel should be added to this Collection Event.");
         }
-    }
-
-    public CenterWrapper<?> getSourceCenter() {
-        return getWrappedProperty(CollectionEventPeer.SOURCE_CENTER, null);
-    }
-
-    public void setSourceCenter(CenterWrapper<?> center) {
-        setWrappedProperty(CollectionEventPeer.SOURCE_CENTER, center);
     }
 
     @Override
@@ -119,29 +88,13 @@ public class CollectionEventWrapper extends
     }
 
     public List<PatientWrapper> getPatientCollection() {
-        Collection<SourceVesselWrapper> sourceVessels = getSourceVesselCollection();
+        Collection<SourceVesselWrapper> sourceVessels = getSourceVesselCollection(false);
         Set<PatientWrapper> patients = new HashSet<PatientWrapper>();
         for (SourceVesselWrapper sourceVessel : sourceVessels) {
             PatientWrapper patient = sourceVessel.getPatient();
             patients.add(patient);
         }
         return new ArrayList<PatientWrapper>(patients);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(CollectionEventPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public void addSourceVessels(List<SourceVesselWrapper> svs) {
-        addToWrapperCollection(CollectionEventPeer.SOURCE_VESSEL_COLLECTION,
-            svs);
-    }
-
-    public void removeSourceVessels(
-        List<SourceVesselWrapper> sourceVesselCollection) {
-        removeFromWrapperCollection(
-            CollectionEventPeer.SOURCE_VESSEL_COLLECTION,
-            sourceVesselCollection);
     }
 
     public static List<CollectionEventWrapper> getCollectionEvents(
@@ -161,7 +114,7 @@ public class CollectionEventWrapper extends
     }
 
     public boolean hasPatient(String pnum) {
-        List<SourceVesselWrapper> svs = getSourceVesselCollection();
+        List<SourceVesselWrapper> svs = getSourceVesselCollection(false);
         for (SourceVesselWrapper sv : svs)
             if (sv.getPatient().getPnumber().equals(pnum))
                 return true;

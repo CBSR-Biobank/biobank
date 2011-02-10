@@ -31,7 +31,7 @@ public class SelectPatientVisitPage extends BiobankWizardPage {
         visitsTable.setCollection(visits);
     }
 
-    public ProcessingEventWrapper getPatientVisit() {
+    public ProcessingEventWrapper getProcessingEvent() {
         return visitsTable.getSelection();
     }
 
@@ -52,12 +52,12 @@ public class SelectPatientVisitPage extends BiobankWizardPage {
         visitsTable.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                selection.setValue(getPatientVisit());
+                selection.setValue(getProcessingEvent());
             }
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                selection.setValue(getPatientVisit());
+                selection.setValue(getProcessingEvent());
             }
         });
 

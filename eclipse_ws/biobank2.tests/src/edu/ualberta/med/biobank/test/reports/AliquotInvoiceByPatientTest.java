@@ -19,8 +19,9 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 public class AliquotInvoiceByPatientTest extends AbstractReportTest {
     private static final Comparator<AliquotWrapper> ORDER_BY_ALIQUOT_PNUMBER = new Comparator<AliquotWrapper>() {
         public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
-            int cmp = compareStrings(lhs.getPatientVisit().getPatient()
-                .getPnumber(), rhs.getPatientVisit().getPatient().getPnumber());
+            int cmp = compareStrings(lhs.getProcessingEvent().getPatient()
+                .getPnumber(), rhs.getProcessingEvent().getPatient()
+                .getPnumber());
 
             if (cmp != 0) {
                 return cmp;
@@ -77,8 +78,8 @@ public class AliquotInvoiceByPatientTest extends AbstractReportTest {
 
         for (AliquotWrapper aliquot : filteredAliquots) {
             expectedResults.add(new Object[] { aliquot.getInventoryId(),
-                aliquot.getPatientVisit().getPatient().getPnumber(),
-                aliquot.getPatientVisit().getShipment().getClinic().getName(),
+                aliquot.getProcessingEvent().getPatient().getPnumber(),
+                aliquot.getProcessingEvent().getCenter().getName(),
                 aliquot.getLinkDate(), aliquot.getSampleType().getName() });
         }
 

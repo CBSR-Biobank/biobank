@@ -6,14 +6,14 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.AbstractShipmentPeer;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.AbstractShipmentBaseWrapper;
 import edu.ualberta.med.biobank.model.AbstractShipment;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Dispatch;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
-    extends ModelWrapper<E> {
+    extends AbstractShipmentBaseWrapper<E> {
 
     public AbstractShipmentWrapper(WritableApplicationService appService) {
         super(appService);
@@ -28,29 +28,13 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
         return AbstractShipmentPeer.PROP_NAMES;
     }
 
-    public Date getDeparted() {
-        return getProperty(AbstractShipmentPeer.DEPARTED);
-    }
-
     public String getFormattedDeparted() {
         return DateFormatter.formatAsDateTime(getDeparted());
-    }
-
-    public void setDeparted(Date date) {
-        setProperty(AbstractShipmentPeer.DEPARTED, date);
-    }
-
-    public Date getDateReceived() {
-        return getProperty(AbstractShipmentPeer.DATE_RECEIVED);
     }
 
     public String getFormattedDateReceived() {
         // date received is not supposed to be null
         return DateFormatter.formatAsDateTime(getDateReceived());
-    }
-
-    public void setDateReceived(Date date) {
-        setProperty(AbstractShipmentPeer.DATE_RECEIVED, date);
     }
 
     @Override
@@ -63,30 +47,6 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
             }
         }
         return 0;
-    }
-
-    public String getComment() {
-        return getProperty(AbstractShipmentPeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(AbstractShipmentPeer.COMMENT, comment);
-    }
-
-    public String getWaybill() {
-        return getProperty(AbstractShipmentPeer.WAYBILL);
-    }
-
-    public void setWaybill(String waybill) {
-        setProperty(AbstractShipmentPeer.WAYBILL, waybill);
-    }
-
-    public String getBoxNumber() {
-        return getProperty(AbstractShipmentPeer.BOX_NUMBER);
-    }
-
-    public void setBoxNumber(String boxNumber) {
-        setProperty(AbstractShipmentPeer.BOX_NUMBER, boxNumber);
     }
 
     @Override
@@ -113,20 +73,6 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
         Date dateReveived = getDateReceived();
         return dateReveived.compareTo(startDate) >= 0
             && dateReveived.compareTo(endDate) <= 0;
-    }
-
-    public ShippingMethodWrapper getShippingMethod() {
-        return getWrappedProperty(AbstractShipmentPeer.SHIPPING_METHOD,
-            ShippingMethodWrapper.class);
-    }
-
-    public void setShippingMethod(ShippingMethodWrapper method) {
-        setWrappedProperty(AbstractShipmentPeer.SHIPPING_METHOD, method);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(AbstractShipmentPeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
     }
 
     public void getActivityStatus(ActivityStatusWrapper activityStatus) {

@@ -104,7 +104,7 @@ public class CachedReportDataSource implements ReportDataSource {
         // FIXME: patient visits need to be converted
         // if (patientVisits == null) {
         // HQLCriteria criteria = new HQLCriteria("from "
-        // + PatientVisit.class.getName());
+        // + ProcessingEvent.class.getName());
         // List<PatientVisit> rawVisits = appService.query(criteria);
         //
         // patientVisits = new ArrayList<ProcessingEventWrapper>();

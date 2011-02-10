@@ -216,7 +216,7 @@ public class DispatchCreateScanDialog extends
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)
                             scanCell.setStatus(CellStatus.FILLED);
-                            scanCell.setTitle(foundAliquot.getPatientVisit()
+                            scanCell.setTitle(foundAliquot.getProcessingEvent()
                                 .getPatient().getPnumber());
                             scanCell.setAliquot(foundAliquot);
                             if (currentAliquots != null
@@ -233,7 +233,7 @@ public class DispatchCreateScanDialog extends
                     } else {
                         // should not be there
                         scanCell.setStatus(CellStatus.ERROR);
-                        scanCell.setTitle(foundAliquot.getPatientVisit()
+                        scanCell.setTitle(foundAliquot.getProcessingEvent()
                             .getPatient().getPnumber());
                         scanCell
                             .setInformation("This aliquot should be on another pallet"); //$NON-NLS-1$

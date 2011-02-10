@@ -147,13 +147,13 @@ public class PatientVisitViewForm extends BiobankViewForm {
     }
 
     private void setPatientVisitValues() {
-        setTextValue(siteLabel, patientVisit.getShipment().getSite().getName());
+        setTextValue(siteLabel, patientVisit.getCollectionEvent().getSite().getName());
         setTextValue(studyLabel, patientVisit.getPatient().getStudy().getName());
         setTextValue(activityStatusLabel, patientVisit.getActivityStatus()
             .getName());
-        setTextValue(clinicLabel, patientVisit.getShipment() == null ? ""
-            : patientVisit.getShipment().getClinic().getName());
-        setTextValue(shipmentLabel, patientVisit.getShipment().toString());
+        setTextValue(clinicLabel, patientVisit.getCollectionEvent() == null ? ""
+            : patientVisit.getCollectionEvent().getClinic().getName());
+        setTextValue(shipmentLabel, patientVisit.getCollectionEvent().toString());
         setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
         setTextValue(dateProcessedLabel,
             patientVisit.getFormattedDateProcessed());

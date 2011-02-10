@@ -125,7 +125,7 @@ public class ShipmentAdministrationView extends
         if (radioWaybill.getSelection()) {
             // with waybill, should find only one corresponding shipment, or
             // mutliple shipments from different clinics
-            List<ShipmentWrapper> shipments = ShipmentWrapper
+            List<CollectionEventWrapper> shipments = ShipmentWrapper
                 .getShipmentsInSites(SessionManager.getAppService(),
                     text.trim());
             if (shipments.size() > 1) {

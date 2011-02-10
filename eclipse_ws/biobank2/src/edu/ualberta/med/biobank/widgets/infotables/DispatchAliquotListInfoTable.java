@@ -122,7 +122,7 @@ public abstract class DispatchAliquotListInfoTable extends
         TableRowData info = new TableRowData();
         info.dsa = dsa;
         info.inventoryId = dsa.getAliquot().getInventoryId();
-        info.pnumber = dsa.getAliquot().getPatientVisit().getPatient()
+        info.pnumber = dsa.getAliquot().getProcessingEvent().getPatient()
             .getPnumber();
         SampleTypeWrapper type = dsa.getAliquot().getSampleType();
         Assert.isNotNull(type, "aliquot with null for sample type");

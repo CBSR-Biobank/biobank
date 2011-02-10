@@ -122,7 +122,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             if (columnIndex == 1)
                 return dsa.getAliquot().getSampleType().getNameShort();
             if (columnIndex == 2)
-                return dsa.getAliquot().getPatientVisit().getPatient()
+                return dsa.getAliquot().getProcessingEvent().getPatient()
                     .getPnumber();
             if (columnIndex == 3)
                 return dsa.getAliquot().getActivityStatus().toString();

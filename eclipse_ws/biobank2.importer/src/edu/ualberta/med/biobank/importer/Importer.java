@@ -926,7 +926,7 @@ public class Importer {
         logger.info("removing old patient visits ...");
 
         HQLCriteria criteria = new HQLCriteria("from "
-            + PatientVisit.class.getName());
+            + ProcessingEvent.class.getName());
         List<PatientVisit> visits = appService.query(criteria);
         for (PatientVisit visit : visits) {
             ProcessingEventWrapper v = new ProcessingEventWrapper(appService, visit);
@@ -1392,7 +1392,7 @@ public class Importer {
         }
         logger.error("an aliquot with inventory id " + inventoryId
             + " already exists for patient "
-            + aliquot.getPatientVisit().getPatient().getPnumber());
+            + aliquot.getProcessingEvent().getPatient().getPnumber());
         return false;
     }
 
@@ -1412,7 +1412,7 @@ public class Importer {
 
     private static Long getPatientVisitCount() throws Exception {
         HQLCriteria c = new HQLCriteria("select count(*) from "
-            + PatientVisit.class.getName());
+            + ProcessingEvent.class.getName());
         List<Long> result = appService.query(c);
         return result.get(0);
     }

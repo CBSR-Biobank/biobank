@@ -19,19 +19,15 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 public class AliquotInvoiceByClinicTest extends AbstractReportTest {
     private static final Comparator<AliquotWrapper> ORDER_BY_CLINIC_ID_PNUMBER = new Comparator<AliquotWrapper>() {
         public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
-            int cmp = lhs
-                .getPatientVisit()
-                .getShipment()
-                .getClinic()
-                .getId()
-                .compareTo(
-                    rhs.getPatientVisit().getShipment().getClinic().getId());
+            int cmp = lhs.getProcessingEvent().getCenter().getId()
+                .compareTo(rhs.getProcessingEvent().getCenter().getId());
             if (cmp != 0) {
                 return cmp;
             }
 
-            cmp = compareStrings(lhs.getPatientVisit().getPatient()
-                .getPnumber(), rhs.getPatientVisit().getPatient().getPnumber());
+            cmp = compareStrings(lhs.getProcessingEvent().getPatient()
+                .getPnumber(), rhs.getProcessingEvent().getPatient()
+                .getPnumber());
 
             if (cmp != 0) {
                 return cmp;
@@ -89,8 +85,8 @@ public class AliquotInvoiceByClinicTest extends AbstractReportTest {
 
         for (AliquotWrapper aliquot : filteredAliquots) {
             expectedResults.add(new Object[] { aliquot.getInventoryId(),
-                aliquot.getPatientVisit().getShipment().getClinic().getName(),
-                aliquot.getPatientVisit().getPatient().getPnumber(),
+                aliquot.getProcessingEvent().getCenter().getName(),
+                aliquot.getProcessingEvent().getPatient().getPnumber(),
                 aliquot.getLinkDate(), aliquot.getSampleType().getName() });
         }
 

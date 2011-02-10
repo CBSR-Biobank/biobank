@@ -6,12 +6,13 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.ContainerPathPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.ContainerPathBaseWrapper;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
+public class ContainerPathWrapper extends ContainerPathBaseWrapper {
 
     public ContainerPathWrapper(WritableApplicationService appService) {
         super(appService);
@@ -20,20 +21,6 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
     public ContainerPathWrapper(WritableApplicationService appService,
         ContainerPath wrappedObject) {
         super(appService, wrappedObject);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ContainerPathPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<ContainerPath> getWrappedClass() {
-        return ContainerPath.class;
-    }
-
-    public String getPath() {
-        return getProperty(ContainerPathPeer.PATH);
     }
 
     private void setPath() throws Exception {
@@ -53,26 +40,12 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
             path = parentPath + "/" + container.getId();
         }
 
-        setProperty(ContainerPathPeer.PATH, path);
+        setPath(path);
         ContainerWrapper topContainer = container.getTop();
         if (topContainer == null) {
             throw new Exception("no top container");
         }
-        setWrappedProperty(ContainerPathPeer.TOP_CONTAINER, topContainer);
-    }
-
-    public ContainerWrapper getContainer() {
-        return getWrappedProperty(ContainerPathPeer.CONTAINER,
-            ContainerWrapper.class);
-    }
-
-    public void setContainer(ContainerWrapper container) {
-        setWrappedProperty(ContainerPathPeer.CONTAINER, container);
-    }
-
-    public ContainerWrapper getTopContainer() {
-        return getWrappedProperty(ContainerPathPeer.TOP_CONTAINER,
-            ContainerWrapper.class);
+        setTopContainer(topContainer);
     }
 
     @Override
@@ -96,11 +69,6 @@ public class ContainerPathWrapper extends ModelWrapper<ContainerPath> {
     public void persist() throws Exception {
         setPath();
         super.persist();
-    }
-
-    @Override
-    public int compareTo(ModelWrapper<ContainerPath> arg0) {
-        return 0;
     }
 
     @Override

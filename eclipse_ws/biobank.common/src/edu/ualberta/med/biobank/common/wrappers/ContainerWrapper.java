@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
@@ -35,7 +36,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerWrapper extends ModelWrapper<Container> {
+public class ContainerWrapper extends ContainerBaseWrapper {
 
     private AbstractObjectWithPositionManagement<ContainerPosition, ContainerWrapper> objectWithPositionManagement;
 
@@ -88,11 +89,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 return null;
             }
         };
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ContainerPeer.PROP_NAMES;
     }
 
     @Override
@@ -296,69 +292,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 + getLabel() + "\" and type \"" + getContainerType().getName()
                 + "\" already exists.");
         }
-    }
-
-    @Override
-    public Class<Container> getWrappedClass() {
-        return Container.class;
-    }
-
-    public SiteWrapper getSite() {
-        return getWrappedProperty(ContainerPeer.SITE, SiteWrapper.class);
-    }
-
-    public void setSite(SiteWrapper site) {
-        setWrappedProperty(ContainerPeer.SITE, site);
-    }
-
-    public String getLabel() {
-        return getProperty(ContainerPeer.LABEL);
-    }
-
-    public void setLabel(String label) {
-        setProperty(ContainerPeer.LABEL, label);
-    }
-
-    public Double getTemperature() {
-        return getProperty(ContainerPeer.TEMPERATURE);
-    }
-
-    public void setTemperature(Double temperature) {
-        setProperty(ContainerPeer.TEMPERATURE, temperature);
-    }
-
-    public ContainerTypeWrapper getContainerType() {
-        return getWrappedProperty(ContainerPeer.CONTAINER_TYPE,
-            ContainerTypeWrapper.class);
-    }
-
-    public void setContainerType(ContainerTypeWrapper containerType) {
-        setWrappedProperty(ContainerPeer.CONTAINER_TYPE, containerType);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(ContainerPeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(ContainerPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public String getComment() {
-        return getProperty(ContainerPeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(ContainerPeer.COMMENT, comment);
-    }
-
-    public String getProductBarcode() {
-        return getProperty(ContainerPeer.PRODUCT_BARCODE);
-    }
-
-    public void setProductBarcode(String barcode) {
-        setProperty(ContainerPeer.PRODUCT_BARCODE, barcode);
     }
 
     public Integer getRowCapacity() {
@@ -772,7 +705,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         if (type == null) {
             throw new BiobankCheckException("sample type is null");
         }
-        return getContainerType().getSampleTypeCollection().contains(type);
+        return getContainerType().getSampleTypeCollection(false).contains(type);
     }
 
     public void moveAliquots(ContainerWrapper destination) throws Exception {

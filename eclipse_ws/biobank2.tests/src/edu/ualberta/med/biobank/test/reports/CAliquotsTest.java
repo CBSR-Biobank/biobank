@@ -22,9 +22,9 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 public class CAliquotsTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_AND_CLINIC = new Mapper<AliquotWrapper, List<String>, Long>() {
         public List<String> getKey(AliquotWrapper aliquot) {
-            return Arrays.asList(aliquot.getPatientVisit().getPatient()
-                .getStudy().getNameShort(), aliquot.getPatientVisit()
-                .getShipment().getClinic().getNameShort());
+            return Arrays.asList(aliquot.getProcessingEvent().getPatient()
+                .getStudy().getNameShort(), aliquot.getProcessingEvent()
+                .getCenter().getNameShort());
         }
 
         public Long getValue(AliquotWrapper type, Long oldValue) {

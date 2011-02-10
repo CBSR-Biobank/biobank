@@ -73,10 +73,10 @@ public class AliquotRequestImpl extends AbstractReport {
                 modifiedResults.add(ob);
             } else {
                 Aliquot aliquot = (Aliquot) ob;
-                String pnumber = aliquot.getPatientVisit().getShipmentPatient()
-                    .getPatient().getPnumber();
+                String pnumber = aliquot.getProcessingEvent().getPatient()
+                    .getPnumber();
                 String inventoryId = aliquot.getInventoryId();
-                Date dateDrawn = aliquot.getPatientVisit().getDateDrawn();
+                Date dateDrawn = aliquot.getProcessingEvent().getDateDrawn();
                 String stName = aliquot.getSampleType().getNameShort();
                 String aliquotLabel = new AliquotWrapper(appService, aliquot)
                     .getPositionString(true, false);
@@ -87,5 +87,4 @@ public class AliquotRequestImpl extends AbstractReport {
         }
         return modifiedResults;
     }
-
 }

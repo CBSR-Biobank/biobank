@@ -94,7 +94,7 @@ public class SentAliquots {
                     continue;
                 }
 
-                String aliquotPnumber = aliquot.getPatientVisit().getPatient()
+                String aliquotPnumber = aliquot.getProcessingEvent().getPatient()
                     .getPnumber();
 
                 if (!aliquotPnumber.equals(info.getPatientNo())) {

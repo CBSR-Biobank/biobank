@@ -65,8 +65,8 @@ public abstract class AbstractReportTest {
     };
     public static final Comparator<AliquotWrapper> ORDER_ALIQUOT_BY_PNUMBER = new Comparator<AliquotWrapper>() {
         public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
-            return compareStrings(lhs.getPatientVisit().getPatient()
-                .getPnumber(), rhs.getPatientVisit().getPatient().getPnumber());
+            return compareStrings(lhs.getProcessingEvent().getPatient()
+                .getPnumber(), rhs.getProcessingEvent().getPatient().getPnumber());
         }
     };
 
@@ -81,7 +81,7 @@ public abstract class AbstractReportTest {
         final Integer siteId) {
         return new Predicate<AliquotWrapper>() {
             public boolean evaluate(AliquotWrapper aliquot) {
-                return isIn == aliquot.getPatientVisit().getCenter().getId()
+                return isIn == aliquot.getProcessingEvent().getCenter().getId()
                     .equals(siteId);
             }
         };
@@ -113,7 +113,7 @@ public abstract class AbstractReportTest {
             private Calendar drawn = Calendar.getInstance();
 
             public boolean evaluate(AliquotWrapper aliquot) {
-                drawn.setTime(aliquot.getPatientVisit().getDateDrawn());
+                drawn.setTime(aliquot.getProcessingEvent().getDateDrawn());
                 int drawnDayOfYear = drawn.get(Calendar.DAY_OF_YEAR);
                 int wantedDayOfYear = wanted.get(Calendar.DAY_OF_YEAR);
                 int drawnYear = drawn.get(Calendar.YEAR);
@@ -139,7 +139,7 @@ public abstract class AbstractReportTest {
         final Date after, final Date before) {
         return new Predicate<AliquotWrapper>() {
             public boolean evaluate(AliquotWrapper aliquot) {
-                Date processed = aliquot.getPatientVisit().getDateProcessed();
+                Date processed = aliquot.getProcessingEvent().getDateProcessed();
                 return (DateCompare.compare(processed, after) <= 0)
                     && (DateCompare.compare(processed, before) >= 0);
             }

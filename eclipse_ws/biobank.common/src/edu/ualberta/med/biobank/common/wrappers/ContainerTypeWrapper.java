@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.base.ContainerTypeBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Capacity;
@@ -35,7 +36,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
+public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     private Set<ContainerTypeWrapper> deletedChildTypes = new HashSet<ContainerTypeWrapper>();
 
@@ -48,11 +49,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public ContainerTypeWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ContainerTypePeer.PROP_NAMES;
     }
 
     @Override
@@ -156,11 +152,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
         }
     }
 
-    @Override
-    public Class<ContainerType> getWrappedClass() {
-        return ContainerType.class;
-    }
-
     public Collection<ContainerTypeWrapper> getChildrenRecursively()
         throws ApplicationException {
         List<ContainerTypeWrapper> allChildren = new ArrayList<ContainerTypeWrapper>();
@@ -222,58 +213,8 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             ContainerTypeWrapper.class);
     }
 
-    public String getName() {
-        return getProperty(ContainerTypePeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(ContainerTypePeer.NAME, name);
-    }
-
-    public String getNameShort() {
-        return getProperty(ContainerTypePeer.NAME_SHORT);
-    }
-
-    public void setNameShort(String nameShort) {
-        setProperty(ContainerTypePeer.NAME_SHORT, nameShort);
-    }
-
-    public String getComment() {
-        return getProperty(ContainerTypePeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(ContainerTypePeer.COMMENT, comment);
-    }
-
-    public Boolean getTopLevel() {
-        return getProperty(ContainerTypePeer.TOP_LEVEL);
-    }
-
-    public void setTopLevel(Boolean topLevel) {
-        setProperty(ContainerTypePeer.TOP_LEVEL, topLevel);
-    }
-
-    public Double getDefaultTemperature() {
-        return getProperty(ContainerTypePeer.DEFAULT_TEMPERATURE);
-    }
-
-    public void setDefaultTemperature(Double temperature) {
-        setProperty(ContainerTypePeer.DEFAULT_TEMPERATURE, temperature);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(ContainerTypePeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(ContainerTypePeer.ACTIVITY_STATUS, activityStatus);
-    }
-
     public void addSampleTypes(List<SampleTypeWrapper> newSampleTypes) {
-        addToWrapperCollection(ContainerTypePeer.SAMPLE_TYPE_COLLECTION,
-            newSampleTypes);
+        addToSampleTypeCollection(newSampleTypes);
 
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
@@ -282,19 +223,13 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
 
     public void removeSampleTypes(List<SampleTypeWrapper> typesToRemove) {
         deletedSampleTypes.addAll(typesToRemove);
-        removeFromWrapperCollection(ContainerTypePeer.SAMPLE_TYPE_COLLECTION,
-            typesToRemove);
-    }
-
-    public List<SampleTypeWrapper> getSampleTypeCollection() {
-        return getWrapperCollection(ContainerTypePeer.SAMPLE_TYPE_COLLECTION,
-            SampleTypeWrapper.class, true);
+        removeFromSampleTypeCollection(typesToRemove);
     }
 
     public Set<SampleTypeWrapper> getSampleTypesRecursively()
         throws ApplicationException {
         Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
-        List<SampleTypeWrapper> sampleSubSet = getSampleTypeCollection();
+        List<SampleTypeWrapper> sampleSubSet = getSampleTypeCollection(false);
         if (sampleSubSet != null)
             sampleTypes.addAll(sampleSubSet);
         for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
@@ -326,55 +261,12 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
             ContainerTypeWrapper.class, true);
     }
 
-    public SiteWrapper getSite() {
-        return getWrappedProperty(ContainerTypePeer.SITE, SiteWrapper.class);
-    }
-
-    public void setSite(SiteWrapper site) {
-        setWrappedProperty(ContainerTypePeer.SITE, site);
-    }
-
-    private CapacityWrapper getCapacity() {
-        return getWrappedProperty(ContainerTypePeer.CAPACITY,
-            CapacityWrapper.class);
-    }
-
-    private void setCapacity(CapacityWrapper capacity) {
-        setWrappedProperty(ContainerTypePeer.CAPACITY, capacity);
-    }
-
     public Integer getRowCapacity() {
-        return getProperty(getCapacity(), CapacityPeer.ROW_CAPACITY);
+        return getCapacity().getRowCapacity();
     }
 
     public Integer getColCapacity() {
-        return getProperty(getCapacity(), CapacityPeer.COL_CAPACITY);
-    }
-
-    private CapacityWrapper initCapacity() {
-        CapacityWrapper capacity = getCapacity();
-        if (capacity == null) {
-            capacity = new CapacityWrapper(appService);
-            setCapacity(capacity);
-        }
-        return capacity;
-    }
-
-    public void setRowCapacity(Integer maxRows) {
-        setProperty(initCapacity(), CapacityPeer.ROW_CAPACITY, maxRows);
-    }
-
-    public void setColCapacity(Integer maxCols) {
-        setProperty(initCapacity(), CapacityPeer.COL_CAPACITY, maxCols);
-    }
-
-    public ContainerLabelingSchemeWrapper getChildLabelingScheme() {
-        return getWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME,
-            ContainerLabelingSchemeWrapper.class);
-    }
-
-    public void setChildLabelingScheme(ContainerLabelingSchemeWrapper scheme) {
-        setWrappedProperty(ContainerTypePeer.CHILD_LABELING_SCHEME, scheme);
+        return getCapacity().getColCapacity();
     }
 
     public Integer getChildLabelingSchemeId() {
@@ -390,23 +282,6 @@ public class ContainerTypeWrapper extends ModelWrapper<ContainerType> {
                 + "\" does not exist");
         }
         setChildLabelingScheme(scheme);
-    }
-
-    public String getChildLabelingSchemeName() {
-        return getProperty(getChildLabelingScheme(),
-            ContainerLabelingSchemePeer.NAME);
-    }
-
-    public void setChildLabelingSchemeName(String name) throws Exception {
-        for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
-            .getAllLabelingSchemesMap(appService).values()) {
-            if (scheme.getName().equals(name)) {
-                setChildLabelingScheme(scheme);
-                return;
-            }
-        }
-        throw new Exception("labeling scheme with name \"" + name
-            + "\" does not exist");
     }
 
     /**

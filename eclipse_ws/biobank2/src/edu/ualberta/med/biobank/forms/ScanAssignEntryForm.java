@@ -711,7 +711,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                     // aliquot scanned is already registered at this
                     // position (everything is ok !)
                     scanCell.setStatus(CellStatus.FILLED);
-                    scanCell.setTitle(foundAliquot.getPatientVisit()
+                    scanCell.setTitle(foundAliquot.getProcessingEvent()
                         .getPatient().getPnumber());
                     scanCell.setAliquot(expectedAliquot);
                 } else {
@@ -726,7 +726,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
                             } else {
                                 scanCell.setStatus(CellStatus.NEW);
                                 scanCell.setTitle(foundAliquot
-                                    .getPatientVisit().getPatient()
+                                    .getProcessingEvent().getPatient()
                                     .getPnumber());
                             }
                         }
@@ -742,7 +742,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void updateCellAsDispatchedError(String positionString,
         PalletCell scanCell, AliquotWrapper foundAliquot) {
-        scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+        scanCell.setTitle(foundAliquot.getProcessingEvent().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
         scanCell
@@ -798,7 +798,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         String palletType = currentPalletWrapper.getContainerType().getName();
         String sampleType = foundAliquot.getSampleType().getName();
 
-        scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+        scanCell.setTitle(foundAliquot.getProcessingEvent().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setInformation(Messages.getFormattedString(
@@ -816,7 +816,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         }
 
         scanCell.setStatus(CellStatus.MOVED);
-        scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+        scanCell.setTitle(foundAliquot.getProcessingEvent().getPatient()
             .getPnumber());
         scanCell.setInformation(Messages.getFormattedString(
             "ScanAssign.scanStatus.aliquot.moved", expectedPosition)); //$NON-NLS-1$
@@ -834,7 +834,7 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         }
         String siteName = foundAliquot.getParent().getSite().getNameShort();
         scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setTitle(foundAliquot.getPatientVisit().getPatient()
+        scanCell.setTitle(foundAliquot.getProcessingEvent().getPatient()
             .getPnumber());
         scanCell.setInformation(Messages.getFormattedString(
             "ScanAssign.scanStatus.aliquot.otherSite", siteName)); //$NON-NLS-1$
@@ -856,9 +856,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
         scanCell.setTitle("!"); //$NON-NLS-1$
         appendLogNLS(
             "ScanAssign.activitylog.aliquot.positionTaken", position, expectedAliquot //$NON-NLS-1$
-                .getInventoryId(), expectedAliquot.getPatientVisit()
+                .getInventoryId(), expectedAliquot.getProcessingEvent()
                 .getPatient().getPnumber(), foundAliquot.getInventoryId(),
-            foundAliquot.getPatientVisit().getPatient().getPnumber());
+            foundAliquot.getProcessingEvent().getPatient().getPnumber());
     }
 
     /**
@@ -888,9 +888,9 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
             scanCell.setTitle("?"); //$NON-NLS-1$
             appendLogNLS(
                 "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
-                    .getInventoryId(), missingAliquot.getPatientVisit()
+                    .getInventoryId(), missingAliquot.getProcessingEvent()
                     .getFormattedDateProcessed(), missingAliquot
-                    .getPatientVisit().getPatient().getPnumber());
+                    .getProcessingEvent().getPatient().getPnumber());
             movedAndMissingAliquotsFromPallet.put(rcp, scanCell);
         } else {
             movedAndMissingAliquotsFromPallet.remove(rcp);
@@ -949,12 +949,12 @@ public class ScanAssignEntryForm extends AbstractPalletAliquotAdminForm {
 
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
         AliquotWrapper aliquot, String posStr) {
-        ProcessingEventWrapper visit = aliquot.getPatientVisit();
+        ProcessingEventWrapper visit = aliquot.getProcessingEvent();
         sb.append(Messages.getFormattedString(
             "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
             posStr, currentSiteSelected.getNameShort(), cell.getValue(),
             aliquot.getSampleType().getName(), visit.getPatient().getPnumber(),
-            visit.getFormattedDateDrawn(), visit.getShipment().getClinic()
+            visit.getFormattedDateDrawn(), visit.getCollectionEvent().getClinic()
                 .getName()));
     }
 

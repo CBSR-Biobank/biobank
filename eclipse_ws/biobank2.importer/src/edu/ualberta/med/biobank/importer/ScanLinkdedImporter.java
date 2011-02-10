@@ -252,8 +252,8 @@ public class ScanLinkdedImporter {
             .getNameShort();
         if (aliquot != null) {
             // check if this is a duplicate
-            if (aliquot.getPatientVisit().getId().equals(visitId)
-                && aliquot.getPatientVisit().getPatient().getPnumber()
+            if (aliquot.getProcessingEvent().getId().equals(visitId)
+                && aliquot.getProcessingEvent().getPatient().getPnumber()
                     .equals(patientNr)
                 && aliquot.getSampleType().getNameShort()
                     .equals(sampleTypeNameShort)) {

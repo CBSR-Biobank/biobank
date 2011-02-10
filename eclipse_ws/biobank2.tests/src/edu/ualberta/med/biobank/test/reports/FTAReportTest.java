@@ -17,8 +17,8 @@ import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 
@@ -34,8 +34,8 @@ public class FTAReportTest extends AbstractReportTest {
             return patientVisit.getPatient().getPnumber();
         }
 
-        public ProcessingEventWrapper getValue(ProcessingEventWrapper patientVisit,
-            ProcessingEventWrapper oldValue) {
+        public ProcessingEventWrapper getValue(
+            ProcessingEventWrapper patientVisit, ProcessingEventWrapper oldValue) {
             // keep the earliest patient visit (according to date processed)
             return (oldValue == null)
                 || patientVisit.getDateProcessed().before(
@@ -44,7 +44,7 @@ public class FTAReportTest extends AbstractReportTest {
     };
     private static final Mapper<AliquotWrapper, String, AliquotWrapper> GROUP_ALIQUOTS_BY_PNUMBER = new Mapper<AliquotWrapper, String, AliquotWrapper>() {
         public String getKey(AliquotWrapper aliquot) {
-            return aliquot.getPatientVisit().getPatient().getPnumber();
+            return aliquot.getProcessingEvent().getPatient().getPnumber();
         }
 
         public AliquotWrapper getValue(AliquotWrapper aliquot,
@@ -65,7 +65,7 @@ public class FTAReportTest extends AbstractReportTest {
     @Deprecated
     private static final Mapper<AliquotWrapper, String, AliquotWrapper> GROUP_ALIQUOTS_BY_PNUMBER_OLD = new Mapper<AliquotWrapper, String, AliquotWrapper>() {
         public String getKey(AliquotWrapper aliquot) {
-            return aliquot.getPatientVisit().getPatient().getPnumber();
+            return aliquot.getProcessingEvent().getPatient().getPnumber();
         }
 
         public AliquotWrapper getValue(AliquotWrapper aliquot,
@@ -76,15 +76,15 @@ public class FTAReportTest extends AbstractReportTest {
             if (oldValue == null) {
                 return aliquot;
             } else {
-                if (aliquot.getPatientVisit().getDateProcessed()
-                    .equals(oldValue.getPatientVisit().getDateProcessed())) {
+                if (aliquot.getProcessingEvent().getDateProcessed()
+                    .equals(oldValue.getProcessingEvent().getDateProcessed())) {
                     if (aliquot.getId() > oldValue.getId()) {
                         return oldValue;
                     } else {
                         return aliquot;
                     }
-                } else if (aliquot.getPatientVisit().getDateProcessed()
-                    .after(oldValue.getPatientVisit().getDateProcessed())) {
+                } else if (aliquot.getProcessingEvent().getDateProcessed()
+                    .after(oldValue.getProcessingEvent().getDateProcessed())) {
                     return oldValue;
                 } else {
                     return aliquot;
@@ -114,8 +114,7 @@ public class FTAReportTest extends AbstractReportTest {
 
         for (StudyWrapper study : getStudies()) {
             for (PatientWrapper patient : study.getPatientCollection()) {
-                patientVisits = patient.getPatientVisitCollection(true, true,
-                    null);
+                patientVisits = patient.getProcessingEventCollection();
                 if ((patientVisits != null) && (patientVisits.size() > 0)) {
                     // check before, on, and after each patient's first patient
                     // visit
@@ -144,7 +143,7 @@ public class FTAReportTest extends AbstractReportTest {
 
         Predicate<AliquotWrapper> pvProcessedAfter = new Predicate<AliquotWrapper>() {
             public boolean evaluate(AliquotWrapper aliquot) {
-                return aliquot.getPatientVisit().getDateProcessed()
+                return aliquot.getProcessingEvent().getDateProcessed()
                     .after(firstPvDateProcessed);
             }
         };
@@ -152,8 +151,8 @@ public class FTAReportTest extends AbstractReportTest {
         Collection<ProcessingEventWrapper> allPatientVisits = getPatientVisits();
         Collection<ProcessingEventWrapper> filteredPatientVisits = PredicateUtil
             .filter(allPatientVisits, patientInStudy);
-        Map<String, ProcessingEventWrapper> groupedPatientVisits = MapperUtil.map(
-            filteredPatientVisits, GROUP_PATIENT_VISITS_BY_PNUMBER);
+        Map<String, ProcessingEventWrapper> groupedPatientVisits = MapperUtil
+            .map(filteredPatientVisits, GROUP_PATIENT_VISITS_BY_PNUMBER);
 
         Collection<AliquotWrapper> allAliquots = getAliquots();
         @SuppressWarnings("unchecked")
@@ -173,7 +172,7 @@ public class FTAReportTest extends AbstractReportTest {
             for (ProcessingEventWrapper patientVisit : groupedPatientVisits
                 .values()) {
                 if (patientVisit.getId().equals(
-                    aliquot.getPatientVisit().getId())) {
+                    aliquot.getProcessingEvent().getId())) {
                     expectedResults.add(aliquot.getId());
                 }
             }
