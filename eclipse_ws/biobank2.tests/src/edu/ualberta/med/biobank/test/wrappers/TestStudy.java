@@ -53,7 +53,7 @@ public class TestStudy extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name, false);
         List<SiteWrapper> sites = SiteWrapper.getSites(appService);
         for (SiteWrapper s : sites) {
-            s.addStudies(Arrays.asList(study));
+            s.addToStudyCollection(Arrays.asList(study));
             s.persist();
         }
         study.reload();
@@ -79,7 +79,7 @@ public class TestStudy extends TestDatabase {
 
         List<SiteWrapper> sites = SiteWrapper.getSites(appService);
         for (SiteWrapper s : sites) {
-            s.addStudies(Arrays.asList(study));
+            s.addToStudyCollection(Arrays.asList(study));
             s.persist();
         }
         study.reload();

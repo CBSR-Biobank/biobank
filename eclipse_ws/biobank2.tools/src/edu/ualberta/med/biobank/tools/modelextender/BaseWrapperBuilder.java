@@ -78,7 +78,6 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         // remove ".java"
         for (String filename : dir.list(filter)) {
-            LOGGER.debug("filename: " + filename);
             wrapperMap.put(filename.replace(".java", ""), packagename);
         }
         return wrapperMap;
@@ -130,9 +129,9 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 .append("BaseWrapper").append("<E extends ")
                 .append(mc.getName()).append("> extends ModelWrapper<E> ");
         } else if (mc.getExtendsClass() != null) {
-            contents.append("\npublic class ").append(mc.getName())
+            contents.append("\npublic abstract class ").append(mc.getName())
                 .append("BaseWrapper").append(" extends ")
-                .append(mc.getExtendsClass().getName()).append("BaseWrapper<")
+                .append(mc.getExtendsClass().getName()).append("Wrapper<")
                 .append(mc.getName()).append("> ");
         } else {
             contents.append("\npublic class ").append(mc.getName())
@@ -160,6 +159,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 contents.append(createCollectionGetter(mc, assoc));
                 contents.append(createCollectionAdder(mc, assoc));
                 contents.append(createCollectionRemover(mc, assoc));
+                contents.append(createCollectionRemoverWithCheck(mc, assoc));
             }
         }
 
@@ -393,9 +393,63 @@ public class BaseWrapperBuilder extends BaseBuilder {
         return result.toString();
     }
 
+    private Object createCollectionRemoverWithCheck(ModelClass mc,
+        ClassAssociation assoc) throws Exception {
+        String assocClassName = assoc.getToClass().getName();
+        String assocWrapperName = new StringBuilder(assocClassName).append(
+            "Wrapper").toString();
+
+        if (!wrapperMap.containsKey(assocWrapperName))
+            return "";
+
+        ClassAssociationType assocType = assoc.getAssociationType();
+
+        if ((assocType != ClassAssociationType.ZERO_OR_ONE_TO_MANY)
+            && (assocType != ClassAssociationType.ONE_TO_MANY)) {
+            throw new Exception("class " + mc.getName() + " does not have a "
+                + "zero to many or one to many relationship with class"
+                + assoc.getClass());
+        }
+
+        String assocName = assoc.getAssocName();
+        StringBuilder result = new StringBuilder();
+
+        // fix warnings
+        if (mc.getName().equals("ShippingMethod")) {
+            result
+                .append("   @SuppressWarnings({ \"unchecked\", \"rawtypes\" })\n");
+        }
+
+        result.append("   public void removeFrom")
+            .append(CamelCase.toCamelCase(assocName, true))
+            .append("WithCheck(List<").append(assocClassName)
+            .append("Wrapper> ").append(assocName)
+            .append(") throws BiobankCheckException {\n")
+            .append("      removeFromWrapperCollectionWithCheck(")
+            .append(mc.getName()).append("Peer.")
+            .append(CamelCase.toTitleCase(assocName)).append(", ")
+            .append(assocName).append(");\n").append("   }\n\n");
+        return result.toString();
+    }
+
     private String getWrapperImports(ModelClass mc) {
         Map<String, Integer> importCount = new HashMap<String, Integer>();
         StringBuilder sb = new StringBuilder();
+
+        // add import for base wrapper
+        ModelClass ec = mc.getExtendsClass();
+        if (ec != null) {
+            StringBuilder wrapperName = new StringBuilder(ec.getName())
+                .append("Wrapper");
+
+            String packagename = wrapperMap.get(wrapperName.toString());
+
+            if (packagename != null) {
+                importCount.put(ec.getName(), 1);
+                sb.append("import ").append(packagename).append(".")
+                    .append(wrapperName).append(";\n");
+            }
+        }
 
         for (Attribute attr : mc.getAttrMap().values()) {
             String attrType = attr.getType();
@@ -413,6 +467,24 @@ public class BaseWrapperBuilder extends BaseBuilder {
         Map<String, ClassAssociation> assocMap = mc.getAssocMap();
         for (ClassAssociation assoc : assocMap.values()) {
             ModelClass toClass = assoc.getToClass();
+
+            if (mc.getName().equals("Report")) {
+                LOGGER.info(mc.getName());
+            }
+
+            // check if need to import BioBankCheckException
+            ClassAssociationType assocType = assoc.getAssociationType();
+            if (((assocType == ClassAssociationType.ZERO_OR_ONE_TO_MANY) || (assocType == ClassAssociationType.ONE_TO_MANY))
+                && (importCount.get("BioBankCheckException") == null)) {
+
+                String wrapperName = new StringBuilder(toClass.getName())
+                    .append("Wrapper").toString();
+                if (wrapperMap.get(wrapperName) != null) {
+
+                    importCount.put("BioBankCheckException", 1);
+                    sb.append("import edu.ualberta.med.biobank.common.exception.BiobankCheckException;\n");
+                }
+            }
 
             if (importCount.get(toClass.getName()) != null) {
                 // already added an import for this class
