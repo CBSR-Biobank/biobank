@@ -6,12 +6,10 @@ import java.util.Map;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 
 public class ModelWrapperHelper {
-    private static final Map<Class<?>, Class<? extends ModelWrapper<?>>> modelKlazzMap = new HashMap<Class<?>, Class<? extends ModelWrapper<?>>>();
+    private static final Map<Class<?>, Class<?>> modelKlazzMap = new HashMap<Class<?>, Class<?>>();
 
-    public static <M> Class<ModelWrapper<M>> getWrapperClass(Class<M> modelKlazz) {
-        @SuppressWarnings("unchecked")
-        Class<ModelWrapper<M>> wrapperKlazz = (Class<ModelWrapper<M>>) modelKlazzMap
-            .get(modelKlazz);
+    public static Class<?> getWrapperClass(Class<?> modelKlazz) {
+        Class<?> wrapperKlazz = modelKlazzMap.get(modelKlazz);
 
         if (wrapperKlazz == null && !modelKlazzMap.containsKey(modelKlazz)) {
             StringBuilder sb = new StringBuilder();
@@ -23,9 +21,7 @@ public class ModelWrapperHelper {
 
             String wrapperKlazzName = sb.toString();
             try {
-                @SuppressWarnings("unchecked")
-                Class<ModelWrapper<M>> tmp = (Class<ModelWrapper<M>>) Class
-                    .forName(wrapperKlazzName);
+                Class<?> tmp = Class.forName(wrapperKlazzName);
                 wrapperKlazz = tmp;
             } catch (ClassNotFoundException e) {
             }
