@@ -109,11 +109,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return getRequestCollection(RequestState.SHIPPED);
     }
 
-    public List<StudyWrapper> getStudyCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.STUDY_COLLECTION,
-            StudyWrapper.class, sort);
-    }
-
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(true);
     }
@@ -129,46 +124,12 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return studyWrappers;
     }
 
-    public void addStudies(List<StudyWrapper> studies) {
-        addToWrapperCollection(SitePeer.STUDY_COLLECTION, studies);
-    }
-
-    public void removeStudies(List<StudyWrapper> studiesToRemove)
-        throws BiobankCheckException {
-        if (studiesToRemove == null || studiesToRemove.isEmpty()) {
-            return;
-        }
-
-        List<StudyWrapper> currentList = getStudyCollection();
-
-        if (currentList == null || !currentList.containsAll(studiesToRemove)) {
-            throw new BiobankCheckException(
-                "studies are not associated with site " + getNameShort());
-        }
-
-        removeFromWrapperCollection(SitePeer.STUDY_COLLECTION, studiesToRemove);
-    }
-
-    public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION,
-            ContainerTypeWrapper.class, sort);
-    }
-
     public List<ContainerTypeWrapper> getContainerTypeCollection() {
         return getContainerTypeCollection(false);
     }
 
-    public void addContainerTypes(List<ContainerTypeWrapper> types) {
-        addToWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION, types);
-    }
-
     public List<ContainerWrapper> getContainerCollection() {
-        return getWrapperCollection(SitePeer.CONTAINER_COLLECTION,
-            ContainerWrapper.class, false);
-    }
-
-    public void addContainers(List<ContainerWrapper> containers) {
-        addToWrapperCollection(SitePeer.CONTAINER_COLLECTION, containers);
+        return getContainerCollection(false);
     }
 
     @SuppressWarnings("unchecked")

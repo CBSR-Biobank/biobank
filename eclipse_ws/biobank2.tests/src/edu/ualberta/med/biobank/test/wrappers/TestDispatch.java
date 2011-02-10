@@ -80,6 +80,10 @@ public class TestDispatch extends TestDatabase {
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
 
         for (SiteWrapper site : allSites) {
+<<<<<<< HEAD
+=======
+            site.addToStudyCollection(allStudies);
+>>>>>>> devloyola
             site.persist();
             site.reload();
         }
@@ -111,6 +115,10 @@ public class TestDispatch extends TestDatabase {
             receiverSite, receiverSite2 };
 
         for (SiteWrapper site : allSites) {
+<<<<<<< HEAD
+=======
+            site.addToStudyCollection(allStudies);
+>>>>>>> devloyola
             site.persist();
             site.reload();
         }
@@ -153,6 +161,10 @@ public class TestDispatch extends TestDatabase {
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
 
         for (SiteWrapper site : allSites) {
+<<<<<<< HEAD
+=======
+            site.addToStudyCollection(allStudies);
+>>>>>>> devloyola
             site.persist();
             site.reload();
         }
@@ -186,6 +198,10 @@ public class TestDispatch extends TestDatabase {
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
 
         for (SiteWrapper site : allSites) {
+<<<<<<< HEAD
+=======
+            site.addToStudyCollection(allStudies);
+>>>>>>> devloyola
             site.persist();
             site.reload();
         }
@@ -217,6 +233,10 @@ public class TestDispatch extends TestDatabase {
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
 
         for (SiteWrapper site : allSites) {
+<<<<<<< HEAD
+=======
+            site.addToStudyCollection(allStudies);
+>>>>>>> devloyola
             site.persist();
             site.reload();
         }
@@ -249,6 +269,10 @@ public class TestDispatch extends TestDatabase {
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
 
         for (SiteWrapper site : allSites) {
+<<<<<<< HEAD
+=======
+            site.addToStudyCollection(allStudies);
+>>>>>>> devloyola
             site.persist();
             site.reload();
         }
@@ -267,3 +291,122 @@ public class TestDispatch extends TestDatabase {
 
         Assert.assertEquals(countBefore - 1, countAfter);
     }
+<<<<<<< HEAD
+=======
+
+    private List<AliquotWrapper> addAliquotsToContainerRow(
+        PatientVisitWrapper visit, ContainerWrapper container, int row,
+        List<SampleTypeWrapper> sampleTypes) throws Exception {
+        int numSampletypes = sampleTypes.size();
+        int colCapacity = container.getColCapacity();
+        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+        for (int i = 0; i < colCapacity; ++i) {
+            aliquots.add(AliquotHelper.addAliquot(
+                sampleTypes.get(r.nextInt(numSampletypes)),
+                ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, visit,
+                row, i));
+        }
+        container.reload();
+        visit.reload();
+        return aliquots;
+    }
+
+    @Test
+    public void testGetSetAliqutotCollection() throws Exception {
+        String name = "testGetSetAliquotCollection" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
+        senderSite.addToStudyCollection(Arrays.asList(study));
+        senderSite.persist();
+        SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
+        receiverSite.addToStudyCollection(Arrays.asList(study));
+        receiverSite.persist();
+
+        senderSite.addStudyDispatchSites(study, Arrays.asList(receiverSite));
+        senderSite.persist();
+        senderSite.reload();
+        DispatchWrapper shipment = DispatchHelper.addDispatch(senderSite,
+            receiverSite, study,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        List<SampleTypeWrapper> sampleTypes = SampleTypeWrapper
+            .getAllSampleTypes(appService, false);
+        ContainerTypeWrapper containerType = ContainerTypeHelper
+            .addContainerType(senderSite, name, name, 1, 8, 12, false);
+        containerType.addSampleTypes(sampleTypes);
+        containerType.persist();
+        containerType.reload();
+        ContainerTypeWrapper topContainerType = ContainerTypeHelper
+            .addContainerTypeRandom(senderSite, name + "top", true);
+        topContainerType.addChildContainerTypes(Arrays.asList(containerType));
+        topContainerType.persist();
+        topContainerType.reload();
+        ContainerWrapper topContainer = ContainerHelper.addContainer(
+            String.valueOf(r.nextInt()), name + "top", null, senderSite,
+            topContainerType);
+        ContainerWrapper container = ContainerHelper.addContainer(null, name,
+            topContainer, senderSite, containerType, 0, 0);
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addToContactCollection(Arrays.asList(contact));
+        study.persist();
+        study.reload();
+        ShipmentWrapper clinicShipment = ShipmentHelper.addShipment(senderSite,
+            clinic,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0),
+            patient);
+        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
+            clinicShipment, Utils.getRandomDate(), Utils.getRandomDate());
+
+        List<AliquotWrapper> aliquotSet1 = addAliquotsToContainerRow(visit,
+            container, 0, sampleTypes);
+        List<AliquotWrapper> aliquotSet2 = addAliquotsToContainerRow(visit,
+            container, 1, sampleTypes);
+
+        shipment.addNewAliquots(aliquotSet1, true);
+        shipment.persist();
+        shipment.reload();
+
+        List<AliquotWrapper> shipmentAliquots = shipment.getAliquotCollection();
+        Assert.assertEquals(aliquotSet1.size(), shipmentAliquots.size());
+
+        // add more aliquots to row 2
+
+        shipment.addNewAliquots(aliquotSet2, true);
+        shipment.persist();
+        shipment.reload();
+
+        shipmentAliquots = shipment.getAliquotCollection();
+        Assert.assertEquals(aliquotSet1.size() + aliquotSet2.size(),
+            shipmentAliquots.size());
+
+        shipment.removeAliquots(aliquotSet1);
+        shipment.persist();
+        shipment.reload();
+
+        shipmentAliquots = shipment.getAliquotCollection();
+        Assert.assertEquals(aliquotSet2.size(), shipmentAliquots.size());
+    }
+
+    @Test
+    public void testRemoveDispatchAliquots() {
+        Assert.fail("testcase missing");
+    }
+
+    @Test
+    public void testGetDispatchesInSite() {
+        Assert.fail("testcase missing");
+    }
+
+    @Test
+    public void testGetDispatchesInSiteByDateSent() {
+        Assert.fail("testcase missing");
+    }
+
+    @Test
+    public void testGetDispatchesInSiteByDateReceived() {
+        Assert.fail("testcase missing");
+    }
+
+}
+>>>>>>> devloyola

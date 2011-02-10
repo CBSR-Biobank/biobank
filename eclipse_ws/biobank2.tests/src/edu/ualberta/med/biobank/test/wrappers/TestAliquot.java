@@ -90,7 +90,7 @@ public class TestAliquot extends TestDatabase {
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
 
-        site.addStudies(Arrays.asList(study));
+        site.addToStudyCollection(Arrays.asList(study));
         site.persist();
         site.reload();
 
@@ -665,7 +665,7 @@ public class TestAliquot extends TestDatabase {
 
         // dispatch aliquot to second site
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
-        destSite2.addStudies(Arrays.asList(study));
+        destSite2.addToStudyCollection(Arrays.asList(study));
         destSite2.persist();
         destSite2.reload();
         destSite.persist();

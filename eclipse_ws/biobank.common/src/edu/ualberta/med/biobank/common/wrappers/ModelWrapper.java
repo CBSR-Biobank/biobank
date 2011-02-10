@@ -1,5 +1,21 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.cglib.proxy.Enhancer;
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -22,23 +38,6 @@ import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import net.sf.cglib.proxy.Enhancer;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final Map<Property<?, ?>, Object> propertyMap = new HashMap<Property<?, ?>, Object>();
@@ -183,6 +182,26 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         allWrappers.removeAll(wrappersToRemove);
 
         setWrapperCollection(property, allWrappers);
+    }
+
+    public <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollectionWithCheck(
+        Property<? extends Collection<R>, ? super E> property,
+        List<W> wrappersToRemove) throws BiobankCheckException {
+        if (wrappersToRemove == null || wrappersToRemove.isEmpty()) {
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
+        Class<W> wrapperKlazz = (Class<W>) wrappersToRemove.get(0).getClass();
+        List<W> currentWrappers = getWrapperCollection(property, wrapperKlazz,
+            false);
+
+        if (!currentWrappers.containsAll(wrappersToRemove)) {
+            throw new BiobankCheckException(
+                "studies are not associated with site ");
+        }
+
+        removeFromWrapperCollection(property, wrappersToRemove);
     }
 
     protected <T> T getProperty(Property<T, ? super E> property) {
