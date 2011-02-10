@@ -96,14 +96,14 @@ public class AliquotWrapper extends AliquotBaseWrapper {
         objectWithPositionManagement.persistChecks();
     }
 
-    public String getFormattedLinkDate() {
-        return DateFormatter.formatAsDateTime(wrappedObject.getLinkDate());
-    }
-
     public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Aliquot.class, AliquotPeer.INVENTORY_ID.getName(),
             getInventoryId(), "An aliquot with inventoryId");
+    }
+
+    public String getFormattedLinkDate() {
+        return DateFormatter.formatAsDateTime(getLinkDate());
     }
 
     public ContainerWrapper getParent() {
@@ -143,7 +143,7 @@ public class AliquotWrapper extends AliquotBaseWrapper {
                 throw new BiobankCheckException(e);
             }
             List<SampleTypeWrapper> types = parentType
-                .getSampleTypeCollection();
+                .getSampleTypeCollection(false);
             if (types == null || !types.contains(getSampleType())) {
                 throw new BiobankCheckException("Container "
                     + getParent().getFullInfoLabel()

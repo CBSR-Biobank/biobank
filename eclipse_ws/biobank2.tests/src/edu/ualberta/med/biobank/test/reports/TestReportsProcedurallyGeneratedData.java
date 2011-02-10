@@ -631,7 +631,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         int aliquotsAdded = 0;
         for (ContainerWrapper container : containers) {
             List<SampleTypeWrapper> sampleTypes = container.getContainerType()
-                .getSampleTypeCollection();
+                .getSampleTypeCollection(false);
             if ((sampleTypes != null) && (sampleTypes.size() > 0)) {
                 for (int row = 0, numRows = container.getRowCapacity(); row < numRows; row++) {
                     for (int col = 0, numCols = container.getColCapacity(); col < numCols; col++) {

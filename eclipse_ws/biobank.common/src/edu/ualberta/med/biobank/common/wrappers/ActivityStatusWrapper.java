@@ -93,9 +93,8 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         if (object instanceof ActivityStatusWrapper)
             return ((ActivityStatusWrapper) object).getName().equals(
                 this.getName());
-        else
 
-            return false;
+        return false;
     }
 
     @Override

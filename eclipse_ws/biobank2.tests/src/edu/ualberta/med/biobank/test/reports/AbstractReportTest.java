@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -47,8 +47,8 @@ public abstract class AbstractReportTest {
     };
     public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
         public boolean evaluate(ContainerWrapper container) {
-            return (container.getContainerType().getSampleTypeCollection() != null)
-                && (container.getContainerType().getSampleTypeCollection()
+            return (container.getContainerType().getSampleTypeCollection(false) != null)
+                && (container.getContainerType().getSampleTypeCollection(false)
                     .size() > 0);
         }
     };
@@ -66,7 +66,8 @@ public abstract class AbstractReportTest {
     public static final Comparator<AliquotWrapper> ORDER_ALIQUOT_BY_PNUMBER = new Comparator<AliquotWrapper>() {
         public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
             return compareStrings(lhs.getProcessingEvent().getPatient()
-                .getPnumber(), rhs.getProcessingEvent().getPatient().getPnumber());
+                .getPnumber(), rhs.getProcessingEvent().getPatient()
+                .getPnumber());
         }
     };
 
@@ -139,7 +140,8 @@ public abstract class AbstractReportTest {
         final Date after, final Date before) {
         return new Predicate<AliquotWrapper>() {
             public boolean evaluate(AliquotWrapper aliquot) {
-                Date processed = aliquot.getProcessingEvent().getDateProcessed();
+                Date processed = aliquot.getProcessingEvent()
+                    .getDateProcessed();
                 return (DateCompare.compare(processed, after) <= 0)
                     && (DateCompare.compare(processed, before) >= 0);
             }

@@ -192,7 +192,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         if (!modelBaseClasses.containsKey(mc.getName())) {
             // wrappers for model base classes do not implement the
             // getWrappedClass() method
-            result.append("    @Override\n    public Class<")
+            result.append("    @Override\n    public final Class<")
                 .append(mc.getName()).append("> getWrappedClass() {\n")
                 .append("        return ").append(mc.getName())
                 .append(".class;\n").append("    }\n\n");
