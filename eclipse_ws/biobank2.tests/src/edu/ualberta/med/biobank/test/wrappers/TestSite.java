@@ -564,18 +564,14 @@ public class TestSite extends TestDatabase {
         ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
 
         List<CollectionEventWrapper> shipments = new ArrayList<CollectionEventWrapper>();
-        shipments
-            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-                site, clinic1, name + "Study1"));
-        shipments
-            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-                site, clinic1, name + "Study2"));
-        shipments
-            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-                site, clinic2, name + "Study3"));
-        shipments
-            .add(CollectionEventHelper.addCollectionEventWithRandomPatient(
-                site, clinic2, name + "Study4"));
+        shipments.add(CollectionEventHelper
+            .addCollectionEventWithRandomPatient(site, name + "Study1"));
+        shipments.add(CollectionEventHelper
+            .addCollectionEventWithRandomPatient(site, name + "Study2"));
+        shipments.add(CollectionEventHelper
+            .addCollectionEventWithRandomPatient(site, name + "Study3"));
+        shipments.add(CollectionEventHelper
+            .addCollectionEventWithRandomPatient(site, name + "Study4"));
 
         site.reload();
         return shipments;
@@ -643,17 +639,17 @@ public class TestSite extends TestDatabase {
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel("test1", patient1,
-                    Utils.getRandomDate(), 0.1),
-                SourceVesselHelper.newSourceVessel("test2", patient3,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                    0.1),
+                SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
+                    0.1));
         CollectionEventHelper.addCollectionEvent(
             site,
             method,
-            SourceVesselHelper.newSourceVessel("test3", patient2,
-                Utils.getRandomDate(), 0.1),
-            SourceVesselHelper.newSourceVessel("test4", patient3,
-                Utils.getRandomDate(), 0.1));
+            SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
+                0.1),
+            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
+                0.1));
 
         site.reload();
         Assert.assertEquals(2, site.getCollectionEventCount());
@@ -666,10 +662,10 @@ public class TestSite extends TestDatabase {
         shipment1 = CollectionEventHelper.addCollectionEvent(
             site,
             method,
-            SourceVesselHelper.newSourceVessel("test1", patient1,
-                Utils.getRandomDate(), 0.1),
-            SourceVesselHelper.newSourceVessel("test2", patient3,
-                Utils.getRandomDate(), 0.1));
+            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                0.1),
+            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
+                0.1));
 
         site.reload();
         Assert.assertEquals(2, site.getCollectionEventCount());
@@ -708,17 +704,17 @@ public class TestSite extends TestDatabase {
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel("test1", patient1,
-                    Utils.getRandomDate(), 0.1),
-                SourceVesselHelper.newSourceVessel("test2", patient3,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                    0.1),
+                SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
+                    0.1));
         CollectionEventHelper.addCollectionEvent(
             site,
             method,
-            SourceVesselHelper.newSourceVessel("test1", patient2,
-                Utils.getRandomDate(), 0.1),
-            SourceVesselHelper.newSourceVessel("test2", patient3,
-                Utils.getRandomDate(), 0.1));
+            SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
+                0.1),
+            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
+                0.1));
 
         site.reload();
         Assert.assertEquals(3, site.getPatientCount().longValue());
@@ -731,8 +727,8 @@ public class TestSite extends TestDatabase {
         shipment1 = CollectionEventHelper.addCollectionEvent(
             site,
             method,
-            SourceVesselHelper.newSourceVessel("test2", patient3,
-                Utils.getRandomDate(), 0.1));
+            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
+                0.1));
 
         site.reload();
         Assert.assertEquals(2, site.getPatientCount().longValue());
@@ -771,17 +767,17 @@ public class TestSite extends TestDatabase {
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel("test1", patient1,
-                    Utils.getRandomDate(), 0.1),
-                SourceVesselHelper.newSourceVessel("test2", patient3,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                    0.1),
+                SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
+                    0.1));
         CollectionEventHelper.addCollectionEvent(
             site,
             method,
-            SourceVesselHelper.newSourceVessel("test1", patient1,
-                Utils.getRandomDate(), 0.1),
-            SourceVesselHelper.newSourceVessel("test2", patient2,
-                Utils.getRandomDate(), 0.1));
+            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                0.1),
+            SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
+                0.1));
 
         // shipment1 has patient visits for patient1 and patient3
         int nber = ProcessingEventHelper.addProcessingEvents(site, patient1)

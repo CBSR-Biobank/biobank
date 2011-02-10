@@ -58,18 +58,18 @@ public class TestShippingMethod extends TestDatabase {
         CollectionEventHelper.addCollectionEvent(
             site,
             method1,
-            SourceVesselHelper.newSourceVessel("Asdfa", patient1,
-                Utils.getRandomDate(), 0.1));
+            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                0.1));
         CollectionEventHelper.addCollectionEvent(
             site,
             method2,
-            SourceVesselHelper.newSourceVessel("Asdfb", patient1,
-                Utils.getRandomDate(), 0.1));
+            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                0.1));
         CollectionEventHelper.addCollectionEvent(
             site,
             method2,
-            SourceVesselHelper.newSourceVessel("Asdfc", patient1,
-                Utils.getRandomDate(), 0.1));
+            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                0.1));
 
         method1.reload();
         method2.reload();
@@ -96,24 +96,24 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel("Asdf", patient1,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                    0.1));
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
         CollectionEventWrapper shipment2 = CollectionEventHelper
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel("Asdf", patient1,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                    0.1));
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
         CollectionEventWrapper shipment3 = CollectionEventHelper
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel("Asdf", patient1,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                    0.1));
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
 
@@ -232,8 +232,8 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel("Asdf", patient1,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                    0.1));
         shipment1.persist();
         method.reload();
 
@@ -315,8 +315,8 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(
                 site,
                 methods[0],
-                SourceVesselHelper.newSourceVessel("Asdf", patient1,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                    0.1));
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
 
@@ -327,8 +327,8 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(
                 site,
                 methods[1],
-                SourceVesselHelper.newSourceVessel("Asdf", patient1,
-                    Utils.getRandomDate(), 0.1));
+                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                    0.1));
         shipment2.setWaybill(name + "QWERTY");
         shipment2.persist();
 

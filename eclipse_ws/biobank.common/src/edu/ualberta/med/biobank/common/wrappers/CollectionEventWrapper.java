@@ -1,7 +1,9 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -13,6 +15,7 @@ import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
+import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class CollectionEventWrapper extends
     AbstractShipmentWrapper<CollectionEvent> {
@@ -139,5 +142,36 @@ public class CollectionEventWrapper extends
         removeFromWrapperCollection(
             CollectionEventPeer.SOURCE_VESSEL_COLLECTION,
             sourceVesselCollection);
+    }
+
+    public static List<CollectionEventWrapper> getCollectionEvents(
+        WritableApplicationService appService, String waybill)
+        throws ApplicationException {
+        return appService.query(new HQLCriteria("from "
+            + CollectionEvent.class.getName() + " ce where ce.waybill=?",
+            Arrays.asList(new Object[] { waybill })));
+    }
+
+    public static List<CollectionEventWrapper> getCollectionEvents(
+        WritableApplicationService appService, Date dateReceived)
+        throws ApplicationException {
+        return appService.query(new HQLCriteria("from "
+            + CollectionEvent.class.getName() + " ce where ce.dateReceived=?",
+            Arrays.asList(new Object[] { dateReceived })));
+    }
+
+    public boolean hasPatient(String pnum) {
+        List<SourceVesselWrapper> svs = getSourceVesselCollection();
+        for (SourceVesselWrapper sv : svs)
+            if (sv.getPatient().getPnumber().equals(pnum))
+                return true;
+        return false;
+    }
+
+    public static List<CollectionEventWrapper> getTodayCollectionEvents(
+        WritableApplicationService appService) throws ApplicationException {
+        return appService.query(new HQLCriteria("from "
+            + CollectionEvent.class.getName() + " ce where ce.dateReceived=?",
+            Arrays.asList(new Object[] { new Date() })));
     }
 }

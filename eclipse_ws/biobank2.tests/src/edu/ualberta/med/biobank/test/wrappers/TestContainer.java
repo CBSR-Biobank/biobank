@@ -867,8 +867,8 @@ public class TestContainer extends TestDatabase {
     private ProcessingEventWrapper addProcessingEvent() throws Exception {
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
-        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel("gg",
-            PatientHelper.newPatient("testP"), Utils.getRandomDate(), 0.01);
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(PatientHelper.newPatient("testP"),
+            Utils.getRandomDate(), 0.01);
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
             site, patient, Utils.getRandomDate(), Utils.getRandomDate());

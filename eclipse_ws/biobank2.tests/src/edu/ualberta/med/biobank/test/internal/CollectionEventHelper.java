@@ -70,8 +70,8 @@ public class CollectionEventHelper extends DbHelper {
 
         return addCollectionEvent(site, ShippingMethodWrapper
             .getShippingMethods(appService).get(0), "wb-54",
-            SourceVesselHelper.newSourceVessel("testSV", patient,
-                Utils.getRandomDate(), 0.1));
+            SourceVesselHelper.newSourceVessel(patient, Utils.getRandomDate(),
+                0.1));
 
     }
 }

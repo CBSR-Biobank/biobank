@@ -27,35 +27,31 @@ public class TestSourceVessel extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
         p1 = PatientHelper.newPatient("444");
-        ssw = SourceVesselHelper.addSourceVessel("SourceVesselName", p1,
-            Utils.getRandomDate(), 0.1);
+        ssw = SourceVesselHelper.addSourceVessel(p1, Utils.getRandomDate(),
+            0.1);
         defaultSite = SiteHelper.addSite("Default");
     }
 
     @Test
     public void testCompareTo() throws Exception {
         SourceVesselWrapper newSourceVessel = SourceVesselHelper
-            .addSourceVessel(ssw.getName() + "1", p1, Utils.getRandomDate(),
-                0.1);
+            .addSourceVessel(p1, Utils.getRandomDate(), 0.1);
         Assert.assertTrue(newSourceVessel.compareTo(ssw) > 0);
         Assert.assertTrue(ssw.compareTo(newSourceVessel) < 0);
-        newSourceVessel.setName(ssw.getName());
         Assert.assertTrue(newSourceVessel.compareTo(ssw) == 0);
     }
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         String old = ssw.getName();
-        ssw.setName("toto");
         ssw.reset();
         Assert.assertEquals(old, ssw.getName());
     }
 
     @Test
     public void testResetNew() throws Exception {
-        SourceVesselWrapper ssw = SourceVesselHelper.newSourceVessel(
-            "testResetNew", p1, Utils.getRandomDate(), 0.1);
-        ssw.setName("toto");
+        SourceVesselWrapper ssw = SourceVesselHelper.newSourceVessel(p1,
+            Utils.getRandomDate(), 0.1);
         ssw.reset();
         Assert.assertEquals(null, ssw.getName());
     }
