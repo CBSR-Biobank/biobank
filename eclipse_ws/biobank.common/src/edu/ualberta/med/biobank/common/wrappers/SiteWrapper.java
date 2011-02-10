@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -32,8 +32,10 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SiteWrapper extends ModelWrapper<Site> {
+public class SiteWrapper extends SiteBaseWrapper {
+
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
+
     private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
@@ -51,47 +53,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         names.addAll(SitePeer.PROP_NAMES);
         names.addAll(AddressPeer.PROP_NAMES);
         return names;
-    }
-
-    public String getName() {
-        return getProperty(SitePeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(SitePeer.NAME, name);
-    }
-
-    public String getNameShort() {
-        return getProperty(SitePeer.NAME_SHORT);
-    }
-
-    public void setNameShort(String nameShort) {
-        setProperty(SitePeer.NAME_SHORT, nameShort);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(SitePeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(SitePeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public String getComment() {
-        return getProperty(SitePeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(SitePeer.COMMENT, comment);
-    }
-
-    private AddressWrapper getAddress() {
-        return getWrappedProperty(SitePeer.ADDRESS, AddressWrapper.class);
-    }
-
-    private void setAddress(AddressWrapper address) {
-        setWrappedProperty(SitePeer.ADDRESS, address);
     }
 
     private AddressWrapper initAddress() {
@@ -220,11 +181,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return getRequestCollection(RequestState.SHIPPED);
     }
 
-    public List<StudyWrapper> getStudyCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.STUDY_COLLECTION,
-            StudyWrapper.class, sort);
-    }
-
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(true);
     }
@@ -240,46 +196,12 @@ public class SiteWrapper extends ModelWrapper<Site> {
         return studyWrappers;
     }
 
-    public void addStudies(List<StudyWrapper> studies) {
-        addToWrapperCollection(SitePeer.STUDY_COLLECTION, studies);
-    }
-
-    public void removeStudies(List<StudyWrapper> studiesToRemove)
-        throws BiobankCheckException {
-        if (studiesToRemove == null || studiesToRemove.isEmpty()) {
-            return;
-        }
-
-        List<StudyWrapper> currentList = getStudyCollection();
-
-        if (currentList == null || !currentList.containsAll(studiesToRemove)) {
-            throw new BiobankCheckException(
-                "studies are not associated with site " + getNameShort());
-        }
-
-        removeFromWrapperCollection(SitePeer.STUDY_COLLECTION, studiesToRemove);
-    }
-
-    public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION,
-            ContainerTypeWrapper.class, sort);
-    }
-
     public List<ContainerTypeWrapper> getContainerTypeCollection() {
         return getContainerTypeCollection(false);
     }
 
-    public void addContainerTypes(List<ContainerTypeWrapper> types) {
-        addToWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION, types);
-    }
-
     public List<ContainerWrapper> getContainerCollection() {
-        return getWrapperCollection(SitePeer.CONTAINER_COLLECTION,
-            ContainerWrapper.class, false);
-    }
-
-    public void addContainers(List<ContainerWrapper> containers) {
-        addToWrapperCollection(SitePeer.CONTAINER_COLLECTION, containers);
+        return getContainerCollection(false);
     }
 
     @SuppressWarnings("unchecked")
@@ -311,11 +233,6 @@ public class SiteWrapper extends ModelWrapper<Site> {
 
     public void clearTopContainerCollection() {
         propertiesMap.put("topContainerCollection", null);
-    }
-
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.SHIPMENT_COLLECTION,
-            ShipmentWrapper.class, sort);
     }
 
     public List<ShipmentWrapper> getShipmentCollection() {
@@ -543,8 +460,7 @@ public class SiteWrapper extends ModelWrapper<Site> {
     }
 
     public List<DispatchWrapper> getReceivedDispatchCollection() {
-        return getWrapperCollection(SitePeer.RECEIVED_DISPATCH_COLLECTION,
-            DispatchWrapper.class, false);
+        return getReceivedDispatchCollection(false);
     }
 
     public List<DispatchWrapper> getSentDispatchCollection() {

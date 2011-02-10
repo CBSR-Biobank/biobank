@@ -82,7 +82,7 @@ public class TestSite extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
 
         try {
-            site.removeStudies(new ArrayList<StudyWrapper>());
+            site.removeFromStudyCollectionWithCheck(new ArrayList<StudyWrapper>());
             Assert.assertTrue(true);
         } catch (BiobankCheckException e) {
             Assert.fail("cannot call removeStudies with empty list");
@@ -90,7 +90,7 @@ public class TestSite extends TestDatabase {
 
         List<StudyWrapper> studySet1 = StudyHelper.addStudies(name + "_s1_",
             r.nextInt(10) + 1);
-        site.addStudies(studySet1);
+        site.addToStudyCollection(studySet1);
         site.persist();
         site.reload();
         List<StudyWrapper> siteStudies = site.getStudyCollection();
@@ -100,7 +100,7 @@ public class TestSite extends TestDatabase {
         // add another set
         List<StudyWrapper> studySet2 = StudyHelper.addStudies(name + "_s2_",
             r.nextInt(10) + 1);
-        site.addStudies(studySet2);
+        site.addToStudyCollection(studySet2);
         site.persist();
         site.reload();
         siteStudies = site.getStudyCollection();
@@ -109,7 +109,7 @@ public class TestSite extends TestDatabase {
             siteStudies.size());
 
         // remove studies
-        site.removeStudies(studySet1);
+        site.removeFromStudyCollection(studySet1);
         site.persist();
         site.reload();
         siteStudies = site.getStudyCollection();
@@ -119,7 +119,7 @@ public class TestSite extends TestDatabase {
 
         // try and remove studies that were already removed
         try {
-            site.removeStudies(studySet1);
+            site.removeFromStudyCollectionWithCheck(studySet1);
             Assert
                 .fail("should not be allowed to remove a study that is not associated with site");
         } catch (BiobankCheckException e) {
@@ -134,7 +134,7 @@ public class TestSite extends TestDatabase {
         StudyHelper.addStudies(name, r.nextInt(15) + 5);
 
         List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
-        site.addStudies(studies);
+        site.addToStudyCollection(studies);
         site.persist();
         site.reload();
 
@@ -153,7 +153,7 @@ public class TestSite extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
 
         try {
-            site.removeStudies(new ArrayList<StudyWrapper>());
+            site.removeFromStudyCollectionWithCheck(new ArrayList<StudyWrapper>());
             Assert.assertTrue(true);
         } catch (BiobankCheckException e) {
             Assert.fail("cannot call removeStudies with empty list");
@@ -166,7 +166,7 @@ public class TestSite extends TestDatabase {
             r.nextInt(10) + 1);
 
         // add set 1
-        site.addStudies(studySet1);
+        site.addToStudyCollection(studySet1);
         site.persist();
         site.reload();
         List<StudyWrapper> siteNonAssocStudies = site.getStudiesNotAssoc();
@@ -174,8 +174,8 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(studySet2.size(), siteNonAssocStudies.size());
 
         // remove set 1 and add set 2
-        site.removeStudies(studySet1);
-        site.addStudies(studySet2);
+        site.removeFromStudyCollection(studySet1);
+        site.addToStudyCollection(studySet2);
         site.persist();
         site.reload();
         siteNonAssocStudies = site.getStudiesNotAssoc();
@@ -183,7 +183,7 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(studySet1.size(), siteNonAssocStudies.size());
 
         // add set 1 again
-        site.addStudies(studySet1);
+        site.addToStudyCollection(studySet1);
         site.persist();
         site.reload();
         siteNonAssocStudies = site.getStudiesNotAssoc();
@@ -199,7 +199,7 @@ public class TestSite extends TestDatabase {
 
         List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
         int studiesNber = studies.size();
-        site.addStudies(studies);
+        site.addToStudyCollection(studies);
         site.persist();
         site.reload();
 
@@ -207,7 +207,7 @@ public class TestSite extends TestDatabase {
 
         // add one more study
         StudyWrapper newStudy = StudyHelper.addStudy(name + "newStudy");
-        site.addStudies(Arrays.asList(newStudy));
+        site.addToStudyCollection(Arrays.asList(newStudy));
         site.persist();
         site.reload();
         Assert.assertEquals(studiesNber + 1, site.getStudyCollection().size());
@@ -221,7 +221,7 @@ public class TestSite extends TestDatabase {
 
         List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
         int studiesNber = studies.size();
-        site.addStudies(studies);
+        site.addToStudyCollection(studies);
         site.persist();
         site.reload();
 
@@ -229,7 +229,7 @@ public class TestSite extends TestDatabase {
 
         // remove one study
         StudyWrapper newStudy = studies.get(0);
-        site.removeStudies(Arrays.asList(newStudy));
+        site.removeFromStudyCollection(Arrays.asList(newStudy));
         site.persist();
         site.reload();
         Assert.assertEquals(studiesNber - 1, site.getStudyCollection().size());
@@ -275,7 +275,7 @@ public class TestSite extends TestDatabase {
 
         ContainerTypeWrapper type = ContainerTypeHelper.newContainerType(site,
             name + "newType", name, 1, 5, 4, false);
-        site.addContainerTypes(Arrays.asList(type));
+        site.addToContainerTypeCollection(Arrays.asList(type));
         site.persist();
 
         site.reload();
@@ -311,7 +311,7 @@ public class TestSite extends TestDatabase {
         ContainerWrapper container = ContainerHelper.newContainer(
             String.valueOf(r.nextInt()), name + "newContainer", null, site,
             type);
-        site.addContainers(Arrays.asList(container));
+        site.addToContainerCollection(Arrays.asList(container));
         site.persist();
 
         site.reload();
@@ -852,10 +852,10 @@ public class TestSite extends TestDatabase {
             r.nextInt(5) + 1);
         List<StudyWrapper> studies = StudyHelper.addStudies(name,
             r.nextInt(5) + 1);
-        srcSite.addStudies(studies);
+        srcSite.addToStudyCollection(studies);
         srcSite.persist();
         for (SiteWrapper site : destSites) {
-            site.addStudies(studies);
+            site.addToStudyCollection(studies);
             site.persist();
         }
         for (StudyWrapper study : studies) {
@@ -911,14 +911,14 @@ public class TestSite extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy(name);
         List<StudyWrapper> studies = Arrays.asList(study);
-        srcSite.addStudies(studies);
+        srcSite.addToStudyCollection(studies);
         srcSite.persist();
         for (SiteWrapper site : destSitesSet1) {
-            site.addStudies(studies);
+            site.addToStudyCollection(studies);
             site.persist();
         }
         for (SiteWrapper site : destSitesSet2) {
-            site.addStudies(studies);
+            site.addToStudyCollection(studies);
             site.persist();
         }
 

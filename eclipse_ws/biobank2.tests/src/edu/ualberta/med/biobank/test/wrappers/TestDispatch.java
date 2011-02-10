@@ -52,7 +52,7 @@ public class TestDispatch extends TestDatabase {
         List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addStudies(allStudies);
+            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
@@ -83,7 +83,7 @@ public class TestDispatch extends TestDatabase {
         List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addStudies(allStudies);
+            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
@@ -118,7 +118,7 @@ public class TestDispatch extends TestDatabase {
         List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addStudies(allStudies);
+            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
@@ -156,7 +156,7 @@ public class TestDispatch extends TestDatabase {
             receiverSite, receiverSite2 };
 
         for (SiteWrapper site : allSites) {
-            site.addStudies(allStudies);
+            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
@@ -254,7 +254,7 @@ public class TestDispatch extends TestDatabase {
         List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addStudies(allStudies);
+            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
@@ -292,7 +292,7 @@ public class TestDispatch extends TestDatabase {
         List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addStudies(allStudies);
+            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
@@ -328,7 +328,7 @@ public class TestDispatch extends TestDatabase {
         List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addStudies(allStudies);
+            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
@@ -365,7 +365,7 @@ public class TestDispatch extends TestDatabase {
         List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addStudies(allStudies);
+            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
@@ -409,10 +409,10 @@ public class TestDispatch extends TestDatabase {
         String name = "testGetSetAliquotCollection" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
-        senderSite.addStudies(Arrays.asList(study));
+        senderSite.addToStudyCollection(Arrays.asList(study));
         senderSite.persist();
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        receiverSite.addStudies(Arrays.asList(study));
+        receiverSite.addToStudyCollection(Arrays.asList(study));
         receiverSite.persist();
 
         senderSite.addStudyDispatchSites(study, Arrays.asList(receiverSite));
