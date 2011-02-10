@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.tools.modelumlparser.ModelUmlParser;
 
 public class ModelExtender {
 
-    private static String USAGE = "Usage: bbpeerbuilder UMLFILE PEER_OUTDIR WRAPPER_BASE_OUTDIR";
+    private static String USAGE = "Usage: bbpeerbuilder UMLFILE PEER_DIR WRAPPER_DIR";
 
     private static String PEER_PACKAGE = "edu.ualberta.med.biobank.common.peer";
 

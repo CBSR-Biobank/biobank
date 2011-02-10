@@ -591,7 +591,7 @@
       <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
       <arg value="${model.proj.dir}/biobank2.uml" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
-      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers/base" />
+      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers" />
       <classpath>
         <pathelement location="${req.jars.dir}/jargs.jar" />
         <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
@@ -847,6 +847,15 @@
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output-validators" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
+    <delete file="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
+    <delete>
+      <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" 
+      includes="*Peer.java"/>
+    </delete>
+    <delete>
+      <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers/base" 
+      includes="*BaseWrapper.java"/>
+    </delete>
   </target>
 
   <target name="clean-caCore" if="cacore.sdk.available">
