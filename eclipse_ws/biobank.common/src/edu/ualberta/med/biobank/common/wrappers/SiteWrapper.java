@@ -38,6 +38,14 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     private List<DispatchInfoWrapper> removedDispatchInfoWrapper = new ArrayList<DispatchInfoWrapper>();
 
+    public static final List<String> PROP_NAMES;
+    static {
+        List<String> aList = new ArrayList<String>();
+        aList.addAll(SitePeer.PROP_NAMES);
+        aList.addAll(AddressPeer.PROP_NAMES);
+        PROP_NAMES = Collections.unmodifiableList(aList);
+    };
+
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
     }
@@ -48,11 +56,7 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     @Override
     protected List<String> getPropertyChangeNames() {
-        // TODO: cache this?
-        List<String> names = new ArrayList<String>();
-        names.addAll(SitePeer.PROP_NAMES);
-        names.addAll(AddressPeer.PROP_NAMES);
-        return names;
+        return PROP_NAMES;
     }
 
     private AddressWrapper initAddress() {

@@ -24,7 +24,7 @@ public class TestCommon {
         List<SampleTypeWrapper> sampleTypes) throws Exception {
         Assert.assertTrue("not enough sample types for test", (sampleTypes
             .size() > 10));
-        ct.addSampleTypes(sampleTypes);
+        ct.addToSampleTypeCollection(sampleTypes);
         ct.persist();
         ct.reload();
         return ct;

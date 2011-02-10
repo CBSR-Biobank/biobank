@@ -447,15 +447,15 @@ public class ContainerViewForm extends BiobankViewForm {
                 containerToOpen.setSite(containerAdapter.getParentFromClass(
                     SiteAdapter.class).getWrapper());
                 containerToOpen.setParent(container);
-                containerToOpen.setPosition(new RowColPos(cell.getRow(), cell
-                    .getCol()));
+                containerToOpen.setPositionAsRowCol(new RowColPos(
+                    cell.getRow(), cell.getCol()));
                 newAdapter = new ContainerAdapter(containerAdapter,
                     containerToOpen);
                 containerToOpen.setSite(containerAdapter.getParentFromClass(
                     SiteAdapter.class).getWrapper());
                 containerToOpen.setParent(container);
-                containerToOpen.setPosition(new RowColPos(cell.getRow(), cell
-                    .getCol()));
+                containerToOpen.setPositionAsRowCol(new RowColPos(
+                    cell.getRow(), cell.getCol()));
                 newAdapter = new ContainerAdapter(containerAdapter,
                     containerToOpen);
                 newAdapter.openEntryForm(true);
@@ -478,11 +478,11 @@ public class ContainerViewForm extends BiobankViewForm {
         setTextValue(temperatureLabel, container.getTemperature());
         if (container.hasParent()) {
             if (rowLabel != null) {
-                setTextValue(rowLabel, container.getPosition().row);
+                setTextValue(rowLabel, container.getPositionAsRowCol().row);
             }
 
             if (colLabel != null) {
-                setTextValue(colLabel, container.getPosition().col);
+                setTextValue(colLabel, container.getPositionAsRowCol().col);
             }
         }
     }

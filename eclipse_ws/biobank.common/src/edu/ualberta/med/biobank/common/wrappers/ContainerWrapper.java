@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
@@ -35,7 +36,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerWrapper extends ModelWrapper<Container> {
+public class ContainerWrapper extends ContainerBaseWrapper {
 
     private AbstractObjectWithPositionManagement<ContainerPosition, ContainerWrapper> objectWithPositionManagement;
 
@@ -91,11 +92,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return ContainerPeer.PROP_NAMES;
-    }
-
-    @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         checkLabelUniqueForType();
@@ -121,7 +117,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
     private void checkHasPosition() throws BiobankCheckException {
         if ((getContainerType() != null)
             && !Boolean.TRUE.equals(getContainerType().getTopLevel())
-            && (getPosition() == null)) {
+            && (getPositionAsRowCol() == null)) {
             throw new BiobankCheckException(
                 "A child container must have a position");
         }
@@ -198,14 +194,14 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         persistAliquots();
     }
 
-    public RowColPos getPosition() {
+    public RowColPos getPositionAsRowCol() {
         return objectWithPositionManagement.getPosition();
     }
 
     public String getPositionString() {
         ContainerWrapper parent = getParent();
         if (parent != null) {
-            RowColPos pos = getPosition();
+            RowColPos pos = getPositionAsRowCol();
             if (pos != null) {
                 return parent.getContainerType().getPositionString(pos);
             }
@@ -213,7 +209,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         return null;
     }
 
-    public void setPosition(RowColPos rcp) {
+    public void setPositionAsRowCol(RowColPos rcp) {
         objectWithPositionManagement.setPosition(rcp);
     }
 
@@ -296,69 +292,6 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                 + getLabel() + "\" and type \"" + getContainerType().getName()
                 + "\" already exists.");
         }
-    }
-
-    @Override
-    public Class<Container> getWrappedClass() {
-        return Container.class;
-    }
-
-    public SiteWrapper getSite() {
-        return getWrappedProperty(ContainerPeer.SITE, SiteWrapper.class);
-    }
-
-    public void setSite(SiteWrapper site) {
-        setWrappedProperty(ContainerPeer.SITE, site);
-    }
-
-    public String getLabel() {
-        return getProperty(ContainerPeer.LABEL);
-    }
-
-    public void setLabel(String label) {
-        setProperty(ContainerPeer.LABEL, label);
-    }
-
-    public Double getTemperature() {
-        return getProperty(ContainerPeer.TEMPERATURE);
-    }
-
-    public void setTemperature(Double temperature) {
-        setProperty(ContainerPeer.TEMPERATURE, temperature);
-    }
-
-    public ContainerTypeWrapper getContainerType() {
-        return getWrappedProperty(ContainerPeer.CONTAINER_TYPE,
-            ContainerTypeWrapper.class);
-    }
-
-    public void setContainerType(ContainerTypeWrapper containerType) {
-        setWrappedProperty(ContainerPeer.CONTAINER_TYPE, containerType);
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        return getWrappedProperty(ContainerPeer.ACTIVITY_STATUS,
-            ActivityStatusWrapper.class);
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(ContainerPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
-    public String getComment() {
-        return getProperty(ContainerPeer.COMMENT);
-    }
-
-    public void setComment(String comment) {
-        setProperty(ContainerPeer.COMMENT, comment);
-    }
-
-    public String getProductBarcode() {
-        return getProperty(ContainerPeer.PRODUCT_BARCODE);
-    }
-
-    public void setProductBarcode(String barcode) {
-        setProperty(ContainerPeer.PRODUCT_BARCODE, barcode);
     }
 
     public Integer getRowCapacity() {
@@ -476,7 +409,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
         setParent(parent);
         RowColPos position = parent.getPositionFromLabelingScheme(label
             .substring(label.length() - 2));
-        setPosition(position);
+        setPositionAsRowCol(position);
     }
 
     /**
@@ -742,7 +675,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
                     + ")");
             }
         }
-        child.setPosition(new RowColPos(row, col));
+        child.setPositionAsRowCol(new RowColPos(row, col));
         child.setParent(this);
         children.put(new RowColPos(row, col), child);
         addedChildren.add(child);
@@ -1123,7 +1056,7 @@ public class ContainerWrapper extends ModelWrapper<Container> {
             newContainer.setContainerType(type);
             newContainer.setSite(getSite());
             newContainer.setTemperature(getTemperature());
-            newContainer.setPosition(new RowColPos(i, j));
+            newContainer.setPositionAsRowCol(new RowColPos(i, j));
             newContainer.setParent(this);
             newContainer.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));

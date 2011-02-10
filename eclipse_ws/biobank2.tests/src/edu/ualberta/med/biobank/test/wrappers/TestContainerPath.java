@@ -33,11 +33,11 @@ public class TestContainerPath extends TestDatabase {
         childType = ContainerTypeHelper.addContainerType(site, name + "Child",
             name + "Child", 1, 5, 5, false);
 
-        topType.addChildContainerTypes(Arrays.asList(childType));
+        topType.addToChildContainerTypeCollection(Arrays.asList(childType));
         topType.persist();
         topType.reload();
 
-        childType.addChildContainerTypes(Arrays.asList(childType));
+        childType.addToChildContainerTypeCollection(Arrays.asList(childType));
         childType.persist();
         childType.reload();
 
@@ -78,11 +78,11 @@ public class TestContainerPath extends TestDatabase {
         childType = ContainerTypeHelper.addContainerType(site, name + "Child",
             name + "Child", 1, 5, 5, false);
 
-        topType.addChildContainerTypes(Arrays.asList(childType));
+        topType.addToChildContainerTypeCollection(Arrays.asList(childType));
         topType.persist();
         topType.reload();
 
-        childType.addChildContainerTypes(Arrays.asList(childType));
+        childType.addToChildContainerTypeCollection(Arrays.asList(childType));
         childType.persist();
         childType.reload();
 
@@ -93,13 +93,13 @@ public class TestContainerPath extends TestDatabase {
 
         String p4Before = c4.getPath();
 
-        c2.setPosition(new RowColPos(1, 1));
+        c2.setPositionAsRowCol(new RowColPos(1, 1));
         c2.persist();
         c4.reload();
 
         Assert.assertEquals(p4Before, c4.getPath());
 
-        c3.setPosition(new RowColPos(1, 1));
+        c3.setPositionAsRowCol(new RowColPos(1, 1));
         c3.persist();
         c3.reload();
         c4.reload();
@@ -109,7 +109,7 @@ public class TestContainerPath extends TestDatabase {
         Assert.assertEquals(1, c1.getChildren().size());
 
         c3.setParent(c1);
-        c3.setPosition(new RowColPos(0, 1));
+        c3.setPositionAsRowCol(new RowColPos(0, 1));
         c1.addChild(0, 1, c3);
         c1.persist();
         c3.persist();
@@ -123,7 +123,7 @@ public class TestContainerPath extends TestDatabase {
         Assert.assertEquals(2, c1.getChildren().size());
 
         c4.setParent(c2);
-        c4.setPosition(new RowColPos(0, 1));
+        c4.setPositionAsRowCol(new RowColPos(0, 1));
         c4.persist();
         c4.reload();
         Assert.assertEquals(c1.getId() + "/" + c2.getId() + "/" + c4.getId(),
@@ -161,7 +161,7 @@ public class TestContainerPath extends TestDatabase {
             + "_childType", name + "_childType", 3, 4, 9, false);
         topType = ContainerTypeHelper.addContainerType(site, name + "_topType",
             name + "_topType", 1, 5, 5, true);
-        topType.addChildContainerTypes(Arrays.asList(childType));
+        topType.addToChildContainerTypeCollection(Arrays.asList(childType));
         topType.persist();
         topType.reload();
 
@@ -194,7 +194,7 @@ public class TestContainerPath extends TestDatabase {
             + "_childType", name + "_childType", 3, 4, 9, false);
         topType = ContainerTypeHelper.addContainerType(site, name + "_topType",
             name + "_topType", 1, 5, 5, true);
-        topType.addChildContainerTypes(Arrays.asList(childType));
+        topType.addToChildContainerTypeCollection(Arrays.asList(childType));
         topType.persist();
         topType.reload();
 
@@ -223,7 +223,7 @@ public class TestContainerPath extends TestDatabase {
             + "_childType", name + "_childType", 3, 4, 9, false);
         topType = ContainerTypeHelper.addContainerType(site, name + "_topType",
             name + "_topType", 1, 5, 5, true);
-        topType.addChildContainerTypes(Arrays.asList(childType));
+        topType.addToChildContainerTypeCollection(Arrays.asList(childType));
         topType.persist();
         topType.reload();
 

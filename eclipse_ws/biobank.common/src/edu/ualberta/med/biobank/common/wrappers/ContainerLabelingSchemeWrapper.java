@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.peer.ContainerLabelingSchemePeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.base.ContainerLabelingSchemeBaseWrapper;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -17,7 +17,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerLabelingSchemeWrapper extends
-    ModelWrapper<ContainerLabelingScheme> {
+    ContainerLabelingSchemeBaseWrapper {
 
     public static final int SCHEME_SBS = 1;
 
@@ -45,56 +45,6 @@ public class ContainerLabelingSchemeWrapper extends
 
     public ContainerLabelingSchemeWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    public Class<ContainerLabelingScheme> getWrappedClass() {
-        return ContainerLabelingScheme.class;
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ContainerLabelingSchemePeer.PROP_NAMES;
-    }
-
-    public String getName() {
-        return getProperty(ContainerLabelingSchemePeer.NAME);
-    }
-
-    public void setName(String name) {
-        setProperty(ContainerLabelingSchemePeer.NAME, name);
-    }
-
-    public Integer getMaxRows() {
-        return getProperty(ContainerLabelingSchemePeer.MAX_ROWS);
-    }
-
-    public final void setMaxRows(Integer maxRows) {
-        setProperty(ContainerLabelingSchemePeer.MAX_ROWS, maxRows);
-    }
-
-    public Integer getMaxCols() {
-        return getProperty(ContainerLabelingSchemePeer.MAX_COLS);
-    }
-
-    public void setMaxCols(Integer maxCols) {
-        setProperty(ContainerLabelingSchemePeer.MAX_COLS, maxCols);
-    }
-
-    public Integer getMaxChars() {
-        return getProperty(ContainerLabelingSchemePeer.MAX_CHARS);
-    }
-
-    public Integer getMinChars() {
-        return getProperty(ContainerLabelingSchemePeer.MIN_CHARS);
-    }
-
-    public Integer getMaxCapacity() {
-        return getProperty(ContainerLabelingSchemePeer.MAX_CAPACITY);
-    }
-
-    public void setMaxCapacity(Integer maxCapacity) {
-        setProperty(ContainerLabelingSchemePeer.MAX_CAPACITY, maxCapacity);
     }
 
     @Override

@@ -425,12 +425,12 @@ public class TestDispatch extends TestDatabase {
             .getAllSampleTypes(appService, false);
         ContainerTypeWrapper containerType = ContainerTypeHelper
             .addContainerType(senderSite, name, name, 1, 8, 12, false);
-        containerType.addSampleTypes(sampleTypes);
+        containerType.addToSampleTypeCollection(sampleTypes);
         containerType.persist();
         containerType.reload();
         ContainerTypeWrapper topContainerType = ContainerTypeHelper
             .addContainerTypeRandom(senderSite, name + "top", true);
-        topContainerType.addChildContainerTypes(Arrays.asList(containerType));
+        topContainerType.addToChildContainerTypeCollection(Arrays.asList(containerType));
         topContainerType.persist();
         topContainerType.reload();
         ContainerWrapper topContainer = ContainerHelper.addContainer(

@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchAliquotState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -25,7 +26,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 /**
  * @see DispatchState
  */
-public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
+public class DispatchWrapper extends DispatchBaseWrapper {
 
     private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedDispatchAliquotCollection";
 
@@ -49,16 +50,6 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
 
     public DispatchWrapper(WritableApplicationService appService, Dispatch ship) {
         super(appService, ship);
-    }
-
-    @Override
-    public Class<Dispatch> getWrappedClass() {
-        return Dispatch.class;
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return DispatchPeer.PROP_NAMES;
     }
 
     @Override
@@ -164,22 +155,6 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         return results.size() == 0;
     }
 
-    public SiteWrapper getSender() {
-        return getWrappedProperty(DispatchPeer.SENDER, SiteWrapper.class);
-    }
-
-    public void setSender(SiteWrapper sender) {
-        setWrappedProperty(DispatchPeer.SENDER, sender);
-    }
-
-    public SiteWrapper getReceiver() {
-        return getWrappedProperty(DispatchPeer.RECEIVER, SiteWrapper.class);
-    }
-
-    public void setReceiver(SiteWrapper receiver) {
-        setWrappedProperty(DispatchPeer.RECEIVER, receiver);
-    }
-
     protected Integer getDispatchState() {
         return getProperty(DispatchPeer.STATE);
     }
@@ -189,20 +164,6 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         if (state == null)
             return "";
         return state.getLabel();
-    }
-
-    public StudyWrapper getStudy() {
-        return getWrappedProperty(DispatchPeer.STUDY, StudyWrapper.class);
-    }
-
-    public void setStudy(StudyWrapper study) {
-        setWrappedProperty(DispatchPeer.STUDY, study);
-    }
-
-    public List<DispatchAliquotWrapper> getDispatchAliquotCollection(
-        boolean sort) {
-        return getWrapperCollection(DispatchPeer.DISPATCH_ALIQUOT_COLLECTION,
-            DispatchAliquotWrapper.class, sort);
     }
 
     public List<DispatchAliquotWrapper> getDispatchAliquotCollection() {
@@ -316,8 +277,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
             }
         }
 
-        addToWrapperCollection(DispatchPeer.DISPATCH_ALIQUOT_COLLECTION,
-            newDispatchAliquots);
+        addToDispatchAliquotCollection(newDispatchAliquots);
         resetStateLists();
 
         // make sure previously deleted ones, that have been re-added, are
@@ -325,13 +285,14 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
         deletedDispatchedAliquots.removeAll(newDispatchAliquots);
     }
 
-    public void removeDispatchAliquots(List<DispatchAliquotWrapper> dasToRemove) {
+    @Override
+    public void removeFromDispatchAliquotCollection(
+        List<DispatchAliquotWrapper> dasToRemove) {
         if ((dasToRemove == null) || (dasToRemove.size() == 0))
             return;
 
         deletedDispatchedAliquots.addAll(dasToRemove);
-        removeFromWrapperCollection(DispatchPeer.DISPATCH_ALIQUOT_COLLECTION,
-            dasToRemove);
+        super.removeFromDispatchAliquotCollection(dasToRemove);
         resetStateLists();
     }
 
@@ -348,8 +309,7 @@ public class DispatchWrapper extends AbstractShipmentWrapper<Dispatch> {
                 deletedDispatchedAliquots.add(dsa);
             }
         }
-        removeFromWrapperCollection(DispatchPeer.DISPATCH_ALIQUOT_COLLECTION,
-            removeDispatchAliquots);
+        removeFromDispatchAliquotCollection(removeDispatchAliquots);
     }
 
     public static class CheckStatus {

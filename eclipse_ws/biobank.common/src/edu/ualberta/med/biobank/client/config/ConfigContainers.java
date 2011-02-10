@@ -62,7 +62,7 @@ public class ConfigContainers {
         container.setContainerType(type);
         container.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(site.getAppService()));
-        container.setPosition(new RowColPos(row, col));
+        container.setPositionAsRowCol(new RowColPos(row, col));
         container.setParent(parent);
         container.setTemperature(type.getDefaultTemperature());
         container.persist();

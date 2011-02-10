@@ -46,7 +46,7 @@ public class TestSampleType extends TestDatabase {
             .getContainerTypeCollection();
         for (int i = 0; i < nber; i++) {
             ContainerTypeWrapper containerType = containerTypes.get(i);
-            containerType.addSampleTypes(sampleTypes);
+            containerType.addToSampleTypeCollection(sampleTypes);
             containerType.persist();
         }
 
@@ -69,7 +69,7 @@ public class TestSampleType extends TestDatabase {
             .getContainerTypeCollection();
         for (int i = 0; i < nber; i++) {
             ContainerTypeWrapper containerType = containerTypes.get(i);
-            containerType.addSampleTypes(sampleTypes);
+            containerType.addToSampleTypeCollection(sampleTypes);
             containerType.persist();
         }
 
@@ -105,10 +105,10 @@ public class TestSampleType extends TestDatabase {
         sampleTypes1.add(sampleType3);
         SampleTypeWrapper sampleType4 = SampleTypeHelper.addSampleType("ST4");
         sampleTypes2.add(sampleType4);
-        containerType1.addSampleTypes(sampleTypes1);
+        containerType1.addToSampleTypeCollection(sampleTypes1);
         int type1Size = sampleTypes1.size();
         containerType1.persist();
-        containerType2.addSampleTypes(sampleTypes2);
+        containerType2.addToSampleTypeCollection(sampleTypes2);
         int type2Size = sampleTypes2.size();
         containerType2.persist();
 

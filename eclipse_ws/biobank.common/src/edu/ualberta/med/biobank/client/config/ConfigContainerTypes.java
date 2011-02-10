@@ -84,7 +84,7 @@ public class ConfigContainerTypes {
         ct.setChildLabelingSchemeById(childLabelingScheme);
 
         if (children != null) {
-            ct.addChildContainerTypes(children);
+            ct.addToChildContainerTypeCollection(children);
         }
 
         List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
@@ -93,7 +93,7 @@ public class ConfigContainerTypes {
                 .getSampleType(sampleTypeName);
             list.add(sampleType);
         }
-        ct.addSampleTypes(list);
+        ct.addToSampleTypeCollection(list);
         ct.persist();
         ct.reload();
         containerTypeMap.put(name, ct);
