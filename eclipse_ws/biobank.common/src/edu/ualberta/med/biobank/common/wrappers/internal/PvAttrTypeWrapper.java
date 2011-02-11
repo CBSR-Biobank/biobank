@@ -5,13 +5,13 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.peer.PvAttrTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.PvAttrTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.PvAttrType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class PvAttrTypeWrapper extends ModelWrapper<PvAttrType> {
+public class PvAttrTypeWrapper extends PvAttrTypeBaseWrapper {
 
     public PvAttrTypeWrapper(WritableApplicationService appService,
         PvAttrType wrappedObject) {
@@ -23,28 +23,8 @@ public class PvAttrTypeWrapper extends ModelWrapper<PvAttrType> {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return PvAttrTypePeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<PvAttrType> getWrappedClass() {
-        return PvAttrType.class;
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-    }
-
-    public String getName() {
-        return wrappedObject.getName();
-    }
-
-    public void setName(String type) {
-        String oldName = getName();
-        wrappedObject.setName(type);
-        propertyChangeSupport.firePropertyChange("name", oldName, type);
     }
 
     @Override

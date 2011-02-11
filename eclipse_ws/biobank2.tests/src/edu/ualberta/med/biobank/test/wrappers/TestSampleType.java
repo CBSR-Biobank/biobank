@@ -51,7 +51,8 @@ public class TestSampleType extends TestDatabase {
         }
 
         type.reload();
-        Assert.assertEquals(nber, type.getContainerTypeCollection().size());
+        Assert
+            .assertEquals(nber, type.getContainerTypeCollection(false).size());
     }
 
     @Test
