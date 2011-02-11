@@ -842,7 +842,7 @@
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-jars, clean-caCore"
+          depends="clean-tests,clean-jars,clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output-validators" />

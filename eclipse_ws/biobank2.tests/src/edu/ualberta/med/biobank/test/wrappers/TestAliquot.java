@@ -532,8 +532,8 @@ public class TestAliquot extends TestDatabase {
             nonActiveAliquots.add(a);
         }
 
-        List<AliquotWrapper> aliquots = AliquotWrapper.getAliquotsNonActiveInSite(
-            appService, site);
+        List<AliquotWrapper> aliquots = AliquotWrapper
+            .getAliquotsNonActiveInSite(appService, site);
         Assert.assertEquals(nonActiveAliquots.size(), aliquots.size());
         Assert.assertTrue(aliquots.containsAll(nonActiveAliquots));
         Assert.assertFalse(aliquots.containsAll(activeAliquots));
@@ -616,13 +616,16 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testGetDispatchs() throws Exception {
+    public void testGetDispatches() throws Exception {
         String name = "testGetDispatchs" + r.nextInt();
         SiteWrapper destSite = SiteHelper.addSite(name);
         StudyWrapper study = aliquot.getPatientVisit().getPatient().getStudy();
+
         destSite.addToStudyCollection(Arrays.asList(study));
         destSite.persist();
         destSite.reload();
+
+        site.reload();
         site.addStudyDispatchSites(study, Arrays.asList(destSite));
         site.persist();
         site.reload();
@@ -695,7 +698,8 @@ public class TestAliquot extends TestDatabase {
         topType.persist();
         ContainerWrapper cont = ContainerHelper.addContainer("22", "22",
             topCont, destSite, childType, 4, 5);
-        childType.addToSampleTypeCollection(Arrays.asList(aliquot.getSampleType()));
+        childType.addToSampleTypeCollection(Arrays.asList(aliquot
+            .getSampleType()));
         childType.persist();
         cont.reload();
         cont.addAliquot(2, 3, aliquot);

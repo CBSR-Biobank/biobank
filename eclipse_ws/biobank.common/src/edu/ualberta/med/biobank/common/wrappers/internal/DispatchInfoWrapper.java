@@ -39,7 +39,7 @@ public class DispatchInfoWrapper extends DispatchInfoBaseWrapper {
 
         // new
         for (SiteWrapper site : newDestSites) {
-            if (site.getStudyCollection().contains(getStudy())) {
+            if (!site.getStudyCollection().contains(getStudy())) {
                 throw new BiobankCheckException(
                     "Site "
                         + site.getNameShort()

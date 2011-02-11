@@ -82,7 +82,7 @@ public class AliquotPositionWrapper extends AliquotPositionBaseWrapper {
     public static final String CHECK_POSITION_QRY = "from "
         + AliquotPosition.class.getName() + " where "
         + Property.concatNames(AliquotPositionPeer.CONTAINER, ContainerPeer.ID)
-        + "? and " + AliquotPositionPeer.ROW.getName() + "=? and "
+        + "=? and " + AliquotPositionPeer.ROW.getName() + "=? and "
         + AliquotPositionPeer.COL.getName() + "=?";
 
     @Override
