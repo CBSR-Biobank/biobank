@@ -114,7 +114,7 @@ public class FTAReportTest extends AbstractReportTest {
 
         for (StudyWrapper study : getStudies()) {
             for (PatientWrapper patient : study.getPatientCollection()) {
-                patientVisits = patient.getProcessingEventCollection();
+                patientVisits = patient.getProcessingEventCollection(false);
                 if ((patientVisits != null) && (patientVisits.size() > 0)) {
                     // check before, on, and after each patient's first patient
                     // visit

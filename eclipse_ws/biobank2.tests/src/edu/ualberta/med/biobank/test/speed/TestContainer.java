@@ -72,7 +72,7 @@ public class TestContainer extends SpeedTest {
     }
 
     public void testWrapper() throws Exception {
-        for (ContainerWrapper c : site.getTopContainerCollection()) {
+        for (ContainerWrapper c : site.getTopContainerCollection(false)) {
             logger.info(c.getLabel() + ": number of children: "
                 + c.getChildCount(false));
             Map<RowColPos, ContainerWrapper> pos = c.getChildren();

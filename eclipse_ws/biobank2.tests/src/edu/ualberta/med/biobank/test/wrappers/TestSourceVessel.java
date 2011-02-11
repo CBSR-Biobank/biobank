@@ -43,9 +43,9 @@ public class TestSourceVessel extends TestDatabase {
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        String old = ssw.getTypeName();
+        String old = ssw.getSourceVesselType().getName();
         ssw.reset();
-        Assert.assertEquals(old, ssw.getName());
+        Assert.assertEquals(old, ssw.getSourceVesselType().getName());
     }
 
     @Test
@@ -53,7 +53,7 @@ public class TestSourceVessel extends TestDatabase {
         SourceVesselWrapper ssw = SourceVesselHelper.newSourceVessel(p1,
             Utils.getRandomDate(), 0.1);
         ssw.reset();
-        Assert.assertEquals(null, ssw.getName());
+        Assert.assertEquals(null, ssw.getSourceVesselType().getName());
     }
 
     @Test

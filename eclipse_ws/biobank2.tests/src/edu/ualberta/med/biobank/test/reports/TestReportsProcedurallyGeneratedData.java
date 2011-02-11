@@ -545,7 +545,7 @@ public final class TestReportsProcedurallyGeneratedData implements
 
                     while (patientsAdded++ < patientLimit) {
                         PatientWrapper patient = patients.get(patientIndex);
-                        shipment.addSourceVessels(Arrays
+                        shipment.addToSourceVesselCollection(Arrays
                             .asList(SourceVesselHelper.newSourceVessel(patient,
                                 Utils.getRandomDate(), 0.1)));
 

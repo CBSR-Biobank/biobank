@@ -28,7 +28,6 @@ public class CachedReportDataSource implements ReportDataSource {
     private List<AliquotWrapper> aliquots;
     private List<ContainerWrapper> containers;
     private List<StudyWrapper> studies;
-    private List<ProcessingEventWrapper> patientVisits;
     private List<PatientWrapper> patients;
 
     public CachedReportDataSource(WritableApplicationService appService) {
