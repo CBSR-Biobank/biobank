@@ -479,4 +479,16 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     public boolean checkSpecificAccess(User user, Integer siteId) {
         return user.isSiteAdministrator(siteId);
     }
+
+    public void setRowCapacity(Integer rowCapacity) {
+        getCapacity().setRow(rowCapacity);
+    }
+
+    public void setColCapacity(Integer colCapacity) {
+        getCapacity().setRow(colCapacity);
+    }
+
+    public String getChildLabelingSchemeName() {
+        return getChildLabelingScheme().getName();
+    }
 }

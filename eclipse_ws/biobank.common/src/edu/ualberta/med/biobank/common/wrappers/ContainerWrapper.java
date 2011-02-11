@@ -209,7 +209,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return null;
     }
 
-    public void setPosition(RowColPos rcp) {
+    public void setRowColPosition(RowColPos rcp) {
         objectWithPositionManagement.setPosition(rcp);
     }
 
@@ -409,7 +409,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         setParent(parent);
         RowColPos position = parent.getPositionFromLabelingScheme(label
             .substring(label.length() - 2));
-        setPosition(position);
+        setRowColPosition(position);
     }
 
     /**
@@ -675,7 +675,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     + ")");
             }
         }
-        child.setPosition(new RowColPos(row, col));
+        child.setRowColPosition(new RowColPos(row, col));
         child.setParent(this);
         children.put(new RowColPos(row, col), child);
         addedChildren.add(child);
@@ -1056,7 +1056,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             newContainer.setContainerType(type);
             newContainer.setSite(getSite());
             newContainer.setTemperature(getTemperature());
-            newContainer.setPosition(new RowColPos(i, j));
+            newContainer.setRowColPosition(new RowColPos(i, j));
             newContainer.setParent(this);
             newContainer.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));

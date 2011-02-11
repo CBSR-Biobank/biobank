@@ -366,4 +366,8 @@ public class SiteWrapper extends SiteBaseWrapper {
         return site.getInTransitSentDispatchCollection();
     }
 
+    public void clearTopContainerCollection() {
+        propertiesMap.put("topContainerCollection", null);
+    }
+
 }

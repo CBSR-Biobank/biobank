@@ -27,8 +27,8 @@ public class TestSourceVessel extends TestDatabase {
     public void setUp() throws Exception {
         super.setUp();
         p1 = PatientHelper.newPatient("444");
-        ssw = SourceVesselHelper.addSourceVessel(p1, Utils.getRandomDate(),
-            0.1);
+        ssw = SourceVesselHelper
+            .addSourceVessel(p1, Utils.getRandomDate(), 0.1);
         defaultSite = SiteHelper.addSite("Default");
     }
 
@@ -43,7 +43,7 @@ public class TestSourceVessel extends TestDatabase {
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        String old = ssw.getName();
+        String old = ssw.getTypeName();
         ssw.reset();
         Assert.assertEquals(old, ssw.getName());
     }

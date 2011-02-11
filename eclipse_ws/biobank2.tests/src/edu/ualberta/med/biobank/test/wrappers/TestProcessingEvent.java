@@ -262,7 +262,8 @@ public class TestProcessingEvent extends TestDatabase {
         visit.reload();
 
         // verify that all samples are there
-        Collection<AliquotWrapper> visitSamples = visit.getAliquotCollection();
+        Collection<AliquotWrapper> visitSamples = visit
+            .getAliquotCollection(false);
         Assert.assertEquals(sampleMap.size(), visitSamples.size());
 
         for (AliquotWrapper aliquot : visitSamples) {
@@ -282,7 +283,7 @@ public class TestProcessingEvent extends TestDatabase {
             aliquot.delete();
         }
         visit.reload();
-        visitSamples = visit.getAliquotCollection();
+        visitSamples = visit.getAliquotCollection(false);
         Assert.assertEquals(0, visitSamples.size());
     }
 
@@ -639,12 +640,12 @@ public class TestProcessingEvent extends TestDatabase {
 
         SourceVesselWrapper ss1, ss2, ss3;
 
-        ss1 = SourceVesselHelper.newSourceVessel(visit.getPatient(), Utils.getRandomDate(),
-            0.01);
-        ss2 = SourceVesselHelper.newSourceVessel(visit.getPatient(), Utils.getRandomDate(),
-            0.01);
+        ss1 = SourceVesselHelper.newSourceVessel(visit.getPatient(),
+            Utils.getRandomDate(), 0.01);
+        ss2 = SourceVesselHelper.newSourceVessel(visit.getPatient(),
+            Utils.getRandomDate(), 0.01);
 
-        visit.addSourceVessels(Arrays.asList(ss1, ss2));
+        visit.addToSourceVesselCollection(Arrays.asList(ss1, ss2));
         visit.persist();
 
         visit.reload();
@@ -653,16 +654,16 @@ public class TestProcessingEvent extends TestDatabase {
         Assert.assertEquals(2, list.size());
         Assert.assertTrue(list.get(0).compareTo(list.get(1)) < 0);
 
-        ss3 = SourceVesselHelper.newSourceVessel(visit.getPatient(), Utils.getRandomDate(),
-            0.01);
+        ss3 = SourceVesselHelper.newSourceVessel(visit.getPatient(),
+            Utils.getRandomDate(), 0.01);
 
         SourceVesselWrapper pvss = list.get(0);
-        visit.removeSourceVessels(Arrays.asList(pvss));
-        visit.addSourceVessels(Arrays.asList(ss3));
+        visit.removeFromSourceVesselCollection(Arrays.asList(pvss));
+        visit.addToSourceVesselCollection(Arrays.asList(ss3));
 
         visit.persist();
 
-        list = visit.getSourceVesselCollection();
+        list = visit.getSourceVesselCollection(false);
         Assert.assertEquals(2, list.size());
     }
 

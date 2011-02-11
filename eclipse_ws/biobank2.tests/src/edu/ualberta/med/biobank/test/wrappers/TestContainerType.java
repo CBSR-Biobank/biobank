@@ -582,7 +582,7 @@ public class TestContainerType extends TestDatabase {
         addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
         Collection<SampleTypeWrapper> childTypeL3SampleTypes = childTypeL3
-            .getSampleTypeCollection();
+            .getSampleTypeCollection(false);
         Assert.assertTrue((childTypeL3SampleTypes == null)
             || (childTypeL3SampleTypes.size() == 0));
 
@@ -600,15 +600,16 @@ public class TestContainerType extends TestDatabase {
         childTypeL3.addSampleTypes(selectedSampleTypes);
         childTypeL3.persist();
         childTypeL3.reload();
-        childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection();
+        childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection(false);
         Assert.assertEquals(selectedSampleTypes.size(),
             childTypeL3SampleTypes.size());
         for (SampleTypeWrapper type : selectedSampleTypes) {
             Assert.assertTrue(childTypeL3SampleTypes.contains(type));
         }
 
-        childTypeL3.removeSampleTypes(childTypeL3.getSampleTypeCollection());
-        childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection();
+        childTypeL3.removeSampleTypes(childTypeL3
+            .getSampleTypeCollection(false));
+        childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection(false);
         Assert.assertTrue((childTypeL3SampleTypes == null)
             || (childTypeL3SampleTypes.size() == 0));
     }
@@ -627,15 +628,16 @@ public class TestContainerType extends TestDatabase {
         childTypeL3.persist();
         childTypeL3.reload();
         List<SampleTypeWrapper> childTypeL3SampleTypes = childTypeL3
-            .getSampleTypeCollection();
+            .getSampleTypeCollection(false);
         Assert.assertEquals(selectedSampleTypes.size(),
             childTypeL3SampleTypes.size());
         for (SampleTypeWrapper type : selectedSampleTypes) {
             Assert.assertTrue(childTypeL3SampleTypes.contains(type));
         }
 
-        childTypeL3.removeSampleTypes(childTypeL3.getSampleTypeCollection());
-        childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection();
+        childTypeL3.removeSampleTypes(childTypeL3
+            .getSampleTypeCollection(false));
+        childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection(false);
         Assert.assertTrue((childTypeL3SampleTypes == null)
             || (childTypeL3SampleTypes.size() == 0));
     }
@@ -725,7 +727,8 @@ public class TestContainerType extends TestDatabase {
             Assert.assertTrue(collection.contains(type));
         }
 
-        childTypeL3.removeSampleTypes(childTypeL3.getSampleTypeCollection());
+        childTypeL3.removeSampleTypes(childTypeL3
+            .getSampleTypeCollection(false));
         childTypeL3.persist();
         topType.reload();
         collection = topType.getSampleTypesRecursively();

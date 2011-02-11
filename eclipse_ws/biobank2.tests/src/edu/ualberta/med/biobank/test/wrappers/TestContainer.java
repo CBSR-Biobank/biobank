@@ -377,7 +377,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), null, site, type);
-        container.setPosition(new RowColPos(0, 0));
+        container.setRowColPosition(new RowColPos(0, 0));
 
         // should have a parent
         try {
@@ -410,7 +410,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), parent, site, type);
-        container.setPosition(new RowColPos(10, 10));
+        container.setRowColPosition(new RowColPos(10, 10));
         try {
             container.persist();
             Assert.fail("position not ok in parent container");
@@ -418,12 +418,12 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        container.setPosition(new RowColPos(0, 0));
+        container.setRowColPosition(new RowColPos(0, 0));
         container.persist();
 
         ContainerWrapper container2 = ContainerHelper.newContainer(null,
             TestCommon.getNewBarcode(r), null, site, type);
-        container2.setPosition(new RowColPos(0, 0));
+        container2.setRowColPosition(new RowColPos(0, 0));
         container2.setParent(parent);
         container2.setContainerType(type);
         try {
@@ -499,7 +499,7 @@ public class TestContainer extends TestDatabase {
             0, 0);
 
         // set position to null
-        child.setPosition(null);
+        child.setRowColPosition(null);
         try {
             child.persist();
             Assert.fail("should not be allowed to set an null position");
@@ -519,7 +519,7 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setPosition(new RowColPos(top.getRowCapacity() + 1, top
+        child.setRowColPosition(new RowColPos(top.getRowCapacity() + 1, top
             .getColCapacity() + 1));
         try {
             child.persist();
@@ -528,7 +528,7 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setPosition(new RowColPos(-1, -1));
+        child.setRowColPosition(new RowColPos(-1, -1));
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
@@ -868,12 +868,13 @@ public class TestContainer extends TestDatabase {
     private ProcessingEventWrapper addProcessingEvent() throws Exception {
         StudyWrapper study = StudyHelper.addStudy("Study1");
         ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
-        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(PatientHelper.newPatient("testP"),
-            Utils.getRandomDate(), 0.01);
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(
+            PatientHelper.newPatient("testP"), Utils.getRandomDate(), 0.01);
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
             site, patient, Utils.getRandomDate(), Utils.getRandomDate());
-        pv.addSourceVessels(Arrays.asList(new SourceVesselWrapper[] { sv }));
+        pv.addToSourceVesselCollection(Arrays
+            .asList(new SourceVesselWrapper[] { sv }));
         return pv;
     }
 
@@ -1241,7 +1242,7 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(children.size() == CONTAINER_TOP_ROWS
             * CONTAINER_TOP_COLS);
         for (ContainerWrapper container : children) {
-            if (container.getPosition().equals(0, 0)) {
+            if (container.getRowColPosition().equals(0, 0)) {
                 Assert.assertTrue(container.getContainerType().equals(
                     containerTypeMap.get("ChildCtL1")));
             } else {

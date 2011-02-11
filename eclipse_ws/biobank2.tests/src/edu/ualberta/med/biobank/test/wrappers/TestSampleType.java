@@ -43,7 +43,7 @@ public class TestSampleType extends TestDatabase {
             containerTypeNber);
         int nber = r.nextInt(containerTypeNber) + 1;
         List<ContainerTypeWrapper> containerTypes = site
-            .getContainerTypeCollection();
+            .getContainerTypeCollection(false);
         for (int i = 0; i < nber; i++) {
             ContainerTypeWrapper containerType = containerTypes.get(i);
             containerType.addSampleTypes(sampleTypes);
@@ -51,7 +51,8 @@ public class TestSampleType extends TestDatabase {
         }
 
         type.reload();
-        Assert.assertEquals(nber, type.getContainerTypeCollection().size());
+        Assert
+            .assertEquals(nber, type.getContainerTypeCollection(false).size());
     }
 
     @Test
@@ -66,7 +67,7 @@ public class TestSampleType extends TestDatabase {
             containerTypeNber);
         int nber = r.nextInt(containerTypeNber) + 1;
         List<ContainerTypeWrapper> containerTypes = site
-            .getContainerTypeCollection();
+            .getContainerTypeCollection(false);
         for (int i = 0; i < nber; i++) {
             ContainerTypeWrapper containerType = containerTypes.get(i);
             containerType.addSampleTypes(sampleTypes);

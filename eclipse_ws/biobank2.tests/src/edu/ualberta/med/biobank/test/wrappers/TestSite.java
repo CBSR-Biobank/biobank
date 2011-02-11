@@ -84,7 +84,7 @@ public class TestSite extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
 
         try {
-            site.removeStudies(new ArrayList<StudyWrapper>());
+            site.removeFromStudyCollectionWithCheck(new ArrayList<StudyWrapper>());
             Assert.assertTrue(true);
         } catch (BiobankCheckException e) {
             Assert.fail("cannot call removeStudies with empty list");
@@ -92,38 +92,36 @@ public class TestSite extends TestDatabase {
 
         List<StudyWrapper> studySet1 = StudyHelper.addStudies(name + "_s1_",
             r.nextInt(10) + 1);
-        site.addStudies(studySet1);
+        site.addToStudyCollection(studySet1);
         site.persist();
         site.reload();
-        List<StudyWrapper> siteStudies = site.getStudyCollection();
+        List<StudyWrapper> siteStudies = site.getStudyCollection(false);
 
         Assert.assertEquals(studySet1.size(), siteStudies.size());
 
         // add another set
         List<StudyWrapper> studySet2 = StudyHelper.addStudies(name + "_s2_",
             r.nextInt(10) + 1);
-        site.addStudies(studySet2);
+        site.addToStudyCollection(studySet2);
         site.persist();
         site.reload();
-        siteStudies = site.getStudyCollection();
+        siteStudies = site.getStudyCollection(false);
 
         Assert.assertEquals(studySet1.size() + studySet2.size(),
             siteStudies.size());
 
         // remove studies
-        site.removeStudies(studySet1);
+        site.removeFromStudyCollection(studySet1);
         site.persist();
         site.reload();
-        siteStudies = site.getStudyCollection();
+        siteStudies = site.getStudyCollection(false);
 
         Assert.assertEquals(studySet2.size(), siteStudies.size());
         Assert.assertTrue(siteStudies.containsAll(studySet2));
 
         // try and remove studies that were already removed
         try {
-            site.removeStudies(studySet1);
-            Assert
-                .fail("should not be allowed to remove a study that is not associated with site");
+            site.removeFromStudyCollectionWithCheck(studySet1);
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
@@ -136,7 +134,7 @@ public class TestSite extends TestDatabase {
         StudyHelper.addStudies(name, r.nextInt(15) + 5);
 
         List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
-        site.addStudies(studies);
+        site.addToStudyCollection(studies);
         site.persist();
         site.reload();
 
@@ -155,7 +153,7 @@ public class TestSite extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
 
         try {
-            site.removeStudies(new ArrayList<StudyWrapper>());
+            site.removeFromStudyCollectionWithCheck(new ArrayList<StudyWrapper>());
             Assert.assertTrue(true);
         } catch (BiobankCheckException e) {
             Assert.fail("cannot call removeStudies with empty list");
@@ -168,7 +166,7 @@ public class TestSite extends TestDatabase {
             r.nextInt(10) + 1);
 
         // add set 1
-        site.addStudies(studySet1);
+        site.addToStudyCollection(studySet1);
         site.persist();
         site.reload();
         List<StudyWrapper> siteNonAssocStudies = site.getStudiesNotAssoc();
@@ -176,8 +174,8 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(studySet2.size(), siteNonAssocStudies.size());
 
         // remove set 1 and add set 2
-        site.removeStudies(studySet1);
-        site.addStudies(studySet2);
+        site.removeFromStudyCollection(studySet1);
+        site.addToStudyCollection(studySet2);
         site.persist();
         site.reload();
         siteNonAssocStudies = site.getStudiesNotAssoc();
@@ -185,7 +183,7 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(studySet1.size(), siteNonAssocStudies.size());
 
         // add set 1 again
-        site.addStudies(studySet1);
+        site.addToStudyCollection(studySet1);
         site.persist();
         site.reload();
         siteNonAssocStudies = site.getStudiesNotAssoc();
@@ -201,18 +199,19 @@ public class TestSite extends TestDatabase {
 
         List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
         int studiesNber = studies.size();
-        site.addStudies(studies);
+        site.addToStudyCollection(studies);
         site.persist();
         site.reload();
 
-        Assert.assertEquals(studiesNber, site.getStudyCollection().size());
+        Assert.assertEquals(studiesNber, site.getStudyCollection(false).size());
 
         // add one more study
         StudyWrapper newStudy = StudyHelper.addStudy(name + "newStudy");
-        site.addStudies(Arrays.asList(newStudy));
+        site.addToStudyCollection(Arrays.asList(newStudy));
         site.persist();
         site.reload();
-        Assert.assertEquals(studiesNber + 1, site.getStudyCollection().size());
+        Assert.assertEquals(studiesNber + 1, site.getStudyCollection(false)
+            .size());
     }
 
     @Test
@@ -223,18 +222,19 @@ public class TestSite extends TestDatabase {
 
         List<StudyWrapper> studies = StudyWrapper.getAllStudies(appService);
         int studiesNber = studies.size();
-        site.addStudies(studies);
+        site.addToStudyCollection(studies);
         site.persist();
         site.reload();
 
-        Assert.assertEquals(studiesNber, site.getStudyCollection().size());
+        Assert.assertEquals(studiesNber, site.getStudyCollection(false).size());
 
         // remove one study
         StudyWrapper newStudy = studies.get(0);
-        site.removeStudies(Arrays.asList(newStudy));
+        site.removeFromStudyCollection(Arrays.asList(newStudy));
         site.persist();
         site.reload();
-        Assert.assertEquals(studiesNber - 1, site.getStudyCollection().size());
+        Assert.assertEquals(studiesNber - 1, site.getStudyCollection(false)
+            .size());
     }
 
     @Test
@@ -244,7 +244,8 @@ public class TestSite extends TestDatabase {
         int nber = r.nextInt(15) + 1;
         ContainerTypeHelper.addContainerTypesRandom(site, name, nber);
 
-        List<ContainerTypeWrapper> types = site.getContainerTypeCollection();
+        List<ContainerTypeWrapper> types = site
+            .getContainerTypeCollection(false);
         int sizeFound = types.size();
 
         Assert.assertEquals(nber, sizeFound);
@@ -277,12 +278,13 @@ public class TestSite extends TestDatabase {
 
         ContainerTypeWrapper type = ContainerTypeHelper.newContainerType(site,
             name + "newType", name, 1, 5, 4, false);
-        site.addContainerTypes(Arrays.asList(type));
+        site.addToContainerTypeCollection(Arrays.asList(type));
         site.persist();
 
         site.reload();
         // one type added
-        Assert.assertEquals(nber + 1, site.getContainerTypeCollection().size());
+        Assert.assertEquals(nber + 1, site.getContainerTypeCollection(false)
+            .size());
     }
 
     @Test
@@ -295,7 +297,7 @@ public class TestSite extends TestDatabase {
         int totalContainers = ContainerHelper.addTopContainersWithChildren(
             site, name, 1);
 
-        List<ContainerWrapper> containers = site.getContainerCollection();
+        List<ContainerWrapper> containers = site.getContainerCollection(false);
         int sizeFound = containers.size();
 
         Assert.assertEquals(totalContainers, sizeFound);
@@ -313,13 +315,13 @@ public class TestSite extends TestDatabase {
         ContainerWrapper container = ContainerHelper.newContainer(
             String.valueOf(r.nextInt()), name + "newContainer", null, site,
             type);
-        site.addContainers(Arrays.asList(container));
+        site.addToContainerCollection(Arrays.asList(container));
         site.persist();
 
         site.reload();
         // one container added
-        Assert.assertEquals(totalContainers + 1, site.getContainerCollection()
-            .size());
+        Assert.assertEquals(totalContainers + 1,
+            site.getContainerCollection(false).size());
     }
 
     @Test
@@ -495,12 +497,13 @@ public class TestSite extends TestDatabase {
         int topNber = r.nextInt(8) + 1;
         ContainerHelper.addTopContainersWithChildren(site, name, topNber);
 
-        List<ContainerWrapper> containers = site.getTopContainerCollection();
+        List<ContainerWrapper> containers = site
+            .getTopContainerCollection(false);
         Assert.assertEquals(topNber, containers.size());
 
         // clear the top containers and get again
         site.clearTopContainerCollection();
-        containers = site.getTopContainerCollection();
+        containers = site.getTopContainerCollection(false);
         Assert.assertEquals(topNber, containers.size());
     }
 
@@ -559,9 +562,6 @@ public class TestSite extends TestDatabase {
     private List<CollectionEventWrapper> createShipments(SiteWrapper site)
         throws Exception {
         String name = site.getName();
-
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2");
 
         List<CollectionEventWrapper> shipments = new ArrayList<CollectionEventWrapper>();
         shipments.add(CollectionEventHelper
@@ -639,17 +639,14 @@ public class TestSite extends TestDatabase {
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                    0.1),
-                SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
-                    0.1));
-        CollectionEventHelper.addCollectionEvent(
-            site,
-            method,
+                SourceVesselHelper.newSourceVessel(patient1,
+                    Utils.getRandomDate(), 0.1),
+                SourceVesselHelper.newSourceVessel(patient3,
+                    Utils.getRandomDate(), 0.1));
+        CollectionEventHelper.addCollectionEvent(site, method,
             SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
-                0.1),
-            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
-                0.1));
+                0.1), SourceVesselHelper.newSourceVessel(patient3,
+                Utils.getRandomDate(), 0.1));
 
         site.reload();
         Assert.assertEquals(2, site.getCollectionEventCount());
@@ -659,13 +656,10 @@ public class TestSite extends TestDatabase {
         Assert.assertEquals(1, site.getCollectionEventCount());
 
         // add shipment again
-        shipment1 = CollectionEventHelper.addCollectionEvent(
-            site,
-            method,
+        shipment1 = CollectionEventHelper.addCollectionEvent(site, method,
             SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                0.1),
-            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
-                0.1));
+                0.1), SourceVesselHelper.newSourceVessel(patient3,
+                Utils.getRandomDate(), 0.1));
 
         site.reload();
         Assert.assertEquals(2, site.getCollectionEventCount());
@@ -704,17 +698,14 @@ public class TestSite extends TestDatabase {
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                    0.1),
-                SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
-                    0.1));
-        CollectionEventHelper.addCollectionEvent(
-            site,
-            method,
+                SourceVesselHelper.newSourceVessel(patient1,
+                    Utils.getRandomDate(), 0.1),
+                SourceVesselHelper.newSourceVessel(patient3,
+                    Utils.getRandomDate(), 0.1));
+        CollectionEventHelper.addCollectionEvent(site, method,
             SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
-                0.1),
-            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
-                0.1));
+                0.1), SourceVesselHelper.newSourceVessel(patient3,
+                Utils.getRandomDate(), 0.1));
 
         site.reload();
         Assert.assertEquals(3, site.getPatientCount().longValue());
@@ -724,9 +715,7 @@ public class TestSite extends TestDatabase {
         patient1.reload();
         patient1.delete();
 
-        shipment1 = CollectionEventHelper.addCollectionEvent(
-            site,
-            method,
+        shipment1 = CollectionEventHelper.addCollectionEvent(site, method,
             SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
                 0.1));
 
@@ -763,21 +752,10 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                method,
-                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                    0.1),
-                SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
-                    0.1));
-        CollectionEventHelper.addCollectionEvent(
-            site,
-            method,
+        CollectionEventHelper.addCollectionEvent(site, method,
             SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                0.1),
-            SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
-                0.1));
+                0.1), SourceVesselHelper.newSourceVessel(patient2,
+                Utils.getRandomDate(), 0.1));
 
         // shipment1 has patient visits for patient1 and patient3
         int nber = ProcessingEventHelper.addProcessingEvents(site, patient1)
@@ -798,7 +776,7 @@ public class TestSite extends TestDatabase {
         // delete patient 1 visits
         patient1.reload();
         for (ProcessingEventWrapper visit : patient1
-            .getProcessingEventCollection()) {
+            .getProcessingEventCollection(false)) {
             visit.delete();
         }
         site.reload();
@@ -840,8 +818,6 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient2 = PatientHelper
             .addPatient(name + "_p2", study2);
 
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
         // shipment 1 has patient visits for patient1 and patient2
         int nber = ProcessingEventHelper.addProcessingEvents(site, patient1,
             10, 24).size();
@@ -858,7 +834,7 @@ public class TestSite extends TestDatabase {
         int sampleCount = 0;
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
             for (ProcessingEventWrapper visit : patient
-                .getProcessingEventCollection()) {
+                .getProcessingEventCollection(false)) {
                 for (int i = 0; i < 2; ++i) {
                     AliquotHelper.addAliquot(
                         allSampleTypes.get(r.nextInt(sampleTypeCount)),
@@ -874,8 +850,8 @@ public class TestSite extends TestDatabase {
 
         // delete patient 1 and all it's visits and samples
         for (ProcessingEventWrapper visit : patient1
-            .getProcessingEventCollection()) {
-            for (AliquotWrapper aliquot : visit.getAliquotCollection()) {
+            .getProcessingEventCollection(false)) {
+            for (AliquotWrapper aliquot : visit.getAliquotCollection(false)) {
                 aliquot.delete();
             }
             visit.delete();

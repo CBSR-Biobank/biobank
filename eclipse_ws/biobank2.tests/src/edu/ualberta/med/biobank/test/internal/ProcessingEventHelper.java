@@ -23,7 +23,7 @@ public class ProcessingEventHelper extends DbHelper {
      * @return A new patient visit wrapper.
      */
     public static ProcessingEventWrapper newProcessingEvent(
-        CenterWrapper center, PatientWrapper patient, Date dateProcessed,
+        CenterWrapper<?> center, PatientWrapper patient, Date dateProcessed,
         Date dateDrawn) throws Exception {
         ProcessingEventWrapper pv = new ProcessingEventWrapper(appService);
         pv.setCenter(center);
@@ -55,7 +55,7 @@ public class ProcessingEventHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static ProcessingEventWrapper addProcessingEvent(
-        CenterWrapper center, PatientWrapper patient, Date dateProcessed,
+        CenterWrapper<?> center, PatientWrapper patient, Date dateProcessed,
         Date dateDrawn) throws Exception {
         ProcessingEventWrapper pv = newProcessingEvent(center, patient,
             dateProcessed, dateDrawn);
@@ -74,7 +74,7 @@ public class ProcessingEventHelper extends DbHelper {
      * @throws Exception if the object could not be saved to the database.
      */
     public static List<ProcessingEventWrapper> addProcessingEvents(
-        CenterWrapper center, PatientWrapper patient, int minimumNumber,
+        CenterWrapper<?> center, PatientWrapper patient, int minimumNumber,
         int maxNumber) throws ParseException, Exception {
         int count = r.nextInt(maxNumber - minimumNumber + 1) + minimumNumber;
         List<ProcessingEventWrapper> visits = new ArrayList<ProcessingEventWrapper>();
@@ -86,13 +86,13 @@ public class ProcessingEventHelper extends DbHelper {
     }
 
     public static List<ProcessingEventWrapper> addProcessingEvents(
-        CenterWrapper center, PatientWrapper patient, int minimumNumber)
+        CenterWrapper<?> center, PatientWrapper patient, int minimumNumber)
         throws ParseException, Exception {
         return addProcessingEvents(center, patient, minimumNumber, 15);
     }
 
     public static List<ProcessingEventWrapper> addProcessingEvents(
-        CenterWrapper center, PatientWrapper patient) throws ParseException,
+        CenterWrapper<?> center, PatientWrapper patient) throws ParseException,
         Exception {
         return addProcessingEvents(center, patient, 1);
 

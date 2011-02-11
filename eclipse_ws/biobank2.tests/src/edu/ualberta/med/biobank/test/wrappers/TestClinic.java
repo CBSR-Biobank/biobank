@@ -54,7 +54,7 @@ public class TestClinic extends TestDatabase {
             ContactHelper.addContact(clinic, name + i);
         }
         clinic.reload();
-        List<ContactWrapper> contacts = clinic.getContactCollection();
+        List<ContactWrapper> contacts = clinic.getContactCollection(false);
         int sizeFound = contacts.size();
 
         Assert.assertEquals(nber, sizeFound);
@@ -85,12 +85,13 @@ public class TestClinic extends TestDatabase {
         }
         clinic.reload();
         ContactWrapper contact = ContactHelper.newContact(clinic, name + "NEW");
-        clinic.addContacts(Arrays.asList(contact));
+        clinic.addToContactCollection(Arrays.asList(contact));
         clinic.persist();
 
         clinic.reload();
         // one contact added
-        Assert.assertEquals(nber + 1, clinic.getContactCollection().size());
+        Assert
+            .assertEquals(nber + 1, clinic.getContactCollection(false).size());
     }
 
     @Test
@@ -102,14 +103,15 @@ public class TestClinic extends TestDatabase {
             ContactHelper.addContact(clinic, name + i);
         }
         clinic.reload();
-        List<ContactWrapper> contacts = clinic.getContactCollection();
+        List<ContactWrapper> contacts = clinic.getContactCollection(false);
         ContactWrapper contact = DbHelper.chooseRandomlyInList(contacts);
-        clinic.removeContacts(Arrays.asList(contact));
+        clinic.removeFromContactCollection(Arrays.asList(contact));
         clinic.persist();
 
         clinic.reload();
         // one contact added
-        Assert.assertEquals(nber - 1, clinic.getContactCollection().size());
+        Assert
+            .assertEquals(nber - 1, clinic.getContactCollection(false).size());
     }
 
     @Test
@@ -118,14 +120,16 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(name, true);
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         study1.addToContactCollection(Arrays.asList(DbHelper
-            .chooseRandomlyInList(clinic.getContactCollection())));
+            .chooseRandomlyInList(clinic.getContactCollection(false))));
         study1.persist();
 
         ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "CLINIC2", true);
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
-        study2.addToContactCollection(Arrays.asList(
-            DbHelper.chooseRandomlyInList(clinic.getContactCollection()),
-            DbHelper.chooseRandomlyInList(clinic2.getContactCollection())));
+        study2
+            .addToContactCollection(Arrays.asList(DbHelper
+                .chooseRandomlyInList(clinic.getContactCollection(false)),
+                DbHelper.chooseRandomlyInList(clinic2
+                    .getContactCollection(false))));
         study2.persist();
 
         clinic.reload();
@@ -140,11 +144,11 @@ public class TestClinic extends TestDatabase {
         ClinicWrapper clinic = ClinicHelper.addClinic(name, true);
         StudyWrapper study1 = StudyHelper.addStudy(name + "STUDY1");
         study1.addToContactCollection(Arrays.asList(DbHelper
-            .chooseRandomlyInList(clinic.getContactCollection())));
+            .chooseRandomlyInList(clinic.getContactCollection(false))));
         study1.persist();
         StudyWrapper study2 = StudyHelper.addStudy(name + "STUDY2");
         study2.addToContactCollection(Arrays.asList(DbHelper
-            .chooseRandomlyInList(clinic.getContactCollection())));
+            .chooseRandomlyInList(clinic.getContactCollection(false))));
         study2.persist();
 
         clinic.reload();
@@ -362,10 +366,12 @@ public class TestClinic extends TestDatabase {
             .newCollectionEvent(site, method);
         CollectionEventWrapper shipment2 = CollectionEventHelper
             .newCollectionEvent(site, method);
-        clinic.addCollectionEvents(Arrays.asList(shipment, shipment2));
+        clinic.addToCollectionEventCollection(Arrays
+            .asList(shipment, shipment2));
         clinic.persist();
         clinic.reload();
-        Assert.assertEquals(4, clinic.getCollectionEventCollection().size());
+        Assert.assertEquals(4, clinic.getCollectionEventCollection(false)
+            .size());
     }
 
     @Test
@@ -435,7 +441,8 @@ public class TestClinic extends TestDatabase {
             Utils.getRandomDate(), Utils.getRandomDate());
 
         clinic.reload();
-        Assert.assertEquals(3, clinic.getProcessingEventCollection().size());
+        Assert.assertEquals(3, clinic.getProcessingEventCollection(false)
+            .size());
     }
 
     @Test
@@ -510,7 +517,6 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testGetPatientCount() throws Exception {
         String name = "testGetPatientCount" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name);
         ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
         ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
@@ -550,9 +556,9 @@ public class TestClinic extends TestDatabase {
             while (patientMap.get(clinic).size() > 0) {
                 patient = patientMap.get(clinic).get(0);
                 patient.reload();
-                if (patient.getSourceVesselCollection() != null) {
+                if (patient.getSourceVesselCollection(false) != null) {
                     for (SourceVesselWrapper s : patient
-                        .getSourceVesselCollection()) {
+                        .getSourceVesselCollection(false)) {
                         s.delete();
                     }
                     patient.reload();

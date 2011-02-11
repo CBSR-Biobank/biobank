@@ -420,4 +420,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         }
         return null;
     }
+
+    public void setState(DispatchState ds) {
+        setState(ds.getId());
+    }
 }

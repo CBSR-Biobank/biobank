@@ -480,8 +480,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
         ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
-            .get(0);
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
+            false).get(0);
         Assert.assertNotNull(sampleType);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
@@ -498,8 +498,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
         ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
-            .get(0);
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
+            false).get(0);
         Assert.assertNotNull(sampleType);
 
         ActivityStatusWrapper activityStatusActive = ActivityStatusWrapper
@@ -541,8 +541,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
         ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
-            .get(0);
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
+            false).get(0);
         Assert.assertNotNull(sampleType);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
@@ -595,8 +595,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
         ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
-            .get(0);
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
+            false).get(0);
         Assert.assertNotNull(sampleType);
 
         AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
@@ -618,7 +618,7 @@ public class TestAliquot extends TestDatabase {
         SiteWrapper destSite = SiteHelper.addSite(name);
         StudyWrapper study = aliquot.getProcessingEvent().getPatient()
             .getStudy();
-        destSite.addStudies(Arrays.asList(study));
+        destSite.addToStudyCollection(Arrays.asList(study));
         destSite.persist();
         destSite.reload();
         site.persist();
