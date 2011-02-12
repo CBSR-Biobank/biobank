@@ -640,13 +640,18 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         String propertyValue = "?";
         if (isNew()) {
-            c = new HQLCriteria("select count(o) from " + objectClass.getName()
-                + " as o where " + propertyName + "=" + propertyValue,
+            StringBuilder qry = new StringBuilder("select count(o) from ")
+                .append(objectClass.getName()).append(" as o where ")
+                .append(propertyName).append("=").append(propertyValue);
+            c = new HQLCriteria(qry.toString(),
                 Arrays.asList(new Object[] { value }));
         } else {
-            c = new HQLCriteria("select count(o) from " + objectClass.getName()
-                + " as o where id <> ? and " + propertyName + "="
-                + propertyValue, Arrays.asList(new Object[] { getId(), value }));
+            StringBuilder qry = new StringBuilder("select count(o) from ")
+                .append(objectClass.getName())
+                .append(" as o where id <> ? and ").append(propertyName)
+                .append("=").append(propertyValue);
+            c = new HQLCriteria(qry.toString(), Arrays.asList(new Object[] {
+                getId(), value }));
         }
 
         List<Long> results = appService.query(c);

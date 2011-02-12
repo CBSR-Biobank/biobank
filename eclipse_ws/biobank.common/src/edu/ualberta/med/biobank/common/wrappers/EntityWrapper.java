@@ -98,10 +98,13 @@ public class EntityWrapper extends EntityBaseWrapper {
         return filters;
     }
 
+    private static final String GET_ENTTITIES_QRY = "from "
+        + Entity.class.getName();
+
     public static Collection<Entity> getEntities(
         WritableApplicationService appService, Comparator<Entity> comparator) {
         List<Entity> entities = new ArrayList<Entity>();
-        HQLCriteria criteria = new HQLCriteria("from " + Entity.class.getName());
+        HQLCriteria criteria = new HQLCriteria(GET_ENTTITIES_QRY);
 
         try {
             List<Entity> results = appService.query(criteria);
