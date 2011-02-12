@@ -11,7 +11,10 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DateCompare;
@@ -59,14 +62,16 @@ public class PatientWrapper extends PatientBaseWrapper {
         return result;
     }
 
+    private static final String PATIENT_QRY = "from " + Patient.class.getName()
+        + " where " + PatientPeer.PNUMBER + "=?";
+
     /**
      * Search a patient in the site with the given number
      */
     public static PatientWrapper getPatient(
         WritableApplicationService appService, String patientNumber)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Patient.class.getName() + " where pnumber = ?",
+        HQLCriteria criteria = new HQLCriteria(PATIENT_QRY,
             Arrays.asList(new Object[] { patientNumber }));
         List<Patient> patients = appService.query(criteria);
         if (patients.size() == 1) {
@@ -132,15 +137,18 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
     }
 
+    private static final String ALIQUOT_COUNT_QRY = "select count(aliquots) from "
+        + ProcessingEvent.class.getName()
+        + " as pv join pv."
+        + ProcessingEventPeer.ALIQUOT_COLLECTION.getName()
+        + " as aliquots where pv."
+        + Property.concatNames(ProcessingEventPeer.PATIENT, PatientPeer.ID)
+        + "=?";
+
     public long getAliquotsCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(
-                "select count(aliquots) from "
-                    + ProcessingEvent.class.getName()
-                    + " as pv join pv.aliquotCollection as aliquots "
-                    + "join pv.shipmentPatient as csp "
-                    + "where csp.patient.id = ? ",
+            HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
@@ -171,6 +179,17 @@ public class PatientWrapper extends PatientBaseWrapper {
         return getPnumber();
     }
 
+    private static final String PATIENTS_IN_TODAYS_COLLECTION_EVENTS_QRY = "select p from "
+        + Patient.class.getName()
+        + " as p join p."
+        + PatientPeer.SOURCE_VESSEL_COLLECTION.getName()
+        + " as svc join svc."
+        + SourceVesselPeer.COLLECTION_EVENT.getName()
+        + " as ces where ces."
+        + CollectionEventPeer.DATE_RECEIVED.getName()
+        + ">=? and ces."
+        + CollectionEventPeer.DATE_RECEIVED.getName() + "<=?";
+
     public static List<PatientWrapper> getPatientsInTodayCollectionEvents(
         WritableApplicationService appService) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
@@ -183,11 +202,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         // today midnight
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria("select p from "
-            + Patient.class.getName()
-            + " as p join p.shipmentPatientCollection as csps"
-            + " join csps.shipment as ships" + " where ships.site is not null"
-            + " and ships.dateReceived >= ? and ships.dateReceived <= ?",
+        HQLCriteria criteria = new HQLCriteria(
+            PATIENTS_IN_TODAYS_COLLECTION_EVENTS_QRY,
             Arrays.asList(new Object[] { startDate, endDate }));
         List<Patient> res = appService.query(criteria);
         List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
@@ -196,6 +212,17 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
         return patients;
     }
+
+    private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY = "select visits from "
+        + Patient.class.getName()
+        + " as p join p."
+        + PatientPeer.PROCESSING_EVENT_COLLECTION.getName()
+        + " as pes where p."
+        + PatientPeer.ID.getName()
+        + "=? and pes."
+        + ProcessingEventPeer.DATE_PROCESSED.getName()
+        + ">? and pes."
+        + ProcessingEventPeer.DATE_PROCESSED.getName() + "<?";
 
     public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
         SiteWrapper site) throws ApplicationException {
@@ -211,13 +238,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         cal.add(Calendar.DATE, -8);
         Date startDate = cal.getTime();
         HQLCriteria criteria = new HQLCriteria(
-            "select visits from "
-                + Patient.class.getName()
-                + " as p join p.shipmentPatientCollection as csps"
-                + " join csps.processingEventCollection as visits"
-                + " where p.id = ? and csps.shipment.site.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
-            Arrays.asList(new Object[] { getId(), site.getId(), startDate,
-                endDate }));
+            LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
+                getId(), site.getId(), startDate, endDate }));
         List<ProcessingEvent> res = appService.query(criteria);
         List<ProcessingEventWrapper> visits = new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent v : res) {

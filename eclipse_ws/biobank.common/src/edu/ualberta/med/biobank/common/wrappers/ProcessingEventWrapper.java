@@ -14,7 +14,10 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.peer.PvAttrPeer;
+import edu.ualberta.med.biobank.common.peer.StudyPvAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
@@ -299,12 +302,16 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         }
     }
 
+    private static final String ALIQUOT_COUNT_QRY = "select count(aliquot) from "
+        + Aliquot.class.getName()
+        + " as aliquot where aliquot."
+        + Property.concatNames(AliquotPeer.PROCESSING_EVENT,
+            ProcessingEventPeer.ID) + "=?";
+
     public long getAliquotsCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(
-                "select count(aliquot) from " + Aliquot.class.getName()
-                    + " as aliquot where aliquot.processingEvent.id = ?",
+            HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             List<Long> results = appService.query(criteria);
             if (results.size() != 1) {
@@ -378,13 +385,17 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return log;
     }
 
+    private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pva.processingEvent from "
+        + PvAttr.class.getName()
+        + " pva where pva."
+        + Property.concatNames(PvAttrPeer.STUDY_PV_ATTR, StudyPvAttrPeer.LABEL)
+        + "? and pva." + PvAttrPeer.VALUE.getName() + "=?";
+
     public static List<ProcessingEventWrapper> getProcessingEventsWithWorksheet(
-        WritableApplicationService appService, String searchString)
+        WritableApplicationService appService, String worksheetNumber)
         throws Exception {
-        HQLCriteria c = new HQLCriteria("select pva.processingEvent from "
-            + PvAttr.class.getName()
-            + " pva where pva.studyPvAttr.label ='Worksheet' and pva.value ='"
-            + searchString + "'");
+        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_WORKSHEET_QRY,
+            Arrays.asList(new Object[] { "Worksheet", worksheetNumber }));
         List<ProcessingEvent> pvs = appService.query(c);
         List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
         for (ProcessingEvent pv : pvs)

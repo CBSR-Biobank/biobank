@@ -262,7 +262,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         containerPath.persist();
     }
 
-    private static final String LABEL_UNIQUE_FOR_TYPE__QRY = "select count(c) from "
+    private static final String LABEL_UNIQUE_FOR_TYPE_BASE_QRY = "select count(c) from "
         + Container.class.getName()
         + " as c where "
         + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
@@ -281,7 +281,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             notSameContainer = " and id <> ?";
             parameters.add(getId());
         }
-        String qry = new StringBuilder(LABEL_UNIQUE_FOR_TYPE__QRY).append(
+        String qry = new StringBuilder(LABEL_UNIQUE_FOR_TYPE_BASE_QRY).append(
             notSameContainer).toString();
         HQLCriteria criteria = new HQLCriteria(qry, parameters);
         List<Long> results = appService.query(criteria);

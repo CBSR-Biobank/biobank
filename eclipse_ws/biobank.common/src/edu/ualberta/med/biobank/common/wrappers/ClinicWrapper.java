@@ -155,20 +155,25 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return uniquePatients.size();
     }
 
+    private static final String ALL_CLINICS_QRY = "from "
+        + Clinic.class.getName();
+
     public static List<ClinicWrapper> getAllClinics(
         WritableApplicationService appService) throws ApplicationException {
         List<ClinicWrapper> wrappers = new ArrayList<ClinicWrapper>();
-        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName());
+        HQLCriteria c = new HQLCriteria(ALL_CLINICS_QRY);
         List<Clinic> clinics = appService.query(c);
         for (Clinic clinic : clinics)
             wrappers.add(new ClinicWrapper(appService, clinic));
         return wrappers;
     }
 
+    private static final String CLINIC_COUNT_QRY = "select count (*) from "
+        + Clinic.class.getName();
+
     public static long getCount(WritableApplicationService appService)
         throws BiobankException, ApplicationException {
-        HQLCriteria c = new HQLCriteria("select count (*) from "
-            + Clinic.class.getName());
+        HQLCriteria c = new HQLCriteria(CLINIC_COUNT_QRY);
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankQueryResultSizeException();

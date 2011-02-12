@@ -43,12 +43,17 @@ public class SourceVesselTypeWrapper extends SourceVesselTypeBaseWrapper {
             "A Source Vessel Type with name");
     }
 
+    private static final String IS_USED_BY_STUDY_QRY = "select count(s) from "
+        + StudySourceVessel.class.getName() + " as s where s."
+        + StudySourceVesselPeer.SOURCE_VESSEL_TYPE.getName() + "=?)";
+
+    private static final String IS_USED_BY_SV_QRY = "select count(s) from "
+        + SourceVessel.class.getName() + " as s where s."
+        + SourceVesselPeer.SOURCE_VESSEL_TYPE + "=?)";
+
     public boolean isUsed() throws ApplicationException, BiobankException {
         // is this used by any Study-s?
-        String queryString = "select count(s) from "
-            + StudySourceVessel.class.getName() + " as s where s."
-            + StudySourceVesselPeer.SOURCE_VESSEL_TYPE.getName() + "=?)";
-        HQLCriteria c = new HQLCriteria(queryString,
+        HQLCriteria c = new HQLCriteria(IS_USED_BY_STUDY_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
@@ -59,9 +64,7 @@ public class SourceVesselTypeWrapper extends SourceVesselTypeBaseWrapper {
         }
 
         // is this used by any SourceVessel-s?
-        queryString = "select count(s) from " + SourceVessel.class.getName()
-            + " as s where s." + SourceVesselPeer.SOURCE_VESSEL_TYPE + "=?)";
-        c = new HQLCriteria(queryString,
+        c = new HQLCriteria(IS_USED_BY_SV_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         results = appService.query(c);
         if (results.size() != 1) {

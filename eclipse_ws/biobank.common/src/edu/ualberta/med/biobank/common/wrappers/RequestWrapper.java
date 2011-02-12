@@ -6,6 +6,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.peer.RequestAliquotPeer;
+import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
 import edu.ualberta.med.biobank.common.wrappers.base.RequestBaseWrapper;
 import edu.ualberta.med.biobank.model.Request;
@@ -120,11 +122,13 @@ public class RequestWrapper extends RequestBaseWrapper {
         return null;
     }
 
+    private static final String REQUEST_BY_NUMBER_QRY = "from "
+        + Request.class.getName() + " where " + RequestPeer.ID.getName() + "=?";
+
     public static List<RequestWrapper> getRequestByNumber(
         WritableApplicationService appService, String requestNumber)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Request.class.getName() + " where id = ?",
+        HQLCriteria criteria = new HQLCriteria(REQUEST_BY_NUMBER_QRY,
             Arrays.asList(new Object[] { Integer.parseInt(requestNumber) }));
         List<Request> shipments = appService.query(criteria);
         List<RequestWrapper> wrappers = new ArrayList<RequestWrapper>();
@@ -134,13 +138,18 @@ public class RequestWrapper extends RequestBaseWrapper {
         return wrappers;
     }
 
+    private static final String IS_ALL_PROCESSED_QRY = "select count(*) from "
+        + RequestAliquot.class.getName() + " as ra where ra."
+        + RequestAliquotPeer.STATE.getName() + "=?" + " and ra."
+        + Property.concatNames(RequestAliquotPeer.REQUEST, RequestPeer.ID)
+        + "=?";
+
     public boolean isAllProcessed() {
         // using the collection was too slow
         List<Object> results = null;
-        HQLCriteria c = new HQLCriteria("select count(*) from "
-            + RequestAliquot.class.getName() + " ra where ra.state="
-            + RequestAliquotState.NONPROCESSED_STATE.getId()
-            + " and ra.request=" + getId());
+        HQLCriteria c = new HQLCriteria(IS_ALL_PROCESSED_QRY,
+            Arrays.asList(new Object[] {
+                RequestAliquotState.NONPROCESSED_STATE.getId(), getId() }));
         try {
             results = appService.query(c);
         } catch (ApplicationException e) {

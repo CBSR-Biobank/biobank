@@ -10,6 +10,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
@@ -97,20 +98,29 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return new ArrayList<PatientWrapper>(patients);
     }
 
+    private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from "
+        + CollectionEvent.class.getName() + " ce where ce."
+        + CollectionEventPeer.WAYBILL.getName() + "=?";
+
     public static List<CollectionEventWrapper> getCollectionEvents(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        return appService.query(new HQLCriteria("from "
-            + CollectionEvent.class.getName() + " ce where ce.waybill=?",
-            Arrays.asList(new Object[] { waybill })));
+        return appService.query(new HQLCriteria(
+            COLLECTION_EVENTS_BY_WAYBILL_QRY, Arrays
+                .asList(new Object[] { waybill })));
     }
+
+    private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY = "from "
+        + CollectionEvent.class.getName()
+        + " ce where ce."
+        + CollectionEventPeer.DATE_RECEIVED.getName() + "=?";
 
     public static List<CollectionEventWrapper> getCollectionEvents(
         WritableApplicationService appService, Date dateReceived)
         throws ApplicationException {
-        return appService.query(new HQLCriteria("from "
-            + CollectionEvent.class.getName() + " ce where ce.dateReceived=?",
-            Arrays.asList(new Object[] { dateReceived })));
+        return appService.query(new HQLCriteria(
+            COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY, Arrays
+                .asList(new Object[] { dateReceived })));
     }
 
     public boolean hasPatient(String pnum) {
@@ -121,10 +131,13 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return false;
     }
 
+    private static final String TODAYS_COLLECTION_EVENTS = "from "
+        + CollectionEvent.class.getName() + " ce where ce."
+        + CollectionEventPeer.DATE_RECEIVED.getName() + "=?";
+
     public static List<CollectionEventWrapper> getTodayCollectionEvents(
         WritableApplicationService appService) throws ApplicationException {
-        return appService.query(new HQLCriteria("from "
-            + CollectionEvent.class.getName() + " ce where ce.dateReceived=?",
+        return appService.query(new HQLCriteria(TODAYS_COLLECTION_EVENTS,
             Arrays.asList(new Object[] { new Date() })));
     }
 }

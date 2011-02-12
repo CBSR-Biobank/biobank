@@ -681,9 +681,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             notSameObject = " and id <> ?";
             parameters.add(getId());
         }
-        HQLCriteria criteria = new HQLCriteria("select count(o) from "
-            + objectClass.getName() + " as o where " + propertyName + "=? and "
-            + siteIdTest + notSameObject, parameters);
+        StringBuilder qry = new StringBuilder("select count(o) from ")
+            .append(objectClass.getName()).append(" as o where ")
+            .append(propertyName).append("=? and ").append(siteIdTest)
+            .append(notSameObject);
+        HQLCriteria criteria = new HQLCriteria(qry.toString(), parameters);
         List<Long> results = appService.query(criteria);
         if (results.size() != 1) {
             throw new BiobankQueryResultSizeException();
@@ -939,7 +941,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         return one.compareTo(two);
-}
+    }
 
     public static <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollection(
         WritableApplicationService appService, List<R> modelCollection,
