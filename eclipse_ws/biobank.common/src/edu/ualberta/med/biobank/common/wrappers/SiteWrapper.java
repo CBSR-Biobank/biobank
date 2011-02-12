@@ -14,7 +14,14 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
+import edu.ualberta.med.biobank.common.peer.ContactPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
+import edu.ualberta.med.biobank.common.peer.PatientVisitPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentPatientPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
@@ -184,10 +191,18 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getStudyCollection(true);
     }
 
+    // due to bug in Hibernate when using elements in query must also use a left
+    // join
+    private static final String STUDIES_NON_ASSOC_BASE_QRY = "select s from "
+        + Study.class.getName() + " s left join s."
+        + StudyPeer.SITE_COLLECTION.getName() + " where ";
+
     public List<StudyWrapper> getStudiesNotAssoc() throws ApplicationException {
         List<StudyWrapper> studyWrappers = new ArrayList<StudyWrapper>();
-        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
-            + " s where " + getId() + " not in elements(s.siteCollection)");
+        StringBuilder qry = new StringBuilder(STUDIES_NON_ASSOC_BASE_QRY)
+            .append(getId()).append(" not in elements(s.")
+            .append(StudyPeer.SITE_COLLECTION.getName()).append(")");
+        HQLCriteria c = new HQLCriteria(qry.toString());
         List<Study> results = appService.query(c);
         for (Study res : results) {
             studyWrappers.add(new StudyWrapper(appService, res));
@@ -203,6 +218,14 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getContainerCollection(false);
     }
 
+    private static final String TOP_CONTAINERS_QRY = "from "
+        + Container.class.getName()
+        + " where "
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
+        + "=? and "
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.TOP_LEVEL) + "=true";
+
     @SuppressWarnings("unchecked")
     public List<ContainerWrapper> getTopContainerCollection(boolean sort)
         throws Exception {
@@ -211,9 +234,7 @@ public class SiteWrapper extends SiteBaseWrapper {
 
         if (topContainerCollection == null) {
             topContainerCollection = new ArrayList<ContainerWrapper>();
-            HQLCriteria criteria = new HQLCriteria("from "
-                + Container.class.getName()
-                + " where site.id = ? and containerType.topLevel = true",
+            HQLCriteria criteria = new HQLCriteria(TOP_CONTAINERS_QRY,
                 Arrays.asList(new Object[] { wrappedObject.getId() }));
             List<Container> containers = appService.query(criteria);
             for (Container c : containers) {
@@ -249,6 +270,10 @@ public class SiteWrapper extends SiteBaseWrapper {
         return 0;
     }
 
+    private static final String SHIPMENT_COUNT_QRY = "select count(*) from "
+        + Shipment.class.getName() + " where "
+        + Property.concatNames(ShipmentPeer.SITE, SitePeer.ID) + "=?";
+
     /**
      * Search for shipments in the site with the given waybill
      * 
@@ -256,8 +281,7 @@ public class SiteWrapper extends SiteBaseWrapper {
      */
     public Long getShipmentCount() throws ApplicationException,
         BiobankException {
-        HQLCriteria criteria = new HQLCriteria("select count(*) from "
-            + Shipment.class.getName() + " where site.id = ?",
+        HQLCriteria criteria = new HQLCriteria(SHIPMENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -265,13 +289,19 @@ public class SiteWrapper extends SiteBaseWrapper {
         }
         return result.get(0);
     }
+
+    private static final String PATIENT_COUNT_QRY = "select count(distinct patient) from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.SHIPMENT_COLLECTION.getName()
+        + " as shipments join shipments."
+        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
+        + " as csps join csps."
+        + ShipmentPatientPeer.PATIENT.getName()
+        + " as patient where site." + SitePeer.ID.getName() + "=?";
 
     public Long getPatientCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria(
-            "select count(distinct patient) from " + Site.class.getName()
-                + " as site " + "join site.shipmentCollection as shipments "
-                + "join shipments.shipmentPatientCollection as csps "
-                + "join csps.patient as patient " + "where site.id = ?",
+        HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -280,13 +310,18 @@ public class SiteWrapper extends SiteBaseWrapper {
         return result.get(0);
     }
 
+    private static final String VISIT_COUNT_QRY = "select count(visits) from "
+        + Site.class.getName() + " as site join site."
+        + SitePeer.SHIPMENT_COLLECTION.getName()
+        + " as shipments join shipments."
+        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
+        + " as csps join csps."
+        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
+        + " as visits where site." + SitePeer.ID.getName() + "=?";
+
     public Long getPatientVisitCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select count(visits) from "
-            + Site.class.getName() + " as site "
-            + "join site.shipmentCollection as shipments "
-            + "join shipments.shipmentPatientCollection as csps "
-            + "join csps.patientVisitCollection as visits "
-            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+        HQLCriteria criteria = new HQLCriteria(VISIT_COUNT_QRY,
+            Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
             throw new BiobankQueryResultSizeException();
@@ -294,13 +329,20 @@ public class SiteWrapper extends SiteBaseWrapper {
         return result.get(0);
     }
 
+    private static final String ALIQUOT_COUNT_QRY = "select count(aliquots) from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.SHIPMENT_COLLECTION.getName()
+        + " as shipments join shipments."
+        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
+        + " as csps join csps."
+        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
+        + " as visits join visits."
+        + PatientVisitPeer.ALIQUOT_COLLECTION.getName()
+        + " as aliquots where site." + SitePeer.ID.getName() + "=?";
+
     public Long getAliquotCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select count(aliquots) from "
-            + Site.class.getName() + " as site "
-            + "join site.shipmentCollection as shipments "
-            + "join shipments.shipmentPatientCollection as csps "
-            + "join csps.patientVisitCollection as visits "
-            + "join visits.aliquotCollection as aliquots where site.id = ?",
+        HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -317,23 +359,24 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getSites(appService, null);
     }
 
+    private static final String SITES_QRY = "from " + Site.class.getName();
+
     /**
      * If "id" is null, then all sites are returned. If not, then only sites
      * with that id are returned.
      */
     public static List<SiteWrapper> getSites(
         WritableApplicationService appService, Integer id) throws Exception {
-        HQLCriteria criteria;
+        StringBuilder qry = new StringBuilder(SITES_QRY);
+        List<Object> qryParms = new ArrayList<Object>();
 
-        if (id == null) {
-            criteria = new HQLCriteria("from " + Site.class.getName());
-        } else {
-            criteria = new HQLCriteria("from " + Site.class.getName()
-                + " where id = ?", Arrays.asList(new Object[] { id }));
+        if (id != null) {
+            qry.append(" where id = ?");
+            qryParms.add(id);
         }
 
+        HQLCriteria criteria = new HQLCriteria(qry.toString(), qryParms);
         List<Site> sites = appService.query(criteria);
-
         List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         for (Site s : sites) {
             wrappers.add(new SiteWrapper(appService, s));
@@ -600,6 +643,18 @@ public class SiteWrapper extends SiteBaseWrapper {
         return clinics;
     }
 
+    private static final String WORKING_CLINIC_COLLECTION_SIZE = "select distinct contact."
+        + ContactPeer.CLINIC.getName()
+        + " from "
+        + Site.class.getName()
+        + " as site "
+        + "inner join site."
+        + SitePeer.STUDY_COLLECTION.getName()
+        + " as study "
+        + "inner join study."
+        + StudyPeer.CONTACT_COLLECTION.getName()
+        + " as contact where site." + SitePeer.ID.getName() + "=?";
+
     /**
      * Use an HQL query to quickly get the size of the collection.
      * 
@@ -607,11 +662,8 @@ public class SiteWrapper extends SiteBaseWrapper {
      * @throws ApplicationException
      */
     public int getWorkingClinicCollectionSize() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct contact.clinic "
-            + "from edu.ualberta.med.biobank.model.Site as site "
-            + "inner join site.studyCollection study "
-            + "inner join study.contactCollection contact "
-            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+        HQLCriteria c = new HQLCriteria(WORKING_CLINIC_COLLECTION_SIZE,
+            Arrays.asList(new Object[] { getId() }));
         List<Clinic> clinics = appService.query(c);
         return clinics.size();
     }
