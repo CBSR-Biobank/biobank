@@ -87,7 +87,7 @@ public class TestActivityStatus extends TestDatabase {
         ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
             site, name, 2, 2);
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
-        topContainerType.addSampleTypes(SampleTypeWrapper.getAllSampleTypes(
+        topContainerType.addToSampleTypeCollection(SampleTypeWrapper.getAllSampleTypes(
             appService, false));
         topContainerType.persist();
 

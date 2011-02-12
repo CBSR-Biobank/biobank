@@ -87,30 +87,30 @@ public class TestContainer extends TestDatabase {
         childType = ContainerTypeHelper.addContainerType(site,
             "Child L3 Container Type", "CCTL3", 1, CONTAINER_CHILD_L3_ROWS,
             CONTAINER_CHILD_L3_COLS, false);
-        childType.addChildContainerTypes(Arrays.asList(containerTypeMap
-            .get("ChildCtL4")));
+        childType.addToChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL4")));
         childType.persist();
         containerTypeMap.put("ChildCtL3", childType);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L2 Container Type", "CCTL2", 1, 3, 12, false);
-        childType.addChildContainerTypes(Arrays.asList(containerTypeMap
-            .get("ChildCtL3")));
+        childType.addToChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL3")));
         childType.persist();
         containerTypeMap.put("ChildCtL2", childType);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
-        childType.addChildContainerTypes(Arrays.asList(containerTypeMap
-            .get("ChildCtL2")));
+        childType.addToChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL2")));
         childType.persist();
         containerTypeMap.put("ChildCtL1", childType);
 
         topType = ContainerTypeHelper.newContainerType(site,
             "Top Container Type", "TCT", 2, CONTAINER_TOP_ROWS,
             CONTAINER_TOP_COLS, true);
-        topType.addChildContainerTypes(Arrays.asList(containerTypeMap
-            .get("ChildCtL1")));
+        topType.addToChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL1")));
         topType.persist();
         containerTypeMap.put("TopCT", topType);
     }
@@ -207,7 +207,7 @@ public class TestContainer extends TestDatabase {
             "H-13", 2, 1, 13, false);
         List<ContainerTypeWrapper> childContainerTypes = new ArrayList<ContainerTypeWrapper>();
         childContainerTypes.add(hotelType);
-        freezerType.addChildContainerTypes(childContainerTypes);
+        freezerType.addToChildContainerTypeCollection(childContainerTypes);
         freezerType.persist();
         containerTypeMap.put("hotel13", hotelType);
 
@@ -218,7 +218,7 @@ public class TestContainer extends TestDatabase {
             "D36", 2, 1, 36, false);
         childContainerTypes = new ArrayList<ContainerTypeWrapper>();
         childContainerTypes.add(drawerType);
-        cabinetType.addChildContainerTypes(childContainerTypes);
+        cabinetType.addToChildContainerTypeCollection(childContainerTypes);
         cabinetType.persist();
         containerTypeMap.put("drawer36", drawerType);
 
@@ -377,7 +377,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), null, site, type);
-        container.setRowColPosition(new RowColPos(0, 0));
+        container.setPositionAsRowCol(new RowColPos(0, 0));
 
         // should have a parent
         try {
@@ -410,7 +410,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerWrapper container = ContainerHelper.newContainer("02",
             TestCommon.getNewBarcode(r), parent, site, type);
-        container.setRowColPosition(new RowColPos(10, 10));
+        container.setPositionAsRowCol(new RowColPos(10, 10));
         try {
             container.persist();
             Assert.fail("position not ok in parent container");
@@ -418,12 +418,12 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        container.setRowColPosition(new RowColPos(0, 0));
+        container.setPositionAsRowCol(new RowColPos(0, 0));
         container.persist();
 
         ContainerWrapper container2 = ContainerHelper.newContainer(null,
             TestCommon.getNewBarcode(r), null, site, type);
-        container2.setRowColPosition(new RowColPos(0, 0));
+        container2.setPositionAsRowCol(new RowColPos(0, 0));
         container2.setParent(parent);
         container2.setContainerType(type);
         try {
@@ -499,7 +499,7 @@ public class TestContainer extends TestDatabase {
             0, 0);
 
         // set position to null
-        child.setRowColPosition(null);
+        child.setPositionAsRowCol(null);
         try {
             child.persist();
             Assert.fail("should not be allowed to set an null position");
@@ -519,7 +519,7 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setRowColPosition(new RowColPos(top.getRowCapacity() + 1, top
+        child.setPositionAsRowCol(new RowColPos(top.getRowCapacity() + 1, top
             .getColCapacity() + 1));
         try {
             child.persist();
@@ -528,7 +528,7 @@ public class TestContainer extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        child.setRowColPosition(new RowColPos(-1, -1));
+        child.setPositionAsRowCol(new RowColPos(-1, -1));
         try {
             child.persist();
             Assert.fail("should not be allowed to set an invalid position");
@@ -1229,7 +1229,7 @@ public class TestContainer extends TestDatabase {
 
         ContainerTypeWrapper topType = containerTypeMap.get("TopCT");
 
-        topType.addChildContainerTypes(Arrays.asList(
+        topType.addToChildContainerTypeCollection(Arrays.asList(
             containerTypeMap.get("ChildCtL1"), childType1_2));
         topType.persist();
         topType.reload();
@@ -1242,7 +1242,7 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(children.size() == CONTAINER_TOP_ROWS
             * CONTAINER_TOP_COLS);
         for (ContainerWrapper container : children) {
-            if (container.getRowColPosition().equals(0, 0)) {
+            if (container.getPositionAsRowCol().equals(0, 0)) {
                 Assert.assertTrue(container.getContainerType().equals(
                     containerTypeMap.get("ChildCtL1")));
             } else {
@@ -1344,7 +1344,7 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper altTopType = ContainerTypeHelper.newContainerType(
             altSite, "Alt Top Container Type", "ATCT", 2, CONTAINER_TOP_ROWS,
             CONTAINER_TOP_COLS, true);
-        altTopType.addChildContainerTypes(Arrays.asList(childType));
+        altTopType.addToChildContainerTypeCollection(Arrays.asList(childType));
         altTopType.persist();
         childType.reload();
 
@@ -1406,7 +1406,8 @@ public class TestContainer extends TestDatabase {
         ProcessingEventWrapper pv = addProcessingEvent();
         ContainerWrapper childL4 = containerMap.get("ChildL4");
         SampleTypeWrapper sampleType = allSampleTypes.get(0);
-        childL4.getContainerType().addSampleTypes(Arrays.asList(sampleType));
+        childL4.getContainerType().addToSampleTypeCollection(
+            Arrays.asList(sampleType));
         childL4.getContainerType().persist();
         AliquotWrapper aliquot = AliquotHelper.addAliquot(sampleType, childL4,
             pv, 0, 0);
@@ -1451,7 +1452,8 @@ public class TestContainer extends TestDatabase {
         newContainer.setPositionAndParentFromLabel(label, Arrays.asList(type));
 
         Assert.assertEquals(childL2, newContainer.getParent());
-        Assert.assertEquals(new RowColPos(1, 5), newContainer.getPosition());
+        Assert.assertEquals(new RowColPos(1, 5),
+            newContainer.getPositionAsRowCol());
         newContainer.persist();
         Assert.assertEquals(label, newContainer.getLabel());
 
@@ -1467,8 +1469,8 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper topType2 = ContainerTypeHelper.newContainerType(
             site, "Top Container Type 2", "TCT2", 2, CONTAINER_TOP_ROWS - 1,
             CONTAINER_TOP_COLS + 1, true);
-        topType2.addChildContainerTypes(Arrays.asList(containerTypeMap
-            .get("ChildCtL1")));
+        topType2.addToChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL1")));
         topType2.persist();
         containerTypeMap.put("TopCT", topType2);
 
@@ -1504,11 +1506,13 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper existingType = containerTypeMap.get("ChildCtL2");
         ContainerTypeWrapper newChildType1 = ContainerTypeHelper
             .addContainerType(site, "newChild1", "NC1", 3, 15, 1, false);
-        newChildType1.addChildContainerTypes(Arrays.asList(existingType));
+        newChildType1.addToChildContainerTypeCollection(Arrays
+            .asList(existingType));
         newChildType1.persist();
         ContainerTypeWrapper newTopType = ContainerTypeHelper.addContainerType(
             site, "NewTop", "NT", 2, 3, 5, true);
-        newTopType.addChildContainerTypes(Arrays.asList(newChildType1));
+        newTopType.addToChildContainerTypeCollection(Arrays
+            .asList(newChildType1));
         newTopType.persist();
 
         ContainerWrapper newTopContainer = ContainerHelper.addContainer("01",
@@ -1743,10 +1747,11 @@ public class TestContainer extends TestDatabase {
 
         ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
             site, "Aliquot Container Type", "ACT", 1, 4, 9, false);
-        childType.addSampleTypes(SampleTypeWrapper.getAllSampleTypes(
-            appService, false));
+        childType.addToSampleTypeCollection(SampleTypeWrapper
+            .getAllSampleTypes(appService, false));
         childType.persist();
-        top.getContainerType().addChildContainerTypes(Arrays.asList(childType));
+        top.getContainerType().addToChildContainerTypeCollection(
+            Arrays.asList(childType));
         top.getContainerType().persist();
 
         ContainerWrapper child = ContainerHelper.newContainer(null,
@@ -1798,13 +1803,15 @@ public class TestContainer extends TestDatabase {
 
         ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
             site, "Aliquot Container Type", "ACT", 1, 4, 9, false);
-        childType.addSampleTypes(Arrays.asList(allSampleTypes.get(0)));
+        childType
+            .addToSampleTypeCollection(Arrays.asList(allSampleTypes.get(0)));
         childType.persist();
         ContainerTypeWrapper childType2 = ContainerTypeHelper.addContainerType(
             site, "Aliquot Container Type2", "ACT2", 1, 4, 9, false);
-        childType2.addSampleTypes(Arrays.asList(allSampleTypes.get(1)));
+        childType2.addToSampleTypeCollection(Arrays.asList(allSampleTypes
+            .get(1)));
         childType2.persist();
-        top.getContainerType().addChildContainerTypes(
+        top.getContainerType().addToChildContainerTypeCollection(
             Arrays.asList(childType, childType2));
         top.getContainerType().persist();
 

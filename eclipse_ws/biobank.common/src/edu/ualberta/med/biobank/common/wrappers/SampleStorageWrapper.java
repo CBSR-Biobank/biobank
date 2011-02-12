@@ -36,8 +36,9 @@ public class SampleStorageWrapper extends SampleStorageBaseWrapper {
 
     @Override
     public String toString() {
-        return getSampleType().getName() + "/" + getQuantity() + "/"
-            + getActivityStatus();
+        return new StringBuilder(getSampleType().getName()).append("/")
+            .append(getQuantity()).append("/").append(getActivityStatus())
+            .toString();
     }
 
 }

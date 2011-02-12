@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,6 +42,14 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     private Set<ContainerTypeWrapper> deletedChildTypes = new HashSet<ContainerTypeWrapper>();
 
     private Set<SampleTypeWrapper> deletedSampleTypes = new HashSet<SampleTypeWrapper>();
+
+    public static final List<String> PROP_NAMES;
+    static {
+        List<String> aList = new ArrayList<String>();
+        aList.addAll(ContainerTypePeer.PROP_NAMES);
+        aList.addAll(CapacityPeer.PROP_NAMES);
+        PROP_NAMES = Collections.unmodifiableList(aList);
+    };
 
     public ContainerTypeWrapper(WritableApplicationService appService,
         ContainerType wrappedObject) {
@@ -169,7 +178,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     public void deleteDependencies() throws Exception {
         // should remove this containerType from its parents
         for (ContainerTypeWrapper parent : getParentContainerTypes()) {
-            parent.removeChildContainers(Arrays.asList(this));
+            parent.removeFromChildContainerTypeCollection(Arrays.asList(this));
             parent.persist();
         }
     }
@@ -213,17 +222,24 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             ContainerTypeWrapper.class);
     }
 
-    public void addSampleTypes(List<SampleTypeWrapper> newSampleTypes) {
-        addToSampleTypeCollection(newSampleTypes);
+    @Override
+    public void addToSampleTypeCollection(List<SampleTypeWrapper> newSampleTypes) {
+        super.addToSampleTypeCollection(newSampleTypes);
 
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
         deletedSampleTypes.removeAll(newSampleTypes);
     }
 
-    public void removeSampleTypes(List<SampleTypeWrapper> typesToRemove) {
+    @Override
+    public void removeFromSampleTypeCollection(
+        List<SampleTypeWrapper> typesToRemove) {
         deletedSampleTypes.addAll(typesToRemove);
-        removeFromSampleTypeCollection(typesToRemove);
+        super.removeFromSampleTypeCollection(typesToRemove);
+    }
+
+    public List<SampleTypeWrapper> getSampleTypeCollection() {
+        return getSampleTypeCollection(true);
     }
 
     public Set<SampleTypeWrapper> getSampleTypesRecursively()
@@ -238,27 +254,25 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         return sampleTypes;
     }
 
-    public void addChildContainerTypes(
+    @Override
+    public void addToChildContainerTypeCollection(
         List<ContainerTypeWrapper> newContainerTypes) {
-        addToWrapperCollection(
-            ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION,
-            newContainerTypes);
+        super.addToChildContainerTypeCollection(newContainerTypes);
 
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
         deletedChildTypes.removeAll(newContainerTypes);
     }
 
-    public void removeChildContainers(List<ContainerTypeWrapper> typesToRemove) {
+    @Override
+    public void removeFromChildContainerTypeCollection(
+        List<ContainerTypeWrapper> typesToRemove) {
         deletedChildTypes.addAll(typesToRemove);
-        removeFromWrapperCollection(
-            ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION, typesToRemove);
+        super.removeFromChildContainerTypeCollection(typesToRemove);
     }
 
     public List<ContainerTypeWrapper> getChildContainerTypeCollection() {
-        return getWrapperCollection(
-            ContainerTypePeer.CHILD_CONTAINER_TYPE_COLLECTION,
-            ContainerTypeWrapper.class, true);
+        return getChildContainerTypeCollection(true);
     }
 
     public Integer getRowCapacity() {
@@ -266,7 +280,24 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public Integer getColCapacity() {
-        return getCapacity().getColCapacity();
+        return getProperty(getCapacity(), CapacityPeer.COL_CAPACITY);
+    }
+
+    private CapacityWrapper initCapacity() {
+        CapacityWrapper capacity = getCapacity();
+        if (capacity == null) {
+            capacity = new CapacityWrapper(appService);
+            setCapacity(capacity);
+        }
+        return capacity;
+    }
+
+    public void setRowCapacity(Integer maxRows) {
+        setProperty(initCapacity(), CapacityPeer.ROW_CAPACITY, maxRows);
+    }
+
+    public void setColCapacity(Integer maxCols) {
+        setProperty(initCapacity(), CapacityPeer.COL_CAPACITY, maxCols);
     }
 
     public Integer getChildLabelingSchemeId() {
@@ -282,6 +313,23 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
                 + "\" does not exist");
         }
         setChildLabelingScheme(scheme);
+    }
+
+    public String getChildLabelingSchemeName() {
+        return getProperty(getChildLabelingScheme(),
+            ContainerLabelingSchemePeer.NAME);
+    }
+
+    public void setChildLabelingSchemeName(String name) throws Exception {
+        for (ContainerLabelingSchemeWrapper scheme : ContainerLabelingSchemeWrapper
+            .getAllLabelingSchemesMap(appService).values()) {
+            if (scheme.getName().equals(name)) {
+                setChildLabelingScheme(scheme);
+                return;
+            }
+        }
+        throw new Exception("labeling scheme with name \"" + name
+            + "\" does not exist");
     }
 
     /**
@@ -478,17 +526,5 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     @Override
     public boolean checkSpecificAccess(User user, Integer siteId) {
         return user.isSiteAdministrator(siteId);
-    }
-
-    public void setRowCapacity(Integer rowCapacity) {
-        getCapacity().setRow(rowCapacity);
-    }
-
-    public void setColCapacity(Integer colCapacity) {
-        getCapacity().setRow(colCapacity);
-    }
-
-    public String getChildLabelingSchemeName() {
-        return getChildLabelingScheme().getName();
     }
 }

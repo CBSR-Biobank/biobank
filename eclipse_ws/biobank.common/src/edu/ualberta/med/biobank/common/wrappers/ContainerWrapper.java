@@ -117,7 +117,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     private void checkHasPosition() throws BiobankCheckException {
         if ((getContainerType() != null)
             && !Boolean.TRUE.equals(getContainerType().getTopLevel())
-            && (getPosition() == null)) {
+            && (getPositionAsRowCol() == null)) {
             throw new BiobankCheckException(
                 "A child container must have a position");
         }
@@ -194,14 +194,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         persistAliquots();
     }
 
-    public RowColPos getRowColPosition() {
+    public RowColPos getPositionAsRowCol() {
         return objectWithPositionManagement.getPosition();
     }
 
     public String getPositionString() {
         ContainerWrapper parent = getParent();
         if (parent != null) {
-            RowColPos pos = getRowColPosition();
+            RowColPos pos = getPositionAsRowCol();
             if (pos != null) {
                 return parent.getContainerType().getPositionString(pos);
             }
@@ -209,7 +209,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return null;
     }
 
-    public void setRowColPosition(RowColPos rcp) {
+    public void setPositionAsRowCol(RowColPos rcp) {
         objectWithPositionManagement.setPosition(rcp);
     }
 
@@ -409,7 +409,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         setParent(parent);
         RowColPos position = parent.getPositionFromLabelingScheme(label
             .substring(label.length() - 2));
-        setRowColPosition(position);
+        setPositionAsRowCol(position);
     }
 
     /**
@@ -675,7 +675,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     + ")");
             }
         }
-        child.setRowColPosition(new RowColPos(row, col));
+        child.setPositionAsRowCol(new RowColPos(row, col));
         child.setParent(this);
         children.put(new RowColPos(row, col), child);
         addedChildren.add(child);
@@ -1056,7 +1056,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             newContainer.setContainerType(type);
             newContainer.setSite(getSite());
             newContainer.setTemperature(getTemperature());
-            newContainer.setRowColPosition(new RowColPos(i, j));
+            newContainer.setPositionAsRowCol(new RowColPos(i, j));
             newContainer.setParent(this);
             newContainer.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));

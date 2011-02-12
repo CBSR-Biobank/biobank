@@ -493,7 +493,7 @@
       <transaction src="${data.sql.dir}/activityStatus.sql" />
       <transaction src="${data.sql.dir}/globalPvAttr.sql" />
       <transaction src="${data.sql.dir}/pvAttrType.sql" />
-      <transaction src="${data.sql.dir}/sourceVessels.sql" />
+      <transaction src="${data.sql.dir}/sourceVesselTypes.sql" />
       <transaction src="${data.sql.dir}/sampleTypes.sql" />
       <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
@@ -842,7 +842,7 @@
   </target>
 
   <target name="clean"
-          depends="clean-tests,clean-jars, clean-caCore"
+          depends="clean-tests,clean-jars,clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <delete dir="${eclipse.proj.dir.common}/output" />
     <delete dir="${eclipse.proj.dir.tools}/output-validators" />

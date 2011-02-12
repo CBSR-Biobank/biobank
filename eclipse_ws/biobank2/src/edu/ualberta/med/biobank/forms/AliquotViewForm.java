@@ -155,7 +155,7 @@ public class AliquotViewForm extends BiobankViewForm {
                 if (parents.isEmpty()) {
                     position = aliquot.getPosition();
                 } else {
-                    position = parents.peek().getPosition();
+                    position = parents.peek().getPositionAsRowCol();
                 }
                 Composite containerComposite = toolkit
                     .createComposite(containersComposite);

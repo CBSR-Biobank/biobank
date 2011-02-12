@@ -56,7 +56,7 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 if (study != null) {
                     List<StudyWrapper> dummyList = new ArrayList<StudyWrapper>();
                     dummyList.add(study);
-                    site.addStudies(dummyList);
+                    site.addToStudyCollection(dummyList);
                     setCollection(site.getStudyCollection(true));
                 }
             }
@@ -89,7 +89,8 @@ public class StudyAddInfoTable extends StudyInfoTable {
                 }
 
                 try {
-                    site.removeStudies(Arrays.asList(study));
+                    site.removeFromStudyCollectionWithCheck(Arrays
+                        .asList(study));
                     setCollection(site.getStudyCollection(true));
                     notifyListeners();
                 } catch (BiobankCheckException e) {

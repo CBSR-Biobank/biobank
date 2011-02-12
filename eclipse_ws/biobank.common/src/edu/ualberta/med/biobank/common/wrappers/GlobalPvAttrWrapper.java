@@ -48,12 +48,15 @@ public class GlobalPvAttrWrapper extends GlobalPvAttrBaseWrapper {
         super.reload();
     }
 
+    public static final String ALL_GLOBAL_PV_ATTRS_QRY = "from "
+        + GlobalPvAttr.class.getName();
+
     public static List<GlobalPvAttrWrapper> getAllGlobalPvAttrs(
         WritableApplicationService appService) throws ApplicationException {
 
         List<GlobalPvAttrWrapper> pvAttrs = new ArrayList<GlobalPvAttrWrapper>();
 
-        HQLCriteria c = new HQLCriteria("from " + GlobalPvAttr.class.getName());
+        HQLCriteria c = new HQLCriteria(ALL_GLOBAL_PV_ATTRS_QRY);
         List<GlobalPvAttr> result = appService.query(c);
         for (GlobalPvAttr pvAttr : result) {
             pvAttrs.add(new GlobalPvAttrWrapper(appService, pvAttr));

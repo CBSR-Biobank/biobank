@@ -64,7 +64,7 @@ public class ContainerHelper extends DbHelper {
         Integer row, Integer col) throws Exception {
         ContainerWrapper container = newContainer(label, barcode, parent, site,
             type);
-        container.setRowColPosition(new RowColPos(row, col));
+        container.setPositionAsRowCol(new RowColPos(row, col));
         return container;
     }
 
@@ -131,7 +131,7 @@ public class ContainerHelper extends DbHelper {
         ContainerWrapper container = addContainer(label, name, null, site, type);
         if (label == null) {
             container.setParent(parent);
-            container.setRowColPosition(new RowColPos(0, 0));
+            container.setPositionAsRowCol(new RowColPos(0, 0));
         }
         container.persist();
         return container;
@@ -153,7 +153,7 @@ public class ContainerHelper extends DbHelper {
             ContainerTypeWrapper type = ContainerTypeHelper
                 .addContainerTypeRandom(site, barcode + "children" + (i + 1),
                     false);
-            topContainer.getContainerType().addChildContainerTypes(
+            topContainer.getContainerType().addToChildContainerTypeCollection(
                 Arrays.asList(type));
             topContainer.getContainerType().persist();
             int maxRow = topContainer.getRowCapacity();

@@ -109,28 +109,36 @@ public class LogWrapper extends LogBaseWrapper {
         }
     }
 
+    public static final String POSSIBLE_SITES_QRY = "select distinct(site) from "
+        + Log.class.getName() + " where site !=''";
+
     public static List<String> getPossibleSites(
         WritableApplicationService appService) throws ApplicationException {
-        return appService.query(new HQLCriteria("select distinct(site) from "
-            + Log.class.getName() + " where site !=''"));
+        return appService.query(new HQLCriteria(POSSIBLE_SITES_QRY));
     }
+
+    public static final String POSSIBLE_USER_NAMES_QRY = "select distinct(username) from "
+        + Log.class.getName();
 
     public static List<String> getPossibleUsernames(
         WritableApplicationService appService) throws ApplicationException {
-        return appService.query(new HQLCriteria(
-            "select distinct(username) from " + Log.class.getName()));
+        return appService.query(new HQLCriteria(POSSIBLE_USER_NAMES_QRY));
     }
+
+    public static final String POSSIBLE_ACTIONS_QRY = "select distinct(action) from "
+        + Log.class.getName();
 
     public static List<String> getPossibleActions(
         WritableApplicationService appService) throws ApplicationException {
-        return appService.query(new HQLCriteria("select distinct(action) from "
-            + Log.class.getName()));
+        return appService.query(new HQLCriteria(POSSIBLE_ACTIONS_QRY));
     }
+
+    public static final String POSSIBLE_TYPES_QRY = "select distinct(type) from "
+        + Log.class.getName() + " where type !=''";
 
     public static List<String> getPossibleTypes(
         WritableApplicationService appService) throws ApplicationException {
-        return appService.query(new HQLCriteria("select distinct(type) from "
-            + Log.class.getName() + " where type !=''"));
+        return appService.query(new HQLCriteria(POSSIBLE_TYPES_QRY));
     }
 
     @Override

@@ -10,6 +10,7 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.base.SampleTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -76,10 +77,13 @@ public class SampleTypeWrapper extends SampleTypeBaseWrapper {
         }
     }
 
+    public static final String ALL_SAMPLE_TYPES_QRY = "from "
+        + SampleType.class.getName();
+
     public static List<SampleTypeWrapper> getAllSampleTypes(
         WritableApplicationService appService, boolean sort)
         throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + SampleType.class.getName());
+        HQLCriteria c = new HQLCriteria(ALL_SAMPLE_TYPES_QRY);
 
         List<SampleType> sampleTypes = appService.query(c);
         List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
@@ -133,11 +137,13 @@ public class SampleTypeWrapper extends SampleTypeBaseWrapper {
         return getName();
     }
 
+    public static final String IS_USED_BY_SAMPLES_QRY = "select count(s) from "
+        + Aliquot.class.getName() + " as s where s."
+        + AliquotPeer.SAMPLE_TYPE.getName() + "=?)";
+
     public boolean isUsedBySamples() throws ApplicationException,
         BiobankException {
-        String queryString = "select count(s) from " + Aliquot.class.getName()
-            + " as s where s.sampleType=?)";
-        HQLCriteria c = new HQLCriteria(queryString,
+        HQLCriteria c = new HQLCriteria(IS_USED_BY_SAMPLES_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {

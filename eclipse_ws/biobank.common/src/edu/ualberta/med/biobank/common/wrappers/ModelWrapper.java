@@ -70,7 +70,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 }
             }
 
-            cache(property, wrapper);
+            cache(modelWrapper, property, wrapper);
         }
 
         return wrapper;
@@ -85,7 +85,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
         R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
         setProperty(modelWrapper, property, newValue);
-        cache(property, wrapper);
+        cache(modelWrapper, property, wrapper);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
@@ -104,7 +104,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         setModelProperty(modelWrapper, property, newValues);
-        cache(property, wrappers);
+        cache(modelWrapper, property, wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
@@ -128,7 +128,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             Collection<R> raw = getModelProperty(modelWrapper, property);
             wrappers = wrapModelCollection(appService, (List<R>) raw,
                 wrapperKlazz);
-            cache(property, wrappers);
+            cache(modelWrapper, property, wrappers);
         }
 
         if (wrappers != null && sort) {
@@ -219,7 +219,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (value == null && !isCached(property)) {
             value = getModelProperty(modelWrapper, property);
-            cache(property, value);
+            cache(modelWrapper, property, value);
         }
 
         return value;
@@ -232,7 +232,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected <T, M> void setProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property, T newValue) {
         setModelProperty(modelWrapper, property, newValue);
-        cache(property, newValue);
+        cache(modelWrapper, property, newValue);
     }
 
     private <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
@@ -281,8 +281,15 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    private void cache(Property<?, ?> property, Object value) {
+    private void cache(ModelWrapper<?> wrapper, Property<?, ?> property,
+        Object value) {
         propertyMap.put(property, value);
+
+        if (wrapper != this) {
+            // update the cache of the wrapper the given property is for, if it
+            // is not for itself
+            wrapper.cache(wrapper, property, value);
+        }
     }
 
     private boolean isCached(Property<?, ?> property) {
@@ -633,13 +640,18 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         String propertyValue = "?";
         if (isNew()) {
-            c = new HQLCriteria("select count(o) from " + objectClass.getName()
-                + " as o where " + propertyName + "=" + propertyValue,
+            StringBuilder qry = new StringBuilder("select count(o) from ")
+                .append(objectClass.getName()).append(" as o where ")
+                .append(propertyName).append("=").append(propertyValue);
+            c = new HQLCriteria(qry.toString(),
                 Arrays.asList(new Object[] { value }));
         } else {
-            c = new HQLCriteria("select count(o) from " + objectClass.getName()
-                + " as o where id <> ? and " + propertyName + "="
-                + propertyValue, Arrays.asList(new Object[] { getId(), value }));
+            StringBuilder qry = new StringBuilder("select count(o) from ")
+                .append(objectClass.getName())
+                .append(" as o where id <> ? and ").append(propertyName)
+                .append("=").append(propertyValue);
+            c = new HQLCriteria(qry.toString(), Arrays.asList(new Object[] {
+                getId(), value }));
         }
 
         List<Long> results = appService.query(c);

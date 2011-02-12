@@ -65,7 +65,7 @@ public abstract class DispatchAliquotListInfoTable extends
                                         + " aliquots from this shipment ?"))
                                 return;
                             try {
-                                shipment.removeDispatchAliquots(dsaList);
+                                shipment.removeFromDispatchAliquotCollection(dsaList);
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {

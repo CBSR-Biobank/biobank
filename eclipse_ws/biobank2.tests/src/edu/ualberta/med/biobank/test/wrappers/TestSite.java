@@ -808,7 +808,7 @@ public class TestSite extends TestDatabase {
             .getAllSampleTypes(appService, true);
         ContainerTypeWrapper ctype = ContainerTypeHelper.addContainerType(site,
             "Pallet96", "P96", 2, 8, 12, true);
-        ctype.addSampleTypes(allSampleTypes);
+        ctype.addToSampleTypeCollection(allSampleTypes);
         ctype.persist();
 
         ContainerWrapper container = ContainerHelper.addContainer("01", "01",
