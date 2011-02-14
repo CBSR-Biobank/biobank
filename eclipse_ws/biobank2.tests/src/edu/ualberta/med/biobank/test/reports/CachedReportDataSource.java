@@ -2,8 +2,9 @@ package edu.ualberta.med.biobank.test.reports;
 
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -11,7 +12,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -28,7 +28,6 @@ public class CachedReportDataSource implements ReportDataSource {
     private List<AliquotWrapper> aliquots;
     private List<ContainerWrapper> containers;
     private List<StudyWrapper> studies;
-    private List<ProcessingEventWrapper> patientVisits;
     private List<PatientWrapper> patients;
 
     public CachedReportDataSource(WritableApplicationService appService) {
@@ -85,8 +84,8 @@ public class CachedReportDataSource implements ReportDataSource {
             HQLCriteria criteria = new HQLCriteria("from "
                 + Container.class.getName());
             List<Container> tmp = appService.query(criteria);
-            containers = ContainerWrapper.transformToWrapperList(appService,
-                tmp);
+            containers = ModelWrapper.wrapModelCollection(appService, tmp,
+                ContainerWrapper.class);
         }
         return containers;
     }
@@ -100,17 +99,19 @@ public class CachedReportDataSource implements ReportDataSource {
 
     public List<ProcessingEventWrapper> getPatientVisits()
         throws ApplicationException {
-        if (patientVisits == null) {
-            HQLCriteria criteria = new HQLCriteria("from "
-                + PatientVisit.class.getName());
-            List<PatientVisit> rawVisits = appService.query(criteria);
-
-            patientVisits = new ArrayList<ProcessingEventWrapper>();
-            for (PatientVisit visit : rawVisits) {
-                patientVisits.add(new ProcessingEventWrapper(appService, visit));
-            }
-        }
-        return patientVisits;
+        return null;
+        // FIXME: patient visits need to be converted
+        // if (patientVisits == null) {
+        // HQLCriteria criteria = new HQLCriteria("from "
+        // + ProcessingEvent.class.getName());
+        // List<PatientVisit> rawVisits = appService.query(criteria);
+        //
+        // patientVisits = new ArrayList<ProcessingEventWrapper>();
+        // for (PatientVisit visit : rawVisits) {
+        // patientVisits.add(new ProcessingEventWrapper(appService, visit));
+        // }
+        // }
+        // return patientVisits;
     }
 
     public List<PatientWrapper> getPatients() throws ApplicationException {

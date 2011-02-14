@@ -73,10 +73,17 @@
             casesensitive="true"
             trim="true" />
   </condition>
+  <condition property="isHostCbsrTraining">
+    <equals arg1="${host.name}"
+            arg2="cbsr-training"
+            casesensitive="true"
+            trim="true" />
+  </condition>
   <condition property="isHostLocal">
     <and>
       <isfalse value="${isHostAicmlMed}" />
       <isfalse value="${isHostCbsr}" />
+      <isfalse value="${isHostCbsrTraining}" />
     </and>
   </condition>
   <condition property="cacore.sdk.tar.available">
@@ -377,10 +384,10 @@
     <copy todir="${eclipse.proj.dir.tools}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
     </copy>
-    <copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
+    <!--copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
       <filelist dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib"
                 files="biobank2-beans.jar" />
-    </copy>
+    </copy-->
     <copy todir="${eclipse.proj.dir.tools}/lib">
       <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
     </copy>
@@ -397,6 +404,11 @@
           overwrite="true" />
   </target>
   <target name="hostCbsr" if="isHostCbsr">
+    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
+  <target name="hostCbsrTraining" if="isHostCbsrTraining">
     <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
@@ -426,7 +438,7 @@
           message="JBOSS_HOME environment variable not defined" />
   </target>
   <target name="deploy-jboss"
-          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostLocal,server-manifest"
+          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -481,7 +493,7 @@
       <transaction src="${data.sql.dir}/activityStatus.sql" />
       <transaction src="${data.sql.dir}/globalPvAttr.sql" />
       <transaction src="${data.sql.dir}/pvAttrType.sql" />
-      <transaction src="${data.sql.dir}/sourceVessels.sql" />
+      <transaction src="${data.sql.dir}/sourceVesselTypes.sql" />
       <transaction src="${data.sql.dir}/sampleTypes.sql" />
       <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
@@ -522,20 +534,21 @@
     </exec>
   </target>
 
-  <target name="build-modelpeer" depends="sdk">
+  <fileset id="modelextender.class.files"
+           dir="${eclipse.proj.dir.tools}/output">
+    <include name="**/tools/modelextender/*.class" />
+    <include name="**/tools/modelumlparser/*.class" />
+    <include name="**/tools/utils/*.class" />
+    <include name="**/common/util/TypeReference.class" />
+    <include name="**/common/wrappers/Property.class" />
+  </fileset>
+
+  <target name="build-modelextender" depends="sdk">
     <echo message="Building model peer tool" />
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/output/biobank2/build/jar"
                    files="biobank2-beans.jar" />
-      <targets>
-        <fileset dir="${eclipse.proj.dir.tools}/output">
-          <include name="**/tools/modelpeer/*.class" />
-          <include name="**/tools/modelumlparser/*.class" />
-          <include name="**/tools/utils/*.class" />
-          <include name="**/common/util/TypeReference.class" />
-          <include name="**/common/wrappers/Property.class" />
-        </fileset>
-      </targets>
+      <targetfileset refid="modelextender.class.files" />
     </dependset>
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <javac debug="on"
@@ -546,7 +559,7 @@
            includeantruntime="false">
       <src path="${eclipse.proj.dir.tools}/src" />
       <src path="${eclipse.proj.dir.common}/src" />
-      <include name="**/tools/modelpeer/*.java" />
+      <include name="**/tools/modelextender/*.java" />
       <include name="**/tools/modelumlparser/*.java" />
       <include name="**/tools/utils/*.java" />
       <include name="**/common/util/TypeReference.java" />
@@ -559,22 +572,26 @@
     </javac>
   </target>
 
-  <target name="check-run-modelpeer">
-    <uptodate property="modelpeer.uptodate"
-              srcfile="${cacore.sdk.dir}/output/biobank2/build/jar/biobank2-beans.jar"
-              targetfile="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer/SitePeer.java" />
+  <target name="check-run-modelextender">
+    <uptodate property="modelextender.uptodate"
+              targetfile="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer/SitePeer.java">
+      <srcfiles dir="${cacore.sdk.dir}/output/biobank2/build/jar"
+                includes="biobank2-beans.jar" />
+      <srcfiles refid="modelextender.class.files" />
+    </uptodate>
   </target>
 
-  <target name="modelpeer"
-          depends="build-modelpeer,check-run-modelpeer"
-          unless="modelpeer.uptodate"
+  <target name="modelextender"
+          depends="build-modelextender,check-run-modelextender"
+          unless="modelextender.uptodate"
           description="Builds wrapper peer classes based on UML logical model.">
-    <java classname="edu.ualberta.med.biobank.tools.modelpeer.ModelPeerBuilder"
+    <java classname="edu.ualberta.med.biobank.tools.modelextender.ModelExtender"
           failonerror="true"
           fork="true">
       <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
       <arg value="${model.proj.dir}/biobank2.uml" />
       <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" />
+      <arg value="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers" />
       <classpath>
         <pathelement location="${req.jars.dir}/jargs.jar" />
         <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
@@ -583,10 +600,26 @@
     </java>
   </target>
 
+  <fileset id="validators.class.files"
+           dir="${eclipse.proj.dir.tools}/output-validators">
+    <include name="**/tools/validator/*.class" />
+    <include name="**/tools/modelumlparser/*.class" />
+    <include name="**/tools/utils/*.class" />
+  </fileset>
+
+  <!-- 
+    build-validators uses a different destination directory from build-hbmstrings and
+    build-modelextender due to dependency restrictions 
+  -->
   <target name="build-validators" depends="cacore-untar">
     <echo message="Building hibernate validators generation tool" />
-    <mkdir dir="${eclipse.proj.dir.tools}/output" />
-    <copy includeemptydirs="false" todir="${eclipse.proj.dir.tools}/output">
+    <dependset>
+      <srcfilelist dir="${model.proj.dir}" files="biobank2.uml" />
+      <targetfileset refid="validators.class.files" />
+    </dependset>
+    <mkdir dir="${eclipse.proj.dir.tools}/output-validators" />
+    <copy includeemptydirs="false"
+          todir="${eclipse.proj.dir.tools}/output-validators">
       <fileset dir="${eclipse.proj.dir.tools}/src">
         <exclude name="**/*.launch" />
         <exclude name="**/*.java" />
@@ -594,7 +627,7 @@
     </copy>
     <javac debug="on"
            debuglevel="source,lines,vars"
-           destdir="${eclipse.proj.dir.tools}/output"
+           destdir="${eclipse.proj.dir.tools}/output-validators"
            source="1.6"
            target="1.6"
            includeantruntime="false">
@@ -612,8 +645,10 @@
 
   <target name="check-run-validators">
     <uptodate property="validators.uptodate"
-              srcfile="${model.proj.dir}/biobank2.uml"
-              targetfile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
+              targetfile="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml">
+      <srcfiles dir="${model.proj.dir}" includes="biobank2.uml" />
+      <srcfiles refid="validators.class.files" />
+    </uptodate>
   </target>
 
   <target name="validators"
@@ -630,23 +665,23 @@
         <pathelement location="${req.jars.dir}/jargs.jar" />
         <pathelement location="${req.jars.dir}/commons-io-1.4.jar" />
         <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
-        <pathelement location="${eclipse.proj.dir.tools}/output" />
+        <pathelement location="${eclipse.proj.dir.tools}/output-validators" />
       </classpath>
     </java>
   </target>
+
+  <fileset id="hbmstrings.class.files" dir="${eclipse.proj.dir.tools}/output">
+    <include name="**/tools/hbmstrings/*.class" />
+    <include name="**/tools/modelumlparser/*.class" />
+    <include name="**/tools/utils/*.class" />
+  </fileset>
 
   <target name="build-hbmstrings" depends="sdk" unless="hmbstrings.uptodate">
     <mkdir dir="${eclipse.proj.dir.tools}/output" />
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/output/biobank2/build/jar"
                    files="biobank2-beans.jar" />
-      <targets>
-        <fileset dir="${eclipse.proj.dir.tools}/output">
-          <include name="**/tools/strfields/*.class" />
-          <include name="**/tools/modelumlparser/*.class" />
-          <include name="**/tools/utils/*.class" />
-        </fileset>
-      </targets>
+      <targetfileset refid="hbmstrings.class.files" />
     </dependset>
     <javac debug="on"
            debuglevel="source,lines,vars"
@@ -655,7 +690,7 @@
            source="1.6"
            target="1.6"
            includeantruntime="false">
-      <include name="**/tools/strfields/*.java" />
+      <include name="**/tools/hbmstrings/*.java" />
       <include name="**/tools/modelumlparser/*.java" />
       <include name="**/tools/utils/*.java" />
       <classpath>
@@ -664,6 +699,7 @@
             <include name="*.jar" />
           </fileset>
         </path>
+        <pathelement location="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
       </classpath>
     </javac>
     <touch file="${eclipse.proj.dir.tools}/output/build.timestamp" />
@@ -671,8 +707,12 @@
 
   <target name="check-run-hbmstrings">
     <uptodate property="hbmstrings.uptodate"
-              srcfile="${cacore.sdk.dir}/output/biobank2/build/jar/biobank2-beans.jar"
-              targetfile="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java" />
+              targetfile="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/VarCharLengths.java">
+
+      <srcfiles dir="${cacore.sdk.dir}/output/biobank2/build/jar"
+                includes="biobank2-beans.jar" />
+      <srcfiles refid="hbmstrings.class.files" />
+    </uptodate>
   </target>
 
   <target name="hbmstrings"
@@ -686,7 +726,7 @@
       <targetfilelist dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common"
                       files="VarCharLengths.java" />
     </dependset>
-    <java classname="edu.ualberta.med.biobank.tools.strfields.StrFields"
+    <java classname="edu.ualberta.med.biobank.tools.hbmstrings.HbmStrings"
           failonerror="true"
           fork="true">
       <jvmarg value="-Dlog4j.configuration=file:${eclipse.proj.dir.tools}/conf/log4j.properties" />
@@ -702,7 +742,8 @@
     </java>
   </target>
 
-  <target name="build-common-project" depends="sdk-files,hbmstrings,modelpeer">
+  <target name="build-common-project"
+          depends="sdk-files,hbmstrings,modelextender">
     <echo message="Building common project" />
     <mkdir dir="${eclipse.proj.dir.common}/output" />
     <copy includeemptydirs="false" todir="${eclipse.proj.dir.common}/output">
@@ -801,10 +842,20 @@
   </target>
 
   <target name="clean"
-          depends="tests-clean,clean-jars, clean-caCore"
+          depends="clean-tests,clean-jars,clean-caCore"
           description="cleans caCORE SDK and deletes jars from eclipse projects">
     <delete dir="${eclipse.proj.dir.common}/output" />
+    <delete dir="${eclipse.proj.dir.tools}/output-validators" />
     <delete dir="${eclipse.proj.dir.tools}/output" />
+    <delete file="${cacore.sdk.dir}/conf/codegen/validator-extension-Config.xml" />
+    <delete>
+      <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/peer" 
+      includes="*Peer.java"/>
+    </delete>
+    <delete>
+      <fileset dir="${eclipse.proj.dir.common}/src/edu/ualberta/med/biobank/common/wrappers/base" 
+      includes="*BaseWrapper.java"/>
+    </delete>
   </target>
 
   <target name="clean-caCore" if="cacore.sdk.available">
@@ -827,11 +878,11 @@
     <pathelement location="${test.build.dir}" />
   </path>
 
-  <target name="tests-clean-results">
+  <target name="clean-test-results">
     <delete dir="${test.output}" />
   </target>
 
-  <target name="tests-clean" depends="tests-clean-results">
+  <target name="clean-tests" depends="clean-test-results">
     <delete dir="${test.build.dir}" />
   </target>
 
@@ -869,6 +920,7 @@
     <junit printsummary="yes" haltonfailure="no" showoutput="yes" fork="true">
       <classpath refid="test.class.path" />
       <classpath refid="biobank.common.run.classpath" />
+      <sysproperty key="server" value="http://localhost:8080" />
       <formatter usefile="yes" type="xml" />
       <test name="${testcase}" todir="${test.output.raw}" if="testcase" />
       <batchtest todir="${test.output.raw}" unless="testcase">
@@ -948,7 +1000,7 @@
   </target>
 
 
-  <target name="product" depends="eclipse.home.env">
+  <target name="product" depends="eclipse.home.env,deploy-eclipse">
     <property name="buildDirectory" value="${product.dir}/buildDirectory" />
     <delete dir="${buildDirectory}" />
     <copy todir="${buildDirectory}/plugins/biobank2">

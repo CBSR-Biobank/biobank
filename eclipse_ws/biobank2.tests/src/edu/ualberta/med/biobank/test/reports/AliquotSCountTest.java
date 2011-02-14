@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 public class AliquotSCountTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_AND_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<String>, Long>() {
         public List<String> getKey(AliquotWrapper aliquot) {
-            return Arrays.asList(aliquot.getPatientVisit().getPatient()
+            return Arrays.asList(aliquot.getProcessingEvent().getPatient()
                 .getStudy().getNameShort(), aliquot.getSampleType().getName());
         }
 

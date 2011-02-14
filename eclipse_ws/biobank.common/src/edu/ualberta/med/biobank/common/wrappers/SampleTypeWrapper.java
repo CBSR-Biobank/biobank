@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -11,15 +10,16 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
+import edu.ualberta.med.biobank.common.wrappers.base.SampleTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SampleTypeWrapper extends ModelWrapper<SampleType> {
+public class SampleTypeWrapper extends SampleTypeBaseWrapper {
 
     public SampleTypeWrapper(WritableApplicationService appService,
         SampleType wrappedObject) {
@@ -28,67 +28,6 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
 
     public SampleTypeWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return SampleTypePeer.PROP_NAMES;
-    }
-
-    public String getName() {
-        return wrappedObject.getName();
-    }
-
-    public void setName(String name) {
-        String oldName = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
-    }
-
-    public String getNameShort() {
-        return wrappedObject.getNameShort();
-    }
-
-    public void setNameShort(String nameShort) {
-        String oldNameShort = getNameShort();
-        wrappedObject.setNameShort(nameShort);
-        propertyChangeSupport.firePropertyChange("nameShort", oldNameShort,
-            nameShort);
-    }
-
-    /**
-     * Get the list of container type that support this sample type. Use
-     * ContainerType.setSampleTypeCollection to link objects together
-     */
-    @SuppressWarnings("unchecked")
-    public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
-        List<ContainerTypeWrapper> containerTypeCollection = (List<ContainerTypeWrapper>) propertiesMap
-            .get("containerTypeCollection");
-        if (containerTypeCollection == null) {
-            Collection<ContainerType> children = wrappedObject
-                .getContainerTypeCollection();
-            if (children != null) {
-                containerTypeCollection = new ArrayList<ContainerTypeWrapper>();
-                for (ContainerType type : children) {
-                    containerTypeCollection.add(new ContainerTypeWrapper(
-                        appService, type));
-                }
-                propertiesMap.put("containerTypeCollection",
-                    containerTypeCollection);
-            }
-        }
-        if ((containerTypeCollection != null) && sort)
-            Collections.sort(containerTypeCollection);
-        return containerTypeCollection;
-    }
-
-    public List<ContainerTypeWrapper> getContainerTypeCollection() {
-        return getContainerTypeCollection(false);
-    }
-
-    @Override
-    public Class<SampleType> getWrappedClass() {
-        return SampleType.class;
     }
 
     /**
@@ -138,10 +77,13 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         }
     }
 
+    public static final String ALL_SAMPLE_TYPES_QRY = "from "
+        + SampleType.class.getName();
+
     public static List<SampleTypeWrapper> getAllSampleTypes(
         WritableApplicationService appService, boolean sort)
         throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + SampleType.class.getName());
+        HQLCriteria c = new HQLCriteria(ALL_SAMPLE_TYPES_QRY);
 
         List<SampleType> sampleTypes = appService.query(c);
         List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
@@ -195,11 +137,13 @@ public class SampleTypeWrapper extends ModelWrapper<SampleType> {
         return getName();
     }
 
+    public static final String IS_USED_BY_SAMPLES_QRY = "select count(s) from "
+        + Aliquot.class.getName() + " as s where s."
+        + AliquotPeer.SAMPLE_TYPE.getName() + "=?)";
+
     public boolean isUsedBySamples() throws ApplicationException,
         BiobankException {
-        String queryString = "select count(s) from " + Aliquot.class.getName()
-            + " as s where s.sampleType=?)";
-        HQLCriteria c = new HQLCriteria(queryString,
+        HQLCriteria c = new HQLCriteria(IS_USED_BY_SAMPLES_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         List<Long> results = appService.query(c);
         if (results.size() != 1) {

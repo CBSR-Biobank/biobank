@@ -13,6 +13,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.ClinicBaseWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Study;
@@ -20,7 +21,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ClinicWrapper extends CenterWrapper<Clinic> {
+public class ClinicWrapper extends ClinicBaseWrapper {
 
     private Set<ContactWrapper> deletedContacts = new HashSet<ContactWrapper>();
 
@@ -31,11 +32,6 @@ public class ClinicWrapper extends CenterWrapper<Clinic> {
     public ClinicWrapper(WritableApplicationService appService,
         Clinic wrappedObject) {
         super(appService, wrappedObject);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ClinicPeer.PROP_NAMES;
     }
 
     @Override
@@ -56,38 +52,11 @@ public class ClinicWrapper extends CenterWrapper<Clinic> {
         }
     }
 
-    @Override
-    public Class<Clinic> getWrappedClass() {
-        return Clinic.class;
-    }
-
-    public List<ContactWrapper> getContactCollection(boolean sort) {
-        return getWrapperCollection(ClinicPeer.CONTACT_COLLECTION,
-            ContactWrapper.class, sort);
-    }
-
-    public List<ContactWrapper> getContactCollection() {
-        return getContactCollection(true);
-    }
-
-    private void setContacts(List<ContactWrapper> allContactsWrappers) {
-        setWrapperCollection(ClinicPeer.CONTACT_COLLECTION, allContactsWrappers);
-    }
-
-    public void addContacts(List<ContactWrapper> newContacts) {
-        addToWrapperCollection(ClinicPeer.CONTACT_COLLECTION, newContacts);
-    }
-
-    public void removeContacts(List<ContactWrapper> contactsToDelete) {
-        removeFromWrapperCollection(ClinicPeer.CONTACT_COLLECTION,
-            contactsToDelete);
-    }
-
     /**
      * Search for a contact in the clinic with the given name
      */
     public ContactWrapper getContact(String contactName) {
-        List<ContactWrapper> contacts = getContactCollection();
+        List<ContactWrapper> contacts = getContactCollection(false);
         if (contacts != null)
             for (ContactWrapper contact : contacts)
                 if (contact.getName().equals(contactName))
@@ -173,12 +142,12 @@ public class ClinicWrapper extends CenterWrapper<Clinic> {
             return results.get(0);
         }
         HashSet<PatientWrapper> uniquePatients = new HashSet<PatientWrapper>();
-        List<CollectionEventWrapper> ships = getCollectionEventCollection();
+        List<CollectionEventWrapper> ships = getCollectionEventCollection(false);
         if (ships != null)
             for (CollectionEventWrapper ship : ships) {
                 if (ship.getPatientCollection() != null) {
                     Collection<SourceVesselWrapper> svCollection = ship
-                        .getSourceVesselCollection();
+                        .getSourceVesselCollection(false);
                     for (SourceVesselWrapper sv : svCollection)
                         uniquePatients.add(sv.getPatient());
                 }
@@ -186,20 +155,25 @@ public class ClinicWrapper extends CenterWrapper<Clinic> {
         return uniquePatients.size();
     }
 
+    private static final String ALL_CLINICS_QRY = "from "
+        + Clinic.class.getName();
+
     public static List<ClinicWrapper> getAllClinics(
         WritableApplicationService appService) throws ApplicationException {
         List<ClinicWrapper> wrappers = new ArrayList<ClinicWrapper>();
-        HQLCriteria c = new HQLCriteria("from " + Clinic.class.getName());
+        HQLCriteria c = new HQLCriteria(ALL_CLINICS_QRY);
         List<Clinic> clinics = appService.query(c);
         for (Clinic clinic : clinics)
             wrappers.add(new ClinicWrapper(appService, clinic));
         return wrappers;
     }
 
+    private static final String CLINIC_COUNT_QRY = "select count (*) from "
+        + Clinic.class.getName();
+
     public static long getCount(WritableApplicationService appService)
         throws BiobankException, ApplicationException {
-        HQLCriteria c = new HQLCriteria("select count (*) from "
-            + Clinic.class.getName());
+        HQLCriteria c = new HQLCriteria(CLINIC_COUNT_QRY);
         List<Long> results = appService.query(c);
         if (results.size() != 1) {
             throw new BiobankQueryResultSizeException();

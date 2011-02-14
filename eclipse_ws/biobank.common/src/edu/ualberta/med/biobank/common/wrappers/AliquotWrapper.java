@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Date;
 import java.util.EnumSet;
 import java.util.List;
 
@@ -19,18 +18,17 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.base.AliquotBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
-import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Log;
-import edu.ualberta.med.biobank.model.SampleType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class AliquotWrapper extends ModelWrapper<Aliquot> {
+public class AliquotWrapper extends AliquotBaseWrapper {
 
     private AbstractObjectWithPositionManagement<AliquotPosition, AliquotWrapper> objectWithPositionManagement;
 
@@ -72,16 +70,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return AliquotPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<Aliquot> getWrappedClass() {
-        return Aliquot.class;
-    }
-
-    @Override
     public void persist() throws Exception {
         // check if position was deleted
         if (getPosition() == null) {
@@ -108,21 +96,41 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         objectWithPositionManagement.persistChecks();
     }
 
-    public String getInventoryId() {
-        return wrappedObject.getInventoryId();
-    }
-
-    public void setInventoryId(String inventoryId) {
-        String oldInventoryId = inventoryId;
-        wrappedObject.setInventoryId(inventoryId);
-        propertyChangeSupport.firePropertyChange("inventoryId", oldInventoryId,
-            inventoryId);
-    }
-
     public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Aliquot.class, AliquotPeer.INVENTORY_ID.getName(),
             getInventoryId(), "An aliquot with inventoryId");
+    }
+
+    public String getFormattedLinkDate() {
+        return DateFormatter.formatAsDateTime(getLinkDate());
+    }
+
+    public ContainerWrapper getParent() {
+        return objectWithPositionManagement.getParent();
+    }
+
+    public void setParent(ContainerWrapper container) {
+        objectWithPositionManagement.setParent(container);
+    }
+
+    public boolean hasParent() {
+        return objectWithPositionManagement.hasParent();
+    }
+
+    public RowColPos getPosition() {
+        return objectWithPositionManagement.getPosition();
+    }
+
+    public void setPosition(RowColPos rcp) {
+        if (rcp == null) {
+            setParent(null);
+        }
+        objectWithPositionManagement.setPosition(rcp);
+    }
+
+    public String getPositionString() {
+        return getPositionString(true, true);
     }
 
     private void checkParentAcceptSampleType() throws BiobankCheckException {
@@ -135,7 +143,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                 throw new BiobankCheckException(e);
             }
             List<SampleTypeWrapper> types = parentType
-                .getSampleTypeCollection();
+                .getSampleTypeCollection(false);
             if (types == null || !types.contains(getSampleType())) {
                 throw new BiobankCheckException("Container "
                     + getParent().getFullInfoLabel()
@@ -147,7 +155,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
     }
 
     public String getCenterString() {
-        CenterWrapper center = getLocation();
+        CenterWrapper<?> center = getLocation();
         if (center != null) {
             return center.getNameShort();
         }
@@ -156,7 +164,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return "CANNOT DISPLAY INFORMATION";
     }
 
-    private CenterWrapper getLocation() {
+    private CenterWrapper<?> getLocation() {
         List<DispatchAliquotWrapper> dsac = this.getDispatchAliquotCollection();
         // if in a container, use the container's site
         if (getParent() != null) {
@@ -164,7 +172,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         } else {
             // dispatched aliquot?
             for (DispatchAliquotWrapper da : dsac) {
-                DispatchItemState state = da.getState();
+                DispatchItemState state = da.getDispatchItemState();
                 if (DispatchState.IN_TRANSIT
                     .equals(da.getDispatch().getState())
                     && DispatchItemState.NONE == state) {
@@ -195,15 +203,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             // if not in a container or a dispatch, use the originating shipment
             return getProcessingEvent().getCenter();
         }
-    }
-
-    public ProcessingEventWrapper getProcessingEvent() {
-        return getWrappedProperty(AliquotPeer.PROCESSING_EVENT,
-            ProcessingEventWrapper.class);
-    }
-
-    public void setProcessingEvent(ProcessingEventWrapper pe) {
-        setWrappedProperty(AliquotPeer.PROCESSING_EVENT, pe);
     }
 
     /**
@@ -253,119 +252,6 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         return true;
     }
 
-    public void setSampleType(SampleTypeWrapper type) {
-        propertiesMap.put("sampleType", type);
-        SampleType oldTypeRaw = wrappedObject.getSampleType();
-        SampleType newTypeRaw = null;
-        if (type != null) {
-            newTypeRaw = type.getWrappedObject();
-        }
-        wrappedObject.setSampleType(newTypeRaw);
-        propertyChangeSupport.firePropertyChange("sampleType", oldTypeRaw,
-            newTypeRaw);
-    }
-
-    public SampleTypeWrapper getSampleType() {
-        SampleTypeWrapper sampleType = (SampleTypeWrapper) propertiesMap
-            .get("sampleType");
-        if (sampleType == null) {
-            SampleType s = wrappedObject.getSampleType();
-            if (s == null)
-                return null;
-            sampleType = new SampleTypeWrapper(appService, s);
-            propertiesMap.put("sampleType", sampleType);
-        }
-        return sampleType;
-    }
-
-    public void setLinkDate(Date date) {
-        Date oldDate = getLinkDate();
-        wrappedObject.setLinkDate(date);
-        propertyChangeSupport.firePropertyChange("linkDate", oldDate, date);
-    }
-
-    public Date getLinkDate() {
-        return wrappedObject.getLinkDate();
-    }
-
-    public String getFormattedLinkDate() {
-        return DateFormatter.formatAsDateTime(wrappedObject.getLinkDate());
-    }
-
-    public void setQuantity(Double quantity) {
-        Double oldQuantity = wrappedObject.getQuantity();
-        wrappedObject.setQuantity(quantity);
-        propertyChangeSupport.firePropertyChange("quantity", oldQuantity,
-            quantity);
-    }
-
-    public Double getQuantity() {
-        return wrappedObject.getQuantity();
-    }
-
-    public ActivityStatusWrapper getActivityStatus() {
-        ActivityStatusWrapper activity = (ActivityStatusWrapper) propertiesMap
-            .get("activityStatus");
-        if (activity == null) {
-            ActivityStatus a = wrappedObject.getActivityStatus();
-            if (a == null)
-                return null;
-            activity = new ActivityStatusWrapper(appService, a);
-            propertiesMap.put("activityStatus", activity);
-        }
-        return activity;
-    }
-
-    public void setActivityStatus(ActivityStatusWrapper activityStatus) {
-        propertiesMap.put("activityStatus", activityStatus);
-        ActivityStatus oldActivityStatus = wrappedObject.getActivityStatus();
-        ActivityStatus rawObject = null;
-        if (activityStatus != null) {
-            rawObject = activityStatus.getWrappedObject();
-        }
-        wrappedObject.setActivityStatus(rawObject);
-        propertyChangeSupport.firePropertyChange("activityStatus",
-            oldActivityStatus, activityStatus);
-    }
-
-    public void setComment(String comment) {
-        String oldComment = wrappedObject.getComment();
-        wrappedObject.setComment(comment);
-        propertyChangeSupport
-            .firePropertyChange("comment", oldComment, comment);
-    }
-
-    public String getComment() {
-        return wrappedObject.getComment();
-    }
-
-    public ContainerWrapper getParent() {
-        return objectWithPositionManagement.getParent();
-    }
-
-    public void setParent(ContainerWrapper container) {
-        objectWithPositionManagement.setParent(container);
-    }
-
-    public boolean hasParent() {
-        return objectWithPositionManagement.hasParent();
-    }
-
-    public RowColPos getPosition() {
-        return objectWithPositionManagement.getPosition();
-    }
-
-    public void setPosition(RowColPos rcp) {
-        if (rcp == null) {
-            setParent(null);
-        }
-        objectWithPositionManagement.setPosition(rcp);
-    }
-
-    public String getPositionString() {
-        return getPositionString(true, true);
-    }
-
     public String getPositionString(boolean fullString,
         boolean addTopParentShortName) {
         RowColPos position = getPosition();
@@ -405,7 +291,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
             StudyWrapper study = processingEvent.getPatient().getStudy();
             Double volume = null;
             Collection<SampleStorageWrapper> sampleStorageCollection = study
-                .getSampleStorageCollection();
+                .getSampleStorageCollection(false);
             if (sampleStorageCollection != null) {
                 for (SampleStorageWrapper ss : sampleStorageCollection) {
                     if (getSampleType().equals(getSampleType())) {
@@ -461,7 +347,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
         throws ApplicationException, BiobankCheckException {
         AliquotWrapper aliquot = getAliquot(appService, inventoryId);
         if (aliquot != null && user != null) {
-            CenterWrapper center = aliquot.getLocation();
+            CenterWrapper<?> center = aliquot.getLocation();
             // site might be null if can't access it !
             if (center == null) {
                 throw new ApplicationException(

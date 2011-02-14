@@ -7,14 +7,14 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class InvoicingReportImpl extends AbstractReport {
 
     private static final String QUERY = "Select Alias.patientVisit.shipmentPatient.patient.study.nameShort, "
         + "Alias.patientVisit.shipmentPatient.shipment.clinic.nameShort, (select count(*) from "
-        + PatientVisit.class.getName()
+        + ProcessingEvent.class.getName()
         + " pv where pv.shipmentPatient.shipment.clinic = Alias.patientVisit.shipmentPatient.shipment.clinic and pv.shipmentPatient.patient.study = Alias.patientVisit.shipmentPatient.patient.study and pv.dateProcessed between ? and ?),"
         + " Alias.sampleType.nameShort, count(*) from "
         + Aliquot.class.getName()

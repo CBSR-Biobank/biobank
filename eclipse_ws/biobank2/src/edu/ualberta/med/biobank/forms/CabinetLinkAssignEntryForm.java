@@ -813,9 +813,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 "This aliquot is currently in transit in a dispatch.");
         }
         canLaunchCheck.setValue(true);
-        PatientWrapper patient = aliquot.getPatientVisit().getPatient();
+        PatientWrapper patient = aliquot.getProcessingEvent().getPatient();
         linkFormPatientManagement.setCurrentPatientAndVisit(patient,
-            aliquot.getPatientVisit());
+            aliquot.getProcessingEvent());
         String positionString = aliquot.getPositionString(true, false);
         if (positionString == null) {
             widgetCreator.hideWidget(oldCabinetPositionCheckLabel);
@@ -843,10 +843,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         widgetCreator.showWidget(drawerLabel, show);
         if (show) {
             cabinetWidget.setContainerType(cabinet.getContainerType());
-            cabinetWidget.setSelection(drawer.getPosition());
+            cabinetWidget.setSelection(drawer.getPositionAsRowCol());
             cabinetLabel.setText("Cabinet " + cabinet.getLabel()); //$NON-NLS-1$
             drawerWidget.setContainer(drawer);
-            drawerWidget.setSelection(bin.getPosition());
+            drawerWidget.setSelection(bin.getPositionAsRowCol());
             drawerLabel.setText("Drawer " + drawer.getLabel()); //$NON-NLS-1$
         }
         page.layout(true, true);
@@ -904,8 +904,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         }
         appendLogNLS(msgString, posStr, aliquot.getInventoryId(), aliquot
             .getSampleType().getName(), linkFormPatientManagement
-            .getCurrentPatient().getPnumber(), aliquot.getPatientVisit()
-            .getFormattedDateDrawn(), aliquot.getPatientVisit().getShipment()
+            .getCurrentPatient().getPnumber(), aliquot.getProcessingEvent()
+            .getFormattedDateDrawn(), aliquot.getProcessingEvent().getCollectionEvent()
             .getClinic().getName());
         setFinished(false);
     }

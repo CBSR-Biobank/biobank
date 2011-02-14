@@ -18,6 +18,8 @@ public class QueryHandleRequest implements Serializable {
     private QueryCommand qc;
     private QueryHandle qh;
     private CommandType ct;
+
+    // FIXME: member appService is not serializable
     private BiobankApplicationService appService;
 
     public QueryHandleRequest(QueryCommand qc, CommandType ct, QueryHandle qh,

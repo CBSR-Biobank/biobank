@@ -26,8 +26,8 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
     private static final Mapper<ProcessingEventWrapper, List<String>, PvCount> PV_COUNT_BY_STUDY_CLINIC_PATIENT = new Mapper<ProcessingEventWrapper, List<String>, PvCount>() {
         public List<String> getKey(ProcessingEventWrapper patientVisit) {
             return Arrays.asList(patientVisit.getPatient().getStudy()
-                .getNameShort(), patientVisit.getShipment().getClinic()
-                .getNameShort(), patientVisit.getPatient().getPnumber());
+                .getNameShort(), patientVisit.getCenter().getNameShort(),
+                patientVisit.getPatient().getPnumber());
         }
 
         public PvCount getValue(ProcessingEventWrapper patientVisit,

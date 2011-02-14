@@ -4,20 +4,18 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.base.ContainerPositionBaseWrapper;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ContainerPositionWrapper extends
-    AbstractPositionWrapper<ContainerPosition> {
-
-    private ContainerWrapper parent;
-    private ContainerWrapper container;
+public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
 
     public ContainerPositionWrapper(WritableApplicationService appService,
         ContainerPosition wrappedObject) {
@@ -26,60 +24,6 @@ public class ContainerPositionWrapper extends
 
     public ContainerPositionWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ContainerPositionPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<ContainerPosition> getWrappedClass() {
-        return ContainerPosition.class;
-    }
-
-    private void setParentContainer(ContainerWrapper parentContainer) {
-        this.parent = parentContainer;
-        Container oldParent = wrappedObject.getParentContainer();
-        Container newParent = null;
-        if (parentContainer != null) {
-            newParent = parentContainer.getWrappedObject();
-        }
-        wrappedObject.setParentContainer(newParent);
-        propertyChangeSupport.firePropertyChange("parentContainer", oldParent,
-            newParent);
-    }
-
-    private ContainerWrapper getParentContainer() {
-        if (parent == null) {
-            Container c = wrappedObject.getParentContainer();
-            if (c == null)
-                return null;
-            parent = new ContainerWrapper(appService, c);
-        }
-        return parent;
-    }
-
-    public ContainerWrapper getContainer() {
-        if (container == null) {
-            Container c = wrappedObject.getContainer();
-            if (c == null)
-                return null;
-            container = new ContainerWrapper(appService, c);
-        }
-        return container;
-    }
-
-    public void setContainer(ContainerWrapper container) {
-        this.container = container;
-        Container oldContainer = wrappedObject.getContainer();
-        Container newContainer = null;
-        if (container != null) {
-            newContainer = container.getWrappedObject();
-        }
-        wrappedObject.setContainer(newContainer);
-        propertyChangeSupport.firePropertyChange("container", oldContainer,
-            newContainer);
     }
 
     @Override
@@ -112,6 +56,13 @@ public class ContainerPositionWrapper extends
         setParentContainer(parent);
     }
 
+    public static final String OBJECT_AT_POSITION_QRY = "from "
+        + ContainerPosition.class.getName()
+        + " where "
+        + Property.concatNames(ContainerPositionPeer.PARENT_CONTAINER,
+            ContainerPeer.ID) + "=? and " + ContainerPositionPeer.ROW.getName()
+        + "=? and " + ContainerPositionPeer.COL.getName() + "=?";
+
     @Override
     protected void checkObjectAtPosition() throws ApplicationException,
         BiobankCheckException {
@@ -120,8 +71,7 @@ public class ContainerPositionWrapper extends
             // do a hql query because parent might need a reload - but if we are
             // in the middle of parent.persist, don't want to do that !
             HQLCriteria criteria = new HQLCriteria(
-                "from " + ContainerPosition.class.getName()
-                    + " where parentContainer.id=? and row=? and col=?",
+                OBJECT_AT_POSITION_QRY,
                 Arrays.asList(new Object[] { parent.getId(), getRow(), getCol() }));
             List<ContainerPosition> positions = appService.query(criteria);
             if (positions.size() == 0) {
@@ -143,7 +93,5 @@ public class ContainerPositionWrapper extends
     @Override
     public void reload() throws Exception {
         super.reload();
-        parent = null;
-        container = null;
     }
 }

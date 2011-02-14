@@ -78,7 +78,7 @@ public class AliquotRequestTest extends AbstractReportTest {
 
             Predicate<AliquotWrapper> aliquotPnumber = new Predicate<AliquotWrapper>() {
                 public boolean evaluate(AliquotWrapper aliquot) {
-                    return aliquot.getPatientVisit().getPatient().getPnumber()
+                    return aliquot.getProcessingEvent().getPatient().getPnumber()
                         .equals(pnumber);
                 }
             };
@@ -126,8 +126,8 @@ public class AliquotRequestTest extends AbstractReportTest {
         Integer limit) {
 
         AliquotRequest request = new AliquotRequest();
-        request.setPnumber(aliquot.getPatientVisit().getPatient().getPnumber());
-        request.setDateDrawn(aliquot.getPatientVisit().getDateDrawn());
+        request.setPnumber(aliquot.getProcessingEvent().getPatient().getPnumber());
+        request.setDateDrawn(aliquot.getProcessingEvent().getDateDrawn());
         request.setSampleTypeNameShort(aliquot.getSampleType().getNameShort());
         request.setMaxAliquots(limit);
 

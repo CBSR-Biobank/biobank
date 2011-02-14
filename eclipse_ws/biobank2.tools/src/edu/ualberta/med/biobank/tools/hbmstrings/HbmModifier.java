@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.tools.strfields;
+package edu.ualberta.med.biobank.tools.hbmstrings;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -89,7 +89,7 @@ public class HbmModifier {
 
             if (documentChanged) {
                 FileUtils.copyFile(outFile, new File(filename));
-                if (StrFields.getInstance().getVerbose()) {
+                if (HbmStrings.getInstance().getVerbose()) {
                     System.out.println("HBM Modified: " + filename);
                 }
             }

@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.peer.EntityPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.EntityBaseWrapper;
 import edu.ualberta.med.biobank.model.Entity;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.EntityFilter;
@@ -15,7 +15,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class EntityWrapper extends ModelWrapper<Entity> {
+public class EntityWrapper extends EntityBaseWrapper {
     public static final Comparator<Entity> ORDER_BY_NAME = new Comparator<Entity>() {
         @Override
         public int compare(Entity lhs, Entity rhs) {
@@ -29,10 +29,6 @@ public class EntityWrapper extends ModelWrapper<Entity> {
 
     public EntityWrapper(WritableApplicationService appService, Entity entity) {
         super(appService, entity);
-    }
-
-    public String getClassName() {
-        return wrappedObject.getClassName();
     }
 
     public Collection<EntityProperty> getEntityPropertyCollection() {
@@ -76,10 +72,6 @@ public class EntityWrapper extends ModelWrapper<Entity> {
         return columns;
     }
 
-    public String getName() {
-        return wrappedObject.getName();
-    }
-
     private static Collection<EntityColumn> getEntityColumnCollection(
         EntityProperty entityProperty) {
         Collection<EntityColumn> columns = new ArrayList<EntityColumn>();
@@ -106,10 +98,13 @@ public class EntityWrapper extends ModelWrapper<Entity> {
         return filters;
     }
 
+    private static final String GET_ENTTITIES_QRY = "from "
+        + Entity.class.getName();
+
     public static Collection<Entity> getEntities(
         WritableApplicationService appService, Comparator<Entity> comparator) {
         List<Entity> entities = new ArrayList<Entity>();
-        HQLCriteria criteria = new HQLCriteria("from " + Entity.class.getName());
+        HQLCriteria criteria = new HQLCriteria(GET_ENTTITIES_QRY);
 
         try {
             List<Entity> results = appService.query(criteria);
@@ -123,16 +118,6 @@ public class EntityWrapper extends ModelWrapper<Entity> {
         }
 
         return entities;
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return EntityPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<Entity> getWrappedClass() {
-        return Entity.class;
     }
 
 }

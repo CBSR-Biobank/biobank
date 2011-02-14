@@ -34,10 +34,10 @@ public class ContactHelper extends DbHelper {
         for (int i = 0; i < nber; i++) {
             ClinicWrapper clinic = clinics.get(i);
             ContactWrapper contact = chooseRandomlyInList(clinic
-                .getContactCollection());
+                .getContactCollection(false));
             contacts.add(contact);
         }
-        study.addContacts(contacts);
+        study.addToContactCollection(contacts);
         study.persist();
         return nber;
     }

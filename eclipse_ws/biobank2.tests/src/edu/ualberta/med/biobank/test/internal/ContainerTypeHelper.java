@@ -33,7 +33,7 @@ public class ContainerTypeHelper extends DbHelper {
         }
         ct.setName(name);
         ct.setNameShort(nameShort);
-        ct.setChildLabelingScheme(labelingScheme);
+        ct.setChildLabelingSchemeById(labelingScheme);
         if (rowCapacity != null)
             ct.setRowCapacity(rowCapacity);
         if (colCapacity != null)

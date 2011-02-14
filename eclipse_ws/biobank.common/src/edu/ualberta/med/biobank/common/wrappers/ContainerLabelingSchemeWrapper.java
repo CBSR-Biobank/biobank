@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.peer.ContainerLabelingSchemePeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.base.ContainerLabelingSchemeBaseWrapper;
 import edu.ualberta.med.biobank.model.ContainerLabelingScheme;
 import edu.ualberta.med.biobank.model.ContainerType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -17,7 +17,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ContainerLabelingSchemeWrapper extends
-    ModelWrapper<ContainerLabelingScheme> {
+    ContainerLabelingSchemeBaseWrapper {
 
     public static final int SCHEME_SBS = 1;
 
@@ -35,7 +35,7 @@ public class ContainerLabelingSchemeWrapper extends
 
     public static String BOX81_LABELLING_PATTERN = "ABCDEFGHJ";
 
-    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes;
+    private static Map<Integer, ContainerLabelingSchemeWrapper> allSchemes = null;
 
     public ContainerLabelingSchemeWrapper(
         WritableApplicationService appService,
@@ -48,65 +48,6 @@ public class ContainerLabelingSchemeWrapper extends
     }
 
     @Override
-    public Class<ContainerLabelingScheme> getWrappedClass() {
-        return ContainerLabelingScheme.class;
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ContainerLabelingSchemePeer.PROP_NAMES;
-    }
-
-    public void setName(String name) {
-        String oldName = wrappedObject.getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", oldName, name);
-    }
-
-    public String getName() {
-        return wrappedObject.getName();
-    }
-
-    public void setMaxRows(Integer maxRows) {
-        Integer oldMaxRows = wrappedObject.getMaxRows();
-        wrappedObject.setMaxRows(maxRows);
-        propertyChangeSupport.firePropertyChange("name", oldMaxRows, maxRows);
-    }
-
-    public Integer getMaxRows() {
-        return wrappedObject.getMaxRows();
-    }
-
-    public Integer getMaxChars() {
-        return wrappedObject.getMaxChars();
-    }
-
-    public void setMaxCols(Integer maxCols) {
-        Integer oldMaxCols = wrappedObject.getMaxCols();
-        wrappedObject.setMaxCols(maxCols);
-        propertyChangeSupport.firePropertyChange("name", oldMaxCols, maxCols);
-    }
-
-    public Integer getMaxCols() {
-        return wrappedObject.getMaxCols();
-    }
-
-    public Integer getMinChars() {
-        return wrappedObject.getMinChars();
-    }
-
-    public void setMaxCapacity(Integer maxCapacity) {
-        Integer oldMaxCapacity = wrappedObject.getMaxCapacity();
-        wrappedObject.setMaxCapacity(maxCapacity);
-        propertyChangeSupport.firePropertyChange("name", oldMaxCapacity,
-            maxCapacity);
-    }
-
-    public Integer getMaxCapacity() {
-        return wrappedObject.getMaxCapacity();
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
         if (hasContainerTypes()) {
@@ -114,7 +55,6 @@ public class ContainerLabelingSchemeWrapper extends
                 "Can't delete this ContainerLabelingScheme: container types are using it.");
         }
     }
-
 
     private static final String HAS_CONTAINER_TYPES_QRY = "from "
         + ContainerType.class.getName() + " where "
@@ -191,8 +131,8 @@ public class ContainerLabelingSchemeWrapper extends
         getAllLabelingSchemesMap(appService);
         ContainerLabelingSchemeWrapper scheme = allSchemes.get(id);
         if (scheme == null) {
-            throw new ApplicationException("labeling scheme with id" + id
-                + "does not exist");
+            throw new ApplicationException("labeling scheme with id " + id
+                + " does not exist");
         }
         return scheme;
     }

@@ -376,10 +376,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 throw new BiobankCheckException(
                     "Problem with removed sample types");
             }
-            containerType.addSampleTypes(addedSampleTypes);
-            containerType.removeSampleTypes(removedSampleTypes);
+            containerType.addToSampleTypeCollection(addedSampleTypes);
+            containerType.removeFromSampleTypeCollection(removedSampleTypes);
         } else {
-            containerType.removeSampleTypes(containerType
+            containerType.removeFromSampleTypeCollection(containerType
                 .getSampleTypeCollection());
         }
     }
@@ -412,10 +412,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 throw new BiobankCheckException(
                     "Problem with removed child container types");
             }
-            containerType.addChildContainerTypes(addedContainerTypes);
-            containerType.removeChildContainers(removedContainerTypes);
+            containerType
+                .addToChildContainerTypeCollection(addedContainerTypes);
+            containerType
+                .removeFromChildContainerTypeCollection(removedContainerTypes);
         } else {
-            containerType.removeChildContainers(containerType
+            containerType.removeFromChildContainerTypeCollection(containerType
                 .getChildContainerTypeCollection());
         }
     }

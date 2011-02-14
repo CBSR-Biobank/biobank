@@ -43,10 +43,10 @@ public class PatientWBCTest extends AbstractReportTest {
         List<Object> expectedResults = new ArrayList<Object>();
 
         for (AliquotWrapper aliquot : filteredAliquots) {
-            ProcessingEventWrapper visit = aliquot.getPatientVisit();
+            ProcessingEventWrapper visit = aliquot.getProcessingEvent();
             List<Object> objects = new ArrayList<Object>();
             objects.add(visit.getPatient().getStudy().getNameShort());
-            objects.add(visit.getShipment().getClinic().getNameShort());
+            objects.add(visit.getCenter().getNameShort());
             objects.add(visit.getPatient().getPnumber());
             objects.add(visit.getDateProcessed());
             objects.add(aliquot.getSampleType().getName());

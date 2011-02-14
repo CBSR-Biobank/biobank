@@ -25,12 +25,12 @@ import edu.ualberta.med.biobank.dialogs.BiobankDialog;
  */
 
 public class SelectShipmentClinicDialog extends BiobankDialog {
-    private List<ShipmentWrapper> shipments;
+    private List<CollectionEventWrapper> shipments;
     private ComboViewer comboViewer;
     protected ShipmentWrapper selectedShipment;
 
     public SelectShipmentClinicDialog(Shell parent,
-        List<ShipmentWrapper> shipments) {
+        List<CollectionEventWrapper> shipments) {
         super(parent);
         Assert.isNotNull(shipments);
         this.shipments = shipments;

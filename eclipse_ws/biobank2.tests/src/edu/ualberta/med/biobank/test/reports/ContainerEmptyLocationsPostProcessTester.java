@@ -33,7 +33,7 @@ public class ContainerEmptyLocationsPostProcessTester implements
                                 + ContainerLabelingSchemeWrapper
                                     .getPositionString(rowColPos, container
                                         .getContainerType()
-                                        .getChildLabelingScheme(), numRows,
+                                        .getChildLabelingSchemeId(), numRows,
                                         numCols),
                             container.getContainerType().getNameShort() });
                     }

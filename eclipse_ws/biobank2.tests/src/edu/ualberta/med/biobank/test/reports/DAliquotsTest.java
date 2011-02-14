@@ -108,10 +108,9 @@ public class DAliquotsTest extends AbstractReportTest {
                 calendar.setTime(aliquot.getLinkDate());
 
                 List<Object> key = new ArrayList<Object>();
-                key.add(aliquot.getPatientVisit().getPatient().getStudy()
+                key.add(aliquot.getProcessingEvent().getPatient().getStudy()
                     .getNameShort());
-                key.add(aliquot.getPatientVisit().getShipment().getClinic()
-                    .getNameShort());
+                key.add(aliquot.getProcessingEvent().getCenter().getNameShort());
                 key.add(new Integer(calendar.get(Calendar.YEAR)));
                 key.add(new Long(getDateFieldValue(calendar, dateField)));
 

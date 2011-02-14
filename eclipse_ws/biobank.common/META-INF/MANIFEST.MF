@@ -67,9 +67,6 @@ Export-Package: antlr;
    com.thoughtworks.xstream.core,
    com.thoughtworks.xstream.core.util,
    com.thoughtworks.xstream.alias",
- edu.ualberta.med.biobank.client.config,
- edu.ualberta.med.biobank.client.config.calgary,
- edu.ualberta.med.biobank.client.config.cbsr,
  edu.ualberta.med.biobank.client.util,
  edu.ualberta.med.biobank.common;
   uses:="edu.ualberta.med.biobank.model,
@@ -90,6 +87,7 @@ Export-Package: antlr;
    edu.ualberta.med.biobank.common.wrappers.internal,
    gov.nih.nci.system.applicationservice,
    edu.ualberta.med.biobank.common.wrappers.listener",
+ edu.ualberta.med.biobank.common.wrappers.base,
  edu.ualberta.med.biobank.common.wrappers.listener,
  edu.ualberta.med.biobank.model,
  edu.ualberta.med.biobank.server.applicationservice;uses:="edu.ualberta.med.biobank.server.query,gov.nih.nci.system.applicationservice",

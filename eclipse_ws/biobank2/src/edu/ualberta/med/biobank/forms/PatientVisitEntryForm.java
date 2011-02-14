@@ -146,23 +146,23 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         }
     }
 
-    private List<ShipmentWrapper> getAllSiteShipmentsCollection() {
-        List<ShipmentWrapper> allShipments = patient.getShipmentCollection(
+    private List<CollectionEventWrapper> getAllSiteShipmentsCollection() {
+        List<CollectionEventWrapper> allShipments = patient.getShipmentCollection(
             true, false, SessionManager.getUser());
-        List<ShipmentWrapper> allSiteShipments = new ArrayList<ShipmentWrapper>();
+        List<CollectionEventWrapper> allSiteShipments = new ArrayList<CollectionEventWrapper>();
         for (ShipmentWrapper ship : allShipments)
             if (ship.getSite().equals(siteCombo.getSelectedSite()))
                 allSiteShipments.add(ship);
         return allSiteShipments;
     }
 
-    private List<ShipmentWrapper> getLast7DaysSiteShipmentsCollection() {
-        ArrayList<ShipmentWrapper> recentShipments = new ArrayList<ShipmentWrapper>();
+    private List<CollectionEventWrapper> getLast7DaysSiteShipmentsCollection() {
+        ArrayList<CollectionEventWrapper> recentShipments = new ArrayList<CollectionEventWrapper>();
         // filter for last 7 days
         Calendar c = Calendar.getInstance();
         ShipmentWrapper selectedShip = null;
         if (!patientVisit.isNew()) {
-            selectedShip = patientVisit.getShipment();
+            selectedShip = patientVisit.getCollectionEvent();
             // need to add into the list, to be able to see it.
             recentShipments.add(selectedShip);
         } else {
@@ -225,9 +225,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
         if (!patientVisit.isNew()) {
             List<SiteWrapper> input = new ArrayList<SiteWrapper>();
-            input.add(patientVisit.getShipment().getSite());
+            input.add(patientVisit.getCollectionEvent().getSite());
             siteCombo.setSitesList(input);
-            siteCombo.setSelectedSite(patientVisit.getShipment().getSite(),
+            siteCombo.setSelectedSite(patientVisit.getCollectionEvent().getSite(),
                 false);
         }
 
@@ -250,21 +250,21 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private void updateShipmentCombo() {
         ISelection sel = shipmentsComboViewer.getSelection();
-        List<ShipmentWrapper> ships;
+        List<CollectionEventWrapper> ships;
         if (shipmentsListCheck.getSelection()) {
             ships = getLast7DaysSiteShipmentsCollection();
-            if (patientVisit.getShipment() != null
-                && !ships.contains(patientVisit.getShipment()))
-                ships.add(patientVisit.getShipment());
+            if (patientVisit.getCollectionEvent() != null
+                && !ships.contains(patientVisit.getCollectionEvent()))
+                ships.add(patientVisit.getCollectionEvent());
         } else {
             ships = getAllSiteShipmentsCollection();
         }
         shipmentsComboViewer.setInput(ships);
         if (sel != null && ships.contains(sel))
             shipmentsComboViewer.setSelection(sel);
-        else if (patientVisit.getShipment() != null)
+        else if (patientVisit.getCollectionEvent() != null)
             shipmentsComboViewer.setSelection(new StructuredSelection(
-                patientVisit.getShipment()));
+                patientVisit.getCollectionEvent()));
         else
             shipmentsComboViewer.setSelection(new StructuredSelection());
     }
@@ -464,9 +464,9 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         patientVisit.setPatient(patient);
 
         shipmentsComboViewer.getCombo().deselectAll();
-        if (patientVisit.getShipment() != null)
+        if (patientVisit.getCollectionEvent() != null)
             shipmentsComboViewer.setSelection(new StructuredSelection(
-                patientVisit.getShipment()));
+                patientVisit.getCollectionEvent()));
         if (patientVisit.getDateProcessed() == null) {
             patientVisit.setDateProcessed(new Date());
         }

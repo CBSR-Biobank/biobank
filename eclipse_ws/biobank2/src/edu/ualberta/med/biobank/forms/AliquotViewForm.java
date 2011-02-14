@@ -155,7 +155,7 @@ public class AliquotViewForm extends BiobankViewForm {
                 if (parents.isEmpty()) {
                     position = aliquot.getPosition();
                 } else {
-                    position = parents.peek().getPosition();
+                    position = parents.peek().getPositionAsRowCol();
                 }
                 Composite containerComposite = toolkit
                     .createComposite(containersComposite);
@@ -183,15 +183,15 @@ public class AliquotViewForm extends BiobankViewForm {
         setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
         setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
             : aliquot.getQuantity().toString());
-        setTextValue(shipmentWaybillLabel, aliquot.getPatientVisit()
-            .getShipment().getWaybill());
-        setTextValue(studyLabel, aliquot.getPatientVisit().getPatient()
+        setTextValue(shipmentWaybillLabel, aliquot.getProcessingEvent()
+            .getCollectionEvent().getWaybill());
+        setTextValue(studyLabel, aliquot.getProcessingEvent().getPatient()
             .getStudy().getNameShort());
-        setTextValue(patientLabel, aliquot.getPatientVisit().getPatient()
+        setTextValue(patientLabel, aliquot.getProcessingEvent().getPatient()
             .getPnumber());
-        setTextValue(dateProcessedLabel, aliquot.getPatientVisit()
+        setTextValue(dateProcessedLabel, aliquot.getProcessingEvent()
             .getFormattedDateProcessed());
-        setTextValue(dateDrawnLabel, aliquot.getPatientVisit()
+        setTextValue(dateDrawnLabel, aliquot.getProcessingEvent()
             .getFormattedDateDrawn());
         setTextValue(activityStatusLabel, aliquot.getActivityStatus());
         setTextValue(commentLabel, aliquot.getComment());

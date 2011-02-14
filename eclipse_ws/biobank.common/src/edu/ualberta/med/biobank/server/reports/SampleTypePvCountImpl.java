@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.server.reports;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.model.AliquotPosition;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 
 /**
  * needs one parameters = study.nameShort
@@ -11,7 +11,7 @@ public class SampleTypePvCountImpl extends AbstractReport {
 
     private static final String QUERY = "Select pv.shipmentPatient.patient.pnumber, pv.dateProcessed,"
         + " pv.dateDrawn,  Alias.sampleType.name, count(*) from "
-        + PatientVisit.class.getName()
+        + ProcessingEvent.class.getName()
         + " as pv join pv.aliquotCollection as Alias"
         + " left join Alias.aliquotPosition p where (p is not null and p not in (from "
         + AliquotPosition.class.getName()

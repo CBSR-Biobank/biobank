@@ -12,7 +12,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class ShipmentInfoTable extends InfoTableWidget<ShipmentWrapper> {
+public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
 
     private class TableRowData {
         ShipmentWrapper shipment;

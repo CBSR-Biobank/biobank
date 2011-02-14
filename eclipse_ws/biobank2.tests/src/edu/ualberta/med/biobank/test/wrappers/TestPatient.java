@@ -72,7 +72,7 @@ public class TestPatient extends TestDatabase {
             + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "Contact - Patient Test");
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
     }
 
@@ -85,13 +85,13 @@ public class TestPatient extends TestDatabase {
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
-        childType.addSampleTypes(allSampleTypes);
+        childType.addToSampleTypeCollection(allSampleTypes);
         childType.persist();
         containerTypeMap.put("ChildCtL1", childType);
 
         topType = ContainerTypeHelper.newContainerType(site,
             "Top Container Type", "TCT", 2, 3, 10, true);
-        topType.addChildContainerTypes(Arrays.asList(containerTypeMap
+        topType.addToChildContainerTypeCollection(Arrays.asList(containerTypeMap
             .get("ChildCtL1")));
         topType.persist();
         containerTypeMap.put("TopCT", topType);
@@ -179,7 +179,7 @@ public class TestPatient extends TestDatabase {
         CollectionEventWrapper shipment = CollectionEventHelper
             .newCollectionEvent(site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        shipment.addSourceVessels(Arrays.asList(sv));
+        shipment.addToSourceVesselCollection(Arrays.asList(sv));
         shipment.persist();
         patient.reload();
 
@@ -192,11 +192,11 @@ public class TestPatient extends TestDatabase {
             visits.add(ProcessingEventHelper.newProcessingEvent(site, patient,
                 Utils.getRandomDate(), Utils.getRandomDate()));
         }
-        patient.addProcessingEvents(visits);
+        patient.addToProcessingEventCollection(visits);
         patient.persist();
         patient.reload();
 
-        visits = patient.getProcessingEventCollection();
+        visits = patient.getProcessingEventCollection(false);
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getAllSampleTypes(appService, true);
         AliquotWrapper aliquot = AliquotHelper.addAliquot(
@@ -221,7 +221,7 @@ public class TestPatient extends TestDatabase {
             Assert.assertTrue(true);
         }
         for (ProcessingEventWrapper visit : patient
-            .getProcessingEventCollection()) {
+            .getProcessingEventCollection(false)) {
             visit.delete();
         }
 
@@ -266,7 +266,7 @@ public class TestPatient extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient(
             Utils.getRandomNumericString(20), study);
         List<ProcessingEventWrapper> list = patient
-            .getProcessingEventCollection();
+            .getProcessingEventCollection(false);
         Assert.assertEquals(null, list);
 
         List<ProcessingEventWrapper> visitsAdded = ProcessingEventHelper
@@ -274,7 +274,7 @@ public class TestPatient extends TestDatabase {
 
         patient.reload();
         List<ProcessingEventWrapper> visits = patient
-            .getProcessingEventCollection();
+            .getProcessingEventCollection(false);
         Assert.assertTrue(visits.containsAll(visitsAdded));
 
         // delete some random visits, ensure at least one left
@@ -288,7 +288,7 @@ public class TestPatient extends TestDatabase {
 
         // make sure patient now only has the visits that were not deleted
         patient.reload();
-        visits = patient.getProcessingEventCollection();
+        visits = patient.getProcessingEventCollection(false);
         Assert.assertTrue(visits.containsAll(visitsAdded));
 
         // now remove all patient visits
@@ -300,7 +300,7 @@ public class TestPatient extends TestDatabase {
 
         // make sure patient does not have any patient visits
         patient.reload();
-        visits = patient.getProcessingEventCollection();
+        visits = patient.getProcessingEventCollection(false);
         Assert.assertEquals(0, visits.size());
     }
 
@@ -313,17 +313,19 @@ public class TestPatient extends TestDatabase {
         ProcessingEventWrapper visit = ProcessingEventHelper
             .newProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
-        patient.addProcessingEvents(Arrays.asList(visit));
+        patient.addToProcessingEventCollection(Arrays.asList(visit));
         patient.persist();
         patient.reload();
-        Assert.assertEquals(1, patient.getProcessingEventCollection().size());
+        Assert.assertEquals(1, patient.getProcessingEventCollection(false)
+            .size());
 
         visit = ProcessingEventHelper.newProcessingEvent(site, patient,
             Utils.getRandomDate(), Utils.getRandomDate());
-        patient.addProcessingEvents(Arrays.asList(visit));
+        patient.addToProcessingEventCollection(Arrays.asList(visit));
         patient.persist();
         patient.reload();
-        Assert.assertEquals(2, patient.getProcessingEventCollection().size());
+        Assert.assertEquals(2, patient.getProcessingEventCollection(false)
+            .size());
     }
 
     @Test
@@ -336,7 +338,7 @@ public class TestPatient extends TestDatabase {
             CollectionEventWrapper ship = CollectionEventHelper
                 .newCollectionEvent(site, ShippingMethodWrapper
                     .getShippingMethods(appService).get(0));
-            ship.addSourceVessels(Arrays
+            ship.addToSourceVesselCollection(Arrays
                 .asList(new SourceVesselWrapper[] { SourceVesselHelper
                     .newSourceVessel(patient, Utils.getRandomDate(), 0.1) }));
             ship.persist();
@@ -412,10 +414,9 @@ public class TestPatient extends TestDatabase {
         CollectionEventWrapper shipment = CollectionEventHelper
             .newCollectionEvent(site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        shipment
-            .addSourceVessels(Arrays
-                .asList(new SourceVesselWrapper[] { SourceVesselHelper
-                    .newSourceVessel(patient1, Utils.getRandomDate(), 0.1) }));
+        shipment.addToSourceVesselCollection(Arrays
+            .asList(new SourceVesselWrapper[] { SourceVesselHelper
+                .newSourceVessel(patient1, Utils.getRandomDate(), 0.1) }));
         shipment.persist();
         patient1.reload();
         patient2.reload();
@@ -432,7 +433,7 @@ public class TestPatient extends TestDatabase {
                 visits.add(ProcessingEventHelper.newProcessingEvent(site,
                     patient, Utils.getRandomDate(), Utils.getRandomDate()));
             }
-            patient.addProcessingEvents(visits);
+            patient.addToProcessingEventCollection(visits);
             patient.persist();
             patient.reload();
         }
@@ -451,7 +452,7 @@ public class TestPatient extends TestDatabase {
         int sampleCount = 0;
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
             for (ProcessingEventWrapper visit : patient
-                .getProcessingEventCollection()) {
+                .getProcessingEventCollection(false)) {
                 for (int i = 0; i < 2; ++i) {
                     samples.add(AliquotHelper.addAliquot(
                         allSampleTypes.get(r.nextInt(sampleTypeCount)),
@@ -469,19 +470,20 @@ public class TestPatient extends TestDatabase {
             }
         }
 
-        Assert.assertEquals(1, patient1.getSourceVesselCollection().size());
+        Assert
+            .assertEquals(1, patient1.getSourceVesselCollection(false).size());
 
         // now delete samples
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
             for (ProcessingEventWrapper visit : patient
-                .getProcessingEventCollection()) {
-                samples = visit.getAliquotCollection();
+                .getProcessingEventCollection(false)) {
+                samples = visit.getAliquotCollection(false);
                 while (samples.size() > 0) {
                     AliquotWrapper aliquot = samples.get(0);
                     aliquot.delete();
                     visit.reload();
                     patient.reload();
-                    samples = visit.getAliquotCollection();
+                    samples = visit.getAliquotCollection(false);
                     patientSampleCount.put(patient,
                         patientSampleCount.get(patient) - 1);
                     Assert.assertEquals(patientSampleCount.get(patient1)
@@ -506,8 +508,9 @@ public class TestPatient extends TestDatabase {
 
         CollectionEventWrapper ship = CollectionEventHelper.newCollectionEvent(
             site, method);
-        ship.addSourceVessels(Arrays.asList(new SourceVesselWrapper[] { SourceVesselHelper
-            .newSourceVessel(patient1, Utils.getRandomDate(), 0.1) }));
+        ship.addToSourceVesselCollection(Arrays
+            .asList(new SourceVesselWrapper[] { SourceVesselHelper
+                .newSourceVessel(patient1, Utils.getRandomDate(), 0.1) }));
         ship.persist();
 
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study);
@@ -517,11 +520,12 @@ public class TestPatient extends TestDatabase {
         CollectionEventWrapper ship2 = CollectionEventHelper
             .newCollectionEvent(site, method);
         ship2.setDateReceived(new Date()); // today
-        ship2.addSourceVessels(Arrays.asList(new SourceVesselWrapper[] {
-            SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
-                0.1),
-            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
-                0.2) }));
+        ship2.addToSourceVesselCollection(Arrays
+            .asList(new SourceVesselWrapper[] {
+                SourceVesselHelper.newSourceVessel(patient2,
+                    Utils.getRandomDate(), 0.1),
+                SourceVesselHelper.newSourceVessel(patient3,
+                    Utils.getRandomDate(), 0.2) }));
         ship2.persist();
 
         List<PatientWrapper> todayPatients = PatientWrapper
@@ -535,13 +539,6 @@ public class TestPatient extends TestDatabase {
     public void testGetLastWeekProcessingEvents() throws Exception {
         String name = "testGetLastWeekProcessingEvents" + r.nextInt();
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-
-        CollectionEventWrapper shipment = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel(patient, Utils.getRandomDate(),
-                    0.1));
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.DATE, -10); // 10 days ago
@@ -573,21 +570,21 @@ public class TestPatient extends TestDatabase {
 
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
 
         CollectionEventWrapper shipment = CollectionEventHelper
             .addCollectionEvent(
                 site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel(patient, Utils.getRandomDate(),
-                    0.1));
+                SourceVesselHelper.newSourceVessel(patient,
+                    Utils.getRandomDate(), 0.1));
         CollectionEventWrapper shipment2 = CollectionEventHelper
             .addCollectionEvent(
                 site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
-                    0.1));
+                SourceVesselHelper.newSourceVessel(patient2,
+                    Utils.getRandomDate(), 0.1));
 
         ProcessingEventWrapper visit1 = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
@@ -620,29 +617,16 @@ public class TestPatient extends TestDatabase {
         String name = "testMergeFail" + r.nextInt();
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
-        study2.addContacts(Arrays.asList(ContactHelper.addContact(clinic, name
-            + "_2")));
+        study2.addToContactCollection(Arrays.asList(ContactHelper.addContact(
+            clinic, name + "_2")));
         study2.persist();
 
         PatientWrapper patient = PatientHelper.addPatient(name + "_1", study);
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
-
-        CollectionEventWrapper shipment = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel(patient, Utils.getRandomDate(),
-                    0.1));
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
-                    0.1));
 
         ProcessingEventWrapper visit1 = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),

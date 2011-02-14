@@ -33,7 +33,7 @@ public class BiobankReport implements QueryCommand {
             e.printStackTrace();
         }
         // load map
-        for (Object prop : props.keySet()) {
+        for (Object prop : props.entrySet()) {
             String key = (String) prop;
             String pieces[] = key.split("[.]");
             ReportData r;

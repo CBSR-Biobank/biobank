@@ -87,7 +87,7 @@ public class TestActivityStatus extends TestDatabase {
         ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
             site, name, 2, 2);
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
-        topContainerType.addSampleTypes(SampleTypeWrapper.getAllSampleTypes(
+        topContainerType.addToSampleTypeCollection(SampleTypeWrapper.getAllSampleTypes(
             appService, false));
         topContainerType.persist();
 
@@ -101,7 +101,7 @@ public class TestActivityStatus extends TestDatabase {
             appService, false).get(0);
 
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         study.reload();
 

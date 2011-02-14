@@ -76,9 +76,10 @@ public class DbHelper {
         // visites liees au ship avec patient de la visit non lie au shipment
         for (PatientWrapper patient : patients) {
             patient.reload();
-            deletePatientVisits(patient.getProcessingEventCollection());
+            deletePatientVisits(patient.getProcessingEventCollection(false));
             patient.reload();
-            for (SourceVesselWrapper s : patient.getSourceVesselCollection()) {
+            for (SourceVesselWrapper s : patient
+                .getSourceVesselCollection(false)) {
                 s.reload();
                 s.delete();
             }
@@ -94,7 +95,7 @@ public class DbHelper {
             return;
 
         for (ProcessingEventWrapper visit : visits) {
-            deleteFromList(visit.getAliquotCollection());
+            deleteFromList(visit.getAliquotCollection(false));
             visit.reload();
             visit.delete();
         }

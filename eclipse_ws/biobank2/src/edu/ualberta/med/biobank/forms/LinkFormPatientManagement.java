@@ -146,9 +146,9 @@ public class LinkFormPatientManagement {
                     if (pv != null) {
                         aliquotAdminForm.appendLogNLS(
                             "linkAssign.activitylog.visit.selection", pv //$NON-NLS-1$
-                                .getShipment().getSite().getNameShort(),
+                                .getCollectionEvent().getSite().getNameShort(),
                             pv.getFormattedDateDrawn(),
-                            pv.getFormattedDateProcessed(), pv.getShipment()
+                            pv.getFormattedDateProcessed(), pv.getCollectionEvent()
                                 .getClinic().getName());
                     }
                 }

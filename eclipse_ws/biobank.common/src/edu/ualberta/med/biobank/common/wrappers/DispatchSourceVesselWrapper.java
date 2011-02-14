@@ -3,11 +3,12 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.DispatchSourceVesselPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.DispatchSourceVesselBaseWrapper;
 import edu.ualberta.med.biobank.model.DispatchSourceVessel;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class DispatchSourceVesselWrapper extends
-    DispatchItemWrapper<DispatchSourceVessel> {
+    DispatchSourceVesselBaseWrapper {
 
     public DispatchSourceVesselWrapper(WritableApplicationService appService) {
         super(appService);
@@ -21,31 +22,6 @@ public class DispatchSourceVesselWrapper extends
     @Override
     protected List<String> getPropertyChangeNames() {
         return DispatchSourceVesselPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<DispatchSourceVessel> getWrappedClass() {
-        return DispatchSourceVessel.class;
-    }
-
-    public SourceVesselWrapper getSourceVessel() {
-        return getWrappedProperty(DispatchSourceVesselPeer.SOURCE_VESSEL,
-            SourceVesselWrapper.class);
-    }
-
-    public void setSourceVessel(SourceVesselWrapper sourceVessel) {
-        setWrappedProperty(DispatchSourceVesselPeer.SOURCE_VESSEL, sourceVessel);
-    }
-
-    @Override
-    public DispatchWrapper getDispatch() {
-        return getWrappedProperty(DispatchSourceVesselPeer.DISPATCH,
-            DispatchWrapper.class);
-    }
-
-    @Override
-    public void setDispatch(DispatchWrapper dispatch) {
-        setWrappedProperty(DispatchSourceVesselPeer.DISPATCH, dispatch);
     }
 
     @Override

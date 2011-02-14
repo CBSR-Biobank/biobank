@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
+import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -30,7 +31,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
  * statuses in the database is created.
  * 
  */
-public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
+public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
 
     public static final String ACTIVE_STATUS_STRING = "Active";
 
@@ -45,15 +46,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
 
     public ActivityStatusWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ActivityStatusPeer.PROP_NAMES;
-    }
-
-    public String getName() {
-        return wrappedObject.getName();
     }
 
     @Override
@@ -89,11 +81,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
     }
 
     @Override
-    public Class<ActivityStatus> getWrappedClass() {
-        return ActivityStatus.class;
-    }
-
-    @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(ActivityStatus.class,
@@ -106,9 +93,8 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         if (object instanceof ActivityStatusWrapper)
             return ((ActivityStatusWrapper) object).getName().equals(
                 this.getName());
-        else
 
-            return false;
+        return false;
     }
 
     @Override
@@ -158,7 +144,6 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         } else if (result.size() == 0) {
             throw new BiobankCheckException("activity status \"" + name
                 + "\" does not exist");
-
         } else if (result.size() > 1) {
             throw new BiobankCheckException(" Too many instances of \"" + name
                 + "\"");
@@ -196,19 +181,13 @@ public class ActivityStatusWrapper extends ModelWrapper<ActivityStatus> {
         }
     }
 
-    public void setName(String name) {
-        String old = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", old, name);
-    }
-
     /**
      * return true if this Activity status name is "Active". Facility method to
      * avoid using "Active" string everywhere
      */
     public boolean isActive() {
         String name = getName();
-        return name != null && name.equals(ACTIVE_STATUS_STRING);
+        return ((name != null) && name.equals(ACTIVE_STATUS_STRING));
     }
 
     public boolean isClosed() {

@@ -44,7 +44,7 @@ public class StudySourceVesselHelper extends DbHelper {
                 .newSourceVesselType("newST");
             sources.add(addStudySourceVessel(study, sourceVesselT));
         }
-        study.addStudySourceVessels(sources);
+        study.addToStudySourceVesselCollection(sources);
         study.persist();
         return nber;
     }

@@ -1,5 +1,21 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.beans.PropertyChangeListener;
+import java.beans.PropertyChangeSupport;
+import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+
+import net.sf.cglib.proxy.Enhancer;
 import edu.ualberta.med.biobank.common.VarCharLengths;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -22,23 +38,6 @@ import gov.nih.nci.system.query.example.DeleteExampleQuery;
 import gov.nih.nci.system.query.example.InsertExampleQuery;
 import gov.nih.nci.system.query.example.UpdateExampleQuery;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
-
-import java.beans.PropertyChangeListener;
-import java.beans.PropertyChangeSupport;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-
-import net.sf.cglib.proxy.Enhancer;
 
 public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private final Map<Property<?, ?>, Object> propertyMap = new HashMap<Property<?, ?>, Object>();
@@ -71,7 +70,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 }
             }
 
-            cache(property, wrapper);
+            cache(modelWrapper, property, wrapper);
         }
 
         return wrapper;
@@ -84,9 +83,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
     protected <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
-        R newValue = wrapper.getWrappedObject();
+        R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
         setProperty(modelWrapper, property, newValue);
-        cache(property, wrapper);
+        cache(modelWrapper, property, wrapper);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
@@ -105,7 +104,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         setModelProperty(modelWrapper, property, newValues);
-        cache(property, wrappers);
+        cache(modelWrapper, property, wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
@@ -127,22 +126,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (wrappers == null && !isCached(property)) {
             Collection<R> raw = getModelProperty(modelWrapper, property);
-
-            if (raw != null) {
-                wrappers = new ArrayList<W>();
-
-                for (R element : raw) {
-                    try {
-                        W wrapper = ModelWrapper.wrapModel(appService, element,
-                            wrapperKlazz);
-                        wrappers.add(wrapper);
-                    } catch (Exception e) {
-                        throw new RuntimeException(e.getMessage());
-                    }
-                }
-            }
-
-            cache(property, wrappers);
+            wrappers = wrapModelCollection(appService, (List<R>) raw,
+                wrapperKlazz);
+            cache(modelWrapper, property, wrappers);
         }
 
         if (wrappers != null && sort) {
@@ -198,6 +184,26 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrapperCollection(property, allWrappers);
     }
 
+    public <W extends ModelWrapper<? extends R>, R> void removeFromWrapperCollectionWithCheck(
+        Property<? extends Collection<R>, ? super E> property,
+        List<W> wrappersToRemove) throws BiobankCheckException {
+        if (wrappersToRemove == null || wrappersToRemove.isEmpty()) {
+            return;
+        }
+
+        @SuppressWarnings("unchecked")
+        Class<W> wrapperKlazz = (Class<W>) wrappersToRemove.get(0).getClass();
+        List<W> currentWrappers = getWrapperCollection(property, wrapperKlazz,
+            false);
+
+        if (!currentWrappers.containsAll(wrappersToRemove)) {
+            throw new BiobankCheckException(
+                "studies are not associated with site ");
+        }
+
+        removeFromWrapperCollection(property, wrappersToRemove);
+    }
+
     protected <T> T getProperty(Property<T, ? super E> property) {
         return getProperty(this, property);
     }
@@ -213,7 +219,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         if (value == null && !isCached(property)) {
             value = getModelProperty(modelWrapper, property);
-            cache(property, value);
+            cache(modelWrapper, property, value);
         }
 
         return value;
@@ -226,7 +232,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     protected <T, M> void setProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property, T newValue) {
         setModelProperty(modelWrapper, property, newValue);
-        cache(property, newValue);
+        cache(modelWrapper, property, newValue);
     }
 
     private <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
@@ -275,8 +281,15 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    private void cache(Property<?, ?> property, Object value) {
+    private void cache(ModelWrapper<?> wrapper, Property<?, ?> property,
+        Object value) {
         propertyMap.put(property, value);
+
+        if (wrapper != this) {
+            // update the cache of the wrapper the given property is for, if it
+            // is not for itself
+            wrapper.cache(wrapper, property, value);
+        }
     }
 
     private boolean isCached(Property<?, ?> property) {
@@ -627,13 +640,18 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
 
         String propertyValue = "?";
         if (isNew()) {
-            c = new HQLCriteria("select count(o) from " + objectClass.getName()
-                + " as o where " + propertyName + "=" + propertyValue,
+            StringBuilder qry = new StringBuilder("select count(o) from ")
+                .append(objectClass.getName()).append(" as o where ")
+                .append(propertyName).append("=").append(propertyValue);
+            c = new HQLCriteria(qry.toString(),
                 Arrays.asList(new Object[] { value }));
         } else {
-            c = new HQLCriteria("select count(o) from " + objectClass.getName()
-                + " as o where id <> ? and " + propertyName + "="
-                + propertyValue, Arrays.asList(new Object[] { getId(), value }));
+            StringBuilder qry = new StringBuilder("select count(o) from ")
+                .append(objectClass.getName())
+                .append(" as o where id <> ? and ").append(propertyName)
+                .append("=").append(propertyValue);
+            c = new HQLCriteria(qry.toString(), Arrays.asList(new Object[] {
+                getId(), value }));
         }
 
         List<Long> results = appService.query(c);
@@ -663,9 +681,11 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             notSameObject = " and id <> ?";
             parameters.add(getId());
         }
-        HQLCriteria criteria = new HQLCriteria("select count(o) from "
-            + objectClass.getName() + " as o where " + propertyName + "=? and "
-            + siteIdTest + notSameObject, parameters);
+        StringBuilder qry = new StringBuilder("select count(o) from ")
+            .append(objectClass.getName()).append(" as o where ")
+            .append(propertyName).append("=? and ").append(siteIdTest)
+            .append(notSameObject);
+        HQLCriteria criteria = new HQLCriteria(qry.toString(), parameters);
         List<Long> results = appService.query(criteria);
         if (results.size() != 1) {
             throw new BiobankQueryResultSizeException();
@@ -921,5 +941,25 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         return one.compareTo(two);
+    }
+
+    public static <W extends ModelWrapper<? extends R>, R, M> List<W> wrapModelCollection(
+        WritableApplicationService appService, List<R> modelCollection,
+        Class<W> wrapperKlazz) {
+        List<W> wrappers = new ArrayList<W>();
+
+        if (modelCollection != null) {
+
+            for (R element : modelCollection) {
+                try {
+                    W wrapper = ModelWrapper.wrapModel(appService, element,
+                        wrapperKlazz);
+                    wrappers.add(wrapper);
+                } catch (Exception e) {
+                    throw new RuntimeException(e.getMessage());
+                }
+            }
+        }
+        return wrappers;
     }
 }

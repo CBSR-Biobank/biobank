@@ -1,15 +1,13 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import java.util.List;
-
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.CapacityBaseWrapper;
 import edu.ualberta.med.biobank.model.Capacity;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class CapacityWrapper extends ModelWrapper<Capacity> {
+public class CapacityWrapper extends CapacityBaseWrapper {
 
     public CapacityWrapper(WritableApplicationService appService) {
         super(appService);
@@ -20,42 +18,18 @@ public class CapacityWrapper extends ModelWrapper<Capacity> {
         super(appService, wrappedObject);
     }
 
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return CapacityPeer.PROP_NAMES;
-    }
-
     public void setRow(Integer rowCapacity) {
-        Integer oldRowCapacity = wrappedObject.getRowCapacity();
-        wrappedObject.setRowCapacity(rowCapacity);
-        propertyChangeSupport.firePropertyChange("row", oldRowCapacity,
-            rowCapacity);
-    }
-
-    public Integer getRowCapacity() {
-        return wrappedObject.getRowCapacity();
+        setRowCapacity(rowCapacity);
     }
 
     public void setCol(Integer colCapacity) {
-        Integer oldColCapacity = wrappedObject.getColCapacity();
-        wrappedObject.setColCapacity(colCapacity);
-        propertyChangeSupport.firePropertyChange("col", oldColCapacity,
-            colCapacity);
-    }
-
-    public Integer getColCapacity() {
-        return wrappedObject.getColCapacity();
+        setColCapacity(colCapacity);
     }
 
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
         // do nothing
-    }
-
-    @Override
-    public Class<Capacity> getWrappedClass() {
-        return Capacity.class;
     }
 
     @Override

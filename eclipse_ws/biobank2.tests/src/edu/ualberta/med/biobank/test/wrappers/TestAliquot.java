@@ -66,12 +66,12 @@ public class TestAliquot extends TestDatabase {
 
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
-        typeChild.addSampleTypes(Arrays.asList(sampleType));
+        typeChild.addToSampleTypeCollection(Arrays.asList(sampleType));
         typeChild.persist();
 
         ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
             site, "topType" + r.nextInt(), "ct", 1, 4, 5, true);
-        topType.addChildContainerTypes(Arrays.asList(typeChild));
+        topType.addToChildContainerTypeCollection(Arrays.asList(typeChild));
         topType.persist();
 
         topContainer = ContainerHelper.addContainer("top" + r.nextInt(), "cc",
@@ -87,10 +87,10 @@ public class TestAliquot extends TestDatabase {
             + r.nextInt());
         ContactWrapper contact = ContactHelper.addContact(clinic,
             "ContactClinic");
-        study.addContacts(Arrays.asList(contact));
+        study.addToContactCollection(Arrays.asList(contact));
         study.persist();
 
-        site.addStudies(Arrays.asList(study));
+        site.addToStudyCollection(Arrays.asList(study));
         site.persist();
         site.reload();
 
@@ -373,7 +373,7 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper oldParent = aliquot.getParent();
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             "newCtType", "ctNew", 1, 4, 5, true);
-        type.addSampleTypes(Arrays.asList(aliquot.getSampleType()));
+        type.addToSampleTypeCollection(Arrays.asList(aliquot.getSampleType()));
         type.persist();
         ContainerWrapper parent = ContainerHelper.addContainer(
             "newcontainerParent", "ccNew", null, site, type);
@@ -443,7 +443,7 @@ public class TestAliquot extends TestDatabase {
         ss3.setActivityStatus(activeStatus);
         ss3.persist();
         aliquot.getProcessingEvent().getPatient().getStudy()
-            .addSampleStorage(Arrays.asList(ss1, ss2, ss3));
+            .addToSampleStorageCollection(Arrays.asList(ss1, ss2, ss3));
         // should be 3
         aliquot.setQuantityFromType();
         Assert.assertTrue(aliquot.getQuantity().equals(3.0));
@@ -480,8 +480,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
         ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
-            .get(0);
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
+            false).get(0);
         Assert.assertNotNull(sampleType);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
@@ -498,8 +498,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
         ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
-            .get(0);
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
+            false).get(0);
         Assert.assertNotNull(sampleType);
 
         ActivityStatusWrapper activityStatusActive = ActivityStatusWrapper
@@ -541,8 +541,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
         ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
-            .get(0);
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
+            false).get(0);
         Assert.assertNotNull(sampleType);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
@@ -595,8 +595,8 @@ public class TestAliquot extends TestDatabase {
         ContainerWrapper container = aliquot.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
         ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection()
-            .get(0);
+        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
+            false).get(0);
         Assert.assertNotNull(sampleType);
 
         AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
@@ -613,12 +613,12 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testGetDispatchs() throws Exception {
+    public void testGetDispatches() throws Exception {
         String name = "testGetDispatchs" + r.nextInt();
         SiteWrapper destSite = SiteHelper.addSite(name);
         StudyWrapper study = aliquot.getProcessingEvent().getPatient()
             .getStudy();
-        destSite.addStudies(Arrays.asList(study));
+        destSite.addToStudyCollection(Arrays.asList(study));
         destSite.persist();
         destSite.reload();
         site.persist();
@@ -665,7 +665,7 @@ public class TestAliquot extends TestDatabase {
 
         // dispatch aliquot to second site
         SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
-        destSite2.addStudies(Arrays.asList(study));
+        destSite2.addToStudyCollection(Arrays.asList(study));
         destSite2.persist();
         destSite2.reload();
         destSite.persist();
@@ -690,11 +690,12 @@ public class TestAliquot extends TestDatabase {
             null, destSite, topType);
         ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
             destSite, "ct22", "ct22", 2, 4, 7, false);
-        topType.addChildContainerTypes(Arrays.asList(childType));
+        topType.addToChildContainerTypeCollection(Arrays.asList(childType));
         topType.persist();
         ContainerWrapper cont = ContainerHelper.addContainer("22", "22",
             topCont, destSite, childType, 4, 5);
-        childType.addSampleTypes(Arrays.asList(aliquot.getSampleType()));
+        childType.addToSampleTypeCollection(Arrays.asList(aliquot
+            .getSampleType()));
         childType.persist();
         cont.reload();
         cont.addAliquot(2, 3, aliquot);

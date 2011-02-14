@@ -14,13 +14,20 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
+import edu.ualberta.med.biobank.common.peer.ContactPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
+import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
@@ -29,8 +36,16 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SiteWrapper extends CenterWrapper<Site> {
+public class SiteWrapper extends SiteBaseWrapper {
     private Map<RequestState, List<RequestWrapper>> requestCollectionMap = new HashMap<RequestState, List<RequestWrapper>>();
+
+    public static final List<String> PROP_NAMES;
+    static {
+        List<String> aList = new ArrayList<String>();
+        aList.addAll(SitePeer.PROP_NAMES);
+        aList.addAll(AddressPeer.PROP_NAMES);
+        PROP_NAMES = Collections.unmodifiableList(aList);
+    };
 
     public SiteWrapper(WritableApplicationService appService, Site wrappedObject) {
         super(appService, wrappedObject);
@@ -42,11 +57,16 @@ public class SiteWrapper extends CenterWrapper<Site> {
 
     @Override
     protected List<String> getPropertyChangeNames() {
-        // TODO: cache this?
-        List<String> names = new ArrayList<String>();
-        names.addAll(SitePeer.PROP_NAMES);
-        names.addAll(AddressPeer.PROP_NAMES);
-        return names;
+        return PROP_NAMES;
+    }
+
+    private AddressWrapper initAddress() {
+        AddressWrapper address = getAddress();
+        if (address == null) {
+            address = new AddressWrapper(appService);
+            setAddress(address);
+        }
+        return address;
     }
 
     @Override
@@ -59,19 +79,14 @@ public class SiteWrapper extends CenterWrapper<Site> {
     }
 
     @Override
-    public Class<Site> getWrappedClass() {
-        return Site.class;
-    }
-
-    @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if ((getContainerCollection() != null && getContainerCollection()
-            .size() > 0)
-            || (getContainerTypeCollection() != null && getContainerTypeCollection()
-                .size() > 0)
-            || (getCollectionEventCollection() != null && getCollectionEventCollection()
-                .size() > 0)) {
+        if ((getContainerCollection(false) != null && getContainerCollection(
+            false).size() > 0)
+            || (getContainerTypeCollection(false) != null && getContainerTypeCollection(
+                false).size() > 0)
+            || (getCollectionEventCollection(false) != null && getCollectionEventCollection(
+                false).size() > 0)) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
@@ -109,19 +124,18 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return getRequestCollection(RequestState.SHIPPED);
     }
 
-    public List<StudyWrapper> getStudyCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.STUDY_COLLECTION,
-            StudyWrapper.class, sort);
-    }
-
-    public List<StudyWrapper> getStudyCollection() {
-        return getStudyCollection(true);
-    }
+    // due to bug in Hibernate when using elements in query must also use a left
+    // join
+    private static final String STUDIES_NON_ASSOC_BASE_QRY = "select s from "
+        + Study.class.getName() + " s left join s."
+        + StudyPeer.SITE_COLLECTION.getName() + " where ";
 
     public List<StudyWrapper> getStudiesNotAssoc() throws ApplicationException {
         List<StudyWrapper> studyWrappers = new ArrayList<StudyWrapper>();
-        HQLCriteria c = new HQLCriteria("from " + Study.class.getName()
-            + " s where " + getId() + " not in elements(s.siteCollection)");
+        StringBuilder qry = new StringBuilder(STUDIES_NON_ASSOC_BASE_QRY)
+            .append(getId()).append(" not in elements(s.")
+            .append(StudyPeer.SITE_COLLECTION.getName()).append(")");
+        HQLCriteria c = new HQLCriteria(qry.toString());
         List<Study> results = appService.query(c);
         for (Study res : results) {
             studyWrappers.add(new StudyWrapper(appService, res));
@@ -129,47 +143,21 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return studyWrappers;
     }
 
-    public void addStudies(List<StudyWrapper> studies) {
-        addToWrapperCollection(SitePeer.STUDY_COLLECTION, studies);
-    }
-
-    public void removeStudies(List<StudyWrapper> studiesToRemove)
-        throws BiobankCheckException {
-        if (studiesToRemove == null || studiesToRemove.isEmpty()) {
-            return;
-        }
-
-        List<StudyWrapper> currentList = getStudyCollection();
-
-        if (currentList == null || !currentList.containsAll(studiesToRemove)) {
-            throw new BiobankCheckException(
-                "studies are not associated with site " + getNameShort());
-        }
-
-        removeFromWrapperCollection(SitePeer.STUDY_COLLECTION, studiesToRemove);
-    }
-
-    public List<ContainerTypeWrapper> getContainerTypeCollection(boolean sort) {
-        return getWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION,
-            ContainerTypeWrapper.class, sort);
-    }
-
     public List<ContainerTypeWrapper> getContainerTypeCollection() {
         return getContainerTypeCollection(false);
     }
 
-    public void addContainerTypes(List<ContainerTypeWrapper> types) {
-        addToWrapperCollection(SitePeer.CONTAINER_TYPE_COLLECTION, types);
-    }
-
     public List<ContainerWrapper> getContainerCollection() {
-        return getWrapperCollection(SitePeer.CONTAINER_COLLECTION,
-            ContainerWrapper.class, false);
+        return getContainerCollection(false);
     }
 
-    public void addContainers(List<ContainerWrapper> containers) {
-        addToWrapperCollection(SitePeer.CONTAINER_COLLECTION, containers);
-    }
+    private static final String TOP_CONTAINERS_QRY = "from "
+        + Container.class.getName()
+        + " where "
+        + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
+        + "=? and "
+        + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
+            ContainerTypePeer.TOP_LEVEL) + "=true";
 
     @SuppressWarnings("unchecked")
     public List<ContainerWrapper> getTopContainerCollection(boolean sort)
@@ -179,9 +167,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
 
         if (topContainerCollection == null) {
             topContainerCollection = new ArrayList<ContainerWrapper>();
-            HQLCriteria criteria = new HQLCriteria("from "
-                + Container.class.getName()
-                + " where site.id = ? and containerType.topLevel = true",
+            HQLCriteria criteria = new HQLCriteria(TOP_CONTAINERS_QRY,
                 Arrays.asList(new Object[] { wrappedObject.getId() }));
             List<Container> containers = appService.query(criteria);
             for (Container c : containers) {
@@ -192,14 +178,6 @@ public class SiteWrapper extends CenterWrapper<Site> {
             propertiesMap.put("topContainerCollection", topContainerCollection);
         }
         return topContainerCollection;
-    }
-
-    public List<ContainerWrapper> getTopContainerCollection() throws Exception {
-        return getTopContainerCollection(false);
-    }
-
-    public void clearTopContainerCollection() {
-        propertiesMap.put("topContainerCollection", null);
     }
 
     @Override
@@ -213,12 +191,17 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return 0;
     }
 
+    private static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.STUDY_COLLECTION.getName()
+        + " as studies join studies."
+        + StudyPeer.PATIENT_COLLECTION.getName()
+        + " as patients where site."
+        + SitePeer.ID.getName() + "=?";
+
     public Long getPatientCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria(
-            "select count(distinct patient) from " + Site.class.getName()
-                + " as site " + "join site.shipmentCollection as shipments "
-                + "join shipments.shipmentPatientCollection as csps "
-                + "join csps.patient as patient " + "where site.id = ?",
+        HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -227,13 +210,19 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return result.get(0);
     }
 
+    private static final String ALIQUOT_COUNT_QRY = "select count(aliquots) from "
+        + Site.class.getName()
+        + SitePeer.STUDY_COLLECTION.getName()
+        + " as studies join studies."
+        + StudyPeer.PATIENT_COLLECTION.getName()
+        + " as patients join patients."
+        + PatientPeer.PROCESSING_EVENT_COLLECTION.getName()
+        + " as pevents join pevents."
+        + ProcessingEventPeer.ALIQUOT_COLLECTION.getName()
+        + " as aliquots where site." + SitePeer.ID.getName() + "=?";
+
     public Long getAliquotCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria("select count(aliquots) from "
-            + Site.class.getName() + " as site "
-            + "join site.shipmentCollection as shipments "
-            + "join shipments.shipmentPatientCollection as csps "
-            + "join csps.processingEventCollection as visits "
-            + "join visits.aliquotCollection as aliquots where site.id = ?",
+        HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         List<Long> result = appService.query(criteria);
         if (result.size() != 1) {
@@ -250,23 +239,24 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return getSites(appService, null);
     }
 
+    private static final String SITES_QRY = "from " + Site.class.getName();
+
     /**
      * If "id" is null, then all sites are returned. If not, then only sites
      * with that id are returned.
      */
     public static List<SiteWrapper> getSites(
         WritableApplicationService appService, Integer id) throws Exception {
-        HQLCriteria criteria;
+        StringBuilder qry = new StringBuilder(SITES_QRY);
+        List<Object> qryParms = new ArrayList<Object>();
 
-        if (id == null) {
-            criteria = new HQLCriteria("from " + Site.class.getName());
-        } else {
-            criteria = new HQLCriteria("from " + Site.class.getName()
-                + " where id = ?", Arrays.asList(new Object[] { id }));
+        if (id != null) {
+            qry.append(" where id = ?");
+            qryParms.add(id);
         }
 
+        HQLCriteria criteria = new HQLCriteria(qry.toString(), qryParms);
         List<Site> sites = appService.query(criteria);
-
         List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
         for (Site s : sites) {
             wrappers.add(new SiteWrapper(appService, s));
@@ -279,22 +269,12 @@ public class SiteWrapper extends CenterWrapper<Site> {
         return getName();
     }
 
-    public List<DispatchWrapper> getReceivedDispatchCollection() {
-        return getWrapperCollection(CenterPeer.DST_DISPATCH_COLLECTION,
-            DispatchWrapper.class, false);
-    }
-
-    public List<DispatchWrapper> getSentDispatchCollection() {
-        return getWrapperCollection(CenterPeer.SRC_DISPATCH_COLLECTION,
-            DispatchWrapper.class, false);
-    }
-
     @SuppressWarnings("unchecked")
     public List<DispatchWrapper> getInTransitSentDispatchCollection() {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("inTransitSentDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getSentDispatchCollection();
+            List<DispatchWrapper> children = getSrcDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -314,7 +294,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("inTransitReceiveDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getReceivedDispatchCollection();
+            List<DispatchWrapper> children = getDstDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -334,7 +314,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("receivingDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getReceivedDispatchCollection();
+            List<DispatchWrapper> children = getDstDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -355,7 +335,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("receivingWithErrorsDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getReceivedDispatchCollection();
+            List<DispatchWrapper> children = getDstDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -376,7 +356,7 @@ public class SiteWrapper extends CenterWrapper<Site> {
         List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
             .get("inCreationDispatchCollection");
         if (shipCollection == null) {
-            List<DispatchWrapper> children = getSentDispatchCollection();
+            List<DispatchWrapper> children = getSrcDispatchCollection(false);
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
@@ -392,13 +372,25 @@ public class SiteWrapper extends CenterWrapper<Site> {
     }
 
     public Set<ClinicWrapper> getWorkingClinicCollection() {
-        List<StudyWrapper> studies = getStudyCollection();
+        List<StudyWrapper> studies = getStudyCollection(false);
         Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
         for (StudyWrapper study : studies) {
             clinics.addAll(study.getClinicCollection());
         }
         return clinics;
     }
+
+    private static final String WORKING_CLINIC_COLLECTION_SIZE = "select distinct contact."
+        + ContactPeer.CLINIC.getName()
+        + " from "
+        + Site.class.getName()
+        + " as site "
+        + "inner join site."
+        + SitePeer.STUDY_COLLECTION.getName()
+        + " as study "
+        + "inner join study."
+        + StudyPeer.CONTACT_COLLECTION.getName()
+        + " as contact where site." + SitePeer.ID.getName() + "=?";
 
     /**
      * Use an HQL query to quickly get the size of the collection.
@@ -407,11 +399,8 @@ public class SiteWrapper extends CenterWrapper<Site> {
      * @throws ApplicationException
      */
     public int getWorkingClinicCollectionSize() throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("select distinct contact.clinic "
-            + "from edu.ualberta.med.biobank.model.Site as site "
-            + "inner join site.studyCollection study "
-            + "inner join study.contactCollection contact "
-            + "where site.id = ?", Arrays.asList(new Object[] { getId() }));
+        HQLCriteria c = new HQLCriteria(WORKING_CLINIC_COLLECTION_SIZE,
+            Arrays.asList(new Object[] { getId() }));
         List<Clinic> clinics = appService.query(c);
         return clinics.size();
     }
@@ -448,6 +437,10 @@ public class SiteWrapper extends CenterWrapper<Site> {
     public static Collection<? extends ModelWrapper<?>> getInTransitSentDispatchCollection(
         SiteWrapper site) {
         return site.getInTransitSentDispatchCollection();
+    }
+
+    public void clearTopContainerCollection() {
+        propertiesMap.put("topContainerCollection", null);
     }
 
 }

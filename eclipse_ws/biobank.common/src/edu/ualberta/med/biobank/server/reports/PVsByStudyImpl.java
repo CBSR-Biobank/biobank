@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.server.reports;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
 import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.DateRangeRowPostProcess;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 
 public class PVsByStudyImpl extends AbstractReport {
 
@@ -11,7 +11,7 @@ public class PVsByStudyImpl extends AbstractReport {
         + " Year(Alias.dateProcessed), "
         + GROUPBY_DATE
         + "(Alias.dateProcessed), count(*) from "
-        + PatientVisit.class.getName()
+        + ProcessingEvent.class.getName()
         + " as Alias where Alias.dateProcessed between ? and ?"
         + " GROUP BY Alias.shipmentPatient.patient.study.nameShort, "
         + "Year(Alias.dateProcessed), "

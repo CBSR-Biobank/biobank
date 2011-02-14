@@ -25,10 +25,10 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 public class InvoicingReportTest extends AbstractReportTest {
     private static final Mapper<AliquotWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<String>, Long>() {
         public List<String> getKey(AliquotWrapper aliquot) {
-            return Arrays.asList(aliquot.getPatientVisit().getPatient()
-                .getStudy().getNameShort(), aliquot.getPatientVisit()
-                .getShipment().getClinic().getNameShort(), aliquot
-                .getSampleType().getNameShort());
+            return Arrays.asList(aliquot.getProcessingEvent().getPatient()
+                .getStudy().getNameShort(), aliquot.getProcessingEvent()
+                .getCenter().getNameShort(), aliquot.getSampleType()
+                .getNameShort());
         }
 
         public Long getValue(AliquotWrapper aliquot, Long aliquotCount) {
@@ -39,8 +39,7 @@ public class InvoicingReportTest extends AbstractReportTest {
     private static final Mapper<ProcessingEventWrapper, List<String>, Long> GROUP_PVS_BY_STUDY_CLINIC = new Mapper<ProcessingEventWrapper, List<String>, Long>() {
         public List<String> getKey(ProcessingEventWrapper patientVisit) {
             return Arrays.asList(patientVisit.getPatient().getStudy()
-                .getNameShort(), patientVisit.getShipment().getClinic()
-                .getNameShort());
+                .getNameShort(), patientVisit.getCenter().getNameShort());
         }
 
         public Long getValue(ProcessingEventWrapper patientVisit, Long pvCount) {

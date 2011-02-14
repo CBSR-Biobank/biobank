@@ -16,8 +16,8 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class NewPsByStudyClinicTest extends AbstractReportTest {
     private static final Mapper<ProcessingEventWrapper, Integer, ProcessingEventWrapper> GROUP_BY_PATIENT = new Mapper<ProcessingEventWrapper, Integer, ProcessingEventWrapper>() {
@@ -45,7 +45,7 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
 
                 List<Object> key = new ArrayList<Object>();
                 key.add(patientVisit.getPatient().getStudy().getNameShort());
-                key.add(patientVisit.getShipment().getClinic().getName());
+                key.add(patientVisit.getCenter().getName());
                 key.add(new Integer(calendar.get(Calendar.YEAR)));
                 key.add(new Long(getDateFieldValue(calendar, dateField)));
 
@@ -83,7 +83,7 @@ public class NewPsByStudyClinicTest extends AbstractReportTest {
     public void testSecondPatientVisitDateRange() throws Exception {
         for (PatientWrapper patient : getPatients()) {
             List<ProcessingEventWrapper> visits = patient
-                .getPatientVisitCollection(true, true, null);
+                .getProcessingEventCollection(false);
             if (visits.size() >= 2) {
                 ProcessingEventWrapper visit = visits.get(1);
 

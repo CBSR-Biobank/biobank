@@ -56,7 +56,7 @@ public class ClinicVisitInfoTable extends InfoTableWidget<ProcessingEventWrapper
     public Object getCollectionModelObject(ProcessingEventWrapper p)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.clinicName = p.getShipment().getClinic().getNameShort();
+        info.clinicName = p.getCollectionEvent().getClinic().getNameShort();
         info.visit = p.getFormattedDateProcessed();
         return info;
     }
