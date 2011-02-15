@@ -22,7 +22,7 @@
   <property name="eclipse.proj.dir.common"
             location="eclipse_ws/biobank.common" />
   <property name="eclipse.proj.dir.tools"
-            location="eclipse_ws/biobnk2.tools" />
+            location="eclipse_ws/biobank2.tools" />
   <property name="eclipse.proj.dir.junit"
             location="eclipse_ws/biobank2.tests" />
   <property name="scripts.proj.dir" location="scripts" />
