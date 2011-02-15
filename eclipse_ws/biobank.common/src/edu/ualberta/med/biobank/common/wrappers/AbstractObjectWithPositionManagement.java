@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.model.AbstractPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -91,6 +90,11 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
             top = (ContainerWrapper) objectAtPosition;
         else
             top = getParent();
+
+        ContainerPathWrapper path = top.getContainerPath();
+        if (path != null) {
+            return path.getTopContainer();
+        }
 
         while (top != null && top.getParent() != null) {
             top = top.getParent();

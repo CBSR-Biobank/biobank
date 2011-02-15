@@ -165,6 +165,10 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void initCells() {
         try {
+            if (container.getContainerType()
+                .getChildContainerTypeCollection(false).isEmpty())
+                return;
+
             Integer rowCap = container.getRowCapacity();
             Integer colCap = container.getColCapacity();
             Assert.isNotNull(rowCap, "row capacity is null");

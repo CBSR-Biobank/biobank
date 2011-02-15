@@ -17,6 +17,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -291,7 +292,7 @@ public class TestContainer extends TestDatabase {
             ContainerHelper.addContainer("05", null, null, site, null);
             Assert
                 .fail("should not be allowed to add container with no container type");
-        } catch (Exception e) {
+        } catch (BiobankException e) {
             Assert.assertTrue(true);
         }
 

@@ -22,7 +22,7 @@
   <property name="eclipse.proj.dir.common"
             location="eclipse_ws/biobank.common" />
   <property name="eclipse.proj.dir.tools"
-            location="eclipse_ws/biobank2.tools" />
+            location="eclipse_ws/biobnk2.tools" />
   <property name="eclipse.proj.dir.junit"
             location="eclipse_ws/biobank2.tests" />
   <property name="scripts.proj.dir" location="scripts" />
@@ -63,6 +63,12 @@
             casesensitive="true"
             trim="true" />
   </condition>
+  <condition property="isHostAicml5">
+    <equals arg1="${host.name}"
+            arg2="aicml5"
+            casesensitive="true"
+            trim="true" />
+  </condition>
   <condition property="isHostCbsr">
     <equals arg1="${host.name}"
             arg2="cbsr.med.ualberta.ca"
@@ -78,6 +84,7 @@
   <condition property="isHostLocal">
     <and>
       <isfalse value="${isHostAicmlMed}" />
+      <isfalse value="${isHostAicml5}" />
       <isfalse value="${isHostCbsr}" />
       <isfalse value="${isHostCbsrTraining}" />
     </and>
@@ -380,6 +387,11 @@
               srcfile="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war" />
   </target>
   <target name="hostAicmlMed" if="isHostAicmlMed">
+    <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
+  <target name="hostAicml5" if="isHostAicml5">
     <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />

@@ -18,7 +18,7 @@
 
   <appender name="CONSOLE" class="org.apache.log4j.ConsoleAppender">
     <param name="Target" value="System.out" />
-    <param name="Threshold" value="@LOG4J_LEVEL@" />
+    <param name="Threshold" value="debug" />
     <layout class="org.apache.log4j.PatternLayout">
       <param name="ConversionPattern"
         value="%d{ABSOLUTE} %-5p [%c{1}] %m%n" />
@@ -50,7 +50,7 @@
   </logger>
 
   <logger name="org.hibernate.SQL">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="debug" />
   </logger>
 
   <logger name="org.hibernate.type">
@@ -69,13 +69,17 @@
     <level value="warn" />
   </logger>
 
-  <logger	name="org.hibernate.connection.DriverManagerConnectionProvider">
+  <logger name="org.hibernate.connection.DriverManagerConnectionProvider">
     <level value="@LOG4J_LEVEL@" />
   </logger>
 
   <logger name="gov.nih.nci">
     <level value="warn" />
   </logger>
+
+  <category name="org.springframework">
+    <priority value="error" />
+  </category>
 
   <root>
     <priority value="@LOG4J_LEVEL@" />

@@ -13,6 +13,7 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
@@ -28,7 +29,6 @@ import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -274,10 +274,18 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     private void checkLabelUniqueForType() throws BiobankException,
         ApplicationException {
+        SiteWrapper site = getSite();
+        if (site == null) {
+            throw new BiobankException("container has no site");
+        }
+        ContainerTypeWrapper type = getContainerType();
+        if (type == null) {
+            throw new BiobankException("container has no type");
+        }
         String notSameContainer = "";
         List<Object> parameters = new ArrayList<Object>(
-            Arrays.asList(new Object[] { getSite().getId(), getLabel(),
-                getContainerType().getWrappedObject() }));
+            Arrays.asList(new Object[] { site.getId(), getLabel(),
+                type.getWrappedObject() }));
         if (!isNew()) {
             notSameContainer = " and id <> ?";
             parameters.add(getId());
@@ -440,17 +448,16 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return rcp;
     }
 
-    private static final String GET_CONTAINER_ALIQUOTS_QRY = "select aliquots, aliquotPositions from "
-        + Container.class.getName()
-        + " as c inner join c."
+    private static final String GET_CONTAINER_ALIQUOTS_QRY = "from "
+        + Container.class.getName() + " as c join fetch c."
         + ContainerPeer.ALIQUOT_POSITION_COLLECTION.getName()
-        + " as aliquotPositions inner join aliquotPositions."
-        + AliquotPositionPeer.ALIQUOT.getName()
-        + " as aliquots where c."
+        + " as aliquotPositions join fetch aliquotPositions."
+        + AliquotPositionPeer.ALIQUOT.getName() + " as aliquots where c."
         + ContainerPeer.ID.getName() + "=?";
 
     @SuppressWarnings("unchecked")
-    public Map<RowColPos, AliquotWrapper> getAliquots() throws BiobankException {
+    public Map<RowColPos, AliquotWrapper> getAliquots()
+        throws BiobankFailedQueryException {
         Map<RowColPos, AliquotWrapper> aliquots = (Map<RowColPos, AliquotWrapper>) propertiesMap
             .get("aliquots");
         if (aliquots == null) {
@@ -459,21 +466,21 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             HQLCriteria criteria = new HQLCriteria(GET_CONTAINER_ALIQUOTS_QRY,
                 Arrays.asList(new Object[] { getId() }));
 
-            List<Object> results;
             try {
-                results = appService.query(criteria);
+                List<Container> results = appService.query(criteria);
+                if ((results != null) && !results.isEmpty()) {
 
-                for (Object row : results) {
-                    Object[] items = (Object[]) row;
-                    AliquotWrapper aliquot = new AliquotWrapper(appService,
-                        (Aliquot) items[0]);
-                    AliquotPosition ap = (AliquotPosition) items[1];
-                    aliquots.put(new RowColPos(ap.getRow(), ap.getCol()),
-                        aliquot);
+                    ContainerWrapper c = new ContainerWrapper(appService,
+                        results.get(0));
+                    for (AliquotPositionWrapper ap : c
+                        .getAliquotPositionCollection(false)) {
+                        aliquots.put(new RowColPos(ap.getRow(), ap.getCol()),
+                            ap.getAliquot());
+                    }
                 }
                 propertiesMap.put("aliquots", aliquots);
             } catch (ApplicationException e) {
-                throw new BiobankException(e);
+                throw new BiobankFailedQueryException(e);
             }
         }
         return aliquots;
@@ -486,7 +493,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public AliquotWrapper getAliquot(Integer row, Integer col)
-        throws BiobankException {
+        throws BiobankException, BiobankFailedQueryException {
         AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
             appService);
         aliquotPosition.setRow(row);
@@ -574,17 +581,16 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return positions.size();
     }
 
-    private static final String GET_CHILD_CONTAINERS_QRY = "select childContainers, containerPositions from "
-        + Container.class.getName()
-        + " as c join c."
+    private static final String GET_CHILD_CONTAINERS_QRY = "from "
+        + Container.class.getName() + " as c join fetch c."
         + ContainerPeer.CHILD_POSITION_COLLECTION.getName()
-        + " as containerPositions join containerPositions."
+        + " as containerPositions join fetch containerPositions."
         + ContainerPositionPeer.CONTAINER.getName()
         + " as childContainers where c." + ContainerPeer.ID.getName() + "=?";
 
     @SuppressWarnings("unchecked")
     public Map<RowColPos, ContainerWrapper> getChildren()
-        throws BiobankException {
+        throws BiobankFailedQueryException {
         Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) propertiesMap
             .get("children");
         if (children == null) {
@@ -593,21 +599,23 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             HQLCriteria criteria = new HQLCriteria(GET_CHILD_CONTAINERS_QRY,
                 Arrays.asList(new Object[] { getId() }));
 
-            List<Object> results;
+            List<Container> results;
             try {
                 results = appService.query(criteria);
+                if ((results != null) && !results.isEmpty()) {
 
-                for (Object row : results) {
-                    Object[] items = (Object[]) row;
-                    ContainerWrapper child = new ContainerWrapper(appService,
-                        (Container) items[0]);
-                    ContainerPosition cp = (ContainerPosition) items[1];
-                    children
-                        .put(new RowColPos(cp.getRow(), cp.getCol()), child);
+                    ContainerWrapper c = new ContainerWrapper(appService,
+                        results.get(0));
+
+                    for (ContainerPositionWrapper cp : c
+                        .getChildPositionCollection(false)) {
+                        children.put(new RowColPos(cp.getRow(), cp.getCol()),
+                            cp.getContainer());
+                    }
                 }
                 propertiesMap.put("children", children);
             } catch (ApplicationException e) {
-                throw new BiobankException(e);
+                throw new BiobankFailedQueryException(e);
             }
         }
         return children;
@@ -620,11 +628,12 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public ContainerWrapper getChild(Integer row, Integer col)
-        throws BiobankException {
+        throws BiobankFailedQueryException {
         return getChild(new RowColPos(row, col));
     }
 
-    public ContainerWrapper getChild(RowColPos rcp) throws BiobankException {
+    public ContainerWrapper getChild(RowColPos rcp)
+        throws BiobankFailedQueryException {
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
             return null;
