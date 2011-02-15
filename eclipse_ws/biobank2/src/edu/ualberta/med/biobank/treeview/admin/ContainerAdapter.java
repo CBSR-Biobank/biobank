@@ -133,15 +133,15 @@ public class ContainerAdapter extends AdapterBase {
                             getContainer().moveAliquots(newContainer);
                             // newContainer.persist();
                             newContainer.reload();
+                            monitor.done();
+                            BioBankPlugin.openAsyncInformation(
+                                "Aliquots moved", newContainer.getAliquots()
+                                    .size()
+                                    + " aliquots are now in "
+                                    + newContainer.getFullInfoLabel() + ".");
                         } catch (Exception e) {
                             BioBankPlugin.openAsyncError("Move problem", e);
                         }
-                        monitor.done();
-                        BioBankPlugin.openAsyncInformation(
-                            "Aliquots moved",
-                            newContainer.getAliquots().size()
-                                + " aliquots are now in "
-                                + newContainer.getFullInfoLabel() + ".");
                     }
                 });
                 ContainerAdapter newContainerAdapter = (ContainerAdapter) SessionManager

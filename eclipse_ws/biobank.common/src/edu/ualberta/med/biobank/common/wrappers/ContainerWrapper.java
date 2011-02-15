@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
+import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
@@ -27,6 +28,7 @@ import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
+import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
@@ -172,7 +174,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     // check the position is the same
                     if (!new RowColPos(origObject.getPosition().getRow(),
                         origObject.getPosition().getCol())
-                        .equals(getPosition())) {
+                        .equals(getPositionAsRowCol())) {
                         labelChanged = true;
                     }
                 }
@@ -438,27 +440,41 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return rcp;
     }
 
+    private static final String GET_CONTAINER_ALIQUOTS_QRY = "select aliquots, aliquotPositions from "
+        + Container.class.getName()
+        + " as c inner join c."
+        + ContainerPeer.ALIQUOT_POSITION_COLLECTION.getName()
+        + " as aliquotPositions inner join aliquotPositions."
+        + AliquotPositionPeer.ALIQUOT.getName()
+        + " as aliquots where c."
+        + ContainerPeer.ID.getName() + "=?";
+
     @SuppressWarnings("unchecked")
-    public Map<RowColPos, AliquotWrapper> getAliquots() {
+    public Map<RowColPos, AliquotWrapper> getAliquots() throws BiobankException {
         Map<RowColPos, AliquotWrapper> aliquots = (Map<RowColPos, AliquotWrapper>) propertiesMap
             .get("aliquots");
         if (aliquots == null) {
-            List<AliquotPositionWrapper> positions = getAliquotPositionCollection(false);
-
             aliquots = new TreeMap<RowColPos, AliquotWrapper>();
-            for (AliquotPositionWrapper position : positions) {
-                try {
-                    position.reload();
-                } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
+
+            HQLCriteria criteria = new HQLCriteria(GET_CONTAINER_ALIQUOTS_QRY,
+                Arrays.asList(new Object[] { getId() }));
+
+            List<Object> results;
+            try {
+                results = appService.query(criteria);
+
+                for (Object row : results) {
+                    Object[] items = (Object[]) row;
+                    AliquotWrapper aliquot = new AliquotWrapper(appService,
+                        (Aliquot) items[0]);
+                    AliquotPosition ap = (AliquotPosition) items[1];
+                    aliquots.put(new RowColPos(ap.getRow(), ap.getCol()),
+                        aliquot);
                 }
-                AliquotWrapper aliquot = position.getAliquot();
-                aliquots.put(
-                    new RowColPos(position.getRow(), position.getCol()),
-                    aliquot);
+                propertiesMap.put("aliquots", aliquots);
+            } catch (ApplicationException e) {
+                throw new BiobankException(e);
             }
-            propertiesMap.put("aliquots", aliquots);
         }
         return aliquots;
     }
@@ -470,7 +486,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public AliquotWrapper getAliquot(Integer row, Integer col)
-        throws BiobankCheckException {
+        throws BiobankException {
         AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
             appService);
         aliquotPosition.setRow(row);
@@ -558,29 +574,41 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return positions.size();
     }
 
+    private static final String GET_CHILD_CONTAINERS_QRY = "select childContainers, containerPositions from "
+        + Container.class.getName()
+        + " as c join c."
+        + ContainerPeer.CHILD_POSITION_COLLECTION.getName()
+        + " as containerPositions join containerPositions."
+        + ContainerPositionPeer.CONTAINER.getName()
+        + " as childContainers where c." + ContainerPeer.ID.getName() + "=?";
+
     @SuppressWarnings("unchecked")
-    public Map<RowColPos, ContainerWrapper> getChildren() {
+    public Map<RowColPos, ContainerWrapper> getChildren()
+        throws BiobankException {
         Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) propertiesMap
             .get("children");
         if (children == null) {
-            Collection<ContainerPositionWrapper> positions = getWrapperCollection(
-                ContainerPeer.CHILD_POSITION_COLLECTION,
-                ContainerPositionWrapper.class, false);
             children = new TreeMap<RowColPos, ContainerWrapper>();
 
-            for (ContainerPositionWrapper position : positions) {
-                ContainerWrapper child = position.getWrappedProperty(
-                    ContainerPositionPeer.CONTAINER, ContainerWrapper.class);
-                try {
-                    // try to reload - will start with a fresh ModelObject
-                    // not containing the whole object hierarchy it can hold
-                    // child.reload();
-                } catch (Exception e) {
+            HQLCriteria criteria = new HQLCriteria(GET_CHILD_CONTAINERS_QRY,
+                Arrays.asList(new Object[] { getId() }));
+
+            List<Object> results;
+            try {
+                results = appService.query(criteria);
+
+                for (Object row : results) {
+                    Object[] items = (Object[]) row;
+                    ContainerWrapper child = new ContainerWrapper(appService,
+                        (Container) items[0]);
+                    ContainerPosition cp = (ContainerPosition) items[1];
+                    children
+                        .put(new RowColPos(cp.getRow(), cp.getCol()), child);
                 }
-                children.put(
-                    new RowColPos(position.getRow(), position.getCol()), child);
+                propertiesMap.put("children", children);
+            } catch (ApplicationException e) {
+                throw new BiobankException(e);
             }
-            propertiesMap.put("children", children);
         }
         return children;
     }
@@ -591,11 +619,12 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return ((positions != null) && (positions.size() > 0));
     }
 
-    public ContainerWrapper getChild(Integer row, Integer col) {
+    public ContainerWrapper getChild(Integer row, Integer col)
+        throws BiobankException {
         return getChild(new RowColPos(row, col));
     }
 
-    public ContainerWrapper getChild(RowColPos rcp) {
+    public ContainerWrapper getChild(RowColPos rcp) throws BiobankException {
         Map<RowColPos, ContainerWrapper> children = getChildren();
         if (children == null) {
             return null;
@@ -651,7 +680,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public void addChild(Integer row, Integer col, ContainerWrapper child)
-        throws BiobankCheckException {
+        throws BiobankException {
         ContainerPositionWrapper tempPosition = new ContainerPositionWrapper(
             appService);
         tempPosition.setRow(row);
@@ -753,9 +782,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     /**
      * Get containers with a given label that can hold this type of container
      * (in this container site)
+     * 
+     * @throws BiobankException
      */
     public List<ContainerWrapper> getPossibleParents(String childLabel)
-        throws ApplicationException {
+        throws ApplicationException, BiobankException {
         return getPossibleParents(appService, childLabel, getSite(), this);
     }
 
@@ -774,10 +805,13 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * aliquot) with label 'childLabel'. If child is not null and is a
      * container, then will check that the parent can contain this type of
      * container
+     * 
+     * @throws BiobankException
      */
     public static List<ContainerWrapper> getPossibleParents(
         WritableApplicationService appService, String childLabel,
-        SiteWrapper site, ModelWrapper<?> child) throws ApplicationException {
+        SiteWrapper site, ModelWrapper<?> child) throws ApplicationException,
+        BiobankException {
         List<Integer> validLengths = ContainerLabelingSchemeWrapper
             .getPossibleLabelLength(appService);
         List<String> validParents = new ArrayList<String>();
@@ -814,8 +848,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                         filteredWrappers
                             .add(new ContainerWrapper(appService, c));
                 } catch (Exception e) {
-                    // do nothing. The positionString doesn't fit the current
-                    // container.
+                    throw new BiobankException(e);
                 }
             }
         }

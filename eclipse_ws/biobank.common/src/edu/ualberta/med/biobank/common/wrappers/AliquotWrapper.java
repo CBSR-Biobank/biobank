@@ -389,7 +389,7 @@ public class AliquotWrapper extends AliquotBaseWrapper {
     public static List<AliquotWrapper> getAliquotsInSiteWithPositionLabel(
         WritableApplicationService appService, SiteWrapper site,
         String positionString) throws ApplicationException,
-        BiobankCheckException {
+        BiobankCheckException, BiobankException {
         List<ContainerWrapper> possibleContainers = ContainerWrapper
             .getPossibleParents(appService, positionString, site, null);
         List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
