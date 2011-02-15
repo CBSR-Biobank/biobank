@@ -15,7 +15,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
-import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
@@ -444,9 +443,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         Map<RowColPos, AliquotWrapper> aliquots = (Map<RowColPos, AliquotWrapper>) propertiesMap
             .get("aliquots");
         if (aliquots == null) {
-            List<AliquotPositionWrapper> positions = getWrapperCollection(
-                ContainerPeer.ALIQUOT_POSITION_COLLECTION,
-                AliquotPositionWrapper.class, false);
+            List<AliquotPositionWrapper> positions = getAliquotPositionCollection(false);
 
             aliquots = new TreeMap<RowColPos, AliquotWrapper>();
             for (AliquotPositionWrapper position : positions) {
@@ -456,8 +453,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-                AliquotWrapper aliquot = position.getWrappedProperty(
-                    AliquotPositionPeer.ALIQUOT, AliquotWrapper.class);
+                AliquotWrapper aliquot = position.getAliquot();
                 aliquots.put(
                     new RowColPos(position.getRow(), position.getCol()),
                     aliquot);
