@@ -493,7 +493,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public AliquotWrapper getAliquot(Integer row, Integer col)
-        throws BiobankException, BiobankFailedQueryException {
+        throws BiobankException {
         AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
             appService);
         aliquotPosition.setRow(row);
