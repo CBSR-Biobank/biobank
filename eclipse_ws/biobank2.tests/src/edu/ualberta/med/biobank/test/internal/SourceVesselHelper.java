@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 
 public class SourceVesselHelper extends DbHelper {
@@ -14,6 +15,7 @@ public class SourceVesselHelper extends DbHelper {
     public static SourceVesselWrapper newSourceVessel(PatientWrapper patient,
         Date timeDrawn, Double volume) {
         SourceVesselWrapper source = new SourceVesselWrapper(appService);
+        source.setSourceVesselType(new SourceVesselTypeWrapper(appService));
         source.setPatient(patient);
         source.setTimeDrawn(timeDrawn);
         source.setVolume(volume);
@@ -21,7 +23,8 @@ public class SourceVesselHelper extends DbHelper {
     }
 
     public static SourceVesselWrapper addSourceVessel(PatientWrapper patient,
-        Date timeDrawn, Double volume, boolean addToCreatedList) throws Exception {
+        Date timeDrawn, Double volume, boolean addToCreatedList)
+        throws Exception {
         SourceVesselWrapper source = newSourceVessel(patient, timeDrawn, volume);
         source.persist();
         if (addToCreatedList) {

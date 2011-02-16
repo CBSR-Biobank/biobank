@@ -61,6 +61,8 @@ public class ClinicHelper extends DbHelper {
     }
 
     public static void deleteCreatedClinics() throws Exception {
+        for (ClinicWrapper c : createdClinics)
+            deleteCollectionEvents(c.getCollectionEventCollection(false));
         deleteClinics(createdClinics);
         createdClinics.clear();
     }

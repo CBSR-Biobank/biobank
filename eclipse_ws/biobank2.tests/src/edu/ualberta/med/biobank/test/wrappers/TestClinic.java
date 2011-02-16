@@ -300,11 +300,10 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testDeleteWithCollectionEvents() throws Exception {
         String name = "testDeleteWithCollectionEvents" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactHelper.addContact(clinic, name);
 
-        CollectionEventHelper.addCollectionEventWithRandomPatient(site, name);
+        CollectionEventHelper.addCollectionEventWithRandomPatient(clinic, name);
 
         clinic.reload();
         try {
@@ -357,8 +356,8 @@ public class TestClinic extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        CollectionEventHelper.addCollectionEvent(site, method, sv1);
-        CollectionEventHelper.addCollectionEvent(site, method, sv2);
+        CollectionEventHelper.addCollectionEvent(clinic, method, sv1);
+        CollectionEventHelper.addCollectionEvent(clinic, method, sv2);
 
         clinic.reload();
 
@@ -377,7 +376,6 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testGetCollectionEventCount() throws Exception {
         String name = "testGetCollectionEventCount" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
@@ -401,9 +399,9 @@ public class TestClinic extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, method, sv1);
+            .addCollectionEvent(clinic, method, sv1);
         CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, method, sv2);
+            .addCollectionEvent(clinic, method, sv2);
 
         Assert.assertEquals(2, clinic.getCollectionEventCount());
         Assert.assertEquals(2, clinic.getCollectionEventCount(true));
@@ -473,7 +471,6 @@ public class TestClinic extends TestDatabase {
     @Test
     public void testGetCollectionEventWithDate() throws Exception {
         String name = "testGetCollectionEventWithDate" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
@@ -494,10 +491,10 @@ public class TestClinic extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(site, method, sv1);
+            .addCollectionEvent(clinic, method, sv1);
         Date date1 = shipment1.getDateReceived();
         CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, method, sv2);
+            .addCollectionEvent(clinic, method, sv2);
         Date date2 = shipment2.getDateReceived();
 
         clinic.reload();
@@ -543,7 +540,7 @@ public class TestClinic extends TestDatabase {
             CollectionEventHelper.addCollectionEvent(
                 clinic,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel(patient,
+                SourceVesselHelper.addSourceVessel(patient,
                     Utils.getRandomDate(), 0.1));
             Assert.assertEquals(patientMap.get(clinic).size(),
                 clinic.getPatientCount(true));

@@ -70,9 +70,12 @@ public class SiteHelper extends DbHelper {
         deleteContainers(site.getContainerCollection(false));
         deleteFromList(site.getContainerTypeCollection(false));
         site.reload();
+        deleteCollectionEvents(site.getCollectionEventCollection(false));
+        site.reload();
         deleteDispatchs(site.getSrcDispatchCollection(false));
         deleteDispatchs(site.getDstDispatchCollection(false));
         site.reload();
+
         site.delete();
     }
 
