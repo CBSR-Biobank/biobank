@@ -21,8 +21,6 @@
   <property name="eclipse.proj.dir" location="eclipse_ws/biobank2" />
   <property name="eclipse.proj.dir.common"
             location="eclipse_ws/biobank.common" />
-  <property name="eclipse.proj.dir.importer"
-            location="eclipse_ws/biobank2.importer" />
   <property name="eclipse.proj.dir.tools"
             location="eclipse_ws/biobank2.tools" />
   <property name="eclipse.proj.dir.junit"
@@ -45,8 +43,6 @@
             value="gluegen.jar,jdom.jar,commons-beanutils-1.8.0.jar, commons-digester-1.7.jar, iText-2.1.0.jar, jasperreports-3.7.0.jar,DynamicJasper-3.0.14.jar,jdt-compiler-3.1.1.jar,mailapi.jar,smtp.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar" />
   <property name="biobank.common.jar.files"
             value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
-  <property name="biobank.importer.jar.files"
-            value="mysql-connector-java-5.1.15-bin.jar" />
   <property name="biobank.tools.jar.files"
             value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
   <property name="cacore.system.jar.files"
@@ -322,12 +318,6 @@
                       files="${biobank2.jar.files}" />
     </dependset>
     <dependset>
-      <srcfilelist dir="${req.jars.dir}"
-                   files="${biobank.importer.jar.files}" />
-      <targetfilelist dir="${eclipse.proj.dir.importer}/lib"
-                      files="${biobank.importer.jar.files}" />
-    </dependset>
-    <dependset>
       <srcfilelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
       <targetfilelist dir="${eclipse.proj.dir.tools}/lib"
                       files="${biobank.tools.jar.files}" />
@@ -337,15 +327,11 @@
                    files="sdk-writable-client-framework.jar" />
       <targetfilelist dir="${eclipse.proj.dir.common}/lib"
                       files="sdk-writable-client-framework.jar" />
-      <targetfilelist dir="${eclipse.proj.dir.importer}/lib"
-                      files="sdk-writable-client-framework.jar" />
     </dependset>
     <dependset>
       <srcfilelist dir="${cacore.sdk.dir}/system/security/dist"
                    files="sdk-security.jar" />
       <targetfilelist dir="${eclipse.proj.dir.common}/lib"
-                      files="sdk-security.jar" />
-      <targetfilelist dir="${eclipse.proj.dir.importer}/lib"
                       files="sdk-security.jar" />
     </dependset>
     <dependset>
@@ -375,11 +361,6 @@
     </copy>
     <copy todir="${eclipse.proj.dir}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
-    </copy>
-    <copy todir="${eclipse.proj.dir.importer}/lib">
-      <filelist dir="${req.jars.dir}" files="${biobank.importer.jar.files}" />
-      <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
-      <fileset file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
     </copy>
     <copy todir="${eclipse.proj.dir.tools}/lib">
       <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
@@ -837,7 +818,6 @@
     <delete>
       <fileset dir="${eclipse.proj.dir}/lib" includes="**/*.jar" />
       <fileset dir="${eclipse.proj.dir.common}/lib" includes="**/*.jar" />
-      <fileset dir="${eclipse.proj.dir.importer}/lib" includes="**/*.jar" />
     </delete>
   </target>
 

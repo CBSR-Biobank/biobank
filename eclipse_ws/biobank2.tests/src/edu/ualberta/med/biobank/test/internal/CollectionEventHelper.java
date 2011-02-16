@@ -32,8 +32,16 @@ public class CollectionEventHelper extends DbHelper {
 
         shipment.setDeparted(Utils.getRandomDate());
 
-        if (svs != null) {
+        if ((svs != null) && (svs.length != 0)) {
             shipment.addToSourceVesselCollection(Arrays.asList(svs));
+        } else {
+            StudyWrapper study = StudyHelper
+                .addStudy(Utils.getRandomString(11));
+            PatientWrapper patient = PatientHelper.addPatient(
+                Utils.getRandomNumericString(11), study);
+            SourceVesselWrapper sv = SourceVesselHelper.addSourceVessel(
+                patient, new Date(), r.nextDouble());
+            shipment.addToSourceVesselCollection(Arrays.asList(sv));
         }
 
         return shipment;
