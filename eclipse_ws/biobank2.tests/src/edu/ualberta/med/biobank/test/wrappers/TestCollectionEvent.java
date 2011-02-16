@@ -40,6 +40,7 @@ public class TestCollectionEvent extends TestDatabase {
 
         CollectionEventWrapper shipment = CollectionEventHelper
             .addCollectionEventWithRandomPatient(site, name);
+
         testGettersAndSetters(shipment);
     }
 

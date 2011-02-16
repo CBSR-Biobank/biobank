@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="conf"/>
-	<classpathentry kind="lib" path="/home/jferland/proj/cbsr/biobank2/jars/mysql-connector-java-5.1.15-bin.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/acegi-security-1.0.4.jar"/>
@@ -34,5 +33,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/server/csmapi-4.1.jar" sourcepath="/home/delphine/projects/sources/CaCore/CSM/CSM_API_4_1_Source/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-writable-core.jar"/>
+	<classpathentry kind="lib" path="lib/client/mysql-connector-java-5.1.15-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
