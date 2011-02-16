@@ -46,9 +46,9 @@
   <property name="biobank.common.jar.files"
             value="xpp3-1.1.3.4.C.jar, commons-lang-2.4.jar,xstream-1.3.1.jar" />
   <property name="biobank.importer.jar.files"
-            value="mysql-connector-java-5.1.7-bin.jar" />
+            value="mysql-connector-java-5.1.15-bin.jar" />
   <property name="biobank.tools.jar.files"
-            value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.7-bin.jar" />
+            value="commons-io-1.4.jar, jargs.jar,spiffy-all-0.05.jar,SuperCSV-1.52.jar,mysql-connector-java-5.1.15-bin.jar" />
   <property name="cacore.system.jar.files"
             value="commons-collections-3.2.jar,commons-logging-1.1.jar,hibernate-validator.jar" />
   <property name="converage.output" location="coverage" />
@@ -240,8 +240,8 @@
           tofile="${cacore.sdk.dir}/conf/system/package/remote-client/conf/application-config-client-info.xml" />
     <copy file="sdk_conf/application-config-security.xml"
           tofile="${cacore.sdk.dir}/conf/system/web/WEB-INF/classes/application-config-security.xml" />
-    <copy file="${req.jars.dir}/mysql-connector-java-5.1.7-bin.jar"
-          tofile="${cacore.sdk.dir}/system/lib/mysql-connector-java-5.1.7-bin.jar" />
+    <copy file="${req.jars.dir}/mysql-connector-java-5.1.15-bin.jar"
+          tofile="${cacore.sdk.dir}/system/lib/mysql-connector-java-5.1.15-bin.jar" />
     <delete file="${cacore.sdk.dir}/system/lib/mysql-connector-java-3.1.13-bin.jar" />
     <ant dir="${cacore.sdk.dir}" target="build-system" inheritRefs="false" />
   </target>
@@ -360,7 +360,7 @@
       <filelist dir="${cacore.sdk.dir}/system/lib"
                 files="${cacore.system.jar.files}" />
       <filelist dir="${req.jars.dir}" files="${biobank.common.jar.files}" />
-      <fileset file="${req.jars.dir}/mysql-connector-java-5.1.7-bin.jar" />
+      <fileset file="${req.jars.dir}/mysql-connector-java-5.1.15-bin.jar" />
       <fileset file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-client-framework.jar" />
     </copy>
