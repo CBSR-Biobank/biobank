@@ -24,7 +24,6 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -38,7 +37,6 @@ import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestActivityStatus extends TestDatabase {
@@ -107,13 +105,14 @@ public class TestActivityStatus extends TestDatabase {
         study.persist();
         study.reload();
 
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
-            Utils.getRandomDate(), 0.1);
-
-        CollectionEventWrapper shipment = CollectionEventHelper
+        CollectionEventWrapper cevent = CollectionEventHelper
             .addCollectionEvent(site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0), sv);
+                ShippingMethodWrapper.getShippingMethods(appService).get(0));
+
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        // SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(shipment,
+        // patient, Utils.getRandomDate(), 0.1);
+
         ProcessingEventWrapper visit = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
@@ -132,7 +131,7 @@ public class TestActivityStatus extends TestDatabase {
         // , clinic, study, site
         testDeleteFail(clinic,
             name + ClassUtils.getClassName(clinic.getClass()),
-            new ModelWrapper<?>[] { visit, shipment, patient, study, contact });
+            new ModelWrapper<?>[] { visit, cevent, patient, study, contact });
     }
 
     private void testDeleteFail(ModelWrapper<?> wrapper, String asName,

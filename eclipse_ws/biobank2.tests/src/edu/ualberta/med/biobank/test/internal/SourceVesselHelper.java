@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -24,24 +23,6 @@ public class SourceVesselHelper extends DbHelper {
         source.setTimeDrawn(timeDrawn);
         source.setVolume(volume);
         return source;
-    }
-
-    public static SourceVesselWrapper addSourceVessel(
-        CollectionEventWrapper ce, PatientWrapper patient, Date timeDrawn,
-        Double volume, boolean addToCreatedList) throws Exception {
-        SourceVesselWrapper source = newSourceVessel(patient, timeDrawn, volume);
-        source.setCollectionEvent(ce);
-        source.persist();
-        if (addToCreatedList) {
-            createdSourceVessels.add(source);
-        }
-        return source;
-    }
-
-    public static SourceVesselWrapper addSourceVessel(
-        CollectionEventWrapper ce, PatientWrapper patient, Date timeDrawn,
-        Double volume) throws Exception {
-        return addSourceVessel(ce, patient, timeDrawn, volume, true);
     }
 
     public static void deleteCreatedSourceVessels() throws Exception {

@@ -416,7 +416,6 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testGetSetQuantityFromType() throws Exception {
-        aliquot.reload();
         Double quantity = aliquot.getQuantity();
         aliquot.setQuantityFromType();
         // no sample storages defined yet, should be null

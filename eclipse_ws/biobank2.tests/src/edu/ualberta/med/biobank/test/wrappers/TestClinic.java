@@ -334,7 +334,7 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testAddCollectionEvents() throws Exception {
+    public void testAddCollectionEvetnts() throws Exception {
         String name = "testAddCollectionEvents" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
@@ -361,12 +361,12 @@ public class TestClinic extends TestDatabase {
 
         clinic.reload();
 
-        CollectionEventWrapper shipment = CollectionEventHelper
+        CollectionEventWrapper cevent = CollectionEventHelper
             .addCollectionEvent(site, method);
         CollectionEventWrapper shipment2 = CollectionEventHelper
             .addCollectionEvent(site, method);
         clinic.addToCollectionEventCollection(Arrays
-            .asList(shipment, shipment2));
+            .asList(cevent, shipment2));
         clinic.persist();
         clinic.reload();
         Assert.assertEquals(4, clinic.getCollectionEventCollection(false)

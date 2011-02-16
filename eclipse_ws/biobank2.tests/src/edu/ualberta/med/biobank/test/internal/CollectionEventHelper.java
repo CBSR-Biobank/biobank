@@ -6,7 +6,6 @@ import java.util.Date;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -18,36 +17,28 @@ public class CollectionEventHelper extends DbHelper {
     public static CollectionEventWrapper newCollectionEvent(
         CenterWrapper<?> site, ShippingMethodWrapper method, String waybill,
         Date dateReceived, SourceVesselWrapper... svs) throws Exception {
-        CollectionEventWrapper shipment = new CollectionEventWrapper(appService);
+        CollectionEventWrapper cevent = new CollectionEventWrapper(appService);
         if (site != null) {
-            shipment.setSourceCenter(site);
-            site.addToCollectionEventCollection(Arrays.asList(shipment));
+            cevent.setSourceCenter(site);
+            site.addToCollectionEventCollection(Arrays.asList(cevent));
         }
-        shipment.setActivityStatus(ActivityStatusWrapper
+        cevent.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
-        shipment.setShippingMethod(method);
-        shipment.setWaybill(waybill);
+        cevent.setShippingMethod(method);
+        cevent.setWaybill(waybill);
         if (dateReceived != null) {
-            shipment.setDateReceived(dateReceived);
+            cevent.setDateReceived(dateReceived);
         }
 
-        shipment.setDeparted(Utils.getRandomDate());
+        cevent.setDeparted(Utils.getRandomDate());
 
         if ((svs != null) && (svs.length != 0)) {
-            shipment.addToSourceVesselCollection(Arrays.asList(svs));
+            cevent.addToSourceVesselCollection(Arrays.asList(svs));
             for (SourceVesselWrapper sv : svs)
-                sv.setCollectionEvent(shipment);
-        } else {
-            StudyWrapper study = StudyHelper
-                .addStudy(Utils.getRandomString(11));
-            PatientWrapper patient = PatientHelper.addPatient(
-                Utils.getRandomNumericString(11), study);
-            SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(
-                patient, new Date(), r.nextDouble());
-            svs = new SourceVesselWrapper[] { sv };
-            shipment.addToSourceVesselCollection(Arrays.asList(svs));
+                sv.setCollectionEvent(cevent);
         }
-        return shipment;
+
+        return cevent;
     }
 
     public static CollectionEventWrapper newCollectionEvent(
@@ -66,10 +57,10 @@ public class CollectionEventHelper extends DbHelper {
     public static CollectionEventWrapper addCollectionEvent(
         CenterWrapper<?> site, ShippingMethodWrapper method, String waybill,
         SourceVesselWrapper... svs) throws Exception {
-        CollectionEventWrapper shipment = newCollectionEvent(site, method,
+        CollectionEventWrapper cevent = newCollectionEvent(site, method,
             waybill, Utils.getRandomDate(), svs);
-        shipment.persist();
-        return shipment;
+        cevent.persist();
+        return cevent;
     }
 
     public static CollectionEventWrapper addCollectionEventWithRandomPatient(
