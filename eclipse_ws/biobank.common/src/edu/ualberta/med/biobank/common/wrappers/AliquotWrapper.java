@@ -285,22 +285,22 @@ public class AliquotWrapper extends AliquotBaseWrapper {
     }
 
     public void setQuantityFromType() {
-        if (getSampleType() != null) {
-            ProcessingEventWrapper processingEvent = (ProcessingEventWrapper) propertiesMap
-                .get("processingEvent");
-            StudyWrapper study = processingEvent.getPatient().getStudy();
-            Double volume = null;
-            Collection<SampleStorageWrapper> sampleStorageCollection = study
-                .getSampleStorageCollection(false);
-            if (sampleStorageCollection != null) {
-                for (SampleStorageWrapper ss : sampleStorageCollection) {
-                    if (getSampleType().equals(getSampleType())) {
-                        volume = ss.getVolume();
-                    }
+        if (getSampleType() == null)
+            return;
+
+        ProcessingEventWrapper processingEvent = getProcessingEvent();
+        StudyWrapper study = processingEvent.getPatient().getStudy();
+        Double volume = null;
+        Collection<SampleStorageWrapper> sampleStorageCollection = study
+            .getSampleStorageCollection(false);
+        if (sampleStorageCollection != null) {
+            for (SampleStorageWrapper ss : sampleStorageCollection) {
+                if (getSampleType().equals(getSampleType())) {
+                    volume = ss.getVolume();
                 }
             }
-            setQuantity(volume);
         }
+        setQuantity(volume);
     }
 
     @Override
