@@ -363,9 +363,9 @@ public class TestClinic extends TestDatabase {
         clinic.reload();
 
         CollectionEventWrapper shipment = CollectionEventHelper
-            .newCollectionEvent(site, method);
+            .addCollectionEvent(site, method);
         CollectionEventWrapper shipment2 = CollectionEventHelper
-            .newCollectionEvent(site, method);
+            .addCollectionEvent(site, method);
         clinic.addToCollectionEventCollection(Arrays
             .asList(shipment, shipment2));
         clinic.persist();

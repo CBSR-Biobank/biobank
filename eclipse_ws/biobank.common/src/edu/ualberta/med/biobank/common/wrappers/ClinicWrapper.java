@@ -183,7 +183,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
 
     @Override
     protected void resetInternalFields() {
-        setAddress(null);
         deletedContacts.clear();
     }
 }
