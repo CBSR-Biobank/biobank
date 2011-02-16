@@ -35,19 +35,18 @@ public class CollectionEventHelper extends DbHelper {
 
         if ((svs != null) && (svs.length != 0)) {
             shipment.addToSourceVesselCollection(Arrays.asList(svs));
+            for (SourceVesselWrapper sv : svs)
+                sv.setCollectionEvent(shipment);
         } else {
             StudyWrapper study = StudyHelper
                 .addStudy(Utils.getRandomString(11));
             PatientWrapper patient = PatientHelper.addPatient(
                 Utils.getRandomNumericString(11), study);
-            SourceVesselWrapper sv = SourceVesselHelper.addSourceVessel(
+            SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(
                 patient, new Date(), r.nextDouble());
-            shipment.addToSourceVesselCollection(Arrays.asList(sv));
+            svs = new SourceVesselWrapper[] { sv };
+            shipment.addToSourceVesselCollection(Arrays.asList(svs));
         }
-
-        for (SourceVesselWrapper sv : svs)
-            sv.setCollectionEvent(shipment);
-
         return shipment;
     }
 
@@ -78,12 +77,8 @@ public class CollectionEventHelper extends DbHelper {
         StudyWrapper study = StudyHelper.addStudy(name);
         study.persist();
 
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-
         return addCollectionEvent(site, ShippingMethodWrapper
-            .getShippingMethods(appService).get(0), "wb-54",
-            SourceVesselHelper.newSourceVessel(patient, Utils.getRandomDate(),
-                0.1));
+            .getShippingMethods(appService).get(0), "wb-54");
 
     }
 }

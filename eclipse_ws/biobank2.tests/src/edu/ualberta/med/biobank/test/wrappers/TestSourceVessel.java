@@ -28,14 +28,14 @@ public class TestSourceVessel extends TestDatabase {
         super.setUp();
         p1 = PatientHelper.newPatient("444");
         ssw = SourceVesselHelper
-            .addSourceVessel(p1, Utils.getRandomDate(), 0.1);
+            .newSourceVessel(p1, Utils.getRandomDate(), 0.1);
         defaultSite = SiteHelper.addSite("Default");
     }
 
     @Test
     public void testCompareTo() throws Exception {
         SourceVesselWrapper newSourceVessel = SourceVesselHelper
-            .addSourceVessel(p1, Utils.getRandomDate(), 0.1);
+            .newSourceVessel(p1, Utils.getRandomDate(), 0.1);
         Assert.assertTrue(newSourceVessel.compareTo(ssw) > 0);
         Assert.assertTrue(ssw.compareTo(newSourceVessel) < 0);
         Assert.assertTrue(newSourceVessel.compareTo(ssw) == 0);
