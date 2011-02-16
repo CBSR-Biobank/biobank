@@ -540,7 +540,7 @@ public class TestClinic extends TestDatabase {
             CollectionEventHelper.addCollectionEvent(
                 clinic,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.addSourceVessel(patient,
+                SourceVesselHelper.newSourceVessel(patient,
                     Utils.getRandomDate(), 0.1));
             Assert.assertEquals(patientMap.get(clinic).size(),
                 clinic.getPatientCount(true));

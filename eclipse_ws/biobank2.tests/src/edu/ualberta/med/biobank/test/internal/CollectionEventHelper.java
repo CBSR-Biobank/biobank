@@ -21,6 +21,7 @@ public class CollectionEventHelper extends DbHelper {
         CollectionEventWrapper shipment = new CollectionEventWrapper(appService);
         if (site != null) {
             shipment.setSourceCenter(site);
+            site.addToCollectionEventCollection(Arrays.asList(shipment));
         }
         shipment.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
@@ -35,6 +36,9 @@ public class CollectionEventHelper extends DbHelper {
         if (svs != null) {
             shipment.addToSourceVesselCollection(Arrays.asList(svs));
         }
+
+        for (SourceVesselWrapper sv : svs)
+            sv.setCollectionEvent(shipment);
 
         return shipment;
     }
