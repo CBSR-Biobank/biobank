@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.test.internal;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -63,6 +64,17 @@ public class DbHelper {
             return;
 
         for (DispatchWrapper shipment : shipments) {
+            shipment.delete();
+        }
+    }
+
+    public static void deleteCollectionEvents(
+        Collection<CollectionEventWrapper> shipments) throws Exception {
+        Assert.assertNotNull("appService is null", appService);
+        if ((shipments == null) || (shipments.size() == 0))
+            return;
+
+        for (CollectionEventWrapper shipment : shipments) {
             shipment.delete();
         }
     }

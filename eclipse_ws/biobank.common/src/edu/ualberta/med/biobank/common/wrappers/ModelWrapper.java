@@ -250,6 +250,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             T tmp = (T) getter.invoke(model);
             value = tmp;
         } catch (Exception e) {
+            e.printStackTrace();
             throw new RuntimeException(e.getMessage());
         }
 
