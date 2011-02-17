@@ -38,8 +38,14 @@ public class TestCollectionEvent extends TestDatabase {
         String name = "testGettersAndSetters" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
+        StudyWrapper study = StudyHelper.addStudy(name);
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
+            Utils.getRandomDate(), 0.1);
+
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEventWithRandomPatient(site, name);
+            .addCollectionEvent(site,
+                ShippingMethodWrapper.getShippingMethods(appService).get(0), sv);
 
         testGettersAndSetters(cevent);
     }
@@ -50,8 +56,15 @@ public class TestCollectionEvent extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         ShippingMethodWrapper company = ShippingMethodHelper
             .addShippingMethod(name);
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
+            Utils.getRandomDate(), 0.1);
+
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEventWithRandomPatient(site, name);
+            .addCollectionEvent(site,
+                ShippingMethodWrapper.getShippingMethods(appService).get(0), sv);
 
         cevent.setShippingMethod(company);
         cevent.persist();

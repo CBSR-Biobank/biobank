@@ -35,8 +35,9 @@ public class CollectionEventHelper extends DbHelper {
 
         if ((svs != null) && (svs.length != 0)) {
             cevent.addToSourceVesselCollection(Arrays.asList(svs));
-            for (SourceVesselWrapper sv : svs)
+            for (SourceVesselWrapper sv : svs) {
                 sv.setCollectionEvent(cevent);
+            }
         }
         return cevent;
     }

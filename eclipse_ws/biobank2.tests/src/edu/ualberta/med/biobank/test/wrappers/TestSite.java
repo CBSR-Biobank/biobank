@@ -21,6 +21,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -559,7 +560,46 @@ public class TestSite extends TestDatabase {
         Assert.assertTrue(site.compareTo(site) == 0);
     }
 
-    private List<CollectionEventWrapper> createShipments(SiteWrapper site)
+    @Test
+    public void testAddCollectiotnEvents() throws Exception {
+        String name = "testAddCollectionEvents" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+        study.persist();
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
+
+        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
+        study2.persist();
+        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
+
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+
+        List<SourceVesselWrapper> svs = new ArrayList<SourceVesselWrapper>();
+        for (PatientWrapper patient : new PatientWrapper[] { patient1, patient2 }) {
+            svs.add(SourceVesselHelper.newSourceVessel(patient,
+                Utils.getRandomDate(), 0.1));
+            svs.add(SourceVesselHelper.newSourceVessel(patient,
+                Utils.getRandomDate(), 0.1));
+        }
+
+        CollectionEventHelper.addCollectionEvent(site, method, svs.get(0),
+            svs.get(1));
+
+        // make sure site has 2 collection events
+        site.reload();
+        Assert.assertEquals(1, site.getCollectionEventCollection(false).size());
+
+        CollectionEventHelper.addCollectionEvent(site, method, svs.get(2));
+        CollectionEventHelper.addCollectionEvent(site, method, svs.get(3));
+
+        // make sure site has 2 more collection events
+        site.reload();
+        Assert.assertEquals(3, site.getCollectionEventCollection(false).size());
+    }
+
+    private List<CollectionEventWrapper> createCollectionEvents(SiteWrapper site)
         throws Exception {
         String name = site.getName();
 
@@ -578,10 +618,10 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetShipmentCollectionSorted() throws Exception {
+    public void testGetCollectionEventCollectionSorted() throws Exception {
         String name = "testGetShipmentCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        List<CollectionEventWrapper> shipments = createShipments(site);
+        List<CollectionEventWrapper> shipments = createCollectionEvents(site);
 
         List<CollectionEventWrapper> savedShipments = site
             .getCollectionEventCollection(true);
@@ -596,10 +636,10 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetShipmentCollection() throws Exception {
+    public void testGetCollectionEventCollection() throws Exception {
         String name = "testGetProcessingEventCountForClinic" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
-        List<CollectionEventWrapper> shipments = createShipments(site);
+        List<CollectionEventWrapper> shipments = createCollectionEvents(site);
 
         List<CollectionEventWrapper> savedShipments = site
             .getCollectionEventCollection(false);
