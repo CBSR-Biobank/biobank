@@ -164,6 +164,18 @@ public class PatientWrapper extends PatientBaseWrapper {
         return total;
     }
 
+    public boolean canBeAddedToCollectionEvent(CollectionEventWrapper cevent)
+        throws ApplicationException, BiobankException {
+        CenterWrapper<?> center = cevent.getSourceCenter();
+        if (center != null) {
+            if (center instanceof ClinicWrapper) {
+                return getStudy().isLinkedToClinic((ClinicWrapper) center);
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public int compareTo(ModelWrapper<Patient> wrapper) {
         if (wrapper instanceof PatientWrapper) {

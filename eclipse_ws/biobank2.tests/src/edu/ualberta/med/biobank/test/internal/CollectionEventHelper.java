@@ -15,8 +15,8 @@ import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class CollectionEventHelper extends DbHelper {
 
-    public static <W extends CenterWrapper<?>> CollectionEventWrapper newCollectionEvent(
-        W center, ShippingMethodWrapper method, String waybill,
+    public static CollectionEventWrapper newCollectionEvent(
+        CenterWrapper<?> center, ShippingMethodWrapper method, String waybill,
         Date dateReceived, SourceVesselWrapper... svs) throws Exception {
         CollectionEventWrapper cevent = new CollectionEventWrapper(appService);
         if (center != null) {
@@ -39,25 +39,24 @@ public class CollectionEventHelper extends DbHelper {
                 sv.setCollectionEvent(cevent);
             }
         }
-
         return cevent;
     }
 
-    public static <W extends CenterWrapper<?>> CollectionEventWrapper newCollectionEvent(
-        W center, ShippingMethodWrapper method) throws Exception {
+    public static CollectionEventWrapper newCollectionEvent(
+        CenterWrapper<?> center, ShippingMethodWrapper method) throws Exception {
         return newCollectionEvent(center, method, TestCommon.getNewWaybill(r),
             Utils.getRandomDate());
     }
 
-    public static <W extends CenterWrapper<?>> CollectionEventWrapper addCollectionEvent(
-        W center, ShippingMethodWrapper method, SourceVesselWrapper... svs)
-        throws Exception {
+    public static CollectionEventWrapper addCollectionEvent(
+        CenterWrapper<?> center, ShippingMethodWrapper method,
+        SourceVesselWrapper... svs) throws Exception {
         return addCollectionEvent(center, method, TestCommon.getNewWaybill(r),
             svs);
     }
 
-    public static <W extends CenterWrapper<?>> CollectionEventWrapper addCollectionEvent(
-        W center, ShippingMethodWrapper method, String waybill,
+    public static CollectionEventWrapper addCollectionEvent(
+        CenterWrapper<?> center, ShippingMethodWrapper method, String waybill,
         SourceVesselWrapper... svs) throws Exception {
         CollectionEventWrapper cevent = newCollectionEvent(center, method,
             waybill, Utils.getRandomDate(), svs);
@@ -66,7 +65,7 @@ public class CollectionEventHelper extends DbHelper {
     }
 
     public static CollectionEventWrapper addCollectionEventWithRandomPatient(
-        CenterWrapper<?> site, String name) throws Exception {
+        CenterWrapper<?> center, String name) throws Exception {
         StudyWrapper study = StudyHelper.addStudy(name);
         study.persist();
 
@@ -74,8 +73,8 @@ public class CollectionEventHelper extends DbHelper {
         SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
             Utils.getRandomDate(), 0.1);
 
-        return addCollectionEvent(site, ShippingMethodWrapper
-            .getShippingMethods(appService).get(0), sv);
+        return addCollectionEvent(center, ShippingMethodWrapper
+            .getShippingMethods(appService).get(0), "wb-54", sv);
 
     }
 }

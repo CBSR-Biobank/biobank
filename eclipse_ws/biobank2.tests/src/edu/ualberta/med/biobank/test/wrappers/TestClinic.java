@@ -190,7 +190,7 @@ public class TestClinic extends TestDatabase {
 
         clinic.setCity("Vesoul");
         clinic.persist();
-        ClinicHelper.createdClinics.add(clinic);
+        clinic.delete();
         int newTotal = ClinicWrapper.getAllClinics(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
@@ -212,7 +212,7 @@ public class TestClinic extends TestDatabase {
         clinic.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
         clinic.persist();
-        ClinicHelper.createdClinics.add(clinic);
+        clinic.delete();
     }
 
     @Test
@@ -232,9 +232,9 @@ public class TestClinic extends TestDatabase {
         }
         clinic.setName(name + "_otherName");
         clinic.persist();
-        ClinicHelper.createdClinics.add(clinic);
         int newTotal = ClinicWrapper.getAllClinics(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
+        clinic.delete();
     }
 
     @Test
@@ -357,28 +357,19 @@ public class TestClinic extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
 
-        List<SourceVesselWrapper> svs = new ArrayList<SourceVesselWrapper>();
-        for (PatientWrapper patient : new PatientWrapper[] { patient1, patient2 }) {
-            svs.add(SourceVesselHelper.newSourceVessel(patient,
-                Utils.getRandomDate(), 0.1));
-            svs.add(SourceVesselHelper.newSourceVessel(patient,
-                Utils.getRandomDate(), 0.1));
-        }
+        CollectionEventHelper.addCollectionEvent(clinic, method, sv1);
+        CollectionEventHelper.addCollectionEvent(clinic, method, sv2);
 
-        CollectionEventHelper.addCollectionEvent(clinic, method, svs.get(0),
-            svs.get(1));
-
-        // make sure clinic has 2 collection events
         clinic.reload();
-        Assert.assertEquals(1, clinic.getCollectionEventCollection(false)
-            .size());
 
-        CollectionEventHelper.addCollectionEvent(clinic, method, svs.get(2));
-        CollectionEventHelper.addCollectionEvent(clinic, method, svs.get(3));
-
-        // make sure clinic has 2 more collection events
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(site, method);
+        CollectionEventWrapper shipment2 = CollectionEventHelper
+            .addCollectionEvent(site, method);
+        clinic.addToCollectionEventCollection(Arrays.asList(cevent, shipment2));
+        clinic.persist();
         clinic.reload();
-        Assert.assertEquals(3, clinic.getCollectionEventCollection(false)
+        Assert.assertEquals(4, clinic.getCollectionEventCollection(false)
             .size());
     }
 

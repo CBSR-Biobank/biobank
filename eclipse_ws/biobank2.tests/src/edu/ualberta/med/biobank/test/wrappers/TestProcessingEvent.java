@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -27,16 +28,19 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -102,8 +106,8 @@ public class TestProcessingEvent extends TestDatabase {
 
         topType = ContainerTypeHelper.newContainerType(site,
             "Top Container Type", "TCT", 2, 3, 10, true);
-        topType.addToChildContainerTypeCollection(Arrays.asList(containerTypeMap
-            .get("ChildCtL1")));
+        topType.addToChildContainerTypeCollection(Arrays
+            .asList(containerTypeMap.get("ChildCtL1")));
         topType.persist();
         containerTypeMap.put("TopCT", topType);
 
@@ -222,6 +226,55 @@ public class TestProcessingEvent extends TestDatabase {
         aliquot.delete();
         visit.reload();
         visit.delete();
+    }
+
+    @Test
+    public void testDeleteNoMoreVisits() throws Exception {
+        String name = "testDeleteNoMoreVisits" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        StudyWrapper study = StudyHelper.addStudy(name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
+        study.addToContactCollection(Arrays.asList(contact));
+        study.persist();
+        ShippingMethodWrapper method = ShippingMethodWrapper
+            .getShippingMethods(appService).get(0);
+        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
+        CollectionEventHelper.addCollectionEvent(site, method,
+            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                0.1));
+        CollectionEventWrapper ceventTest = CollectionEventHelper
+            .addCollectionEvent(
+                site,
+                method,
+                SourceVesselHelper.newSourceVessel(patient1,
+                    Utils.getRandomDate(), 0.1));
+        CollectionEventHelper.addCollectionEvent(site, method,
+            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
+                0.1));
+
+        ProcessingEventHelper.addProcessingEvent(site, patient1,
+            Utils.getRandomDate(), Utils.getRandomDate());
+        ceventTest.reload();
+
+        try {
+            ceventTest.delete();
+            Assert.fail("one visit still there");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
+
+        CollectionEventHelper.addCollectionEvent(site, ShippingMethodWrapper
+            .getShippingMethods(appService).get(0), SourceVesselHelper
+            .newSourceVessel(patient1, Utils.getRandomDate(), 0.1));
+
+        int countBefore = appService.search(CollectionEvent.class,
+            new CollectionEvent()).size();
+        ceventTest.reload();
+        ceventTest.delete();
+        int countAfter = appService.search(CollectionEvent.class,
+            new CollectionEvent()).size();
+        Assert.assertEquals(countBefore - 1, countAfter);
     }
 
     @Test
