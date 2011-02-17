@@ -72,4 +72,17 @@ public class SourceVesselWrapper extends SourceVesselBaseWrapper {
             }
         }
     }
+
+    @Override
+    protected void deleteChecks() throws BiobankException, ApplicationException {
+        checkProcessingEvent();
+    }
+
+    private void checkProcessingEvent() throws BiobankCheckException {
+        ProcessingEventWrapper pevent = getProcessingEvent();
+        if (pevent != null) {
+            throw new BiobankCheckException(
+                "Source vessel has a processing event. cannot be deleted.");
+        }
+    }
 }

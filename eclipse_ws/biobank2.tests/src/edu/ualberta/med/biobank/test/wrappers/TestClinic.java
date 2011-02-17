@@ -384,6 +384,15 @@ public class TestClinic extends TestDatabase {
         clinic.removeFromCollectionEventCollectionWithCheck(ces);
         Assert.assertEquals(2, clinic.getCollectionEventCollection(false)
             .size());
+        clinic.persist();
+
+        for (CollectionEventWrapper ce : ces) {
+            DbHelper.deleteFromList(ce.getSourceVesselCollection(false));
+            ce.delete();
+        }
+        clinic.reload();
+        Assert.assertEquals(2, clinic.getCollectionEventCollection(false)
+            .size());
     }
 
     @Test
@@ -411,17 +420,22 @@ public class TestClinic extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(clinic, method, sv1);
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(clinic, method, sv2);
+        CollectionEventWrapper ce1 = CollectionEventHelper.addCollectionEvent(
+            clinic, method, sv1);
+        CollectionEventWrapper ce2 = CollectionEventHelper.addCollectionEvent(
+            clinic, method, sv2);
 
         Assert.assertEquals(2, clinic.getCollectionEventCount());
         Assert.assertEquals(2, clinic.getCollectionEventCount(true));
 
         clinic.reload();
-        shipment1.delete();
-        shipment2.delete();
+
+        DbHelper.deleteFromList(ce1.getSourceVesselCollection(false));
+        ce1.delete();
+
+        DbHelper.deleteFromList(ce2.getSourceVesselCollection(false));
+        ce2.delete();
+
         clinic.reload();
 
         Assert.assertEquals(0, clinic.getCollectionEventCount());
@@ -476,10 +490,10 @@ public class TestClinic extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(clinic, method, sv1);
+            .addCollectionEventNoWaybill(clinic, method, sv1);
         Date date1 = shipment1.getDateReceived();
         CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(clinic, method, sv2);
+            .addCollectionEventNoWaybill(clinic, method, sv2);
         Date date2 = shipment2.getDateReceived();
 
         clinic.reload();
@@ -522,7 +536,7 @@ public class TestClinic extends TestDatabase {
             patient = PatientHelper.addPatient(name + "_p" + i, study);
             ClinicWrapper clinic = clinics.get(i & 1);
             patientMap.get(clinic).add(patient);
-            CollectionEventHelper.addCollectionEvent(
+            CollectionEventHelper.addCollectionEventNoWaybill(
                 clinic,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
                 SourceVesselHelper.newSourceVessel(patient,
