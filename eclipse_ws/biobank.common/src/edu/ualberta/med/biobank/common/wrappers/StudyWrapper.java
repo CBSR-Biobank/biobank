@@ -420,7 +420,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     private static final String PATIENT_COUNT_FOR_SITE_QRY = "select count(distinct patients) from "
         + Site.class.getName()
         + " as site join site."
-        + CenterPeer.PROCESSING_EVENT_COLLECTION
+        + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pvs join pvs.patient as patients where site."
         + SitePeer.ID.getName()
         + "=? and "
@@ -441,17 +441,18 @@ public class StudyWrapper extends StudyBaseWrapper {
     private static final String VISIT_COUNT_FOR_SITE_QRY = "select count(distinct visits) from "
         + Site.class.getName()
         + " as site join site."
-        + CenterPeer.PROCESSING_EVENT_COLLECTION
+        + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as visits join visits."
-        + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION
+        + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION.getName()
         + " as svs join svs."
-        + SourceVesselPeer.PATIENT
+        + SourceVesselPeer.PATIENT.getName()
         + "."
-        + PatientPeer.STUDY
+        + PatientPeer.STUDY.getName()
         + " as study where study."
-        + StudyPeer.ID
+        + StudyPeer.ID.getName()
         + "=? and site."
-        + SitePeer.ID + "=?";
+        + SitePeer.ID.getName()
+        + "=?";
 
     public long getProcessingEventCountForCenter(CenterWrapper<?> site)
         throws ApplicationException, BiobankException {
@@ -467,12 +468,13 @@ public class StudyWrapper extends StudyBaseWrapper {
     private static final String VISIT_COUNT_QRY = "select count(distinct visits) from "
         + ProcessingEvent.class.getName()
         + " as visits join visits."
-        + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION
+        + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION.getName()
         + " as svs join svs."
-        + SourceVesselPeer.PATIENT
+        + SourceVesselPeer.PATIENT.getName()
         + "."
-        + PatientPeer.STUDY
-        + " as study where study." + StudyPeer.ID + "=?";
+        + PatientPeer.STUDY.getName()
+        + " as study where study."
+        + StudyPeer.ID.getName() + "=?";
 
     public long getProcessingEventCount() throws ApplicationException,
         BiobankException {
@@ -488,6 +490,13 @@ public class StudyWrapper extends StudyBaseWrapper {
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
+        if (getName() == null) {
+            throw new BiobankCheckException("Name must be set.");
+        }
+        if (getNameShort() == null) {
+            throw new BiobankCheckException("Short name must be set.");
+        }
+
         checkNoDuplicates(Study.class, StudyPeer.NAME.getName(), getName(),
             "A study with name");
         checkNoDuplicates(Study.class, StudyPeer.NAME_SHORT.getName(),
