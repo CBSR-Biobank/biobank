@@ -49,6 +49,15 @@ public class CollectionEventHelper extends DbHelper {
     }
 
     public static CollectionEventWrapper addCollectionEvent(
+        CenterWrapper<?> center, ShippingMethodWrapper method, String waybill,
+        Date dateReceived, SourceVesselWrapper... svs) throws Exception {
+        CollectionEventWrapper ce = newCollectionEvent(center, method, waybill,
+            dateReceived, svs);
+        ce.persist();
+        return ce;
+    }
+
+    public static CollectionEventWrapper addCollectionEvent(
         CenterWrapper<?> center, ShippingMethodWrapper method,
         SourceVesselWrapper... svs) throws Exception {
         return addCollectionEvent(center, method, TestCommon.getNewWaybill(r),
@@ -76,5 +85,14 @@ public class CollectionEventHelper extends DbHelper {
         return addCollectionEvent(center, ShippingMethodWrapper
             .getShippingMethods(appService).get(0), "wb-54", sv);
 
+    }
+
+    public static CollectionEventWrapper addCollectionEventNoWaybill(
+        CenterWrapper<?> center, ShippingMethodWrapper method,
+        SourceVesselWrapper... svs) throws Exception {
+        CollectionEventWrapper cevent = newCollectionEvent(center, method,
+            null, Utils.getRandomDate(), svs);
+        cevent.persist();
+        return cevent;
     }
 }
