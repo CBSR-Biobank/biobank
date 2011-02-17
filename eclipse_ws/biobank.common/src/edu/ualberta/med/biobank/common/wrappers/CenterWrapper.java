@@ -2,7 +2,9 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
@@ -22,6 +24,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class CenterWrapper<E extends Center> extends
     CenterBaseWrapper<E> {
+
+    private Set<CollectionEventWrapper> deletedCollectionEvents = new HashSet<CollectionEventWrapper>();
 
     public CenterWrapper(WritableApplicationService appService) {
         super(appService);
@@ -78,6 +82,23 @@ public abstract class CenterWrapper<E extends Center> extends
 
     public void setPostalCode(String postalCode) {
         setProperty(initAddress(), AddressPeer.POSTAL_CODE, postalCode);
+    }
+
+    @Override
+    public void addToCollectionEventCollection(
+        List<CollectionEventWrapper> collectionEventCollection) {
+        super.addToCollectionEventCollection(collectionEventCollection);
+
+        // make sure previously deleted ones, that have been re-added, are
+        // no longer deleted
+        deletedCollectionEvents.removeAll(collectionEventCollection);
+    }
+
+    @Override
+    public void removeFromCollectionEventCollection(
+        List<CollectionEventWrapper> collectionEventCollection) {
+        deletedCollectionEvents.addAll(collectionEventCollection);
+        super.removeFromCollectionEventCollection(collectionEventCollection);
     }
 
     public static final String PROCESSING_EVENT_COUNT_QRY = "select count(proc) from "
@@ -178,6 +199,19 @@ public abstract class CenterWrapper<E extends Center> extends
                             return source;
                 }
         return null;
+    }
+
+    @Override
+    protected void persistDependencies(Center origObject) throws Exception {
+        deleteCollectionEvents();
+    }
+
+    private void deleteCollectionEvents() throws Exception {
+        for (CollectionEventWrapper ce : deletedCollectionEvents) {
+            if (!ce.isNew()) {
+                ce.delete();
+            }
+        }
     }
 
 }

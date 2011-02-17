@@ -75,10 +75,6 @@ public abstract class AbstractShipmentWrapper<E extends AbstractShipment>
             && dateReveived.compareTo(endDate) <= 0;
     }
 
-    public void getActivityStatus(ActivityStatusWrapper activityStatus) {
-        setWrappedProperty(AbstractShipmentPeer.ACTIVITY_STATUS, activityStatus);
-    }
-
     public static AbstractShipmentWrapper<?> createInstance(
         WritableApplicationService appService, AbstractShipment ship) {
         if (ship instanceof Dispatch) {

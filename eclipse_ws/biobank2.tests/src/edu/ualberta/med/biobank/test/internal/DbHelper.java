@@ -69,13 +69,15 @@ public class DbHelper {
     }
 
     public static void deleteCollectionEvents(
-        Collection<CollectionEventWrapper> shipments) throws Exception {
+        Collection<CollectionEventWrapper> cevents) throws Exception {
         Assert.assertNotNull("appService is null", appService);
-        if ((shipments == null) || (shipments.size() == 0))
+        if ((cevents == null) || (cevents.size() == 0))
             return;
 
-        for (CollectionEventWrapper shipment : shipments) {
-            shipment.delete();
+        for (CollectionEventWrapper cevent : cevents) {
+            if (!cevent.isNew()) {
+                cevent.delete();
+            }
         }
     }
 

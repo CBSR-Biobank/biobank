@@ -193,7 +193,7 @@ public class TestClinic extends TestDatabase {
 
         clinic.setCity("Vesoul");
         clinic.persist();
-        ClinicHelper.createdClinics.add(clinic);
+        clinic.delete();
         int newTotal = ClinicWrapper.getAllClinics(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
     }
@@ -215,7 +215,7 @@ public class TestClinic extends TestDatabase {
         clinic.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
         clinic.persist();
-        ClinicHelper.createdClinics.add(clinic);
+        clinic.delete();
     }
 
     @Test
@@ -235,9 +235,9 @@ public class TestClinic extends TestDatabase {
         }
         clinic.setName(name + "_otherName");
         clinic.persist();
-        ClinicHelper.createdClinics.add(clinic);
         int newTotal = ClinicWrapper.getAllClinics(appService).size();
         Assert.assertEquals(oldTotal + 1, newTotal);
+        clinic.delete();
     }
 
     @Test
@@ -365,8 +365,7 @@ public class TestClinic extends TestDatabase {
             .addCollectionEvent(site, method);
         CollectionEventWrapper shipment2 = CollectionEventHelper
             .addCollectionEvent(site, method);
-        clinic.addToCollectionEventCollection(Arrays
-            .asList(cevent, shipment2));
+        clinic.addToCollectionEventCollection(Arrays.asList(cevent, shipment2));
         clinic.persist();
         clinic.reload();
         Assert.assertEquals(4, clinic.getCollectionEventCollection(false)
