@@ -23,6 +23,11 @@ public class SourceVesselTypeWrapper extends SourceVesselTypeBaseWrapper {
         super(appService);
     }
 
+    public SourceVesselTypeWrapper(WritableApplicationService appService,
+        SourceVesselType sourceVesselType) {
+        super(appService, sourceVesselType);
+    }
+
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsed()) {
