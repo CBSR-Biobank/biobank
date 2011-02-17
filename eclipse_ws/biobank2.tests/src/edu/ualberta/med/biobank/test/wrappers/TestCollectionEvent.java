@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -38,8 +39,14 @@ public class TestCollectionEvent extends TestDatabase {
         String name = "testGettersAndSetters" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
+        StudyWrapper study = StudyHelper.addStudy(name);
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
+            Utils.getRandomDate(), 0.1);
+
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEventWithRandomPatient(site, name);
+            .addCollectionEvent(site,
+                ShippingMethodWrapper.getShippingMethods(appService).get(0), sv);
 
         testGettersAndSetters(cevent);
     }
@@ -50,8 +57,15 @@ public class TestCollectionEvent extends TestDatabase {
         SiteWrapper site = SiteHelper.addSite(name);
         ShippingMethodWrapper company = ShippingMethodHelper
             .addShippingMethod(name);
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
+            Utils.getRandomDate(), 0.1);
+
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEventWithRandomPatient(site, name);
+            .addCollectionEvent(site,
+                ShippingMethodWrapper.getShippingMethods(appService).get(0), sv);
 
         cevent.setShippingMethod(company);
         cevent.persist();

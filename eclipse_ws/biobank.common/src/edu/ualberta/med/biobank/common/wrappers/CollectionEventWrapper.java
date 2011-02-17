@@ -58,7 +58,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     public void checkAtLeastOneSouceVessel() throws BiobankCheckException {
         List<SourceVesselWrapper> sourceVessels = getSourceVesselCollection(false);
-        if (sourceVessels == null || sourceVessels.size() == 0) {
+        if (sourceVessels == null || sourceVessels.isEmpty()) {
             throw new BiobankCheckException(
                 "At least one Source Vessel should be added to this Collection Event.");
         }

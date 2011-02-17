@@ -18,7 +18,6 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
@@ -32,7 +31,6 @@ import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
-import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -105,8 +103,7 @@ public class TestClinic extends TestDatabase {
         clinic.reload();
         List<ContactWrapper> contacts = clinic.getContactCollection(false);
         ContactWrapper contact = DbHelper.chooseRandomlyInList(contacts);
-        clinic.removeFromContactCollection(Arrays.asList(contact));
-        clinic.persist();
+        contact.delete();
 
         clinic.reload();
         // one contact added
@@ -301,9 +298,17 @@ public class TestClinic extends TestDatabase {
     public void testDeleteWithCollectionEvents() throws Exception {
         String name = "testDeleteWithCollectionEvents" + r.nextInt();
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        ContactHelper.addContact(clinic, name);
+        ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
-        CollectionEventHelper.addCollectionEventWithRandomPatient(clinic, name);
+        StudyWrapper study = StudyHelper.addStudy(name);
+        study.addToContactCollection(Arrays.asList(contact));
+        study.persist();
+        PatientWrapper patient = PatientHelper.addPatient(name, study);
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
+            Utils.getRandomDate(), 0.1);
+
+        CollectionEventHelper.addCollectionEvent(clinic, ShippingMethodWrapper
+            .getShippingMethods(appService).get(0), sv);
 
         clinic.reload();
         try {
@@ -334,9 +339,8 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testAddCollectionEvetnts() throws Exception {
+    public void testAddCollectionEvents() throws Exception {
         String name = "testAddCollectionEvents" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic = ClinicHelper.addClinic(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
 
@@ -344,32 +348,37 @@ public class TestClinic extends TestDatabase {
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        SourceVesselWrapper sv1 = SourceVesselHelper.newSourceVessel(patient1,
-            Utils.getRandomDate(), 0.1);
 
         StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
         study2.addToContactCollection(Arrays.asList(contact));
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
-        SourceVesselWrapper sv2 = SourceVesselHelper.newSourceVessel(patient2,
-            Utils.getRandomDate(), 0.1);
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        CollectionEventHelper.addCollectionEvent(clinic, method, sv1);
-        CollectionEventHelper.addCollectionEvent(clinic, method, sv2);
 
-        clinic.reload();
+        List<SourceVesselWrapper> svs = new ArrayList<SourceVesselWrapper>();
+        for (PatientWrapper patient : new PatientWrapper[] { patient1, patient2 }) {
+            svs.add(SourceVesselHelper.newSourceVessel(patient,
+                Utils.getRandomDate(), 0.1));
+            svs.add(SourceVesselHelper.newSourceVessel(patient,
+                Utils.getRandomDate(), 0.1));
+        }
 
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, method);
-        CollectionEventWrapper shipment2 = CollectionEventHelper
-            .addCollectionEvent(site, method);
-        clinic.addToCollectionEventCollection(Arrays
-            .asList(cevent, shipment2));
-        clinic.persist();
+        CollectionEventHelper.addCollectionEvent(clinic, method, svs.get(0),
+            svs.get(1));
+
+        // make sure clinic has 2 collection events
         clinic.reload();
-        Assert.assertEquals(4, clinic.getCollectionEventCollection(false)
+        Assert.assertEquals(1, clinic.getCollectionEventCollection(false)
+            .size());
+
+        CollectionEventHelper.addCollectionEvent(clinic, method, svs.get(2));
+        CollectionEventHelper.addCollectionEvent(clinic, method, svs.get(3));
+
+        // make sure clinic has 2 more collection events
+        clinic.reload();
+        Assert.assertEquals(3, clinic.getCollectionEventCollection(false)
             .size());
     }
 
