@@ -54,6 +54,7 @@ public class ClinicHelper extends DbHelper {
         throws Exception {
         ClinicWrapper clinic = addClinic(name, false, true);
         clinic.setSendsShipments(true);
+        clinic.persist();
         return clinic;
     }
 
