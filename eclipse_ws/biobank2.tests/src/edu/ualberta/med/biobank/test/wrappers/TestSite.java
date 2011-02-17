@@ -693,6 +693,7 @@ public class TestSite extends TestDatabase {
 
         // delete shipment 1
         shipment1.delete();
+        site.reload();
         Assert.assertEquals(1, site.getCollectionEventCount());
 
         // add shipment again
@@ -732,32 +733,12 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                method,
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1),
-                SourceVesselHelper.newSourceVessel(patient3,
-                    Utils.getRandomDate(), 0.1));
-        CollectionEventHelper.addCollectionEvent(site, method,
-            SourceVesselHelper.newSourceVessel(patient2, Utils.getRandomDate(),
-                0.1), SourceVesselHelper.newSourceVessel(patient3,
-                Utils.getRandomDate(), 0.1));
-
         site.reload();
         Assert.assertEquals(3, site.getPatientCount().longValue());
 
         // delete patient 1
-        shipment1.delete();
         patient1.reload();
         patient1.delete();
-
-        shipment1 = CollectionEventHelper.addCollectionEvent(site, method,
-            SourceVesselHelper.newSourceVessel(patient3, Utils.getRandomDate(),
-                0.1));
 
         site.reload();
         Assert.assertEquals(2, site.getPatientCount().longValue());

@@ -102,7 +102,7 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
         return getName();
     }
 
-    private static final String IS_USED_QRY = "select count(s) from "
+    private static final String IS_USED_QRY = "select count(ce) from "
         + CollectionEvent.class.getName() + " as ce where ce."
         + CollectionEventPeer.SHIPPING_METHOD.getName() + "=?)";
 

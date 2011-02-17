@@ -106,7 +106,7 @@ public abstract class CenterWrapper<E extends Center> extends
             }
             return results.get(0);
         }
-        List<CollectionEventWrapper> list = getCollectionEventCollection(false);
+        List<ProcessingEventWrapper> list = getProcessingEventCollection(false);
         if (list == null) {
             return 0;
         }
