@@ -115,10 +115,22 @@ public class DbHelper {
         }
     }
 
+    public static void deleteCollectionEvents(
+        List<CollectionEventWrapper> cevents) throws Exception {
+
+        for (CollectionEventWrapper ce : cevents) {
+            deleteFromList(ce.getSourceVesselCollection(false));
+            ce.reload();
+            ce.delete();
+        }
+    }
+
     public static void deleteClinics(List<ClinicWrapper> clinics)
         throws Exception {
         Assert.assertNotNull("appService is null", appService);
         for (ClinicWrapper clinic : clinics) {
+            deleteCollectionEvents(clinic.getCollectionEventCollection(false));
+            clinic.reload();
             clinic.delete();
         }
     }

@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudySourceVessel;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -39,7 +40,7 @@ public class TestStudySourceVessel extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
 
         SourceVesselTypeWrapper sourceVessel = SourceVesselTypeHelper
-            .newSourceVesselType("newST");
+            .newSourceVesselType("newST" + Utils.getRandomString(11));
         ssv = StudySourceVesselHelper.addStudySourceVessel(study, sourceVessel);
 
         ssv.reload();
