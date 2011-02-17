@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.base.SourceVesselBaseWrapper;
 import edu.ualberta.med.biobank.model.SourceVessel;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -30,14 +29,6 @@ public class SourceVesselWrapper extends SourceVesselBaseWrapper {
             wrappers.add(new SourceVesselWrapper(appService, ss));
         }
         return wrappers;
-    }
-
-    @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        if (getSourceVesselType() == null) {
-            throw new BiobankCheckException("A SourceVesselType is required.");
-        }
     }
 
     @Override
