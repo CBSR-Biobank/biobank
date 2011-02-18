@@ -19,8 +19,11 @@ public class ExceptionInterceptor implements ThrowsAdvice {
     /**
      * Intercept Hibernate validation errors to throw an exception with a better
      * message.
+     * 
+     * @throws ValidationException
      */
-    public void afterThrowing(InvalidStateException ise) {
+    public void afterThrowing(InvalidStateException ise)
+        throws ValidationException {
         String message = "";
         for (int i = 0; i < ise.getInvalidValues().length; i++) {
             InvalidValue iv = ise.getInvalidValues()[i];
@@ -32,24 +35,34 @@ public class ExceptionInterceptor implements ThrowsAdvice {
         throw new ValidationException(message, ise);
     }
 
-    public void afterThrowing(ApplicationException ae) throws Throwable {
-        findNotNullPropertyValueException(ae);
+    public void afterThrowing(ApplicationException ae)
+        throws ApplicationException {
+        Throwable cause = ExceptionUtils.findCausesInThrowable(ae,
+            PropertyValueException.class, ValueNotSetException.class);
+        getNotNullPropertyValueException(cause, ae);
+        if (cause != null && cause instanceof ValueNotSetException) {
+            ValueNotSetException pve = (ValueNotSetException) cause;
+            throw new ValueNotSetException(pve.getPropertyName(), ae);
+        }
+        throw ae;
     }
 
     public void afterThrowing(DataIntegrityViolationException dive)
-        throws Throwable {
-        findNotNullPropertyValueException(dive);
+        throws ValueNotSetException {
+        Throwable cause = ExceptionUtils.findCausesInThrowable(dive,
+            PropertyValueException.class);
+        getNotNullPropertyValueException(cause, dive);
+        throw dive;
     }
 
-    private void findNotNullPropertyValueException(Throwable t)
-        throws Throwable {
-        Throwable cause = ExceptionUtils.findCauseInThrowable(t,
-            PropertyValueException.class);
-        if (cause != null) {
+    private void getNotNullPropertyValueException(Throwable cause,
+        Throwable originalMainEx) throws ValueNotSetException {
+        if (cause != null && cause instanceof PropertyValueException) {
             PropertyValueException pve = (PropertyValueException) cause;
             if (pve.getMessage().startsWith("not-null"))
-                throw new ValueNotSetException(pve.getPropertyName(), t);
+                throw new ValueNotSetException(pve.getPropertyName(),
+                    originalMainEx);
         }
-        throw t;
     }
+
 }

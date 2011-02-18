@@ -81,9 +81,10 @@ public class TestActivityStatus extends TestDatabase {
         String name = "testDeleteFail" + r.nextInt();
 
         // should not be allowed to remove an activity status that is used
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(name, false);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name, false, false);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name, false);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name, false,
+            false);
         ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
             site, name, 2, 2);
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();

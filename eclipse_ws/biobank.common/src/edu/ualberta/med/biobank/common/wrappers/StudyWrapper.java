@@ -490,13 +490,6 @@ public class StudyWrapper extends StudyBaseWrapper {
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        if (getName() == null) {
-            throw new BiobankCheckException("Name must be set.");
-        }
-        if (getNameShort() == null) {
-            throw new BiobankCheckException("Short name must be set.");
-        }
-
         checkNoDuplicates(Study.class, StudyPeer.NAME.getName(), getName(),
             "A study with name");
         checkNoDuplicates(Study.class, StudyPeer.NAME_SHORT.getName(),

@@ -42,8 +42,8 @@ public class TestShippingMethod extends TestDatabase {
     @Test
     public void testGetShipmentCollection() throws Exception {
         String name = "testGetShipmentCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
@@ -55,19 +55,13 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method2 = ShippingMethodHelper
             .addShippingMethod(name + "_2");
 
-        CollectionEventHelper.addCollectionEvent(
-            site,
-            method1,
+        CollectionEventHelper.addCollectionEvent(site, method1,
             SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
                 0.1));
-        CollectionEventHelper.addCollectionEvent(
-            site,
-            method2,
+        CollectionEventHelper.addCollectionEvent(site, method2,
             SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
                 0.1));
-        CollectionEventHelper.addCollectionEvent(
-            site,
-            method2,
+        CollectionEventHelper.addCollectionEvent(site, method2,
             SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
                 0.1));
 
@@ -81,8 +75,8 @@ public class TestShippingMethod extends TestDatabase {
     @Test
     public void testGetShipmentCollectionBoolean() throws Exception {
         String name = "testGetShipmentCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
@@ -96,24 +90,24 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                    0.1));
+                SourceVesselHelper.newSourceVessel(patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
         CollectionEventWrapper shipment2 = CollectionEventHelper
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                    0.1));
+                SourceVesselHelper.newSourceVessel(patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.setWaybill("ASDFG" + name);
         shipment2.persist();
         CollectionEventWrapper shipment3 = CollectionEventHelper
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                    0.1));
+                SourceVesselHelper.newSourceVessel(patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.setWaybill("ghrtghd" + name);
         shipment3.persist();
 
@@ -221,8 +215,8 @@ public class TestShippingMethod extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodHelper.addShippingMethod(
             name, false);
 
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
@@ -232,8 +226,8 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(
                 site,
                 method,
-                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                    0.1));
+                SourceVesselHelper.newSourceVessel(patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.persist();
         method.reload();
 
@@ -303,8 +297,8 @@ public class TestShippingMethod extends TestDatabase {
         Assert.assertFalse(methods[1].isUsed());
 
         String name = "testIsUsed" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
@@ -315,8 +309,8 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(
                 site,
                 methods[0],
-                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                    0.1));
+                SourceVesselHelper.newSourceVessel(patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment1.setWaybill("QWERTY" + name);
         shipment1.persist();
 
@@ -327,8 +321,8 @@ public class TestShippingMethod extends TestDatabase {
             .addCollectionEvent(
                 site,
                 methods[1],
-                SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                    0.1));
+                SourceVesselHelper.newSourceVessel(patient1,
+                    Utils.getRandomDate(), 0.1));
         shipment2.setWaybill(name + "QWERTY");
         shipment2.persist();
 

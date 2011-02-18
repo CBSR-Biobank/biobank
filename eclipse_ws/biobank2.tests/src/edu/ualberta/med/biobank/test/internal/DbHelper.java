@@ -129,8 +129,8 @@ public class DbHelper {
         throws Exception {
         Assert.assertNotNull("appService is null", appService);
         for (ClinicWrapper clinic : clinics) {
-            deleteCollectionEvents(clinic.getCollectionEventCollection(false));
             clinic.reload();
+            deleteCollectionEvents(clinic.getCollectionEventCollection(false));
             clinic.delete();
         }
     }

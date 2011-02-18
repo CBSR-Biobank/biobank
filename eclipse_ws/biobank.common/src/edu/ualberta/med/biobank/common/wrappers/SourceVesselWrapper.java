@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.base.SourceVesselBaseWrapper;
 import edu.ualberta.med.biobank.model.SourceVessel;
 import gov.nih.nci.system.applicationservice.ApplicationException;
