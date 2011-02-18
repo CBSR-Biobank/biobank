@@ -7,7 +7,6 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -70,11 +69,7 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
                     " as x where x.activityStatus=?");
             HQLCriteria c = new HQLCriteria(sb.toString(),
                 Arrays.asList(new Object[] { wrappedObject }));
-            List<Long> results = appService.query(c);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            usedCount += results.get(0);
+            usedCount += getCountResult(appService, c);
         }
 
         return usedCount > 0;

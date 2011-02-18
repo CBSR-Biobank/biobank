@@ -13,7 +13,6 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
@@ -24,6 +23,7 @@ import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
@@ -283,11 +283,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         }
         String qry = new StringBuilder(LABEL_UNIQUE_FOR_TYPE_BASE_QRY).append(
             notSameContainer).toString();
-        HQLCriteria criteria = new HQLCriteria(qry, parameters);
-        List<Long> results = appService.query(criteria);
-        if (results.size() != 1)
-            throw new BiobankQueryResultSizeException();
-        if (results.get(0) > 0) {
+        if (getCountResult(appService, new HQLCriteria(qry, parameters)) > 0) {
             throw new DuplicateEntryException("A container with label \""
                 + getLabel() + "\" and type \"" + getContainerType().getName()
                 + "\" already exists.");
@@ -544,11 +540,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(CHILD_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            List<Long> results = appService.query(criteria);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            return results.get(0);
+            return getCountResult(appService, criteria);
         }
         Map<RowColPos, ContainerWrapper> children = (Map<RowColPos, ContainerWrapper>) propertiesMap
             .get("children");
@@ -561,6 +553,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             return 0;
         return positions.size();
     }
+
+    public static final Property<Map<RowColPos, ContainerWrapper>, Container> ID = Property
+        .create("children",
+            new TypeReference<Map<RowColPos, ContainerWrapper>>() {
+            });
 
     @SuppressWarnings("unchecked")
     public Map<RowColPos, ContainerWrapper> getChildren() {

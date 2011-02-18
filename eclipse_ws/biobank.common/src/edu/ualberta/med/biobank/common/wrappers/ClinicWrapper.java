@@ -9,7 +9,6 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
@@ -136,11 +135,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            List<Long> results = appService.query(criteria);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            return results.get(0);
+            return getCountResult(appService, criteria);
         }
         HashSet<PatientWrapper> uniquePatients = new HashSet<PatientWrapper>();
         List<CollectionEventWrapper> ships = getCollectionEventCollection(false);
@@ -174,12 +169,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
 
     public static long getCount(WritableApplicationService appService)
         throws BiobankException, ApplicationException {
-        HQLCriteria c = new HQLCriteria(CLINIC_COUNT_QRY);
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
+        return getCountResult(appService, new HQLCriteria(CLINIC_COUNT_QRY));
     }
 
     @Override

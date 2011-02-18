@@ -12,7 +12,6 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
@@ -313,11 +312,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            List<Long> results = appService.query(criteria);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            return results.get(0);
+            return getCountResult(appService, criteria);
         }
         List<AliquotWrapper> list = getAliquotCollection(false);
         if (list == null)
