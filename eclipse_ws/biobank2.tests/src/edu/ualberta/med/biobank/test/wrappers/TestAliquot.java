@@ -601,10 +601,13 @@ public class TestAliquot extends TestDatabase {
         aliquot.persist();
         AliquotHelper.addAliquot(sampleType, null, pv, null, null);
 
-        DebugUtil.getRandomAliquotsAlreadyLinked(appService, site.getId());
-        DebugUtil.getRandomAliquotsAlreadyAssigned(appService, site.getId());
-        DebugUtil.getRandomAliquotsNotAssignedNoDispatch(appService,
+        DebugUtil.getRandomLinkedAliquots(appService, site.getId());
+        DebugUtil.getRandomAssignedAliquots(appService, site.getId());
+        DebugUtil.getRandomNonAssignedNonDispatchedAliquots(appService,
             site.getId());
+        DebugUtil.getRandomDispatchedAliquots(appService, site.getId());
+
+        Assert.fail("not real tests here");
     }
 
     @Test
