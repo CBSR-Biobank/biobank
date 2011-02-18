@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -24,8 +26,12 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
+
     private final Map<DispatchItemState, List<DispatchAliquotWrapper>> dispatchAliquotsMap = new HashMap<DispatchItemState, List<DispatchAliquotWrapper>>();
+
     private final Map<DispatchItemState, List<DispatchSourceVesselWrapper>> dispatchSourceVesselsMap = new HashMap<DispatchItemState, List<DispatchSourceVesselWrapper>>();
+
+    private List<DispatchAliquotWrapper> deletedDispatchedAliquots = new ArrayList<DispatchAliquotWrapper>();
 
     public DispatchWrapper(WritableApplicationService appService) {
         super(appService);
@@ -51,6 +57,58 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             DispatchItemState.MISSING, DispatchItemState.EXTRA).isEmpty();
 
         return faultyAliquots || faultySourceVessels;
+    }
+
+    @Override
+    protected void persistChecks() throws BiobankException,
+        ApplicationException {
+        if (getSender() == null) {
+            throw new BiobankCheckException("Sender should be set");
+        }
+        if (getReceiver() == null) {
+            throw new BiobankCheckException("Receiver should be set");
+        }
+
+        if (!checkWaybillUniqueForSender()) {
+            throw new BiobankCheckException("A dispatch with waybill "
+                + getWaybill() + " already exists for sending site "
+                + getSender().getNameShort());
+        }
+    }
+
+    @Override
+    protected void persistDependencies(Dispatch origObject) throws Exception {
+        for (DispatchAliquotWrapper dsa : deletedDispatchedAliquots) {
+            if (!dsa.isNew()) {
+                dsa.delete();
+            }
+        }
+    }
+
+    private static final String WAYBILL_UNIQUE_FOR_SENDER_QRY = "from "
+        + Dispatch.class.getName() + " where "
+        + Property.concatNames(DispatchPeer.SENDER, CenterPeer.ID) + "=? and "
+        + DispatchPeer.WAYBILL.getName() + "=?";
+
+    private boolean checkWaybillUniqueForSender() throws ApplicationException,
+        BiobankCheckException {
+        List<Object> params = new ArrayList<Object>();
+        CenterWrapper<?> sender = getSender();
+        if (sender == null) {
+            throw new BiobankCheckException("sender site cannot be null");
+        }
+        params.add(sender.getId());
+        params.add(getWaybill());
+
+        StringBuilder qry = new StringBuilder(WAYBILL_UNIQUE_FOR_SENDER_QRY);
+        if (!isNew()) {
+            qry.append(" and id <> ?");
+            params.add(getId());
+        }
+        HQLCriteria c = new HQLCriteria(qry.toString(), params);
+
+        List<Object> results = appService.query(c);
+        return results.size() == 0;
     }
 
     private List<DispatchAliquotWrapper> getDispatchAliquotCollectionWithState(
@@ -121,26 +179,35 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getSourceVesselCollection(true);
     }
 
-    public void addAliquots(List<AliquotWrapper> newAliquots,
-        DispatchItemState state) throws BiobankCheckException {
-        List<AliquotWrapper> currentAliquots = getAliquotCollection();
+    public void addAliquots(List<AliquotWrapper> newAliquots) {
+        if (newAliquots == null)
+            return;
+
+        // already added dsa
+        List<DispatchAliquotWrapper> currentDaList = getDispatchAliquotCollection(false);
         List<DispatchAliquotWrapper> newDispatchAliquots = new ArrayList<DispatchAliquotWrapper>();
+        List<AliquotWrapper> currentAliquotList = new ArrayList<AliquotWrapper>();
 
-        for (AliquotWrapper aliquot : newAliquots) {
-            checkCanAddAliquot(currentAliquots, aliquot);
-
-            DispatchAliquotWrapper da = new DispatchAliquotWrapper(appService);
-            da.setAliquot(aliquot);
-            da.setState(state.getId());
-            da.setDispatch(this);
-
-            newDispatchAliquots.add(da);
+        for (DispatchAliquotWrapper dsa : currentDaList) {
+            currentAliquotList.add(dsa.getAliquot());
         }
 
-        addToWrapperCollection(DispatchPeer.DISPATCH_ALIQUOT_COLLECTION,
-            newDispatchAliquots);
+        // new aliquots added
+        for (AliquotWrapper aliquot : newAliquots) {
+            if (!currentAliquotList.contains(aliquot)) {
+                DispatchAliquotWrapper dsa = new DispatchAliquotWrapper(
+                    appService);
+                dsa.setAliquot(aliquot);
+                dsa.setDispatch(this);
+                newDispatchAliquots.add(dsa);
+            }
+        }
 
-        dispatchAliquotsMap.clear();
+        addToDispatchAliquotCollection(newDispatchAliquots);
+
+        // make sure previously deleted ones, that have been re-added, are
+        // no longer deleted
+        deletedDispatchedAliquots.removeAll(newDispatchAliquots);
     }
 
     public void checkCanAddAliquot(List<AliquotWrapper> currentAliquots,
@@ -187,20 +254,31 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return dispatchItems;
     }
 
-    public void removeDispatchAliquots(List<DispatchAliquotWrapper> dasToRemove) {
-        removeFromWrapperCollection(DispatchPeer.DISPATCH_ALIQUOT_COLLECTION,
-            dasToRemove);
-
+    @Override
+    public void removeFromDispatchAliquotCollection(
+        List<DispatchAliquotWrapper> dasToRemove) {
+        super.removeFromDispatchAliquotCollection(dasToRemove);
         dispatchAliquotsMap.clear();
     }
 
     public void removeAliquots(List<AliquotWrapper> aliquotsToRemove) {
-        List<DispatchAliquotWrapper> allDas = getDispatchAliquotCollection(false);
-        List<DispatchAliquotWrapper> dasToRemove = getDispatchItems(allDas,
-            aliquotsToRemove);
+        if (aliquotsToRemove == null) {
+            throw new NullPointerException();
+        }
 
-        removeFromWrapperCollection(DispatchPeer.DISPATCH_ALIQUOT_COLLECTION,
-            dasToRemove);
+        if (aliquotsToRemove.isEmpty())
+            return;
+
+        List<DispatchAliquotWrapper> currentDaList = getDispatchAliquotCollection(false);
+        List<DispatchAliquotWrapper> removeDispatchAliquots = new ArrayList<DispatchAliquotWrapper>();
+
+        for (DispatchAliquotWrapper dsa : currentDaList) {
+            if (aliquotsToRemove.contains(dsa.getAliquot())) {
+                removeDispatchAliquots.add(dsa);
+                deletedDispatchedAliquots.add(dsa);
+            }
+        }
+        removeFromDispatchAliquotCollection(removeDispatchAliquots);
     }
 
     public void receiveAliquots(List<AliquotWrapper> aliquotsToReceive) {
@@ -214,8 +292,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         dispatchAliquotsMap.clear();
     }
 
-    public void addSourceVessels(List<SourceVesselWrapper> newSourceVessels,
-        DispatchItemState state) {
+    public void addToSourceVesselCollection(
+        List<SourceVesselWrapper> newSourceVessels, DispatchItemState state) {
         List<DispatchSourceVesselWrapper> newDispatchSourceVessels = new ArrayList<DispatchSourceVesselWrapper>();
 
         for (SourceVesselWrapper sourceVessel : newSourceVessels) {
@@ -231,16 +309,14 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             newDispatchSourceVessels.add(da);
         }
 
-        addToWrapperCollection(DispatchPeer.DISPATCH_SOURCE_VESSEL_COLLECTION,
-            newDispatchSourceVessels);
-
         dispatchSourceVesselsMap.clear();
+        addToDispatchSourceVesselCollection(newDispatchSourceVessels);
     }
 
-    public void removeDispatchSourceVessels(
+    @Override
+    public void removeFromDispatchSourceVesselCollection(
         List<DispatchSourceVesselWrapper> dasToRemove) {
-        removeFromWrapperCollection(
-            DispatchPeer.DISPATCH_SOURCE_VESSEL_COLLECTION, dasToRemove);
+        super.removeFromDispatchSourceVesselCollection(dasToRemove);
 
         dispatchSourceVesselsMap.clear();
     }

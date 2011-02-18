@@ -14,8 +14,6 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
-import edu.ualberta.med.biobank.common.util.DispatchItemState;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -23,12 +21,10 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
@@ -40,7 +36,6 @@ import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
-import edu.ualberta.med.biobank.test.internal.DispatchHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
@@ -614,102 +609,101 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testGetDispatches() throws Exception {
-        String name = "testGetDispatchs" + r.nextInt();
-        SiteWrapper destSite = SiteHelper.addSite(name);
-        StudyWrapper study = aliquot.getProcessingEvent().getPatient()
-            .getStudy();
-        destSite.addToStudyCollection(Arrays.asList(study));
-        destSite.persist();
-        destSite.reload();
-        site.persist();
-        site.reload();
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-        DispatchWrapper dCollectionEvent = DispatchHelper.newDispatch(site,
-            destSite, method);
-
-        // add an aliquot that has not been persisted
-        try {
-            dCollectionEvent.addAliquots(Arrays.asList(aliquot),
-                DispatchItemState.NONE);
-            Assert.fail("Should not be allowed to add aliquots not yet in DB");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-
-        aliquot.persist();
-        aliquot.reload();
-
-        dCollectionEvent = DispatchHelper.newDispatch(site, destSite, method);
-        dCollectionEvent.addAliquots(Arrays.asList(aliquot),
-            DispatchItemState.NONE);
-        dCollectionEvent.persist();
-        aliquot.reload();
-
-        List<DispatchWrapper> aliquotDispatchs = aliquot.getDispatchs();
-        Assert.assertEquals(1, aliquotDispatchs.size());
-        Assert.assertTrue(aliquotDispatchs.contains(dCollectionEvent));
-
-        Assert.assertTrue(dCollectionEvent.isInCreationState());
-
-        // site send aliquots
-        dCollectionEvent.setState(DispatchState.IN_TRANSIT);
-        dCollectionEvent.persist();
-        Assert.assertTrue(dCollectionEvent.isInTransitState());
-
-        // dest site receive aliquot
-        dCollectionEvent.setState(DispatchState.RECEIVED);
-        dCollectionEvent.receiveAliquots(Arrays.asList(aliquot));
-        dCollectionEvent.persist();
-        Assert.assertTrue(dCollectionEvent.isInReceivedState());
-
-        // dispatch aliquot to second site
-        SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
-        destSite2.addToStudyCollection(Arrays.asList(study));
-        destSite2.persist();
-        destSite2.reload();
-        destSite.persist();
-
-        destSite.reload();
-        DispatchWrapper dCollectionEvent2 = DispatchHelper.newDispatch(
-            destSite, destSite2, method);
-        try {
-            dCollectionEvent2.addAliquots(Arrays.asList(aliquot),
-                DispatchItemState.NONE);
-            Assert
-                .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Active' status)");
-        } catch (BiobankCheckException bce) {
-            Assert.assertTrue(true);
-        }
-
-        aliquot.reload();
-        // assign a position to this aliquot
-        ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
-            destSite, "ct11", "ct11", 1, 5, 6, true);
-        ContainerWrapper topCont = ContainerHelper.addContainer("11", "11",
-            null, destSite, topType);
-        ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
-            destSite, "ct22", "ct22", 2, 4, 7, false);
-        topType.addToChildContainerTypeCollection(Arrays.asList(childType));
-        topType.persist();
-        ContainerWrapper cont = ContainerHelper.addContainer("22", "22",
-            topCont, destSite, childType, 4, 5);
-        childType.addToSampleTypeCollection(Arrays.asList(aliquot
-            .getSampleType()));
-        childType.persist();
-        cont.reload();
-        cont.addAliquot(2, 3, aliquot);
-        aliquot.persist();
-
-        // add to new shipment
-        dCollectionEvent2.addAliquots(Arrays.asList(aliquot),
-            DispatchItemState.NONE);
-        dCollectionEvent2.persist();
-
-        aliquot.reload();
-        aliquotDispatchs = aliquot.getDispatchs();
-        Assert.assertEquals(2, aliquotDispatchs.size());
-        Assert.assertTrue(aliquotDispatchs.contains(dCollectionEvent));
-        Assert.assertTrue(aliquotDispatchs.contains(dCollectionEvent2));
+        Assert.fail("test need to be rewritten");
+        // String name = "testGetDispatchs" + r.nextInt();
+        // SiteWrapper destSite = SiteHelper.addSite(name);
+        // StudyWrapper study = aliquot.getProcessingEvent().getPatient()
+        // .getStudy();
+        // destSite.addToStudyCollection(Arrays.asList(study));
+        // destSite.persist();
+        // destSite.reload();
+        // site.persist();
+        // site.reload();
+        // ShippingMethodWrapper method = ShippingMethodWrapper
+        // .getShippingMethods(appService).get(0);
+        // DispatchWrapper dCollectionEvent = DispatchHelper.newDispatch(site,
+        // destSite, method);
+        //
+        // // add an aliquot that has not been persisted
+        // try {
+        // dCollectionEvent.addAliquots(Arrays.asList(aliquot));
+        // Assert.fail("Should not be allowed to add aliquots not yet in DB");
+        // } catch (BiobankCheckException bce) {
+        // Assert.assertTrue(true);
+        // }
+        //
+        // aliquot.persist();
+        // aliquot.reload();
+        //
+        // dCollectionEvent = DispatchHelper.newDispatch(site, destSite,
+        // method);
+        // dCollectionEvent.addAliquots(Arrays.asList(aliquot));
+        // dCollectionEvent.persist();
+        // aliquot.reload();
+        //
+        // List<DispatchWrapper> aliquotDispatchs = aliquot.getDispatchs();
+        // Assert.assertEquals(1, aliquotDispatchs.size());
+        // Assert.assertTrue(aliquotDispatchs.contains(dCollectionEvent));
+        //
+        // Assert.assertTrue(dCollectionEvent.isInCreationState());
+        //
+        // // site send aliquots
+        // dCollectionEvent.setState(DispatchState.IN_TRANSIT);
+        // dCollectionEvent.persist();
+        // Assert.assertTrue(dCollectionEvent.isInTransitState());
+        //
+        // // dest site receive aliquot
+        // dCollectionEvent.setState(DispatchState.RECEIVED);
+        // dCollectionEvent.receiveAliquots(Arrays.asList(aliquot));
+        // dCollectionEvent.persist();
+        // Assert.assertTrue(dCollectionEvent.isInReceivedState());
+        //
+        // // dispatch aliquot to second site
+        // SiteWrapper destSite2 = SiteHelper.addSite(name + "_2");
+        // destSite2.addToStudyCollection(Arrays.asList(study));
+        // destSite2.persist();
+        // destSite2.reload();
+        // destSite.persist();
+        //
+        // destSite.reload();
+        // DispatchWrapper dCollectionEvent2 = DispatchHelper.newDispatch(
+        // destSite, destSite2, method);
+        // try {
+        // dCollectionEvent2.addAliquots(Arrays.asList(aliquot));
+        // Assert
+        // .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Active' status)");
+        // } catch (BiobankCheckException bce) {
+        // Assert.assertTrue(true);
+        // }
+        //
+        // aliquot.reload();
+        // // assign a position to this aliquot
+        // ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
+        // destSite, "ct11", "ct11", 1, 5, 6, true);
+        // ContainerWrapper topCont = ContainerHelper.addContainer("11", "11",
+        // null, destSite, topType);
+        // ContainerTypeWrapper childType =
+        // ContainerTypeHelper.addContainerType(
+        // destSite, "ct22", "ct22", 2, 4, 7, false);
+        // topType.addToChildContainerTypeCollection(Arrays.asList(childType));
+        // topType.persist();
+        // ContainerWrapper cont = ContainerHelper.addContainer("22", "22",
+        // topCont, destSite, childType, 4, 5);
+        // childType.addToSampleTypeCollection(Arrays.asList(aliquot
+        // .getSampleType()));
+        // childType.persist();
+        // cont.reload();
+        // cont.addAliquot(2, 3, aliquot);
+        // aliquot.persist();
+        //
+        // // add to new shipment
+        // dCollectionEvent2.addAliquots(Arrays.asList(aliquot));
+        // dCollectionEvent2.persist();
+        //
+        // aliquot.reload();
+        // aliquotDispatchs = aliquot.getDispatchs();
+        // Assert.assertEquals(2, aliquotDispatchs.size());
+        // Assert.assertTrue(aliquotDispatchs.contains(dCollectionEvent));
+        // Assert.assertTrue(aliquotDispatchs.contains(dCollectionEvent2));
     }
 }
