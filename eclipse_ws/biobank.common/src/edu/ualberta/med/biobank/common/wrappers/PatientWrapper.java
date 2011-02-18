@@ -121,6 +121,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMoreProcessingEvents();
+        checkNoMoreSourceVessels();
         if (getAliquotsCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
@@ -129,11 +130,21 @@ public class PatientWrapper extends PatientBaseWrapper {
 
     private void checkNoMoreProcessingEvents() throws BiobankCheckException {
         List<ProcessingEventWrapper> pvs = getProcessingEventCollection(false);
-        if (pvs != null && pvs.size() > 0) {
+        if (pvs != null && !pvs.isEmpty()) {
             throw new BiobankCheckException(
-                "Visits are still linked to this patient."
+                "Processing events are still linked to this patient."
                     + " Delete them before attempting to remove the patient.");
         }
+    }
+
+    private void checkNoMoreSourceVessels() throws BiobankCheckException {
+        List<SourceVesselWrapper> svs = getSourceVesselCollection(false);
+        if (svs != null && !svs.isEmpty()) {
+            throw new BiobankCheckException(
+                "Source vessels are still linked to this patient."
+                    + " Delete them before attempting to remove the patient.");
+        }
+
     }
 
     private static final String ALIQUOT_COUNT_QRY = "select count(aliquots) from "
@@ -293,11 +304,25 @@ public class PatientWrapper extends PatientBaseWrapper {
         reload();
         patient2.reload();
         if (getStudy().equals(patient2.getStudy())) {
+            List<ProcessingEventWrapper> pevents = patient2
+                .getProcessingEventCollection(false);
+            if (!pevents.isEmpty()) {
+                patient2.removeFromProcessingEventCollection(pevents);
+                addToProcessingEventCollection(pevents);
+                for (ProcessingEventWrapper pevent : pevents) {
+                    pevent.setPatient(this);
+                    pevent.persist();
+                }
+            }
             List<SourceVesselWrapper> svs = patient2
                 .getSourceVesselCollection(false);
-            if (svs != null) {
+            if (!svs.isEmpty()) {
                 patient2.removeFromSourceVesselCollection(svs);
                 addToSourceVesselCollection(svs);
+                for (SourceVesselWrapper sv : svs) {
+                    sv.setPatient(this);
+                    sv.persist();
+                }
             }
             patient2.delete();
             persist();

@@ -15,12 +15,12 @@ public class ProcessingEventHelper extends DbHelper {
     private static ActivityStatusWrapper activeActivityStatus = null;
 
     /**
-     * Creates a new patient visit wrapper. It is not saved to the database.
+     * Creates a new patient pevent wrapper. It is not saved to the database.
      * 
-     * @param patient The patient that the patient visit belongs to.
+     * @param patient The patient that the patient pevent belongs to.
      * @param shipment The shipment that the samples where received in.
      * @param dateProcessed The date the aliquot was processed.
-     * @return A new patient visit wrapper.
+     * @return A new patient pevent wrapper.
      */
     public static ProcessingEventWrapper newProcessingEvent(
         CenterWrapper<?> center, PatientWrapper patient, Date dateProcessed,
@@ -46,12 +46,12 @@ public class ProcessingEventHelper extends DbHelper {
     }
 
     /**
-     * Adds a new patient visit to the database.
+     * Adds a new patient pevent to the database.
      * 
-     * @param patient The patient that the patient visit belongs to.
+     * @param patient The patient that the patient pevent belongs to.
      * @param shipment The shipment that the samples where received in.
      * @param dateProcessed The date the aliquot was processed.
-     * @return A new patient visit wrapper.
+     * @return A new patient pevent wrapper.
      * @throws Exception if the object could not be saved to the database.
      */
     public static ProcessingEventWrapper addProcessingEvent(
@@ -64,12 +64,12 @@ public class ProcessingEventHelper extends DbHelper {
     }
 
     /**
-     * Adds a new patient visit to the database.
+     * Adds a new patient pevent to the database.
      * 
-     * @param patient The patient that the patient visit belongs to.
-     * @param shipment The shipment associated with the visit.
+     * @param patient The patient that the patient pevent belongs to.
+     * @param shipment The shipment associated with the pevent.
      * 
-     * @return A new patient visit wrapper.
+     * @return A new patient pevent wrapper.
      * 
      * @throws Exception if the object could not be saved to the database.
      */
@@ -77,12 +77,12 @@ public class ProcessingEventHelper extends DbHelper {
         CenterWrapper<?> center, PatientWrapper patient, int minimumNumber,
         int maxNumber) throws ParseException, Exception {
         int count = r.nextInt(maxNumber - minimumNumber + 1) + minimumNumber;
-        List<ProcessingEventWrapper> visits = new ArrayList<ProcessingEventWrapper>();
+        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
         for (int i = 0; i < count; i++) {
-            visits.add(addProcessingEvent(center, patient,
+            pevents.add(addProcessingEvent(center, patient,
                 TestCommon.getUniqueDate(r), TestCommon.getUniqueDate(r)));
         }
-        return visits;
+        return pevents;
     }
 
     public static List<ProcessingEventWrapper> addProcessingEvents(
