@@ -123,7 +123,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetContactCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = ContactHelper.addContactsToStudy(study, site, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
 
         List<ContactWrapper> contacts = study.getContactCollection(false);
         int sizeFound = contacts.size();
@@ -136,7 +136,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetContactCollectionBoolean" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
-        ContactHelper.addContactsToStudy(study, site, name);
+        ContactHelper.addContactsToStudy(study, name);
 
         List<ContactWrapper> contacts = study.getContactCollection(true);
         if (contacts.size() > 1) {
@@ -153,7 +153,7 @@ public class TestStudy extends TestDatabase {
         String name = "testAddContacts" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = ContactHelper.addContactsToStudy(study, site, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
         site.reload();
 
         // get a clinic not yet added
@@ -178,7 +178,7 @@ public class TestStudy extends TestDatabase {
         String name = "testRemoveContacts" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = ContactHelper.addContactsToStudy(study, site, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
         site.reload();
 
         // get a clinic not yet added
@@ -563,7 +563,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetClinicCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = ContactHelper.addContactsToStudy(study, site, name);
+        int nber = ContactHelper.addContactsToStudy(study, name);
 
         List<ClinicWrapper> clinics = study.getClinicCollection();
         int sizeFound = clinics.size();

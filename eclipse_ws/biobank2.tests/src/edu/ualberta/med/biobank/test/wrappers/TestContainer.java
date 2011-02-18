@@ -867,7 +867,7 @@ public class TestContainer extends TestDatabase {
 
     private ProcessingEventWrapper addProcessingEvent() throws Exception {
         StudyWrapper study = StudyHelper.addStudy("Study1");
-        ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
+        ContactHelper.addContactsToStudy(study, "contactsStudy1");
         SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(
             PatientHelper.newPatient("testP"), Utils.getRandomDate(), 0.01);
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
@@ -935,7 +935,7 @@ public class TestContainer extends TestDatabase {
         containerTypeMap.put("ChildCtL3", childTypeL3);
 
         StudyWrapper study = StudyHelper.addStudy("Study1");
-        ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
+        ContactHelper.addContactsToStudy(study, "contactsStudy1");
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
             site, patient, Utils.getRandomDate(), Utils.getRandomDate());
@@ -1768,7 +1768,7 @@ public class TestContainer extends TestDatabase {
             .getAliquots().size());
 
         StudyWrapper study = StudyHelper.addStudy("Study1");
-        ContactHelper.addContactsToStudy(study, site, "contactsStudy1");
+        ContactHelper.addContactsToStudy(study, "contactsStudy1");
         PatientWrapper patient = PatientHelper.addPatient("1000", study);
         ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
             site, patient, Utils.getRandomDate(), Utils.getRandomDate());
