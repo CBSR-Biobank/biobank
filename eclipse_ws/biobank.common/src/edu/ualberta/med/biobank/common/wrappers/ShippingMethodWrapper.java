@@ -6,7 +6,6 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ShippingMethodBaseWrapper;
@@ -109,14 +108,7 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
     public boolean isUsed() throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(IS_USED_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        if (results.get(0) > 0) {
-            return true;
-        }
-        return false;
+        return getCountResult(appService, c) > 0;
     }
 
     public static void persistShippingMethods(

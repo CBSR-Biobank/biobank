@@ -12,7 +12,6 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -203,11 +202,7 @@ public class SiteWrapper extends SiteBaseWrapper {
     public Long getPatientCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
+        return getCountResult(appService, criteria);
     }
 
     private static final String ALIQUOT_COUNT_QRY = "select count(aliquots) from "
@@ -224,11 +219,7 @@ public class SiteWrapper extends SiteBaseWrapper {
     public Long getAliquotCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
+        return getCountResult(appService, criteria);
     }
 
     /**

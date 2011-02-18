@@ -9,7 +9,6 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.base.SampleTypeBaseWrapper;
@@ -145,11 +144,7 @@ public class SampleTypeWrapper extends SampleTypeBaseWrapper {
         BiobankException {
         HQLCriteria c = new HQLCriteria(IS_USED_BY_SAMPLES_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0) > 0;
+        return getCountResult(appService, c) > 0;
     }
 
     @Override

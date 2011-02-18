@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -121,11 +120,7 @@ public abstract class CenterWrapper<E extends Center> extends
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(PROCESSING_EVENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            List<Long> results = appService.query(criteria);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            return results.get(0);
+            return getCountResult(appService, criteria);
         }
         List<ProcessingEventWrapper> list = getProcessingEventCollection(false);
         if (list == null) {
@@ -155,11 +150,7 @@ public abstract class CenterWrapper<E extends Center> extends
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            List<Long> results = appService.query(criteria);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            return results.get(0);
+            return getCountResult(appService, criteria);
         }
         List<CollectionEventWrapper> list = getCollectionEventCollection(false);
         if (list == null) {

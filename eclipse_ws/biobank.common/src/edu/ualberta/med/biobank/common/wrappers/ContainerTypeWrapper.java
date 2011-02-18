@@ -12,7 +12,6 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.AliquotPeer;
 import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
@@ -201,11 +200,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         BiobankException {
         HQLCriteria c = new HQLCriteria(IS_USED_BY_CONTAINERS_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0) > 0;
+        return getCountResult(appService, c) > 0;
     }
 
     private static final String PARENT_CONTAINER_TYPES_QRY = "select ct from "
@@ -477,11 +472,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         BiobankException {
         HQLCriteria c = new HQLCriteria(CONTAINER_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
+        return getCountResult(appService, c);
     }
 
     @Override
