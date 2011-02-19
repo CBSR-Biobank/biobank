@@ -9,6 +9,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.ClassUtils;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -331,19 +332,30 @@ public class TestActivityStatus extends TestDatabase {
                 Utils.getRandomString(15, 20));
             Assert
                 .fail("should not be allowed to retreive invalid activity status");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankFailedQueryException bce) {
             Assert.assertTrue(true);
         }
     }
 
     @Test
-    public void testIsActive() throws Exception {
+    public void testActiveClosedFlagged() throws Exception {
         ActivityStatusWrapper active = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
         Assert.assertTrue(active.isActive());
+        Assert.assertFalse(active.isClosed());
+        Assert.assertFalse(active.isFlagged());
 
         ActivityStatusWrapper closed = ActivityStatusWrapper.getActivityStatus(
             appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
+        Assert.assertTrue(closed.isClosed());
         Assert.assertFalse(closed.isActive());
+        Assert.assertFalse(closed.isFlagged());
+
+        ActivityStatusWrapper flagged = ActivityStatusWrapper
+            .getActivityStatus(appService,
+                ActivityStatusWrapper.FLAGGED_STATUS_STRING);
+        Assert.assertTrue(flagged.isFlagged());
+        Assert.assertFalse(flagged.isClosed());
+        Assert.assertFalse(flagged.isActive());
     }
 }

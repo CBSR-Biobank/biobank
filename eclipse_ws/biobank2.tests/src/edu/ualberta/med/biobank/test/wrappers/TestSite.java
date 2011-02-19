@@ -675,7 +675,7 @@ public class TestSite extends TestDatabase {
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        CollectionEventWrapper shipment1 = CollectionEventHelper
+        CollectionEventWrapper cevent1 = CollectionEventHelper
             .addCollectionEvent(
                 site,
                 method,
@@ -691,13 +691,14 @@ public class TestSite extends TestDatabase {
         site.reload();
         Assert.assertEquals(2, site.getCollectionEventCount());
 
-        // delete shipment 1
-        shipment1.delete();
+        // delete cevent 1
+        DbHelper.deleteFromList(cevent1.getSourceVesselCollection(false));
+        cevent1.delete();
         site.reload();
         Assert.assertEquals(1, site.getCollectionEventCount());
 
-        // add shipment again
-        shipment1 = CollectionEventHelper.addCollectionEvent(site, method,
+        // add cevent again
+        cevent1 = CollectionEventHelper.addCollectionEvent(site, method,
             SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
                 0.1), SourceVesselHelper.newSourceVessel(patient3,
                 Utils.getRandomDate(), 0.1));
@@ -733,11 +734,33 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
+        List<CollectionEventWrapper> cevents = new ArrayList<CollectionEventWrapper>();
+        List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
+        for (PatientWrapper p : Arrays.asList(patient1, patient2, patient3)) {
+            CollectionEventWrapper cevent = CollectionEventHelper
+                .addCollectionEvent(site, ShippingMethodWrapper
+                    .getShippingMethods(appService).get(0), SourceVesselHelper
+                    .newSourceVessel(p, Utils.getRandomDate(), 0.1),
+                    SourceVesselHelper.newSourceVessel(p,
+                        Utils.getRandomDate(), 0.1));
+            cevents.add(cevent);
+
+            ProcessingEventWrapper pevent = ProcessingEventHelper
+                .addProcessingEvent(site, p, Utils.getRandomDate(),
+                    Utils.getRandomDate());
+            pevent.addToSourceVesselCollection(cevent
+                .getSourceVesselCollection(false));
+            pevent.persist();
+            pevents.add(pevent);
+        }
+
         site.reload();
         Assert.assertEquals(3, site.getPatientCount().longValue());
 
         // delete patient 1
         patient1.reload();
+        DbHelper.deleteFromList(patient1.getProcessingEventCollection(false));
+        DbHelper.deleteFromList(patient1.getSourceVesselCollection(false));
         patient1.delete();
 
         site.reload();
@@ -778,13 +801,13 @@ public class TestSite extends TestDatabase {
                 0.1), SourceVesselHelper.newSourceVessel(patient2,
                 Utils.getRandomDate(), 0.1));
 
-        // shipment1 has patient visits for patient1 and patient3
+        // cevent1 has processing events for patient1 and patient3
         int nber = ProcessingEventHelper.addProcessingEvents(site, patient1)
             .size();
         int nber2 = ProcessingEventHelper.addProcessingEvents(site, patient3)
             .size();
 
-        // shipment 2 has patient visits for patient1 and patient2
+        // cevent 2 has processing events for patient1 and patient2
         int nber3 = ProcessingEventHelper.addProcessingEvents(site, patient1)
             .size();
         int nber4 = ProcessingEventHelper.addProcessingEvents(site, patient2)
@@ -839,13 +862,13 @@ public class TestSite extends TestDatabase {
         PatientWrapper patient2 = PatientHelper
             .addPatient(name + "_p2", study2);
 
-        // shipment 1 has patient visits for patient1 and patient2
+        // cevent 1 has processing events for patient1 and patient2
         int nber = ProcessingEventHelper.addProcessingEvents(site, patient1,
             10, 24, false).size();
         int nber2 = ProcessingEventHelper.addProcessingEvents(site, patient2,
             10, 24, false).size();
 
-        // add 2 samples to each patient visit
+        // add 2 samples to each processing event
         //
         // make sure we do not exceed 96 samples since that is all container
         // type can hold

@@ -16,7 +16,6 @@ import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
-import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
@@ -193,11 +192,10 @@ public class SiteWrapper extends SiteBaseWrapper {
     private static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
         + Site.class.getName()
         + " as site join site."
-        + SitePeer.STUDY_COLLECTION.getName()
-        + " as studies join studies."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patients where site."
-        + SitePeer.ID.getName() + "=?";
+        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
+        + " as pevent join pevent."
+        + ProcessingEventPeer.PATIENT.getName()
+        + " as patients where site." + SitePeer.ID.getName() + "=?";
 
     public Long getPatientCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
@@ -207,12 +205,9 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     private static final String ALIQUOT_COUNT_QRY = "select count(aliquots) from "
         + Site.class.getName()
-        + SitePeer.STUDY_COLLECTION.getName()
-        + " as studies join studies."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patients join patients."
-        + PatientPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pevents join pevents."
+        + " site left join site."
+        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
+        + " as pevent join pevent."
         + ProcessingEventPeer.ALIQUOT_COLLECTION.getName()
         + " as aliquots where site." + SitePeer.ID.getName() + "=?";
 

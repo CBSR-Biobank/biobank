@@ -263,9 +263,16 @@ public class AliquotWrapper extends AliquotBaseWrapper {
             return getPositionStringInParent(position, getParent());
         }
         ContainerWrapper directParent = getParent();
-        ContainerWrapper topContainer = directParent;
-        while (topContainer.hasParent()) {
-            topContainer = topContainer.getParent();
+        ContainerPathWrapper path = directParent.getContainerPath();
+        ContainerWrapper topContainer;
+
+        if (path != null) {
+            topContainer = path.getTopContainer();
+        } else {
+            topContainer = directParent;
+            while (topContainer.hasParent()) {
+                topContainer = topContainer.getParent();
+            }
         }
         String nameShort = topContainer.getContainerType().getNameShort();
         if (addTopParentShortName && nameShort != null)

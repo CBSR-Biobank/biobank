@@ -305,11 +305,13 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testSetAliquotPositionFromString() throws Exception {
         aliquot.setAliquotPositionFromString("A1", aliquot.getParent());
+        aliquot.persist();
         Assert.assertTrue(aliquot.getPositionString(false, false).equals("A1"));
         RowColPos pos = aliquot.getPosition();
         Assert.assertTrue((pos.col == 0) && (pos.row == 0));
 
         aliquot.setAliquotPositionFromString("C2", aliquot.getParent());
+        aliquot.persist();
         Assert.assertTrue(aliquot.getPositionString(false, false).equals("C2"));
         pos = aliquot.getPosition();
         Assert.assertTrue((pos.col == 1) && (pos.row == 2));

@@ -59,7 +59,7 @@ public class AliquotPositionWrapper extends AliquotPositionBaseWrapper {
             if (containerType != null) {
                 String positionString = containerType
                     .getPositionString(new RowColPos(getRow(), getCol()));
-                wrappedObject.setPositionString(positionString);
+                setPositionString(positionString);
             }
         }
     }
