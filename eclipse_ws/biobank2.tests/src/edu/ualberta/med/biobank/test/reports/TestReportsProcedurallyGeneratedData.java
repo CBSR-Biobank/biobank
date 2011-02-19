@@ -299,7 +299,8 @@ public final class TestReportsProcedurallyGeneratedData implements
                 containerType = addContainerType(site, getInstance()
                     .getRandString(), isTopLevel);
 
-                containerType.addToSampleTypeCollection(sampleTypes.subList(i, i + 1));
+                containerType.addToSampleTypeCollection(sampleTypes.subList(i,
+                    i + 1));
 
                 childContainerTypes.add(containerType);
             }
@@ -325,7 +326,8 @@ public final class TestReportsProcedurallyGeneratedData implements
         }
 
         if (parentContainerType != null) {
-            parentContainerType.addToChildContainerTypeCollection(childContainerTypes);
+            parentContainerType
+                .addToChildContainerTypeCollection(childContainerTypes);
         }
 
         List<ContainerTypeWrapper> descendantContainerTypes = new ArrayList<ContainerTypeWrapper>();

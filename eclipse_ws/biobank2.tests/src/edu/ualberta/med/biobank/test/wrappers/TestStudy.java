@@ -121,7 +121,6 @@ public class TestStudy extends TestDatabase {
     @Test
     public void testGetContactCollection() throws Exception {
         String name = "testGetContactCollection" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         int nber = ContactHelper.addContactsToStudy(study, name);
 
@@ -134,7 +133,6 @@ public class TestStudy extends TestDatabase {
     @Test
     public void testGetContactCollectionBoolean() throws Exception {
         String name = "testGetContactCollectionBoolean" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactHelper.addContactsToStudy(study, name);
 
@@ -705,17 +703,17 @@ public class TestStudy extends TestDatabase {
         PatientWrapper patient3 = PatientHelper
             .addPatient(name + "_p3", study1);
 
-        // shipment1 has patient visits for patient1 and patient3
-        long nber = ProcessingEventHelper.addProcessingEvents(site1, patient1)
-            .size();
-        long nber2 = ProcessingEventHelper.addProcessingEvents(site1, patient3)
-            .size();
+        // site1 has processing events for patient1 and patient3
+        long nber = ProcessingEventHelper.addProcessingEvents(site1, patient1,
+            true).size();
+        long nber2 = ProcessingEventHelper.addProcessingEvents(site1, patient3,
+            true).size();
 
-        // shipment 2 has patient visits for patient1 and patient2
-        long nber3 = ProcessingEventHelper.addProcessingEvents(site2, patient1)
-            .size();
-        long nber4 = ProcessingEventHelper.addProcessingEvents(site2, patient2)
-            .size();
+        // site2 has processing events for patient1 and patient2
+        long nber3 = ProcessingEventHelper.addProcessingEvents(site2, patient1,
+            true).size();
+        long nber4 = ProcessingEventHelper.addProcessingEvents(site2, patient2,
+            true).size();
 
         site1.reload();
         site2.reload();
@@ -756,8 +754,8 @@ public class TestStudy extends TestDatabase {
             study1);
         // clinic 1 = 1 patient for study 1
         ProcessingEventHelper.addProcessingEvents(clinic1, patient1);
-        ProcessingEventHelper.addProcessingEvents(clinic1, patient1);
         // clinic 2 = 2 patients for study 1
+        ProcessingEventHelper.addProcessingEvents(clinic2, patient1);
         ProcessingEventHelper.addProcessingEvents(clinic2, patient2);
 
         study1.reload();
@@ -794,16 +792,16 @@ public class TestStudy extends TestDatabase {
             .addPatient(name + "_p3", study1);
 
         // shipment1 has patient visits for patient1 and patient3
-        int nber = ProcessingEventHelper.addProcessingEvents(clinic1, patient1)
-            .size();
-        int nber2 = ProcessingEventHelper
-            .addProcessingEvents(clinic1, patient3).size();
+        int nber = ProcessingEventHelper.addProcessingEvents(clinic1, patient1,
+            true).size();
+        int nber2 = ProcessingEventHelper.addProcessingEvents(clinic1,
+            patient3, true).size();
 
         // shipment 2 has patient visits for patient1 and patient2
-        int nber3 = ProcessingEventHelper
-            .addProcessingEvents(clinic2, patient1).size();
-        int nber4 = ProcessingEventHelper
-            .addProcessingEvents(clinic2, patient2).size();
+        int nber3 = ProcessingEventHelper.addProcessingEvents(clinic2,
+            patient1, true).size();
+        int nber4 = ProcessingEventHelper.addProcessingEvents(clinic2,
+            patient2, true).size();
 
         study1.reload();
         clinic1.reload();
@@ -842,12 +840,12 @@ public class TestStudy extends TestDatabase {
         study2.addToContactCollection(contacts);
         study2.persist();
         PatientWrapper patient2 = PatientHelper.addPatient(name + "2", study2);
-        int nber = ProcessingEventHelper.addProcessingEvents(clinic1, patient1)
-            .size();
-        int nber2 = ProcessingEventHelper
-            .addProcessingEvents(clinic1, patient1).size();
-        ProcessingEventHelper.addProcessingEvents(clinic1, patient2);
-        ProcessingEventHelper.addProcessingEvents(clinic2, patient2);
+        int nber = ProcessingEventHelper.addProcessingEvents(clinic1, patient1,
+            true).size();
+        int nber2 = ProcessingEventHelper.addProcessingEvents(clinic1,
+            patient1, true).size();
+        ProcessingEventHelper.addProcessingEvents(clinic1, patient2, true);
+        ProcessingEventHelper.addProcessingEvents(clinic2, patient2, true);
 
         study1.reload();
         Assert.assertEquals(nber + nber2, study1.getProcessingEventCount());

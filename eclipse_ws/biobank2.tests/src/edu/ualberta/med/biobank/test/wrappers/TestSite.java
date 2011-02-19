@@ -841,9 +841,9 @@ public class TestSite extends TestDatabase {
 
         // shipment 1 has patient visits for patient1 and patient2
         int nber = ProcessingEventHelper.addProcessingEvents(site, patient1,
-            10, 24).size();
+            10, 24, false).size();
         int nber2 = ProcessingEventHelper.addProcessingEvents(site, patient2,
-            10, 24).size();
+            10, 24, false).size();
 
         // add 2 samples to each patient visit
         //

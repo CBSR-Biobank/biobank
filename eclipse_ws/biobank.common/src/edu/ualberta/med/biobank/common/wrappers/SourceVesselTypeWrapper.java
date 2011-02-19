@@ -52,7 +52,7 @@ public class SourceVesselTypeWrapper extends SourceVesselTypeBaseWrapper {
 
     private static final String IS_USED_BY_SV_QRY = "select count(s) from "
         + SourceVessel.class.getName() + " as s where s."
-        + SourceVesselPeer.SOURCE_VESSEL_TYPE + "=?)";
+        + SourceVesselPeer.SOURCE_VESSEL_TYPE.getName() + "=?)";
 
     public boolean isUsed() throws ApplicationException, BiobankException {
         // is this used by any Study-s?

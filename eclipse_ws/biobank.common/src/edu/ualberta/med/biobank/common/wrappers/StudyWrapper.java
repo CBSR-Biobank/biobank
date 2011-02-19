@@ -18,16 +18,15 @@ import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -409,15 +408,17 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     private static final String PATIENT_COUNT_FOR_SITE_QRY = "select count(distinct patients) from "
-        + Site.class.getName()
-        + " as site join site."
+        + Center.class.getName()
+        + " as center join center."
         + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pvs join pvs.patient as patients where site."
-        + SitePeer.ID.getName()
+        + " as pes join pes.patient as patients where center."
+        + CenterPeer.ID.getName()
         + "=? and "
         + "patients."
         + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
+    // FIXME : We might want also to go through the CollectionEvent to count the
+    // patients ! (for clinics for example)
     public long getPatientCountForCenter(CenterWrapper<?> center)
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_SITE_QRY,
@@ -425,11 +426,11 @@ public class StudyWrapper extends StudyBaseWrapper {
         return getCountResult(appService, c);
     }
 
-    private static final String VISIT_COUNT_FOR_SITE_QRY = "select count(distinct visits) from "
-        + Site.class.getName()
-        + " as site join site."
+    private static final String PROCESSING_EVENT_COUNT_FOR_SITE_QRY = "select count(distinct pes) from "
+        + Center.class.getName()
+        + " as center join center."
         + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as visits join visits."
+        + " as pes join pes."
         + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION.getName()
         + " as svs join svs."
         + SourceVesselPeer.PATIENT.getName()
@@ -437,20 +438,20 @@ public class StudyWrapper extends StudyBaseWrapper {
         + PatientPeer.STUDY.getName()
         + " as study where study."
         + StudyPeer.ID.getName()
-        + "=? and site."
-        + SitePeer.ID.getName()
+        + "=? and center."
+        + CenterPeer.ID.getName()
         + "=?";
 
-    public long getProcessingEventCountForCenter(CenterWrapper<?> site)
+    public long getProcessingEventCountForCenter(CenterWrapper<?> center)
         throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_SITE_QRY,
-            Arrays.asList(new Object[] { site.getId(), getId() }));
+        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_COUNT_FOR_SITE_QRY,
+            Arrays.asList(new Object[] { getId(), center.getId() }));
         return getCountResult(appService, c);
     }
 
-    private static final String VISIT_COUNT_QRY = "select count(distinct visits) from "
+    private static final String PROCESSING_EVENT_COUNT_QRY = "select count(distinct pes) from "
         + ProcessingEvent.class.getName()
-        + " as visits join visits."
+        + " as pes join pes."
         + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION.getName()
         + " as svs join svs."
         + SourceVesselPeer.PATIENT.getName()
@@ -461,7 +462,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public long getProcessingEventCount() throws ApplicationException,
         BiobankException {
-        HQLCriteria c = new HQLCriteria(VISIT_COUNT_QRY,
+        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, c);
     }

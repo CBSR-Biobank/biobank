@@ -278,7 +278,7 @@ public class TestPatient extends TestDatabase {
         Assert.assertTrue(list.isEmpty());
 
         List<ProcessingEventWrapper> visitsAdded = ProcessingEventHelper
-            .addProcessingEvents(site, patient, 3);
+            .addProcessingEvents(site, patient, 3, false);
 
         patient.reload();
         List<ProcessingEventWrapper> pevents = patient

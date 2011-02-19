@@ -7,8 +7,13 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class ProcessingEventHelper extends DbHelper {
@@ -56,11 +61,34 @@ public class ProcessingEventHelper extends DbHelper {
      */
     public static ProcessingEventWrapper addProcessingEvent(
         CenterWrapper<?> center, PatientWrapper patient, Date dateProcessed,
-        Date dateDrawn) throws Exception {
+        Date dateDrawn, boolean includeSourceVessels) throws Exception {
         ProcessingEventWrapper pv = newProcessingEvent(center, patient,
             dateProcessed, dateDrawn);
         pv.persist();
+        if (includeSourceVessels) {
+            List<ClinicWrapper> clinics = patient.getStudy()
+                .getClinicCollection();
+            if ((clinics == null) || clinics.isEmpty())
+                throw new Exception(
+                    "Cannot add source vessels: no clinic link to the study to "
+                        + "create a collection event");
+            SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(
+                patient, Utils.getRandomDate(), 0.1);
+            sv.setProcessingEvent(pv);
+            CollectionEventWrapper ce = CollectionEventHelper
+                .addCollectionEventNoWaybill(
+                    clinics.get(0),
+                    ShippingMethodWrapper.getShippingMethods(appService).get(0),
+                    sv);
+        }
         return pv;
+    }
+
+    public static ProcessingEventWrapper addProcessingEvent(
+        CenterWrapper<?> center, PatientWrapper patient, Date dateProcessed,
+        Date dateDrawn) throws Exception {
+        return addProcessingEvent(center, patient, dateProcessed, dateDrawn,
+            false);
     }
 
     /**
@@ -75,26 +103,36 @@ public class ProcessingEventHelper extends DbHelper {
      */
     public static List<ProcessingEventWrapper> addProcessingEvents(
         CenterWrapper<?> center, PatientWrapper patient, int minimumNumber,
-        int maxNumber) throws ParseException, Exception {
+        int maxNumber, boolean includeSourceVessels) throws ParseException,
+        Exception {
         int count = r.nextInt(maxNumber - minimumNumber + 1) + minimumNumber;
         List<ProcessingEventWrapper> pevents = new ArrayList<ProcessingEventWrapper>();
         for (int i = 0; i < count; i++) {
             pevents.add(addProcessingEvent(center, patient,
-                TestCommon.getUniqueDate(r), TestCommon.getUniqueDate(r)));
+                TestCommon.getUniqueDate(r), TestCommon.getUniqueDate(r),
+                includeSourceVessels));
         }
         return pevents;
     }
 
     public static List<ProcessingEventWrapper> addProcessingEvents(
-        CenterWrapper<?> center, PatientWrapper patient, int minimumNumber)
-        throws ParseException, Exception {
-        return addProcessingEvents(center, patient, minimumNumber, 15);
+        CenterWrapper<?> center, PatientWrapper patient, int minimumNumber,
+        boolean includeSourceVessels) throws ParseException, Exception {
+        return addProcessingEvents(center, patient, minimumNumber, 15,
+            includeSourceVessels);
+    }
+
+    public static List<ProcessingEventWrapper> addProcessingEvents(
+        CenterWrapper<?> center, PatientWrapper patient,
+        boolean includeSourceVessels) throws ParseException, Exception {
+        return addProcessingEvents(center, patient, 1, includeSourceVessels);
     }
 
     public static List<ProcessingEventWrapper> addProcessingEvents(
         CenterWrapper<?> center, PatientWrapper patient) throws ParseException,
         Exception {
-        return addProcessingEvents(center, patient, 1);
+        return addProcessingEvents(center, patient, false);
 
     }
+
 }

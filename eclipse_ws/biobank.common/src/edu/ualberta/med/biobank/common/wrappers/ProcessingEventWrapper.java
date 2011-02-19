@@ -272,6 +272,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         // patient to clinic relationship tested by shipment, so no need to
         // test it again here
         // TODO: new checks required
+        // TODO at least one sourcewrapper ?
     }
 
     @Override
