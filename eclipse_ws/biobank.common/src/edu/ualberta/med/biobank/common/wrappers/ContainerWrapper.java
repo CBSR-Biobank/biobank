@@ -101,10 +101,10 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                 + getProductBarcode() + "\" already exists.");
         checkTopAndParent();
         checkParentAcceptContainerType();
-        checkContainerTypeSameSite();
         checkHasPosition();
         objectWithPositionManagement.persistChecks();
         checkParentFromSameSite();
+        checkContainerTypeSameSite();
     }
 
     private void checkParentFromSameSite() throws BiobankCheckException {
@@ -851,8 +851,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public static List<ContainerWrapper> getContainersHoldingContainerTypes(
         WritableApplicationService appService, String label, SiteWrapper site,
         List<ContainerTypeWrapper> types) throws ApplicationException {
-        if (site == null)
-            return new ArrayList<ContainerWrapper>();
+        if (site == null) {
+            throw new NullPointerException();
+        }
         List<Integer> typeIds = new ArrayList<Integer>();
         for (ContainerTypeWrapper type : types) {
             typeIds.add(type.getId());
