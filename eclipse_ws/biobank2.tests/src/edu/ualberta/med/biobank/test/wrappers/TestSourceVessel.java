@@ -9,11 +9,16 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
+import edu.ualberta.med.biobank.test.internal.SourceVesselTypeHelper;
+import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class TestSourceVessel extends TestDatabase {
@@ -26,24 +31,27 @@ public class TestSourceVessel extends TestDatabase {
     @Before
     public void setUp() throws Exception {
         super.setUp();
-        p1 = PatientHelper.newPatient("444");
+        StudyWrapper study = StudyHelper.addStudy(Utils.getRandomString(11));
+        p1 = PatientHelper.addPatient(Utils.getRandomNumericString(11), study);
         ssw = SourceVesselHelper
             .newSourceVessel(p1, Utils.getRandomDate(), 0.1);
         defaultSite = SiteHelper.addSite("Default");
+        CollectionEventHelper.addCollectionEvent(defaultSite,
+            ShippingMethodHelper.addShippingMethod(Utils.getRandomString(11)),
+            ssw);
+        ssw.reload();
     }
 
     @Test
     public void testCompareTo() throws Exception {
-        SourceVesselWrapper newSourceVessel = SourceVesselHelper
-            .newSourceVessel(p1, Utils.getRandomDate(), 0.1);
-        Assert.assertTrue(newSourceVessel.compareTo(ssw) > 0);
-        Assert.assertTrue(ssw.compareTo(newSourceVessel) < 0);
-        Assert.assertTrue(newSourceVessel.compareTo(ssw) == 0);
+        Assert.assertTrue(ssw.compareTo(ssw) == 0);
     }
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         String old = ssw.getSourceVesselType().getName();
+        ssw.setSourceVesselType(SourceVesselTypeHelper
+            .addSourceVesselType(Utils.getRandomString(11)));
         ssw.reset();
         Assert.assertEquals(old, ssw.getSourceVesselType().getName());
     }

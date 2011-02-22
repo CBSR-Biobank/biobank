@@ -44,10 +44,8 @@ public class SourceVesselWrapper extends SourceVesselBaseWrapper {
     public int compareTo(ModelWrapper<SourceVessel> wrapper) {
         if (wrapper instanceof SourceVesselWrapper) {
             SourceVesselWrapper svWrapper = (SourceVesselWrapper) wrapper;
-            String name1 = toString();
-            String name2 = svWrapper.toString();
 
-            return nullSafeComparator(name1, name2);
+            return nullSafeComparator(svWrapper.getId(), getId());
         }
         return 0;
     }
