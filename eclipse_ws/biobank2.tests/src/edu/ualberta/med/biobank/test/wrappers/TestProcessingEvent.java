@@ -77,14 +77,14 @@ public class TestProcessingEvent extends TestDatabase {
         super.setUp();
         containerMap = new HashMap<String, ContainerWrapper>();
         containerTypeMap = new HashMap<String, ContainerTypeWrapper>();
-        site = SiteHelper.addSite("Site - Patient Visit Test "
+        site = SiteHelper.addSite("Site - Processing Event Test "
             + Utils.getRandomString(10));
-        study = StudyHelper.addStudy("Study - Patient Visit Test "
+        study = StudyHelper.addStudy("Study - Processing Event Test "
             + Utils.getRandomString(10));
-        clinic = ClinicHelper.addClinic("Clinic - Patient Visit Test "
+        clinic = ClinicHelper.addClinic("Clinic - Processing Event Test "
             + Utils.getRandomString(10));
         ContactWrapper contact = ContactHelper.addContact(clinic,
-            "Contact - Patient Visit Test");
+            "Contact - Processing Event Test");
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         patient = PatientHelper.addPatient(Utils.getRandomNumericString(20),
@@ -144,14 +144,14 @@ public class TestProcessingEvent extends TestDatabase {
 
     @Test
     public void testGettersAndSetters() throws Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
-        testGettersAndSetters(visit, GETTER_SKIP_METHODS);
+        testGettersAndSetters(pevent, GETTER_SKIP_METHODS);
 
-        visit = new ProcessingEventWrapper(appService);
-        Assert.assertEquals(null, visit.getPatient());
-        Assert.assertEquals(null, visit.getActivityStatus());
+        pevent = new ProcessingEventWrapper(appService);
+        Assert.assertEquals(null, pevent.getPatient());
+        Assert.assertEquals(null, pevent.getActivityStatus());
     }
 
     @Test
@@ -183,49 +183,49 @@ public class TestProcessingEvent extends TestDatabase {
 
     @Test
     public void testReset() throws Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
-        visit.reset();
+        pevent.reset();
     }
 
     @Test
     public void testReload() throws Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
-        visit.reload();
+        pevent.reload();
     }
 
     @Test
     public void testDelete() throws Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
-        visit.delete();
+        pevent.delete();
 
-        // make sure visit cannot be deleted if it has samples
-        visit = ProcessingEventHelper.addProcessingEvent(site, patient,
+        // make sure pevent cannot be deleted if it has samples
+        pevent = ProcessingEventHelper.addProcessingEvent(site, patient,
             Utils.getRandomDate(), Utils.getRandomDate());
         addContainerTypes();
         addContainers();
         List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
             .getAllSampleTypes(appService, true);
         AliquotWrapper aliquot = AliquotHelper.addAliquot(
-            allSampleTypes.get(0), containerMap.get("ChildL1"), visit, 0, 0);
-        visit.reload();
+            allSampleTypes.get(0), containerMap.get("ChildL1"), pevent, 0, 0);
+        pevent.reload();
 
         try {
-            visit.delete();
-            Assert.fail("should not be allowed to delete patient visit");
+            pevent.delete();
+            Assert.fail("should not be allowed to delete Processing Event");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
 
-        // delete aliquot and visit
+        // delete aliquot and pevent
         aliquot.delete();
-        visit.reload();
-        visit.delete();
+        pevent.reload();
+        pevent.delete();
     }
 
     @Test
@@ -259,7 +259,7 @@ public class TestProcessingEvent extends TestDatabase {
 
         try {
             ceventTest.delete();
-            Assert.fail("one visit still there");
+            Assert.fail("one pevent still there");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
@@ -271,6 +271,7 @@ public class TestProcessingEvent extends TestDatabase {
         int countBefore = appService.search(CollectionEvent.class,
             new CollectionEvent()).size();
         ceventTest.reload();
+        DbHelper.deleteFromList(ceventTest.getSourceVesselCollection(false));
         ceventTest.delete();
         int countAfter = appService.search(CollectionEvent.class,
             new CollectionEvent()).size();
@@ -279,15 +280,15 @@ public class TestProcessingEvent extends TestDatabase {
 
     @Test
     public void testGetWrappedClass() throws Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
-        Assert.assertEquals(ProcessingEvent.class, visit.getWrappedClass());
+        Assert.assertEquals(ProcessingEvent.class, pevent.getWrappedClass());
     }
 
     @Test
     public void testGetSampleCollection() throws Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
         addContainerTypes();
@@ -309,13 +310,13 @@ public class TestProcessingEvent extends TestDatabase {
                 // col);
                 sampleMap.put(row + col * rows, AliquotHelper.addAliquot(
                     allSampleTypes.get(r.nextInt(allSampleTypesCount)),
-                    container, visit, row, col));
+                    container, pevent, row, col));
             }
         }
-        visit.reload();
+        pevent.reload();
 
         // verify that all samples are there
-        Collection<AliquotWrapper> visitSamples = visit
+        Collection<AliquotWrapper> visitSamples = pevent
             .getAliquotCollection(false);
         Assert.assertEquals(sampleMap.size(), visitSamples.size());
 
@@ -335,8 +336,8 @@ public class TestProcessingEvent extends TestDatabase {
         for (AliquotWrapper aliquot : visitSamples) {
             aliquot.delete();
         }
-        visit.reload();
-        visitSamples = visit.getAliquotCollection(false);
+        pevent.reload();
+        visitSamples = pevent.getAliquotCollection(false);
         Assert.assertEquals(0, visitSamples.size());
     }
 
@@ -346,28 +347,28 @@ public class TestProcessingEvent extends TestDatabase {
         List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
         Assert.assertEquals(5, labels.size());
 
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
                 Utils.getRandomDate());
-        visit.reload();
+        pevent.reload();
 
-        Assert.assertEquals(0, visit.getPvAttrLabels().length);
+        Assert.assertEquals(0, pevent.getPvAttrLabels().length);
 
-        visit.setPvAttrValue("PMBC Count", "-0.543");
-        visit.setPvAttrValue("Worksheet", "abcdefghi");
-        visit.setPvAttrValue("Date", "1999-12-31 23:59");
-        visit.setPvAttrValue("Consent", "c1;c2;c3");
-        visit.setPvAttrValue("Visit", "v1");
-        visit.persist();
+        pevent.setPvAttrValue("PMBC Count", "-0.543");
+        pevent.setPvAttrValue("Worksheet", "abcdefghi");
+        pevent.setPvAttrValue("Date", "1999-12-31 23:59");
+        pevent.setPvAttrValue("Consent", "c1;c2;c3");
+        pevent.setPvAttrValue("Visit", "v1");
+        pevent.persist();
 
-        labels = Arrays.asList(visit.getPvAttrLabels());
+        labels = Arrays.asList(pevent.getPvAttrLabels());
         Assert.assertEquals(5, labels.size());
         Assert.assertTrue(labels.containsAll(Arrays.asList("PMBC Count",
             "Worksheet", "Date", "Consent", "Visit")));
 
         // set an invalid label
         try {
-            visit.setPvAttrValue("xyz", "abcdef");
+            pevent.setPvAttrValue("xyz", "abcdef");
             Assert.fail("should not be allowed to assign invalid value");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -376,11 +377,11 @@ public class TestProcessingEvent extends TestDatabase {
 
     @Test
     public void testEmptyGetPvAttr() throws Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
                 Utils.getRandomDate());
-        visit.reload();
-        List<String> pvAttr = Arrays.asList(visit.getPvAttrLabels());
+        pevent.reload();
+        List<String> pvAttr = Arrays.asList(pevent.getPvAttrLabels());
         Assert.assertEquals(0, pvAttr.size());
     }
 
@@ -388,21 +389,21 @@ public class TestProcessingEvent extends TestDatabase {
     public void testGetPvAttr() throws Exception {
         addPvAttrs();
 
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
                 Utils.getRandomDate());
-        visit.reload();
+        pevent.reload();
 
         // no values have been set yet, they should return null
-        Assert.assertEquals(null, visit.getPvAttrValue("PMBC Count"));
-        Assert.assertEquals(null, visit.getPvAttrValue("Worksheet"));
-        Assert.assertEquals(null, visit.getPvAttrValue("Date"));
-        Assert.assertEquals(null, visit.getPvAttrValue("Consent"));
-        Assert.assertEquals(null, visit.getPvAttrValue("Visit"));
+        Assert.assertEquals(null, pevent.getPvAttrValue("PMBC Count"));
+        Assert.assertEquals(null, pevent.getPvAttrValue("Worksheet"));
+        Assert.assertEquals(null, pevent.getPvAttrValue("Date"));
+        Assert.assertEquals(null, pevent.getPvAttrValue("Consent"));
+        Assert.assertEquals(null, pevent.getPvAttrValue("Visit"));
 
         // select an invalid PvAttr label
         try {
-            visit.getPvAttrValue("abcdef");
+            pevent.getPvAttrValue("abcdef");
             Assert.fail("should not be query an invalid label");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -410,25 +411,25 @@ public class TestProcessingEvent extends TestDatabase {
 
         // assign PvAttrs correctly
         String worksheetValue = Utils.getRandomString(10, 20);
-        visit.setPvAttrValue("PMBC Count", "-0.543");
-        visit.setPvAttrValue("Worksheet", worksheetValue);
-        visit.setPvAttrValue("Date", "1999-12-31 23:59");
-        visit.setPvAttrValue("Consent", "c1;c2;c3");
-        visit.setPvAttrValue("Visit", "v1");
-        visit.persist();
+        pevent.setPvAttrValue("PMBC Count", "-0.543");
+        pevent.setPvAttrValue("Worksheet", worksheetValue);
+        pevent.setPvAttrValue("Date", "1999-12-31 23:59");
+        pevent.setPvAttrValue("Consent", "c1;c2;c3");
+        pevent.setPvAttrValue("Visit", "v1");
+        pevent.persist();
 
-        visit.reload();
-        List<String> pvAttr = Arrays.asList(visit.getPvAttrLabels());
+        pevent.reload();
+        List<String> pvAttr = Arrays.asList(pevent.getPvAttrLabels());
         Assert.assertEquals(5, pvAttr.size());
-        Assert.assertEquals("-0.543", visit.getPvAttrValue("PMBC Count"));
-        Assert.assertEquals(worksheetValue, visit.getPvAttrValue("Worksheet"));
-        Assert.assertEquals("1999-12-31 23:59", visit.getPvAttrValue("Date"));
-        Assert.assertEquals("c1;c2;c3", visit.getPvAttrValue("Consent"));
-        Assert.assertEquals("v1", visit.getPvAttrValue("Visit"));
+        Assert.assertEquals("-0.543", pevent.getPvAttrValue("PMBC Count"));
+        Assert.assertEquals(worksheetValue, pevent.getPvAttrValue("Worksheet"));
+        Assert.assertEquals("1999-12-31 23:59", pevent.getPvAttrValue("Date"));
+        Assert.assertEquals("c1;c2;c3", pevent.getPvAttrValue("Consent"));
+        Assert.assertEquals("v1", pevent.getPvAttrValue("Visit"));
 
         // select an invalid value for a number PvAttr
         try {
-            visit.setPvAttrValue("PMBC Count", "abcdef");
+            pevent.setPvAttrValue("PMBC Count", "abcdef");
             Assert.fail("should not be allowed to assign invalid value");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -436,7 +437,7 @@ public class TestProcessingEvent extends TestDatabase {
 
         // select an invalid value for a date_time PvAttr
         try {
-            visit.setPvAttrValue("PMBC Count", "1999-12-31 2300:59");
+            pevent.setPvAttrValue("PMBC Count", "1999-12-31 2300:59");
             Assert.fail("should not be allowed to assign invalid value");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -444,7 +445,7 @@ public class TestProcessingEvent extends TestDatabase {
 
         // select an invalid value for a select_multiple PvAttr
         try {
-            visit.setPvAttrValue("Consent", "c2;c99");
+            pevent.setPvAttrValue("Consent", "c2;c99");
             Assert.fail("should not be allowed to assign invalid value");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -452,7 +453,7 @@ public class TestProcessingEvent extends TestDatabase {
 
         // select an invalid value for a select_single PvAttr
         try {
-            visit.setPvAttrValue("Visit", "abcdef");
+            pevent.setPvAttrValue("Visit", "abcdef");
             Assert.fail("should not be allowed to assign invalid value");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -465,45 +466,45 @@ public class TestProcessingEvent extends TestDatabase {
         List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
         Assert.assertEquals(5, labels.size());
 
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
                 Utils.getRandomDate());
-        visit.reload();
+        pevent.reload();
 
-        // get types before they are assigned on patient visit
-        Assert.assertEquals("number", visit.getPvAttrTypeName("PMBC Count"));
-        Assert.assertEquals("text", visit.getPvAttrTypeName("Worksheet"));
-        Assert.assertEquals("date_time", visit.getPvAttrTypeName("Date"));
+        // get types before they are assigned on Processing Event
+        Assert.assertEquals("number", pevent.getPvAttrTypeName("PMBC Count"));
+        Assert.assertEquals("text", pevent.getPvAttrTypeName("Worksheet"));
+        Assert.assertEquals("date_time", pevent.getPvAttrTypeName("Date"));
         Assert.assertEquals("select_multiple",
-            visit.getPvAttrTypeName("Consent"));
-        Assert.assertEquals("select_single", visit.getPvAttrTypeName("Visit"));
+            pevent.getPvAttrTypeName("Consent"));
+        Assert.assertEquals("select_single", pevent.getPvAttrTypeName("Visit"));
 
         // select an invalid label
         try {
-            visit.getPvAttrTypeName("xyz");
+            pevent.getPvAttrTypeName("xyz");
             Assert.fail("should not be allowed get type for invalid label");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
 
-        visit.setPvAttrValue("PMBC Count", "-0.543");
-        visit.setPvAttrValue("Worksheet", "abcdefghi");
-        visit.setPvAttrValue("Date", "1999-12-31 23:59");
-        visit.setPvAttrValue("Consent", "c1;c2;c3");
-        visit.setPvAttrValue("Visit", "v1");
-        visit.persist();
+        pevent.setPvAttrValue("PMBC Count", "-0.543");
+        pevent.setPvAttrValue("Worksheet", "abcdefghi");
+        pevent.setPvAttrValue("Date", "1999-12-31 23:59");
+        pevent.setPvAttrValue("Consent", "c1;c2;c3");
+        pevent.setPvAttrValue("Visit", "v1");
+        pevent.persist();
 
         // set value to null
-        visit.setPvAttrValue("PMBC Count", null);
-        visit.persist();
+        pevent.setPvAttrValue("PMBC Count", null);
+        pevent.persist();
 
-        // get types after they are assigned on patient visit
-        Assert.assertEquals("number", visit.getPvAttrTypeName("PMBC Count"));
-        Assert.assertEquals("text", visit.getPvAttrTypeName("Worksheet"));
-        Assert.assertEquals("date_time", visit.getPvAttrTypeName("Date"));
+        // get types after they are assigned on Processing Event
+        Assert.assertEquals("number", pevent.getPvAttrTypeName("PMBC Count"));
+        Assert.assertEquals("text", pevent.getPvAttrTypeName("Worksheet"));
+        Assert.assertEquals("date_time", pevent.getPvAttrTypeName("Date"));
         Assert.assertEquals("select_multiple",
-            visit.getPvAttrTypeName("Consent"));
-        Assert.assertEquals("select_single", visit.getPvAttrTypeName("Visit"));
+            pevent.getPvAttrTypeName("Consent"));
+        Assert.assertEquals("select_single", pevent.getPvAttrTypeName("Visit"));
     }
 
     @Test
@@ -512,37 +513,37 @@ public class TestProcessingEvent extends TestDatabase {
         List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
         Assert.assertEquals(5, labels.size());
 
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
                 Utils.getRandomDate());
-        visit.reload();
+        pevent.reload();
 
-        visit.setPvAttrValue("PMBC Count", "-0.543");
-        visit.setPvAttrValue("Worksheet", "abcdefghi");
-        visit.setPvAttrValue("Date", "1999-12-31 23:59");
-        visit.setPvAttrValue("Consent", "c1;c2;c3");
-        visit.setPvAttrValue("Visit", "v1");
-        visit.persist();
-        visit.reload();
+        pevent.setPvAttrValue("PMBC Count", "-0.543");
+        pevent.setPvAttrValue("Worksheet", "abcdefghi");
+        pevent.setPvAttrValue("Date", "1999-12-31 23:59");
+        pevent.setPvAttrValue("Consent", "c1;c2;c3");
+        pevent.setPvAttrValue("Visit", "v1");
+        pevent.persist();
+        pevent.reload();
 
-        Assert.assertEquals(null, visit.getPvAttrPermissible("PMBC Count"));
-        Assert.assertEquals(null, visit.getPvAttrPermissible("Worksheet"));
-        Assert.assertEquals(null, visit.getPvAttrPermissible("Date"));
+        Assert.assertEquals(null, pevent.getPvAttrPermissible("PMBC Count"));
+        Assert.assertEquals(null, pevent.getPvAttrPermissible("Worksheet"));
+        Assert.assertEquals(null, pevent.getPvAttrPermissible("Date"));
 
-        List<String> permissibles = Arrays.asList(visit
+        List<String> permissibles = Arrays.asList(pevent
             .getPvAttrPermissible("Consent"));
         Assert.assertEquals(3, permissibles.size());
         Assert.assertTrue(permissibles.containsAll(Arrays.asList("c1", "c2",
             "c3")));
 
-        permissibles = Arrays.asList(visit.getPvAttrPermissible("Visit"));
+        permissibles = Arrays.asList(pevent.getPvAttrPermissible("Visit"));
         Assert.assertEquals(4, permissibles.size());
         Assert.assertTrue(permissibles.containsAll(Arrays.asList("v1", "v2",
             "v3", "v4")));
 
         // select an invalid label
         try {
-            visit.getPvAttrPermissible("xyz");
+            pevent.getPvAttrPermissible("xyz");
             Assert
                 .fail("should not be allowed get permissible for invalid label");
         } catch (Exception e) {
@@ -556,19 +557,19 @@ public class TestProcessingEvent extends TestDatabase {
         List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
         Assert.assertEquals(5, labels.size());
 
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
                 Utils.getRandomDate());
-        visit.reload();
+        pevent.reload();
 
         // lock an attribute
         study.setStudyPvAttrActivityStatus("Worksheet", ActivityStatusWrapper
             .getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING));
         study.persist();
-        visit.reload();
+        pevent.reload();
         try {
-            visit.setPvAttrValue("Worksheet", "xyz");
+            pevent.setPvAttrValue("Worksheet", "xyz");
             Assert.fail("should not be allowed set value for locked label");
         } catch (Exception e) {
             Assert.assertTrue(true);
@@ -578,9 +579,9 @@ public class TestProcessingEvent extends TestDatabase {
         study.setStudyPvAttrActivityStatus("Worksheet",
             ActivityStatusWrapper.getActiveActivityStatus(appService));
         study.persist();
-        visit.reload();
-        visit.setPvAttrValue("Worksheet", "xyz");
-        visit.persist();
+        pevent.reload();
+        pevent.setPvAttrValue("Worksheet", "xyz");
+        pevent.persist();
     }
 
     @Test
@@ -589,18 +590,18 @@ public class TestProcessingEvent extends TestDatabase {
         List<String> labels = Arrays.asList(study.getStudyPvAttrLabels());
         Assert.assertEquals(5, labels.size());
 
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
                 Utils.getRandomDate());
-        visit.reload();
+        pevent.reload();
 
-        visit.setPvAttrValue("Worksheet", "abcdefghi");
-        visit.persist();
+        pevent.setPvAttrValue("Worksheet", "abcdefghi");
+        pevent.persist();
 
         // change the worksheet value
-        visit.setPvAttrValue("Worksheet", "jklmnopqr");
-        visit.persist();
-        visit.reload();
+        pevent.setPvAttrValue("Worksheet", "jklmnopqr");
+        pevent.persist();
+        pevent.reload();
 
         // make sure only one value in database
         HQLCriteria c = new HQLCriteria(
@@ -609,7 +610,7 @@ public class TestProcessingEvent extends TestDatabase {
                 + " as pv "
                 + "join pv.pvAttrCollection as pvattr "
                 + "join pvattr.studyPvAttr as spvattr where pv.id = ? and spvattr.label= ?",
-            Arrays.asList(new Object[] { visit.getId(), "Worksheet" }));
+            Arrays.asList(new Object[] { pevent.getId(), "Worksheet" }));
         List<PvAttr> results = appService.query(c);
         Assert.assertEquals(1, results.size());
     }
@@ -617,60 +618,38 @@ public class TestProcessingEvent extends TestDatabase {
     @Test
     public void testGetFormattedDateProcessed() throws Exception {
         Date date = Utils.getRandomDate();
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, date, date);
 
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         Assert.assertTrue(sdf.format(date).equals(
-            visit.getFormattedDateProcessed()));
+            pevent.getFormattedDateProcessed()));
     }
 
     @Test
     public void testGetPatient() throws Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
                 Utils.getRandomDate());
-        Assert.assertEquals(patient, visit.getPatient());
+        Assert.assertEquals(patient, pevent.getPatient());
     }
 
     @Test
     public void testCheckHasCollectionEvent() throws Exception {
         // check valid case
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .newProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
                 Utils.getRandomDate());
 
         // check invalid case
-        visit = new ProcessingEventWrapper(appService);
-        visit.setPatient(patient);
-        visit.setDateProcessed(TestCommon.getUniqueDate(r));
+        pevent = new ProcessingEventWrapper(appService);
+        pevent.setPatient(patient);
+        pevent.setDateProcessed(TestCommon.getUniqueDate(r));
 
         try {
-            visit.persist();
+            pevent.persist();
             Assert
                 .fail("should not be allowed to add a visits with no shipment");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
-    }
-
-    @Test
-    public void testCheckPatientInCollectionEvent() throws Exception {
-        // check valid case
-        ProcessingEventWrapper visit = ProcessingEventHelper
-            .newProcessingEvent(site, patient, TestCommon.getUniqueDate(r),
-                Utils.getRandomDate());
-
-        // check invalid case
-        PatientWrapper patient2 = PatientHelper.addPatient(
-            Utils.getRandomNumericString(20), study);
-        visit = ProcessingEventHelper.newProcessingEvent(site, patient2,
-            TestCommon.getUniqueDate(r), Utils.getRandomDate());
-
-        try {
-            visit.persist();
-            Assert
-                .fail("should not be allowed to add a visits with patient not in shipment");
         } catch (Exception e) {
             Assert.assertTrue(true);
         }
@@ -687,42 +666,53 @@ public class TestProcessingEvent extends TestDatabase {
 
     @Test
     public void testAddSourceVessels() throws Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
 
-        SourceVesselWrapper ss1, ss2, ss3;
+        SourceVesselWrapper sv1, sv2, sv3;
 
-        ss1 = SourceVesselHelper.newSourceVessel(visit.getPatient(),
+        sv1 = SourceVesselHelper.newSourceVessel(pevent.getPatient(),
             Utils.getRandomDate(), 0.01);
-        ss2 = SourceVesselHelper.newSourceVessel(visit.getPatient(),
+        sv2 = SourceVesselHelper.newSourceVessel(pevent.getPatient(),
             Utils.getRandomDate(), 0.01);
 
-        visit.addToSourceVesselCollection(Arrays.asList(ss1, ss2));
-        visit.persist();
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(site,
+                ShippingMethodWrapper.getShippingMethods(appService).get(0),
+                sv1, sv2);
 
-        visit.reload();
+        pevent.addToSourceVesselCollection(Arrays.asList(sv1, sv2));
+        pevent.persist();
+
+        for (SourceVesselWrapper sv : Arrays.asList(sv1, sv2)) {
+            sv.setCollectionEvent(cevent);
+            sv.setProcessingEvent(pevent);
+            sv.persist();
+        }
+
+        pevent.reload();
         // get the sorted list
-        List<SourceVesselWrapper> list = visit.getSourceVesselCollection(true);
+        List<SourceVesselWrapper> list = pevent.getSourceVesselCollection(true);
         Assert.assertEquals(2, list.size());
         Assert.assertTrue(list.get(0).compareTo(list.get(1)) < 0);
 
-        ss3 = SourceVesselHelper.newSourceVessel(visit.getPatient(),
+        sv3 = SourceVesselHelper.newSourceVessel(pevent.getPatient(),
             Utils.getRandomDate(), 0.01);
 
         SourceVesselWrapper pvss = list.get(0);
-        visit.removeFromSourceVesselCollection(Arrays.asList(pvss));
-        visit.addToSourceVesselCollection(Arrays.asList(ss3));
+        pevent.removeFromSourceVesselCollection(Arrays.asList(pvss));
+        pevent.addToSourceVesselCollection(Arrays.asList(sv3));
 
-        visit.persist();
+        pevent.persist();
 
-        list = visit.getSourceVesselCollection(false);
+        list = pevent.getSourceVesselCollection(false);
         Assert.assertEquals(2, list.size());
     }
 
     @Test
     public void testAddAliquot() throws BiobankCheckException, Exception {
-        ProcessingEventWrapper visit = ProcessingEventHelper
+        ProcessingEventWrapper pevent = ProcessingEventHelper
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
 
@@ -737,7 +727,7 @@ public class TestProcessingEvent extends TestDatabase {
             sampleType);
         ss3.setVolume(3.0);
         ss3.persist();
-        visit.reload();
+        pevent.reload();
 
         String inventoryId = "newid";
         AliquotWrapper newAliquot = new AliquotWrapper(appService);
@@ -746,8 +736,8 @@ public class TestProcessingEvent extends TestDatabase {
         newAliquot.setSampleType(sampleType);
         newAliquot.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
-        visit.addAliquots(Arrays.asList(newAliquot));
-        visit.persist();
+        pevent.addAliquots(Arrays.asList(newAliquot));
+        pevent.persist();
 
         AliquotWrapper aliquot = AliquotWrapper.getAliquot(appService,
             inventoryId, null);
@@ -755,7 +745,7 @@ public class TestProcessingEvent extends TestDatabase {
         Assert.assertEquals(aliquot.getSampleType().getId(), newAliquot
             .getSampleType().getId());
         Assert.assertTrue(aliquot.getQuantity().equals(3.0));
-        Assert
-            .assertEquals(aliquot.getProcessingEvent().getId(), visit.getId());
+        Assert.assertEquals(aliquot.getProcessingEvent().getId(),
+            pevent.getId());
     }
 }

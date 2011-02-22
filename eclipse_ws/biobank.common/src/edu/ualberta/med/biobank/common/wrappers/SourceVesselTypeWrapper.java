@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.Arrays;
+import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -24,6 +25,14 @@ public class SourceVesselTypeWrapper extends SourceVesselTypeBaseWrapper {
     public SourceVesselTypeWrapper(WritableApplicationService appService,
         SourceVesselType sourceVesselType) {
         super(appService, sourceVesselType);
+    }
+
+    @Override
+    public int compareTo(ModelWrapper<SourceVesselType> o) {
+        if (o instanceof SourceVesselTypeWrapper) {
+            return getName().compareTo(((SourceVesselTypeWrapper) o).getName());
+        }
+        return 0;
     }
 
     @Override
@@ -66,5 +75,21 @@ public class SourceVesselTypeWrapper extends SourceVesselTypeBaseWrapper {
         c = new HQLCriteria(IS_USED_BY_SV_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;
+    }
+
+    public static void persistSourceVesselTypes(
+        List<SourceVesselTypeWrapper> addedOrModifiedTypes,
+        List<SourceVesselTypeWrapper> typesToDelete)
+        throws BiobankCheckException, Exception {
+        if (addedOrModifiedTypes != null) {
+            for (SourceVesselTypeWrapper svt : addedOrModifiedTypes) {
+                svt.persist();
+            }
+        }
+        if (typesToDelete != null) {
+            for (SourceVesselTypeWrapper svt : typesToDelete) {
+                svt.delete();
+            }
+        }
     }
 }

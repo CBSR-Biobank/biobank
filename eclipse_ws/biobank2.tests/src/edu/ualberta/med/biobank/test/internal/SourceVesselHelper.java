@@ -14,15 +14,20 @@ public class SourceVesselHelper extends DbHelper {
     public static List<SourceVesselWrapper> createdSourceVessels = new ArrayList<SourceVesselWrapper>();
 
     public static SourceVesselWrapper newSourceVessel(PatientWrapper patient,
-        Date timeDrawn, Double volume) {
+        SourceVesselTypeWrapper svType, Date timeDrawn, Double volume) {
         SourceVesselWrapper source = new SourceVesselWrapper(appService);
-        SourceVesselTypeWrapper svt = SourceVesselTypeHelper
-            .addSourceVesselType(Utils.getRandomString(11) + r.nextInt());
-        source.setSourceVesselType(svt);
+        source.setSourceVesselType(svType);
         source.setPatient(patient);
         source.setTimeDrawn(timeDrawn);
         source.setVolume(volume);
         return source;
+    }
+
+    public static SourceVesselWrapper newSourceVessel(PatientWrapper patient,
+        Date timeDrawn, Double volume) {
+        SourceVesselTypeWrapper svType = SourceVesselTypeHelper
+            .addSourceVesselType(Utils.getRandomString(11) + r.nextInt());
+        return newSourceVessel(patient, svType, timeDrawn, volume);
     }
 
     public static void deleteCreatedSourceVessels() throws Exception {
