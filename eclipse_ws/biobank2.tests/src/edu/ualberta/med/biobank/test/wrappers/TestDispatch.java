@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
@@ -319,7 +318,7 @@ public class TestDispatch extends TestDatabase {
 
         senderSite.persist();
         senderSite.reload();
-        DispatchWrapper shipment = DispatchHelper.addDispatch(senderSite,
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
             receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
                 .get(0));
         List<SampleTypeWrapper> sampleTypes = SampleTypeWrapper
@@ -331,7 +330,8 @@ public class TestDispatch extends TestDatabase {
         containerType.reload();
         ContainerTypeWrapper topContainerType = ContainerTypeHelper
             .addContainerTypeRandom(senderSite, name + "top", true);
-        topContainerType.addToChildContainerTypeCollection(Arrays.asList(containerType));
+        topContainerType.addToChildContainerTypeCollection(Arrays
+            .asList(containerType));
         topContainerType.persist();
         topContainerType.reload();
         ContainerWrapper topContainer = ContainerHelper.addContainer(
@@ -354,28 +354,28 @@ public class TestDispatch extends TestDatabase {
         List<AliquotWrapper> aliquotSet2 = addAliquotsToContainerRow(visit,
             container, 1, sampleTypes);
 
-        shipment.addAliquots(aliquotSet1, DispatchItemState.NONE);
-        shipment.persist();
-        shipment.reload();
+        dispatch.addAliquots(aliquotSet1);
+        dispatch.persist();
+        dispatch.reload();
 
-        List<AliquotWrapper> shipmentAliquots = shipment.getAliquotCollection();
+        List<AliquotWrapper> shipmentAliquots = dispatch.getAliquotCollection();
         Assert.assertEquals(aliquotSet1.size(), shipmentAliquots.size());
 
         // add more aliquots to row 2
 
-        shipment.addAliquots(aliquotSet2, DispatchItemState.NONE);
-        shipment.persist();
-        shipment.reload();
+        dispatch.addAliquots(aliquotSet2);
+        dispatch.persist();
+        dispatch.reload();
 
-        shipmentAliquots = shipment.getAliquotCollection();
+        shipmentAliquots = dispatch.getAliquotCollection();
         Assert.assertEquals(aliquotSet1.size() + aliquotSet2.size(),
             shipmentAliquots.size());
 
-        shipment.removeAliquots(aliquotSet1);
-        shipment.persist();
-        shipment.reload();
+        dispatch.removeAliquots(aliquotSet1);
+        dispatch.persist();
+        dispatch.reload();
 
-        shipmentAliquots = shipment.getAliquotCollection();
+        shipmentAliquots = dispatch.getAliquotCollection();
         Assert.assertEquals(aliquotSet2.size(), shipmentAliquots.size());
     }
 

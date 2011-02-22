@@ -7,7 +7,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
@@ -70,11 +70,7 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
                     " as x where x.activityStatus=?");
             HQLCriteria c = new HQLCriteria(sb.toString(),
                 Arrays.asList(new Object[] { wrappedObject }));
-            List<Long> results = appService.query(c);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            usedCount += results.get(0);
+            usedCount += getCountResult(appService, c);
         }
 
         return usedCount > 0;
@@ -131,24 +127,17 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
 
     public static ActivityStatusWrapper getActivityStatus(
         WritableApplicationService appService, String name)
-        throws ApplicationException, BiobankCheckException {
+        throws ApplicationException, BiobankFailedQueryException {
 
         HQLCriteria c = new HQLCriteria(ACTIVITY_STATUS_QRY,
             Arrays.asList(new Object[] { name }));
 
         List<ActivityStatus> result = appService.query(c);
-
-        if (result.size() == 1) {
-            return new ActivityStatusWrapper(appService, result.get(0));
-
-        } else if (result.size() == 0) {
-            throw new BiobankCheckException("activity status \"" + name
-                + "\" does not exist");
-        } else if (result.size() > 1) {
-            throw new BiobankCheckException(" Too many instances of \"" + name
-                + "\"");
+        if (result.size() != 1) {
+            throw new BiobankFailedQueryException(
+                "unexpected results from query");
         }
-        return null;
+        return new ActivityStatusWrapper(appService, result.get(0));
 
     }
 
@@ -161,7 +150,7 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
      */
     public static ActivityStatusWrapper getActiveActivityStatus(
         WritableApplicationService appService) throws ApplicationException,
-        BiobankCheckException {
+        BiobankFailedQueryException {
         return getActivityStatus(appService, ACTIVE_STATUS_STRING);
     }
 

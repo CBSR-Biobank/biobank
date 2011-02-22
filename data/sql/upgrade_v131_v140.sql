@@ -544,13 +544,11 @@ alter table Abstract_Position
 alter table Capacity
  change column ROW_CAPACITY ROW_CAPACITY integer not null,
  change column COL_CAPACITY COL_CAPACITY integer not null;
-alter table Abstract_Shipment
- change column DATE_RECEIVED DATE_RECEIVED datetime not null;
 alter table Activity_Status
  change column NAME NAME varchar(50) not null unique;
 alter table Aliquot
  change column INVENTORY_ID INVENTORY_ID varchar(100) not null unique;
-alter table Clinic
+alter table Center
  change column NAME NAME varchar(255) not null unique, 
  change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
 alter table Container
@@ -566,10 +564,7 @@ alter table Sample_Type
  change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
 alter table Shipping_Method
  change column NAME NAME varchar(255) not null unique;
-alter table Site
- change column NAME NAME varchar(255) not null unique,
- change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
-alter table Source_Vessel
+alter table Source_Vessel_Type
  change column NAME NAME varchar(100) not null unique;
 alter table Study
  change column NAME NAME varchar(255) not null unique, 
@@ -577,13 +572,12 @@ alter table Study
 
 -- unique constraint on multiple columns
 ALTER TABLE container
-  ADD CONSTRAINT uc_label UNIQUE (label,container_type_id),
-  ADD CONSTRAINT uc_productbarcode UNIQUE (product_barcode,site_id);
+  ADD CONSTRAINT uc_container_label UNIQUE (label,container_type_id),
+  ADD CONSTRAINT uc_container_productbarcode UNIQUE (product_barcode,site_id);
 
 ALTER TABLE container_type
-  ADD CONSTRAINT uc_name UNIQUE (name,site_id),
-  ADD CONSTRAINT uc_nameshort UNIQUE (name_short,site_id);
+  ADD CONSTRAINT uc_containertype_name UNIQUE (name,site_id),
+  ADD CONSTRAINT uc_containertype_nameshort UNIQUE (name_short,site_id);
 
 ALTER TABLE Study_Pv_Attr
-  ADD CONSTRAINT uc_label UNIQUE (label,study_id);
-
+  ADD CONSTRAINT uc_study_pv_attr_label UNIQUE (label,study_id);

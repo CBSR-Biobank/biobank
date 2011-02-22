@@ -117,9 +117,9 @@ public class TestCollectionEvent extends TestDatabase {
     @Test
     public void testAddPatients() throws Exception {
         String name = "testAddPatients" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
@@ -148,9 +148,9 @@ public class TestCollectionEvent extends TestDatabase {
     @Test
     public void testRemoveSourceVessels() throws Exception {
         String name = "testRemovePatients" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
@@ -183,9 +183,9 @@ public class TestCollectionEvent extends TestDatabase {
     @Test
     public void testGetCollectionEventsInSite() throws Exception {
         String name = "testSetPatientCollectionRemove" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
@@ -402,9 +402,9 @@ public class TestCollectionEvent extends TestDatabase {
     @Test
     public void testPersistFailNoPatient() throws Exception {
         String name = "testPersistFailNoPatient" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
@@ -447,9 +447,9 @@ public class TestCollectionEvent extends TestDatabase {
     @Test
     public void testDelete() throws Exception {
         String name = "testDelete" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
@@ -488,9 +488,9 @@ public class TestCollectionEvent extends TestDatabase {
     @Test
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
@@ -524,9 +524,9 @@ public class TestCollectionEvent extends TestDatabase {
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        StudyWrapper study = StudyHelper.addStudy(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();

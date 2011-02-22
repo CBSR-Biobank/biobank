@@ -33,14 +33,6 @@ public class SourceVesselWrapper extends SourceVesselBaseWrapper {
     }
 
     @Override
-    protected void persistChecks() throws BiobankException,
-        ApplicationException {
-        if (getSourceVesselType() == null) {
-            throw new BiobankCheckException("A SourceVesselType is required.");
-        }
-    }
-
-    @Override
     public int compareTo(ModelWrapper<SourceVessel> wrapper) {
         if (wrapper instanceof SourceVesselWrapper) {
             SourceVesselWrapper svWrapper = (SourceVesselWrapper) wrapper;
@@ -68,6 +60,19 @@ public class SourceVesselWrapper extends SourceVesselBaseWrapper {
             for (SourceVesselWrapper ss : typesToDelete) {
                 ss.delete();
             }
+        }
+    }
+
+    @Override
+    protected void deleteChecks() throws BiobankException, ApplicationException {
+        checkProcessingEvent();
+    }
+
+    private void checkProcessingEvent() throws BiobankCheckException {
+        ProcessingEventWrapper pevent = getProcessingEvent();
+        if (pevent != null) {
+            throw new BiobankCheckException(
+                "Source vessel has a processing event. cannot be deleted.");
         }
     }
 }

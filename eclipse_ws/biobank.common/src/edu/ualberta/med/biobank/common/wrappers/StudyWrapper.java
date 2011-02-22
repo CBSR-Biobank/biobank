@@ -13,22 +13,20 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -356,11 +354,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     public boolean hasPatients() throws ApplicationException, BiobankException {
         HQLCriteria criteria = new HQLCriteria(HAS_PATIENTS_QRY,
             Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0) > 0;
+        return getCountResult(appService, criteria) > 0;
     }
 
     public long getPatientCount() throws ApplicationException, BiobankException {
@@ -383,11 +377,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            List<Long> results = appService.query(criteria);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            return results.get(0);
+            return getCountResult(appService, criteria);
         }
         List<PatientWrapper> list = getPatientCollection();
         if (list == null) {
@@ -418,31 +408,29 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     private static final String PATIENT_COUNT_FOR_SITE_QRY = "select count(distinct patients) from "
-        + Site.class.getName()
-        + " as site join site."
+        + Center.class.getName()
+        + " as center join center."
         + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pvs join pvs.patient as patients where site."
-        + SitePeer.ID.getName()
+        + " as pes join pes.patient as patients where center."
+        + CenterPeer.ID.getName()
         + "=? and "
         + "patients."
         + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
+    // FIXME : We might want also to go through the CollectionEvent to count the
+    // patients ! (for clinics for example)
     public long getPatientCountForCenter(CenterWrapper<?> center)
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_SITE_QRY,
             Arrays.asList(new Object[] { center.getId(), getId() }));
-        List<Long> result = appService.query(c);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
+        return getCountResult(appService, c);
     }
 
-    private static final String VISIT_COUNT_FOR_SITE_QRY = "select count(distinct visits) from "
-        + Site.class.getName()
-        + " as site join site."
+    private static final String PROCESSING_EVENT_COUNT_FOR_SITE_QRY = "select count(distinct pes) from "
+        + Center.class.getName()
+        + " as center join center."
         + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as visits join visits."
+        + " as pes join pes."
         + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION.getName()
         + " as svs join svs."
         + SourceVesselPeer.PATIENT.getName()
@@ -450,24 +438,20 @@ public class StudyWrapper extends StudyBaseWrapper {
         + PatientPeer.STUDY.getName()
         + " as study where study."
         + StudyPeer.ID.getName()
-        + "=? and site."
-        + SitePeer.ID.getName()
+        + "=? and center."
+        + CenterPeer.ID.getName()
         + "=?";
 
-    public long getProcessingEventCountForCenter(CenterWrapper<?> site)
+    public long getProcessingEventCountForCenter(CenterWrapper<?> center)
         throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_SITE_QRY,
-            Arrays.asList(new Object[] { site.getId(), getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
+        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_COUNT_FOR_SITE_QRY,
+            Arrays.asList(new Object[] { getId(), center.getId() }));
+        return getCountResult(appService, c);
     }
 
-    private static final String VISIT_COUNT_QRY = "select count(distinct visits) from "
+    private static final String PROCESSING_EVENT_COUNT_QRY = "select count(distinct pes) from "
         + ProcessingEvent.class.getName()
-        + " as visits join visits."
+        + " as pes join pes."
         + ProcessingEventPeer.SOURCE_VESSEL_COLLECTION.getName()
         + " as svs join svs."
         + SourceVesselPeer.PATIENT.getName()
@@ -478,25 +462,14 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public long getProcessingEventCount() throws ApplicationException,
         BiobankException {
-        HQLCriteria c = new HQLCriteria(VISIT_COUNT_QRY,
+        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
+        return getCountResult(appService, c);
     }
 
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        if (getName() == null) {
-            throw new BiobankCheckException("Name must be set.");
-        }
-        if (getNameShort() == null) {
-            throw new BiobankCheckException("Short name must be set.");
-        }
-
         checkNoDuplicates(Study.class, StudyPeer.NAME.getName(), getName(),
             "A study with name");
         checkNoDuplicates(Study.class, StudyPeer.NAME_SHORT.getName(),
@@ -534,11 +507,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(IS_LINKED_TO_CLINIC_QRY,
             Arrays.asList(new Object[] { getId(), clinic.getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0) != 0;
+        return getCountResult(appService, c) != 0;
     }
 
     @Override
@@ -567,12 +536,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public static long getCount(WritableApplicationService appService)
         throws BiobankException, ApplicationException {
-        HQLCriteria c = new HQLCriteria(COUNT_QRY);
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
+        return getCountResult(appService, new HQLCriteria(COUNT_QRY));
     }
 
     @Override

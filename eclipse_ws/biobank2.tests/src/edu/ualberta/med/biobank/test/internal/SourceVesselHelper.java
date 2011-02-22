@@ -17,7 +17,7 @@ public class SourceVesselHelper extends DbHelper {
         Date timeDrawn, Double volume) {
         SourceVesselWrapper source = new SourceVesselWrapper(appService);
         SourceVesselTypeWrapper svt = SourceVesselTypeHelper
-            .addSourceVesselType(Utils.getRandomString(11));
+            .addSourceVesselType(Utils.getRandomString(11) + r.nextInt());
         source.setSourceVesselType(svt);
         source.setPatient(patient);
         source.setTimeDrawn(timeDrawn);

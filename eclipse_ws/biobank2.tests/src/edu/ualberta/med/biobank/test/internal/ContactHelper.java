@@ -5,7 +5,6 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class ContactHelper extends DbHelper {
@@ -25,8 +24,8 @@ public class ContactHelper extends DbHelper {
         return contact;
     }
 
-    public static int addContactsToStudy(StudyWrapper study, SiteWrapper site,
-        String name) throws Exception {
+    public static int addContactsToStudy(StudyWrapper study, String name)
+        throws Exception {
         ClinicHelper.addClinics(name, r.nextInt(15) + 3, true);
         List<ClinicWrapper> clinics = ClinicWrapper.getAllClinics(appService);
         int nber = r.nextInt(clinics.size() - 2) + 1;

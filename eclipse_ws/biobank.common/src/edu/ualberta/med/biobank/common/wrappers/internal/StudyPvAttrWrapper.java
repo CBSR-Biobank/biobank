@@ -7,7 +7,6 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.PvAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyPvAttrBaseWrapper;
@@ -46,11 +45,7 @@ public class StudyPvAttrWrapper extends StudyPvAttrBaseWrapper {
         BiobankException {
         HQLCriteria c = new HQLCriteria(IS_USED_BY_PROC_EVENTS_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0) > 0;
+        return getCountResult(appService, c) > 0;
     }
 
     @Override

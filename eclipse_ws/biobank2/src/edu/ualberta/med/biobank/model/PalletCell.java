@@ -55,7 +55,7 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
         List<AliquotWrapper> aliquots = DebugUtil
-            .getRandomAliquotsAlreadyLinked(appService, siteId);
+            .getRandomLinkedAliquots(appService, siteId);
         if (aliquots.size() > 1) {
             int row = 2;
             int col = 3;
@@ -80,7 +80,7 @@ public class PalletCell extends Cell {
         throws Exception {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots = DebugUtil
-            .getRandomAliquotsAlreadyAssigned(appService, siteId, studyId);
+            .getRandomAssignedAliquots(appService, siteId, studyId);
         if (randomAliquots.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
                 0, 0, randomAliquots.get(0).getInventoryId())));
@@ -97,7 +97,7 @@ public class PalletCell extends Cell {
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<AliquotWrapper> randomAliquots = DebugUtil
-            .getRandomAliquotsNotAssignedNoDispatch(appService, siteId);
+            .getRandomNonAssignedNonDispatchedAliquots(appService, siteId);
         int i = 0;
         while (i < randomAliquots.size() && i < 30) {
             int row = i / 12;

@@ -231,8 +231,8 @@ public class TestProcessingEvent extends TestDatabase {
     @Test
     public void testDeleteNoMoreVisits() throws Exception {
         String name = "testDeleteNoMoreVisits" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
         StudyWrapper study = StudyHelper.addStudy(name);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
