@@ -21,17 +21,6 @@ public class SourceVesselWrapper extends SourceVesselBaseWrapper {
         super(appService);
     }
 
-    public static List<SourceVesselWrapper> getAllSourceVessels(
-        WritableApplicationService appService) throws ApplicationException {
-        List<SourceVessel> list = appService.search(SourceVessel.class,
-            new SourceVessel());
-        List<SourceVesselWrapper> wrappers = new ArrayList<SourceVesselWrapper>();
-        for (SourceVessel ss : list) {
-            wrappers.add(new SourceVesselWrapper(appService, ss));
-        }
-        return wrappers;
-    }
-
     @Override
     public int compareTo(ModelWrapper<SourceVessel> wrapper) {
         if (wrapper instanceof SourceVesselWrapper) {
@@ -47,22 +36,6 @@ public class SourceVesselWrapper extends SourceVesselBaseWrapper {
         return getSourceVesselType().getName() + " " + getTimeDrawn();
     }
 
-    public static void persistSourceVessels(
-        List<SourceVesselWrapper> addedOrModifiedTypes,
-        List<SourceVesselWrapper> typesToDelete) throws BiobankCheckException,
-        Exception {
-        if (addedOrModifiedTypes != null) {
-            for (SourceVesselWrapper ss : addedOrModifiedTypes) {
-                ss.persist();
-            }
-        }
-        if (typesToDelete != null) {
-            for (SourceVesselWrapper ss : typesToDelete) {
-                ss.delete();
-            }
-        }
-    }
-
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         checkProcessingEvent();
@@ -74,5 +47,16 @@ public class SourceVesselWrapper extends SourceVesselBaseWrapper {
             throw new BiobankCheckException(
                 "Source vessel has a processing event. cannot be deleted.");
         }
+    }
+
+    public static List<SourceVesselWrapper> getAllSourceVessels(
+        WritableApplicationService appService) throws ApplicationException {
+        List<SourceVessel> list = appService.search(SourceVessel.class,
+            new SourceVessel());
+        List<SourceVesselWrapper> wrappers = new ArrayList<SourceVesselWrapper>();
+        for (SourceVessel ss : list) {
+            wrappers.add(new SourceVesselWrapper(appService, ss));
+        }
+        return wrappers;
     }
 }

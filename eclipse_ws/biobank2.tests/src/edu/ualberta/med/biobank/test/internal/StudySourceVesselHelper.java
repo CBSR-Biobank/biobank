@@ -11,41 +11,36 @@ import edu.ualberta.med.biobank.test.Utils;
 public class StudySourceVesselHelper extends DbHelper {
 
     public static StudySourceVesselWrapper newStudySourceVessel(
-        StudyWrapper study, SourceVesselTypeWrapper sourceVessel) {
-        StudySourceVesselWrapper source = new StudySourceVesselWrapper(
-            appService);
-        source.setStudy(study);
-        source.setSourceVesselType(sourceVessel);
-        return source;
+        StudyWrapper study, SourceVesselTypeWrapper svType,
+        boolean needTimeDrawn, boolean needOriginalVolume) {
+        StudySourceVesselWrapper ssv = new StudySourceVesselWrapper(appService);
+        ssv.setStudy(study);
+        ssv.setSourceVesselType(svType);
+        ssv.setNeedTimeDrawn(needTimeDrawn);
+        ssv.setNeedOriginalVolume(needOriginalVolume);
+        return ssv;
     }
 
     public static StudySourceVesselWrapper addStudySourceVessel(
-        StudyWrapper study, SourceVesselTypeWrapper sourceVesselT)
-        throws Exception {
-        StudySourceVesselWrapper source = newStudySourceVessel(study,
-            sourceVesselT);
-        source.persist();
-        return source;
+        StudyWrapper study, SourceVesselTypeWrapper svType,
+        boolean needTimeDrawn, boolean needOriginalVolume) throws Exception {
+        StudySourceVesselWrapper ssv = newStudySourceVessel(study, svType,
+            needTimeDrawn, needOriginalVolume);
+        ssv.persist();
+        return ssv;
     }
 
-    // public static void deleteCreatedSourceVessels() throws Exception {
-    // for (SourceVesselWrapper source : createdSourceVessels) {
-    // source.reload();
-    // source.delete();
-    // }
-    // createdSourceVessels.clear();
-    // }\
-
-    public static int addStudySourceVessels(StudyWrapper study, String name)
-        throws Exception {
+    public static int addStudySourceVessels(StudyWrapper study, String name,
+        boolean needTimeDrawn, boolean needOriginalVolume) throws Exception {
         int nber = r.nextInt(15) + 1;
-        List<StudySourceVesselWrapper> sources = new ArrayList<StudySourceVesselWrapper>();
+        List<StudySourceVesselWrapper> ssvs = new ArrayList<StudySourceVesselWrapper>();
         for (int i = 0; i < nber; i++) {
-            SourceVesselTypeWrapper sourceVesselT = SourceVesselTypeHelper
+            SourceVesselTypeWrapper svType = SourceVesselTypeHelper
                 .addSourceVesselType("newST" + Utils.getRandomString(11));
-            sources.add(addStudySourceVessel(study, sourceVesselT));
+            ssvs.add(addStudySourceVessel(study, svType, needTimeDrawn,
+                needOriginalVolume));
         }
-        study.addToStudySourceVesselCollection(sources);
+        study.addToStudySourceVesselCollection(ssvs);
         study.persist();
         return nber;
     }

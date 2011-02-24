@@ -267,7 +267,8 @@ public class TestStudy extends TestDatabase {
     public void testGetStudySourceVesselCollection() throws Exception {
         String name = "testGetStudySourceVesselCollection" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name);
+        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name,
+            true, true);
 
         List<StudySourceVesselWrapper> storages = study
             .getStudySourceVesselCollection(false);
@@ -280,7 +281,7 @@ public class TestStudy extends TestDatabase {
     public void testGetStudySourceVesselCollectionBoolean() throws Exception {
         String name = "testGetStudySourceVesselCollectionBoolean" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
-        StudySourceVesselHelper.addStudySourceVessels(study, name);
+        StudySourceVesselHelper.addStudySourceVessels(study, name, true, true);
 
         List<StudySourceVesselWrapper> sources = study
             .getStudySourceVesselCollection(true);
@@ -297,7 +298,8 @@ public class TestStudy extends TestDatabase {
     public void testAddStudySourceVessels() throws Exception {
         String name = "testAddStudySourceVessels" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name);
+        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name,
+            true, true);
 
         study.persist();
 
@@ -311,7 +313,8 @@ public class TestStudy extends TestDatabase {
     public void testRemoveStudySourceVessels() throws Exception {
         String name = "testRemoveStudySourceVessels" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
-        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name);
+        int nber = StudySourceVesselHelper.addStudySourceVessels(study, name,
+            true, true);
 
         List<StudySourceVesselWrapper> sources = study
             .getStudySourceVesselCollection(false);
