@@ -24,4 +24,15 @@ public class StudySourceVesselWrapper extends StudySourceVesselBaseWrapper {
         return 0;
     }
 
+    public SourceVesselWrapper getSourceVessel() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void setSourceVessel(SourceVesselWrapper sourceVessel) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

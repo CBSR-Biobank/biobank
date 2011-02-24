@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -263,5 +264,80 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         }
         return wrapModelCollection(appService, raw,
             CollectionEventWrapper.class);
+    }
+
+    @Deprecated
+    public static List<? extends ModelWrapper<?>> getTodayShipments(
+        BiobankApplicationService appService) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public ClinicWrapper getClinic() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public static List<CollectionEventWrapper> getShipmentsInSites(
+        BiobankApplicationService appService, String trim) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public static List<? extends ModelWrapper<?>> getShipmentsInSites(
+        BiobankApplicationService appService, Date date) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public SiteWrapper getSite() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void addPatients(List<PatientWrapper> asList) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void checkCanRemovePatient(PatientWrapper patient) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void removePatients(List<PatientWrapper> asList) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void checkPatientsStudy() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void setClinic(ClinicWrapper selectedObject) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void setSite(SiteWrapper selectedSite) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public Collection<? extends ModelWrapper<?>> getProcessingEventCollection() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

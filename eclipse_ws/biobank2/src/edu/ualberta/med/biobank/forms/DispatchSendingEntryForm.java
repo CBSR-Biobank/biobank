@@ -22,6 +22,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -45,6 +46,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     public static final String MSG_NEW_DISPATCH_OK = "Creating a new dispatch record.";
 
     public static final String MSG_DISPATCH_OK = "Editing an existing dispatch record.";
+
+    private ComboViewer studyComboViewer;
 
     private ComboViewer destSiteComboViewer;
 
@@ -310,7 +313,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
         }
         if (destSiteComboViewer != null) {
-            SiteWrapper destSite = dispatch.getReceiver();
+            CenterWrapper<?> destSite = dispatch.getReceiver();
             if (destSite != null) {
                 destSiteComboViewer.setSelection(new StructuredSelection(
                     destSite));

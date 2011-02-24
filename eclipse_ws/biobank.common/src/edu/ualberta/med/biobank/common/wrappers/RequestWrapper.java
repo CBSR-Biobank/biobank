@@ -1,9 +1,11 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.RequestAliquotPeer;
@@ -157,5 +159,76 @@ public class RequestWrapper extends RequestBaseWrapper {
             e.printStackTrace();
         }
         return 0 == (Long) results.get(0);
+    }
+
+    @Deprecated
+    public void setInAcceptedState() {
+        // TODO replace by appropriate method
+    }
+
+    @Deprecated
+    public Date getDateCreated() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void setInFilledState() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void setInShippedState() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void setInCloseState() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public Date getAccepted() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public Timestamp getShipped() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public String getWaybill() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public boolean isInAcceptedState() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Deprecated
+    public SiteWrapper getSite() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void setShipped(Date date) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void setWaybill(String text) {
+        // TODO Auto-generated method stub
+
     }
 }

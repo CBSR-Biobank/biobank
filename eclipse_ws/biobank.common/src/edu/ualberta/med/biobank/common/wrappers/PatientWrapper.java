@@ -351,4 +351,24 @@ public class PatientWrapper extends PatientBaseWrapper {
         return getProcessingEventCollection(false);
     }
 
+    @Deprecated
+    public boolean canBeAddedToShipment(CollectionEventWrapper shipment) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Deprecated
+    public List<ProcessingEventWrapper> getLast7DaysPatientVisits(
+        SiteWrapper site) throws ApplicationException {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public List<ProcessingEventWrapper> getProcessingEventCollection(boolean b,
+        boolean c, Object object) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

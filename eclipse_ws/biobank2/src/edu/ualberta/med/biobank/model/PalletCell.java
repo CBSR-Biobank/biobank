@@ -54,8 +54,8 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        List<AliquotWrapper> aliquots = DebugUtil
-            .getRandomLinkedAliquots(appService, siteId);
+        List<AliquotWrapper> aliquots = DebugUtil.getRandomLinkedAliquots(
+            appService, siteId);
         if (aliquots.size() > 1) {
             int row = 2;
             int col = 3;

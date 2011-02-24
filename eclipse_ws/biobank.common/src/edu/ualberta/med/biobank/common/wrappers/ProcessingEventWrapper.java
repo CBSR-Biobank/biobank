@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.PvAttr;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -408,5 +409,44 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     public List<AliquotWrapper> getAliquotCollection() {
         return getAliquotCollection(false);
+    }
+
+    @Deprecated
+    public CollectionEventWrapper getCollectionEvent() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void setShipment(CollectionEventWrapper shipmentToBeSaved) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void addPvSourceVessels(
+        List<PvSourceVesselWrapper> addedPvSourceVessels) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public static List<ProcessingEventWrapper> getPatientVisitsWithWorksheet(
+        BiobankApplicationService appService, String searchString) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public List<PvSourceVesselWrapper> getPvSourceVesselCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void removePvSourceVessels(
+        List<PvSourceVesselWrapper> removedPvSourceVessels) {
+        // TODO Auto-generated method stub
+
     }
 }
