@@ -179,7 +179,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getSourceVesselCollection(true);
     }
 
-    public void addAliquots(List<AliquotWrapper> newAliquots) {
+    public void addNewAliquots(List<AliquotWrapper> newAliquots) {
         if (newAliquots == null)
             return;
 

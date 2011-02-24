@@ -183,15 +183,15 @@ public class AliquotViewForm extends BiobankViewForm {
         setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
         setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
             : aliquot.getQuantity().toString());
-        setTextValue(shipmentWaybillLabel, aliquot.getProcessingEvent()
-            .getCollectionEvent().getWaybill());
-        setTextValue(studyLabel, aliquot.getProcessingEvent().getPatient()
+        setTextValue(shipmentWaybillLabel, aliquot.getCollectionEvent()
+            .getWaybill());
+        setTextValue(studyLabel, aliquot.getCollectionEvent().getPatient()
             .getStudy().getNameShort());
-        setTextValue(patientLabel, aliquot.getProcessingEvent().getPatient()
+        setTextValue(patientLabel, aliquot.getCollectionEvent().getPatient()
             .getPnumber());
-        setTextValue(dateProcessedLabel, aliquot.getProcessingEvent()
+        setTextValue(dateProcessedLabel, aliquot.getCollectionEvent()
             .getFormattedDateProcessed());
-        setTextValue(dateDrawnLabel, aliquot.getProcessingEvent()
+        setTextValue(dateDrawnLabel, aliquot.getCollectionEvent()
             .getFormattedDateDrawn());
         setTextValue(activityStatusLabel, aliquot.getActivityStatus());
         setTextValue(commentLabel, aliquot.getComment());

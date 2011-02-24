@@ -22,7 +22,6 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
@@ -138,7 +137,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
         SourceVesselWrapper currentSourceVessel = internalSourceVessel
             .getSourceVessel();
         if (currentSourceVessel != null) {
-            ssv = mapStudySourceVessel.get(currentSourceVessel.getName());
+            ssv = mapStudySourceVessel.get(currentSourceVessel
+                .getSourceVesselType().getName());
         }
         if (ssv == null && currentSourceVessel != null
             && allSourceVessels.contains(currentSourceVessel)) {
@@ -217,7 +217,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
         SourceVesselWrapper currentSourceVessel = internalSourceVessel
             .getSourceVessel();
         if (currentSourceVessel != null) {
-            ssv = mapStudySourceVessel.get(currentSourceVessel.getName());
+            ssv = mapStudySourceVessel.get(currentSourceVessel
+                .getSourceVesselType().getName());
         }
         boolean enableTimeDrawn = (currentSourceVessel != null)
             && (ssv == null || Boolean.TRUE.equals(ssv.getNeedTimeDrawn()));

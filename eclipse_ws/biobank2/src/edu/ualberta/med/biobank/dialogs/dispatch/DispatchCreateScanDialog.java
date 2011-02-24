@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -123,7 +124,8 @@ public class DispatchCreateScanDialog extends
         } else {
             currentPallet = ContainerWrapper
                 .getContainerWithProductBarcodeInSite(
-                    SessionManager.getAppService(), site, currentProductBarcode);
+                    SessionManager.getAppService(), (SiteWrapper) site,
+                    currentProductBarcode);
             if (currentPallet != null) {
                 // FIXME check it is a pallet ? Should we do it when enter
                 // barcode ?
@@ -271,7 +273,7 @@ public class DispatchCreateScanDialog extends
                 cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
             }
         }
-        (currentShipment).addNewAliquots(aliquots, false);
+        (currentShipment).addNewAliquots(aliquots);
         if (currentPallet != null) {
             removedPallets.add(currentPallet);
         }
@@ -309,13 +311,13 @@ public class DispatchCreateScanDialog extends
     protected Map<RowColPos, PalletCell> getFakeScanCells() throws Exception {
         ContainerWrapper currentPallet = ContainerWrapper
             .getContainerWithProductBarcodeInSite(
-                SessionManager.getAppService(), currentSite,
+                SessionManager.getAppService(), (SiteWrapper) currentSite,
                 currentProductBarcode);
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell
-                .getRandomAssignedAliquots(SessionManager.getAppService(),
-                    (currentShipment).getSender().getId());
+                .getRandomAliquotsAlreadyAssigned(SessionManager
+                    .getAppService(), (currentShipment).getSender().getId());
             return cells;
         } else {
             for (AliquotWrapper aliquot : currentPallet.getAliquots().values()) {

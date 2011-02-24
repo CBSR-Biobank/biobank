@@ -961,7 +961,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     protected void siteComboSelectionChanged(SiteWrapper currentSelection)
         throws Exception {
         linkFormPatientManagement.setSite(currentSelection);
-        linkFormPatientManagement.setVisitsList();
         if (viewerSampleTypes != null) {
             initCabinetContainerTypesList();
             viewerSampleTypes.setInput(null);

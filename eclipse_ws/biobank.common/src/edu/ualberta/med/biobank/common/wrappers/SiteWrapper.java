@@ -433,7 +433,7 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getStudyCollection(false);
     }
 
-    public List<ContainerWrapper> getTopContainerCollection() {
+    public List<ContainerWrapper> getTopContainerCollection() throws Exception {
         return getTopContainerCollection(false);
     }
 
