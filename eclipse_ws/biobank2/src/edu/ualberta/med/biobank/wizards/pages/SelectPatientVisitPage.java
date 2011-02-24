@@ -27,7 +27,7 @@ public class SelectPatientVisitPage extends BiobankWizardPage {
         super(PAGE_NAME, "Select a patient visit", null);
     }
 
-    public void setPatientVisitList(List<ProcessingEventWrapper> visits) {
+    public void setProcessingEventList(List<ProcessingEventWrapper> visits) {
         visitsTable.setCollection(visits);
     }
 

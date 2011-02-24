@@ -89,7 +89,7 @@ public class PvListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         if (info.waybill == null)
             info.waybill = "None";
         info.departed = pv.getCollectionEvent().getDeparted();
-        info.clinic = pv.getCollectionEvent().getClinic().getNameShort();
+        info.clinic = pv.getCenter().getNameShort();
         info.numSVs = pv.getPvSourceVesselCollection().size();
         info.numAliquots = pv.getAliquotCollection().size();
         return info;

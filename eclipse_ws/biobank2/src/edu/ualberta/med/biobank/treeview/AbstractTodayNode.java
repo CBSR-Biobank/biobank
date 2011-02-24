@@ -10,9 +10,9 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
@@ -93,10 +93,10 @@ public abstract class AbstractTodayNode extends AdapterBase {
             // add today elements is not yet there
             for (ModelWrapper<?> wrapper : currentTodayElements) {
                 assert wrapper instanceof PatientWrapper
-                    || wrapper instanceof ShipmentWrapper;
+                    || wrapper instanceof CollectionEventWrapper;
                 if (wrapper instanceof PatientWrapper) {
                     PatientAdministrationView.addToNode(this, wrapper);
-                } else if (wrapper instanceof ShipmentWrapper) {
+                } else if (wrapper instanceof CollectionEventWrapper) {
                     ShipmentAdministrationView.addToNode(this, wrapper);
                 }
             }

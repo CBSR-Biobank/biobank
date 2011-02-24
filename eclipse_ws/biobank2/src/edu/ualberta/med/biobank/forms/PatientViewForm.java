@@ -76,7 +76,7 @@ public class PatientViewForm extends BiobankViewForm {
         Section section = createSection("Patient Visits");
 
         visitsTable = new PatientVisitInfoTable(section,
-            patient.getPatientVisitCollection());
+            patient.getProcessingEventCollection());
         section.setClient(visitsTable);
         visitsTable.adaptToToolkit(toolkit, true);
         visitsTable.addClickListener(collectionDoubleClickListener);
@@ -85,8 +85,8 @@ public class PatientViewForm extends BiobankViewForm {
     private void setValues() throws BiobankException, ApplicationException {
         setTextValue(studyLabel, patient.getStudy().getName());
         setTextValue(visitCountLabel,
-            (patient.getPatientVisitCollection() == null) ? 0 : patient
-                .getPatientVisitCollection().size());
+            (patient.getProcessingEventCollection() == null) ? 0 : patient
+                .getProcessingEventCollection().size());
         setTextValue(sampleCountLabel, patient.getAliquotsCount(true));
     }
 
@@ -96,7 +96,7 @@ public class PatientViewForm extends BiobankViewForm {
         retrievePatient();
         setPartName("Patient " + patient.getPnumber());
         form.setText("Patient: " + patient.getPnumber());
-        visitsTable.setCollection(patient.getPatientVisitCollection());
+        visitsTable.setCollection(patient.getProcessingEventCollection());
     }
 
 }

@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -39,7 +40,7 @@ public class DispatchReceiveScanDialog extends
     private int errors;
 
     public DispatchReceiveScanDialog(Shell parentShell,
-        final DispatchWrapper currentShipment, SiteWrapper currentSite) {
+        final DispatchWrapper currentShipment, CenterWrapper<?> currentSite) {
         super(parentShell, currentShipment, currentSite);
     }
 

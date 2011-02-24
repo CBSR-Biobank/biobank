@@ -156,8 +156,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void saveForm() throws Exception {
-        clinic.addContacts(contactEntryWidget.getAddedOrModifedContacts());
-        clinic.removeContacts(contactEntryWidget.getDeletedContacts());
+        clinic.addToContactCollection(contactEntryWidget
+            .getAddedOrModifedContacts());
+        clinic.removeFromContactCollection(contactEntryWidget
+            .getDeletedContacts());
         clinic.persist();
         SessionManager.updateAllSimilarNodes(clinicAdapter, true);
     }

@@ -101,9 +101,9 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());
-        setTextValue(shipmentTotal, clinic.getShipmentCount(true));
+        setTextValue(shipmentTotal, clinic.getCollectionEventCount(true));
         setTextValue(patientTotal, clinic.getPatientCount(true));
-        setTextValue(visitTotal, clinic.getPatientVisitCount());
+        setTextValue(visitTotal, clinic.getProcessingEventCount());
     }
 
     private void createContactsSection() {
@@ -143,7 +143,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setClinicValues();
         setAdressValues(clinic);
         contactsTable.setCollection(clinic.getContactCollection(true));
-        shipmentsTable.setCollection(clinic.getShipmentCollection());
+        shipmentsTable.setCollection(clinic.getCollectionEventCollection());
         studiesTable.setCollection(clinic.getStudyCollection());
     }
 

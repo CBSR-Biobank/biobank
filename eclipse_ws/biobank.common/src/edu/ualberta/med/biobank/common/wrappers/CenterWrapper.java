@@ -113,7 +113,7 @@ public abstract class CenterWrapper<E extends Center> extends
 
     /**
      * fast = true will execute a hql query. fast = false will call the
-     * getShipmentCollection().size method
+     * getCollectionEventCollection().size method
      */
     public long getProcessingEventCount(boolean fast)
         throws ApplicationException, BiobankException {
@@ -143,7 +143,7 @@ public abstract class CenterWrapper<E extends Center> extends
 
     /**
      * fast = true will execute a hql query. fast = false will call the
-     * getShipmentCollection().size method
+     * getCollectionEventCollection().size method
      */
     public long getCollectionEventCount(boolean fast)
         throws ApplicationException, BiobankException {

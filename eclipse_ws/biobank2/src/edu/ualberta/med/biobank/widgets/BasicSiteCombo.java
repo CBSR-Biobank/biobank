@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -76,16 +77,18 @@ public class BasicSiteCombo extends BiobankWidget {
      * @param defaultSelection will select a site if there is only one in the
      *            list
      */
-    public void setSelectedSite(SiteWrapper site, boolean defaultSelection) {
+    public void setSelectedSite(CenterWrapper<?> centerWrapper,
+        boolean defaultSelection) {
         if (comboViewer != null) {
-            if (site == null) {
+            if (centerWrapper == null) {
                 comboViewer.getCombo().deselectAll();
                 if (defaultSelection
                     && comboViewer.getCombo().getItemCount() == 1)
                     comboViewer.setSelection(new StructuredSelection(
                         comboViewer.getElementAt(0)));
             } else
-                comboViewer.setSelection(new StructuredSelection(site));
+                comboViewer
+                    .setSelection(new StructuredSelection(centerWrapper));
         }
     }
 

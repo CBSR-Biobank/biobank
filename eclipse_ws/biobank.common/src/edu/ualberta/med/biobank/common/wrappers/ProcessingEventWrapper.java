@@ -405,4 +405,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     public CenterWrapper<?> getCenterLinkedToObject() {
         return getCenter();
     }
+
+    public List<AliquotWrapper> getAliquotCollection() {
+        return getAliquotCollection(false);
+    }
 }

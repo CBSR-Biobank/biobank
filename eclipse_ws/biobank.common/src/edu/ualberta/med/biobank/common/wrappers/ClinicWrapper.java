@@ -51,6 +51,10 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         }
     }
 
+    public List<ContactWrapper> getContactCollection() {
+        return getContactCollection(false);
+    }
+
     /**
      * Search for a contact in the clinic with the given name
      */
@@ -125,7 +129,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
 
     /**
      * fast = true will execute a hql query. fast = false will call the
-     * getShipmentCollection() method and loop on it to get patients
+     * getCollectionEventCollection() method and loop on it to get patients
      * 
      * @throws BiobankCheckException
      * @throws ApplicationException
@@ -175,5 +179,9 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     @Override
     protected void resetInternalFields() {
         deletedContacts.clear();
+    }
+
+    public List<CollectionEventWrapper> getCollectionEventCollection() {
+        return getCollectionEventCollection(false);
     }
 }

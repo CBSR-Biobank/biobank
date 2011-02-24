@@ -20,6 +20,10 @@ public abstract class DispatchItemWrapper<E extends DispatchItem> extends
         return DispatchItemState.getState(getState());
     }
 
+    public String getStateDescription() {
+        return DispatchItemState.getState(getState()).getLabel();
+    }
+
     public abstract DispatchWrapper getDispatch();
 
     public abstract void setDispatch(DispatchWrapper dispatch);

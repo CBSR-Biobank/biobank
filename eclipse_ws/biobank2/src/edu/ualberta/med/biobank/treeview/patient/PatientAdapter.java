@@ -14,8 +14,8 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
@@ -26,8 +26,8 @@ public class PatientAdapter extends AdapterBase {
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
         super(parent, patientWrapper);
         if (patientWrapper != null) {
-            setHasChildren(patientWrapper.getPatientVisitCollection() != null
-                && patientWrapper.getPatientVisitCollection().size() > 0);
+            setHasChildren(patientWrapper.getProcessingEventCollection() != null
+                && patientWrapper.getProcessingEventCollection().size() > 0);
         }
     }
 
@@ -102,7 +102,7 @@ public class PatientAdapter extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         getWrapper().reload();
-        return getWrapper().getPatientVisitCollection();
+        return getWrapper().getProcessingEventCollection();
     }
 
     @Override

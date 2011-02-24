@@ -108,7 +108,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
             "Comments");
 
-        setPatientVisitValues();
+        setProcessingEventValues();
     }
 
     private void createPvDataSection(Composite client) throws Exception {
@@ -146,14 +146,17 @@ public class PatientVisitViewForm extends BiobankViewForm {
         }
     }
 
-    private void setPatientVisitValues() {
-        setTextValue(siteLabel, patientVisit.getCollectionEvent().getSite().getName());
+    private void setProcessingEventValues() {
+        setTextValue(siteLabel, patientVisit.getCollectionEvent().getSite()
+            .getName());
         setTextValue(studyLabel, patientVisit.getPatient().getStudy().getName());
         setTextValue(activityStatusLabel, patientVisit.getActivityStatus()
             .getName());
-        setTextValue(clinicLabel, patientVisit.getCollectionEvent() == null ? ""
-            : patientVisit.getCollectionEvent().getClinic().getName());
-        setTextValue(shipmentLabel, patientVisit.getCollectionEvent().toString());
+        setTextValue(clinicLabel,
+            patientVisit.getCollectionEvent() == null ? "" : patientVisit
+                .getCenter().getName());
+        setTextValue(shipmentLabel, patientVisit.getCollectionEvent()
+            .toString());
         setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
         setTextValue(dateProcessedLabel,
             patientVisit.getFormattedDateProcessed());
@@ -188,7 +191,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         String date = patientVisit.getFormattedDateProcessed();
         setPartName("Visit " + date);
         form.setText("Visit Drawn Date: " + date);
-        setPatientVisitValues();
+        setProcessingEventValues();
         table.setCollection(patientVisit.getPvSourceVesselCollection());
         aliquotWidget.setCollection(patientVisit.getAliquotCollection());
     }

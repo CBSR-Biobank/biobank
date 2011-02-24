@@ -20,11 +20,10 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -62,7 +61,7 @@ public class DispatchCreateScanDialog extends
     private ProductBarcodeValue productBarcodeValue;
 
     public DispatchCreateScanDialog(Shell parentShell,
-        DispatchWrapper currentShipment, SiteWrapper site) {
+        DispatchWrapper currentShipment, CenterWrapper<?> site) {
         super(parentShell, currentShipment, site);
     }
 
@@ -109,8 +108,8 @@ public class DispatchCreateScanDialog extends
     }
 
     @Override
-    protected void processScanResult(IProgressMonitor monitor, SiteWrapper site)
-        throws Exception {
+    protected void processScanResult(IProgressMonitor monitor,
+        CenterWrapper<?> site) throws Exception {
         aliquotsAdded = false;
         boolean scanOk = true;
         currentPallet = null;
@@ -315,9 +314,8 @@ public class DispatchCreateScanDialog extends
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell
-                .getRandomAssignedAliquots(SessionManager
-                    .getAppService(), (currentShipment).getSender().getId(),
-                    (currentShipment).getStudy().getId());
+                .getRandomAssignedAliquots(SessionManager.getAppService(),
+                    (currentShipment).getSender().getId());
             return cells;
         } else {
             for (AliquotWrapper aliquot : currentPallet.getAliquots().values()) {

@@ -429,4 +429,12 @@ public class SiteWrapper extends SiteBaseWrapper {
         propertiesMap.put("topContainerCollection", null);
     }
 
+    public List<StudyWrapper> getStudyCollection() {
+        return getStudyCollection(false);
+    }
+
+    public List<ContainerWrapper> getTopContainerCollection() {
+        return getTopContainerCollection(false);
+    }
+
 }

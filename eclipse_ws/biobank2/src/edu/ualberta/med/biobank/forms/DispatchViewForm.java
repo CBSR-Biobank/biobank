@@ -26,6 +26,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
@@ -252,7 +253,7 @@ public class DispatchViewForm extends BiobankViewForm {
                             public void run(final IProgressMonitor monitor) {
                                 monitor.beginTask("Saving...",
                                     IProgressMonitor.UNKNOWN);
-                                dispatch.setInTransitState();
+                                dispatch.setState(DispatchState.IN_TRANSIT);
                                 try {
                                     dispatch.persist();
                                 } catch (final RemoteConnectFailureException exp) {
@@ -333,7 +334,6 @@ public class DispatchViewForm extends BiobankViewForm {
     }
 
     private void setDispatchValues() {
-        setTextValue(studyLabel, dispatch.getStudy().getName());
         setTextValue(senderLabel,
             dispatch.getSender() == null ? " ACCESS DENIED" : dispatch
                 .getSender().getName());

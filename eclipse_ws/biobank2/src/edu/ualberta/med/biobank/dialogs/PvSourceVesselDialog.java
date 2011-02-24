@@ -311,7 +311,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
             PvSourceVesselWrapper newPvSourceVessel = new PvSourceVesselWrapper(
                 SessionManager.getAppService());
             newPvSourceVessel.initObjectWith(internalSourceVessel);
-            newPvSourceVessel.setPatientVisit(patientVisit);
+            newPvSourceVessel.setProcessingEvent(patientVisit);
             infotable.addPvSourceVessel(newPvSourceVessel);
             internalSourceVessel.reset();
             quantityText.setText("");
@@ -325,7 +325,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
         }
     }
 
-    public void setPatientVisit(ProcessingEventWrapper patientVisit) {
+    public void setProcessingEvent(ProcessingEventWrapper patientVisit) {
         this.patientVisit = patientVisit;
     }
 }

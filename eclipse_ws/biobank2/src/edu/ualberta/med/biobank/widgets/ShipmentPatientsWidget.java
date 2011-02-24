@@ -31,7 +31,7 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappersCollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
@@ -45,7 +45,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentPatientsWidget extends BiobankWidget {
 
-    private ShipmentWrapper shipment;
+    privateCollectionEventWrapper shipment;
 
     private PatientInfoTable patientTable;
 
@@ -61,7 +61,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         Boolean.class);
 
     public ShipmentPatientsWidget(Composite parent, int style,
-        ShipmentWrapper ship, FormToolkit toolkit, boolean editable) {
+       CollectionEventWrapper ship, FormToolkit toolkit, boolean editable) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
         this.shipment = ship;

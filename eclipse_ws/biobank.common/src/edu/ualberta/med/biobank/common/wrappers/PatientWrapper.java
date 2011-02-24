@@ -347,4 +347,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         return new ArrayList<CollectionEventWrapper>(collectionEvents);
     }
 
+    public List<ProcessingEventWrapper> getProcessingEventCollection() {
+        return getProcessingEventCollection(false);
+    }
+
 }

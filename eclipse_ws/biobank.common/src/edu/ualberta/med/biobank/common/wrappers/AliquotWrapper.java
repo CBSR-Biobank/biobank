@@ -515,4 +515,5 @@ public class AliquotWrapper extends AliquotBaseWrapper {
     protected void resetInternalFields() {
         objectWithPositionManagement.resetInternalFields();
     }
+
 }

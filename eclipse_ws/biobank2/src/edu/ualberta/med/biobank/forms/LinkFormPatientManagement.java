@@ -23,8 +23,8 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.Messages;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -146,10 +146,10 @@ public class LinkFormPatientManagement {
                     if (pv != null) {
                         aliquotAdminForm.appendLogNLS(
                             "linkAssign.activitylog.visit.selection", pv //$NON-NLS-1$
-                                .getCollectionEvent().getSite().getNameShort(),
-                            pv.getFormattedDateDrawn(),
-                            pv.getFormattedDateProcessed(), pv.getCollectionEvent()
-                                .getClinic().getName());
+                                .getCenter().getNameShort(), pv
+                                .getFormattedDateDrawn(), pv
+                                .getFormattedDateProcessed(), pv.getCenter()
+                                .getName());
                     }
                 }
             }
@@ -230,8 +230,8 @@ public class LinkFormPatientManagement {
                     }
                 }
                 if (collection == null) {
-                    collection = currentPatient.getPatientVisitCollection(true,
-                        false, site);
+                    collection = currentPatient
+                        .getProcessingEventCollection(true);
                 }
                 viewerVisits.setInput(collection);
                 viewerVisits.getCombo().setFocus();
@@ -281,7 +281,7 @@ public class LinkFormPatientManagement {
         this.currentPatient = patient;
         patientNumberText.setText(patient.getPnumber());
         List<ProcessingEventWrapper> collection = patient
-            .getPatientVisitCollection();
+            .getProcessingEventCollection();
         viewerVisits.setInput(collection);
         viewerVisits.setSelection(new StructuredSelection(patientVisit));
         if (visitText != null) {

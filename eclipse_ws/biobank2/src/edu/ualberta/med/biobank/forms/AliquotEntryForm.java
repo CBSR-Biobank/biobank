@@ -51,7 +51,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
     protected void init() throws Exception {
         AliquotAdapter aliquotAdapter = (AliquotAdapter) adapter;
         aliquot = aliquotAdapter.getAliquot();
-        aliquot.logEdit(aliquot.getSiteString());
+        aliquot.logEdit(aliquot.getCenterString());
         setPartName("Aliquot Entry");
     }
 
@@ -69,7 +69,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        StudyWrapper study = aliquot.getProcessingEvent().getPatient().getStudy();
+        StudyWrapper study = aliquot.getProcessingEvent().getPatient()
+            .getStudy();
         study.reload();
 
         List<SampleStorageWrapper> allowedSampleStorage = study
@@ -100,7 +101,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
         }
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
-        setTextValue(siteLabel, aliquot.getSiteString());
+        setTextValue(siteLabel, aliquot.getCenterString());
 
         sampleTypeComboViewer = createComboViewer(client, "Type", sampleTypes,
             aliquot.getSampleType(), "Aliquot must have a sample type",
@@ -126,9 +127,6 @@ public class AliquotEntryForm extends BiobankEntryForm {
         volumeField = createReadOnlyLabelledField(client, SWT.NONE,
             "Volume (ml)", aliquot.getQuantity() == null ? null : aliquot
                 .getQuantity().toString());
-
-        createReadOnlyLabelledField(client, SWT.NONE, "Shipment Waybill",
-            aliquot.getProcessingEvent().getCollectionEvent().getWaybill());
 
         createReadOnlyLabelledField(client, SWT.NONE, "Study", aliquot
             .getProcessingEvent().getPatient().getStudy().getNameShort());
@@ -173,7 +171,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
                     wizard);
                 int res = dialog.open();
                 if (res == Status.OK) {
-                    aliquot.setPatientVisit(wizard.getProcessingEvent());
+                    aliquot.setProcessingEvent(wizard.getProcessingEvent());
 
                     dateProcessed.setText(aliquot.getProcessingEvent()
                         .getFormattedDateProcessed());

@@ -374,7 +374,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
      * Search for shipments with the given waybill. Site can be the sender or
      * the receiver.
      */
-    public static List<DispatchWrapper> getShipmentsInSite(
+    public static List<DispatchWrapper> getDispatchesInSite(
         WritableApplicationService appService, String waybill, SiteWrapper site)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(DISPATCHES_IN_SITE_QRY,
@@ -438,7 +438,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
      * Search for shipments with the given date received. Don't use hour and
      * minute. Site can be the sender or the receiver.
      */
-    public static List<DispatchWrapper> getShipmentsInSiteByDateReceived(
+    public static List<DispatchWrapper> getDispatchesInSiteByDateReceived(
         WritableApplicationService appService, Date dateReceived,
         SiteWrapper site) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
@@ -474,7 +474,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return sb.toString();
     }
 
-    public boolean canBeSentBy(User user, SiteWrapper site) {
+    public boolean canBeSentBy(User user, CenterWrapper<?> site) {
         return canUpdate(user) && getSender().equals(site)
             && isInCreationState() && hasDispatchItems();
     }
@@ -488,7 +488,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return hasAliquots || hasSourceVessels;
     }
 
-    public boolean canBeReceivedBy(User user, SiteWrapper site) {
+    public boolean canBeReceivedBy(User user, CenterWrapper<?> site) {
         return canUpdate(user) && getReceiver().equals(site)
             && isInTransitState();
     }
@@ -503,5 +503,25 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public void setState(DispatchState ds) {
         setState(ds.getId());
+    }
+
+    public boolean isInLostState() {
+        return DispatchState.LOST.equals(getState());
+    }
+
+    public List<DispatchAliquotWrapper> getNonProcessedDispatchAliquotCollection() {
+        return getDispatchAliquotCollectionWithState(DispatchItemState.NONE);
+    }
+
+    public List<DispatchAliquotWrapper> getExtraDispatchAliquots() {
+        return getDispatchAliquotCollectionWithState(DispatchItemState.EXTRA);
+    }
+
+    public List<DispatchAliquotWrapper> getMissingDispatchAliquots() {
+        return getDispatchAliquotCollectionWithState(DispatchItemState.MISSING);
+    }
+
+    public List<DispatchAliquotWrapper> getReceivedDispatchAliquots() {
+        return getDispatchAliquotCollectionWithState(DispatchItemState.RECEIVED);
     }
 }

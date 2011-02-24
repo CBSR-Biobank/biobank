@@ -130,7 +130,7 @@ public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             pvSourceVessel, studySourceVessels, allSourceVessels, this);
         if (add) {
-            dlg.setPatientVisit(patientVisit);
+            dlg.setProcessingEvent(patientVisit);
         }
         int res = dlg.open();
         if (!add && res == Dialog.OK) {

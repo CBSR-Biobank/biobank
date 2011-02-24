@@ -46,8 +46,6 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
     public static final String MSG_DISPATCH_OK = "Editing an existing dispatch record.";
 
-    private ComboViewer studyComboViewer;
-
     private ComboViewer destSiteComboViewer;
 
     protected DispatchAliquotListInfoTable aliquotsNonProcessedTable;
@@ -86,23 +84,6 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                 public void doSelection(Object selectedObject) {
                     SiteWrapper currentSite = siteCombo.getSelectedSite();
                     dispatch.setSender(currentSite);
-                    List<StudyWrapper> studies = currentSite
-                        .getDispatchStudiesAsSender();
-                    if ((studies == null) || (studies.size() == 0)) {
-                        BioBankPlugin.openAsyncError(
-                            "Sender Site Error",
-                            "Site "
-                                + currentSite.getNameShort()
-                                + " does not have any dispatch studies associated with it.\n");
-                    }
-                    studyComboViewer.setInput(studies);
-                    if (dispatch.getStudy() != null) {
-                        // will trigger the listener and set the value :
-                        studyComboViewer.setSelection(new StructuredSelection(
-                            dispatch.getStudy()));
-                    } else if (studies.size() == 1)
-                        studyComboViewer.setSelection(new StructuredSelection(
-                            studies.get(0)));
                 }
             });
         setFirstControl(siteCombo);

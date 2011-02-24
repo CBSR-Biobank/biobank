@@ -27,9 +27,9 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -88,7 +88,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
 
     private Button shipmentsListCheck;
 
-    protected ShipmentWrapper shipmentToBeSaved;
+    protected CollectionEventWrapper shipmentToBeSaved;
 
     private BasicSiteCombo siteCombo;
 
@@ -147,11 +147,11 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
     }
 
     private List<CollectionEventWrapper> getAllSiteShipmentsCollection() {
-        List<CollectionEventWrapper> allShipments = patient.getShipmentCollection(
-            true, false, SessionManager.getUser());
+        List<CollectionEventWrapper> allShipments = patient
+            .getCollectionEventCollection();
         List<CollectionEventWrapper> allSiteShipments = new ArrayList<CollectionEventWrapper>();
-        for (ShipmentWrapper ship : allShipments)
-            if (ship.getSite().equals(siteCombo.getSelectedSite()))
+        for (CollectionEventWrapper ship : allShipments)
+            if (ship.getSourceCenter().equals(siteCombo.getSelectedSite()))
                 allSiteShipments.add(ship);
         return allSiteShipments;
     }
@@ -160,13 +160,13 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
         ArrayList<CollectionEventWrapper> recentShipments = new ArrayList<CollectionEventWrapper>();
         // filter for last 7 days
         Calendar c = Calendar.getInstance();
-        ShipmentWrapper selectedShip = null;
+        CollectionEventWrapper selectedShip = null;
         if (!patientVisit.isNew()) {
             selectedShip = patientVisit.getCollectionEvent();
             // need to add into the list, to be able to see it.
             recentShipments.add(selectedShip);
         } else {
-            for (ShipmentWrapper shipment : getAllSiteShipmentsCollection()) {
+            for (CollectionEventWrapper shipment : getAllSiteShipmentsCollection()) {
                 c.setTime(shipment.getDateReceived());
                 c.add(Calendar.DAY_OF_MONTH, 7);
                 if (c.getTime().after(new Date()))
@@ -227,8 +227,8 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             List<SiteWrapper> input = new ArrayList<SiteWrapper>();
             input.add(patientVisit.getCollectionEvent().getSite());
             siteCombo.setSitesList(input);
-            siteCombo.setSelectedSite(patientVisit.getCollectionEvent().getSite(),
-                false);
+            siteCombo.setSelectedSite(patientVisit.getCollectionEvent()
+                .getSite(), false);
         }
 
         if (patientVisit.getDateProcessed() == null) {
@@ -289,7 +289,7 @@ public class PatientVisitEntryForm extends BiobankEntryForm {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    shipmentToBeSaved = (ShipmentWrapper) selectedObject;
+                    shipmentToBeSaved = (CollectionEventWrapper) selectedObject;
                 }
             });
 

@@ -111,7 +111,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof SourceVesselWrapper) {
             SourceVesselWrapper source = (SourceVesselWrapper) element;
             if (columnIndex == 0) {
-                return source.getName();
+                return source.getSourceVesselType().getName();
             } else {
                 Assert.isTrue(false, "invalid column index: " + columnIndex);
             }
@@ -164,7 +164,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof ActivityStatusWrapper) {
             return ((ActivityStatusWrapper) element).getName();
         } else if (element instanceof StudySourceVesselWrapper) {
-            return ((StudySourceVesselWrapper) element).getSourceVessel()
+            return ((StudySourceVesselWrapper) element).getSourceVesselType()
                 .getName();
         } else if (element instanceof AdapterBase) {
             return ((AdapterBase) element).getLabel();
