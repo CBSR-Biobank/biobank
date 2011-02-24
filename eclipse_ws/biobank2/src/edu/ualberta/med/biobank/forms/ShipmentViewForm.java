@@ -6,7 +6,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappersCollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -21,7 +21,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private ShipmentAdapter shipmentAdapter;
 
-    privateCollectionEventWrapper shipment;
+    private CollectionEventWrapper shipment;
 
     private BiobankText siteLabel;
 

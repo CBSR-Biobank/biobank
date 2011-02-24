@@ -37,7 +37,7 @@ Bundle-ClassPath: conf/,
  lib/server/sdk-writable-core.jar,
  .,
  conf/,
- lib/client/mysql-connector-java-5.1.7-bin.jar
+ lib/client/mysql-connector-java-5.1.15-bin.jar
 Bundle-Vendor: AICML
 Export-Package: antlr;
   uses:="antlr.collections.impl,

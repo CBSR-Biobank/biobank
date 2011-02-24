@@ -308,4 +308,10 @@ public class LinkFormPatientManagement {
         this.site = site;
     }
 
+    @Deprecated
+    public void setVisitsList() {
+        // TODO Auto-generated method stub
+
+    }
+
 }

@@ -59,4 +59,37 @@ public class SourceVesselWrapper extends SourceVesselBaseWrapper {
         }
         return wrappers;
     }
+
+    @Deprecated
+    public String getName() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void checkUnique() throws ApplicationException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public boolean isUsed() {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Deprecated
+    public void setName(String name) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public static void persistSourceVessels(
+        List<SourceVesselWrapper> addedOrModifiedSampleTypes,
+        List<SourceVesselWrapper> deletedSampleTypes) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

@@ -516,4 +516,16 @@ public class AliquotWrapper extends AliquotBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
     }
 
+    @Deprecated
+    public CenterWrapper getCenter() {
+        // TODO new method or old method?
+        return null;
+    }
+
+    @Deprecated
+    public CollectionEventWrapper getCollectionEvent() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

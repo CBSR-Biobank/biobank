@@ -45,6 +45,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
     public static final String MSG_DISPATCH_OK = "Editing an existing dispatch record.";
 
+    private ComboViewer studyComboViewer;
+
     private ComboViewer destSiteComboViewer;
 
     protected DispatchAliquotListInfoTable aliquotsNonProcessedTable;
@@ -258,7 +260,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         super.reset();
         dispatch.setSender(siteCombo.getSelectedSite());
         if (destSiteComboViewer != null) {
-            CenterWrapper destSite = dispatch.getReceiver();
+            CenterWrapper<?> destSite = dispatch.getReceiver();
             if (destSite != null) {
                 destSiteComboViewer.setSelection(new StructuredSelection(
                     destSite));

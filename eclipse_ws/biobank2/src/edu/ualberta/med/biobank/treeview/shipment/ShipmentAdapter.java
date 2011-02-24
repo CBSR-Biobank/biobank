@@ -9,9 +9,9 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappersCollectionEventWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -19,18 +19,18 @@ import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 
 public class ShipmentAdapter extends AdapterBase {
 
-    public ShipmentAdapter(AdapterBase parent,CollectionEventWrapper shipment) {
+    public ShipmentAdapter(AdapterBase parent, CollectionEventWrapper shipment) {
         super(parent, shipment);
         setHasChildren(true);
     }
 
-    publicCollectionEventWrapper getWrapper() {
-        return CollectionEventWrapper) modelObject;
+    public CollectionEventWrapper getWrapper() {
+        return (CollectionEventWrapper) modelObject;
     }
 
     @Override
     protected String getLabelInternal() {
-       CollectionEventWrapper shipment = getWrapper();
+        CollectionEventWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "shipment is null");
         String label = shipment.getFormattedDateReceived();
         if (shipment.getWaybill() != null) {
@@ -42,7 +42,7 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-       CollectionEventWrapper shipment = getWrapper();
+        CollectionEventWrapper shipment = getWrapper();
         ClinicWrapper clinic = shipment.getClinic();
         if (clinic != null) {
             return clinic.getName() + " - " + getTooltipText("Shipment");

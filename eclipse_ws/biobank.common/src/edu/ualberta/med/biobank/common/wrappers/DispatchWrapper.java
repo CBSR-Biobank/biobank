@@ -210,7 +210,80 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         deletedDispatchedAliquots.removeAll(newDispatchAliquots);
     }
 
-    public void checkCanAddAliquot(List<AliquotWrapper> currentAliquots,
+    public class CheckStatus {
+        public CheckStatus(boolean b, String string) {
+            this.ok = b;
+            this.message = string;
+        }
+
+        public boolean ok = true;
+        public String message;
+
+    }
+
+    @Deprecated
+    public CheckStatus checkCanAddAliquot(AliquotWrapper aliquot,
+        boolean checkAlreadyAdded) {
+        return checkCanAddAliquot(getAliquotCollection(), aliquot,
+            checkAlreadyAdded);
+    }
+
+    @Deprecated
+    /**
+     * need to rewrite this. Compare with following method that jon rewrote
+     */
+    protected CheckStatus checkCanAddAliquot(
+        List<AliquotWrapper> currentAliquots, AliquotWrapper aliquot,
+        boolean checkAlreadyAdded) {
+        // if (aliquot.isNew()) {
+        // return new CheckStatus(false, "Cannot add aliquot "
+        // + aliquot.getInventoryId() + ": it has not already been saved");
+        // }
+        // if (!aliquot.isActive()) {
+        // return new CheckStatus(false, "Activity status of "
+        // + aliquot.getInventoryId() + " is not 'Active'."
+        // + " Check comments on this aliquot for more information.");
+        // }
+        // if (aliquot.getPosition() == null) {
+        // return new CheckStatus(false, "Cannot add aliquot "
+        // + aliquot.getInventoryIgetExtraDispatchAliquotsd()
+        // + ": it has no position. A position should be first assigned.");
+        // }
+        // if (aliquot.getParent() != null
+        // && !aliquot.getParent().getSite().equals(getSender())) {
+        // return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
+        // + " is currently assigned to site "
+        // + aliquot.getParent().getSite().getNameShort()
+        // + ". It should be first assigned to "
+        // + getSender().getNameShort() + " site.");
+        // }
+        // StudyWrapper aliquotStudy = aliquot.getPatientVisit().getPatient()
+        // .getStudy();
+        // // if (!aliquotStudy.equals(getStudy())) {
+        // // return new CheckStatus(false, "Aliquot " +
+        // aliquot.getInventoryId()
+        // // + " is linked to study " + aliquotStudy.getNameShort()
+        // // + ". The study of this shipment is "
+        // // + ((getStudy() == null) ? "none" : getStudy().getNameShort())
+        // // + ".");
+        // // }
+        // if (checkAlreadyAdded && currentAliquots != null
+        // && currentAliquots.contains(aliquot)) {
+        // return new CheckStatus(false, aliquot.getInventoryId()
+        // + " is already in this shipment.");
+        // }
+        // if (aliquot.isUsedInDispatch()) {
+        // return new CheckStatus(false, aliquot.getInventoryId()
+        // + " is already in another shipment in transit or in creation.");
+        // }
+        return new CheckStatus(true, "");
+    }
+
+    @Deprecated
+    /**
+     * See previous method comment. Return Checkstatus for compiling only
+     */
+    public CheckStatus checkCanAddAliquot(List<AliquotWrapper> currentAliquots,
         AliquotWrapper aliquot) throws BiobankCheckException {
         if (aliquot.isNew()) {
             throw new BiobankCheckException("Cannot add aliquot "
@@ -241,6 +314,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             throw new BiobankCheckException(aliquot.getInventoryId()
                 + " is already in a Dispatch in-transit or in creation.");
         }
+        return new CheckStatus(true, "");
     }
 
     private <T extends DispatchItemWrapper<?>> List<T> getDispatchItems(
@@ -536,7 +610,61 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         addToDispatchAliquotCollection(daws);
     }
 
-    public List<DispatchAliquotWrapper> getDispatchAliquotCollection() {
+    public List<DispatchAliquotWrapper> getDispatchSpecimenCollection() {
         return getDispatchAliquotCollection(false);
+    }
+
+    @Deprecated
+    public StudyWrapper getStudy() {
+        // TODO this can be removed once the gui doesn't use it anymore
+        return null;
+    }
+
+    @Deprecated
+    public void addNewAliquots(List<AliquotWrapper> asList, boolean b) {
+        // TODO this can be removed once the gui doesn't use it anymore
+
+    }
+
+    @Deprecated
+    public void setStudy(StudyWrapper study) {
+        // TODO this can be removed once the gui doesn't use it anymore
+    }
+
+    @Deprecated
+    public void addExtraAliquots(List<AliquotWrapper> extraAliquots, boolean b)
+        throws BiobankCheckException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public List<DispatchAliquotWrapper> getDispatchAliquotCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public boolean canBeSentBy(User user) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Deprecated
+    public boolean canBeReceivedBy(User user) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Deprecated
+    public boolean canBeClosedBy(User user) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    @Deprecated
+    public void addAliquots(List<AliquotWrapper> asList) {
+        // TODO seems that this method has been removed... ?
+
     }
 }

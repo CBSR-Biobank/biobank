@@ -9,7 +9,7 @@ import org.eclipse.ui.WorkbenchException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappersCollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 
 public class ShipmentAdministrationHandler extends AbstractHandler implements
@@ -34,7 +34,7 @@ public class ShipmentAdministrationHandler extends AbstractHandler implements
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canViewCollectionEventWrapper.class)
+        return SessionManager.canView(CollectionEventWrapper.class)
             && SessionManager.getInstance().getSession() != null;
     }
 }
