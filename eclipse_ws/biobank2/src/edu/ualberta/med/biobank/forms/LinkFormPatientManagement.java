@@ -212,44 +212,6 @@ public class LinkFormPatientManagement {
         setVisitsList();
     }
 
-    protected void setVisitsList() {
-        if (viewerVisits != null) {
-            if (currentPatient != null) {
-                // show visits list
-                List<ProcessingEventWrapper> collection = null;
-                if (visitsListCheck.getSelection()) {
-                    try {
-                        collection = currentPatient
-                            .getLast7DaysPatientVisits(site);
-                    } catch (ApplicationException e) {
-                        BioBankPlugin.openAsyncError("Visits problem",
-                            "Problem getting last 7 days visits. All visits will "
-                                + "be displayed into the list");
-                        aliquotAdminForm.getErrorLogger().error(
-                            "Last 7 days visits error", e);
-                    }
-                }
-                if (collection == null) {
-                    collection = currentPatient
-                        .getProcessingEventCollection(true);
-                }
-                viewerVisits.setInput(collection);
-                viewerVisits.getCombo().setFocus();
-                if (collection != null && collection.size() == 1) {
-                    viewerVisits.setSelection(new StructuredSelection(
-                        collection.get(0)));
-                } else {
-                    viewerVisits.getCombo().deselectAll();
-                }
-            } else {
-                viewerVisits.setInput(null);
-            }
-            if (visitText != null) {
-                visitText.setText("");
-            }
-        }
-    }
-
     public void onClose() {
         if (aliquotAdminForm.finished) {
             visitsListCheckSelection = true;
@@ -344,6 +306,12 @@ public class LinkFormPatientManagement {
 
     public void setSite(SiteWrapper site) {
         this.site = site;
+    }
+
+    @Deprecated
+    public void setVisitsList() {
+        // TODO Auto-generated method stub
+
     }
 
 }

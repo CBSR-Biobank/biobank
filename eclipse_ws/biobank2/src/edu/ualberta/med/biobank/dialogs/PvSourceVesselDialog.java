@@ -138,7 +138,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
         SourceVesselWrapper currentSourceVessel = internalSourceVessel
             .getSourceVessel();
         if (currentSourceVessel != null) {
-            ssv = mapStudySourceVessel.get(currentSourceVessel.getName());
+            ssv = mapStudySourceVessel.get(currentSourceVessel
+                .getSourceVesselType().getName());
         }
         if (ssv == null && currentSourceVessel != null
             && allSourceVessels.contains(currentSourceVessel)) {
@@ -217,7 +218,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
         SourceVesselWrapper currentSourceVessel = internalSourceVessel
             .getSourceVessel();
         if (currentSourceVessel != null) {
-            ssv = mapStudySourceVessel.get(currentSourceVessel.getName());
+            ssv = mapStudySourceVessel.get(currentSourceVessel
+                .getSourceVesselType().getName());
         }
         boolean enableTimeDrawn = (currentSourceVessel != null)
             && (ssv == null || Boolean.TRUE.equals(ssv.getNeedTimeDrawn()));

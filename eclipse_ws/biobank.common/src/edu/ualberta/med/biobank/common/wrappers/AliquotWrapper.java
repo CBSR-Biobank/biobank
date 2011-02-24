@@ -522,4 +522,10 @@ public class AliquotWrapper extends AliquotBaseWrapper {
         return null;
     }
 
+    @Deprecated
+    public CollectionEventWrapper getCollectionEvent() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

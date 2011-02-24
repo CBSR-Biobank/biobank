@@ -179,7 +179,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getSourceVesselCollection(true);
     }
 
-    public void addAliquots(List<AliquotWrapper> newAliquots) {
+    public void addNewAliquots(List<AliquotWrapper> newAliquots) {
         if (newAliquots == null)
             return;
 
@@ -645,5 +645,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public boolean canBeClosedBy(User user) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    @Deprecated
+    public void addAliquots(List<AliquotWrapper> asList) {
+        // TODO seems that this method has been removed... ?
+
     }
 }

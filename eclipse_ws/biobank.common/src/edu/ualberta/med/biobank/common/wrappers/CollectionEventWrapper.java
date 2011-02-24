@@ -337,7 +337,25 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     @Deprecated
     public Collection<? extends ModelWrapper<?>> getProcessingEventCollection() {
-        // TODO Auto-generated method stub
+        // TODO new but not yet in model
+        return null;
+    }
+
+    @Deprecated
+    public PatientWrapper getPatient() {
+        // TODO new but not yet in model
+        return null;
+    }
+
+    @Deprecated
+    public String getFormattedDateProcessed() {
+        // TODO new but not yet in model
+        return null;
+    }
+
+    @Deprecated
+    public String getFormattedDateDrawn() {
+        // TODO new but not yet in model
         return null;
     }
 }

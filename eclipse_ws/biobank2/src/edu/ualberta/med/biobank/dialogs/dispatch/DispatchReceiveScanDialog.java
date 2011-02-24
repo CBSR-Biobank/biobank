@@ -105,7 +105,7 @@ public class DispatchReceiveScanDialog extends
 
     @Override
     protected void processScanResult(IProgressMonitor monitor,
-        CenterWrapper center) throws Exception {
+        CenterWrapper<?> site) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             processCells(cells.keySet(), monitor);
