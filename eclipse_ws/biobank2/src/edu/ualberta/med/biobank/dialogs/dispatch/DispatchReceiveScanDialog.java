@@ -148,8 +148,7 @@ public class DispatchReceiveScanDialog extends
                                 + " to be in this shipment. They will be added to the"
                                 + " extra-pending list.");
                     try {
-                        (currentShipment)
-                            .addExtraAliquots(extraAliquots, false);
+                        (currentShipment).addExtraAliquots(extraAliquots);
                     } catch (Exception e) {
                         BioBankPlugin.openAsyncError("Error flagging aliquots",
                             e);

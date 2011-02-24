@@ -55,7 +55,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankDataErrorException;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.sourceproviders.ConfirmState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
@@ -200,7 +200,7 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
                         });
                         monitor.setCanceled(true);
                         BioBankPlugin.openAsyncError("Save error", bce);
-                    } catch (BiobankDataErrorException bdee) {
+                    } catch (BiobankServerException bdee) {
                         Display.getDefault().syncExec(new Runnable() {
                             @Override
                             public void run() {

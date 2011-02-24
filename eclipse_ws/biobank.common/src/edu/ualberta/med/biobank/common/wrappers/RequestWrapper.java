@@ -9,6 +9,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.peer.RequestAliquotPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.util.RequestAliquotState;
+import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.RequestBaseWrapper;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestAliquot;
@@ -157,5 +158,9 @@ public class RequestWrapper extends RequestBaseWrapper {
             e.printStackTrace();
         }
         return 0 == (Long) results.get(0);
+    }
+
+    public void setState(RequestState state) {
+        setState(state.getId());
     }
 }

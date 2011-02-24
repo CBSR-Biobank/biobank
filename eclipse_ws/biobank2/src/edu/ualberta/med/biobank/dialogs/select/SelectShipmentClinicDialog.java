@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 public class SelectShipmentClinicDialog extends BiobankDialog {
     private List<CollectionEventWrapper> shipments;
     private ComboViewer comboViewer;
-    protectedCollectionEventWrapper selectedShipment;
+    protected CollectionEventWrapper selectedShipment;
 
     public SelectShipmentClinicDialog(Shell parent,
         List<CollectionEventWrapper> shipments) {
