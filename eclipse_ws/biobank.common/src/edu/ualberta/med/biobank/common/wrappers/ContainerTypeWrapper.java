@@ -278,11 +278,11 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public Integer getRowCapacity() {
-        return getProperty(getCapacity(), CapacityPeer.ROW_CAPACITY);
+        return getCapacity().getProperty(CapacityPeer.ROW_CAPACITY);
     }
 
     public Integer getColCapacity() {
-        return getProperty(getCapacity(), CapacityPeer.COL_CAPACITY);
+        return getCapacity().getProperty(CapacityPeer.COL_CAPACITY);
     }
 
     private CapacityWrapper initCapacity() {
@@ -295,15 +295,15 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public void setRowCapacity(Integer maxRows) {
-        setProperty(initCapacity(), CapacityPeer.ROW_CAPACITY, maxRows);
+        initCapacity().setProperty(CapacityPeer.ROW_CAPACITY, maxRows);
     }
 
     public void setColCapacity(Integer maxCols) {
-        setProperty(initCapacity(), CapacityPeer.COL_CAPACITY, maxCols);
+        initCapacity().setProperty(CapacityPeer.COL_CAPACITY, maxCols);
     }
 
     public Integer getChildLabelingSchemeId() {
-        return getProperty(getChildLabelingScheme(),
+        return getChildLabelingScheme().getProperty(
             ContainerLabelingSchemePeer.ID);
     }
 
@@ -318,7 +318,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public String getChildLabelingSchemeName() {
-        return getProperty(getChildLabelingScheme(),
+        return getChildLabelingScheme().getProperty(
             ContainerLabelingSchemePeer.NAME);
     }
 

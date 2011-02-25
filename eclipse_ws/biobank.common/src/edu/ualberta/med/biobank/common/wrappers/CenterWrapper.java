@@ -52,43 +52,43 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public String getStreet1() {
-        return getProperty(getAddress(), AddressPeer.STREET1);
+        return getAddress().getProperty(AddressPeer.STREET1);
     }
 
     public void setStreet1(String street1) {
-        setProperty(initAddress(), AddressPeer.STREET1, street1);
+        initAddress().setProperty(AddressPeer.STREET1, street1);
     }
 
     public String getStreet2() {
-        return getProperty(getAddress(), AddressPeer.STREET2);
+        return getAddress().getProperty(AddressPeer.STREET2);
     }
 
     public void setStreet2(String street2) {
-        setProperty(initAddress(), AddressPeer.STREET2, street2);
+        initAddress().setProperty(AddressPeer.STREET2, street2);
     }
 
     public String getCity() {
-        return getProperty(getAddress(), AddressPeer.CITY);
+        return getAddress().getProperty(AddressPeer.CITY);
     }
 
     public void setCity(String city) {
-        setProperty(initAddress(), AddressPeer.CITY, city);
+        initAddress().setProperty(AddressPeer.CITY, city);
     }
 
     public String getProvince() {
-        return getProperty(getAddress(), AddressPeer.PROVINCE);
+        return getAddress().getProperty(AddressPeer.PROVINCE);
     }
 
     public void setProvince(String province) {
-        setProperty(initAddress(), AddressPeer.PROVINCE, province);
+        initAddress().setProperty(AddressPeer.PROVINCE, province);
     }
 
     public String getPostalCode() {
-        return getProperty(getAddress(), AddressPeer.POSTAL_CODE);
+        return getAddress().getProperty(AddressPeer.POSTAL_CODE);
     }
 
     public void setPostalCode(String postalCode) {
-        setProperty(initAddress(), AddressPeer.POSTAL_CODE, postalCode);
+        initAddress().setProperty(AddressPeer.POSTAL_CODE, postalCode);
     }
 
     @Override

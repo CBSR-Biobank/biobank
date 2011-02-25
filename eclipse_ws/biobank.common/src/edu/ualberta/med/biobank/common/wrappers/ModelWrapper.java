@@ -696,7 +696,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return getWrappedProperty(this, property, wrapperKlazz);
     }
 
-    protected <W extends ModelWrapper<? extends R>, R, M> W getWrappedProperty(
+    private <W extends ModelWrapper<? extends R>, R, M> W getWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property,
         Class<W> wrapperKlazz) {
         if (modelWrapper == null) {
@@ -730,7 +730,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrappedProperty(this, property, wrapper);
     }
 
-    protected <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
+    private <W extends ModelWrapper<? extends R>, R, M> void setWrappedProperty(
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
         R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
         setProperty(modelWrapper, property, newValue);
@@ -743,7 +743,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrapperCollection(this, property, wrappers);
     }
 
-    protected <W extends ModelWrapper<? extends R>, R, M> void setWrapperCollection(
+    private <W extends ModelWrapper<? extends R>, R, M> void setWrapperCollection(
         ModelWrapper<M> modelWrapper,
         Property<? extends Collection<R>, ? super M> property,
         Collection<W> wrappers) {
@@ -762,7 +762,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return getWrapperCollection(this, property, wrapperKlazz, sort);
     }
 
-    protected <W extends ModelWrapper<? extends R>, R, M> List<W> getWrapperCollection(
+    private <W extends ModelWrapper<? extends R>, R, M> List<W> getWrapperCollection(
         ModelWrapper<M> modelWrapper,
         Property<? extends Collection<R>, ? super M> property,
         Class<W> wrapperKlazz, boolean sort) {
@@ -857,7 +857,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return getProperty(this, property);
     }
 
-    protected <T, M> T getProperty(ModelWrapper<M> modelWrapper,
+    private <T, M> T getProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property) {
         if (modelWrapper == null) {
             return null;
@@ -878,7 +878,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setProperty(this, property, newValue);
     }
 
-    protected <T, M> void setProperty(ModelWrapper<M> modelWrapper,
+    private <T, M> void setProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property, T newValue) {
         setModelProperty(modelWrapper, property, newValue);
         cache(modelWrapper, property, newValue);
