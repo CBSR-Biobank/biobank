@@ -704,9 +704,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         @SuppressWarnings("unchecked")
-        W wrapper = (W) recall(property);
+        W wrapper = (W) modelWrapper.recall(property);
 
-        if (wrapper == null && !isCached(property)) {
+        if (wrapper == null && !modelWrapper.isCached(property)) {
             R raw = getModelProperty(modelWrapper, property);
 
             if (raw != null) {
@@ -719,7 +719,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
                 }
             }
 
-            cache(modelWrapper, property, wrapper);
+            modelWrapper.cache(property, wrapper);
         }
 
         return wrapper;
@@ -734,7 +734,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         ModelWrapper<M> modelWrapper, Property<R, ? super M> property, W wrapper) {
         R newValue = (wrapper == null ? null : wrapper.getWrappedObject());
         setProperty(modelWrapper, property, newValue);
-        cache(modelWrapper, property, wrapper);
+        modelWrapper.cache(property, wrapper);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> void setWrapperCollection(
@@ -753,7 +753,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         setModelProperty(modelWrapper, property, newValues);
-        cache(modelWrapper, property, wrappers);
+        modelWrapper.cache(property, wrappers);
     }
 
     protected <W extends ModelWrapper<? extends R>, R> List<W> getWrapperCollection(
@@ -771,13 +771,13 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         @SuppressWarnings("unchecked")
-        List<W> wrappers = (List<W>) recall(property);
+        List<W> wrappers = (List<W>) modelWrapper.recall(property);
 
-        if (wrappers == null && !isCached(property)) {
+        if (wrappers == null && !modelWrapper.isCached(property)) {
             Collection<R> raw = getModelProperty(modelWrapper, property);
             wrappers = wrapModelCollection(appService, (List<R>) raw,
                 wrapperKlazz);
-            cache(modelWrapper, property, wrappers);
+            modelWrapper.cache(property, wrappers);
         }
 
         if (wrappers != null && sort) {
@@ -857,7 +857,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return getProperty(this, property);
     }
 
-    private <T, M> T getProperty(ModelWrapper<M> modelWrapper,
+    protected <T, M> T getProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property) {
         if (modelWrapper == null) {
             return null;
@@ -866,9 +866,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         @SuppressWarnings("unchecked")
         T value = (T) recall(property);
 
-        if (value == null && !isCached(property)) {
+        if (value == null && !modelWrapper.isCached(property)) {
             value = getModelProperty(modelWrapper, property);
-            cache(modelWrapper, property, value);
+            modelWrapper.cache(property, value);
         }
 
         return value;
@@ -881,7 +881,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     private <T, M> void setProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property, T newValue) {
         setModelProperty(modelWrapper, property, newValue);
-        cache(modelWrapper, property, newValue);
+        modelWrapper.cache(property, newValue);
     }
 
     private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
@@ -931,15 +931,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
     }
 
-    private void cache(ModelWrapper<?> wrapper, Property<?, ?> property,
-        Object value) {
+    private void cache(Property<?, ?> property, Object value) {
         propertyMap.put(property, value);
-
-        if (wrapper != this) {
-            // update the cache of the wrapper the given property is for, if it
-            // is not for itself
-            wrapper.cache(wrapper, property, value);
-        }
     }
 
     private boolean isCached(Property<?, ?> property) {

@@ -52,7 +52,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public String getStreet1() {
-        return getAddress().getProperty(AddressPeer.STREET1);
+        return getProperty(getAddress(), AddressPeer.STREET1);
     }
 
     public void setStreet1(String street1) {
@@ -60,7 +60,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public String getStreet2() {
-        return getAddress().getProperty(AddressPeer.STREET2);
+        return getProperty(getAddress(), AddressPeer.STREET2);
     }
 
     public void setStreet2(String street2) {
@@ -68,7 +68,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public String getCity() {
-        return getAddress().getProperty(AddressPeer.CITY);
+        return getProperty(getAddress(), AddressPeer.CITY);
     }
 
     public void setCity(String city) {
@@ -76,7 +76,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public String getProvince() {
-        return getAddress().getProperty(AddressPeer.PROVINCE);
+        return getProperty(getAddress(), AddressPeer.PROVINCE);
     }
 
     public void setProvince(String province) {
@@ -84,7 +84,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public String getPostalCode() {
-        return getAddress().getProperty(AddressPeer.POSTAL_CODE);
+        return getProperty(getAddress(), AddressPeer.POSTAL_CODE);
     }
 
     public void setPostalCode(String postalCode) {
