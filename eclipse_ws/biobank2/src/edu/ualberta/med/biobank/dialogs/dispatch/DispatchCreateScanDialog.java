@@ -186,7 +186,7 @@ public class DispatchCreateScanDialog extends
             scanCell.setStatus(CellStatus.MISSING);
             scanCell
                 .setInformation(Messages
-                    .getFormattedString(
+                    .getString(
                         "ScanAssign.scanStatus.aliquot.missing", expectedAliquot.getInventoryId())); //$NON-NLS-1$
             scanCell.setTitle("?"); //$NON-NLS-1$
         } else {

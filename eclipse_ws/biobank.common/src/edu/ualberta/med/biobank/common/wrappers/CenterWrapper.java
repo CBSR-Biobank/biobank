@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.HashSet;
@@ -32,6 +33,13 @@ public abstract class CenterWrapper<E extends Center> extends
 
     public CenterWrapper(WritableApplicationService appService, E c) {
         super(appService, c);
+    }
+
+    @Override
+    protected List<String> getPropertyChangeNames() {
+        List<String> all = new ArrayList<String>(super.getPropertyChangeNames());
+        all.addAll(AddressPeer.PROP_NAMES);
+        return all;
     }
 
     private AddressWrapper initAddress() {

@@ -574,38 +574,11 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.CbsrConfigHandler"
-            commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfig">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.CbsrConfigWithDataHandler"
-            commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.CalgaryConfigHandler"
-            commandId="edu.ualberta.med.biobank.commands.debug.calgaryConfig">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
             class="edu.ualberta.med.biobank.handlers.ShipmentAddHandler"
             commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd">
          <activeWhen>
             <and>
-              <reference
+              <reference	
                     definitionId="biobank2.processingPerspectiveSelected">
               </reference>
               <reference

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.tools.modelextender;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -71,6 +72,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
 
         FilenameFilter filter = new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 return name.contains("Wrapper.java");
             }
@@ -83,6 +85,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         return wrapperMap;
     }
 
+    @Override
     protected void generateClassFile(ModelClass mc) throws Exception {
         String className = mc.getName();
         String wrapperName = new StringBuilder(className).append("Wrapper")
@@ -112,11 +115,13 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append("import ").append(mc.getPkg()).append(".")
             .append(mc.getName()).append(";\n");
 
-        if (mc.getExtendsClass() == null) {
+        if (mc.getExtendsClass() == null)
             contents.append("import ").append(wrapperPackageName)
                 .append(".ModelWrapper;\n");
-
-        }
+        else
+            // need this for the getPropertyChangeNames method
+            contents.append("import ").append(ArrayList.class.getName())
+                .append(";\n");
 
         // import the peer class
         contents.append("import ").append(peerpackagename).append(".")
@@ -198,10 +203,20 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 .append(".class;\n").append("    }\n\n");
         }
 
-        result.append("    @Override\n")
-            .append("   protected List<String> getPropertyChangeNames() {\n")
-            .append("        return ").append(mc.getName())
-            .append("Peer.PROP_NAMES;\n").append("    }\n\n");
+        result.append("    @Override\n").append(
+            "   protected List<String> getPropertyChangeNames() {\n");
+        if (mc.getExtendsClass() == null)
+            result.append("        return ").append(mc.getName())
+                .append("Peer.PROP_NAMES;\n");
+        else
+            result
+                .append(
+                    "        List<String> superNames = super.getPropertyChangeNames();\n")
+                .append("        List<String> all = new ArrayList<String>();\n")
+                .append("        all.addAll(superNames);\n")
+                .append("        all.addAll(").append(mc.getName())
+                .append("Peer.PROP_NAMES);\n").append("        return all;\n");
+        result.append("    }\n\n");
         return result.toString();
 
     }

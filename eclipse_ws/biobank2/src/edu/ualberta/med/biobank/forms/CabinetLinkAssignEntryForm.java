@@ -497,7 +497,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 cabinet = drawer.getParent();
             } else if (cabinetContainers.size() == 0) {
                 String errorMsg = Messages
-                    .getFormattedString(
+                    .getString(
                         "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested), currentSite.getNameShort()); //$NON-NLS-1$
                 BioBankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
@@ -616,10 +616,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 .getContainerTypesInSite(appService,
                     siteCombo.getSelectedSite(), cabinetNameContains, false);
             if (cabinetContainerTypes.size() == 0)
-                BioBankPlugin.openAsyncError(Messages
-                    .getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
-                    Messages.getFormattedString(
-                        "Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
+                BioBankPlugin.openAsyncError(
+                    Messages.getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
+                    Messages.getString("Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
                         cabinetNameContains));
         }
     }
@@ -664,7 +663,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         cancelConfirmWidget.setFocus();
                     } else {
                         BioBankPlugin.openError("Position not free", Messages
-                            .getFormattedString(
+                            .getString(
                                 "Cabinet.checkStatus.error", positionString, //$NON-NLS-1$
                                 bin.getLabel()));
                         appendLogNLS(

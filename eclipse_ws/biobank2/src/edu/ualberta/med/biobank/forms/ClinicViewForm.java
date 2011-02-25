@@ -7,6 +7,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -53,12 +54,14 @@ public class ClinicViewForm extends AddressViewFormCommon {
         clinicAdapter = (ClinicAdapter) adapter;
         clinic = clinicAdapter.getWrapper();
         clinic.reload();
-        setPartName("Clinic: " + clinic.getNameShort());
+        setPartName(Messages.getString("ClinicViewForm.title",
+            clinic.getNameShort()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Clinic: " + clinic.getName());
+        form.setText(Messages.getString("ClinicViewForm.title",
+            clinic.getName()));
 
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
@@ -76,21 +79,24 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("label.name"));
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Short Name");
+            Messages.getString("label.nameShort"));
         hasShipmentsButton = (Button) createLabelledWidget(client,
-            Button.class, SWT.NONE, "Sends Shipments");
+            Button.class, SWT.NONE,
+            Messages.getString("clinic.field.label.sendsShipments"));
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity Status");
+            Messages.getString("label.activity"));
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+            Messages.getString("label.comments"));
         shipmentTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Shipments");
+            Messages.getString("ClinicViewForm.field.label.totalShipments"));
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Patients");
+            Messages.getString("ClinicViewForm.field.label.totalPatients"));
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Patient Visits");
+            Messages
+                .getString(" ClinicViewForm.field.label.totalPatientVisits"));
 
         setClinicValues();
     }
@@ -107,7 +113,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     private void createContactsSection() {
-        Composite client = createSectionWithClient("Contacts");
+        Composite client = createSectionWithClient(Messages
+            .getString("clinic.contact.title"));
 
         contactsTable = new ContactInfoTable(client,
             clinic.getContactCollection());
@@ -116,7 +123,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     protected void createStudiesSection() throws ApplicationException {
-        Composite client = createSectionWithClient("Studies");
+        Composite client = createSectionWithClient(Messages
+            .getString("ClinicViewForm.studies.title"));
 
         studiesTable = new ClinicStudyInfoTable(client, clinic);
         studiesTable.adaptToToolkit(toolkit, true);
@@ -126,7 +134,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     protected void createShipmentsSection() {
-        Composite client = createSectionWithClient("Shipments");
+        Composite client = createSectionWithClient(Messages
+            .getString("ClinicViewForm.shipments.title"));
 
         shipmentsTable = new ShipmentInfoTable(client, clinic);
         shipmentsTable.adaptToToolkit(toolkit, true);
@@ -138,8 +147,10 @@ public class ClinicViewForm extends AddressViewFormCommon {
     @Override
     public void reload() throws Exception {
         clinic.reload();
-        setPartName("Clinic: " + clinic.getName());
-        form.setText("Clinic: " + clinic.getName());
+        setPartName(Messages
+            .getString("ClinicViewForm.title", clinic.getName()));
+        form.setText(Messages.getString("ClinicViewForm.title",
+            clinic.getName()));
         setClinicValues();
         setAdressValues(clinic);
         contactsTable.setCollection(clinic.getContactCollection(true));
