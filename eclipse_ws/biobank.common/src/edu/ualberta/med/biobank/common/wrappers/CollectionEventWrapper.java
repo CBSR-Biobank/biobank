@@ -358,4 +358,22 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         // TODO new but not yet in model
         return null;
     }
+
+    @Deprecated
+    public Integer getVisitNumber() {
+        // TODO new but not yet in model
+        return null;
+    }
+
+    @Deprecated
+    public Integer getOriginalSpecimensCount() {
+        // TODO new but not yet in model
+        return null;
+    }
+
+    @Deprecated
+    public Integer getAliquotedSpecimensCount() {
+        // TODO new but not yet in model
+        return null;
+    }
 }

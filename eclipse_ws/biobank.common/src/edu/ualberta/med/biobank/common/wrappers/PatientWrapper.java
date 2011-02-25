@@ -371,4 +371,16 @@ public class PatientWrapper extends PatientBaseWrapper {
         return null;
     }
 
+    @Deprecated
+    public String getSourceSpecimenCount() {
+        // TODO New method. Need to be implemented !
+        return null;
+    }
+
+    @Deprecated
+    public String getAliquotedSpecimenCount() {
+        // TODO New method. Need to be implemented !
+        return null;
+    }
+
 }
