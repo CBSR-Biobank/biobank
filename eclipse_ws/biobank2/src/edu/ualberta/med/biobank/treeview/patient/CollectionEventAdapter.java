@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
@@ -26,8 +25,8 @@ public class CollectionEventAdapter extends AdapterBase {
     private AliquotWrapper selectedAliquot;
 
     public CollectionEventAdapter(AdapterBase parent,
-        ProcessingEventWrapper patientVisitWrapper) {
-        super(parent, patientVisitWrapper);
+        CollectionEventWrapper collectionEventWrapper) {
+        super(parent, collectionEventWrapper);
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 

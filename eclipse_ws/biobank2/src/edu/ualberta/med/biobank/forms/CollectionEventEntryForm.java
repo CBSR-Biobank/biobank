@@ -159,13 +159,14 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 patientVisit.getActivityStatus()));
         }
 
-        setFirstControl(activityStatusComboViewer.getCombo());
         createReadOnlyLabelledField(client, SWT.NONE, "Patient",
             patient.getPnumber());
 
         dateDrawnWidget = createDateTimeWidget(client, "Date Drawn",
             patientVisit.getDateDrawn(), patientVisit, "dateDrawn",
             new NotNullValidator("Date Drawn should be set"));
+
+        setFirstControl(dateDrawnWidget);
 
         createPvDataSection(client);
 

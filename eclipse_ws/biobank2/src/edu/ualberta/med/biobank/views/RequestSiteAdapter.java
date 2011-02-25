@@ -13,16 +13,12 @@ import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.SiteViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.request.AcceptedRequestNode;
 import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
-import edu.ualberta.med.biobank.treeview.request.ShippedRequestNode;
 
 public class RequestSiteAdapter extends AdapterBase {
 
     private ApprovedRequestNode approvedNode;
-    private AcceptedRequestNode acceptedNode;
-    private ShippedRequestNode shippedNode;
 
     public RequestSiteAdapter(AdapterBase parent, SiteWrapper site) {
         super(parent, site, false);
@@ -33,14 +29,6 @@ public class RequestSiteAdapter extends AdapterBase {
         approvedNode = new ApprovedRequestNode(this, 0, site);
         approvedNode.setParent(this);
         this.addChild(approvedNode);
-
-        acceptedNode = new AcceptedRequestNode(this, 1, site);
-        acceptedNode.setParent(this);
-        this.addChild(acceptedNode);
-
-        shippedNode = new ShippedRequestNode(this, 2, site);
-        shippedNode.setParent(this);
-        this.addChild(shippedNode);
     }
 
     public SiteWrapper getWrapper() {

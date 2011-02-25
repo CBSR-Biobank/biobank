@@ -641,8 +641,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),
                     site.getNameShort(), patientVisit.getFormattedDateDrawn(),
-                    patientVisit.getCollectionEvent().getClinic().getName(),
-                    cell.getType().getName()));
+                    patientVisit.getCenter().getName(), cell.getType()
+                        .getName()));
                 nber++;
             }
         }

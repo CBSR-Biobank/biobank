@@ -424,8 +424,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Deprecated
-    public void addPvSourceVessels(
-        List<PvSourceVesselWrapper> addedPvSourceVessels) {
+    public void addSourceVessels(List<SourceVesselWrapper> addedSourceVessels) {
         // TODO Auto-generated method stub
 
     }
@@ -438,14 +437,14 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Deprecated
-    public List<PvSourceVesselWrapper> getPvSourceVesselCollection() {
+    public List<SourceVesselWrapper> getSourceVesselCollection() {
         // TODO Auto-generated method stub
         return null;
     }
 
     @Deprecated
-    public void removePvSourceVessels(
-        List<PvSourceVesselWrapper> removedPvSourceVessels) {
+    public void removeSourceVessels(
+        List<SourceVesselWrapper> removedPvSourceVessels) {
         // TODO Auto-generated method stub
 
     }

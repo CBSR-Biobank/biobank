@@ -13,6 +13,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -73,7 +74,7 @@ public class PatientAdapter extends AdapterBase {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
                     CollectionEventAdapter adapter = new CollectionEventAdapter(
-                        PatientAdapter.this, new ProcessingEventWrapper(
+                        PatientAdapter.this, new CollectionEventWrapper(
                             getAppService()));
                     adapter.getWrapper().setPatient(getWrapper());
                     adapter.openEntryForm();
@@ -95,7 +96,7 @@ public class PatientAdapter extends AdapterBase {
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof ProcessingEventWrapper);
-        return new CollectionEventAdapter(this, (ProcessingEventWrapper) child);
+        return new CollectionEventAdapter(this, (CollectionEventWrapper) child);
     }
 
     @Override

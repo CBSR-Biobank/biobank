@@ -108,10 +108,6 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getRequestCollection(RequestState.APPROVED);
     }
 
-    public List<RequestWrapper> getShippedRequestCollection() {
-        return getRequestCollection(RequestState.SHIPPED);
-    }
-
     // due to bug in Hibernate when using elements in query must also use a left
     // join
     private static final String STUDIES_NON_ASSOC_BASE_QRY = "select s from "

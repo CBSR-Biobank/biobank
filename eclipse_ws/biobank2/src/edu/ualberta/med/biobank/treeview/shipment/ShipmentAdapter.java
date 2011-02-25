@@ -75,14 +75,14 @@ public class ShipmentAdapter extends AdapterBase {
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof ProcessingEventWrapper);
-        return new CollectionEventAdapter(this, (ProcessingEventWrapper) child);
+        return new CollectionEventAdapter(this, (CollectionEventWrapper) child);
     }
 
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         getWrapper().reload();
-        return getWrapper().getProcessingEventCollection();
+        return getWrapper().getSpecimenCollection();
     }
 
     @Override

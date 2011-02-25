@@ -21,7 +21,6 @@ import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -40,8 +39,8 @@ public class RequestReceiveScanDialog extends
     private int errors;
 
     public RequestReceiveScanDialog(Shell parentShell,
-        final RequestWrapper currentShipment, SiteWrapper currentSite) {
-        super(parentShell, currentShipment, currentSite);
+        final RequestWrapper currentShipment, CenterWrapper centerWrapper) {
+        super(parentShell, currentShipment, centerWrapper);
     }
 
     @Override
@@ -106,7 +105,7 @@ public class RequestReceiveScanDialog extends
 
     @Override
     protected void processScanResult(IProgressMonitor monitor,
-        CenterWrapper site) throws Exception {
+        CenterWrapper<?> site) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             processCells(cells.keySet(), monitor);

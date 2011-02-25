@@ -29,8 +29,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private CollectionEventWrapper patientVisit;
 
-    private BiobankText siteLabel;
-
     private BiobankText studyLabel;
 
     private BiobankText activityStatusLabel;
@@ -38,10 +36,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
     private AliquotListInfoTable aliquotWidget;
 
     private List<FormPvCustomInfo> pvCustomInfoList;
-
-    private BiobankText clinicLabel;
-
-    private BiobankText shipmentLabel;
 
     private BiobankText patientLabel;
 
@@ -90,13 +84,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
-        clinicLabel = createReadOnlyLabelledField(client, SWT.NONE, "Clinic");
-        shipmentLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Shipment");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date Processed");
@@ -151,8 +141,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setTextValue(activityStatusLabel, patientVisit.getActivityStatus()
             .getName());
         setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
-        setTextValue(dateProcessedLabel,
-            patientVisit.getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, patientVisit.getFormattedDateDrawn());
         setTextValue(commentLabel, patientVisit.getComment());
 

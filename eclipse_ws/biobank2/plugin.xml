@@ -1649,18 +1649,18 @@
             name="Patient Merge">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
+            class="edu.ualberta.med.biobank.forms.CollectionEventEntryForm"
             default="false"
             icon="icons/patientVisit.png"
-            id="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
-            name="Patient Visit Entry">
+            id="edu.ualberta.med.biobank.forms.CollectionEventEntryForm"
+            name="Collection Event Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
+            class="edu.ualberta.med.biobank.forms.CollectionEventViewForm"
             default="false"
             icon="icons/patientVisit.png"
-            id="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
-            name="Patient Visit View">
+            id="edu.ualberta.med.biobank.forms.CollectionEventViewForm"
+            name="Collection Event View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerEntryForm"
