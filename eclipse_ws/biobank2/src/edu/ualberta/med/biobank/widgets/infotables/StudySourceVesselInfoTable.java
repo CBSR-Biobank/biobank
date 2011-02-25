@@ -9,6 +9,10 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
+@Deprecated
+/**
+ * this need to be rename ? to study source specimen ??
+ */
 public class StudySourceVesselInfoTable extends
     InfoTableWidget<StudySourceVesselWrapper> {
 

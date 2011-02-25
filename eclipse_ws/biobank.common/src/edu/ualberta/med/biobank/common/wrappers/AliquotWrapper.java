@@ -528,4 +528,10 @@ public class AliquotWrapper extends AliquotBaseWrapper {
         return null;
     }
 
+    @Deprecated
+    public void setCollectionEvent(CollectionEventWrapper collectionEvent) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

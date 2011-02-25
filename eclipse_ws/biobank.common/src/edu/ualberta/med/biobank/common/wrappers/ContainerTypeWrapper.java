@@ -60,6 +60,13 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     @Override
+    protected List<String> getPropertyChangeNames() {
+        List<String> all = new ArrayList<String>(super.getPropertyChangeNames());
+        all.addAll(CapacityPeer.PROP_NAMES);
+        return all;
+    }
+
+    @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         if (getSite() != null) {
@@ -271,7 +278,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public Integer getRowCapacity() {
-        return getCapacity().getRowCapacity();
+        return getProperty(getCapacity(), CapacityPeer.ROW_CAPACITY);
     }
 
     public Integer getColCapacity() {

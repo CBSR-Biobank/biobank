@@ -51,14 +51,14 @@
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective"
-            icon="icons/patientPerspective.png"
+            icon="icons/processingPerspective.png"
             id="edu.ualberta.med.biobank.perspective.processing"
             name="Processing View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective"
-            id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
-            name="Samples Management Perspective">
+            class="edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective"
+            id="edu.ualberta.med.biobank.perspective.linkAssign"
+            name="Link/Assign Perspective">
       </perspective>
    </extension>
    <extension
@@ -574,38 +574,11 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.CbsrConfigHandler"
-            commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfig">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.CbsrConfigWithDataHandler"
-            commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.CalgaryConfigHandler"
-            commandId="edu.ualberta.med.biobank.commands.debug.calgaryConfig">
-         <activeWhen>
-            <reference
-                  definitionId="biobank2.loggedIn">
-            </reference>
-         </activeWhen>
-      </handler>
-      <handler
             class="edu.ualberta.med.biobank.handlers.ShipmentAddHandler"
             commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd">
          <activeWhen>
             <and>
-              <reference
+              <reference	
                     definitionId="biobank2.processingPerspectiveSelected">
               </reference>
               <reference
@@ -1064,7 +1037,7 @@
             </command>
             <command
                commandId="edu.ualberta.med.biobank.commands.processingAdmin"
-               icon="icons/patientPerspective.png"
+               icon="icons/processingPerspective.png"
                label="Processing View"
                style="push">
             </command>
@@ -1183,7 +1156,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.processingAdmin"
-                  icon="icons/patientPerspective.png"
+                  icon="icons/processingPerspective.png"
                   label="Processing View"
                   style="push">
             </command>
@@ -2346,7 +2319,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
-            icon="icons/patientPerspective.png"
+            icon="icons/patientView.png"
             id="edu.ualberta.med.biobank.views.PatientsAdminView"
             name="Patients"
             restorable="true">

@@ -365,7 +365,13 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     @Deprecated
     public String getPvAttrValue(String label) {
+        return label;
         // will be added in new model
+    }
+
+    @Deprecated
+    public Integer getVisitNumber() {
+        // TODO new but not yet in model
         return null;
     }
 
@@ -377,7 +383,12 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     @Deprecated
     public Date getDateDrawn() {
+        return null;
         // will be added in new model
+    }
+
+    public Integer getOriginalSpecimensCount() {
+        // TODO new but not yet in model
         return null;
     }
 
@@ -389,7 +400,12 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     @Deprecated
     public List<AliquotWrapper> getSpecimenCollection() {
+        return null;
         // will be added in new model
+    }
+
+    public Integer getAliquotedSpecimensCount() {
+        // TODO new but not yet in model
         return null;
     }
 }

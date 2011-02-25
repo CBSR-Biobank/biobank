@@ -171,7 +171,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
                     wizard);
                 int res = dialog.open();
                 if (res == Status.OK) {
-                    aliquot.setProcessingEvent(wizard.getProcessingEvent());
+                    aliquot.setCollectionEvent(wizard.getCollectionEvent());
 
                     dateProcessed.setText(aliquot.getProcessingEvent()
                         .getFormattedDateProcessed());

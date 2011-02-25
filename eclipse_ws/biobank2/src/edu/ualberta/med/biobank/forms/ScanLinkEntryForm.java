@@ -280,12 +280,9 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
             authorizedSampleTypes = SampleTypeWrapper.getSampleTypeForPallet96(
                 appService, currentSite);
             if (authorizedSampleTypes.size() == 0) {
-                BioBankPlugin
-                    .openAsyncError(
-                        Messages
-                            .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
-                        Messages
-                            .getFormattedString("ScanLink.dialog.sampleTypesError.msg")); //$NON-NLS-1$
+                BioBankPlugin.openAsyncError(Messages
+                    .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
+                    Messages.getString("ScanLink.dialog.sampleTypesError.msg")); //$NON-NLS-1$
             }
         }
     }
@@ -640,7 +637,7 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                 aliquot.setActivityStatus(activeStatus);
                 newAliquots.add(aliquot);
 
-                sb.append(Messages.getFormattedString(
+                sb.append(Messages.getString(
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),
                     site.getNameShort(), patientVisit.getFormattedDateDrawn(),

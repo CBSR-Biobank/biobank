@@ -62,7 +62,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     private static final String PATIENT_QRY = "from " + Patient.class.getName()
-        + " where " + PatientPeer.PNUMBER + "=?";
+        + " where " + PatientPeer.PNUMBER.getName() + "=?";
 
     /**
      * Search a patient in the site with the given number
@@ -368,6 +368,18 @@ public class PatientWrapper extends PatientBaseWrapper {
     public List<ProcessingEventWrapper> getProcessingEventCollection(boolean b,
         boolean c, Object object) {
         // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public String getSourceSpecimenCount() {
+        // TODO New method. Need to be implemented !
+        return null;
+    }
+
+    @Deprecated
+    public String getAliquotedSpecimenCount() {
+        // TODO New method. Need to be implemented !
         return null;
     }
 
