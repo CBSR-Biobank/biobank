@@ -590,11 +590,11 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     String palletPosition = ContainerLabelingSchemeWrapper
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                     appendLogNLS("ScanLink.activitylog.aliquot.existsError",
-                        palletPosition, value, foundAliquot.getProcessingEvent()
-                            .getFormattedDateProcessed(), foundAliquot
-                            .getProcessingEvent().getPatient().getPnumber(),
-                        foundAliquot.getProcessingEvent().getCollectionEvent().getSite()
-                            .getNameShort());
+                        palletPosition, value, foundAliquot
+                            .getProcessingEvent().getFormattedDateProcessed(),
+                        foundAliquot.getProcessingEvent().getPatient()
+                            .getPnumber(), foundAliquot.getCollectionEvent()
+                            .getSite().getNameShort());
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);
                     if (independantProcess) {
@@ -644,8 +644,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),
                     site.getNameShort(), patientVisit.getFormattedDateDrawn(),
-                    patientVisit.getCollectionEvent().getClinic().getName(), cell
-                        .getType().getName()));
+                    patientVisit.getCollectionEvent().getClinic().getName(),
+                    cell.getType().getName()));
                 nber++;
             }
         }

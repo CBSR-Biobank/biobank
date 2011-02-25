@@ -9,25 +9,25 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
-import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.PvSourceVesselInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SourceVesselInfoTable;
 
-public class PatientVisitViewForm extends BiobankViewForm {
+public class CollectionEventViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitViewForm";
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(PatientVisitViewForm.class.getName());
+        .getLogger(CollectionEventViewForm.class.getName());
 
-    private PatientVisitAdapter patientVisitAdapter;
+    private CollectionEventAdapter patientVisitAdapter;
 
-    private ProcessingEventWrapper patientVisit;
+    private CollectionEventWrapper patientVisit;
 
     private BiobankText siteLabel;
 
@@ -51,7 +51,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private BiobankText dateDrawnLabel;
 
-    private PvSourceVesselInfoTable table;
+    private SourceVesselInfoTable table;
 
     private class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
@@ -59,11 +59,11 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     @Override
     public void init() throws Exception {
-        Assert.isTrue((adapter instanceof PatientVisitAdapter),
+        Assert.isTrue((adapter instanceof CollectionEventAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        patientVisitAdapter = (PatientVisitAdapter) adapter;
+        patientVisitAdapter = (CollectionEventAdapter) adapter;
         patientVisit = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
         patientVisit.logLookup(null);
@@ -108,7 +108,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
             "Comments");
 
-        setProcessingEventValues();
+        setCollectionEventValues();
     }
 
     private void createPvDataSection(Composite client) throws Exception {
@@ -146,17 +146,10 @@ public class PatientVisitViewForm extends BiobankViewForm {
         }
     }
 
-    private void setProcessingEventValues() {
-        setTextValue(siteLabel, patientVisit.getCollectionEvent().getSite()
-            .getName());
+    private void setCollectionEventValues() {
         setTextValue(studyLabel, patientVisit.getPatient().getStudy().getName());
         setTextValue(activityStatusLabel, patientVisit.getActivityStatus()
             .getName());
-        setTextValue(clinicLabel,
-            patientVisit.getCollectionEvent() == null ? "" : patientVisit
-                .getCenter().getName());
-        setTextValue(shipmentLabel, patientVisit.getCollectionEvent()
-            .toString());
         setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
         setTextValue(dateProcessedLabel,
             patientVisit.getFormattedDateProcessed());
@@ -171,15 +164,15 @@ public class PatientVisitViewForm extends BiobankViewForm {
 
     private void createSourcesSection() {
         Composite client = createSectionWithClient("Source Vessels");
-        table = new PvSourceVesselInfoTable(client,
-            patientVisit.getPvSourceVesselCollection());
+        table = new SourceVesselInfoTable(client,
+            patientVisit.getSourceVesselCollection());
         table.adaptToToolkit(toolkit, true);
     }
 
     private void createAliquotsSection() {
         Composite parent = createSectionWithClient("Aliquots");
         aliquotWidget = new AliquotListInfoTable(parent,
-            patientVisit.getAliquotCollection());
+            patientVisit.getSpecimenCollection());
         aliquotWidget.adaptToToolkit(toolkit, true);
         aliquotWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
         aliquotWidget.addClickListener(collectionDoubleClickListener);
@@ -191,9 +184,9 @@ public class PatientVisitViewForm extends BiobankViewForm {
         String date = patientVisit.getFormattedDateProcessed();
         setPartName("Visit " + date);
         form.setText("Visit Drawn Date: " + date);
-        setProcessingEventValues();
-        table.setCollection(patientVisit.getPvSourceVesselCollection());
-        aliquotWidget.setCollection(patientVisit.getAliquotCollection());
+        setCollectionEventValues();
+        table.setCollection(patientVisit.getSourceVesselCollection());
+        aliquotWidget.setCollection(patientVisit.getSpecimenCollection());
     }
 
     private void retrievePatientVisit() {

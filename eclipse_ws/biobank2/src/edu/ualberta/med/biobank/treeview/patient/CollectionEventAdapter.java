@@ -8,37 +8,40 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
-import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
+import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
+import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class PatientVisitAdapter extends AdapterBase {
+public class CollectionEventAdapter extends AdapterBase {
 
     /**
      * Aliquot selected in this patient visit
      */
     private AliquotWrapper selectedAliquot;
 
-    public PatientVisitAdapter(AdapterBase parent,
+    public CollectionEventAdapter(AdapterBase parent,
         ProcessingEventWrapper patientVisitWrapper) {
         super(parent, patientVisitWrapper);
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
-    public ProcessingEventWrapper getWrapper() {
-        return (ProcessingEventWrapper) modelObject;
+    public CollectionEventWrapper getWrapper() {
+        return (CollectionEventWrapper) modelObject;
     }
 
     @Override
     protected String getLabelInternal() {
-        ProcessingEventWrapper wrapper = getWrapper();
+        CollectionEventWrapper wrapper = getWrapper();
         Assert.isNotNull(wrapper, "patientVisit is null");
         String name = wrapper.getFormattedDateProcessed();
-        Collection<AliquotWrapper> samples = wrapper.getAliquotCollection();
+        Collection<SourceVesselWrapper> samples = wrapper
+            .getSourceVesselCollection();
         int total = 0;
         if (samples != null) {
             total = samples.size();
@@ -48,7 +51,7 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        ProcessingEventWrapper visit = getWrapper();
+        CollectionEventWrapper visit = getWrapper();
         if (visit != null) {
             PatientWrapper patient = visit.getPatient();
             if (patient != null) {
@@ -105,12 +108,12 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return PatientVisitEntryForm.ID;
+        return CollectionEventEntryForm.ID;
     }
 
     @Override
     public String getViewFormId() {
-        return PatientVisitViewForm.ID;
+        return CollectionEventViewForm.ID;
     }
 
     @Override

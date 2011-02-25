@@ -10,7 +10,6 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
@@ -167,11 +166,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
                 "Aliquot with inventory id " + inventoryId
                     + " has not been found in this dispatch."
                     + " It will be moved into the extra-pending list.");
-            try {
-                dispatch.addExtraAliquots(Arrays.asList(info.aliquot));
-            } catch (BiobankCheckException e) {
-                BioBankPlugin.openAsyncError("Eror adding extra aliquot", e);
-            }
+            dispatch.addExtraAliquots(Arrays.asList(info.aliquot));
             aliquotsTree.refresh();
             setDirty(true);
             break;
