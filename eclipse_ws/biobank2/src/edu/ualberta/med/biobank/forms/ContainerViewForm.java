@@ -32,6 +32,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
@@ -117,8 +118,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Container " + container.getLabel() + " ("
-            + container.getContainerType().getNameShort() + ")");
+        form.setText(Messages.getString("ContainerViewForm.title",
+            container.getLabel(), container.getContainerType().getNameShort()));
         page.setLayout(new GridLayout(1, false));
 
         createContainerSection();
@@ -140,19 +141,19 @@ public class ContainerViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Repository Site");
+            Messages.getString("container.field.label.site"));
         containerLabelLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Label");
+            Messages.getString("container.field.label.label"));
         productBarcodeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Product Bar Code");
+            Messages.getString("container.field.label.barcode"));
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity Status");
+            Messages.getString("label.activity"));
         commentsLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+            Messages.getString("label.comments"));
         containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Container Type");
+            Messages.getString("container.field.label.type"));
         temperatureLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Temperature");
+            Messages.getString("container.field.label.temperature"));
 
         setContainerValues();
 

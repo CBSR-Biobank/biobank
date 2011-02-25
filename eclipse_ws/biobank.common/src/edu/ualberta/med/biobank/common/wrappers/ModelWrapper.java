@@ -884,7 +884,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         cache(modelWrapper, property, newValue);
     }
 
-    private <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
+    private static <T, M> T getModelProperty(ModelWrapper<M> modelWrapper,
         Property<T, ? super M> property) {
         T value = null;
 
@@ -950,7 +950,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return propertyMap.get(property);
     }
 
-    private String capitalizeFirstLetter(String name) {
+    private static String capitalizeFirstLetter(String name) {
         StringBuilder sb = new StringBuilder();
 
         if (name.length() > 0) {

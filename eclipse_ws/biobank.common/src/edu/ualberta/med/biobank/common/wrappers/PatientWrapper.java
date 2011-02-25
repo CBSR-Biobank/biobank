@@ -62,7 +62,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     private static final String PATIENT_QRY = "from " + Patient.class.getName()
-        + " where " + PatientPeer.PNUMBER + "=?";
+        + " where " + PatientPeer.PNUMBER.getName() + "=?";
 
     /**
      * Search a patient in the site with the given number

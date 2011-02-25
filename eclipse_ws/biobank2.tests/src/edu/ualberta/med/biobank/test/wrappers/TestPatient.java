@@ -662,4 +662,10 @@ public class TestPatient extends TestDatabase {
             Assert.assertTrue(true);
         }
     }
+
+    @Test
+    public void testGetPatient() throws Exception {
+        Assert
+            .fail("static getPatient method of PatientWrapper are not tested");
+    }
 }

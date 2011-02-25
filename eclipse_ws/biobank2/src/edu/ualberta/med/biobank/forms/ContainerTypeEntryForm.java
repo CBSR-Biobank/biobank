@@ -20,8 +20,11 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.CapacityPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -49,25 +52,21 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
 
-    private static final String MSG_NEW_STORAGE_TYPE_OK = "Creating a new storage type.";
+    private static final String MSG_NEW_STORAGE_TYPE_OK = Messages
+        .getString("ContainerTypeEntryForm.creation.msg");
 
-    private static final String MSG_STORAGE_TYPE_OK = "Editing an existing storage type.";
-
-    private static final String MSG_NO_CONTAINER_TYPE_NAME = "Container type must have a name";
-
-    private static final String MSG_NO_CONTAINER_TYPE_NAME_SHORT = "Container type must have a short name";
-
-    public static final String MSG_CHILD_LABELING_SCHEME_EMPTY = "Select a child labeling scheme";
+    private static final String MSG_STORAGE_TYPE_OK = Messages
+        .getString("ContainerTypeEntryForm.edition.msg");
 
     private ContainerTypeAdapter containerTypeAdapter;
 
     private ContainerTypeWrapper containerType;
 
-    private MultiSelectWidget samplesMultiSelect;
+    private MultiSelectWidget specimensMultiSelect;
 
     private MultiSelectWidget childContainerTypesMultiSelect;
 
-    private List<SampleTypeWrapper> allSampleTypes;
+    private List<SampleTypeWrapper> allSpecimenTypes;
 
     private List<ContainerTypeWrapper> availSubContainerTypes;
 
@@ -79,11 +78,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private ComboViewer activityStatusComboViewer;
 
-    protected boolean hasSamples = false;
+    protected boolean hasSpecimens = false;
 
     private Button hasContainersRadio;
 
-    private Button hasSamplesRadio;
+    private Button hasSpecimensRadio;
 
     private BasicSiteCombo siteCombo;
 
@@ -107,18 +106,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         containerType = containerTypeAdapter.getContainerType();
         String tabName;
         if (containerType.isNew()) {
-            tabName = "New Container Type";
+            tabName = Messages.getString("ContainerTypeEntryForm.new.title");
             containerType.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            tabName = "Container Type " + containerType.getName();
+            tabName = Messages.getString("ContainerTypeEntryForm.edit.title",
+                containerType.getName());
         }
         setPartName(tabName);
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Container Type Information");
+        form.setText(Messages.getString("ContainerTypeEntryForm.main.title"));
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -158,34 +158,68 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             });
         setFirstControl(siteCombo);
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE, "Name",
-            null, containerType, "name", new NonEmptyStringValidator(
-                MSG_NO_CONTAINER_TYPE_NAME));
+        createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("label.name"),
+            null,
+            containerType,
+            ContainerTypePeer.NAME.getName(),
+            new NonEmptyStringValidator(Messages
+                .getString("ContainerTypeEntryForm.name.validation.msg")));
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null, containerType, "nameShort",
-            new NonEmptyStringValidator(MSG_NO_CONTAINER_TYPE_NAME_SHORT));
+        createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("label.nameShort"),
+            null,
+            containerType,
+            ContainerTypePeer.NAME_SHORT.getName(),
+            new NonEmptyStringValidator(Messages
+                .getString("ContainerTypeEntryForm.nameShort.validation.msg")));
 
         if (containerType.getTopLevel() == null) {
             containerType.setTopLevel(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Top Level Container", null, containerType, "topLevel", null);
+            Messages.getString("containerType.field.label.topLevel"), null,
+            containerType, ContainerTypePeer.TOP_LEVEL.getName(), null);
         toolkit.paintBordersFor(client);
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE, "Rows",
-            null, containerType, "rowCapacity", new IntegerNumberValidator(
-                "Row capacity is not a valid number", false));
+        createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("containerType.field.label.rows"),
+            null,
+            containerType,
+            CapacityPeer.ROW_CAPACITY.getName(),
+            new IntegerNumberValidator(Messages
+                .getString("ContainerTypeEntryForm.rows.validation.msg"), false));
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Columns", null, containerType, "colCapacity",
-            new IntegerNumberValidator("Column capacity is not a valid nubmer",
-                false));
+        createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("containerType.field.label.cols"),
+            null,
+            containerType,
+            CapacityPeer.COL_CAPACITY.getName(),
+            new IntegerNumberValidator(Messages
+                .getString("ContainerTypeEntryForm.cols.validation.msg"), false));
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Default Temperature\n(Celcius)", null, containerType,
-            "defaultTemperature", new DoubleNumberValidator(
-                "Default temperature is not a valid number"));
+        createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("containerType.field.label.temperature"),
+            null,
+            containerType,
+            ContainerTypePeer.DEFAULT_TEMPERATURE.getName(),
+            new DoubleNumberValidator(Messages
+                .getString("ContainerTypeEntryForm.temperature.validation.msg")));
 
         String currentScheme = containerType.getChildLabelingSchemeName();
         labelingSchemeMap = new HashMap<Integer, String>();
@@ -194,8 +228,10 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             labelingSchemeMap.put(scheme.getId(), scheme.getName());
         }
         labelingSchemeComboViewer = createComboViewer(client,
-            "Child Labeling Scheme", labelingSchemeMap.values(), currentScheme,
-            MSG_CHILD_LABELING_SCHEME_EMPTY, new ComboSelectionUpdate() {
+            Messages.getString("containerType.field.label.scheme"),
+            labelingSchemeMap.values(), currentScheme,
+            Messages.getString("ContainerTypeEntryForm.scheme.validation.msg"),
+            new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     try {
@@ -203,16 +239,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                             .setChildLabelingSchemeName((String) selectedObject);
                     } catch (Exception e) {
                         BioBankPlugin.openAsyncError(
-                            "Error setting the labeling scheme", e);
+                            Messages
+                                .getString("ContainerTypeEntryForm.scheme.error.msg"),
+                            e);
                     }
                 }
             });
 
         activityStatusComboViewer = createComboViewer(client,
-            "Activity status",
+            Messages.getString("label.activity"),
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             containerType.getActivityStatus(),
-            "Container type must have an activity status",
+            Messages
+                .getString("ContainerTypeEntryForm.activity.validation.msg"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -222,63 +261,74 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, containerType, "comment", null);
+            Messages.getString("label.comments"), null, containerType,
+            ContainerTypePeer.COMMENT.getName(), null);
 
     }
 
     private void createContainsSection() throws Exception {
-        Composite client = createSectionWithClient("Contents");
-        hasContainersRadio = toolkit.createButton(client,
-            "Contains Containers", SWT.RADIO);
-        hasSamplesRadio = toolkit.createButton(client, "Contains aliquots",
+        Composite client = createSectionWithClient(Messages
+            .getString("ContainerTypeEntryForm.contents.title"));
+        hasContainersRadio = toolkit.createButton(client, Messages
+            .getString("ContainerTypeEntryForm.contents.button.container"),
+            SWT.RADIO);
+        hasSpecimensRadio = toolkit.createButton(client, Messages
+            .getString("ContainerTypeEntryForm.contents.button.specimen"),
             SWT.RADIO);
         hasContainersRadio.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                hasSamples = !hasContainersRadio.getSelection();
+                hasSpecimens = !hasContainersRadio.getSelection();
                 if (hasContainersRadio.getSelection()) {
-                    showSamples(false);
+                    showSpecimens(false);
                 }
             }
         });
-        hasSamplesRadio.addSelectionListener(new SelectionAdapter() {
+        hasSpecimensRadio.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                hasSamples = hasSamplesRadio.getSelection();
-                if (hasSamplesRadio.getSelection()) {
-                    showSamples(true);
+                hasSpecimens = hasSpecimensRadio.getSelection();
+                if (hasSpecimensRadio.getSelection()) {
+                    showSpecimens(true);
                 }
             }
         });
 
         createChildContainerTypesSection(client);
-        createSampleTypesSection(client);
-        showContainersOrSamples();
+        createSpecimenTypesSection(client);
+        showContainersOrSpecimens();
     }
 
-    protected void showSamples(boolean show) {
-        samplesMultiSelect.setVisible(show);
-        ((GridData) samplesMultiSelect.getLayoutData()).exclude = !show;
+    protected void showSpecimens(boolean show) {
+        specimensMultiSelect.setVisible(show);
+        ((GridData) specimensMultiSelect.getLayoutData()).exclude = !show;
         childContainerTypesMultiSelect.setVisible(!show);
         ((GridData) childContainerTypesMultiSelect.getLayoutData()).exclude = show;
         form.layout(true, true);
     }
 
-    private void createSampleTypesSection(Composite parent) throws Exception {
-        allSampleTypes = SampleTypeWrapper.getAllSampleTypes(appService, true);
+    private void createSpecimenTypesSection(Composite parent) throws Exception {
+        allSpecimenTypes = SampleTypeWrapper
+            .getAllSampleTypes(appService, true);
 
-        samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
-            "Selected Sample Types", "Available Sample Types", 100);
-        samplesMultiSelect.adaptToToolkit(toolkit, true);
-        samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
+        specimensMultiSelect = new MultiSelectWidget(
+            parent,
+            SWT.NONE,
+            Messages
+                .getString("ContainerTypeEntryForm.contents.specimen.selected"),
+            Messages
+                .getString("ContainerTypeEntryForm.contents.specimen.available"),
+            100);
+        specimensMultiSelect.adaptToToolkit(toolkit, true);
+        specimensMultiSelect.addSelectionChangedListener(multiSelectListener);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
-        samplesMultiSelect.setLayoutData(gd);
+        specimensMultiSelect.setLayoutData(gd);
 
-        setSampleTypesSelection();
+        setSpecimenTypesSelection();
     }
 
-    private void setSampleTypesSelection() {
+    private void setSpecimenTypesSelection() {
         Collection<SampleTypeWrapper> stSamplesTypes = containerType
             .getSampleTypeCollection();
         LinkedHashMap<Integer, String> availSampleTypes = new LinkedHashMap<Integer, String>();
@@ -290,16 +340,21 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             }
         }
 
-        for (SampleTypeWrapper sampleType : allSampleTypes) {
+        for (SampleTypeWrapper sampleType : allSpecimenTypes) {
             availSampleTypes.put(sampleType.getId(), sampleType.getName());
         }
-        samplesMultiSelect.setSelections(availSampleTypes, selSampleTypes);
+        specimensMultiSelect.setSelections(availSampleTypes, selSampleTypes);
     }
 
     private void createChildContainerTypesSection(Composite parent) {
-        childContainerTypesMultiSelect = new MultiSelectWidget(parent,
-            SWT.NONE, "Selected Sub-Container Types",
-            "Available Sub-Container Types", 100);
+        childContainerTypesMultiSelect = new MultiSelectWidget(
+            parent,
+            SWT.NONE,
+            Messages
+                .getString("ContainerTypeEntryForm.contents.subcontainer.selected"),
+            Messages
+                .getString("ContainerTypeEntryForm.contents.subcontainer.available"),
+            100);
         childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
@@ -345,39 +400,41 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
      */
     @Override
     protected void saveForm() throws Exception {
-        setSampleTypes();
+        setSpecimenTypes();
         setChildContainerTypes();
         containerType.persist();
         SessionManager.updateAllSimilarNodes(containerTypeAdapter, true);
 
     }
 
-    private void setSampleTypes() throws BiobankCheckException {
+    private void setSpecimenTypes() throws BiobankCheckException {
         List<Integer> addedIds = new ArrayList<Integer>();
         List<Integer> removedIds = new ArrayList<Integer>();
-        if (hasSamples) {
-            addedIds = samplesMultiSelect.getAddedToSelection();
-            removedIds = samplesMultiSelect.getRemovedToSelection();
-            List<SampleTypeWrapper> addedSampleTypes = new ArrayList<SampleTypeWrapper>();
-            List<SampleTypeWrapper> removedSampleTypes = new ArrayList<SampleTypeWrapper>();
-            for (SampleTypeWrapper sampleType : allSampleTypes) {
+        if (hasSpecimens) {
+            addedIds = specimensMultiSelect.getAddedToSelection();
+            removedIds = specimensMultiSelect.getRemovedToSelection();
+            List<SampleTypeWrapper> addedSpecimenTypes = new ArrayList<SampleTypeWrapper>();
+            List<SampleTypeWrapper> removedSpecimenTypes = new ArrayList<SampleTypeWrapper>();
+            for (SampleTypeWrapper sampleType : allSpecimenTypes) {
                 if (addedIds.indexOf(sampleType.getId()) >= 0) {
-                    addedSampleTypes.add(sampleType);
+                    addedSpecimenTypes.add(sampleType);
                 }
                 if (removedIds.indexOf(sampleType.getId()) >= 0) {
-                    removedSampleTypes.add(sampleType);
+                    removedSpecimenTypes.add(sampleType);
                 }
             }
-            if (addedIds.size() != addedSampleTypes.size()) {
+            if (addedIds.size() != addedSpecimenTypes.size()) {
                 throw new BiobankCheckException(
-                    "Problem with added sample types");
+                    Messages
+                        .getString("ContainerTypeEntryForm.save.error.msg.specimen.added"));
             }
-            if (removedIds.size() != removedSampleTypes.size()) {
+            if (removedIds.size() != removedSpecimenTypes.size()) {
                 throw new BiobankCheckException(
-                    "Problem with removed sample types");
+                    Messages
+                        .getString("ContainerTypeEntryForm.save.error.msg.specimen.removed"));
             }
-            containerType.addToSampleTypeCollection(addedSampleTypes);
-            containerType.removeFromSampleTypeCollection(removedSampleTypes);
+            containerType.addToSampleTypeCollection(addedSpecimenTypes);
+            containerType.removeFromSampleTypeCollection(removedSpecimenTypes);
         } else {
             containerType.removeFromSampleTypeCollection(containerType
                 .getSampleTypeCollection());
@@ -387,7 +444,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private void setChildContainerTypes() throws BiobankCheckException {
         List<Integer> addedTypesIds = new ArrayList<Integer>();
         List<Integer> removedTypesIds = new ArrayList<Integer>();
-        if (!hasSamples) {
+        if (!hasSpecimens) {
             addedTypesIds = childContainerTypesMultiSelect
                 .getAddedToSelection();
             removedTypesIds = childContainerTypesMultiSelect
@@ -406,11 +463,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             }
             if (addedTypesIds.size() != addedContainerTypes.size()) {
                 throw new BiobankCheckException(
-                    "Problem with added child container types");
+                    Messages
+                        .getString("ContainerTypeEntryForm.save.error.msg.subcontainer.added"));
             }
             if (removedTypesIds.size() != removedContainerTypes.size()) {
                 throw new BiobankCheckException(
-                    "Problem with removed child container types");
+                    Messages
+                        .getString("ContainerTypeEntryForm.save.error.msg.subcontainer.removed"));
             }
             containerType
                 .addToChildContainerTypeCollection(addedContainerTypes);
@@ -435,18 +494,18 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.setTopLevel(false);
         }
         setChildContainerTypeSelection();
-        setSampleTypesSelection();
-        showContainersOrSamples();
+        setSpecimenTypesSelection();
+        showContainersOrSpecimens();
         setLabelingScheme();
         setActivityStatus();
     }
 
-    private void showContainersOrSamples() {
-        hasSamples = containerType.getSampleTypeCollection() != null
+    private void showContainersOrSpecimens() {
+        hasSpecimens = containerType.getSampleTypeCollection() != null
             && containerType.getSampleTypeCollection().size() > 0;
-        showSamples(hasSamples);
-        hasSamplesRadio.setSelection(hasSamples);
-        hasContainersRadio.setSelection(!hasSamples);
+        showSpecimens(hasSpecimens);
+        hasSpecimensRadio.setSelection(hasSpecimens);
+        hasContainersRadio.setSelection(!hasSpecimens);
     }
 
     private void setLabelingScheme() {
