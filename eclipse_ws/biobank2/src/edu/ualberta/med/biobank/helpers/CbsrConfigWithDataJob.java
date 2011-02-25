@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -183,18 +183,18 @@ public class CbsrConfigWithDataJob extends CbsrConfigJob {
             r.nextInt(12) + 1, r.nextInt(24), r.nextInt(60));
         patientVisit.setDateProcessed(DateFormatter.parseToDateTime(dateStr));
         patientVisit.setPatient(patient);
-        AliquotWrapper aliquot = addAliquot(patientVisit);
+        SpecimenWrapper aliquot = addAliquot(patientVisit);
         aliquot.setPatientVisit(patientVisit);
         patientVisit.setShipment(shipments.get(r.nextInt(shipments.size())));
         return patientVisit;
     }
 
-    private AliquotWrapper addAliquot(ProcessingEventWrapper patientVisit) {
-        AliquotWrapper aliquot = new AliquotWrapper(appService);
+    private SpecimenWrapper addAliquot(ProcessingEventWrapper patientVisit) {
+        SpecimenWrapper aliquot = new SpecimenWrapper(appService);
         aliquot.setInventoryId(Integer.valueOf(r.nextInt(10000)).toString());
         aliquot.setPatientVisit(patientVisit);
         aliquot.setLinkDate(new Date());
-        aliquot.setSampleType(sampleTypesList.get(r.nextInt(sampleTypesList
+        aliquot.setSpecimenType(sampleTypesList.get(r.nextInt(sampleTypesList
             .size())));
         return aliquot;
     }

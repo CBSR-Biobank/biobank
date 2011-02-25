@@ -1,12 +1,12 @@
 package edu.ualberta.med.biobank.test.reports;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -23,9 +23,9 @@ import java.util.List;
 public class CachedReportDataSource implements ReportDataSource {
     private WritableApplicationService appService;
     private List<SiteWrapper> sites;
-    private List<SampleTypeWrapper> sampleTypes;
-    private List<SampleStorageWrapper> sampleStorages;
-    private List<AliquotWrapper> aliquots;
+    private List<SpecimenTypeWrapper> sampleTypes;
+    private List<AliquotedSpecimenWrapper> sampleStorages;
+    private List<SpecimenWrapper> aliquots;
     private List<ContainerWrapper> containers;
     private List<StudyWrapper> studies;
     private List<PatientWrapper> patients;
@@ -41,39 +41,39 @@ public class CachedReportDataSource implements ReportDataSource {
         return sites;
     }
 
-    public List<SampleTypeWrapper> getSampleTypes() throws ApplicationException {
+    public List<SpecimenTypeWrapper> getSpecimenTypes() throws ApplicationException {
         if (sampleTypes == null) {
-            sampleTypes = SampleTypeWrapper
+            sampleTypes = SpecimenTypeWrapper
                 .getAllSampleTypes(appService, false);
         }
         return sampleTypes;
     }
 
-    public List<SampleStorageWrapper> getSampleStorages()
+    public List<AliquotedSpecimenWrapper> getSampleStorages()
         throws ApplicationException {
         if (sampleStorages == null) {
             HQLCriteria criteria = new HQLCriteria("from "
                 + SampleStorage.class.getName());
             List<SampleStorage> rawSampleStorage = appService.query(criteria);
 
-            sampleStorages = new ArrayList<SampleStorageWrapper>();
+            sampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
             for (SampleStorage sampleStorage : rawSampleStorage) {
-                sampleStorages.add(new SampleStorageWrapper(appService,
+                sampleStorages.add(new AliquotedSpecimenWrapper(appService,
                     sampleStorage));
             }
         }
         return sampleStorages;
     }
 
-    public List<AliquotWrapper> getAliquots() throws ApplicationException {
+    public List<SpecimenWrapper> getSpecimens() throws ApplicationException {
         if (aliquots == null) {
             HQLCriteria criteria = new HQLCriteria("from "
                 + Aliquot.class.getName());
             List<Aliquot> rawAliquots = appService.query(criteria);
 
-            aliquots = new ArrayList<AliquotWrapper>();
+            aliquots = new ArrayList<SpecimenWrapper>();
             for (Aliquot aliquot : rawAliquots) {
-                aliquots.add(new AliquotWrapper(appService, aliquot));
+                aliquots.add(new SpecimenWrapper(appService, aliquot));
             }
         }
         return aliquots;

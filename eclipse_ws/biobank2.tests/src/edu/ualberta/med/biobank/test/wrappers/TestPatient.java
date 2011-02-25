@@ -14,7 +14,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -80,7 +80,7 @@ public class TestPatient extends TestDatabase {
         // first add container types
         ContainerTypeWrapper topType, childType;
 
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSampleTypes(appService, true);
 
         childType = ContainerTypeHelper.newContainerType(site,
@@ -203,9 +203,9 @@ public class TestPatient extends TestDatabase {
         patient.reload();
 
         pevent = patient.getProcessingEventCollection(false);
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSampleTypes(appService, true);
-        AliquotWrapper aliquot = AliquotHelper.addAliquot(
+        SpecimenWrapper aliquot = AliquotHelper.addAliquot(
             allSampleTypes.get(0), containerMap.get("ChildL1"), pevent.get(0),
             0, 0);
         patient.reload();
@@ -443,11 +443,11 @@ public class TestPatient extends TestDatabase {
             patient.reload();
         }
 
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSampleTypes(appService, true);
 
         int sampleTypeCount = allSampleTypes.size();
-        List<AliquotWrapper> samples = new ArrayList<AliquotWrapper>();
+        List<SpecimenWrapper> samples = new ArrayList<SpecimenWrapper>();
         Map<PatientWrapper, Integer> patientSampleCount = new HashMap<PatientWrapper, Integer>();
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
             patientSampleCount.put(patient, 0);
@@ -468,9 +468,9 @@ public class TestPatient extends TestDatabase {
                         patientSampleCount.get(patient) + 1);
                     ++sampleCount;
                     Assert.assertEquals(patientSampleCount.get(patient)
-                        .intValue(), patient.getAliquotsCount(true));
+                        .intValue(), patient.getSpecimensCount(true));
                     Assert.assertEquals(patientSampleCount.get(patient)
-                        .intValue(), patient.getAliquotsCount(false));
+                        .intValue(), patient.getSpecimensCount(false));
                 }
             }
         }
@@ -482,23 +482,23 @@ public class TestPatient extends TestDatabase {
         for (PatientWrapper patient : Arrays.asList(patient1, patient2)) {
             for (ProcessingEventWrapper pevent : patient
                 .getProcessingEventCollection(false)) {
-                samples = pevent.getAliquotCollection(false);
+                samples = pevent.getSpecimenCollection(false);
                 while (samples.size() > 0) {
-                    AliquotWrapper aliquot = samples.get(0);
+                    SpecimenWrapper aliquot = samples.get(0);
                     aliquot.delete();
                     pevent.reload();
                     patient.reload();
-                    samples = pevent.getAliquotCollection(false);
+                    samples = pevent.getSpecimenCollection(false);
                     patientSampleCount.put(patient,
                         patientSampleCount.get(patient) - 1);
                     Assert.assertEquals(patientSampleCount.get(patient1)
-                        .intValue(), patient1.getAliquotsCount(true));
+                        .intValue(), patient1.getSpecimensCount(true));
                     Assert.assertEquals(patientSampleCount.get(patient1)
-                        .intValue(), patient1.getAliquotsCount(false));
+                        .intValue(), patient1.getSpecimensCount(false));
                     Assert.assertEquals(patientSampleCount.get(patient2)
-                        .intValue(), patient2.getAliquotsCount(true));
+                        .intValue(), patient2.getSpecimensCount(true));
                     Assert.assertEquals(patientSampleCount.get(patient2)
-                        .intValue(), patient2.getAliquotsCount(false));
+                        .intValue(), patient2.getSpecimensCount(false));
                 }
             }
         }

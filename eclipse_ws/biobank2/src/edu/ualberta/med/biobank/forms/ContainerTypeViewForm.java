@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
@@ -77,8 +77,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
         createContainerTypeSection();
         boolean containsSamples = false;
-        if (containerType.getSampleTypeCollection() != null
-            && containerType.getSampleTypeCollection().size() > 0) {
+        if (containerType.getSpecimenTypeCollection() != null
+            && containerType.getSpecimenTypeCollection().size() > 0) {
             createSampleTypesSection();
             containsSamples = true;
         }
@@ -156,16 +156,16 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         sampleTypesViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                SampleTypeWrapper type = (SampleTypeWrapper) element;
+                SpecimenTypeWrapper type = (SpecimenTypeWrapper) element;
                 return type.getName() + " (" + type.getNameShort() + ")";
             }
         });
-        setSampleTypesValues();
+        setSpecimenTypesValues();
     }
 
-    private void setSampleTypesValues() {
+    private void setSpecimenTypesValues() {
         if (sampleTypesViewer != null) {
-            sampleTypesViewer.setInput(containerType.getSampleTypeCollection());
+            sampleTypesViewer.setInput(containerType.getSpecimenTypeCollection());
         }
     }
 
@@ -231,7 +231,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         setPartName("Container Type " + containerType.getName());
         form.setText("Container Type: " + containerType.getName());
         setContainerTypeValues();
-        setSampleTypesValues();
+        setSpecimenTypesValues();
         setChildContainerTypesValues();
     }
 

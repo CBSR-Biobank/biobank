@@ -13,8 +13,8 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -35,13 +35,13 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SampleStorageEntryInfoTable.class.getName());
 
-    private List<SampleTypeWrapper> allSampleTypes;
+    private List<SpecimenTypeWrapper> allSampleTypes;
 
-    private List<SampleStorageWrapper> selectedSampleStorages;
+    private List<AliquotedSpecimenWrapper> selectedSampleStorages;
 
-    private List<SampleStorageWrapper> addedOrModifiedSampleStorages;
+    private List<AliquotedSpecimenWrapper> addedOrModifiedSampleStorages;
 
-    private List<SampleStorageWrapper> deletedSampleStorages;
+    private List<AliquotedSpecimenWrapper> deletedSampleStorages;
 
     private StudyWrapper study;
 
@@ -58,15 +58,15 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
      */
     public SampleStorageEntryInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null);
-        getSampleTypes();
+        getSpecimenTypes();
         this.study = study;
         selectedSampleStorages = study.getSampleStorageCollection();
         if (selectedSampleStorages == null) {
-            selectedSampleStorages = new ArrayList<SampleStorageWrapper>();
+            selectedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
         }
         setCollection(selectedSampleStorages);
-        addedOrModifiedSampleStorages = new ArrayList<SampleStorageWrapper>();
-        deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
+        addedOrModifiedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
+        deletedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -81,16 +81,16 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
 
     public void addSampleStorage() {
         addOrEditSampleStorage(true,
-            new SampleStorageWrapper(SessionManager.getAppService()));
+            new AliquotedSpecimenWrapper(SessionManager.getAppService()));
     }
 
     private void addOrEditSampleStorage(boolean add,
-        SampleStorageWrapper sampleStorage) {
-        List<SampleTypeWrapper> availableSampleTypes = new ArrayList<SampleTypeWrapper>();
+        AliquotedSpecimenWrapper sampleStorage) {
+        List<SpecimenTypeWrapper> availableSampleTypes = new ArrayList<SpecimenTypeWrapper>();
         availableSampleTypes.addAll(allSampleTypes);
-        for (SampleStorageWrapper ssw : selectedSampleStorages) {
+        for (AliquotedSpecimenWrapper ssw : selectedSampleStorages) {
             if (add || !ssw.equals(sampleStorage)) {
-                availableSampleTypes.remove(ssw.getSampleType());
+                availableSampleTypes.remove(ssw.getSpecimenType());
             }
         }
         SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
@@ -108,7 +108,7 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
     }
 
     private void addEditSupport() {
-        if (SessionManager.canCreate(SampleStorageWrapper.class, null)) {
+        if (SessionManager.canCreate(AliquotedSpecimenWrapper.class, null)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
@@ -116,27 +116,27 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
                 }
             });
         }
-        if (SessionManager.canUpdate(SampleStorageWrapper.class, null)) {
+        if (SessionManager.canUpdate(AliquotedSpecimenWrapper.class, null)) {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    SampleStorageWrapper sampleStorage = getSelection();
+                    AliquotedSpecimenWrapper sampleStorage = getSelection();
                     if (sampleStorage != null)
                         addOrEditSampleStorage(false, sampleStorage);
                 }
             });
         }
-        if (SessionManager.canDelete(SampleStorageWrapper.class, null)) {
+        if (SessionManager.canDelete(AliquotedSpecimenWrapper.class, null)) {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
-                    SampleStorageWrapper sampleStorage = getSelection();
+                    AliquotedSpecimenWrapper sampleStorage = getSelection();
                     if (sampleStorage != null) {
                         if (!MessageDialog.openConfirm(PlatformUI
                             .getWorkbench().getActiveWorkbenchWindow()
                             .getShell(), "Delete Aliquot Storage",
                             "Are you sure you want to delete sample storage \""
-                                + sampleStorage.getSampleType().getName()
+                                + sampleStorage.getSpecimenType().getName()
                                 + "\"?")) {
                             return;
                         }
@@ -151,33 +151,33 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
         }
     }
 
-    private void getSampleTypes() {
+    private void getSpecimenTypes() {
         try {
-            allSampleTypes = SampleTypeWrapper.getAllSampleTypes(
+            allSampleTypes = SpecimenTypeWrapper.getAllSampleTypes(
                 SessionManager.getAppService(), true);
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ApplicationException e) {
-            logger.error("getSampleTypes", e);
+            logger.error("getSpecimenTypes", e);
         }
     }
 
-    public List<SampleStorageWrapper> getAddedOrModifiedSampleStorages() {
+    public List<AliquotedSpecimenWrapper> getAddedOrModifiedSampleStorages() {
         return addedOrModifiedSampleStorages;
     }
 
-    public List<SampleStorageWrapper> getDeletedSampleStorages() {
+    public List<AliquotedSpecimenWrapper> getDeletedSampleStorages() {
         return deletedSampleStorages;
     }
 
     public void reload() {
         selectedSampleStorages = study.getSampleStorageCollection();
         if (selectedSampleStorages == null) {
-            selectedSampleStorages = new ArrayList<SampleStorageWrapper>();
+            selectedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
         }
         reloadCollection(selectedSampleStorages);
-        addedOrModifiedSampleStorages = new ArrayList<SampleStorageWrapper>();
-        deletedSampleStorages = new ArrayList<SampleStorageWrapper>();
+        addedOrModifiedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
+        deletedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
     }
 
     @Override
@@ -186,8 +186,8 @@ public class SampleStorageEntryInfoTable extends SampleStorageInfoTable {
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((SampleStorageWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((SampleStorageWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject((AliquotedSpecimenWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((AliquotedSpecimenWrapper) e2);
                     return super.compare(i1.typeName, i2.typeName);
                 } catch (Exception e) {
                     return 0;

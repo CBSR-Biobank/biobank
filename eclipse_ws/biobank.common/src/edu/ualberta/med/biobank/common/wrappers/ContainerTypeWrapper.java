@@ -40,7 +40,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     private Set<ContainerTypeWrapper> deletedChildTypes = new HashSet<ContainerTypeWrapper>();
 
-    private Set<SampleTypeWrapper> deletedSampleTypes = new HashSet<SampleTypeWrapper>();
+    private Set<SpecimenTypeWrapper> deletedSampleTypes = new HashSet<SpecimenTypeWrapper>();
 
     public static final List<String> PROP_NAMES;
     static {
@@ -112,7 +112,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             return;
 
         List<String> ids = new ArrayList<String>();
-        for (SampleTypeWrapper type : deletedSampleTypes) {
+        for (SpecimenTypeWrapper type : deletedSampleTypes) {
             ids.add(Integer.toString(type.getId()));
         }
         StringBuilder sb = new StringBuilder(DELETED_SAMPLE_TYPES_BASE_QRY)
@@ -218,7 +218,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     @Override
-    public void addToSampleTypeCollection(List<SampleTypeWrapper> newSampleTypes) {
+    public void addToSampleTypeCollection(List<SpecimenTypeWrapper> newSampleTypes) {
         super.addToSampleTypeCollection(newSampleTypes);
 
         // make sure previously deleted ones, that have been re-added, are
@@ -228,23 +228,23 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
 
     @Override
     public void removeFromSampleTypeCollection(
-        List<SampleTypeWrapper> typesToRemove) {
+        List<SpecimenTypeWrapper> typesToRemove) {
         deletedSampleTypes.addAll(typesToRemove);
         super.removeFromSampleTypeCollection(typesToRemove);
     }
 
-    public List<SampleTypeWrapper> getSampleTypeCollection() {
-        return getSampleTypeCollection(true);
+    public List<SpecimenTypeWrapper> getSpecimenTypeCollection() {
+        return getSpecimenTypeCollection(true);
     }
 
-    public Set<SampleTypeWrapper> getSampleTypesRecursively()
+    public Set<SpecimenTypeWrapper> getSpecimenTypesRecursively()
         throws ApplicationException {
-        Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
-        List<SampleTypeWrapper> sampleSubSet = getSampleTypeCollection(false);
+        Set<SpecimenTypeWrapper> sampleTypes = new HashSet<SpecimenTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleSubSet = getSpecimenTypeCollection(false);
         if (sampleSubSet != null)
             sampleTypes.addAll(sampleSubSet);
         for (ContainerTypeWrapper type : getChildContainerTypeCollection()) {
-            sampleTypes.addAll(type.getSampleTypesRecursively());
+            sampleTypes.addAll(type.getSpecimenTypesRecursively());
         }
         return sampleTypes;
     }

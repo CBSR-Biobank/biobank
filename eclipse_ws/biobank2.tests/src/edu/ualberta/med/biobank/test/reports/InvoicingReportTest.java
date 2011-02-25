@@ -19,19 +19,19 @@ import edu.ualberta.med.biobank.common.util.CollectionsUtil;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class InvoicingReportTest extends AbstractReportTest {
-    private static final Mapper<AliquotWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<String>, Long>() {
-        public List<String> getKey(AliquotWrapper aliquot) {
+    private static final Mapper<SpecimenWrapper, List<String>, Long> GROUP_ALIQUOTS_BY_STUDY_CLINIC_SAMPLE_TYPE = new Mapper<SpecimenWrapper, List<String>, Long>() {
+        public List<String> getKey(SpecimenWrapper aliquot) {
             return Arrays.asList(aliquot.getProcessingEvent().getPatient()
                 .getStudy().getNameShort(), aliquot.getProcessingEvent()
-                .getCenter().getNameShort(), aliquot.getSampleType()
+                .getCenter().getNameShort(), aliquot.getSpecimenType()
                 .getNameShort());
         }
 
-        public Long getValue(AliquotWrapper aliquot, Long aliquotCount) {
+        public Long getValue(SpecimenWrapper aliquot, Long aliquotCount) {
             return aliquotCount == null ? new Long(1) : new Long(
                 aliquotCount + 1);
         }
@@ -68,19 +68,19 @@ public class InvoicingReportTest extends AbstractReportTest {
 
     @Test
     public void testSmallDatePoint() throws Exception {
-        List<AliquotWrapper> aliquots = getAliquots();
+        List<SpecimenWrapper> aliquots = getSpecimens();
         Assert.assertTrue(aliquots.size() > 0);
 
-        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
+        SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
         checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
     }
 
     @Test
     public void testSmallDateRange() throws Exception {
-        List<AliquotWrapper> aliquots = getAliquots();
+        List<SpecimenWrapper> aliquots = getSpecimens();
         Assert.assertTrue(aliquots.size() > 0);
 
-        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
+        SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(aliquot.getLinkDate());
@@ -96,9 +96,9 @@ public class InvoicingReportTest extends AbstractReportTest {
         Date processedAndLinkedAfter = (Date) getReport().getParams().get(0);
         Date processedAndLinkedBefore = (Date) getReport().getParams().get(1);
 
-        Collection<AliquotWrapper> allAliquots = getAliquots();
+        Collection<SpecimenWrapper> allAliquots = getSpecimens();
         @SuppressWarnings("unchecked")
-        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
+        Collection<SpecimenWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 aliquotSite(isInSite(), getSiteId()), AbstractReportTest
                     .aliquotLinkedBetween(processedAndLinkedAfter,

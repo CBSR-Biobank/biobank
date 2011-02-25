@@ -211,7 +211,7 @@ public class SiteWrapper extends SiteBaseWrapper {
         + ProcessingEventPeer.ALIQUOT_COLLECTION.getName()
         + " as aliquots where site." + SitePeer.ID.getName() + "=?";
 
-    public Long getAliquotCount() throws Exception {
+    public Long getSpecimenCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, criteria);

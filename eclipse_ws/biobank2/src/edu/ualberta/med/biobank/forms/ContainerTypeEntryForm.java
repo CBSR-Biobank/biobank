@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
@@ -67,7 +67,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private MultiSelectWidget childContainerTypesMultiSelect;
 
-    private List<SampleTypeWrapper> allSampleTypes;
+    private List<SpecimenTypeWrapper> allSampleTypes;
 
     private List<ContainerTypeWrapper> availSubContainerTypes;
 
@@ -265,7 +265,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     }
 
     private void createSampleTypesSection(Composite parent) throws Exception {
-        allSampleTypes = SampleTypeWrapper.getAllSampleTypes(appService, true);
+        allSampleTypes = SpecimenTypeWrapper.getAllSampleTypes(appService, true);
 
         samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
             "Selected Sample Types", "Available Sample Types", 100);
@@ -275,22 +275,22 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         gd.horizontalSpan = 2;
         samplesMultiSelect.setLayoutData(gd);
 
-        setSampleTypesSelection();
+        setSpecimenTypesSelection();
     }
 
-    private void setSampleTypesSelection() {
-        Collection<SampleTypeWrapper> stSamplesTypes = containerType
-            .getSampleTypeCollection();
+    private void setSpecimenTypesSelection() {
+        Collection<SpecimenTypeWrapper> stSamplesTypes = containerType
+            .getSpecimenTypeCollection();
         LinkedHashMap<Integer, String> availSampleTypes = new LinkedHashMap<Integer, String>();
         List<Integer> selSampleTypes = new ArrayList<Integer>();
 
         if (stSamplesTypes != null) {
-            for (SampleTypeWrapper sampleType : stSamplesTypes) {
+            for (SpecimenTypeWrapper sampleType : stSamplesTypes) {
                 selSampleTypes.add(sampleType.getId());
             }
         }
 
-        for (SampleTypeWrapper sampleType : allSampleTypes) {
+        for (SpecimenTypeWrapper sampleType : allSampleTypes) {
             availSampleTypes.put(sampleType.getId(), sampleType.getName());
         }
         samplesMultiSelect.setSelections(availSampleTypes, selSampleTypes);
@@ -345,22 +345,22 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
      */
     @Override
     protected void saveForm() throws Exception {
-        setSampleTypes();
+        setSpecimenTypes();
         setChildContainerTypes();
         containerType.persist();
         SessionManager.updateAllSimilarNodes(containerTypeAdapter, true);
 
     }
 
-    private void setSampleTypes() throws BiobankCheckException {
+    private void setSpecimenTypes() throws BiobankCheckException {
         List<Integer> addedIds = new ArrayList<Integer>();
         List<Integer> removedIds = new ArrayList<Integer>();
         if (hasSamples) {
             addedIds = samplesMultiSelect.getAddedToSelection();
             removedIds = samplesMultiSelect.getRemovedToSelection();
-            List<SampleTypeWrapper> addedSampleTypes = new ArrayList<SampleTypeWrapper>();
-            List<SampleTypeWrapper> removedSampleTypes = new ArrayList<SampleTypeWrapper>();
-            for (SampleTypeWrapper sampleType : allSampleTypes) {
+            List<SpecimenTypeWrapper> addedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
+            List<SpecimenTypeWrapper> removedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
+            for (SpecimenTypeWrapper sampleType : allSampleTypes) {
                 if (addedIds.indexOf(sampleType.getId()) >= 0) {
                     addedSampleTypes.add(sampleType);
                 }
@@ -380,7 +380,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.removeFromSampleTypeCollection(removedSampleTypes);
         } else {
             containerType.removeFromSampleTypeCollection(containerType
-                .getSampleTypeCollection());
+                .getSpecimenTypeCollection());
         }
     }
 
@@ -435,15 +435,15 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             containerType.setTopLevel(false);
         }
         setChildContainerTypeSelection();
-        setSampleTypesSelection();
+        setSpecimenTypesSelection();
         showContainersOrSamples();
         setLabelingScheme();
         setActivityStatus();
     }
 
     private void showContainersOrSamples() {
-        hasSamples = containerType.getSampleTypeCollection() != null
-            && containerType.getSampleTypeCollection().size() > 0;
+        hasSamples = containerType.getSpecimenTypeCollection() != null
+            && containerType.getSpecimenTypeCollection().size() > 0;
         showSamples(hasSamples);
         hasSamplesRadio.setSelection(hasSamples);
         hasContainersRadio.setSelection(!hasSamples);

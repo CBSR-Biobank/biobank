@@ -26,7 +26,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.AliquotPositionWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import edu.ualberta.med.biobank.model.Container;
@@ -42,7 +42,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     private List<ContainerWrapper> addedChildren = new ArrayList<ContainerWrapper>();
 
-    private List<AliquotWrapper> addedAliquots = new ArrayList<AliquotWrapper>();
+    private List<SpecimenWrapper> addedAliquots = new ArrayList<SpecimenWrapper>();
 
     public ContainerWrapper(WritableApplicationService appService,
         Container wrappedObject) {
@@ -226,7 +226,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     private void persistAliquots() throws Exception {
-        for (AliquotWrapper aliquot : addedAliquots) {
+        for (SpecimenWrapper aliquot : addedAliquots) {
             aliquot.setParent(this);
             aliquot.persist();
         }
@@ -436,24 +436,24 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    public Map<RowColPos, AliquotWrapper> getAliquots() {
-        Map<RowColPos, AliquotWrapper> aliquots = (Map<RowColPos, AliquotWrapper>) propertiesMap
+    public Map<RowColPos, SpecimenWrapper> getSpecimens() {
+        Map<RowColPos, SpecimenWrapper> aliquots = (Map<RowColPos, SpecimenWrapper>) propertiesMap
             .get("aliquots");
         if (aliquots == null) {
-            List<AliquotPositionWrapper> positions = getWrapperCollection(
+            List<SpecimenPositionWrapper> positions = getWrapperCollection(
                 ContainerPeer.ALIQUOT_POSITION_COLLECTION,
-                AliquotPositionWrapper.class, false);
+                SpecimenPositionWrapper.class, false);
 
-            aliquots = new TreeMap<RowColPos, AliquotWrapper>();
-            for (AliquotPositionWrapper position : positions) {
+            aliquots = new TreeMap<RowColPos, SpecimenWrapper>();
+            for (SpecimenPositionWrapper position : positions) {
                 try {
                     position.reload();
                 } catch (Exception e1) {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-                AliquotWrapper aliquot = position.getWrappedProperty(
-                    AliquotPositionPeer.ALIQUOT, AliquotWrapper.class);
+                SpecimenWrapper aliquot = position.getWrappedProperty(
+                    AliquotPositionPeer.ALIQUOT, SpecimenWrapper.class);
                 aliquots.put(
                     new RowColPos(position.getRow(), position.getCol()),
                     aliquot);
@@ -465,41 +465,41 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     public boolean hasAliquots() {
         Collection<AliquotPosition> positions = wrappedObject
-            .getAliquotPositionCollection();
+            .getSpecimenPositionCollection();
         return ((positions != null) && (positions.size() > 0));
     }
 
-    public AliquotWrapper getAliquot(Integer row, Integer col)
+    public SpecimenWrapper getSpecimen(Integer row, Integer col)
         throws BiobankCheckException {
-        AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
+        SpecimenPositionWrapper aliquotPosition = new SpecimenPositionWrapper(
             appService);
         aliquotPosition.setRow(row);
         aliquotPosition.setCol(col);
         aliquotPosition.checkPositionValid(this);
-        Map<RowColPos, AliquotWrapper> aliquots = getAliquots();
+        Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         if (aliquots == null) {
             return null;
         }
         return aliquots.get(new RowColPos(row, col));
     }
 
-    public void addAliquot(Integer row, Integer col, AliquotWrapper aliquot)
+    public void addAliquot(Integer row, Integer col, SpecimenWrapper aliquot)
         throws Exception {
-        AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
+        SpecimenPositionWrapper aliquotPosition = new SpecimenPositionWrapper(
             appService);
         aliquotPosition.setRow(row);
         aliquotPosition.setCol(col);
         aliquotPosition.checkPositionValid(this);
-        Map<RowColPos, AliquotWrapper> aliquots = getAliquots();
+        Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
         if (aliquots == null) {
-            aliquots = new TreeMap<RowColPos, AliquotWrapper>();
+            aliquots = new TreeMap<RowColPos, SpecimenWrapper>();
             propertiesMap.put("aliquots", aliquots);
         } else if (!canHoldAliquot(aliquot)) {
             throw new BiobankCheckException("Container " + getFullInfoLabel()
                 + " does not allow inserts of type "
-                + aliquot.getSampleType().getName() + ".");
+                + aliquot.getSpecimenType().getName() + ".");
         } else {
-            AliquotWrapper sampleAtPosition = getAliquot(row, col);
+            SpecimenWrapper sampleAtPosition = getSpecimen(row, col);
             if (sampleAtPosition != null) {
                 throw new BiobankCheckException("Container "
                     + getFullInfoLabel()
@@ -697,17 +697,17 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * 
      * @throws Exception if the sample type is null.
      */
-    public boolean canHoldAliquot(AliquotWrapper aliquot) throws Exception {
-        SampleTypeWrapper type = aliquot.getSampleType();
+    public boolean canHoldAliquot(SpecimenWrapper aliquot) throws Exception {
+        SpecimenTypeWrapper type = aliquot.getSpecimenType();
         if (type == null) {
             throw new BiobankCheckException("sample type is null");
         }
-        return getContainerType().getSampleTypeCollection(false).contains(type);
+        return getContainerType().getSpecimenTypeCollection(false).contains(type);
     }
 
     public void moveAliquots(ContainerWrapper destination) throws Exception {
-        Map<RowColPos, AliquotWrapper> aliquots = getAliquots();
-        for (Entry<RowColPos, AliquotWrapper> e : aliquots.entrySet()) {
+        Map<RowColPos, SpecimenWrapper> aliquots = getSpecimens();
+        for (Entry<RowColPos, SpecimenWrapper> e : aliquots.entrySet()) {
             destination
                 .addAliquot(e.getKey().row, e.getKey().col, e.getValue());
         }
@@ -886,7 +886,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      */
     public static List<ContainerWrapper> getContainersHoldingSampleType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
-        String label, SampleTypeWrapper sampleType) throws ApplicationException {
+        String label, SpecimenTypeWrapper sampleType) throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
             CONTAINERS_HOLDING_SAMPLE_TYPES_QRY, Arrays.asList(new Object[] {
                 siteWrapper.getId(), label, sampleType.getWrappedObject() }));
@@ -935,11 +935,11 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      */
     public static List<ContainerWrapper> getEmptyContainersHoldingSampleType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
-        List<SampleTypeWrapper> sampleTypes, Integer minRowCapacity,
+        List<SpecimenTypeWrapper> sampleTypes, Integer minRowCapacity,
         Integer minColCapacity) throws ApplicationException {
         List<Integer> typeIds = new ArrayList<Integer>();
         for (int i = 0; i < sampleTypes.size(); i++) {
-            SampleTypeWrapper st = sampleTypes.get(i);
+            SpecimenTypeWrapper st = sampleTypes.get(i);
             typeIds.add(st.getId());
         }
         String qry = new StringBuilder(

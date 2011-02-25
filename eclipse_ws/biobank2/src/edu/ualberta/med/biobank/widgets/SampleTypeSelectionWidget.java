@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
@@ -51,7 +51,7 @@ public class SampleTypeSelectionWidget {
     private Object nextWidget;
 
     public SampleTypeSelectionWidget(Composite parent, Character letter,
-        List<SampleTypeWrapper> types, FormToolkit toolkit) {
+        List<SpecimenTypeWrapper> types, FormToolkit toolkit) {
 
         if (letter != null) {
             toolkit.createLabel(parent, letter.toString(), SWT.LEFT);
@@ -71,7 +71,7 @@ public class SampleTypeSelectionWidget {
         setNumber(null);
     }
 
-    private void createCombo(Composite parent, List<SampleTypeWrapper> types) {
+    private void createCombo(Composite parent, List<SpecimenTypeWrapper> types) {
         combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
         combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
 
@@ -80,7 +80,7 @@ public class SampleTypeSelectionWidget {
         cv.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((SampleTypeWrapper) element).getName();
+                return ((SpecimenTypeWrapper) element).getName();
             }
         });
         cv.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -162,8 +162,8 @@ public class SampleTypeSelectionWidget {
         }
     }
 
-    public SampleTypeWrapper getSelection() {
-        return (SampleTypeWrapper) ((StructuredSelection) cv.getSelection())
+    public SpecimenTypeWrapper getSelection() {
+        return (SpecimenTypeWrapper) ((StructuredSelection) cv.getSelection())
             .getFirstElement();
     }
 
@@ -224,7 +224,7 @@ public class SampleTypeSelectionWidget {
         this.nextWidget = nextWidget;
     }
 
-    public void setTypes(List<SampleTypeWrapper> types) {
+    public void setTypes(List<SpecimenTypeWrapper> types) {
         cv.setInput(types);
     }
 

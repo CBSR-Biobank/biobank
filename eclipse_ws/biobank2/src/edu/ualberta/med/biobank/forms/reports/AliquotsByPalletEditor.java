@@ -103,7 +103,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
             List<ContainerWrapper> containers = ContainerWrapper
                 .getContainersByLabel(SessionManager.getAppService(), label);
             for (ContainerWrapper c : containers)
-                if (c.getContainerType().getSampleTypeCollection().size() > 0)
+                if (c.getContainerType().getSpecimenTypeCollection().size() > 0)
                     validContainers.add(c);
             if (label.equals("") || validContainers.size() > 0)
                 filterList(label);

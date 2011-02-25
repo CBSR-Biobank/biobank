@@ -5,7 +5,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudySourceVessel;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -24,7 +24,7 @@ public class TestStudySourceVessel extends TestDatabase {
 
         SourceVesselTypeWrapper sourceVessel = SourceVesselTypeHelper
             .addSourceVesselType(name);
-        StudySourceVesselWrapper ssv = StudySourceVesselHelper
+        SourceSpecimenWrapper ssv = StudySourceVesselHelper
             .addStudySourceVessel(study, sourceVessel, true, true);
 
         testGettersAndSetters(ssv);
@@ -33,7 +33,7 @@ public class TestStudySourceVessel extends TestDatabase {
     @Test
     public void testGetSetSourceVessel() throws Exception {
         String name = "testGetSetSourceVessel" + r.nextInt();
-        StudySourceVesselWrapper ssv = new StudySourceVesselWrapper(appService);
+        SourceSpecimenWrapper ssv = new SourceSpecimenWrapper(appService);
         Assert.assertNull(ssv.getSourceVesselType());
 
         ssv.setSourceVesselType(null);
@@ -57,7 +57,7 @@ public class TestStudySourceVessel extends TestDatabase {
 
         SourceVesselTypeWrapper svType = SourceVesselTypeHelper
             .addSourceVesselType(name);
-        StudySourceVesselWrapper ssv = StudySourceVesselHelper
+        SourceSpecimenWrapper ssv = StudySourceVesselHelper
             .addStudySourceVessel(study, svType, true, true);
 
         ssv.reload();
@@ -79,12 +79,12 @@ public class TestStudySourceVessel extends TestDatabase {
 
         SourceVesselTypeWrapper svType1 = SourceVesselTypeHelper
             .addSourceVesselType("A" + name);
-        StudySourceVesselWrapper ssv1 = StudySourceVesselHelper
+        SourceSpecimenWrapper ssv1 = StudySourceVesselHelper
             .addStudySourceVessel(study, svType1, true, true);
 
         SourceVesselTypeWrapper svType2 = SourceVesselTypeHelper
             .addSourceVesselType("B" + name);
-        StudySourceVesselWrapper ssv2 = StudySourceVesselHelper
+        SourceSpecimenWrapper ssv2 = StudySourceVesselHelper
             .addStudySourceVessel(study, svType2, true, true);
 
         Assert.assertTrue(ssv1.compareTo(ssv2) < 0);
@@ -99,7 +99,7 @@ public class TestStudySourceVessel extends TestDatabase {
 
         SourceVesselTypeWrapper ss1 = SourceVesselTypeHelper
             .addSourceVesselType(name);
-        StudySourceVesselWrapper ssv1 = StudySourceVesselHelper
+        SourceSpecimenWrapper ssv1 = StudySourceVesselHelper
             .newStudySourceVessel(study, ss1, true, true);
         ssv1.setNeedOriginalVolume(true);
         ssv1.persist();
@@ -117,7 +117,7 @@ public class TestStudySourceVessel extends TestDatabase {
 
         SourceVesselTypeWrapper svType1 = SourceVesselTypeHelper
             .addSourceVesselType(name);
-        StudySourceVesselWrapper ssv1 = StudySourceVesselHelper
+        SourceSpecimenWrapper ssv1 = StudySourceVesselHelper
             .newStudySourceVessel(study, svType1, true, true);
 
         ssv1.reset();
@@ -132,7 +132,7 @@ public class TestStudySourceVessel extends TestDatabase {
 
         SourceVesselTypeWrapper ss1 = SourceVesselTypeHelper
             .addSourceVesselType(name);
-        StudySourceVesselWrapper ssv1 = StudySourceVesselHelper
+        SourceSpecimenWrapper ssv1 = StudySourceVesselHelper
             .addStudySourceVessel(study, ss1, true, true);
 
         int count = appService.search(StudySourceVessel.class,

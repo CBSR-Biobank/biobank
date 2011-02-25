@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.tools.sentaliquots;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -76,14 +76,14 @@ public class SentAliquots {
             .getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING);
 
-        Map<String, AliquotWrapper> aliquotsAffected = new HashMap<String, AliquotWrapper>();
+        Map<String, SpecimenWrapper> aliquotsAffected = new HashMap<String, SpecimenWrapper>();
 
         try {
             String[] header = new String[] { "patientNo", "inventoryId",
                 "closeComment" };
             PatientInfo info;
             while ((info = reader.read(PatientInfo.class, header, processors)) != null) {
-                AliquotWrapper aliquot = AliquotWrapper.getAliquot(appService,
+                SpecimenWrapper aliquot = SpecimenWrapper.getSpecimen(appService,
                     info.getInventoryId(), null);
 
                 if (aliquot == null) {

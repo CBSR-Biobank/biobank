@@ -50,7 +50,7 @@ public class DbHelper {
                 deleteContainers(container.getChildren().values());
             }
             if (container.hasAliquots()) {
-                deleteFromList(container.getAliquots().values());
+                deleteFromList(container.getSpecimens().values());
             }
             container.reload();
             container.delete();
@@ -109,7 +109,7 @@ public class DbHelper {
             return;
 
         for (ProcessingEventWrapper visit : visits) {
-            deleteFromList(visit.getAliquotCollection(false));
+            deleteFromList(visit.getSpecimenCollection(false));
             visit.reload();
             visit.delete();
         }

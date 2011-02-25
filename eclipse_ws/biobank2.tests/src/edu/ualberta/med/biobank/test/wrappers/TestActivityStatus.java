@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.ClassUtils;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -22,7 +22,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -92,7 +92,7 @@ public class TestActivityStatus extends TestDatabase {
         ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
             site, name, 2, 2);
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
-        topContainerType.addToSampleTypeCollection(SampleTypeWrapper
+        topContainerType.addToSampleTypeCollection(SpecimenTypeWrapper
             .getAllSampleTypes(appService, false));
         topContainerType.persist();
 
@@ -102,7 +102,7 @@ public class TestActivityStatus extends TestDatabase {
         StudyPvAttrWrapper spa = StudyPvAttrWrapper.getStudyPvAttrCollection(
             study).get(0);
 
-        SampleTypeWrapper sampleType = SampleTypeWrapper.getAllSampleTypes(
+        SpecimenTypeWrapper sampleType = SpecimenTypeWrapper.getAllSampleTypes(
             appService, false).get(0);
 
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
@@ -122,7 +122,7 @@ public class TestActivityStatus extends TestDatabase {
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
 
-        AliquotWrapper aliquot = AliquotHelper.addAliquot(sampleType,
+        SpecimenWrapper aliquot = AliquotHelper.addAliquot(sampleType,
             topContainer, visit, 0, 0);
 
         ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { aliquot, spa,
@@ -146,8 +146,8 @@ public class TestActivityStatus extends TestDatabase {
         as.persist();
         as.reload();
 
-        if (wrapper instanceof AliquotWrapper) {
-            ((AliquotWrapper) wrapper).setActivityStatus(as);
+        if (wrapper instanceof SpecimenWrapper) {
+            ((SpecimenWrapper) wrapper).setActivityStatus(as);
         } else if (wrapper instanceof StudyPvAttrWrapper) {
             ((StudyPvAttrWrapper) wrapper).setActivityStatus(as);
         } else if (wrapper instanceof ContainerWrapper) {

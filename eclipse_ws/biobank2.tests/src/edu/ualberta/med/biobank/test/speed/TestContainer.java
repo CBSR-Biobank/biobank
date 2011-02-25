@@ -95,7 +95,7 @@ public class TestContainer extends SpeedTest {
         int count = 0;
         for (Container c : containers) {
             logger.info(c.getLabel() + ": number of aliquots: "
-                + c.getAliquotPositionCollection().size());
+                + c.getSpecimenPositionCollection().size());
             ++count;
 
             if (count >= 20)

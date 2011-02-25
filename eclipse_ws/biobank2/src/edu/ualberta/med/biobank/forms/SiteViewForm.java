@@ -123,7 +123,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         setTextValue(shipmentCountLabel, site.getShipmentCount());
         setTextValue(patientCountLabel, site.getPatientCount());
         setTextValue(patientVisitCountLabel, site.getPatientVisitCount());
-        setTextValue(sampleCountLabel, site.getAliquotCount());
+        setTextValue(sampleCountLabel, site.getSpecimenCount());
         setTextValue(activityStatusLabel, site.getActivityStatus().getName());
         setTextValue(commentLabel, site.getComment());
     }

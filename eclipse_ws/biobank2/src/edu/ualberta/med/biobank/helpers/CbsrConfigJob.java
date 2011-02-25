@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.client.config.cbsr.CbsrContainerTypes;
 import edu.ualberta.med.biobank.client.config.cbsr.CbsrContainers;
 import edu.ualberta.med.biobank.client.config.cbsr.CbsrSite;
 import edu.ualberta.med.biobank.client.config.cbsr.CbsrStudies;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -49,7 +49,7 @@ public class CbsrConfigJob {
 
     protected Random r = new Random();
 
-    protected List<SampleTypeWrapper> sampleTypesList;
+    protected List<SpecimenTypeWrapper> sampleTypesList;
 
     protected List<ShippingMethodWrapper> shippingCompaniesList;
 
@@ -82,7 +82,7 @@ public class CbsrConfigJob {
         appService = SessionManager.getInstance().getSession().getAppService();
 
         try {
-            sampleTypesList = SampleTypeWrapper.getAllSampleTypes(appService,
+            sampleTypesList = SpecimenTypeWrapper.getAllSampleTypes(appService,
                 false);
             shippingCompaniesList = ShippingMethodWrapper
                 .getShippingMethods(appService);

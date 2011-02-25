@@ -24,7 +24,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -42,7 +42,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     private ComboViewer sourceVesselsComboViewer;
 
-    private Map<String, StudySourceVesselWrapper> mapStudySourceVessel;
+    private Map<String, SourceSpecimenWrapper> mapStudySourceVessel;
 
     private BiobankText quantityText;
 
@@ -70,7 +70,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
 
     public PvSourceVesselDialog(Shell parent,
         PvSourceVesselWrapper pvSourceVessel,
-        List<StudySourceVesselWrapper> studySourceVessels,
+        List<SourceSpecimenWrapper> studySourceVessels,
         List<SourceVesselWrapper> allSourceVessels,
         PvSourceVesselEntryInfoTable infoTable) {
         super(parent);
@@ -88,8 +88,8 @@ public class PvSourceVesselDialog extends BiobankDialog {
             editedSourceVessel = pvSourceVessel;
             addMode = false;
         }
-        mapStudySourceVessel = new HashMap<String, StudySourceVesselWrapper>();
-        for (StudySourceVesselWrapper ssv : studySourceVessels) {
+        mapStudySourceVessel = new HashMap<String, SourceSpecimenWrapper>();
+        for (SourceSpecimenWrapper ssv : studySourceVessels) {
             mapStudySourceVessel.put(ssv.getSourceVessel().getName(), ssv);
         }
         this.allSourceVessels = allSourceVessels;
@@ -134,7 +134,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         boolean useStudyOnlySourceVessels = true;
-        StudySourceVesselWrapper ssv = null;
+        SourceSpecimenWrapper ssv = null;
         SourceVesselWrapper currentSourceVessel = internalSourceVessel
             .getSourceVessel();
         if (currentSourceVessel != null) {
@@ -149,9 +149,9 @@ public class PvSourceVesselDialog extends BiobankDialog {
             "A source vessel should be selected", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    if (selectedObject instanceof StudySourceVesselWrapper) {
+                    if (selectedObject instanceof SourceSpecimenWrapper) {
                         internalSourceVessel
-                            .setSourceVessel(((StudySourceVesselWrapper) selectedObject)
+                            .setSourceVessel(((SourceSpecimenWrapper) selectedObject)
                                 .getSourceVessel());
                     } else {
                         internalSourceVessel
@@ -213,7 +213,7 @@ public class PvSourceVesselDialog extends BiobankDialog {
         if (!dialogCreated)
             return;
 
-        StudySourceVesselWrapper ssv = null;
+        SourceSpecimenWrapper ssv = null;
         SourceVesselWrapper currentSourceVessel = internalSourceVessel
             .getSourceVessel();
         if (currentSourceVessel != null) {

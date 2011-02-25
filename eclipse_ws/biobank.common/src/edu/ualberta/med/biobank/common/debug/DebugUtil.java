@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.model.Aliquot;
@@ -33,7 +33,7 @@ public class DebugUtil {
         + ProcessingEventPeer.ALIQUOT_COLLECTION.getName()
         + " as aliquots where s." + SitePeer.ID.getName() + "=?";
 
-    public static List<AliquotWrapper> getRandomLinkedAliquots(
+    public static List<SpecimenWrapper> getRandomLinkedAliquots(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(RANDOM_LINKED_ALIQUOTS_QRY,
@@ -43,10 +43,10 @@ public class DebugUtil {
         int items = aliquots.size();
         int maxItems = items > 10 ? 10 : items;
         return ModelWrapper.wrapModelCollection(appService,
-            aliquots.subList(0, maxItems), AliquotWrapper.class);
+            aliquots.subList(0, maxItems), SpecimenWrapper.class);
     }
 
-    public static List<AliquotWrapper> getRandomAssignedAliquots(
+    public static List<SpecimenWrapper> getRandomAssignedAliquots(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         return getRandomAssignedAliquots(appService, siteId, null);
@@ -63,7 +63,7 @@ public class DebugUtil {
             AliquotPositionPeer.CONTAINER, ContainerPeer.SITE, SitePeer.ID)
         + "=?";
 
-    public static List<AliquotWrapper> getRandomAssignedAliquots(
+    public static List<SpecimenWrapper> getRandomAssignedAliquots(
         WritableApplicationService appService, Integer siteId, Integer studyId)
         throws ApplicationException {
         List<Object> params = new ArrayList<Object>();
@@ -85,7 +85,7 @@ public class DebugUtil {
         int items = aliquots.size();
         int maxItems = items > 10 ? 10 : items;
         return ModelWrapper.wrapModelCollection(appService,
-            aliquots.subList(0, maxItems), AliquotWrapper.class);
+            aliquots.subList(0, maxItems), SpecimenWrapper.class);
     }
 
     private static final String RANDOM_NON_ASSIGNED_NON_DISPATCHED_ALIQUOT_QRY = "select a from "
@@ -103,7 +103,7 @@ public class DebugUtil {
         + Property.concatNames(AliquotPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + "!='Dispatched'";
 
-    public static List<AliquotWrapper> getRandomNonAssignedNonDispatchedAliquots(
+    public static List<SpecimenWrapper> getRandomNonAssignedNonDispatchedAliquots(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
@@ -111,7 +111,7 @@ public class DebugUtil {
             Arrays.asList(new Object[] { siteId }));
         List<Aliquot> aliquots = appService.query(criteria);
         return ModelWrapper.wrapModelCollection(appService, aliquots,
-            AliquotWrapper.class);
+            SpecimenWrapper.class);
     }
 
     private static final String RANDOM_DISPATCHED_ALIQUOT_QRY = "select aliquots from "
@@ -126,7 +126,7 @@ public class DebugUtil {
         + Property.concatNames(AliquotPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + "='Dispatched'";
 
-    public static List<AliquotWrapper> getRandomDispatchedAliquots(
+    public static List<SpecimenWrapper> getRandomDispatchedAliquots(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(RANDOM_DISPATCHED_ALIQUOT_QRY,
@@ -136,6 +136,6 @@ public class DebugUtil {
         int items = aliquots.size();
         int maxItems = items > 10 ? 10 : items;
         return ModelWrapper.wrapModelCollection(appService,
-            aliquots.subList(0, maxItems), AliquotWrapper.class);
+            aliquots.subList(0, maxItems), SpecimenWrapper.class);
     }
 }

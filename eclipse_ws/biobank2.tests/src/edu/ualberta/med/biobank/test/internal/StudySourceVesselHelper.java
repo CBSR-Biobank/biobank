@@ -4,16 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
 public class StudySourceVesselHelper extends DbHelper {
 
-    public static StudySourceVesselWrapper newStudySourceVessel(
+    public static SourceSpecimenWrapper newStudySourceVessel(
         StudyWrapper study, SourceVesselTypeWrapper svType,
         boolean needTimeDrawn, boolean needOriginalVolume) {
-        StudySourceVesselWrapper ssv = new StudySourceVesselWrapper(appService);
+        SourceSpecimenWrapper ssv = new SourceSpecimenWrapper(appService);
         ssv.setStudy(study);
         ssv.setSourceVesselType(svType);
         ssv.setNeedTimeDrawn(needTimeDrawn);
@@ -21,10 +21,10 @@ public class StudySourceVesselHelper extends DbHelper {
         return ssv;
     }
 
-    public static StudySourceVesselWrapper addStudySourceVessel(
+    public static SourceSpecimenWrapper addStudySourceVessel(
         StudyWrapper study, SourceVesselTypeWrapper svType,
         boolean needTimeDrawn, boolean needOriginalVolume) throws Exception {
-        StudySourceVesselWrapper ssv = newStudySourceVessel(study, svType,
+        SourceSpecimenWrapper ssv = newStudySourceVessel(study, svType,
             needTimeDrawn, needOriginalVolume);
         ssv.persist();
         return ssv;
@@ -33,7 +33,7 @@ public class StudySourceVesselHelper extends DbHelper {
     public static int addStudySourceVessels(StudyWrapper study, String name,
         boolean needTimeDrawn, boolean needOriginalVolume) throws Exception {
         int nber = r.nextInt(15) + 1;
-        List<StudySourceVesselWrapper> ssvs = new ArrayList<StudySourceVesselWrapper>();
+        List<SourceSpecimenWrapper> ssvs = new ArrayList<SourceSpecimenWrapper>();
         for (int i = 0; i < nber; i++) {
             SourceVesselTypeWrapper svType = SourceVesselTypeHelper
                 .addSourceVesselType("newST" + Utils.getRandomString(11));

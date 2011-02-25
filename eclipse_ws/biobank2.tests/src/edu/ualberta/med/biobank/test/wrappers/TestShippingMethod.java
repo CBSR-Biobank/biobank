@@ -9,7 +9,7 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.AbstractShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -117,8 +117,8 @@ public class TestShippingMethod extends TestDatabase {
             .getCollectionEventCollection(true);
         if (shipments.size() > 1) {
             for (int i = 0; i < shipments.size() - 1; i++) {
-                AbstractShipmentWrapper s1 = shipments.get(i);
-                AbstractShipmentWrapper s2 = shipments.get(i + 1);
+                ShipmentInfoWrapper s1 = shipments.get(i);
+                ShipmentInfoWrapper s2 = shipments.get(i + 1);
                 Assert.assertTrue(s1.compareTo(s2) <= 0);
             }
         }

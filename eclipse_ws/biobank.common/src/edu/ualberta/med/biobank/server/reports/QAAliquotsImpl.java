@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -46,10 +46,10 @@ public class QAAliquotsImpl extends AbstractReport {
             Aliquot a = (Aliquot) ob;
             String pnumber = a.getProcessingEvent().getPatient().getPnumber();
             String inventoryId = a.getInventoryId();
-            String stName = a.getSampleType().getNameShort();
+            String stName = a.getSpecimenType().getNameShort();
             String dateProcessed = DateFormatter.formatAsDate(a
                 .getProcessingEvent().getDateProcessed());
-            AliquotWrapper aliquotWrapper = new AliquotWrapper(appService, a);
+            SpecimenWrapper aliquotWrapper = new SpecimenWrapper(appService, a);
             String aliquotLabel = aliquotWrapper.getPositionString();
             modifiedResults.add(new Object[] { aliquotLabel, inventoryId,
                 pnumber, dateProcessed, stName });

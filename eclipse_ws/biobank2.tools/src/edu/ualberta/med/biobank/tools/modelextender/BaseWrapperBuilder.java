@@ -88,8 +88,11 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String wrapperName = new StringBuilder(className).append("Wrapper")
             .toString();
 
-        if (!wrapperMap.containsKey(wrapperName))
+        if (!wrapperMap.containsKey(wrapperName)) {
+            LOGGER.info("skipping generation of wrapper for " + className
+                + ": no wrapper found with name " + wrapperName);
             return;
+        }
 
         LOGGER.info("generating wrapper base class for " + mc.getName());
 
@@ -151,6 +154,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         for (ClassAssociation assoc : mc.getAssocMap().values()) {
             ClassAssociationType assocType = assoc.getAssociationType();
+
             if ((assocType == ClassAssociationType.ZERO_OR_ONE_TO_ONE)
                 || (assocType == ClassAssociationType.ONE_TO_ONE)) {
                 contents.append(createWrappedPropertyGetter(mc, assoc));
@@ -467,10 +471,6 @@ public class BaseWrapperBuilder extends BaseBuilder {
         Map<String, ClassAssociation> assocMap = mc.getAssocMap();
         for (ClassAssociation assoc : assocMap.values()) {
             ModelClass toClass = assoc.getToClass();
-
-            if (mc.getName().equals("Report")) {
-                LOGGER.info(mc.getName());
-            }
 
             // check if need to import BioBankCheckException
             ClassAssociationType assocType = assoc.getAssociationType();

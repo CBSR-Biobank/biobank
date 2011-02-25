@@ -7,8 +7,8 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.SampleStorage;
 import edu.ualberta.med.biobank.model.SampleType;
@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSet
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
-import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestSampleStorage extends TestDatabase {
@@ -26,9 +26,9 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testGettersAndSetters" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
             appService, false);
-        SampleStorageWrapper sampleStorage = SampleStorageHelper
+        AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
         testGettersAndSetters(sampleStorage);
     }
@@ -38,9 +38,9 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testGetSetStudy" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
             appService, false);
-        SampleStorageWrapper sampleStorage = SampleStorageHelper
+        AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
 
         Assert.assertEquals(study, sampleStorage.getStudy());
@@ -52,32 +52,32 @@ public class TestSampleStorage extends TestDatabase {
         Assert.assertEquals(newStudy, sampleStorage.getStudy());
         Assert.assertFalse(study.equals(sampleStorage.getStudy()));
 
-        sampleStorage = new SampleStorageWrapper(appService);
+        sampleStorage = new AliquotedSpecimenWrapper(appService);
         Assert.assertNull(sampleStorage.getStudy());
     }
 
     @Test
-    public void testGetSetSampleType() throws Exception {
-        String name = "testGetSetSampleType" + r.nextInt();
+    public void testGetSetSpecimenType() throws Exception {
+        String name = "testGetSetSpecimenType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
             appService, false);
-        SampleTypeWrapper type = DbHelper.chooseRandomlyInList(types);
-        SampleStorageWrapper sampleStorage = SampleStorageHelper
+        SpecimenTypeWrapper type = DbHelper.chooseRandomlyInList(types);
+        AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, type);
 
-        Assert.assertEquals(type, sampleStorage.getSampleType());
+        Assert.assertEquals(type, sampleStorage.getSpecimenType());
 
-        SampleTypeWrapper newType = SampleTypeHelper.addSampleType(name);
-        sampleStorage.setSampleType(newType);
+        SpecimenTypeWrapper newType = SpecimenTypeHelper.addSampleType(name);
+        sampleStorage.setSpecimenType(newType);
         sampleStorage.persist();
 
-        Assert.assertEquals(newType, sampleStorage.getSampleType());
-        Assert.assertFalse(type.equals(sampleStorage.getSampleType()));
+        Assert.assertEquals(newType, sampleStorage.getSpecimenType());
+        Assert.assertFalse(type.equals(sampleStorage.getSpecimenType()));
 
-        sampleStorage = new SampleStorageWrapper(appService);
-        Assert.assertNull(sampleStorage.getSampleType());
+        sampleStorage = new AliquotedSpecimenWrapper(appService);
+        Assert.assertNull(sampleStorage.getSpecimenType());
     }
 
     @Test
@@ -87,7 +87,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testPersist" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
             appService, false);
         SampleStorageHelper.addSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
@@ -101,9 +101,9 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testPersist" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
             appService, false);
-        SampleStorageWrapper ss = SampleStorageHelper.newSampleStorage(study,
+        AliquotedSpecimenWrapper ss = SampleStorageHelper.newSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
         ss.setActivityStatus(null);
 
@@ -124,9 +124,9 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testDelete" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
             appService, false);
-        SampleStorageWrapper sampleStorage = SampleStorageHelper
+        AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
 
         // object is in database
@@ -147,9 +147,9 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SampleTypeWrapper> types = SampleTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
             appService, false);
-        SampleStorageWrapper sampleStorage = SampleStorageHelper
+        AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
 
         sampleStorage.reload();
@@ -161,7 +161,7 @@ public class TestSampleStorage extends TestDatabase {
 
     @Test
     public void testResetNew() throws Exception {
-        SampleStorageWrapper sampleStorage = new SampleStorageWrapper(
+        AliquotedSpecimenWrapper sampleStorage = new AliquotedSpecimenWrapper(
             appService);
         sampleStorage.setVolume(5.2);
         sampleStorage.reset();
@@ -176,18 +176,18 @@ public class TestSampleStorage extends TestDatabase {
         SampleType type = new SampleType();
         type.setName("Plasma");
         type = (SampleType) appService.search(SampleType.class, type).get(0);
-        SampleTypeWrapper typeWrapperPlasma = new SampleTypeWrapper(appService,
+        SpecimenTypeWrapper typeWrapperPlasma = new SpecimenTypeWrapper(appService,
             type);
 
         type = new SampleType();
         type.setName("Hair");
         type = (SampleType) appService.search(SampleType.class, type).get(0);
-        SampleTypeWrapper typeWrapperHair = new SampleTypeWrapper(appService,
+        SpecimenTypeWrapper typeWrapperHair = new SpecimenTypeWrapper(appService,
             type);
 
-        SampleStorageWrapper sampleStorage1 = SampleStorageHelper
+        AliquotedSpecimenWrapper sampleStorage1 = SampleStorageHelper
             .addSampleStorage(study, typeWrapperPlasma);
-        SampleStorageWrapper sampleStorage2 = SampleStorageHelper
+        AliquotedSpecimenWrapper sampleStorage2 = SampleStorageHelper
             .addSampleStorage(study, typeWrapperHair);
 
         Assert.assertTrue(sampleStorage1.compareTo(sampleStorage2) > 0);

@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PvSourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.PvSourceVesselDialog;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -34,7 +34,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PvSourceVesselEntryInfoTable extends PvSourceVesselInfoTable {
 
-    private List<StudySourceVesselWrapper> studySourceVessels;
+    private List<SourceSpecimenWrapper> studySourceVessels;
 
     private List<PvSourceVesselWrapper> selectedPvSourceVessels;
 

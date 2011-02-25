@@ -10,7 +10,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
@@ -828,8 +828,8 @@ public class TestSite extends TestDatabase {
     }
 
     @Test
-    public void testGetAliquotCountForSite() throws Exception {
-        String name = "testGetAliquotCountForSite" + r.nextInt();
+    public void testGetSpecimenCountForSite() throws Exception {
+        String name = "testGetSpecimenCountForSite" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
 
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
@@ -848,7 +848,7 @@ public class TestSite extends TestDatabase {
         study2.addToContactCollection(Arrays.asList(contact2));
         study2.persist();
 
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSampleTypes(appService, true);
         ContainerTypeWrapper ctype = ContainerTypeHelper.addContainerType(site,
             "Pallet96", "P96", 2, 8, 12, true);
@@ -889,13 +889,13 @@ public class TestSite extends TestDatabase {
         }
 
         site.reload();
-        Assert.assertEquals(2 * (nber + nber2), site.getAliquotCount()
+        Assert.assertEquals(2 * (nber + nber2), site.getSpecimenCount()
             .longValue());
 
         // delete patient 1 and all it's visits and samples
         for (ProcessingEventWrapper visit : patient1
             .getProcessingEventCollection(false)) {
-            for (AliquotWrapper aliquot : visit.getAliquotCollection(false)) {
+            for (SpecimenWrapper aliquot : visit.getSpecimenCollection(false)) {
                 aliquot.delete();
             }
             visit.delete();
@@ -903,6 +903,6 @@ public class TestSite extends TestDatabase {
         patient1.delete();
 
         site.reload();
-        Assert.assertEquals(2 * nber2, site.getAliquotCount().longValue());
+        Assert.assertEquals(2 * nber2, site.getSpecimenCount().longValue());
     }
 }

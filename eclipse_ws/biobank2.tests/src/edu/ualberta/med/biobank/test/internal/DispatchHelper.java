@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Date;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -15,7 +15,7 @@ public class DispatchHelper extends DbHelper {
 
     public static DispatchWrapper newDispatch(CenterWrapper<?> sender,
         CenterWrapper<?> receiver, ShippingMethodWrapper method,
-        String waybill, Date dateReceived, AliquotWrapper... aliquots)
+        String waybill, Date dateReceived, SpecimenWrapper... aliquots)
         throws Exception {
         DispatchWrapper dispatch = new DispatchWrapper(appService);
         dispatch.setSender(sender);
@@ -31,7 +31,7 @@ public class DispatchHelper extends DbHelper {
         dispatch.setDeparted(Utils.getRandomDate());
 
         if (aliquots != null) {
-            dispatch.addAliquots(Arrays.asList(aliquots));
+            dispatch.addSpecimens(Arrays.asList(aliquots));
         }
 
         return dispatch;
@@ -41,7 +41,7 @@ public class DispatchHelper extends DbHelper {
         CenterWrapper<?> receiver, ShippingMethodWrapper method,
         String waybill, Date dateReceived) throws Exception {
         return newDispatch(sender, receiver, method, waybill, dateReceived,
-            (AliquotWrapper[]) null);
+            (SpecimenWrapper[]) null);
     }
 
     public static DispatchWrapper newDispatch(CenterWrapper<?> sender,
@@ -53,7 +53,7 @@ public class DispatchHelper extends DbHelper {
 
     public static DispatchWrapper addDispatch(CenterWrapper<?> sender,
         CenterWrapper<?> receiver, ShippingMethodWrapper method,
-        String waybill, Date dateReceived, AliquotWrapper... containers)
+        String waybill, Date dateReceived, SpecimenWrapper... containers)
         throws Exception {
         DispatchWrapper dispatch = newDispatch(sender, receiver, method,
             waybill, dateReceived, containers);

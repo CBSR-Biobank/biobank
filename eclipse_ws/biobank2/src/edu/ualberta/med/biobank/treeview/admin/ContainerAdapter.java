@@ -137,7 +137,7 @@ public class ContainerAdapter extends AdapterBase {
                         monitor.done();
                         BioBankPlugin.openAsyncInformation(
                             "Aliquots moved",
-                            newContainer.getAliquots().size()
+                            newContainer.getSpecimens().size()
                                 + " aliquots are now in "
                                 + newContainer.getFullInfoLabel() + ".");
                     }

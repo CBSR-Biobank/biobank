@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SourceVesselPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Contact;
@@ -36,9 +36,9 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
-    private Set<SampleStorageWrapper> deletedSampleStorages = new HashSet<SampleStorageWrapper>();
+    private Set<AliquotedSpecimenWrapper> deletedSampleStorages = new HashSet<AliquotedSpecimenWrapper>();
 
-    private Set<StudySourceVesselWrapper> deletedStudySourceVessels = new HashSet<StudySourceVesselWrapper>();
+    private Set<SourceSpecimenWrapper> deletedStudySourceVessels = new HashSet<SourceSpecimenWrapper>();
 
     private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
 
@@ -65,7 +65,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @Override
     public void addToSampleStorageCollection(
-        List<SampleStorageWrapper> sampleStorageCollection) {
+        List<AliquotedSpecimenWrapper> sampleStorageCollection) {
         super.addToSampleStorageCollection(sampleStorageCollection);
 
         // make sure previously deleted ones, that have been re-added, are
@@ -75,7 +75,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @Override
     public void removeFromSampleStorageCollection(
-        List<SampleStorageWrapper> sampleStoragesToRemove) {
+        List<AliquotedSpecimenWrapper> sampleStoragesToRemove) {
         deletedSampleStorages.addAll(sampleStoragesToRemove);
         super.removeFromSampleStorageCollection(sampleStoragesToRemove);
     }
@@ -96,7 +96,7 @@ public class StudyWrapper extends StudyBaseWrapper {
      * collection.
      */
     private void deleteSampleStorages() throws Exception {
-        for (SampleStorageWrapper st : deletedSampleStorages) {
+        for (AliquotedSpecimenWrapper st : deletedSampleStorages) {
             if (!st.isNew()) {
                 st.delete();
             }
@@ -108,7 +108,7 @@ public class StudyWrapper extends StudyBaseWrapper {
      * collection.
      */
     private void deleteStudySourceVessels() throws Exception {
-        for (StudySourceVesselWrapper st : deletedStudySourceVessels) {
+        for (SourceSpecimenWrapper st : deletedStudySourceVessels) {
             if (!st.isNew()) {
                 st.delete();
             }
@@ -117,7 +117,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @Override
     public void addToStudySourceVesselCollection(
-        List<StudySourceVesselWrapper> newStudySourceVessels) {
+        List<SourceSpecimenWrapper> newStudySourceVessels) {
         super.addToStudySourceVesselCollection(newStudySourceVessels);
 
         // make sure previously deleted ones, that have been re-added, are
@@ -127,7 +127,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @Override
     public void removeFromStudySourceVesselCollection(
-        List<StudySourceVesselWrapper> studySourceVesselsToDelete) {
+        List<SourceSpecimenWrapper> studySourceVesselsToDelete) {
         deletedStudySourceVessels.addAll(studySourceVesselsToDelete);
         super.removeFromStudySourceVesselCollection(studySourceVesselsToDelete);
     }
@@ -215,9 +215,9 @@ public class StudyWrapper extends StudyBaseWrapper {
      */
     public void setStudyPvAttr(String label, String type,
         String[] permissibleValues) throws Exception {
-        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = PvAttrTypeWrapper
+        Map<String, EventAttrTypeWrapper> pvAttrTypeMap = EventAttrTypeWrapper
             .getAllPvAttrTypesMap(appService);
-        PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
+        EventAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
         if (pvAttrType == null) {
             throw new Exception("the pv attribute type \"" + type
                 + "\" does not exist");

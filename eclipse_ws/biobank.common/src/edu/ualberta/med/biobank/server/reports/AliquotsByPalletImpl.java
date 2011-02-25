@@ -6,7 +6,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ContainerPath;
@@ -38,8 +38,8 @@ public class AliquotsByPalletImpl extends AbstractReport {
             Aliquot a = (Aliquot) ob;
             String pnumber = a.getProcessingEvent().getPatient().getPnumber();
             String inventoryId = a.getInventoryId();
-            String stName = a.getSampleType().getNameShort();
-            AliquotWrapper aliquotWrapper = new AliquotWrapper(appService, a);
+            String stName = a.getSpecimenType().getNameShort();
+            SpecimenWrapper aliquotWrapper = new SpecimenWrapper(appService, a);
             String aliquotLabel = aliquotWrapper
                 .getPositionString(false, false);
             parent = aliquotWrapper.getParent();

@@ -63,10 +63,10 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
     }
 
     @SuppressWarnings("unchecked")
-    public List<AbstractShipmentWrapper<?>> getAllShipmentCollection(
+    public List<ShipmentInfoWrapper<?>> getAllShipmentCollection(
         boolean sort) {
         return getWrapperCollection(ShippingMethodPeer.SHIPMENT_COLLECTION,
-            AbstractShipmentWrapper.class, sort);
+            ShipmentInfoWrapper.class, sort);
     }
 
     public List<CollectionEventWrapper> getCollectionEventCollection() {
@@ -75,9 +75,9 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
 
     public List<CollectionEventWrapper> getCollectionEventCollection(
         boolean sort) {
-        List<AbstractShipmentWrapper<?>> allShipmentCollection = getAllShipmentCollection(sort);
+        List<ShipmentInfoWrapper<?>> allShipmentCollection = getAllShipmentCollection(sort);
         List<CollectionEventWrapper> shipmentCollection = new ArrayList<CollectionEventWrapper>();
-        for (AbstractShipmentWrapper<?> ship : allShipmentCollection) {
+        for (ShipmentInfoWrapper<?> ship : allShipmentCollection) {
             if (ship instanceof CollectionEventWrapper) {
                 shipmentCollection.add((CollectionEventWrapper) ship);
             }

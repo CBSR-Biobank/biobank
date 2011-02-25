@@ -176,7 +176,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
     private void createAliquotsSection() {
         Composite parent = createSectionWithClient("Aliquots");
         aliquotWidget = new AliquotListInfoTable(parent,
-            patientVisit.getAliquotCollection());
+            patientVisit.getSpecimenCollection());
         aliquotWidget.adaptToToolkit(toolkit, true);
         aliquotWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
         aliquotWidget.addClickListener(collectionDoubleClickListener);
@@ -190,7 +190,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         form.setText("Visit Drawn Date: " + date);
         setPatientVisitValues();
         table.setCollection(patientVisit.getPvSourceVesselCollection());
-        aliquotWidget.setCollection(patientVisit.getAliquotCollection());
+        aliquotWidget.setCollection(patientVisit.getSpecimenCollection());
     }
 
     private void retrievePatientVisit() {

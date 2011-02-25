@@ -15,7 +15,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.ContainerType;
@@ -580,21 +580,21 @@ public class TestContainerType extends TestDatabase {
     }
 
     @Test
-    public void testGetSampleTypeCollection() throws Exception {
+    public void testGetSpecimenTypeCollection() throws Exception {
         addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
-        Collection<SampleTypeWrapper> childTypeL3SampleTypes = childTypeL3
-            .getSampleTypeCollection(false);
+        Collection<SpecimenTypeWrapper> childTypeL3SampleTypes = childTypeL3
+            .getSpecimenTypeCollection(false);
         Assert.assertTrue((childTypeL3SampleTypes == null)
             || (childTypeL3SampleTypes.size() == 0));
 
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSampleTypes(appService, true);
-        List<SampleTypeWrapper> selectedSampleTypes = TestCommon
+        List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
         // get list of unselected sample types
-        List<SampleTypeWrapper> unselectedSampleTypes = new ArrayList<SampleTypeWrapper>();
-        for (SampleTypeWrapper sampleType : allSampleTypes) {
+        List<SpecimenTypeWrapper> unselectedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        for (SpecimenTypeWrapper sampleType : allSampleTypes) {
             if (!selectedSampleTypes.contains(sampleType)) {
                 unselectedSampleTypes.add(sampleType);
             }
@@ -602,16 +602,16 @@ public class TestContainerType extends TestDatabase {
         childTypeL3.addToSampleTypeCollection(selectedSampleTypes);
         childTypeL3.persist();
         childTypeL3.reload();
-        childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection(false);
+        childTypeL3SampleTypes = childTypeL3.getSpecimenTypeCollection(false);
         Assert.assertEquals(selectedSampleTypes.size(),
             childTypeL3SampleTypes.size());
-        for (SampleTypeWrapper type : selectedSampleTypes) {
+        for (SpecimenTypeWrapper type : selectedSampleTypes) {
             Assert.assertTrue(childTypeL3SampleTypes.contains(type));
         }
 
         childTypeL3.removeFromSampleTypeCollection(childTypeL3
-            .getSampleTypeCollection());
-        childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection();
+            .getSpecimenTypeCollection());
+        childTypeL3SampleTypes = childTypeL3.getSpecimenTypeCollection();
         Assert.assertTrue((childTypeL3SampleTypes == null)
             || (childTypeL3SampleTypes.size() == 0));
     }
@@ -621,25 +621,25 @@ public class TestContainerType extends TestDatabase {
         addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
 
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSampleTypes(appService, true);
-        List<SampleTypeWrapper> selectedSampleTypes = TestCommon
+        List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
 
         childTypeL3.addToSampleTypeCollection(selectedSampleTypes);
         childTypeL3.persist();
         childTypeL3.reload();
-        List<SampleTypeWrapper> childTypeL3SampleTypes = childTypeL3
-            .getSampleTypeCollection(false);
+        List<SpecimenTypeWrapper> childTypeL3SampleTypes = childTypeL3
+            .getSpecimenTypeCollection(false);
         Assert.assertEquals(selectedSampleTypes.size(),
             childTypeL3SampleTypes.size());
-        for (SampleTypeWrapper type : selectedSampleTypes) {
+        for (SpecimenTypeWrapper type : selectedSampleTypes) {
             Assert.assertTrue(childTypeL3SampleTypes.contains(type));
         }
 
         childTypeL3.removeFromSampleTypeCollection(childTypeL3
-            .getSampleTypeCollection());
-        childTypeL3SampleTypes = childTypeL3.getSampleTypeCollection();
+            .getSpecimenTypeCollection());
+        childTypeL3SampleTypes = childTypeL3.getSpecimenTypeCollection();
         Assert.assertTrue((childTypeL3SampleTypes == null)
             || (childTypeL3SampleTypes.size() == 0));
     }
@@ -649,9 +649,9 @@ public class TestContainerType extends TestDatabase {
         addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
 
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSampleTypes(appService, true);
-        List<SampleTypeWrapper> selectedSampleTypes = TestCommon
+        List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
 
         childTypeL3.addToSampleTypeCollection(selectedSampleTypes);
@@ -683,7 +683,7 @@ public class TestContainerType extends TestDatabase {
         ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
             site, patient, Utils.getRandomDate(), Utils.getRandomDate());
         AliquotHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);
-        AliquotWrapper aliquot = AliquotHelper.addAliquot(
+        SpecimenWrapper aliquot = AliquotHelper.addAliquot(
             selectedSampleTypes.get(1), cont3, pv, 0, 1);
 
         childTypeL3.removeFromSampleTypeCollection(Arrays
@@ -704,18 +704,18 @@ public class TestContainerType extends TestDatabase {
     }
 
     @Test
-    public void testGetSampleTypesRecursively() throws Exception {
+    public void testGetSpecimenTypesRecursively() throws Exception {
         ContainerTypeWrapper topType, childTypeL3;
 
         topType = addContainerTypeHierarchy(containerTypeMap.get("TopCT"));
         childTypeL3 = containerTypeMap.get("ChildCtL3");
-        Collection<SampleTypeWrapper> collection = topType
-            .getSampleTypesRecursively();
+        Collection<SpecimenTypeWrapper> collection = topType
+            .getSpecimenTypesRecursively();
         Assert.assertEquals(0, collection.size());
 
-        List<SampleTypeWrapper> allSampleTypes = SampleTypeWrapper
+        List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSampleTypes(appService, true);
-        List<SampleTypeWrapper> selectedSampleTypes = TestCommon
+        List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
 
         childTypeL3 = TestCommon.addSampleTypes(childTypeL3,
@@ -723,17 +723,17 @@ public class TestContainerType extends TestDatabase {
         childTypeL3.addToSampleTypeCollection(selectedSampleTypes);
         childTypeL3.persist();
         topType.reload();
-        collection = topType.getSampleTypesRecursively();
+        collection = topType.getSpecimenTypesRecursively();
         Assert.assertEquals(selectedSampleTypes.size(), collection.size());
-        for (SampleTypeWrapper type : selectedSampleTypes) {
+        for (SpecimenTypeWrapper type : selectedSampleTypes) {
             Assert.assertTrue(collection.contains(type));
         }
 
         childTypeL3.removeFromSampleTypeCollection(childTypeL3
-            .getSampleTypeCollection());
+            .getSpecimenTypeCollection());
         childTypeL3.persist();
         topType.reload();
-        collection = topType.getSampleTypesRecursively();
+        collection = topType.getSpecimenTypesRecursively();
         Assert.assertTrue((collection == null) || (collection.size() == 0));
     }
 

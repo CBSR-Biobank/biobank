@@ -91,7 +91,7 @@ public class PvListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         info.departed = pv.getCollectionEvent().getDeparted();
         info.clinic = pv.getCollectionEvent().getClinic().getNameShort();
         info.numSVs = pv.getPvSourceVesselCollection().size();
-        info.numAliquots = pv.getAliquotCollection().size();
+        info.numAliquots = pv.getSpecimenCollection().size();
         return info;
     }
 

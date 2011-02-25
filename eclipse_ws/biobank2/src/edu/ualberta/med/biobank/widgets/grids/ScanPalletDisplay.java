@@ -13,7 +13,7 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -135,9 +135,9 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
             PalletCell cell =
                 (PalletCell) cells.get(new RowColPos(indexRow, indexCol));
             if (cell != null) {
-                AliquotWrapper aliquot = cell.getAliquot();
+                SpecimenWrapper aliquot = cell.getSpecimen();
                 if (aliquot != null) {
-                    return aliquot.getSampleType().getNameShort();
+                    return aliquot.getSpecimenType().getNameShort();
                 }
             }
         }

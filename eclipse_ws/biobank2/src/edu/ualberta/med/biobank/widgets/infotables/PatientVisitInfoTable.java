@@ -6,7 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
@@ -73,7 +73,7 @@ public class PatientVisitInfoTable extends InfoTableWidget<ProcessingEventWrappe
         info.visit = visit;
         info.dateProcessed = visit.getFormattedDateProcessed();
         info.dateDrawn = visit.getFormattedDateDrawn();
-        List<AliquotWrapper> samples = visit.getAliquotCollection();
+        List<SpecimenWrapper> samples = visit.getSpecimenCollection();
         if (samples != null) {
             info.sampleCount = samples.size();
         }

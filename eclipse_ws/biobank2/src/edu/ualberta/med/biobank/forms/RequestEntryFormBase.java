@@ -17,9 +17,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchItemState;
 import edu.ualberta.med.biobank.common.util.RequestState;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.dialogs.RequestShippedDialog;
@@ -227,13 +227,13 @@ public class RequestEntryFormBase extends BiobankFormBase {
 
     public static AliquotInfo getInfoForInventoryId(
         ModelWrapper<?> currentShipment, String inventoryId) {
-        RequestAliquotWrapper dsa = ((RequestWrapper) currentShipment)
+        RequestSpecimenWrapper dsa = ((RequestWrapper) currentShipment)
             .getRequestAliquot(inventoryId);
         if (dsa == null) {
             // aliquot not in shipment. Check if exists in DB:
-            AliquotWrapper aliquot = null;
+            SpecimenWrapper aliquot = null;
             try {
-                aliquot = AliquotWrapper.getAliquot(
+                aliquot = SpecimenWrapper.getSpecimen(
                     currentShipment.getAppService(), inventoryId,
                     SessionManager.getUser());
             } catch (Exception ae) {
@@ -245,11 +245,11 @@ public class RequestEntryFormBase extends BiobankFormBase {
             return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
         }
         if (DispatchItemState.RECEIVED.isEquals(dsa.getState())) {
-            return new AliquotInfo(dsa.getAliquot(), ResType.RECEIVED);
+            return new AliquotInfo(dsa.getSpecimen(), ResType.RECEIVED);
         }
         if (DispatchItemState.EXTRA.isEquals(dsa.getState())) {
-            return new AliquotInfo(dsa.getAliquot(), ResType.EXTRA);
+            return new AliquotInfo(dsa.getSpecimen(), ResType.EXTRA);
         }
-        return new AliquotInfo(dsa.getAliquot(), ResType.OK);
+        return new AliquotInfo(dsa.getSpecimen(), ResType.OK);
     }
 }

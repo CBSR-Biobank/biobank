@@ -21,8 +21,8 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -229,7 +229,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(parent,
             dispatch, edit) {
             @Override
-            public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
+            public List<DispatchSpecimenWrapper> getInternalDispatchAliquots() {
                 return dispatch.getNonProcessedDispatchAliquotCollection();
             }
 
@@ -241,10 +241,10 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                 Object selection = event.getSelection();
                 if (selection instanceof InfoTableSelection) {
                     InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                    DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) tableSelection
+                    DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) tableSelection
                         .getObject();
                     if (dsa != null) {
-                        SessionManager.openViewForm(dsa.getAliquot());
+                        SessionManager.openViewForm(dsa.getSpecimen());
                     }
                 }
             }
@@ -270,7 +270,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     protected void addAliquot(String inventoryId) {
         if (!inventoryId.isEmpty()) {
             try {
-                AliquotWrapper existingAliquot = AliquotWrapper.getAliquot(
+                SpecimenWrapper existingAliquot = SpecimenWrapper.getSpecimen(
                     dispatch.getAppService(), inventoryId,
                     SessionManager.getUser());
                 if (existingAliquot == null)
@@ -287,8 +287,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         }
     }
 
-    private void addAliquot(AliquotWrapper aliquot) {
-        List<AliquotWrapper> aliquots = dispatch.getAliquotCollection();
+    private void addAliquot(SpecimenWrapper aliquot) {
+        List<SpecimenWrapper> aliquots = dispatch.getSpecimenCollection();
         if (aliquots != null && aliquots.contains(aliquot)) {
             BioBankPlugin.openAsyncError("Error",
                 "Aliquot " + aliquot.getInventoryId()

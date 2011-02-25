@@ -122,7 +122,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMoreProcessingEvents();
         checkNoMoreSourceVessels();
-        if (getAliquotsCount(false) > 0)
+        if (getSpecimensCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
                 + " because patient has samples stored in database.");
@@ -155,7 +155,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         + Property.concatNames(ProcessingEventPeer.PATIENT, PatientPeer.ID)
         + "=?";
 
-    public long getAliquotsCount(boolean fast) throws BiobankException,
+    public long getSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
@@ -166,7 +166,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         List<ProcessingEventWrapper> pvs = getProcessingEventCollection(false);
         if (pvs != null)
             for (ProcessingEventWrapper pv : pvs)
-                total += pv.getAliquotsCount(false);
+                total += pv.getSpecimensCount(false);
         return total;
     }
 

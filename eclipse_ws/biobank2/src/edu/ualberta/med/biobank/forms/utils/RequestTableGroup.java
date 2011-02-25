@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.RequestAliquotState;
+import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
@@ -23,12 +23,12 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class RequestTableGroup implements Node {
 
     private Integer numAliquots = 0;
-    private RequestAliquotState state;
+    private RequestSpecimenState state;
     private List<Object> tops;
     private static final Pattern p = Pattern.compile("/");
     private Object parent = null;
 
-    private RequestTableGroup(RequestAliquotState state, RequestWrapper request) {
+    private RequestTableGroup(RequestSpecimenState state, RequestWrapper request) {
         this.state = state;
         getAdapterTree(state.getId(), request);
     }
@@ -45,11 +45,11 @@ public class RequestTableGroup implements Node {
     public static List<RequestTableGroup> getGroupsForShipment(
         RequestWrapper ship) {
         List<RequestTableGroup> groups = new ArrayList<RequestTableGroup>();
-        groups.add(new RequestTableGroup(RequestAliquotState.PROCESSED_STATE,
+        groups.add(new RequestTableGroup(RequestSpecimenState.PROCESSED_STATE,
             ship));
         groups.add(new RequestTableGroup(
-            RequestAliquotState.NONPROCESSED_STATE, ship));
-        groups.add(new RequestTableGroup(RequestAliquotState.UNAVAILABLE_STATE,
+            RequestSpecimenState.NONPROCESSED_STATE, ship));
+        groups.add(new RequestTableGroup(RequestSpecimenState.UNAVAILABLE_STATE,
             ship));
         return groups;
     }
@@ -103,7 +103,7 @@ public class RequestTableGroup implements Node {
             }
             adapters.get(Integer.parseInt(cIds[i - 1])).addChild(
                 new RequestAliquotAdapter(adapters.get(Integer
-                    .parseInt(cIds[i - 1])), new RequestAliquotWrapper(
+                    .parseInt(cIds[i - 1])), new RequestSpecimenWrapper(
                     SessionManager.getAppService(), ra)));
             numAliquots++;
         }

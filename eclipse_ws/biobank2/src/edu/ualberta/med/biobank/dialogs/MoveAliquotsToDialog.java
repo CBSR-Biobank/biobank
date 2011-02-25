@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -163,8 +163,8 @@ public class MoveAliquotsToDialog extends BiobankDialog {
 
     protected void buildContainersMap() {
         map.clear();
-        List<SampleTypeWrapper> typesFromOlContainer = oldContainer
-            .getContainerType().getSampleTypeCollection();
+        List<SpecimenTypeWrapper> typesFromOlContainer = oldContainer
+            .getContainerType().getSpecimenTypeCollection();
         List<ContainerWrapper> conts = new ArrayList<ContainerWrapper>();
         if (siteCombo.getSelectedSite() != null)
             try {

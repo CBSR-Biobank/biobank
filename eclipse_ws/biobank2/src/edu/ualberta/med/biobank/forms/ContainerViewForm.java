@@ -34,7 +34,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -123,7 +123,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
         createContainerSection();
 
-        if (container.getContainerType().getSampleTypeCollection().size() > 0) {
+        if (container.getContainerType().getSpecimenTypeCollection().size() > 0) {
             // only show aliquots section this if this container type does not
             // have child containers
             createAliquotsSection();
@@ -489,8 +489,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createAliquotsSection() {
         Composite parent = createSectionWithClient("Aliquots");
-        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>(container
-            .getAliquots().values());
+        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>(container
+            .getSpecimens().values());
         aliquotsWidget = new AliquotListInfoTable(parent, aliquots);
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addClickListener(collectionDoubleClickListener);
@@ -522,8 +522,8 @@ public class ContainerViewForm extends BiobankViewForm {
             }
 
             if (aliquotsWidget != null) {
-                aliquotsWidget.reloadCollection(new ArrayList<AliquotWrapper>(
-                    container.getAliquots().values()));
+                aliquotsWidget.reloadCollection(new ArrayList<SpecimenWrapper>(
+                    container.getSpecimens().values()));
             }
         }
     }

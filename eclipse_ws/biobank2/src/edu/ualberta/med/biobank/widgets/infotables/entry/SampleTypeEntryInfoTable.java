@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.SampleTypeDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -34,11 +34,11 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SampleTypeEntryInfoTable.class.getName());
 
-    private List<SampleTypeWrapper> selectedSampleTypes;
+    private List<SpecimenTypeWrapper> selectedSampleTypes;
 
-    private List<SampleTypeWrapper> addedOrModifiedSampleTypes;
+    private List<SpecimenTypeWrapper> addedOrModifiedSampleTypes;
 
-    private List<SampleTypeWrapper> deletedSampleTypes;
+    private List<SpecimenTypeWrapper> deletedSampleTypes;
 
     private String addMessage;
 
@@ -54,7 +54,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
      *            displayed in the table viewer (can be null).
      */
     public SampleTypeEntryInfoTable(Composite parent,
-        List<SampleTypeWrapper> sampleTypeCollection, String addMessage,
+        List<SpecimenTypeWrapper> sampleTypeCollection, String addMessage,
         String editMessage, SiteWrapper currentSite) {
         super(parent, sampleTypeCollection);
         setLists(sampleTypeCollection);
@@ -74,13 +74,13 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
      * @param message The message to display in the SampleTypeDialog.
      */
     public void addSampleType() {
-        SampleTypeWrapper newST = new SampleTypeWrapper(
+        SpecimenTypeWrapper newST = new SpecimenTypeWrapper(
             SessionManager.getAppService());
         addOrEditSampleType(true, newST, addMessage);
     }
 
     private boolean addOrEditSampleType(boolean add,
-        SampleTypeWrapper sampleType, String message) {
+        SpecimenTypeWrapper sampleType, String message) {
         SampleTypeDialog dlg = new SampleTypeDialog(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), sampleType, message);
         if (dlg.open() == Dialog.OK) {
@@ -94,7 +94,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                 notifyListeners();
                 return true;
             } else {
-                SampleTypeWrapper orig = dlg.getOrigSampleType();
+                SpecimenTypeWrapper orig = dlg.getOrigSampleType();
                 sampleType.setName(orig.getName());
                 sampleType.setNameShort(orig.getNameShort());
                 reloadCollection(selectedSampleTypes);
@@ -104,7 +104,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
     }
 
     private void addEditSupport() {
-        if (SessionManager.canCreate(SampleTypeWrapper.class, null)) {
+        if (SessionManager.canCreate(SpecimenTypeWrapper.class, null)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
@@ -113,22 +113,22 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
             });
         }
 
-        if (SessionManager.canUpdate(SampleTypeWrapper.class, null)) {
+        if (SessionManager.canUpdate(SpecimenTypeWrapper.class, null)) {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    SampleTypeWrapper type = (SampleTypeWrapper) getSelection();
+                    SpecimenTypeWrapper type = (SpecimenTypeWrapper) getSelection();
                     if (type != null)
                         addOrEditSampleType(false, type, editMessage);
                 }
             });
         }
 
-        if (SessionManager.canDelete(SampleTypeWrapper.class, null)) {
+        if (SessionManager.canDelete(SpecimenTypeWrapper.class, null)) {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
-                    SampleTypeWrapper sampleType = (SampleTypeWrapper) getSelection();
+                    SpecimenTypeWrapper sampleType = (SpecimenTypeWrapper) getSelection();
                     if (sampleType != null) {
                         try {
                             if (!sampleType.isNew()
@@ -167,15 +167,15 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         }
     }
 
-    private boolean addEditOk(SampleTypeWrapper type) {
+    private boolean addEditOk(SpecimenTypeWrapper type) {
         try {
-            for (SampleTypeWrapper st : selectedSampleTypes)
+            for (SpecimenTypeWrapper st : selectedSampleTypes)
                 if (st.getId() != type.getId()
                     && (st.getName().equals(type.getName()) || st
                         .getNameShort().equals(type.getNameShort())))
                     throw new BiobankCheckException(
                         "That sample type has already been added.");
-            for (SampleTypeWrapper st : addedOrModifiedSampleTypes)
+            for (SpecimenTypeWrapper st : addedOrModifiedSampleTypes)
                 if (st.getId() != type.getId()
                     && (st.getName().equals(type.getName()) || st
                         .getNameShort().equals(type.getNameShort())))
@@ -192,24 +192,24 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         return true;
     }
 
-    public List<SampleTypeWrapper> getAddedOrModifiedSampleTypes() {
+    public List<SpecimenTypeWrapper> getAddedOrModifiedSampleTypes() {
         return addedOrModifiedSampleTypes;
     }
 
-    public List<SampleTypeWrapper> getDeletedSampleTypes() {
+    public List<SpecimenTypeWrapper> getDeletedSampleTypes() {
         return deletedSampleTypes;
     }
 
-    public void setLists(List<SampleTypeWrapper> sampleTypeCollection) {
+    public void setLists(List<SpecimenTypeWrapper> sampleTypeCollection) {
         if (sampleTypeCollection == null) {
-            selectedSampleTypes = new ArrayList<SampleTypeWrapper>();
+            selectedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
         } else {
-            selectedSampleTypes = new ArrayList<SampleTypeWrapper>(
+            selectedSampleTypes = new ArrayList<SpecimenTypeWrapper>(
                 sampleTypeCollection);
         }
         reloadCollection(sampleTypeCollection);
-        addedOrModifiedSampleTypes = new ArrayList<SampleTypeWrapper>();
-        deletedSampleTypes = new ArrayList<SampleTypeWrapper>();
+        addedOrModifiedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        deletedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
     }
 
     public SiteWrapper getCurrentSite() {
@@ -221,8 +221,8 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
         return new BiobankTableSorter() {
             @Override
             public int compare(Object e1, Object e2) {
-                return super.compare(((SampleTypeWrapper) e1).getName(),
-                    ((SampleTypeWrapper) e2).getName());
+                return super.compare(((SpecimenTypeWrapper) e1).getName(),
+                    ((SpecimenTypeWrapper) e2).getName());
             }
         };
     }

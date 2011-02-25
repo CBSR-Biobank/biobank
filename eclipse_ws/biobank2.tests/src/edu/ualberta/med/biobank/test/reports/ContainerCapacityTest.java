@@ -49,8 +49,8 @@ public class ContainerCapacityTest extends AbstractReportTest {
                     .getRowCapacity()
                     * container.getContainerType().getColCapacity();
 
-                if (container.getAliquots() != null) {
-                    row.usedSlots += container.getAliquots().size();
+                if (container.getSpecimens() != null) {
+                    row.usedSlots += container.getSpecimens().size();
                 }
 
                 return row;

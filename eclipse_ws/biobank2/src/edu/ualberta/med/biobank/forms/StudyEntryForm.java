@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.GlobalPvAttrWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -166,7 +166,7 @@ public class StudyEntryForm extends BiobankEntryForm {
                 public void widgetSelected(SelectionEvent e) {
                     sampleStorageEntryTable.addSampleStorage();
                 }
-            }, SampleStorageWrapper.class);
+            }, AliquotedSpecimenWrapper.class);
         section.setClient(sampleStorageEntryTable);
     }
 

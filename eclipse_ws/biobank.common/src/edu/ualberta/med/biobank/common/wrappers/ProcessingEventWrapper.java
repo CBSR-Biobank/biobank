@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.PvAttrPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPvAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.Log;
@@ -32,7 +32,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
 
-    private Map<String, PvAttrWrapper> pvAttrMap;
+    private Map<String, EventAttrWrapper> pvAttrMap;
 
     private Set<SourceVesselWrapper> deletedSourceVessels = new HashSet<SourceVesselWrapper>();
 
@@ -50,10 +50,10 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      * 
      * @throws BiobankCheckException
      */
-    public void addAliquots(List<AliquotWrapper> aliquots)
+    public void addAliquots(List<SpecimenWrapper> aliquots)
         throws BiobankCheckException {
         if (aliquots != null && aliquots.size() > 0) {
-            List<SampleStorageWrapper> sampleStorages = getPatient().getStudy()
+            List<AliquotedSpecimenWrapper> sampleStorages = getPatient().getStudy()
                 .getSampleStorageCollection(false);
             if (sampleStorages == null || sampleStorages.size() == 0) {
                 throw new BiobankCheckException(
@@ -61,11 +61,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             }
 
             Collection<Aliquot> allAliquotObjects = new HashSet<Aliquot>();
-            List<AliquotWrapper> allAliquotWrappers = new ArrayList<AliquotWrapper>();
+            List<SpecimenWrapper> allAliquotWrappers = new ArrayList<SpecimenWrapper>();
             // already added
-            List<AliquotWrapper> currentList = getAliquotCollection(false);
+            List<SpecimenWrapper> currentList = getSpecimenCollection(false);
             if (currentList != null) {
-                for (AliquotWrapper aliquot : currentList) {
+                for (SpecimenWrapper aliquot : currentList) {
                     allAliquotObjects.add(aliquot.getWrappedObject());
                     allAliquotWrappers.add(aliquot);
                 }
@@ -74,11 +74,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
             // will set the adequate volume to the added aliquots
             Map<Integer, Double> typesVolumes = new HashMap<Integer, Double>();
-            for (SampleStorageWrapper ss : sampleStorages) {
-                typesVolumes.put(ss.getSampleType().getId(), ss.getVolume());
+            for (AliquotedSpecimenWrapper ss : sampleStorages) {
+                typesVolumes.put(ss.getSpecimenType().getId(), ss.getVolume());
             }
-            for (AliquotWrapper aliquot : aliquots) {
-                aliquot.setQuantity(typesVolumes.get(aliquot.getSampleType()
+            for (SpecimenWrapper aliquot : aliquots) {
+                aliquot.setQuantity(typesVolumes.get(aliquot.getSpecimenType()
                     .getId()));
                 aliquot.setProcessingEvent(this);
                 allAliquotObjects.add(aliquot.getWrappedObject());
@@ -106,15 +106,15 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return studyPvAttrMap;
     }
 
-    private Map<String, PvAttrWrapper> getPvAttrMap() {
+    private Map<String, EventAttrWrapper> getPvAttrMap() {
         getStudyPvAttrMap();
         if (pvAttrMap != null)
             return pvAttrMap;
 
-        pvAttrMap = new HashMap<String, PvAttrWrapper>();
-        List<PvAttrWrapper> pvAttrCollection = getPvAttrCollection(false);
+        pvAttrMap = new HashMap<String, EventAttrWrapper>();
+        List<EventAttrWrapper> pvAttrCollection = getPvAttrCollection(false);
         if (pvAttrCollection != null) {
-            for (PvAttrWrapper pvAttr : pvAttrCollection) {
+            for (EventAttrWrapper pvAttr : pvAttrCollection) {
                 pvAttrMap.put(pvAttr.getStudyPvAttr().getLabel(), pvAttr);
             }
         }
@@ -128,7 +128,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     public String getPvAttrValue(String label) throws Exception {
         getPvAttrMap();
-        PvAttrWrapper pvAttr = pvAttrMap.get(label);
+        EventAttrWrapper pvAttr = pvAttrMap.get(label);
         if (pvAttr == null) {
             StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
             // make sure "label" is a valid study pv attr
@@ -144,7 +144,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     public String getPvAttrTypeName(String label) throws Exception {
         getPvAttrMap();
-        PvAttrWrapper pvAttr = pvAttrMap.get(label);
+        EventAttrWrapper pvAttr = pvAttrMap.get(label);
         StudyPvAttrWrapper studyPvAttr = null;
         if (pvAttr != null) {
             studyPvAttr = pvAttr.getStudyPvAttr();
@@ -161,7 +161,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     public String[] getPvAttrPermissible(String label) throws Exception {
         getPvAttrMap();
-        PvAttrWrapper pvAttr = pvAttrMap.get(label);
+        EventAttrWrapper pvAttr = pvAttrMap.get(label);
         StudyPvAttrWrapper studyPvAttr = null;
         if (pvAttr != null) {
             studyPvAttr = pvAttr.getStudyPvAttr();
@@ -198,7 +198,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      */
     public void setPvAttrValue(String label, String value) throws Exception {
         getPvAttrMap();
-        PvAttrWrapper pvAttr = pvAttrMap.get(label);
+        EventAttrWrapper pvAttr = pvAttrMap.get(label);
         StudyPvAttrWrapper studyPvAttr = null;
 
         if (pvAttr != null) {
@@ -258,7 +258,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         }
 
         if (pvAttr == null) {
-            pvAttr = new PvAttrWrapper(appService);
+            pvAttr = new EventAttrWrapper(appService);
             pvAttr.setProcessingEvent(this);
             pvAttr.setStudyPvAttr(studyPvAttr);
             pvAttrMap.put(label, pvAttr);
@@ -295,7 +295,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (getAliquotsCount(false) > 0) {
+        if (getSpecimensCount(false) > 0) {
             throw new BiobankCheckException("Unable to delete patient visit "
                 + getDateProcessed()
                 + " since it has samples stored in database.");
@@ -308,17 +308,17 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         + Property.concatNames(AliquotPeer.PROCESSING_EVENT,
             ProcessingEventPeer.ID) + "=?";
 
-    public long getAliquotsCount(boolean fast) throws BiobankException,
+    public long getSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
-        List<AliquotWrapper> list = getAliquotCollection(false);
+        List<SpecimenWrapper> list = getSpecimenCollection(false);
         if (list == null)
             return 0;
-        return getAliquotCollection(false).size();
+        return getSpecimenCollection(false).size();
     }
 
     @Override

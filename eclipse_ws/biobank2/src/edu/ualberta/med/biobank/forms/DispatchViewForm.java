@@ -26,7 +26,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -160,7 +160,7 @@ public class DispatchViewForm extends BiobankViewForm {
             aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(
                 parent, dispatch, false) {
                 @Override
-                public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
+                public List<DispatchSpecimenWrapper> getInternalDispatchAliquots() {
                     return dispatch.getNonProcessedDispatchAliquotCollection();
                 }
 
@@ -173,10 +173,10 @@ public class DispatchViewForm extends BiobankViewForm {
                         Object selection = event.getSelection();
                         if (selection instanceof InfoTableSelection) {
                             InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                            DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) tableSelection
+                            DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) tableSelection
                                 .getObject();
                             if (dsa != null) {
-                                SessionManager.openViewForm(dsa.getAliquot());
+                                SessionManager.openViewForm(dsa.getSpecimen());
                             }
                         }
                     }

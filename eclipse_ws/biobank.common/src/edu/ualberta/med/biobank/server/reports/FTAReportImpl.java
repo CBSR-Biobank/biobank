@@ -5,7 +5,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -50,8 +50,8 @@ public class FTAReportImpl extends AbstractReport {
             String inventoryId = a.getInventoryId();
             String dateProcessed = DateFormatter.formatAsDate(a
                 .getProcessingEvent().getDateProcessed());
-            String stName = a.getSampleType().getNameShort();
-            AliquotWrapper aliquotWrapper = new AliquotWrapper(appService, a);
+            String stName = a.getSpecimenType().getNameShort();
+            SpecimenWrapper aliquotWrapper = new SpecimenWrapper(appService, a);
             String aliquotLabel = aliquotWrapper.getPositionString(true, true);
             modifiedResults.add(new Object[] { pnumber, dateProcessed,
                 inventoryId, stName,

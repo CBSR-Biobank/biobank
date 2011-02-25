@@ -7,7 +7,7 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Aliquot;
 import edu.ualberta.med.biobank.model.AliquotPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -39,7 +39,7 @@ public class AliquotRequestImpl extends AbstractReport {
 
             c = new HQLCriteria(queryString);
             c.setParameters(Arrays.asList(new Object[] { request.getPnumber(),
-                request.getDateDrawn(), request.getSampleTypeNameShort() }));
+                request.getDateDrawn(), request.getSpecimenTypeNameShort() }));
             // need to limit query size but not possible in hql
             List<Object> queried = appService.query(c);
 
@@ -50,7 +50,7 @@ public class AliquotRequestImpl extends AbstractReport {
             }
             if (queried.size() < maxResults)
                 results.add(getNotFoundRow(request.getPnumber(),
-                    request.getDateDrawn(), request.getSampleTypeNameShort(),
+                    request.getDateDrawn(), request.getSpecimenTypeNameShort(),
                     maxResults, queried.size()));
         }
         return results;
@@ -77,8 +77,8 @@ public class AliquotRequestImpl extends AbstractReport {
                     .getPnumber();
                 String inventoryId = aliquot.getInventoryId();
                 Date dateDrawn = aliquot.getProcessingEvent().getDateDrawn();
-                String stName = aliquot.getSampleType().getNameShort();
-                String aliquotLabel = new AliquotWrapper(appService, aliquot)
+                String stName = aliquot.getSpecimenType().getNameShort();
+                String aliquotLabel = new SpecimenWrapper(appService, aliquot)
                     .getPositionString(true, false);
                 String activityStatus = aliquot.getActivityStatus().getName();
                 modifiedResults.add(new Object[] { pnumber, inventoryId,
