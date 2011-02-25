@@ -1529,21 +1529,9 @@
                standalone="false"
                visible="true">
          </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.RequestAdminView"
-               minimized="false"
-               moveable="false"
-               ratio="0.20"
-               relationship="stack"
-               relative="edu.ualberta.med.biobank.views.DispatchAdministrationView"
-               showTitle="false"
-               standalone="false"
-               visible="true">
-         </view>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.aliquotsManagement">
+            targetID="edu.ualberta.med.biobank.perspective.linkAssign">
          <view
                closeable="false"
                id="org.eclipse.ui.console.ConsoleView"
@@ -2360,14 +2348,6 @@
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.views.LoggingView"
             name="Logging"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.RequestAdministrationView"
-            icon="icons/request.png"
-            id="edu.ualberta.med.biobank.views.RequestAdminView"
-            name="Requests"
             restorable="true">
       </view>
    </extension>

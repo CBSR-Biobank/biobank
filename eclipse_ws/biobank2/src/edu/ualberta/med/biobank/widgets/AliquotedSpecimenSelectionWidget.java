@@ -23,7 +23,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
@@ -31,6 +30,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
@@ -38,27 +38,35 @@ import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
  * one combo with different types and one text showing total number of samples
  * found
  */
-public class SampleTypeSelectionWidget {
-    private Combo combo;
-    private ComboViewer cv;
+public class AliquotedSpecimenSelectionWidget {
+    private ComboViewer cvSource;
+    private ComboViewer cvResult;
     private ControlDecoration controlDecoration;
     private Label textNumber;
     private Integer number;
 
-    private IObservableValue selectionDone = new WritableValue(Boolean.TRUE,
+    private IObservableValue selectionsDone = new WritableValue(Boolean.TRUE,
         Boolean.class);
+    // [source|result]
+    private Boolean[] selections = new Boolean[2];
     private Binding binding;
     private Object nextWidget;
 
-    public SampleTypeSelectionWidget(Composite parent, Character letter,
-        List<SampleTypeWrapper> types, FormToolkit toolkit) {
+    public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
+        List<SourceVesselWrapper> sourceTypes,
+        List<SampleTypeWrapper> resultTypes, FormToolkit toolkit) {
 
         if (letter != null) {
             toolkit.createLabel(parent, letter.toString(), SWT.LEFT);
         }
 
-        createCombo(parent, types);
-        toolkit.adapt(combo, true, true);
+        cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
+            | SWT.BORDER);
+        setComboProperties(cvSource, toolkit, sourceTypes, 0);
+
+        cvResult = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
+            | SWT.BORDER);
+        setComboProperties(cvResult, toolkit, resultTypes, 1);
 
         textNumber = toolkit.createLabel(parent, "", SWT.BORDER);
         GridData data = new GridData();
@@ -66,21 +74,27 @@ public class SampleTypeSelectionWidget {
         data.horizontalAlignment = SWT.LEFT;
         textNumber.setLayoutData(data);
 
-        controlDecoration = BiobankWidget.createDecorator(combo,
-            "A sample type should be selected");
         setNumber(null);
+
+        controlDecoration = BiobankWidget
+            .createDecorator(textNumber,
+                "A source specimen type and an aliquoted specimen type should be selected");
     }
 
-    private void createCombo(Composite parent, List<SampleTypeWrapper> types) {
-        combo = new Combo(parent, SWT.DROP_DOWN | SWT.READ_ONLY | SWT.BORDER);
-        combo.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
-
-        cv = new ComboViewer(combo);
+    private void setComboProperties(ComboViewer cv, FormToolkit toolkit,
+        List<?> types, final int selectionPosition) {
+        cv.getControl().setLayoutData(
+            new GridData(SWT.FILL, SWT.TOP, true, false));
+        toolkit.adapt(cv.getControl(), true, true);
         cv.setContentProvider(new ArrayContentProvider());
         cv.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((SampleTypeWrapper) element).getName();
+                if (element instanceof SampleTypeWrapper)
+                    return ((SampleTypeWrapper) element).getName();
+                if (element instanceof SourceVesselWrapper)
+                    return ((SourceVesselWrapper) element).getName();
+                return null;
             }
         });
         cv.addSelectionChangedListener(new ISelectionChangedListener() {
@@ -88,15 +102,16 @@ public class SampleTypeSelectionWidget {
             public void selectionChanged(SelectionChangedEvent event) {
                 if (event.getSelection() == null
                     || ((IStructuredSelection) event.getSelection()).size() == 0) {
-                    selectionDone.setValue(false);
+                    selections[selectionPosition] = false;
                 } else {
-                    selectionDone.setValue(true);
+                    selections[selectionPosition] = true;
                 }
+                selectionsDone.setValue(selections[0] && selections[1]);
             }
         });
         cv.setComparator(new ViewerComparator());
         cv.setInput(types);
-        combo.addTraverseListener(new TraverseListener() {
+        cv.getControl().addTraverseListener(new TraverseListener() {
             @Override
             public void keyTraversed(TraverseEvent e) {
                 if (e.detail == SWT.TRAVERSE_TAB_NEXT
@@ -105,6 +120,7 @@ public class SampleTypeSelectionWidget {
                 }
             }
         });
+
     }
 
     private boolean setNextFocus() {
@@ -112,15 +128,16 @@ public class SampleTypeSelectionWidget {
             if (nextWidget instanceof Control) {
                 ((Control) nextWidget).setFocus();
                 return false; // cancel doit
-            } else if (nextWidget instanceof SampleTypeSelectionWidget) {
-                ((SampleTypeSelectionWidget) nextWidget).combo.setFocus();
+            } else if (nextWidget instanceof AliquotedSpecimenSelectionWidget) {
+                ((AliquotedSpecimenSelectionWidget) nextWidget).cvSource
+                    .getControl().setFocus();
             }
         }
         return true;
     }
 
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
-        cv.addSelectionChangedListener(listener);
+        cvResult.addSelectionChangedListener(listener);
     }
 
     public void setNumber(Integer number) {
@@ -130,11 +147,13 @@ public class SampleTypeSelectionWidget {
             text = number.toString();
         }
         if (number == null || number == 0) {
-            combo.setEnabled(false);
-            selectionDone.setValue(true);
+            cvSource.getControl().setEnabled(false);
+            cvResult.getControl().setEnabled(false);
+            selectionsDone.setValue(true);
         } else {
-            combo.setEnabled(true);
-            selectionDone.setValue(getSelection() != null);
+            cvSource.getControl().setEnabled(true);
+            cvResult.getControl().setEnabled(true);
+            selectionsDone.setValue(getResultSelection() != null);
         }
         textNumber.setText(text);
     }
@@ -144,11 +163,11 @@ public class SampleTypeSelectionWidget {
             number = 0;
         number++;
         setNumber(number);
-        selectionDone.setValue(getSelection() != null);
+        selectionsDone.setValue(getResultSelection() != null);
     }
 
-    public boolean isComboEnabled() {
-        return combo.isEnabled();
+    public boolean canFocus() {
+        return cvSource.getControl().isEnabled();
     }
 
     /**
@@ -162,9 +181,14 @@ public class SampleTypeSelectionWidget {
         }
     }
 
-    public SampleTypeWrapper getSelection() {
-        return (SampleTypeWrapper) ((StructuredSelection) cv.getSelection())
-            .getFirstElement();
+    public SampleTypeWrapper getResultSelection() {
+        return (SampleTypeWrapper) ((StructuredSelection) cvResult
+            .getSelection()).getFirstElement();
+    }
+
+    public SourceVesselWrapper getSourceSelection() {
+        return (SourceVesselWrapper) ((StructuredSelection) cvSource
+            .getSelection()).getFirstElement();
     }
 
     public void addBinding(WidgetCreator dbc) {
@@ -185,7 +209,7 @@ public class SampleTypeSelectionWidget {
                 }
 
             });
-            binding = dbc.bindValue(wv, selectionDone, uvs, uvs);
+            binding = dbc.bindValue(wv, selectionsDone, uvs, uvs);
         } else {
             dbc.addBinding(binding);
         }
@@ -198,8 +222,10 @@ public class SampleTypeSelectionWidget {
     }
 
     public void resetValues(boolean resetSelection, boolean resetNumber) {
-        if (resetSelection)
-            cv.setSelection(null);
+        if (resetSelection) {
+            cvSource.setSelection(null);
+            cvResult.setSelection(null);
+        }
         if (resetNumber)
             setNumber(null);
         else
@@ -225,10 +251,10 @@ public class SampleTypeSelectionWidget {
     }
 
     public void setTypes(List<SampleTypeWrapper> types) {
-        cv.setInput(types);
+        cvResult.setInput(types);
     }
 
     public void setFocus() {
-        combo.setFocus();
+        cvSource.getControl().setFocus();
     }
 }

@@ -38,10 +38,10 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -267,7 +267,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 }
             });
 
-        linkFormPatientManagement.createVisitWidgets(fieldsComposite);
+        linkFormPatientManagement.createCollectionEventWidgets(fieldsComposite);
 
         // inventoryID
         inventoryIDValidator = new CabinetInventoryIDValidator();
@@ -639,9 +639,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             public void run() {
                 try {
                     appendLog("----"); //$NON-NLS-1$
-                    ProcessingEventWrapper pv = linkFormPatientManagement
-                        .getSelectedPatientVisit();
-                    aliquot.setProcessingEvent(pv);
+                    CollectionEventWrapper ce = linkFormPatientManagement
+                        .getSelectedCollectionEvent();
+                    aliquot.setCollectionEvent(ce);
                     if (radioNew.getSelection()) {
                         appendLogNLS("Cabinet.activitylog.checkingId", //$NON-NLS-1$
                             aliquot.getInventoryId());
