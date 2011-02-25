@@ -91,11 +91,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (getCollectionEventCount() > 0) {
-            throw new BiobankCheckException("Unable to delete clinic "
-                + getName()
-                + ". All defined collection events must be removed first.");
-        }
         List<StudyWrapper> studies = getStudyCollection();
         if (studies != null && studies.size() > 0) {
             throw new BiobankCheckException("Unable to delete clinic "
