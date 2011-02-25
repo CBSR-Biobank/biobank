@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 
 public class ShipmentAdapter extends AdapterBase {
 
@@ -69,13 +69,13 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode() {
-        return new PatientVisitAdapter(this, null);
+        return new CollectionEventAdapter(this, null);
     }
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof ProcessingEventWrapper);
-        return new PatientVisitAdapter(this, (ProcessingEventWrapper) child);
+        return new CollectionEventAdapter(this, (ProcessingEventWrapper) child);
     }
 
     @Override

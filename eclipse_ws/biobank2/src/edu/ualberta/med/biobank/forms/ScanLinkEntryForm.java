@@ -611,8 +611,8 @@ public class ScanLinkEntryForm extends AbstractPalletAliquotAdminForm {
                         palletPosition, value, foundAliquot
                             .getProcessingEvent().getFormattedDateProcessed(),
                         foundAliquot.getProcessingEvent().getPatient()
-                            .getPnumber(), foundAliquot.getProcessingEvent()
-                            .getCollectionEvent().getSite().getNameShort());
+                            .getPnumber(), foundAliquot.getCollectionEvent()
+                            .getSite().getNameShort());
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);
                     if (independantProcess) {

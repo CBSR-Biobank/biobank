@@ -73,32 +73,19 @@ public class RequestEntryFormBase extends BiobankFormBase {
             SWT.NONE, "Research Group");
         setTextValue(researchGroupLabel, request.getStudy().getResearchGroup()
             .getNameShort());
-        BiobankText siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Site");
-        setTextValue(siteLabel, request.getSite().getNameShort());
         BiobankText submittedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date Submitted");
         setTextValue(submittedLabel,
             DateFormatter.formatAsDateTime(request.getSubmitted()));
-        BiobankText acceptedLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Date Accepted");
-        setTextValue(acceptedLabel,
-            DateFormatter.formatAsDateTime(request.getAccepted()));
         BiobankText shippedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date Shipped");
-        setTextValue(shippedLabel,
-            DateFormatter.formatAsDateTime(request.getShipped()));
-        BiobankText waybillLabel = createReadOnlyLabelledField(client,
-            SWT.NONE, "Waybill");
-        setTextValue(waybillLabel, request.getWaybill());
         createReadOnlyLabelledField(client, SWT.NONE, "Comments");
         Section s = createSection("Aliquots");
         Composite c = toolkit.createComposite(s);
         s.setClient(c);
         c.setLayout(new GridLayout());
         c.setLayoutData(new GridData());
-        if (request.isInAcceptedState())
-            createAliquotsSelectionActions(c, false);
+        createAliquotsSelectionActions(c, false);
 
         aliquotsTree = new RequestAliquotsTreeTable(c, request);
 

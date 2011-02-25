@@ -72,7 +72,7 @@ public class PatientAdapter extends AdapterBase {
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
-                    PatientVisitAdapter adapter = new PatientVisitAdapter(
+                    CollectionEventAdapter adapter = new CollectionEventAdapter(
                         PatientAdapter.this, new ProcessingEventWrapper(
                             getAppService()));
                     adapter.getWrapper().setPatient(getWrapper());
@@ -89,13 +89,13 @@ public class PatientAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode() {
-        return new PatientVisitAdapter(this, null);
+        return new CollectionEventAdapter(this, null);
     }
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof ProcessingEventWrapper);
-        return new PatientVisitAdapter(this, (ProcessingEventWrapper) child);
+        return new CollectionEventAdapter(this, (ProcessingEventWrapper) child);
     }
 
     @Override

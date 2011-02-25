@@ -599,6 +599,21 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return getDispatchAliquotCollectionWithState(DispatchItemState.RECEIVED);
     }
 
+    public void addExtraAliquots(List<AliquotWrapper> extraAliquots) {
+        List<DispatchAliquotWrapper> daws = new ArrayList<DispatchAliquotWrapper>();
+        for (AliquotWrapper a : extraAliquots) {
+            DispatchAliquotWrapper da = new DispatchAliquotWrapper(appService);
+            da.setAliquot(a);
+            da.setDispatchItemState(DispatchItemState.EXTRA);
+            daws.add(da);
+        }
+        addToDispatchAliquotCollection(daws);
+    }
+
+    public List<DispatchAliquotWrapper> getDispatchSpecimenCollection() {
+        return getDispatchAliquotCollection(false);
+    }
+
     @Deprecated
     public StudyWrapper getStudy() {
         // TODO this can be removed once the gui doesn't use it anymore

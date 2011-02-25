@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientVisitAddHandler extends AbstractHandler {
@@ -24,7 +24,7 @@ public class PatientVisitAddHandler extends AbstractHandler {
             ProcessingEventWrapper pvWrapper = new ProcessingEventWrapper(
                 SessionManager.getAppService());
             pvWrapper.setPatient(patientAdapter.getWrapper());
-            PatientVisitAdapter adapter = new PatientVisitAdapter(
+            CollectionEventAdapter adapter = new CollectionEventAdapter(
                 patientAdapter, pvWrapper);
             adapter.openEntryForm();
         } catch (Exception exp) {

@@ -7,23 +7,23 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.layout.GridLayout;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.widgets.infotables.PvListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CeListInfoTable;
 
-public class PvListViewForm extends BiobankViewForm {
+public class CeListViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PvListViewForm";
 
-    private PvListInfoTable patientVisits;
+    private CeListInfoTable patientVisits;
 
-    private List<ProcessingEventWrapper> pvs;
+    private List<CollectionEventWrapper> pvs;
 
     @SuppressWarnings("unchecked")
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter == null, "adapter should be null");
         FormInput input = (FormInput) getEditorInput();
-        pvs = (List<ProcessingEventWrapper>) input.getAdapter(ArrayList.class);
+        pvs = (List<CollectionEventWrapper>) input.getAdapter(ArrayList.class);
         Assert.isNotNull(pvs, "aliquots are null");
         setPartName("Patient Visits");
     }
@@ -36,7 +36,7 @@ public class PvListViewForm extends BiobankViewForm {
         form.setImage(BioBankPlugin.getDefault().getImageRegistry()
             .get(BioBankPlugin.IMG_BOX));
 
-        patientVisits = new PvListInfoTable(page, pvs);
+        patientVisits = new CeListInfoTable(page, pvs);
         patientVisits.adaptToToolkit(toolkit, true);
         patientVisits.addClickListener(collectionDoubleClickListener);
     }

@@ -1,41 +1,35 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class PvListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
+public class CeListInfoTable extends InfoTableWidget<CollectionEventWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 24;
 
     protected class TableRowData {
-        ProcessingEventWrapper pv;
+        CollectionEventWrapper pv;
         public String pnumber;
         public String studyNameShort;
-        public String waybill;
-        public Date departed;
-        public String clinic;
         public Integer numSVs;
-        public Integer numAliquots;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { pnumber, studyNameShort,
-                ((waybill == null) ? "None" : waybill), departed.toString(),
-                clinic, numSVs.toString(), numAliquots.toString() }, "\t");
+                numSVs.toString() }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] { "Patient Number",
         "Study", "Waybill", "Departed", "Clinic", "Source Vessels", "Aliquots" };
 
-    public PvListInfoTable(Composite parent, List<ProcessingEventWrapper> pvs) {
+    public CeListInfoTable(Composite parent, List<CollectionEventWrapper> pvs) {
         super(parent, pvs, HEADINGS, PAGE_SIZE_ROWS);
     }
 
@@ -57,15 +51,7 @@ public class PvListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
                 case 1:
                     return item.studyNameShort;
                 case 2:
-                    return item.waybill;
-                case 3:
-                    return item.departed.toString();
-                case 4:
-                    return item.clinic;
-                case 5:
                     return item.numSVs.toString();
-                case 6:
-                    return item.numAliquots.toString();
                 default:
                     return "";
                 }
@@ -74,7 +60,7 @@ public class PvListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(ProcessingEventWrapper pv)
+    public TableRowData getCollectionModelObject(CollectionEventWrapper pv)
         throws Exception {
         TableRowData info = new TableRowData();
         info.pv = pv;
@@ -85,13 +71,7 @@ public class PvListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
         } else {
             info.studyNameShort = new String();
         }
-        info.waybill = pv.getCollectionEvent().getWaybill();
-        if (info.waybill == null)
-            info.waybill = "None";
-        info.departed = pv.getCollectionEvent().getDeparted();
-        info.clinic = pv.getCenter().getNameShort();
-        info.numSVs = pv.getPvSourceVesselCollection().size();
-        info.numAliquots = pv.getAliquotCollection().size();
+        info.numSVs = pv.getSourceVesselCollection().size();
         return info;
     }
 
@@ -103,7 +83,7 @@ public class PvListInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
     }
 
     @Override
-    public ProcessingEventWrapper getSelection() {
+    public CollectionEventWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

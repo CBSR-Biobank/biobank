@@ -134,7 +134,7 @@ public class RequestAdapter extends AdapterBase {
 
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    request.setInCloseState();
+                    request.setState(RequestState.CLOSED);
                     persistAndRebuild();
                 }
 

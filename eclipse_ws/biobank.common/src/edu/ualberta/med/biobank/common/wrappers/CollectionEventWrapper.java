@@ -359,6 +359,16 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return null;
     }
 
+    public List<SourceVesselWrapper> getSourceVesselCollection() {
+        return getSourceVesselCollection(false);
+    }
+
+    @Deprecated
+    public String getPvAttrValue(String label) {
+        return label;
+        // will be added in new model
+    }
+
     @Deprecated
     public Integer getVisitNumber() {
         // TODO new but not yet in model
@@ -366,12 +376,34 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Deprecated
+    public void setPatient(PatientWrapper wrapper) {
+        // will be added in new model
+
+    }
+
+    @Deprecated
+    public Date getDateDrawn() {
+        return null;
+        // will be added in new model
+    }
+
     public Integer getOriginalSpecimensCount() {
         // TODO new but not yet in model
         return null;
     }
 
     @Deprecated
+    public void setPvAttrValue(String label, String value) {
+        // will be added in new model
+
+    }
+
+    @Deprecated
+    public List<AliquotWrapper> getSpecimenCollection() {
+        return null;
+        // will be added in new model
+    }
+
     public Integer getAliquotedSpecimensCount() {
         // TODO new but not yet in model
         return null;
