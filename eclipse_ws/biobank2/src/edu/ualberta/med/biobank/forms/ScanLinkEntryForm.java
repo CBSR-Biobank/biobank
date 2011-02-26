@@ -643,7 +643,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 sb.append(Messages.getFormattedString(
                     "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
                     cell.getValue(), patientVisit.getPatient().getPnumber(),
-                    site.getNameShort(), patientVisit.getFormattedDateDrawn(),
+                    site.getNameShort(), patientVisit.getFormattedCreatedAt(),
                     patientVisit.getCollectionEvent().getClinic().getName(), cell
                         .getType().getName()));
                 nber++;
@@ -654,7 +654,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         appendLog(sb.toString());
         appendLogNLS("ScanLink.activitylog.save.summary", nber, patientVisit
             .getPatient().getPnumber(), site.getNameShort(),
-            patientVisit.getFormattedDateDrawn(),
+            patientVisit.getFormattedCreatedAt(),
             patientVisit.getFormattedDateProcessed()); //$NON-NLS-1$
         setFinished(false);
     }

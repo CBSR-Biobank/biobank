@@ -15,7 +15,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.util.DispatchItemState;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -244,10 +244,10 @@ public class RequestEntryFormBase extends BiobankFormBase {
             }
             return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
         }
-        if (DispatchItemState.RECEIVED.isEquals(dsa.getState())) {
+        if (DispatchSpecimenState.RECEIVED.isEquals(dsa.getState())) {
             return new AliquotInfo(dsa.getSpecimen(), ResType.RECEIVED);
         }
-        if (DispatchItemState.EXTRA.isEquals(dsa.getState())) {
+        if (DispatchSpecimenState.EXTRA.isEquals(dsa.getState())) {
             return new AliquotInfo(dsa.getSpecimen(), ResType.EXTRA);
         }
         return new AliquotInfo(dsa.getSpecimen(), ResType.OK);

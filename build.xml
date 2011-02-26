@@ -13,7 +13,7 @@
   <property name="java.client.version.num" value="1.4.0.pre" />
 
   <property environment="env" />
-  <property name="host" value="aicml-med.cs.ualberta.ca" />
+  <property name="host" value="aicml5.cs.ualberta.ca" />
   <!--property name="${host}/" value="" /-->
   <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
   <property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />

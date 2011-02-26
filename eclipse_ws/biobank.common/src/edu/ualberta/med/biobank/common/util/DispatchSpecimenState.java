@@ -4,14 +4,14 @@ package edu.ualberta.med.biobank.common.util;
  * Never remove one of these enum. Use deprecated if it should not be used
  * anymore.
  */
-public enum DispatchItemState {
+public enum DispatchSpecimenState {
     NONE(0, "Ok"), RECEIVED(1, "Received"), MISSING(2, "Missing"), EXTRA(3,
         "Extra");
 
     private Integer id;
     private String label;
 
-    private DispatchItemState(Integer id, String label) {
+    private DispatchSpecimenState(Integer id, String label) {
         this.id = id;
         this.label = label;
     }
@@ -33,8 +33,8 @@ public enum DispatchItemState {
         return getLabel();
     }
 
-    public static DispatchItemState getState(Integer state) {
-        for (DispatchItemState das : values()) {
+    public static DispatchSpecimenState getState(Integer state) {
+        for (DispatchSpecimenState das : values()) {
             if (das.isEquals(state)) {
                 return das;
             }

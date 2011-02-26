@@ -157,7 +157,7 @@ public class PatientVisitViewForm extends BiobankViewForm {
         setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
         setTextValue(dateProcessedLabel,
             patientVisit.getFormattedDateProcessed());
-        setTextValue(dateDrawnLabel, patientVisit.getFormattedDateDrawn());
+        setTextValue(dateDrawnLabel, patientVisit.getFormattedCreatedAt());
         setTextValue(commentLabel, patientVisit.getComment());
 
         // assign PvInfo

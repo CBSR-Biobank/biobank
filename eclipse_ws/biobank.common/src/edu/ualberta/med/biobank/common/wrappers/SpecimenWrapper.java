@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.DispatchItemState;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenBaseWrapper;
@@ -102,8 +102,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             getInventoryId(), "An Specimen with inventoryId");
     }
 
-    public String getFormattedLinkDate() {
-        return DateFormatter.formatAsDateTime(getLinkDate());
+    public String getFormattedCreatedAt() {
+        return DateFormatter.formatAsDateTime(getCreatedAt());
     }
 
     public ContainerWrapper getParent() {
@@ -165,18 +165,20 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     private CenterWrapper<?> getLocation() {
-        List<DispatchSpecimenWrapper> dsac = this
-            .getDispatchSpecimenCollection();
+        List<DispatchSpecimenWrapper> dspcs = getDispatchSpecimenCollection();
+
         // if in a container, use the container's site
         if (getParent() != null) {
             return getParent().getSite();
         } else {
             // dispatched Specimen?
-            for (DispatchSpecimenWrapper da : dsac) {
-                DispatchItemState state = da.getDispatchSpecimenState();
+            for (DispatchSpecimenWrapper da : dspcs) {
+                DispatchSpecimenState state = DispatchSpecimenState.getState(da
+                    .getState());
+
                 if (DispatchState.IN_TRANSIT
                     .equals(da.getDispatch().getState())
-                    && DispatchItemState.NONE == state) {
+                    && DispatchSpecimenState.NONE == state) {
                     // Specimen is in transit
                     // FIXME what if can't read sender or receiver
                     SiteWrapper fakeSite = new SiteWrapper(appService);
@@ -224,13 +226,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     private static final String POSITION_FREE_QRY = "from "
         + Specimen.class.getName()
         + " where "
-        + Property.concatNames(SpecimenPeer.Specimen_POSITION,
+        + Property.concatNames(SpecimenPeer.SPECIMEN_POSITION,
             SpecimenPositionPeer.ROW)
         + "=? and "
-        + Property.concatNames(SpecimenPeer.Specimen_POSITION,
+        + Property.concatNames(SpecimenPeer.SPECIMEN_POSITION,
             SpecimenPositionPeer.COL)
         + "=? and "
-        + Property.concatNames(SpecimenPeer.Specimen_POSITION,
+        + Property.concatNames(SpecimenPeer.SPECIMEN_POSITION,
             SpecimenPositionPeer.CONTAINER) + "=?";
 
     /**
@@ -297,11 +299,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         if (getSpecimenType() == null)
             return;
 
-        ProcessingEventWrapper processingEvent = getProcessingEvent();
-        StudyWrapper study = processingEvent.getPatient().getStudy();
+        CollectionEventWrapper cevent = getCollectionEvent();
+        StudyWrapper study = cevent.getPatient().getStudy();
         Double volume = null;
         Collection<AliquotedSpecimenWrapper> sampleStorageCollection = study
-            .getSampleStorageCollection(false);
+            .getAliquotedSpecimenCollection(false);
         if (sampleStorageCollection != null) {
             for (AliquotedSpecimenWrapper ss : sampleStorageCollection) {
                 if (getSpecimenType().equals(getSpecimenType())) {
@@ -459,14 +461,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     @Override
     protected Log getLogMessage(String action, String center, String details) {
         Log log = new Log();
-        ProcessingEventWrapper visit = getProcessingEvent();
+        CollectionEventWrapper cevent = getCollectionEvent();
         log.setAction(action);
-        if (center == null) {
-            log.setSite(visit.getCenter().getNameShort());
-        } else {
-            log.setSite(center);
-        }
-        log.setPatientNumber(visit.getPatient().getPnumber());
+        log.setSite(center);
+        log.setPatientNumber(cevent.getPatient().getPnumber());
         log.setInventoryId(getInventoryId());
         log.setLocationLabel(getPositionString(true, true));
         log.setDetails(details);
@@ -489,7 +487,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
-        return getWrapperCollection(SpecimenPeer.DISPATCH_Specimen_COLLECTION,
+        return getWrapperCollection(SpecimenPeer.DISPATCH_SPECIMEN_COLLECTION,
             DispatchSpecimenWrapper.class, false);
     }
 
@@ -505,7 +503,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 if (!dispatch.equals(excludedShipment)
                     && (EnumSet.of(DispatchState.CREATION,
                         DispatchState.IN_TRANSIT).contains(dispatch.getState()))) {
-                    if (DispatchItemState.MISSING.equals(dsa.getState())) {
+                    if (DispatchSpecimenState.MISSING.equals(dsa.getState())) {
                         return false;
                     }
                     return true;

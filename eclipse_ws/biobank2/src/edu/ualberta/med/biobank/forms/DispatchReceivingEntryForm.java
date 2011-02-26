@@ -11,7 +11,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.DispatchItemState;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -140,10 +140,10 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
             }
             return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
         }
-        if (DispatchItemState.RECEIVED.isEquals(dsa.getState())) {
+        if (DispatchSpecimenState.RECEIVED.isEquals(dsa.getState())) {
             return new AliquotInfo(dsa.getSpecimen(), ResType.RECEIVED);
         }
-        if (DispatchItemState.EXTRA.isEquals(dsa.getState())) {
+        if (DispatchSpecimenState.EXTRA.isEquals(dsa.getState())) {
             return new AliquotInfo(dsa.getSpecimen(), ResType.EXTRA);
         }
         return new AliquotInfo(dsa.getSpecimen(), ResType.OK);

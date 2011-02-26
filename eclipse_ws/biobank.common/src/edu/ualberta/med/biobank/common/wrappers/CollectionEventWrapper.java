@@ -2,20 +2,26 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -25,6 +31,10 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 @SuppressWarnings("unused")
 public class CollectionEventWrapper extends CollectionEventBaseWrapper {
+
+    private Map<String, StudyEventAttrWrapper> studyEventAttrMap;
+
+    private Map<String, EventAttrWrapper> eventAttrMap;
 
     private Set<SpecimenWrapper> deletedSpecimens = new HashSet<SpecimenWrapper>();
 
@@ -120,6 +130,10 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     protected void persistDependencies(CollectionEvent origObject)
         throws Exception {
         deleteSourceVessels();
+        if (eventAttrMap != null) {
+            setWrapperCollection(CollectionEventPeer.EVENT_ATTR_COLLECTION,
+                eventAttrMap.values());
+        }
     }
 
     public void checkAtLeastOneSpecimen() throws BiobankCheckException {
@@ -236,4 +250,191 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         WritableApplicationService appService) {
         return null;
     }
+
+    private Map<String, StudyEventAttrWrapper> getStudyEventAttrMap() {
+        if (studyEventAttrMap != null)
+            return studyEventAttrMap;
+
+        PatientWrapper patient = getPatient();
+
+        studyEventAttrMap = new HashMap<String, StudyEventAttrWrapper>();
+        if (patient != null && patient.getStudy() != null) {
+            Collection<StudyEventAttrWrapper> studyEventAttrCollection = patient
+                .getStudy().getStudyEventAttrCollection();
+            if (studyEventAttrCollection != null) {
+                for (StudyEventAttrWrapper studyEventAttr : studyEventAttrCollection) {
+                    studyEventAttrMap.put(studyEventAttr.getLabel(),
+                        studyEventAttr);
+                }
+            }
+        }
+        return studyEventAttrMap;
+    }
+
+    private Map<String, EventAttrWrapper> getEventAttrMap() {
+        getStudyEventAttrMap();
+        if (eventAttrMap != null)
+            return eventAttrMap;
+
+        eventAttrMap = new HashMap<String, EventAttrWrapper>();
+        List<EventAttrWrapper> pvAttrCollection = getEventAttrCollection(false);
+        if (pvAttrCollection != null) {
+            for (EventAttrWrapper pvAttr : pvAttrCollection) {
+                eventAttrMap.put(pvAttr.getStudyEventAttr().getLabel(), pvAttr);
+            }
+        }
+        return eventAttrMap;
+    }
+
+    public String[] getEventAttrLabels() {
+        getEventAttrMap();
+        return eventAttrMap.keySet().toArray(new String[] {});
+    }
+
+    public String getEventAttrValue(String label) throws Exception {
+        getEventAttrMap();
+        EventAttrWrapper pvAttr = eventAttrMap.get(label);
+        if (pvAttr == null) {
+            StudyEventAttrWrapper studyEventAttr = studyEventAttrMap.get(label);
+            // make sure "label" is a valid study pv attr
+            if (studyEventAttr == null) {
+                throw new Exception("StudyEventAttr with label \"" + label
+                    + "\" is invalid");
+            }
+            // not assigned yet so return null
+            return null;
+        }
+        return pvAttr.getValue();
+    }
+
+    public String getEventAttrTypeName(String label) throws Exception {
+        getEventAttrMap();
+        EventAttrWrapper pvAttr = eventAttrMap.get(label);
+        StudyEventAttrWrapper studyEventAttr = null;
+        if (pvAttr != null) {
+            studyEventAttr = pvAttr.getStudyEventAttr();
+        } else {
+            studyEventAttr = studyEventAttrMap.get(label);
+            // make sure "label" is a valid study pv attr
+            if (studyEventAttr == null) {
+                throw new Exception("StudyEventAttr withr label \"" + label
+                    + "\" does not exist");
+            }
+        }
+        return studyEventAttr.getEventAttrType().getName();
+    }
+
+    public String[] getEventAttrPermissible(String label) throws Exception {
+        getEventAttrMap();
+        EventAttrWrapper pvAttr = eventAttrMap.get(label);
+        StudyEventAttrWrapper studyEventAttr = null;
+        if (pvAttr != null) {
+            studyEventAttr = pvAttr.getStudyEventAttr();
+        } else {
+            studyEventAttr = studyEventAttrMap.get(label);
+            // make sure "label" is a valid study pv attr
+            if (studyEventAttr == null) {
+                throw new Exception("EventAttr for label \"" + label
+                    + "\" does not exist");
+            }
+        }
+        String permissible = studyEventAttr.getPermissible();
+        if (permissible == null) {
+            return null;
+        }
+        return permissible.split(";");
+    }
+
+    /**
+     * Assigns a value to a patient visit attribute. The value is parsed for
+     * correctness.
+     * 
+     * @param label The attribute's label.
+     * @param value The value to assign.
+     * @throws Exception when assigning a label of type "select_single" or
+     *             "select_multiple" and the value is not one of the permissible
+     *             ones.
+     * @throws NumberFormatException when assigning a label of type "number" and
+     *             the value is not a valid double number.
+     * @throws ParseException when assigning a label of type "date_time" and the
+     *             value is not a valid date and time.
+     * @see edu.ualberta.med.biobank
+     *      .common.formatters.DateFormatter.DATE_TIME_FORMAT
+     */
+    public void setEventAttrValue(String label, String value) throws Exception {
+        getEventAttrMap();
+        EventAttrWrapper pvAttr = eventAttrMap.get(label);
+        StudyEventAttrWrapper studyEventAttr = null;
+
+        if (pvAttr != null) {
+            studyEventAttr = pvAttr.getStudyEventAttr();
+        } else {
+            studyEventAttr = studyEventAttrMap.get(label);
+            if (studyEventAttr == null) {
+                throw new Exception("no StudyEventAttr found for label \""
+                    + label + "\"");
+            }
+        }
+
+        if (!studyEventAttr.getActivityStatus().isActive()) {
+            throw new Exception("attribute for label \"" + label
+                + "\" is locked, changes not premitted");
+        }
+
+        if (value != null) {
+            // validate the value
+            value = value.trim();
+            if (value.length() > 0) {
+                String type = studyEventAttr.getEventAttrType().getName();
+                List<String> permissibleSplit = null;
+
+                if (type.equals("select_single")
+                    || type.equals("select_multiple")) {
+                    String permissible = studyEventAttr.getPermissible();
+                    if (permissible != null) {
+                        permissibleSplit = Arrays
+                            .asList(permissible.split(";"));
+                    }
+                }
+
+                if (type.equals("select_single")) {
+                    if (!permissibleSplit.contains(value)) {
+                        throw new Exception("value " + value
+                            + "is invalid for label \"" + label + "\"");
+                    }
+                } else if (type.equals("select_multiple")) {
+                    for (String singleVal : value.split(";")) {
+                        if (!permissibleSplit.contains(singleVal)) {
+                            throw new Exception("value " + singleVal + " ("
+                                + value + ") is invalid for label \"" + label
+                                + "\"");
+                        }
+                    }
+                } else if (type.equals("number")) {
+                    Double.parseDouble(value);
+                } else if (type.equals("date_time")) {
+                    DateFormatter.dateFormatter.parse(value);
+                } else if (type.equals("text")) {
+                    // do nothing
+                } else {
+                    throw new Exception("type \"" + type + "\" not tested");
+                }
+            }
+        }
+
+        if (pvAttr == null) {
+            pvAttr = new EventAttrWrapper(appService);
+            pvAttr.setCollectionEvent(this);
+            pvAttr.setStudyEventAttr(studyEventAttr);
+            eventAttrMap.put(label, pvAttr);
+        }
+        pvAttr.setValue(value);
+    }
+
+    @Override
+    public void resetInternalFields() {
+        eventAttrMap = null;
+        studyEventAttrMap = null;
+    }
+
 }

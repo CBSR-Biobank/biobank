@@ -180,7 +180,7 @@ public class AliquotViewForm extends BiobankViewForm {
     private void setValues() {
         setTextValue(siteLabel, aliquot.getSiteString());
         setTextValue(sampleTypeLabel, aliquot.getSpecimenType().getName());
-        setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
+        setTextValue(linkDateLabel, aliquot.getFormattedCreatedAt());
         setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
             : aliquot.getQuantity().toString());
         setTextValue(shipmentWaybillLabel, aliquot.getProcessingEvent()
@@ -192,7 +192,7 @@ public class AliquotViewForm extends BiobankViewForm {
         setTextValue(dateProcessedLabel, aliquot.getProcessingEvent()
             .getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, aliquot.getProcessingEvent()
-            .getFormattedDateDrawn());
+            .getFormattedCreatedAt());
         setTextValue(activityStatusLabel, aliquot.getActivityStatus());
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));

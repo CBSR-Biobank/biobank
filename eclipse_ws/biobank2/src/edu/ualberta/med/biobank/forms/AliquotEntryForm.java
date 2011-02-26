@@ -121,7 +121,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
             });
 
         createReadOnlyLabelledField(client, SWT.NONE, "Link Date",
-            aliquot.getFormattedLinkDate());
+            aliquot.getFormattedCreatedAt());
 
         volumeField = createReadOnlyLabelledField(client, SWT.NONE,
             "Volume (ml)", aliquot.getQuantity() == null ? null : aliquot
@@ -162,7 +162,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
 
         final BiobankText dateDrawn = createReadOnlyLabelledField(client,
             SWT.NONE, "Date Drawn", aliquot.getProcessingEvent()
-                .getFormattedDateDrawn());
+                .getFormattedCreatedAt());
 
         editPatientButton.addListener(SWT.MouseUp, new Listener() {
             @Override
@@ -178,7 +178,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
                     dateProcessed.setText(aliquot.getProcessingEvent()
                         .getFormattedDateProcessed());
                     dateDrawn.setText(aliquot.getProcessingEvent()
-                        .getFormattedDateDrawn());
+                        .getFormattedCreatedAt());
 
                     setDirty(true); // so changes can be saved
                 }

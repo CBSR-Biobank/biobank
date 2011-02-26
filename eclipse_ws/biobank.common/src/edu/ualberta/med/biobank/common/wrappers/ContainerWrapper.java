@@ -14,24 +14,23 @@ import org.apache.commons.lang.StringUtils;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
-import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
-import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AbstractPositionWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.ContainerPositionWrapper;
-import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.common.wrappers.internal.SpecimenPositionWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPosition;
 import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.SpecimenPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -441,7 +440,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             .get("aliquots");
         if (aliquots == null) {
             List<SpecimenPositionWrapper> positions = getWrapperCollection(
-                ContainerPeer.ALIQUOT_POSITION_COLLECTION,
+                ContainerPeer.SPECIMEN_POSITION_COLLECTION,
                 SpecimenPositionWrapper.class, false);
 
             aliquots = new TreeMap<RowColPos, SpecimenWrapper>();
@@ -452,19 +451,17 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                     // TODO Auto-generated catch block
                     e1.printStackTrace();
                 }
-                SpecimenWrapper aliquot = position.getWrappedProperty(
-                    AliquotPositionPeer.ALIQUOT, SpecimenWrapper.class);
+                SpecimenWrapper spc = position.getSpecimen();
                 aliquots.put(
-                    new RowColPos(position.getRow(), position.getCol()),
-                    aliquot);
+                    new RowColPos(position.getRow(), position.getCol()), spc);
             }
             propertiesMap.put("aliquots", aliquots);
         }
         return aliquots;
     }
 
-    public boolean hasAliquots() {
-        Collection<AliquotPosition> positions = wrappedObject
+    public boolean hasSpecimens() {
+        Collection<SpecimenPosition> positions = wrappedObject
             .getSpecimenPositionCollection();
         return ((positions != null) && (positions.size() > 0));
     }
@@ -702,7 +699,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (type == null) {
             throw new BiobankCheckException("sample type is null");
         }
-        return getContainerType().getSpecimenTypeCollection(false).contains(type);
+        return getContainerType().getSpecimenTypeCollection(false).contains(
+            type);
     }
 
     public void moveAliquots(ContainerWrapper destination) throws Exception {
@@ -732,7 +730,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if (hasAliquots()) {
+        if (hasSpecimens()) {
             throw new BiobankCheckException("Unable to delete container "
                 + getLabel() + ". All aliquots must be removed first.");
         }
@@ -868,7 +866,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             ContainerWrapper.class);
     }
 
-    private static final String CONTAINERS_HOLDING_SAMPLE_TYPES_QRY = "from "
+    private static final String CONTAINERS_HOLDING_SPECIMEN_TYPES_QRY = "from "
         + Container.class.getName() + " where "
         + Property.concatNames(ContainerPeer.SITE, SitePeer.ID) + "=? and "
         + ContainerPeer.LABEL.getName() + "=? and "
@@ -877,7 +875,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         + ContainerTypePeer.ID.getName() + " in (select ct."
         + ContainerTypePeer.ID.getName() + " from "
         + ContainerType.class.getName() + " as ct" + " left join ct."
-        + ContainerTypePeer.SAMPLE_TYPE_COLLECTION.getName()
+        + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
         + " as sampleType where sampleType = ?))";
 
     /**
@@ -886,21 +884,22 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      */
     public static List<ContainerWrapper> getContainersHoldingSampleType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
-        String label, SpecimenTypeWrapper sampleType) throws ApplicationException {
+        String label, SpecimenTypeWrapper sampleType)
+        throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
-            CONTAINERS_HOLDING_SAMPLE_TYPES_QRY, Arrays.asList(new Object[] {
+            CONTAINERS_HOLDING_SPECIMEN_TYPES_QRY, Arrays.asList(new Object[] {
                 siteWrapper.getId(), label, sampleType.getWrappedObject() }));
         List<Container> containers = appService.query(criteria);
         return wrapModelCollection(appService, containers,
             ContainerWrapper.class);
     }
 
-    private static final String EMPTY_CONTAINERS_HOLDING_SAMPLE_TYPE_BASE_QRY = "from "
+    private static final String EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY = "from "
         + Container.class.getName()
         + " where "
         + Property.concatNames(ContainerPeer.SITE, SitePeer.ID)
         + "=? and "
-        + ContainerPeer.ALIQUOT_POSITION_COLLECTION.getName()
+        + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
         + ".size = 0 and "
         + Property.concatNames(ContainerPeer.CONTAINER_TYPE,
             ContainerTypePeer.CAPACITY, CapacityPeer.ROW_CAPACITY)
@@ -915,9 +914,9 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         + " from "
         + ContainerType.class.getName()
         + " as ct left join ct."
-        + ContainerTypePeer.SAMPLE_TYPE_COLLECTION.getName()
+        + ContainerTypePeer.SPECIMEN_TYPE_COLLECTION.getName()
         + " as sampleType where sampleType."
-        + SampleTypePeer.ID.getName()
+        + SpecimenTypePeer.ID.getName()
         + " in (";
 
     /**
@@ -943,7 +942,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             typeIds.add(st.getId());
         }
         String qry = new StringBuilder(
-            EMPTY_CONTAINERS_HOLDING_SAMPLE_TYPE_BASE_QRY)
+            EMPTY_CONTAINERS_HOLDING_SPECIMEN_TYPE_BASE_QRY)
             .append(StringUtils.join(typeIds, ',')).append("))").toString();
         HQLCriteria criteria = new HQLCriteria(qry, Arrays.asList(new Object[] {
             siteWrapper.getId(), minRowCapacity, minColCapacity }));

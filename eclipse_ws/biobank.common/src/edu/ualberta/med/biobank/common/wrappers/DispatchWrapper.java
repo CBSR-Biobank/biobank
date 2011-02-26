@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.DispatchItemState;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.base.DispatchBaseWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
@@ -29,7 +29,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
 
-    private final Map<DispatchItemState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap = new HashMap<DispatchItemState, List<DispatchSpecimenWrapper>>();
+    private final Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap = new HashMap<DispatchSpecimenState, List<DispatchSpecimenWrapper>>();
 
     private List<DispatchSpecimenWrapper> deletedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
@@ -56,7 +56,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean hasErrors() {
         return !getDispatchSpecimenCollectionWithState(
-            DispatchItemState.MISSING, DispatchItemState.EXTRA).isEmpty();
+            DispatchSpecimenState.MISSING, DispatchSpecimenState.EXTRA).isEmpty();
     }
 
     @Override
@@ -113,17 +113,17 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     private List<DispatchSpecimenWrapper> getDispatchSpecimenCollectionWithState(
-        DispatchItemState... states) {
+        DispatchSpecimenState... states) {
         return getDispatchSpecimenCollectionWithState(dispatchSpecimenMap,
             getDispatchSpecimenCollection(false), states);
     }
 
     private List<DispatchSpecimenWrapper> getDispatchSpecimenCollectionWithState(
-        Map<DispatchItemState, List<DispatchSpecimenWrapper>> map,
-        List<DispatchSpecimenWrapper> list, DispatchItemState... states) {
+        Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> map,
+        List<DispatchSpecimenWrapper> list, DispatchSpecimenState... states) {
 
         if (map.isEmpty()) {
-            for (DispatchItemState state : DispatchItemState.values()) {
+            for (DispatchSpecimenState state : DispatchSpecimenState.values()) {
                 map.put(state, new ArrayList<DispatchSpecimenWrapper>());
             }
             for (DispatchSpecimenWrapper wrapper : list) {
@@ -135,7 +135,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             return map.get(states[0]);
         } else {
             List<DispatchSpecimenWrapper> tmp = new ArrayList<DispatchSpecimenWrapper>();
-            for (DispatchItemState state : states) {
+            for (DispatchSpecimenState state : states) {
                 tmp.addAll(map.get(state));
             }
             return tmp;
@@ -262,10 +262,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public void receiveSpecimens(List<SpecimenWrapper> specimensToReceive) {
-        List<DispatchSpecimenWrapper> nonProcessedAliquots = getDispatchSpecimenCollectionWithState(DispatchItemState.NONE);
+        List<DispatchSpecimenWrapper> nonProcessedAliquots = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
         for (DispatchSpecimenWrapper da : nonProcessedAliquots) {
             if (specimensToReceive.contains(da.getSpecimen())) {
-                da.setState(DispatchItemState.RECEIVED.getId());
+                da.setState(DispatchSpecimenState.RECEIVED.getId());
             }
         }
 

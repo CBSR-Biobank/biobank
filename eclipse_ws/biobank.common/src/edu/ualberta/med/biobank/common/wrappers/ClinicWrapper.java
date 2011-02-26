@@ -113,7 +113,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     public static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
         + Clinic.class.getName()
         + " as clinic join clinic."
-        + ClinicPeer.ORIGIN_INFO.getName()
+        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
         + " as oi join oi."
         + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
         + " as spcs join spcs."

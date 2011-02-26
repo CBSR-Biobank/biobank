@@ -72,7 +72,7 @@ public class PatientVisitInfoTable extends InfoTableWidget<ProcessingEventWrappe
         TableRowData info = new TableRowData();
         info.visit = visit;
         info.dateProcessed = visit.getFormattedDateProcessed();
-        info.dateDrawn = visit.getFormattedDateDrawn();
+        info.dateDrawn = visit.getFormattedCreatedAt();
         List<SpecimenWrapper> samples = visit.getSpecimenCollection();
         if (samples != null) {
             info.sampleCount = samples.size();

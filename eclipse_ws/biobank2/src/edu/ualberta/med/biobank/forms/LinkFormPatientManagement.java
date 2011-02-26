@@ -126,7 +126,7 @@ public class LinkFormPatientManagement {
             public String getText(Object element) {
                 if (element instanceof ProcessingEventWrapper)
                     return ((ProcessingEventWrapper) element)
-                        .getFormattedDateDrawn();
+                        .getFormattedCreatedAt();
                 return element.toString();
             }
         });
@@ -147,7 +147,7 @@ public class LinkFormPatientManagement {
                         aliquotAdminForm.appendLogNLS(
                             "linkAssign.activitylog.visit.selection", pv //$NON-NLS-1$
                                 .getCollectionEvent().getSite().getNameShort(),
-                            pv.getFormattedDateDrawn(),
+                            pv.getFormattedCreatedAt(),
                             pv.getFormattedDateProcessed(), pv.getCollectionEvent()
                                 .getClinic().getName());
                     }
@@ -285,7 +285,7 @@ public class LinkFormPatientManagement {
         viewerVisits.setInput(collection);
         viewerVisits.setSelection(new StructuredSelection(patientVisit));
         if (visitText != null) {
-            visitText.setText(patientVisit.getFormattedDateDrawn());
+            visitText.setText(patientVisit.getFormattedCreatedAt());
         }
     }
 

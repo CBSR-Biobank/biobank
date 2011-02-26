@@ -97,7 +97,7 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        if (isEditable() && getContainer().hasAliquots()) {
+        if (isEditable() && getContainer().hasSpecimens()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Move All Aliquots To");
             mi.addSelectionListener(new SelectionAdapter() {

@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.reports.BiobankReport;
 
 public class PatientWBCImpl extends AbstractReport {
 
-    private static final String TYPE_NAME = "%Cabinet%";
+    // private static final String TYPE_NAME = "%Cabinet%";
 
     // private static final String QUERY =
     // "Select Alias.patient.study.nameShort, Alias.shipment.clinic.nameShort, "

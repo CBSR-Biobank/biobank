@@ -2,8 +2,8 @@ package edu.ualberta.med.biobank.tools.sentaliquots;
 
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.io.FileReader;
@@ -83,10 +83,10 @@ public class SentAliquots {
                 "closeComment" };
             PatientInfo info;
             while ((info = reader.read(PatientInfo.class, header, processors)) != null) {
-                SpecimenWrapper aliquot = SpecimenWrapper.getSpecimen(appService,
+                SpecimenWrapper spc = SpecimenWrapper.getSpecimen(appService,
                     info.getInventoryId(), null);
 
-                if (aliquot == null) {
+                if (spc == null) {
                     System.out
                         .println(" ERROR: aliquot not found: inventoryId/"
                             + info.getInventoryId() + " patientNo/"
@@ -94,7 +94,7 @@ public class SentAliquots {
                     continue;
                 }
 
-                String aliquotPnumber = aliquot.getProcessingEvent().getPatient()
+                String aliquotPnumber = spc.getCollectionEvent().getPatient()
                     .getPnumber();
 
                 if (!aliquotPnumber.equals(info.getPatientNo())) {
@@ -116,23 +116,23 @@ public class SentAliquots {
                     continue;
                 }
 
-                aliquotsAffected.put(info.getInventoryId(), aliquot);
+                aliquotsAffected.put(info.getInventoryId(), spc);
 
-                if (aliquot.getActivityStatus().equals(closedStatus)) {
+                if (spc.getActivityStatus().equals(closedStatus)) {
                     System.out
                         .println(" ERROR: aliquot already closed: inventoryId/"
                             + info.getInventoryId() + " patientNo/"
                             + info.getPatientNo() + " comment/\""
-                            + aliquot.getComment() + "\"");
+                            + spc.getComment() + "\"");
                     continue;
                 }
 
-                String oldPosition = new String(aliquot.getPositionString());
+                String oldPosition = new String(spc.getPositionString());
 
-                aliquot.setComment(info.getCloseComment());
-                aliquot.setPosition(null);
-                aliquot.setActivityStatus(closedStatus);
-                aliquot.persist();
+                spc.setComment(info.getCloseComment());
+                spc.setPosition(null);
+                spc.setActivityStatus(closedStatus);
+                spc.persist();
 
                 if (appArgs.verbose) {
                     System.out.println("patient/" + info.getPatientNo()

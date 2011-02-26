@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.server.reports;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
@@ -34,31 +33,32 @@ public class FTAReportImpl extends AbstractReport {
     @Override
     public List<Object> postProcess(WritableApplicationService appService,
         List<Object> results) {
-        ArrayList<Object> modifiedResults = new ArrayList<Object>();
-        // get the info
-        for (Object ob : results) {
-            // Aliquot a = new Aliquot();
-            // a.setId((Integer) ob);
-            // try {
-            // a = (Aliquot) appService.search(Aliquot.class, a).get(0);
-            // } catch (ApplicationException e) {
-            // e.printStackTrace();
-            // }
-            // String pnumber =
-            // a.getProcessingEvent().getPatient().getPnumber();
-            // String inventoryId = a.getInventoryId();
-            // String dateProcessed = DateFormatter.formatAsDate(a
-            // .getProcessingEvent().getDateProcessed());
-            // String stName = a.getSpecimenType().getNameShort();
-            // SpecimenWrapper aliquotWrapper = new SpecimenWrapper(appService,
-            // a);
-            // String aliquotLabel = aliquotWrapper.getPositionString(true,
-            // true);
-            // modifiedResults.add(new Object[] { pnumber, dateProcessed,
-            // inventoryId, stName,
-            // aliquotWrapper.getParent().getSite().getNameShort(),
-            // aliquotLabel });
-        }
-        return modifiedResults;
+        // ArrayList<Object> modifiedResults = new ArrayList<Object>();
+        // // get the info
+        // for (Object ob : results) {
+        // Aliquot a = new Aliquot();
+        // a.setId((Integer) ob);
+        // try {
+        // a = (Aliquot) appService.search(Aliquot.class, a).get(0);
+        // } catch (ApplicationException e) {
+        // e.printStackTrace();
+        // }
+        // String pnumber =
+        // a.getProcessingEvent().getPatient().getPnumber();
+        // String inventoryId = a.getInventoryId();
+        // String dateProcessed = DateFormatter.formatAsDate(a
+        // .getProcessingEvent().getDateProcessed());
+        // String stName = a.getSpecimenType().getNameShort();
+        // SpecimenWrapper aliquotWrapper = new SpecimenWrapper(appService,
+        // a);
+        // String aliquotLabel = aliquotWrapper.getPositionString(true,
+        // true);
+        // modifiedResults.add(new Object[] { pnumber, dateProcessed,
+        // inventoryId, stName,
+        // aliquotWrapper.getParent().getSite().getNameShort(),
+        // aliquotLabel });
+        // }
+        // return modifiedResults;
+        return null;
     }
 }

@@ -905,7 +905,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         appendLogNLS(msgString, posStr, aliquot.getInventoryId(), aliquot
             .getSpecimenType().getName(), linkFormPatientManagement
             .getCurrentPatient().getPnumber(), aliquot.getProcessingEvent()
-            .getFormattedDateDrawn(), aliquot.getProcessingEvent().getCollectionEvent()
+            .getFormattedCreatedAt(), aliquot.getProcessingEvent().getCollectionEvent()
             .getClinic().getName());
         setFinished(false);
     }

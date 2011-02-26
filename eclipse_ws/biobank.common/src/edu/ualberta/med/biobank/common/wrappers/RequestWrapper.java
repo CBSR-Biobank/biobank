@@ -6,23 +6,23 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.peer.RequestAliquotPeer;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
+import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.base.RequestBaseWrapper;
 import edu.ualberta.med.biobank.model.Request;
-import edu.ualberta.med.biobank.model.RequestAliquot;
+import edu.ualberta.med.biobank.model.RequestSpecimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class RequestWrapper extends RequestBaseWrapper {
 
-    private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedRequestAliquotCollection";
+    private static final String NON_PROCESSED_ALIQUOTS_KEY = "nonProcessedRequestSpecimenCollection";
 
-    private static final String PROCESSED_ALIQUOTS_KEY = "processedRequestAliquots";
+    private static final String PROCESSED_ALIQUOTS_KEY = "processedRequestSpecimens";
 
-    private static final String UNAVAILABLE_ALIQUOTS_KEY = "unavailableRequestAliquots";
+    private static final String UNAVAILABLE_ALIQUOTS_KEY = "unavailableRequestSpecimens";
 
     public RequestWrapper(WritableApplicationService appService) {
         super(appService);
@@ -32,9 +32,10 @@ public class RequestWrapper extends RequestBaseWrapper {
         super(appService, request);
     }
 
-    public void receiveAliquots(List<SpecimenWrapper> aliquots) throws Exception {
+    public void receiveAliquots(List<SpecimenWrapper> aliquots)
+        throws Exception {
         List<RequestSpecimenWrapper> flagged = new ArrayList<RequestSpecimenWrapper>();
-        List<RequestSpecimenWrapper> ras = getNonProcessedRequestAliquotCollection();
+        List<RequestSpecimenWrapper> ras = getNonProcessedRequestSpecimenCollection();
         for (RequestSpecimenWrapper r : ras)
             for (SpecimenWrapper a : aliquots)
                 if (r.getSpecimen().getInventoryId().equals(a.getInventoryId())) {
@@ -54,7 +55,7 @@ public class RequestWrapper extends RequestBaseWrapper {
     }
 
     public void receiveAliquot(String text) throws Exception {
-        List<RequestSpecimenWrapper> ras = getNonProcessedRequestAliquotCollection();
+        List<RequestSpecimenWrapper> ras = getNonProcessedRequestSpecimenCollection();
         for (RequestSpecimenWrapper r : ras)
             if (r.getSpecimen().getInventoryId().equals(text)) {
                 flagAliquots(Arrays.asList(r));
@@ -65,23 +66,24 @@ public class RequestWrapper extends RequestBaseWrapper {
 
     }
 
-    public List<RequestSpecimenWrapper> getNonProcessedRequestAliquotCollection() {
-        return getRequestAliquotCollectionWithState(NON_PROCESSED_ALIQUOTS_KEY,
-            true, RequestSpecimenState.NONPROCESSED_STATE);
+    public List<RequestSpecimenWrapper> getNonProcessedRequestSpecimenCollection() {
+        return getRequestSpecimenCollectionWithState(
+            NON_PROCESSED_ALIQUOTS_KEY, true,
+            RequestSpecimenState.NONPROCESSED_STATE);
     }
 
-    public List<RequestSpecimenWrapper> getProcessedRequestAliquotCollection() {
-        return getRequestAliquotCollectionWithState(PROCESSED_ALIQUOTS_KEY,
+    public List<RequestSpecimenWrapper> getProcessedRequestSpecimenCollection() {
+        return getRequestSpecimenCollectionWithState(PROCESSED_ALIQUOTS_KEY,
             true, RequestSpecimenState.PROCESSED_STATE);
     }
 
     @SuppressWarnings("unchecked")
-    private List<RequestSpecimenWrapper> getRequestAliquotCollectionWithState(
+    private List<RequestSpecimenWrapper> getRequestSpecimenCollectionWithState(
         String mapKey, boolean sort, RequestSpecimenState... states) {
         List<RequestSpecimenWrapper> dsaCollection = (List<RequestSpecimenWrapper>) propertiesMap
             .get(mapKey);
         if (dsaCollection == null) {
-            Collection<RequestSpecimenWrapper> children = getRequestAliquotCollection(sort);
+            Collection<RequestSpecimenWrapper> children = getRequestSpecimenCollection(sort);
             if (children != null) {
                 dsaCollection = new ArrayList<RequestSpecimenWrapper>();
                 for (RequestSpecimenWrapper dsa : children) {
@@ -103,8 +105,8 @@ public class RequestWrapper extends RequestBaseWrapper {
         return dsaCollection;
     }
 
-    public List<RequestSpecimenWrapper> getUnavailableRequestAliquotCollection() {
-        return getRequestAliquotCollectionWithState(UNAVAILABLE_ALIQUOTS_KEY,
+    public List<RequestSpecimenWrapper> getUnavailableRequestSpecimenCollection() {
+        return getRequestSpecimenCollectionWithState(UNAVAILABLE_ALIQUOTS_KEY,
             true, RequestSpecimenState.UNAVAILABLE_STATE);
     }
 
@@ -114,8 +116,8 @@ public class RequestWrapper extends RequestBaseWrapper {
         propertiesMap.put(NON_PROCESSED_ALIQUOTS_KEY, null);
     }
 
-    public RequestSpecimenWrapper getRequestAliquot(String inventoryId) {
-        for (RequestSpecimenWrapper dsa : getRequestAliquotCollection(false)) {
+    public RequestSpecimenWrapper getRequestSpecimen(String inventoryId) {
+        for (RequestSpecimenWrapper dsa : getRequestSpecimenCollection(false)) {
             if (dsa.getSpecimen().getInventoryId().equals(inventoryId))
                 return dsa;
         }
@@ -139,9 +141,9 @@ public class RequestWrapper extends RequestBaseWrapper {
     }
 
     private static final String IS_ALL_PROCESSED_QRY = "select count(*) from "
-        + RequestAliquot.class.getName() + " as ra where ra."
-        + RequestAliquotPeer.STATE.getName() + "=?" + " and ra."
-        + Property.concatNames(RequestAliquotPeer.REQUEST, RequestPeer.ID)
+        + RequestSpecimen.class.getName() + " as ra where ra."
+        + RequestSpecimenPeer.STATE.getName() + "=?" + " and ra."
+        + Property.concatNames(RequestSpecimenPeer.REQUEST, RequestPeer.ID)
         + "=?";
 
     public boolean isAllProcessed() {

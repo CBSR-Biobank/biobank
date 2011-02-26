@@ -956,7 +956,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
             posStr, currentSiteSelected.getNameShort(), cell.getValue(),
             aliquot.getSpecimenType().getName(), visit.getPatient().getPnumber(),
-            visit.getFormattedDateDrawn(), visit.getCollectionEvent().getClinic()
+            visit.getFormattedCreatedAt(), visit.getCollectionEvent().getClinic()
                 .getName()));
     }
 
@@ -1149,7 +1149,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             ContainerWrapper containerAtPosition = containersAtPosition.get(0);
             String barcode = containerAtPosition.getProductBarcode();
             if ((barcode != null && !barcode.isEmpty())
-                || containerAtPosition.hasAliquots()) {
+                || containerAtPosition.hasSpecimens()) {
                 // Position already physically used
                 boolean ok = openDialogPositionUsed(barcode);
                 if (!ok) {
