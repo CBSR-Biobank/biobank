@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -26,16 +26,15 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.PvAttr;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.AliquotHelper;
@@ -96,7 +95,7 @@ public class TestProcessingEvent extends TestDatabase {
         ContainerTypeWrapper topType, childType;
 
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
@@ -127,8 +126,8 @@ public class TestProcessingEvent extends TestDatabase {
 
     private void addPvAttrs() throws Exception {
         // add PvAtt to study
-        Collection<String> types = EventAttrTypeWrapper.getAllPvAttrTypesMap(
-            appService).keySet();
+        Collection<String> types = EventAttrTypeWrapper
+            .getAllEventAttrTypesMap(appService).keySet();
         Assert
             .assertTrue("PvAttrTypes not initialized", types.contains("text"));
         study.setStudyPvAttr("PMBC Count", "number");
@@ -148,10 +147,6 @@ public class TestProcessingEvent extends TestDatabase {
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
         testGettersAndSetters(pevent, GETTER_SKIP_METHODS);
-
-        pevent = new ProcessingEventWrapper(appService);
-        Assert.assertEquals(null, pevent.getPatient());
-        Assert.assertEquals(null, pevent.getActivityStatus());
     }
 
     @Test
@@ -210,7 +205,7 @@ public class TestProcessingEvent extends TestDatabase {
         addContainerTypes();
         addContainers();
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         SpecimenWrapper aliquot = AliquotHelper.addAliquot(
             allSampleTypes.get(0), containerMap.get("ChildL1"), pevent, 0, 0);
         pevent.reload();
@@ -294,7 +289,7 @@ public class TestProcessingEvent extends TestDatabase {
         addContainerTypes();
         addContainers();
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         int allSampleTypesCount = allSampleTypes.size();
         ContainerWrapper container = containerMap.get("ChildL1");
 
@@ -716,15 +711,15 @@ public class TestProcessingEvent extends TestDatabase {
             .addProcessingEvent(site, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
 
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
-            appService, false);
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
         SampleStorageHelper.addSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
         SampleStorageHelper.addSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
         SpecimenTypeWrapper sampleType = DbHelper.chooseRandomlyInList(types);
-        AliquotedSpecimenWrapper ss3 = SampleStorageHelper.newSampleStorage(study,
-            sampleType);
+        AliquotedSpecimenWrapper ss3 = SampleStorageHelper.newSampleStorage(
+            study, sampleType);
         ss3.setVolume(3.0);
         ss3.persist();
         pevent.reload();
@@ -736,7 +731,7 @@ public class TestProcessingEvent extends TestDatabase {
         newAliquot.setSpecimenType(sampleType);
         newAliquot.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
-        pevent.addAliquots(Arrays.asList(newAliquot));
+        pevent.addChildSpecimens(Arrays.asList(newAliquot));
         pevent.persist();
 
         SpecimenWrapper aliquot = SpecimenWrapper.getSpecimen(appService,

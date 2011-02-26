@@ -649,7 +649,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 nber++;
             }
         }
-        patientVisit.addAliquots(newAliquots);
+        patientVisit.addChildSpecimens(newAliquots);
         patientVisit.persist();
         appendLog(sb.toString());
         appendLogNLS("ScanLink.activitylog.save.summary", nber, patientVisit

@@ -1,18 +1,18 @@
 package edu.ualberta.med.biobank.test.reports;
 
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -41,23 +41,25 @@ public class CachedReportDataSource implements ReportDataSource {
         return sites;
     }
 
-    public List<SpecimenTypeWrapper> getSpecimenTypes() throws ApplicationException {
+    public List<SpecimenTypeWrapper> getSpecimenTypes()
+        throws ApplicationException {
         if (sampleTypes == null) {
-            sampleTypes = SpecimenTypeWrapper
-                .getAllSampleTypes(appService, false);
+            sampleTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
+                false);
         }
         return sampleTypes;
     }
 
-    public List<AliquotedSpecimenWrapper> getSampleStorages()
+    public List<AliquotedSpecimenWrapper> getAliquotedSpecimens()
         throws ApplicationException {
         if (sampleStorages == null) {
             HQLCriteria criteria = new HQLCriteria("from "
-                + SampleStorage.class.getName());
-            List<SampleStorage> rawSampleStorage = appService.query(criteria);
+                + AliquotedSpecimen.class.getName());
+            List<AliquotedSpecimen> rawAliquotedSpecimen = appService
+                .query(criteria);
 
             sampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
-            for (SampleStorage sampleStorage : rawSampleStorage) {
+            for (AliquotedSpecimen sampleStorage : rawAliquotedSpecimen) {
                 sampleStorages.add(new AliquotedSpecimenWrapper(appService,
                     sampleStorage));
             }
@@ -68,11 +70,11 @@ public class CachedReportDataSource implements ReportDataSource {
     public List<SpecimenWrapper> getSpecimens() throws ApplicationException {
         if (aliquots == null) {
             HQLCriteria criteria = new HQLCriteria("from "
-                + Aliquot.class.getName());
-            List<Aliquot> rawAliquots = appService.query(criteria);
+                + Specimen.class.getName());
+            List<Specimen> rawSpecimens = appService.query(criteria);
 
             aliquots = new ArrayList<SpecimenWrapper>();
-            for (Aliquot aliquot : rawAliquots) {
+            for (Specimen aliquot : rawSpecimens) {
                 aliquots.add(new SpecimenWrapper(appService, aliquot));
             }
         }

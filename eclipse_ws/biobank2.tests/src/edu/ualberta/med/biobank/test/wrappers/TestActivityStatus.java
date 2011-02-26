@@ -93,7 +93,7 @@ public class TestActivityStatus extends TestDatabase {
             site, name, 2, 2);
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
         topContainerType.addToSampleTypeCollection(SpecimenTypeWrapper
-            .getAllSampleTypes(appService, false));
+            .getAllSpecimenTypes(appService, false));
         topContainerType.persist();
 
         study.setStudyPvAttr("worksheet", "text");
@@ -102,7 +102,7 @@ public class TestActivityStatus extends TestDatabase {
         StudyPvAttrWrapper spa = StudyPvAttrWrapper.getStudyPvAttrCollection(
             study).get(0);
 
-        SpecimenTypeWrapper sampleType = SpecimenTypeWrapper.getAllSampleTypes(
+        SpecimenTypeWrapper sampleType = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, false).get(0);
 
         ContactWrapper contact = ContactHelper.addContact(clinic, name);

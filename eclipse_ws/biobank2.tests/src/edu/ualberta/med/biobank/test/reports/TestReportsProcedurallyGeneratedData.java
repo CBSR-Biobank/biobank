@@ -177,7 +177,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         }
 
         for (SpecimenTypeWrapper sampleType : SpecimenTypeWrapper
-            .getAllSampleTypes(getInstance().getAppService(), true)) {
+            .getAllSpecimenTypes(getInstance().getAppService(), true)) {
             if (sampleType.getNameShort().equals(
                 AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME)) {
                 sampleTypes.add(sampleType);

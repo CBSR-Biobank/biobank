@@ -76,7 +76,7 @@ public class CalgaryConfigJob {
         appService = SessionManager.getInstance().getSession().getAppService();
 
         try {
-            sampleTypesList = SpecimenTypeWrapper.getAllSampleTypes(appService,
+            sampleTypesList = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
                 false);
             shippingCompaniesList = ShippingMethodWrapper
                 .getShippingMethods(appService);

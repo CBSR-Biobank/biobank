@@ -322,7 +322,7 @@ public class TestDispatch extends TestDatabase {
             receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
                 .get(0));
         List<SpecimenTypeWrapper> sampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, false);
+            .getAllSpecimenTypes(appService, false);
         ContainerTypeWrapper containerType = ContainerTypeHelper
             .addContainerType(senderSite, name, name, 1, 8, 12, false);
         containerType.addToSampleTypeCollection(sampleTypes);

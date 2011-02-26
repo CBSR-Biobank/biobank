@@ -85,7 +85,7 @@ public class QAAliquotsEditor extends ReportsEditor {
     protected ComboViewer createSampleTypeComboOption(String labelText,
         Composite parent) throws ApplicationException {
         Collection<SpecimenTypeWrapper> sampleTypeWrappers = SpecimenTypeWrapper
-            .getAllSampleTypes(SessionManager.getAppService(), true);
+            .getAllSpecimenTypes(SessionManager.getAppService(), true);
         ComboViewer widget = widgetCreator.createComboViewer(parent, labelText,
             sampleTypeWrappers, null, "No selection", null);
         widget.setLabelProvider(new BiobankLabelProvider() {

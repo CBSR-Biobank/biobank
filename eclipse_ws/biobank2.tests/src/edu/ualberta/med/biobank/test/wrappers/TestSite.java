@@ -849,7 +849,7 @@ public class TestSite extends TestDatabase {
         study2.persist();
 
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         ContainerTypeWrapper ctype = ContainerTypeHelper.addContainerType(site,
             "Pallet96", "P96", 2, 8, 12, true);
         ctype.addToSampleTypeCollection(allSampleTypes);

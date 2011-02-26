@@ -26,7 +26,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testGettersAndSetters" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, false);
         AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
@@ -38,7 +38,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testGetSetStudy" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, false);
         AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
@@ -61,7 +61,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testGetSetSpecimenType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, false);
         SpecimenTypeWrapper type = DbHelper.chooseRandomlyInList(types);
         AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
@@ -87,7 +87,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testPersist" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, false);
         SampleStorageHelper.addSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
@@ -101,7 +101,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testPersist" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, false);
         AliquotedSpecimenWrapper ss = SampleStorageHelper.newSampleStorage(study,
             DbHelper.chooseRandomlyInList(types));
@@ -124,7 +124,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testDelete" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, false);
         AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));
@@ -147,7 +147,7 @@ public class TestSampleStorage extends TestDatabase {
         String name = "testResetAlreadyInDatabase" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, false);
         AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
             .addSampleStorage(study, DbHelper.chooseRandomlyInList(types));

@@ -81,7 +81,7 @@ public class TestPatient extends TestDatabase {
         ContainerTypeWrapper topType, childType;
 
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
 
         childType = ContainerTypeHelper.newContainerType(site,
             "Child L1 Container Type", "CCTL1", 3, 4, 5, false);
@@ -204,7 +204,7 @@ public class TestPatient extends TestDatabase {
 
         pevent = patient.getProcessingEventCollection(false);
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         SpecimenWrapper aliquot = AliquotHelper.addAliquot(
             allSampleTypes.get(0), containerMap.get("ChildL1"), pevent.get(0),
             0, 0);
@@ -444,7 +444,7 @@ public class TestPatient extends TestDatabase {
         }
 
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
 
         int sampleTypeCount = allSampleTypes.size();
         List<SpecimenWrapper> samples = new ArrayList<SpecimenWrapper>();

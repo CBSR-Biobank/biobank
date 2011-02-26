@@ -589,7 +589,7 @@ public class TestContainerType extends TestDatabase {
             || (childTypeL3SampleTypes.size() == 0));
 
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
         // get list of unselected sample types
@@ -622,7 +622,7 @@ public class TestContainerType extends TestDatabase {
         ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
 
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
 
@@ -650,7 +650,7 @@ public class TestContainerType extends TestDatabase {
         ContainerTypeWrapper childTypeL3 = containerTypeMap.get("ChildCtL3");
 
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
 
@@ -714,7 +714,7 @@ public class TestContainerType extends TestDatabase {
         Assert.assertEquals(0, collection.size());
 
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
 

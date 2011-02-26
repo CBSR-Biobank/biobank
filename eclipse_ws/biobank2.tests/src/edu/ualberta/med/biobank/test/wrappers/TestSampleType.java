@@ -130,21 +130,21 @@ public class TestSampleType extends TestDatabase {
 
     @Test
     public void testGetSpecimenTypes() throws Exception {
-        int startSize = SpecimenTypeWrapper.getAllSampleTypes(appService, false)
+        int startSize = SpecimenTypeWrapper.getAllSpecimenTypes(appService, false)
             .size();
 
         String name = "testGetSpecimenTypes" + r.nextInt();
         SpecimenTypeHelper.addSampleType(name);
         Assert.assertEquals(startSize + 1,
-            SpecimenTypeWrapper.getAllSampleTypes(appService, false).size());
+            SpecimenTypeWrapper.getAllSpecimenTypes(appService, false).size());
 
         SpecimenTypeHelper.addSampleType(name + "_2");
         Assert.assertEquals(startSize + 2,
-            SpecimenTypeWrapper.getAllSampleTypes(appService, false).size());
+            SpecimenTypeWrapper.getAllSpecimenTypes(appService, false).size());
 
         SpecimenTypeHelper.addSampleType("QWERTY" + name);
         SpecimenTypeHelper.addSampleType("ASDFG" + name);
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, true);
         if (types.size() > 1) {
             for (int i = 0; i < types.size() - 1; i++) {
@@ -157,7 +157,7 @@ public class TestSampleType extends TestDatabase {
 
     @Test
     public void testPersistSampleTypes() throws Exception {
-        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSampleTypes(
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper.getAllSpecimenTypes(
             appService, false);
         int startSize = types.size();
 
@@ -165,11 +165,11 @@ public class TestSampleType extends TestDatabase {
         SpecimenTypeWrapper type = SpecimenTypeHelper.newSampleType(name);
         SpecimenTypeWrapper.persistSampleTypes(Arrays.asList(type), null);
         Assert.assertEquals(startSize + 1,
-            SpecimenTypeWrapper.getAllSampleTypes(appService, false).size());
+            SpecimenTypeWrapper.getAllSpecimenTypes(appService, false).size());
 
         SpecimenTypeWrapper.persistSampleTypes(null, Arrays.asList(type));
         Assert.assertEquals(startSize,
-            SpecimenTypeWrapper.getAllSampleTypes(appService, false).size());
+            SpecimenTypeWrapper.getAllSpecimenTypes(appService, false).size());
     }
 
     @Test

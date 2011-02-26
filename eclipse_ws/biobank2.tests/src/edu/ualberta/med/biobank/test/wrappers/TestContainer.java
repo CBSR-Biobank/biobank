@@ -881,7 +881,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testCanHoldSample() throws Exception {
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
 
@@ -919,7 +919,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testGetSpecimens() throws Exception {
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
         List<SpecimenTypeWrapper> unselectedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
@@ -1034,7 +1034,7 @@ public class TestContainer extends TestDatabase {
     @Test
     public void testGetContainersHoldingSampleType() throws Exception {
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         List<SpecimenTypeWrapper> selectedSampleTypes = TestCommon
             .getRandomSampleTypeList(r, allSampleTypes);
         ContainerTypeWrapper childTypeL3 = TestCommon.addSampleTypes(
@@ -1402,7 +1402,7 @@ public class TestContainer extends TestDatabase {
 
         // add a aliquot to childL4
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, true);
+            .getAllSpecimenTypes(appService, true);
         ProcessingEventWrapper pv = addProcessingEvent();
         ContainerWrapper childL4 = containerMap.get("ChildL4");
         SpecimenTypeWrapper sampleType = allSampleTypes.get(0);
@@ -1749,7 +1749,7 @@ public class TestContainer extends TestDatabase {
         ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
             site, "Aliquot Container Type", "ACT", 1, 4, 9, false);
         childType.addToSampleTypeCollection(SpecimenTypeWrapper
-            .getAllSampleTypes(appService, false));
+            .getAllSpecimenTypes(appService, false));
         childType.persist();
         top.getContainerType().addToChildContainerTypeCollection(
             Arrays.asList(childType));
@@ -1774,7 +1774,7 @@ public class TestContainer extends TestDatabase {
         ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
             site, patient, Utils.getRandomDate(), Utils.getRandomDate());
 
-        SpecimenTypeWrapper st = SpecimenTypeWrapper.getAllSampleTypes(appService,
+        SpecimenTypeWrapper st = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
             false).get(0);
         AliquotHelper.addAliquot(st, child, pv, 0, 0);
         AliquotHelper.addAliquot(st, child, pv, 0, 1);
@@ -1800,7 +1800,7 @@ public class TestContainer extends TestDatabase {
         ContainerWrapper top = containerMap.get("Top");
 
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
-            .getAllSampleTypes(appService, false);
+            .getAllSpecimenTypes(appService, false);
 
         ContainerTypeWrapper childType = ContainerTypeHelper.addContainerType(
             site, "Aliquot Container Type", "ACT", 1, 4, 9, false);

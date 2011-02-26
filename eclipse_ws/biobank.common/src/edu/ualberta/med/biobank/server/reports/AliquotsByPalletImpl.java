@@ -6,24 +6,22 @@ import java.util.Comparator;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.ContainerPath;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AliquotsByPalletImpl extends AbstractReport {
 
-    private static final String QUERY = "select s from "
-        + Aliquot.class.getName() + " s where s.aliquotPosition.container.id "
-        + "in (select path1.container.id from " + ContainerPath.class.getName()
-        + " as path1, " + ContainerPath.class.getName()
-        + " as path2 where path1.path like path2.path || '/%' and"
-        + " path2.container.id in (" + CONTAINER_LIST + ")) "
-        + "and s.aliquotPosition.container.label = ?";
+    // private static final String QUERY = "select s from "
+    // + Aliquot.class.getName() + " s where s.aliquotPosition.container.id "
+    // + "in (select path1.container.id from " + ContainerPath.class.getName()
+    // + " as path1, " + ContainerPath.class.getName()
+    // + " as path2 where path1.path like path2.path || '/%' and"
+    // + " path2.container.id in (" + CONTAINER_LIST + ")) "
+    // + "and s.aliquotPosition.container.label = ?";
 
     public AliquotsByPalletImpl(BiobankReport report) {
-        super(QUERY, report);
+        // super(QUERY, report);
+        super("", report);
     }
 
     // Use Collections.sort, so can't use RowPostProcess
@@ -35,17 +33,19 @@ public class AliquotsByPalletImpl extends AbstractReport {
         // get the info
         ContainerWrapper parent = null;
         for (Object ob : results) {
-            Aliquot a = (Aliquot) ob;
-            String pnumber = a.getProcessingEvent().getPatient().getPnumber();
-            String inventoryId = a.getInventoryId();
-            String stName = a.getSpecimenType().getNameShort();
-            SpecimenWrapper aliquotWrapper = new SpecimenWrapper(appService, a);
-            String aliquotLabel = aliquotWrapper
-                .getPositionString(false, false);
-            parent = aliquotWrapper.getParent();
-            String containerLabel = aliquotWrapper.getParent().getLabel();
-            modifiedResults.add(new Object[] { aliquotLabel, containerLabel,
-                inventoryId, pnumber, stName });
+            // Aliquot a = (Aliquot) ob;
+            // String pnumber =
+            // a.getProcessingEvent().getPatient().getPnumber();
+            // String inventoryId = a.getInventoryId();
+            // String stName = a.getSpecimenType().getNameShort();
+            // SpecimenWrapper aliquotWrapper = new SpecimenWrapper(appService,
+            // a);
+            // String aliquotLabel = aliquotWrapper
+            // .getPositionString(false, false);
+            // parent = aliquotWrapper.getParent();
+            // String containerLabel = aliquotWrapper.getParent().getLabel();
+            // modifiedResults.add(new Object[] { aliquotLabel, containerLabel,
+            // inventoryId, pnumber, stName });
         }
         if (parent != null
             && parent.getContainerType().getChildLabelingSchemeId() != 1)
