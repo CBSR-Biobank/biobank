@@ -30,6 +30,13 @@ public class SpecimenHelper extends DbHelper {
             ActivityStatusWrapper.ACTIVE_STATUS_STRING);
     }
 
+    public static SpecimenWrapper newSpecimen(String specimenTypeName)
+        throws Exception {
+        return newSpecimen(
+            SpecimenTypeHelper.addSpecimenType(specimenTypeName),
+            ActivityStatusWrapper.ACTIVE_STATUS_STRING);
+    }
+
     public static SpecimenWrapper newSpecimen(SpecimenTypeWrapper specimenType,
         String activityStatus, ContainerWrapper container,
         CollectionEventWrapper cevent, Integer row, Integer col)
