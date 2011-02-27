@@ -9,7 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.wrappers.TestActivityStatus;
-import edu.ualberta.med.biobank.test.wrappers.TestAliquot;
+import edu.ualberta.med.biobank.test.wrappers.TestSpecimen;
 import edu.ualberta.med.biobank.test.wrappers.TestClinic;
 import edu.ualberta.med.biobank.test.wrappers.TestCollectionEvent;
 import edu.ualberta.med.biobank.test.wrappers.TestContact;
@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.test.wrappers.TestStudySourceVessel;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
-@SuiteClasses({ TestActivityStatus.class, TestAliquot.class, TestClinic.class,
+@SuiteClasses({ TestActivityStatus.class, TestSpecimen.class, TestClinic.class,
     TestCollectionEvent.class, TestContact.class, TestContainer.class,
     TestContainerLabelingScheme.class, TestContainerPath.class,
     TestContainerType.class, TestDispatch.class, TestModelWrapper.class,

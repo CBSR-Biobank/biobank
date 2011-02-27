@@ -4,10 +4,11 @@ import java.util.Arrays;
 import java.util.Date;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
@@ -20,15 +21,20 @@ public class DispatchHelper extends DbHelper {
         DispatchWrapper dispatch = new DispatchWrapper(appService);
         dispatch.setSender(sender);
         dispatch.setReceiver(receiver);
-        dispatch.setShippingMethod(method);
-        dispatch.setWaybill(waybill);
+
+        ShipmentInfoWrapper shipInfo = new ShipmentInfoWrapper(appService);
+        dispatch.setShipmentInfo(shipInfo);
+
+        shipInfo.setShippingMethod(method);
+        shipInfo.setWaybill(waybill);
+
         dispatch.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         if (dateReceived != null) {
-            dispatch.setDateReceived(dateReceived);
+            shipInfo.setReceivedAt(dateReceived);
         }
 
-        dispatch.setDeparted(Utils.getRandomDate());
+        dispatch.setDepartedAt(Utils.getRandomDate());
 
         if (aliquots != null) {
             dispatch.addSpecimens(Arrays.asList(aliquots));

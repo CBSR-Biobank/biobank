@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -297,7 +297,7 @@ public class TestDispatch extends TestDatabase {
         int colCapacity = container.getColCapacity();
         List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
         for (int i = 0; i < colCapacity; ++i) {
-            aliquots.add(AliquotHelper.addAliquot(
+            aliquots.add(SpecimenHelper.addAliquot(
                 sampleTypes.get(r.nextInt(numSampletypes)),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, visit,
                 row, i));

@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
@@ -880,7 +880,7 @@ public class TestSite extends TestDatabase {
             for (ProcessingEventWrapper visit : patient
                 .getProcessingEventCollection(false)) {
                 for (int i = 0; i < 2; ++i) {
-                    AliquotHelper.addAliquot(
+                    SpecimenHelper.addAliquot(
                         allSampleTypes.get(r.nextInt(sampleTypeCount)),
                         container, visit, sampleCount / 12, sampleCount % 12);
                     ++sampleCount;

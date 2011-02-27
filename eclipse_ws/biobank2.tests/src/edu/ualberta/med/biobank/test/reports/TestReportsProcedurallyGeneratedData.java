@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
@@ -645,7 +645,7 @@ public final class TestReportsProcedurallyGeneratedData implements
                         ProcessingEventWrapper patientVisit = patientVisits
                             .get(aliquotsAdded % patientVisits.size());
 
-                        SpecimenWrapper aliquot = AliquotHelper
+                        SpecimenWrapper aliquot = SpecimenHelper
                             .newAliquot(sampleType);
 
                         // leave some positions without an Aliquot (but still
@@ -684,7 +684,7 @@ public final class TestReportsProcedurallyGeneratedData implements
             ProcessingEventWrapper patientVisit = patientVisits
                 .get(aliquotsAdded % patientVisits.size());
 
-            SpecimenWrapper aliquot = AliquotHelper.newAliquot(sampleType);
+            SpecimenWrapper aliquot = SpecimenHelper.newAliquot(sampleType);
 
             aliquot.setProcessingEvent(patientVisit);
             aliquot.setInventoryId(getInstance().getRandString());

@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.ClassUtils;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -21,26 +20,23 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestActivityStatus extends TestDatabase {
@@ -92,18 +88,18 @@ public class TestActivityStatus extends TestDatabase {
         ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
             site, name, 2, 2);
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
-        topContainerType.addToSampleTypeCollection(SpecimenTypeWrapper
+        topContainerType.addToSpecimenTypeCollection(SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false));
         topContainerType.persist();
 
-        study.setStudyPvAttr("worksheet", "text");
+        study.setStudyEventAttr("worksheet", "text");
         study.persist();
 
-        StudyPvAttrWrapper spa = StudyPvAttrWrapper.getStudyPvAttrCollection(
-            study).get(0);
+        StudyEventAttrWrapper spa = StudyEventAttrWrapper
+            .getStudyEventAttrCollection(study).get(0);
 
-        SpecimenTypeWrapper sampleType = SpecimenTypeWrapper.getAllSpecimenTypes(
-            appService, false).get(0);
+        SpecimenTypeWrapper sampleType = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false).get(0);
 
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
@@ -111,18 +107,16 @@ public class TestActivityStatus extends TestDatabase {
         study.reload();
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
-            Utils.getRandomDate(), 0.1);
+        SpecimenWrapper spc = SpecimenHelper.newSpecimen(SpecimenTypeHelper
+            .newSpecimenType(name));
 
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0), sv);
+            .addCollectionEvent(site, patient, 1, spc);
 
-        ProcessingEventWrapper visit = ProcessingEventHelper
-            .addProcessingEvent(site, patient, Utils.getRandomDate(),
-                Utils.getRandomDate());
+        CollectionEventWrapper visit = CollectionEventHelper
+            .addCollectionEvent(site, patient, 1);
 
-        SpecimenWrapper aliquot = AliquotHelper.addAliquot(sampleType,
+        SpecimenWrapper aliquot = SpecimenHelper.addSpecimen(sampleType,
             topContainer, visit, 0, 0);
 
         ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { aliquot, spa,
@@ -148,8 +142,8 @@ public class TestActivityStatus extends TestDatabase {
 
         if (wrapper instanceof SpecimenWrapper) {
             ((SpecimenWrapper) wrapper).setActivityStatus(as);
-        } else if (wrapper instanceof StudyPvAttrWrapper) {
-            ((StudyPvAttrWrapper) wrapper).setActivityStatus(as);
+        } else if (wrapper instanceof StudyEventAttrWrapper) {
+            ((StudyEventAttrWrapper) wrapper).setActivityStatus(as);
         } else if (wrapper instanceof ContainerWrapper) {
             ((ContainerWrapper) wrapper).setActivityStatus(as);
         } else if (wrapper instanceof ContainerTypeWrapper) {
@@ -180,7 +174,7 @@ public class TestActivityStatus extends TestDatabase {
                 if (delWrapper instanceof CollectionEventWrapper) {
                     DbHelper
                         .deleteFromList(((CollectionEventWrapper) delWrapper)
-                            .getSourceVesselCollection(false));
+                            .getSpecimenCollection(false));
                 }
                 delWrapper.delete();
             }

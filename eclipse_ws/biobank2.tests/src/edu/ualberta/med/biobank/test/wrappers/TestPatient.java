@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
@@ -205,7 +205,7 @@ public class TestPatient extends TestDatabase {
         pevent = patient.getProcessingEventCollection(false);
         List<SpecimenTypeWrapper> allSampleTypes = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, true);
-        SpecimenWrapper aliquot = AliquotHelper.addAliquot(
+        SpecimenWrapper aliquot = SpecimenHelper.addAliquot(
             allSampleTypes.get(0), containerMap.get("ChildL1"), pevent.get(0),
             0, 0);
         patient.reload();
@@ -459,7 +459,7 @@ public class TestPatient extends TestDatabase {
             for (ProcessingEventWrapper pevent : patient
                 .getProcessingEventCollection(false)) {
                 for (int i = 0; i < 2; ++i) {
-                    samples.add(AliquotHelper.addAliquot(
+                    samples.add(SpecimenHelper.addAliquot(
                         allSampleTypes.get(r.nextInt(sampleTypeCount)),
                         childL1, pevent, sampleCount / maxCols, sampleCount
                             % maxCols));

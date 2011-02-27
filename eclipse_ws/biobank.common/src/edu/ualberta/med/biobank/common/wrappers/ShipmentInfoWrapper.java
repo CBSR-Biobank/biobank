@@ -19,7 +19,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public abstract class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
+public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
 
     public ShipmentInfoWrapper(WritableApplicationService appService) {
         super(appService);

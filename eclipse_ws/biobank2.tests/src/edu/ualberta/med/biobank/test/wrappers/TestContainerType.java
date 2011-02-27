@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -682,8 +682,8 @@ public class TestContainerType extends TestDatabase {
         study.persist();
         ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
             site, patient, Utils.getRandomDate(), Utils.getRandomDate());
-        AliquotHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);
-        SpecimenWrapper aliquot = AliquotHelper.addAliquot(
+        SpecimenHelper.addAliquot(selectedSampleTypes.get(0), cont3, pv, 0, 0);
+        SpecimenWrapper aliquot = SpecimenHelper.addAliquot(
             selectedSampleTypes.get(1), cont3, pv, 0, 1);
 
         childTypeL3.removeFromSampleTypeCollection(Arrays

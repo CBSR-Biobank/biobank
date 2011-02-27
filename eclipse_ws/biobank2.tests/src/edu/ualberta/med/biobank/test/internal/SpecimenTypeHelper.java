@@ -7,47 +7,49 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 
 public class SpecimenTypeHelper extends DbHelper {
 
-    public static List<SpecimenTypeWrapper> createdSampleTypes = new ArrayList<SpecimenTypeWrapper>();
+    public static List<SpecimenTypeWrapper> createdSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
 
-    public static SpecimenTypeWrapper newSampleType(String name) throws Exception {
+    public static SpecimenTypeWrapper newSpecimenType(String name)
+        throws Exception {
         SpecimenTypeWrapper type = new SpecimenTypeWrapper(appService);
         type.setName(name);
         type.setNameShort(name);
         return type;
     }
 
-    public static SpecimenTypeWrapper addSampleType(String name,
+    public static SpecimenTypeWrapper addSpecimenType(String name,
         boolean addToCreatedList) throws Exception {
-        SpecimenTypeWrapper type = newSampleType(name);
+        SpecimenTypeWrapper type = newSpecimenType(name);
         type.persist();
         if (addToCreatedList) {
-            createdSampleTypes.add(type);
+            createdSpecimenTypes.add(type);
         }
         return type;
     }
 
-    public static SpecimenTypeWrapper addSampleType(String name) throws Exception {
-        return addSampleType(name, true);
+    public static SpecimenTypeWrapper addSpecimenType(String name)
+        throws Exception {
+        return addSpecimenType(name, true);
     }
 
-    public static int addSampleTypes(String name) throws Exception {
+    public static int addSpecimenTypes(String name) throws Exception {
         int nber = r.nextInt(15) + 2;
         for (int i = 0; i < nber; i++) {
-            addSampleType(name + i);
+            addSpecimenType(name + i);
         }
         return nber;
     }
 
-    public static void deleteCreatedSampleTypes() throws Exception {
-        for (SpecimenTypeWrapper type : createdSampleTypes) {
+    public static void deleteCreatedSpecimenTypes() throws Exception {
+        for (SpecimenTypeWrapper type : createdSpecimenTypes) {
             type.reload();
             type.delete();
         }
-        createdSampleTypes.clear();
+        createdSpecimenTypes.clear();
     }
 
     public static void removeFromCreated(SpecimenTypeWrapper type) {
-        createdSampleTypes.remove(type);
+        createdSpecimenTypes.remove(type);
     }
 
 }

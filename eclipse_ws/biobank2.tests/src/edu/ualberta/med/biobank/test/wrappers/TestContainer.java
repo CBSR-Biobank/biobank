@@ -36,7 +36,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationE
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -898,7 +898,7 @@ public class TestContainer extends TestDatabase {
         SpecimenWrapper aliquot;
 
         for (SpecimenTypeWrapper st : allSampleTypes) {
-            aliquot = AliquotHelper.newAliquot(st, childL3, pv, 0, 0);
+            aliquot = SpecimenHelper.newAliquot(st, childL3, pv, 0, 0);
             if (selectedSampleTypes.contains(st)) {
                 Assert.assertTrue(childL3.canHoldAliquot(aliquot));
             } else {
@@ -906,7 +906,7 @@ public class TestContainer extends TestDatabase {
             }
         }
 
-        aliquot = AliquotHelper.newAliquot(null, childL3, pv, 0, 0);
+        aliquot = SpecimenHelper.newAliquot(null, childL3, pv, 0, 0);
         try {
             childL3.canHoldAliquot(aliquot);
             Assert
@@ -957,7 +957,7 @@ public class TestContainer extends TestDatabase {
                     Assert.assertNull(childL3.getSpecimen(row, col));
                     try {
                         childL3.addAliquot(row, col,
-                            AliquotHelper.newAliquot(sampleType));
+                            SpecimenHelper.newAliquot(sampleType));
                         Assert
                             .fail("should not be allowed to add invalid sample type");
                     } catch (Exception e) {
@@ -967,7 +967,7 @@ public class TestContainer extends TestDatabase {
 
                 sampleType = selectedSampleTypes.get(r.nextInt(n));
                 samplesTypesMap.put(new RowColPos(row, col), sampleType);
-                childL3.addAliquot(row, col, AliquotHelper.newAliquot(
+                childL3.addAliquot(row, col, SpecimenHelper.newAliquot(
                     sampleType, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
                 SpecimenWrapper aliquot = childL3.getSpecimen(row, col);
                 aliquot.setProcessingEvent(pv);
@@ -981,7 +981,7 @@ public class TestContainer extends TestDatabase {
         sampleType = selectedSampleTypes.get(r.nextInt(selectedSampleTypes
             .size()));
         try {
-            childL3.addAliquot(0, 0, AliquotHelper.newAliquot(sampleType));
+            childL3.addAliquot(0, 0, SpecimenHelper.newAliquot(sampleType));
             Assert
                 .fail("should not be allowed to add second sample type in same position");
         } catch (Exception e) {
@@ -1409,7 +1409,7 @@ public class TestContainer extends TestDatabase {
         childL4.getContainerType().addToSampleTypeCollection(
             Arrays.asList(sampleType));
         childL4.getContainerType().persist();
-        SpecimenWrapper aliquot = AliquotHelper.addAliquot(sampleType, childL4,
+        SpecimenWrapper aliquot = SpecimenHelper.addAliquot(sampleType, childL4,
             pv, 0, 0);
 
         // attempt to delete the containers - should fail
@@ -1776,9 +1776,9 @@ public class TestContainer extends TestDatabase {
 
         SpecimenTypeWrapper st = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
             false).get(0);
-        AliquotHelper.addAliquot(st, child, pv, 0, 0);
-        AliquotHelper.addAliquot(st, child, pv, 0, 1);
-        AliquotHelper.addAliquot(st, child, pv, 0, 2);
+        SpecimenHelper.addAliquot(st, child, pv, 0, 0);
+        SpecimenHelper.addAliquot(st, child, pv, 0, 1);
+        SpecimenHelper.addAliquot(st, child, pv, 0, 2);
 
         Assert.assertEquals(3, child.getSpecimens() == null ? 0 : child
             .getSpecimens().size());
