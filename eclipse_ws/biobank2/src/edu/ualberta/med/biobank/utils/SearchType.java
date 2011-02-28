@@ -106,8 +106,8 @@ public enum SearchType {
             SiteWrapper site) throws Exception {
 
             List<ProcessingEventWrapper> pvs = ProcessingEventWrapper
-                .getPatientVisitsWithWorksheet(SessionManager.getAppService(),
-                    searchString);
+                .getProcessingEventsWithWorksheet(
+                    SessionManager.getAppService(), searchString);
 
             if (pvs == null)
                 return null;

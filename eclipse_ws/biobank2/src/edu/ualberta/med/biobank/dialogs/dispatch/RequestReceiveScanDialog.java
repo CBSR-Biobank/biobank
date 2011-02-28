@@ -39,7 +39,7 @@ public class RequestReceiveScanDialog extends
     private int errors;
 
     public RequestReceiveScanDialog(Shell parentShell,
-        final RequestWrapper currentShipment, CenterWrapper centerWrapper) {
+        final RequestWrapper currentShipment, CenterWrapper<?> centerWrapper) {
         super(parentShell, currentShipment, centerWrapper);
     }
 

@@ -43,7 +43,7 @@ public class RequestAdapter extends AdapterBase {
 
         label += shipment.getId() + " - ";
         label += study.getNameShort() + " - ";
-        label += DateFormatter.formatAsDate(shipment.getDateCreated());
+        label += DateFormatter.formatAsDate(shipment.getCreated());
         return label;
 
     }

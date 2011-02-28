@@ -158,31 +158,29 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             }
         });
 
-        if (shipment.isInAcceptedState()) {
-            final Menu menu = new Menu(this);
-            tv.getTree().setMenu(menu);
+        final Menu menu = new Menu(this);
+        tv.getTree().setMenu(menu);
 
-            menu.addListener(SWT.Show, new Listener() {
-                @Override
-                public void handleEvent(Event event) {
-                    for (MenuItem menuItem : menu.getItems()) {
-                        menuItem.dispose();
-                    }
+        menu.addListener(SWT.Show, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                for (MenuItem menuItem : menu.getItems()) {
+                    menuItem.dispose();
+                }
 
-                    RequestAliquotWrapper ra = getSelectedAliquot();
-                    if (ra != null) {
-                        addClipboardCopySupport(menu, labelProvider);
-                        addSetUnavailableMenu(menu);
+                RequestAliquotWrapper ra = getSelectedAliquot();
+                if (ra != null) {
+                    addClipboardCopySupport(menu, labelProvider);
+                    addSetUnavailableMenu(menu);
+                    addClaimMenu(menu);
+                } else {
+                    Object node = getSelectedNode();
+                    if (node != null) {
                         addClaimMenu(menu);
-                    } else {
-                        Object node = getSelectedNode();
-                        if (node != null) {
-                            addClaimMenu(menu);
-                        }
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     protected Object getSelectedNode() {
