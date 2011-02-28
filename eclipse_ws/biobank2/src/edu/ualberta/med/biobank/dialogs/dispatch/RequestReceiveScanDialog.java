@@ -16,10 +16,11 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -38,7 +39,7 @@ public class RequestReceiveScanDialog extends
     private int errors;
 
     public RequestReceiveScanDialog(Shell parentShell,
-        final RequestWrapper currentShipment, CenterWrapper centerWrapper) {
+        final RequestWrapper currentShipment, CenterWrapper<?> centerWrapper) {
         super(parentShell, currentShipment, centerWrapper);
     }
 
@@ -65,7 +66,7 @@ public class RequestReceiveScanDialog extends
             currentShipment, cell.getValue());
         if (info.aliquot != null) {
             cell.setSpecimen(info.aliquot);
-            cell.setTitle(info.aliquot.getProcessingEvent().getPatient()
+            cell.setTitle(info.aliquot.getCollectionEvent().getPatient()
                 .getPnumber());
         }
         switch (info.type) {
@@ -199,10 +200,10 @@ public class RequestReceiveScanDialog extends
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        if ((currentShipment).getRequestAliquotCollection(false).size() > 0) {
+        if ((currentShipment).getRequestSpecimenCollection(false).size() > 0) {
             int i = 0;
             for (RequestSpecimenWrapper dsa : (currentShipment)
-                .getRequestAliquotCollection(false)) {
+                .getRequestSpecimenCollection(false)) {
                 int row = i / 12;
                 int col = i % 12;
                 if (row > 7)

@@ -216,8 +216,9 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                         return;
                     }
                     try {
-                        shipment.checkCanRemovePatient(patient);
-                        shipment.removePatients(Arrays.asList(patient));
+                        // FIXME:
+                        // shipment.checkCanRemovePatient(patient);
+                        // shipment.removePatients(Arrays.asList(patient));
                     } catch (Exception e) {
                         BioBankPlugin
                             .openAsyncError("Cannot remove patient", e);

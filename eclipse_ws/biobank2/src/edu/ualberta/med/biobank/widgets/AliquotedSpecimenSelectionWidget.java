@@ -29,6 +29,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
@@ -51,8 +52,9 @@ public class AliquotedSpecimenSelectionWidget {
     private Binding binding;
     private Object nextWidget;
 
-    public SampleTypeSelectionWidget(Composite parent, Character letter,
-        List<SpecimenTypeWrapper> types, FormToolkit toolkit) {
+    public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
+        List<SpecimenTypeWrapper> sourceTypes,
+        List<SpecimenTypeWrapper> resultTypes, FormToolkit toolkit) {
 
         if (letter != null) {
             toolkit.createLabel(parent, letter.toString(), SWT.LEFT);
@@ -175,20 +177,19 @@ public class AliquotedSpecimenSelectionWidget {
         }
     }
 
-<<<<<<< HEAD:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/SampleTypeSelectionWidget.java
-    public SpecimenTypeWrapper getSelection() {
-        return (SpecimenTypeWrapper) ((StructuredSelection) cv.getSelection())
-            .getFirstElement();
-=======
-    public SampleTypeWrapper getResultSelection() {
-        return (SampleTypeWrapper) ((StructuredSelection) cvResult
+    public SpecimenTypeWrapper getResultSelection() {
+        return (SpecimenTypeWrapper) ((StructuredSelection) cvResult
             .getSelection()).getFirstElement();
     }
 
-    public SourceVesselWrapper getSourceSelection() {
-        return (SourceVesselWrapper) ((StructuredSelection) cvSource
+    public SpecimenTypeWrapper getSelection() {
+        return (SpecimenTypeWrapper) ((StructuredSelection) cvSource
             .getSelection()).getFirstElement();
->>>>>>> dev-aaron:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/AliquotedSpecimenSelectionWidget.java
+    }
+
+    @Deprecated
+    public SourceVesselWrapper getSourceSelection() {
+        return null;
     }
 
     public void addBinding(WidgetCreator dbc) {
@@ -250,13 +251,8 @@ public class AliquotedSpecimenSelectionWidget {
         this.nextWidget = nextWidget;
     }
 
-<<<<<<< HEAD:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/SampleTypeSelectionWidget.java
     public void setTypes(List<SpecimenTypeWrapper> types) {
-        cv.setInput(types);
-=======
-    public void setTypes(List<SampleTypeWrapper> types) {
         cvResult.setInput(types);
->>>>>>> dev-aaron:eclipse_ws/biobank2/src/edu/ualberta/med/biobank/widgets/AliquotedSpecimenSelectionWidget.java
     }
 
     public void setFocus() {

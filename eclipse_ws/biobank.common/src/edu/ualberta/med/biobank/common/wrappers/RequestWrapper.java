@@ -11,6 +11,7 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.RequestBaseWrapper;
 import edu.ualberta.med.biobank.model.Request;
 import edu.ualberta.med.biobank.model.RequestSpecimen;

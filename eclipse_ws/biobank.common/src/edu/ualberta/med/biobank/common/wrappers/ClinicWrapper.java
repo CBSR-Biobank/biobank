@@ -166,7 +166,8 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         deletedContacts.clear();
     }
 
+    @Deprecated
     public List<CollectionEventWrapper> getCollectionEventCollection() {
-        return getCollectionEventCollection(false);
+        return null;
     }
 }

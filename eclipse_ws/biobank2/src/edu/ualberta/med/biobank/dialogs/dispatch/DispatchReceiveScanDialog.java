@@ -16,10 +16,11 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -65,7 +66,7 @@ public class DispatchReceiveScanDialog extends
             currentShipment, cell.getValue());
         if (info.aliquot != null) {
             cell.setSpecimen(info.aliquot);
-            cell.setTitle(info.aliquot.getProcessingEvent().getPatient()
+            cell.setTitle(info.aliquot.getCollectionEvent().getPatient()
                 .getPnumber());
         }
         switch (info.type) {

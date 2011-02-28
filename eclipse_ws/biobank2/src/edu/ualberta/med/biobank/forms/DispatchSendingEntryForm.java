@@ -20,10 +20,11 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
@@ -94,15 +95,15 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
         if (!dispatch.isNew() && !dispatch.isInCreationState()) {
             ShippingMethodWrapper selectedShippingMethod = dispatch
-                .getShippingMethod();
+                .getShipmentInfo().getShippingMethod();
             widgetCreator.createComboViewer(client, "Shipping Method",
                 ShippingMethodWrapper.getShippingMethods(SessionManager
                     .getAppService()), selectedShippingMethod, null,
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
-                        dispatch
-                            .setShippingMethod((ShippingMethodWrapper) selectedObject);
+                        dispatch.getShipmentInfo().setShippingMethod(
+                            (ShippingMethodWrapper) selectedObject);
                     }
                 });
 
@@ -171,7 +172,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
             dispatch, edit) {
             @Override
             public List<DispatchSpecimenWrapper> getInternalDispatchAliquots() {
-                return dispatch.getNonProcessedDispatchAliquotCollection();
+                return dispatch.getNonProcessedDispatchSpecimenCollection();
             }
 
         };
@@ -237,7 +238,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
             return;
         }
         try {
-            dispatch.addNewAliquots(Arrays.asList(aliquot));
+            dispatch.addNewAliquots(Arrays.asList(aliquot), true);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error adding aliquots", e);
         }

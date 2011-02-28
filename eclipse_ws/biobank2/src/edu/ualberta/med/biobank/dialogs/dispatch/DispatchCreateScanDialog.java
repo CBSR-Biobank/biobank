@@ -19,13 +19,13 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -218,7 +218,7 @@ public class DispatchCreateScanDialog extends
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)
                             scanCell.setStatus(CellStatus.FILLED);
-                            scanCell.setTitle(foundAliquot.getProcessingEvent()
+                            scanCell.setTitle(foundAliquot.getCollectionEvent()
                                 .getPatient().getPnumber());
                             scanCell.setSpecimen(foundAliquot);
                             if (currentAliquots != null
@@ -235,7 +235,7 @@ public class DispatchCreateScanDialog extends
                     } else {
                         // should not be there
                         scanCell.setStatus(CellStatus.ERROR);
-                        scanCell.setTitle(foundAliquot.getProcessingEvent()
+                        scanCell.setTitle(foundAliquot.getCollectionEvent()
                             .getPatient().getPnumber());
                         scanCell
                             .setInformation("This aliquot should be on another pallet"); //$NON-NLS-1$
@@ -274,7 +274,7 @@ public class DispatchCreateScanDialog extends
                 cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
             }
         }
-        (currentShipment).addNewAliquots(aliquots);
+        (currentShipment).addNewAliquots(aliquots, true);
         if (currentPallet != null) {
             removedPallets.add(currentPallet);
         }
@@ -321,7 +321,8 @@ public class DispatchCreateScanDialog extends
                     .getAppService(), (currentShipment).getSender().getId());
             return cells;
         } else {
-            for (SpecimenWrapper aliquot : currentPallet.getSpecimens().values()) {
+            for (SpecimenWrapper aliquot : currentPallet.getSpecimens()
+                .values()) {
                 PalletCell cell = new PalletCell(new ScanCell(
                     aliquot.getPosition().row, aliquot.getPosition().col,
                     aliquot.getInventoryId()));

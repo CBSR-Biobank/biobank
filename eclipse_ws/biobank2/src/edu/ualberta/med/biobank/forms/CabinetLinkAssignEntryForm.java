@@ -37,13 +37,14 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -588,7 +589,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 public void doSelection(Object selectedObject) {
                     if (aliquotMode == AliquotMode.MOVE_ALIQUOT)
                         return;
-                    aliquot.setSpecimenType((SpecimenTypeWrapper) selectedObject);
+                    aliquot
+                        .setSpecimenType((SpecimenTypeWrapper) selectedObject);
 
                 }
             }); //$NON-NLS-1$
@@ -724,7 +726,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Problem reloading study", e);
             }
-            for (AliquotedSpecimenWrapper ss : study.getSampleStorageCollection()) {
+            for (AliquotedSpecimenWrapper ss : study
+                .getAliquotedSpecimenCollection()) {
                 if (ss.getActivityStatus().isActive()) {
                     SpecimenTypeWrapper type = ss.getSpecimenType();
                     if (binTypes.contains(type)) {
@@ -811,7 +814,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 "This aliquot is currently in transit in a dispatch.");
         }
         canLaunchCheck.setValue(true);
-        PatientWrapper patient = aliquot.getProcessingEvent().getPatient();
+        PatientWrapper patient = aliquot.getCollectionEvent().getPatient();
         linkFormPatientManagement.setCurrentPatientAndVisit(patient,
             aliquot.getProcessingEvent());
         String positionString = aliquot.getPositionString(true, false);
@@ -884,7 +887,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     @Override
     protected void saveForm() throws Exception {
         if (newAliquotCreation) {
-            aliquot.setLinkDate(new Date());
+            aliquot.setCreatedAt(new Date());
             aliquot.setQuantityFromType();
             aliquot.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
@@ -903,8 +906,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         appendLogNLS(msgString, posStr, aliquot.getInventoryId(), aliquot
             .getSpecimenType().getName(), linkFormPatientManagement
             .getCurrentPatient().getPnumber(), aliquot.getProcessingEvent()
-            .getFormattedCreatedAt(), aliquot.getProcessingEvent().getCollectionEvent()
-            .getClinic().getName());
+            .getFormattedCreatedAt(), aliquot.getCurrentCenter().getName());
         setFinished(false);
     }
 

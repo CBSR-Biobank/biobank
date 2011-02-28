@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import edu.ualberta.med.biobank.model.RequestAliquot;
+import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.RequestAliquotAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
@@ -49,8 +49,8 @@ public class RequestTableGroup implements Node {
             ship));
         groups.add(new RequestTableGroup(
             RequestSpecimenState.NONPROCESSED_STATE, ship));
-        groups.add(new RequestTableGroup(RequestSpecimenState.UNAVAILABLE_STATE,
-            ship));
+        groups.add(new RequestTableGroup(
+            RequestSpecimenState.UNAVAILABLE_STATE, ship));
         return groups;
     }
 
@@ -59,7 +59,7 @@ public class RequestTableGroup implements Node {
         // test hql
         HQLCriteria query = new HQLCriteria(
             "select ra, cp.container, cp.path from "
-                + RequestAliquot.class.getName()
+                + RequestSpecimen.class.getName()
                 + " ra inner join fetch ra.aliquot inner join fetch ra.aliquot.sampleType, "
                 + ContainerPath.class.getName()
                 + " cp where ra.request ="
@@ -80,7 +80,7 @@ public class RequestTableGroup implements Node {
         // get all the containers to display
         for (Object o : results) {
             String path = (String) ((Object[]) o)[2];
-            RequestAliquot ra = (RequestAliquot) ((Object[]) o)[0];
+            RequestSpecimen ra = (RequestSpecimen) ((Object[]) o)[0];
             Container container = (Container) ((Object[]) o)[1];
             String[] cIds = p.split(path);
             int i = 0;

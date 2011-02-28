@@ -82,7 +82,7 @@ public class ContainerTypeViewForm extends BiobankViewForm {
         boolean containsSamples = false;
         if (containerType.getSpecimenTypeCollection() != null
             && containerType.getSpecimenTypeCollection().size() > 0) {
-            createSampleTypesSection();
+            createSpecimenTypesSection();
             containsSamples = true;
         }
         if (containerType.getChildContainerTypeCollection() != null
@@ -171,7 +171,8 @@ public class ContainerTypeViewForm extends BiobankViewForm {
 
     private void setSpecimenTypesValues() {
         if (sampleTypesViewer != null) {
-            sampleTypesViewer.setInput(containerType.getSpecimenTypeCollection());
+            sampleTypesViewer.setInput(containerType
+                .getSpecimenTypeCollection());
         }
     }
 

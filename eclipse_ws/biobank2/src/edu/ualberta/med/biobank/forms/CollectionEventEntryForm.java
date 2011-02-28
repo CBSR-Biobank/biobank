@@ -7,22 +7,17 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
-import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -31,7 +26,6 @@ import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
-import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -39,7 +33,6 @@ import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SourceVesselEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class CollectionEventEntryForm extends BiobankEntryForm {
 
@@ -54,9 +47,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     public static final String MSG_NO_VISIT_NUMBER = "Visit must have a number";
 
-    private CollectionEventAdapter patientVisitAdapter;
+    private CollectionEventAdapter ceventAdapter;
 
-    private CollectionEventWrapper patientVisit;
+    private CollectionEventWrapper cevent;
 
     private PatientWrapper patient;
 
@@ -66,6 +59,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private List<FormPvCustomInfo> pvCustomInfoList;
 
+    // FIXME should be source specimen table
     private SourceVesselEntryInfoTable pvSourceVesseltable;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
@@ -85,22 +79,20 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        patientVisitAdapter = (CollectionEventAdapter) adapter;
-        patientVisit = patientVisitAdapter.getWrapper();
-        patient = patientVisit.getPatient();
+        ceventAdapter = (CollectionEventAdapter) adapter;
+        cevent = ceventAdapter.getWrapper();
+        patient = cevent.getPatient();
         retrieve();
         try {
-            patientVisit.logEdit(null);
+            cevent.logEdit(null);
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log edit failed", e);
         }
         String tabName;
-        if (patientVisit.isNew()) {
-            tabName = "New Patient Visit";
-            patientVisit.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
+        if (cevent.isNew()) {
+            tabName = "New Collection Event";
         } else {
-            tabName = "Visit " + patientVisit.getFormattedDateProcessed();
+            tabName = "Collection Event ";
         }
 
         setPartName(tabName);
@@ -108,14 +100,15 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private void retrieve() {
         try {
-            if (!patientVisit.isNew()) {
-                patientVisit.reload();
+            if (!cevent.isNew()) {
+                cevent.reload();
             }
             patient.reload();
         } catch (Exception e) {
-            logger.error("Error while retrieving patient visit "
-                + patientVisitAdapter.getWrapper().getFormattedDateProcessed()
-                + " (Patient " + patientVisit.getPatient() + ")", e);
+            logger.error(
+                "Error while retrieving patient visit "
+                    + cevent.getFormattedDateReceived() + " (Patient "
+                    + cevent.getPatient() + ")", e);
         }
     }
 
@@ -125,8 +118,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
-        createSourcesSection();
-        if (patientVisit.isNew()) {
+        createSourceSpecimensSection();
+        if (cevent.isNew()) {
             setDirty(true);
         }
     }
@@ -142,58 +135,40 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
             .getStudy().getName());
 
-        activityStatusComboViewer = createComboViewer(client,
-            "Activity Status",
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            patientVisit.getActivityStatus(),
-            "Patient visit must have an activity status",
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    patientVisit
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
-                }
-            });
-        if (patientVisit.getActivityStatus() != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                patientVisit.getActivityStatus()));
-        }
-
         createReadOnlyLabelledField(client, SWT.NONE, "Patient",
             patient.getPnumber());
 
-        dateDrawnWidget = createDateTimeWidget(client, "Date Drawn",
-            patientVisit.getDateDrawn(), patientVisit, "dateDrawn",
-            new NotNullValidator("Date Drawn should be set"));
-
-        setFirstControl(dateDrawnWidget);
+        // FIXME first control should be patient visit number
+        // setFirstControl(dateDrawnWidget);
 
         createPvDataSection(client);
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, patientVisit, "comment", null);
+            "Comments", null, cevent, "comment", null);
     }
 
-    private void createSourcesSection() {
-        Section section = createSection("Source Vessels");
-        pvSourceVesseltable = new SourceVesselEntryInfoTable(section,
-            patientVisit.getSourceVesselCollection(true), "Add a Specimen",
-            "Edit a Specimen");
-        pvSourceVesseltable.adaptToToolkit(toolkit, true);
-        pvSourceVesseltable.addSelectionChangedListener(listener);
-
-        addSectionToolbar(section, "Add Source Vessel", new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                pvSourceVesseltable.addSourceVessel();
-            }
-        });
-        section.setClient(pvSourceVesseltable);
+    private void createSourceSpecimensSection() {
+        // FIXME: specimens should be diplayed here
+        // Section section = createSection("Source Vessels");
+        // pvSourceVesseltable = new SourceVesselEntryInfoTable(section,
+        // cevent.getSpecimenCollection(true), "Add a Specimen",
+        // "Edit a Specimen");
+        // pvSourceVesseltable.adaptToToolkit(toolkit, true);
+        // pvSourceVesseltable.addSelectionChangedListener(listener);
+        //
+        // addSectionToolbar(section, "Add Source Vessel", new
+        // SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // pvSourceVesseltable.addSourceVessel();
+        // }
+        // });
+        // section.setClient(pvSourceVesseltable);
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        StudyWrapper study = patientVisit.getPatient().getStudy();
-        String[] labels = study.getStudyPvAttrLabels();
+        StudyWrapper study = cevent.getPatient().getStudy();
+        String[] labels = study.getStudyEventAttrLabels();
         if (labels == null)
             return;
 
@@ -202,10 +177,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         for (String label : labels) {
             FormPvCustomInfo pvCustomInfo = new FormPvCustomInfo();
             pvCustomInfo.setLabel(label);
-            pvCustomInfo.setType(study.getStudyPvAttrType(label));
+            pvCustomInfo.setType(study.getStudyEventAttrType(label));
             pvCustomInfo.setAllowedValues(study
-                .getStudyPvAttrPermissible(label));
-            pvCustomInfo.setValue(patientVisit.getPvAttrValue(label));
+                .getStudyEventAttrPermissible(label));
+            pvCustomInfo.setValue(cevent.getEventAttrValue(label));
             pvCustomInfo.control = getControlForLabel(client, pvCustomInfo);
             pvCustomInfoList.add(pvCustomInfo);
         }
@@ -257,28 +232,29 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected String getOkMessage() {
-        return (patientVisit.isNew()) ? MSG_NEW_PATIENT_VISIT_OK
+        return (cevent.isNew()) ? MSG_NEW_PATIENT_VISIT_OK
             : MSG_PATIENT_VISIT_OK;
     }
 
     @Override
     protected void doBeforeSave() throws Exception {
-        PatientAdapter patientAdapter = (PatientAdapter) patientVisitAdapter
+        PatientAdapter patientAdapter = (PatientAdapter) ceventAdapter
             .getParent();
         if (patientAdapter != null)
-            patientVisit.setPatient(patientAdapter.getWrapper());
+            cevent.setPatient(patientAdapter.getWrapper());
 
-        patientVisit.addToSourceVesselCollection(pvSourceVesseltable
-            .getAddedOrModifiedSourceVessels());
-        patientVisit.removeFromSourceVesselCollection(pvSourceVesseltable
-            .getDeletedSourceVessels());
+        // FIXME should be source specimens
+        // cevent.addToSourceVesselCollection(pvSourceVesseltable
+        // .getAddedOrModifiedSourceVessels());
+        // cevent.removeFromSourceVesselCollection(pvSourceVesseltable
+        // .getDeletedSourceVessels());
         savePvCustomInfo();
     }
 
     @Override
     protected void saveForm() throws Exception {
-        patientVisit.persist();
-        SessionManager.updateAllSimilarNodes(patientVisitAdapter, true);
+        cevent.persist();
+        SessionManager.updateAllSimilarNodes(ceventAdapter, true);
     }
 
     private void savePvCustomInfo() throws Exception {
@@ -288,7 +264,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             if (value == null)
                 continue;
 
-            patientVisit.setPvAttrValue(combinedPvInfo.getLabel(), value);
+            cevent.setEventAttrValue(combinedPvInfo.getLabel(), value);
         }
     }
 
@@ -315,35 +291,24 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @Override
     public void reset() throws Exception {
-        PatientWrapper patient = patientVisit.getPatient();
+        PatientWrapper patient = cevent.getPatient();
         patient.reload();
-        patientVisit.reload();
+        cevent.reload();
         super.reset();
-        patientVisit.setPatient(patient);
+        cevent.setPatient(patient);
 
-        if (patientVisit.getDateDrawn() == null) {
-            dateDrawnWidget.setDate(null);
-        }
         pvSourceVesseltable.reload();
         resetPvCustomInfo();
-
-        ActivityStatusWrapper activity = patientVisit.getActivityStatus();
-        if (activity != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                activity));
-        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
-            activityStatusComboViewer.getCombo().deselectAll();
-        }
     }
 
     private void resetPvCustomInfo() throws Exception {
-        StudyWrapper study = patientVisit.getPatient().getStudy();
-        String[] labels = study.getStudyPvAttrLabels();
+        StudyWrapper study = cevent.getPatient().getStudy();
+        String[] labels = study.getStudyEventAttrLabels();
         if (labels == null)
             return;
 
         for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
-            pvCustomInfo.setValue(patientVisit.getPvAttrValue(pvCustomInfo
+            pvCustomInfo.setValue(cevent.getEventAttrValue(pvCustomInfo
                 .getLabel()));
             if (pvCustomInfo.getType().equals("date_time")) {
                 DateTimeWidget dateWidget = (DateTimeWidget) pvCustomInfo.control;

@@ -26,6 +26,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
@@ -88,15 +89,15 @@ public class DispatchViewForm extends BiobankViewForm {
         try {
             dispatch.reload();
         } catch (Exception ex) {
-            logger.error(
-                "Error while retrieving shipment " + dispatch.getWaybill(), ex);
+            logger.error("Error while retrieving shipment "
+                + dispatch.getShipmentInfo().getWaybill(), ex);
         }
     }
 
     @Override
     public void reload() throws Exception {
         retrieveDispatch();
-        setPartName("Dispatch sent on " + dispatch.getDeparted());
+        setPartName("Dispatch sent on " + dispatch.getDepartedAt());
         setDispatchValues();
         aliquotsTree.refresh();
     }
@@ -104,7 +105,7 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         String dateString = "";
-        if (dispatch.getDeparted() != null) {
+        if (dispatch.getDepartedAt() != null) {
             dateString = " on " + dispatch.getFormattedDeparted();
         }
         canSeeEverything = true;
@@ -161,7 +162,7 @@ public class DispatchViewForm extends BiobankViewForm {
                 parent, dispatch, false) {
                 @Override
                 public List<DispatchSpecimenWrapper> getInternalDispatchAliquots() {
-                    return dispatch.getNonProcessedDispatchAliquotCollection();
+                    return dispatch.getNonProcessedDispatchSpecimenCollection();
                 }
 
             };
@@ -342,13 +343,14 @@ public class DispatchViewForm extends BiobankViewForm {
         if (departedLabel != null)
             setTextValue(departedLabel, dispatch.getFormattedDeparted());
         if (shippingMethodLabel != null)
-            setTextValue(shippingMethodLabel,
-                dispatch.getShippingMethod() == null ? "" : dispatch
-                    .getShippingMethod().getName());
+            setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
+                .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
+                .getShippingMethod().getName());
         if (waybillLabel != null)
-            setTextValue(waybillLabel, dispatch.getWaybill());
+            setTextValue(waybillLabel, dispatch.getShipmentInfo().getWaybill());
         if (dateReceivedLabel != null)
-            setTextValue(dateReceivedLabel, dispatch.getFormattedDateReceived());
+            setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
+                .getFormattedDateReceived());
         setTextValue(commentLabel, dispatch.getComment());
     }
 

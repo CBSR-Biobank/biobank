@@ -56,7 +56,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean hasErrors() {
         return !getDispatchSpecimenCollectionWithState(
-            DispatchSpecimenState.MISSING, DispatchSpecimenState.EXTRA).isEmpty();
+            DispatchSpecimenState.MISSING, DispatchSpecimenState.EXTRA)
+            .isEmpty();
     }
 
     @Override
@@ -164,7 +165,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
         // already added dsa
         List<DispatchSpecimenWrapper> currentDaList = getDispatchSpecimenCollection(false);
-        List<DispatchSpecimenWrapper> newDispatchAliquots = new ArrayList<DispatchSpecimenWrapper>();
+        List<DispatchSpecimenWrapper> newDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
         List<SpecimenWrapper> currentAliquotList = new ArrayList<SpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : currentDaList) {
@@ -178,15 +179,15 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     appService);
                 dsa.setSpecimen(aliquot);
                 dsa.setDispatch(this);
-                newDispatchAliquots.add(dsa);
+                newDispatchSpecimens.add(dsa);
             }
         }
 
-        addToDispatchSpecimenCollection(newDispatchAliquots);
+        addToDispatchSpecimenCollection(newDispatchSpecimens);
 
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
-        deletedDispatchedAliquots.removeAll(newDispatchAliquots);
+        deletedDispatchedSpecimens.removeAll(newDispatchSpecimens);
     }
 
     public class CheckStatus {
@@ -201,9 +202,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Deprecated
-    public CheckStatus checkCanAddAliquot(AliquotWrapper aliquot,
+    public CheckStatus checkCanAddAliquot(SpecimenWrapper spc,
         boolean checkAlreadyAdded) {
-        return checkCanAddAliquot(getAliquotCollection(), aliquot,
+        return checkCanAddSpecimen(getSpecimenCollection(), spc,
             checkAlreadyAdded);
     }
 
@@ -211,8 +212,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     /**
      * need to rewrite this. Compare with following method that jon rewrote
      */
-    protected CheckStatus checkCanAddAliquot(
-        List<AliquotWrapper> currentAliquots, AliquotWrapper aliquot,
+    protected CheckStatus checkCanAddSpecimen(
+        List<SpecimenWrapper> currentAliquots, SpecimenWrapper aliquot,
         boolean checkAlreadyAdded) {
         // if (aliquot.isNew()) {
         // return new CheckStatus(false, "Cannot add aliquot "
@@ -225,7 +226,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         // }
         // if (aliquot.getPosition() == null) {
         // return new CheckStatus(false, "Cannot add aliquot "
-        // + aliquot.getInventoryIgetExtraDispatchAliquotsd()
+        // + aliquot.getInventoryIgetExtraDispatchSpecimensd()
         // + ": it has no position. A position should be first assigned.");
         // }
         // if (aliquot.getParent() != null
@@ -262,8 +263,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     /**
      * See previous method comment. Return Checkstatus for compiling only
      */
-    public CheckStatus checkCanAddAliquot(List<AliquotWrapper> currentAliquots,
-        AliquotWrapper aliquot) throws BiobankCheckException {
+    public CheckStatus checkCanAddSpecimen(
+        List<SpecimenWrapper> currentAliquots, SpecimenWrapper aliquot)
+        throws BiobankCheckException {
         if (aliquot.isNew()) {
             throw new BiobankCheckException("Cannot add aliquot "
                 + aliquot.getInventoryId() + ": it has not already been saved");
@@ -324,15 +326,15 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             return;
 
         List<DispatchSpecimenWrapper> currentDaList = getDispatchSpecimenCollection(false);
-        List<DispatchSpecimenWrapper> removeDispatchAliquots = new ArrayList<DispatchSpecimenWrapper>();
+        List<DispatchSpecimenWrapper> removeDispatchSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
         for (DispatchSpecimenWrapper dsa : currentDaList) {
             if (aliquotsToRemove.contains(dsa.getSpecimen())) {
-                removeDispatchAliquots.add(dsa);
+                removeDispatchSpecimens.add(dsa);
                 deletedDispatchedSpecimens.add(dsa);
             }
         }
-        removeFromDispatchSpecimenCollection(removeDispatchAliquots);
+        removeFromDispatchSpecimenCollection(removeDispatchSpecimens);
     }
 
     public void receiveSpecimens(List<SpecimenWrapper> specimensToReceive) {
@@ -508,35 +510,31 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return DispatchState.LOST.equals(getState());
     }
 
-    public List<DispatchAliquotWrapper> getNonProcessedDispatchAliquotCollection() {
-        return getDispatchAliquotCollectionWithState(DispatchItemState.NONE);
+    public List<DispatchSpecimenWrapper> getNonProcessedDispatchSpecimenCollection() {
+        return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
     }
 
-    public List<DispatchAliquotWrapper> getExtraDispatchAliquots() {
-        return getDispatchAliquotCollectionWithState(DispatchItemState.EXTRA);
+    public List<DispatchSpecimenWrapper> getExtraDispatchSpecimens() {
+        return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.EXTRA);
     }
 
-    public List<DispatchAliquotWrapper> getMissingDispatchAliquots() {
-        return getDispatchAliquotCollectionWithState(DispatchItemState.MISSING);
+    public List<DispatchSpecimenWrapper> getMissingDispatchSpecimens() {
+        return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.MISSING);
     }
 
-    public List<DispatchAliquotWrapper> getReceivedDispatchAliquots() {
-        return getDispatchAliquotCollectionWithState(DispatchItemState.RECEIVED);
+    public List<DispatchSpecimenWrapper> getReceivedDispatchSpecimens() {
+        return getDispatchSpecimenCollectionWithState(DispatchSpecimenState.RECEIVED);
     }
 
-    public void addExtraAliquots(List<AliquotWrapper> extraAliquots) {
-        List<DispatchAliquotWrapper> daws = new ArrayList<DispatchAliquotWrapper>();
-        for (AliquotWrapper a : extraAliquots) {
-            DispatchAliquotWrapper da = new DispatchAliquotWrapper(appService);
-            da.setAliquot(a);
-            da.setDispatchItemState(DispatchItemState.EXTRA);
+    public void addExtraAliquots(List<SpecimenWrapper> extraAliquots) {
+        List<DispatchSpecimenWrapper> daws = new ArrayList<DispatchSpecimenWrapper>();
+        for (SpecimenWrapper a : extraAliquots) {
+            DispatchSpecimenWrapper da = new DispatchSpecimenWrapper(appService);
+            da.setSpecimen(a);
+            da.setDispatchSpecimenState(DispatchSpecimenState.EXTRA);
             daws.add(da);
         }
-        addToDispatchAliquotCollection(daws);
-    }
-
-    public List<DispatchAliquotWrapper> getDispatchSpecimenCollection() {
-        return getDispatchAliquotCollection(false);
+        addToDispatchSpecimenCollection(daws);
     }
 
     @Deprecated
@@ -546,7 +544,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Deprecated
-    public void addNewAliquots(List<AliquotWrapper> asList, boolean b) {
+    public void addNewAliquots(List<SpecimenWrapper> asList, boolean b) {
         // TODO this can be removed once the gui doesn't use it anymore
 
     }
@@ -557,14 +555,14 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Deprecated
-    public void addExtraAliquots(List<AliquotWrapper> extraAliquots, boolean b)
+    public void addExtraAliquots(List<SpecimenWrapper> extraAliquots, boolean b)
         throws BiobankCheckException {
         // TODO Auto-generated method stub
 
     }
 
     @Deprecated
-    public List<DispatchAliquotWrapper> getDispatchAliquotCollection() {
+    public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
         // TODO Auto-generated method stub
         return null;
     }
@@ -588,7 +586,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     @Deprecated
-    public void addAliquots(List<AliquotWrapper> asList) {
+    public void addAliquots(List<SpecimenWrapper> asList) {
         // TODO seems that this method has been removed... ?
 
     }

@@ -11,8 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-@Deprecated
-public class SampleStorageInfoTable extends
+public class AliquotedSpecimenInfoTable extends
     InfoTableWidget<AliquotedSpecimenWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 5;
@@ -35,7 +34,7 @@ public class SampleStorageInfoTable extends
     private static final String[] HEADINGS = new String[] { "Sample type",
         "Volume (ml)", "Quantity", "Activity status" };
 
-    public SampleStorageInfoTable(Composite parent,
+    public AliquotedSpecimenInfoTable(Composite parent,
         List<AliquotedSpecimenWrapper> sampleStorageCollection) {
         super(parent, sampleStorageCollection, HEADINGS, PAGE_SIZE_ROWS);
     }

@@ -28,8 +28,8 @@ import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
@@ -66,7 +66,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     private MultiSelectWidget childContainerTypesMultiSelect;
 
-    private List<SpecimenTypeWrapper> allSampleTypes;
+    private List<SpecimenTypeWrapper> allSpecimenTypes;
 
     private List<ContainerTypeWrapper> availSubContainerTypes;
 
@@ -307,13 +307,14 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         form.layout(true, true);
     }
 
-    private void createSampleTypesSection(Composite parent) throws Exception {
-        allSampleTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService, true);
+    private void createSpecimenTypesSection(Composite parent) throws Exception {
+        allSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
+            true);
 
-        samplesMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
+        specimensMultiSelect = new MultiSelectWidget(parent, SWT.NONE,
             "Selected Sample Types", "Available Sample Types", 100);
-        samplesMultiSelect.adaptToToolkit(toolkit, true);
-        samplesMultiSelect.addSelectionChangedListener(multiSelectListener);
+        specimensMultiSelect.adaptToToolkit(toolkit, true);
+        specimensMultiSelect.addSelectionChangedListener(multiSelectListener);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
         gd.horizontalSpan = 2;
         specimensMultiSelect.setLayoutData(gd);
@@ -324,19 +325,20 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private void setSpecimenTypesSelection() {
         Collection<SpecimenTypeWrapper> stSamplesTypes = containerType
             .getSpecimenTypeCollection();
-        LinkedHashMap<Integer, String> availSampleTypes = new LinkedHashMap<Integer, String>();
-        List<Integer> selSampleTypes = new ArrayList<Integer>();
+        LinkedHashMap<Integer, String> availSpecimenTypes = new LinkedHashMap<Integer, String>();
+        List<Integer> selSpecimenTypes = new ArrayList<Integer>();
 
         if (stSamplesTypes != null) {
             for (SpecimenTypeWrapper sampleType : stSamplesTypes) {
-                selSampleTypes.add(sampleType.getId());
+                selSpecimenTypes.add(sampleType.getId());
             }
         }
 
-        for (SpecimenTypeWrapper sampleType : allSampleTypes) {
-            availSampleTypes.put(sampleType.getId(), sampleType.getName());
+        for (SpecimenTypeWrapper sampleType : allSpecimenTypes) {
+            availSpecimenTypes.put(sampleType.getId(), sampleType.getName());
         }
-        specimensMultiSelect.setSelections(availSampleTypes, selSampleTypes);
+        specimensMultiSelect
+            .setSelections(availSpecimenTypes, selSpecimenTypes);
     }
 
     private void createChildContainerTypesSection(Composite parent) {
@@ -403,12 +405,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private void setSpecimenTypes() throws BiobankCheckException {
         List<Integer> addedIds = new ArrayList<Integer>();
         List<Integer> removedIds = new ArrayList<Integer>();
-        if (hasSamples) {
-            addedIds = samplesMultiSelect.getAddedToSelection();
-            removedIds = samplesMultiSelect.getRemovedToSelection();
-            List<SpecimenTypeWrapper> addedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
-            List<SpecimenTypeWrapper> removedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
-            for (SpecimenTypeWrapper sampleType : allSampleTypes) {
+        if (hasSpecimens) {
+            addedIds = specimensMultiSelect.getAddedToSelection();
+            removedIds = specimensMultiSelect.getRemovedToSelection();
+            List<SpecimenTypeWrapper> addedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
+            List<SpecimenTypeWrapper> removedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
+            for (SpecimenTypeWrapper sampleType : allSpecimenTypes) {
                 if (addedIds.indexOf(sampleType.getId()) >= 0) {
                     addedSpecimenTypes.add(sampleType);
                 }
@@ -426,10 +428,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                     Messages
                         .getString("ContainerTypeEntryForm.save.error.msg.specimen.removed"));
             }
-            containerType.addToSampleTypeCollection(addedSpecimenTypes);
-            containerType.removeFromSampleTypeCollection(removedSpecimenTypes);
+            containerType.addToSpecimenTypeCollection(addedSpecimenTypes);
+            containerType
+                .removeFromSpecimenTypeCollection(removedSpecimenTypes);
         } else {
-            containerType.removeFromSampleTypeCollection(containerType
+            containerType.removeFromSpecimenTypeCollection(containerType
                 .getSpecimenTypeCollection());
         }
     }
@@ -488,17 +491,17 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         }
         setChildContainerTypeSelection();
         setSpecimenTypesSelection();
-        showContainersOrSamples();
+        showContainersOrSpecimens();
         setLabelingScheme();
         setActivityStatus();
     }
 
-    private void showContainersOrSamples() {
-        hasSamples = containerType.getSpecimenTypeCollection() != null
+    private void showContainersOrSpecimens() {
+        hasSpecimens = containerType.getSpecimenTypeCollection() != null
             && containerType.getSpecimenTypeCollection().size() > 0;
-        showSamples(hasSamples);
-        hasSamplesRadio.setSelection(hasSamples);
-        hasContainersRadio.setSelection(!hasSamples);
+        showSpecimens(hasSpecimens);
+        hasSpecimensRadio.setSelection(hasSpecimens);
+        hasContainersRadio.setSelection(!hasSpecimens);
     }
 
     private void setLabelingScheme() {

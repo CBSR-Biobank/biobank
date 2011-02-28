@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+@Deprecated
 public class PvAttrCustom {
     private Boolean isDefault;
     private String label;

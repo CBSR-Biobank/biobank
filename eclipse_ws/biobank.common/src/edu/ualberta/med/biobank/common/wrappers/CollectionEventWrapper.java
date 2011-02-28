@@ -437,4 +437,52 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         studyEventAttrMap = null;
     }
 
+    @Deprecated
+    public void addPatients(List<PatientWrapper> asList) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void checkCanRemovePatient(PatientWrapper patient) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public ClinicWrapper getClinic() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void setClinic(ClinicWrapper selectedObject) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void checkPatientsStudy() {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public String getFormattedDateReceived() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public CenterWrapper<?> getSite() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void setSite(SiteWrapper selectedSite) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

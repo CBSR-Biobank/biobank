@@ -65,14 +65,14 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
                 "Can only add aliquots in a visit which study has sample storages");
         }
 
-        Collection<Specimen> allAliquotObjects = new HashSet<Specimen>();
-        List<SpecimenWrapper> allAliquotWrappers = new ArrayList<SpecimenWrapper>();
+        Collection<Specimen> allSpecimenObjects = new HashSet<Specimen>();
+        List<SpecimenWrapper> allSpecimenWrappers = new ArrayList<SpecimenWrapper>();
         // already added
         List<SpecimenWrapper> currentList = getChildSpecimenCollection(false);
         if (currentList != null) {
             for (SpecimenWrapper aliquot : currentList) {
-                allAliquotObjects.add(aliquot.getWrappedObject());
-                allAliquotWrappers.add(aliquot);
+                allSpecimenObjects.add(aliquot.getWrappedObject());
+                allSpecimenWrappers.add(aliquot);
             }
         }
         // new added
@@ -86,11 +86,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
             aliquot.setQuantity(typesVolumes.get(aliquot.getSpecimenType()
                 .getId()));
             aliquot.setProcessingEvent(this);
-            allAliquotObjects.add(aliquot.getWrappedObject());
-            allAliquotWrappers.add(aliquot);
+            allSpecimenObjects.add(aliquot.getWrappedObject());
+            allSpecimenWrappers.add(aliquot);
         }
         setWrapperCollection(ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION,
-            allAliquotWrappers);
+            allSpecimenWrappers);
     }
 
     @Override
@@ -230,8 +230,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return getCenter();
     }
 
-    public List<AliquotWrapper> getAliquotCollection() {
-        return getAliquotCollection(false);
+    @Deprecated
+    public List<SpecimenWrapper> getSpecimenCollection() {
+        return null;
     }
 
     @Deprecated
