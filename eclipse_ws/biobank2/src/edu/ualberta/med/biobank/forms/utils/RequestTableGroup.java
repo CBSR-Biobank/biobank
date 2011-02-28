@@ -8,13 +8,13 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.RequestAliquotState;
+import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerPath;
-import edu.ualberta.med.biobank.model.RequestAliquot;
+import edu.ualberta.med.biobank.model.RequestSpecimen;
 import edu.ualberta.med.biobank.treeview.Node;
 import edu.ualberta.med.biobank.treeview.RequestAliquotAdapter;
 import edu.ualberta.med.biobank.treeview.admin.RequestContainerAdapter;
@@ -23,12 +23,12 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 public class RequestTableGroup implements Node {
 
     private Integer numAliquots = 0;
-    private RequestAliquotState state;
+    private RequestSpecimenState state;
     private List<Object> tops;
     private static final Pattern p = Pattern.compile("/");
     private Object parent = null;
 
-    private RequestTableGroup(RequestAliquotState state, RequestWrapper request) {
+    private RequestTableGroup(RequestSpecimenState state, RequestWrapper request) {
         this.state = state;
         getAdapterTree(state.getId(), request);
     }
@@ -45,12 +45,12 @@ public class RequestTableGroup implements Node {
     public static List<RequestTableGroup> getGroupsForShipment(
         RequestWrapper ship) {
         List<RequestTableGroup> groups = new ArrayList<RequestTableGroup>();
-        groups.add(new RequestTableGroup(RequestAliquotState.PROCESSED_STATE,
+        groups.add(new RequestTableGroup(RequestSpecimenState.PROCESSED_STATE,
             ship));
         groups.add(new RequestTableGroup(
-            RequestAliquotState.NONPROCESSED_STATE, ship));
-        groups.add(new RequestTableGroup(RequestAliquotState.UNAVAILABLE_STATE,
-            ship));
+            RequestSpecimenState.NONPROCESSED_STATE, ship));
+        groups.add(new RequestTableGroup(
+            RequestSpecimenState.UNAVAILABLE_STATE, ship));
         return groups;
     }
 
@@ -59,7 +59,7 @@ public class RequestTableGroup implements Node {
         // test hql
         HQLCriteria query = new HQLCriteria(
             "select ra, cp.container, cp.path from "
-                + RequestAliquot.class.getName()
+                + RequestSpecimen.class.getName()
                 + " ra inner join fetch ra.aliquot inner join fetch ra.aliquot.sampleType, "
                 + ContainerPath.class.getName()
                 + " cp where ra.request ="
@@ -80,7 +80,7 @@ public class RequestTableGroup implements Node {
         // get all the containers to display
         for (Object o : results) {
             String path = (String) ((Object[]) o)[2];
-            RequestAliquot ra = (RequestAliquot) ((Object[]) o)[0];
+            RequestSpecimen ra = (RequestSpecimen) ((Object[]) o)[0];
             Container container = (Container) ((Object[]) o)[1];
             String[] cIds = p.split(path);
             int i = 0;
@@ -103,7 +103,7 @@ public class RequestTableGroup implements Node {
             }
             adapters.get(Integer.parseInt(cIds[i - 1])).addChild(
                 new RequestAliquotAdapter(adapters.get(Integer
-                    .parseInt(cIds[i - 1])), new RequestAliquotWrapper(
+                    .parseInt(cIds[i - 1])), new RequestSpecimenWrapper(
                     SessionManager.getAppService(), ra)));
             numAliquots++;
         }

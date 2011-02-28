@@ -44,7 +44,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
-public abstract class AbstractPalletAliquotAdminForm extends
+public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractAliquotAdminForm {
 
     private BiobankText plateToScanText;
@@ -88,7 +88,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
             @Override
             protected void beforeThreadStart() {
                 currentPlateToScan = plateToScanValue.getValue().toString();
-                AbstractPalletAliquotAdminForm.this.beforeScanThreadStart();
+                AbstractPalletSpecimenAdminForm.this.beforeScanThreadStart();
             }
 
             @Override
@@ -105,13 +105,13 @@ public abstract class AbstractPalletAliquotAdminForm extends
             @Override
             protected Map<RowColPos, PalletCell> getFakeScanCells()
                 throws Exception {
-                return AbstractPalletAliquotAdminForm.this.getFakeScanCells();
+                return AbstractPalletSpecimenAdminForm.this.getFakeScanCells();
             }
 
             @Override
             protected void processScanResult(IProgressMonitor monitor)
                 throws Exception {
-                AbstractPalletAliquotAdminForm.this.processScanResult(monitor);
+                AbstractPalletSpecimenAdminForm.this.processScanResult(monitor);
             }
 
             @Override
@@ -127,7 +127,7 @@ public abstract class AbstractPalletAliquotAdminForm extends
 
             @Override
             protected void afterScanAndProcess() {
-                AbstractPalletAliquotAdminForm.this.afterScanAndProcess();
+                AbstractPalletSpecimenAdminForm.this.afterScanAndProcess();
             }
 
             @Override

@@ -11,7 +11,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
@@ -28,7 +28,7 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private AliquotAdapter aliquotAdapter;
 
-    private AliquotWrapper aliquot;
+    private SpecimenWrapper aliquot;
 
     private BiobankText siteLabel;
 
@@ -63,10 +63,10 @@ public class AliquotViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         aliquotAdapter = (AliquotAdapter) adapter;
-        aliquot = aliquotAdapter.getAliquot();
+        aliquot = aliquotAdapter.getSpecimen();
         retrieveAliquot();
         try {
-            aliquot.logLookup(aliquot.getSiteString());
+            aliquot.logLookup(aliquot.getCenterString());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log lookup failed", e);
         }
@@ -179,20 +179,20 @@ public class AliquotViewForm extends BiobankViewForm {
 
     private void setValues() {
         setTextValue(siteLabel, aliquot.getSiteString());
-        setTextValue(sampleTypeLabel, aliquot.getSampleType().getName());
-        setTextValue(linkDateLabel, aliquot.getFormattedLinkDate());
+        setTextValue(sampleTypeLabel, aliquot.getSpecimenType().getName());
+        setTextValue(linkDateLabel, aliquot.getFormattedCreatedAt());
         setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
             : aliquot.getQuantity().toString());
-        setTextValue(shipmentWaybillLabel, aliquot.getPatientVisit()
-            .getShipment().getWaybill());
-        setTextValue(studyLabel, aliquot.getPatientVisit().getPatient()
+        setTextValue(shipmentWaybillLabel, aliquot.getCollectionEvent()
+            .getWaybill());
+        setTextValue(studyLabel, aliquot.getCollectionEvent().getPatient()
             .getStudy().getNameShort());
-        setTextValue(patientLabel, aliquot.getPatientVisit().getPatient()
+        setTextValue(patientLabel, aliquot.getCollectionEvent().getPatient()
             .getPnumber());
-        setTextValue(dateProcessedLabel, aliquot.getPatientVisit()
+        setTextValue(dateProcessedLabel, aliquot.getCollectionEvent()
             .getFormattedDateProcessed());
-        setTextValue(dateDrawnLabel, aliquot.getPatientVisit()
-            .getFormattedDateDrawn());
+        setTextValue(dateDrawnLabel, aliquot.getProcessingEvent()
+            .getFormattedCreatedAt());
         setTextValue(activityStatusLabel, aliquot.getActivityStatus());
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));

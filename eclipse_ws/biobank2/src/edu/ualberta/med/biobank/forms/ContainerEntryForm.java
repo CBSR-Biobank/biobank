@@ -224,7 +224,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         if (container.hasParent())
             tempWidget.setEnabled(false);
 
-        if (container.hasChildren() || container.hasAliquots()) {
+        if (container.hasChildren() || container.hasSpecimens()) {
             containerTypeComboViewer.getCombo().setEnabled(false);
         }
     }

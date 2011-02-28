@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -29,20 +31,18 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientEntryForm";
 
-    public static final String MSG_NEW_PATIENT_OK = "Creating a new patient record.";
+    public static final String MSG_NEW_PATIENT_OK = Messages
+        .getString("PatientEntryForm.creation.msg");
 
-    public static final String MSG_PATIENT_OK = "Editing an existing patient record.";
-
-    public static final String MSG_NO_PATIENT_NUMBER = "Patient must have a patient number";
-
-    public static final String MSG_NO_STUDY = "Enter a valid study short name";
+    public static final String MSG_PATIENT_OK = Messages
+        .getString("PatientEntryForm.edition.msg");
 
     private PatientAdapter patientAdapter;
 
     private ComboViewer studiesViewer;
 
     private NonEmptyStringValidator pnumberNonEmptyValidator = new NonEmptyStringValidator(
-        MSG_NO_PATIENT_NUMBER);
+        Messages.getString("PatientEntryForm.patientNumber.validation.msg"));
 
     @Override
     public void init() {
@@ -59,16 +59,17 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
         String tabName;
         if (patientAdapter.getWrapper().isNew()) {
-            tabName = "New Patient";
+            tabName = Messages.getString("PatientEntryForm.new.title");
         } else {
-            tabName = "Patient " + patientAdapter.getWrapper().getPnumber();
+            tabName = Messages.getString("PatientEntryForm.edit.title",
+                patientAdapter.getWrapper().getPnumber());
         }
         setPartName(tabName);
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Patient Information");
+        form.setText(Messages.getString("PatientEntryForm.main.title"));
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -98,8 +99,10 @@ public class PatientEntryForm extends BiobankEntryForm {
             selectedStudy = patientAdapter.getWrapper().getStudy();
         }
 
-        studiesViewer = createComboViewer(client, "Study", studies,
-            selectedStudy, "A study should be selected",
+        studiesViewer = createComboViewer(client,
+            Messages.getString("PatientEntryForm.field.study.label"), studies,
+            selectedStudy,
+            Messages.getString("PatientEntryForm.field.study.validation.msg"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -113,7 +116,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         }
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Patient Number", null, patientAdapter.getWrapper(), "pnumber",
+            Messages.getString("PatientEntryForm.field.pNumber.label"), null,
+            patientAdapter.getWrapper(), PatientPeer.PNUMBER.getName(),
             pnumberNonEmptyValidator);
     }
 
@@ -148,8 +152,9 @@ public class PatientEntryForm extends BiobankEntryForm {
         try {
             patientAdapter.getWrapper().reload();
         } catch (Exception e) {
-            logger.error("Error while retrieving patient "
-                + patientAdapter.getWrapper().getPnumber(), e);
+            logger.error(Messages.getString(
+                "PatientEntryForm.retrieve.error.msg", patientAdapter
+                    .getWrapper().getPnumber()), e);
         }
     }
 

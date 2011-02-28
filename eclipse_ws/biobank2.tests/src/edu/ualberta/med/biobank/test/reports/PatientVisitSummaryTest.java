@@ -20,17 +20,17 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class PatientVisitSummaryTest extends AbstractReportTest {
-    private static final Mapper<PatientVisitWrapper, List<String>, PvCount> PV_COUNT_BY_STUDY_CLINIC_PATIENT = new Mapper<PatientVisitWrapper, List<String>, PvCount>() {
-        public List<String> getKey(PatientVisitWrapper patientVisit) {
+    private static final Mapper<ProcessingEventWrapper, List<String>, PvCount> PV_COUNT_BY_STUDY_CLINIC_PATIENT = new Mapper<ProcessingEventWrapper, List<String>, PvCount>() {
+        public List<String> getKey(ProcessingEventWrapper patientVisit) {
             return Arrays.asList(patientVisit.getPatient().getStudy()
-                .getNameShort(), patientVisit.getShipment().getClinic()
-                .getNameShort(), patientVisit.getPatient().getPnumber());
+                .getNameShort(), patientVisit.getCenter().getNameShort(),
+                patientVisit.getPatient().getPnumber());
         }
 
-        public PvCount getValue(PatientVisitWrapper patientVisit,
+        public PvCount getValue(ProcessingEventWrapper patientVisit,
             PvCount pvCount) {
             if (pvCount != null) {
                 pvCount.count = new Long(pvCount.count + 1);
@@ -97,10 +97,10 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
 
     @Test
     public void testSmallDatePoint() throws Exception {
-        List<PatientVisitWrapper> patientVisits = getPatientVisits();
+        List<ProcessingEventWrapper> patientVisits = getPatientVisits();
         Assert.assertTrue(patientVisits.size() > 0);
 
-        PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
+        ProcessingEventWrapper patientVisit = patientVisits.get(patientVisits
             .size() / 2);
 
         checkResults(patientVisit.getDateProcessed(),
@@ -109,10 +109,10 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
 
     @Test
     public void testSmallDateRange() throws Exception {
-        List<PatientVisitWrapper> patientVisits = getPatientVisits();
+        List<ProcessingEventWrapper> patientVisits = getPatientVisits();
         Assert.assertTrue(patientVisits.size() > 0);
 
-        PatientVisitWrapper patientVisit = patientVisits.get(patientVisits
+        ProcessingEventWrapper patientVisit = patientVisits.get(patientVisits
             .size() / 2);
 
         Calendar calendar = Calendar.getInstance();
@@ -127,9 +127,9 @@ public class PatientVisitSummaryTest extends AbstractReportTest {
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
 
-        Collection<PatientVisitWrapper> patientVisits = getPatientVisits();
+        Collection<ProcessingEventWrapper> patientVisits = getPatientVisits();
 
-        Collection<PatientVisitWrapper> filteredPatientVisits = PredicateUtil
+        Collection<ProcessingEventWrapper> filteredPatientVisits = PredicateUtil
             .filter(patientVisits, PredicateUtil.andPredicate(
                 patientVisitProcessedBetween(after, before),
                 patientVisitSite(isInSite(), getSiteId())));

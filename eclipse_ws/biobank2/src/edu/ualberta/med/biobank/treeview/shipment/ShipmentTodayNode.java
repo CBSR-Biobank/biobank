@@ -6,8 +6,8 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
@@ -34,15 +34,15 @@ public class ShipmentTodayNode extends AbstractTodayNode {
     @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
-        return ShipmentWrapper
-            .getTodayShipments(SessionManager.getAppService());
+        return CollectionEventWrapper.getTodayShipments(SessionManager
+            .getAppService());
 
     }
 
     @Override
     protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
-        if (child instanceof ShipmentWrapper) {
-            return parent.equals(((ShipmentWrapper) child).getClinic());
+        if (child instanceof CollectionEventWrapper) {
+            return parent.equals(((CollectionEventWrapper) child).getClinic());
         }
         return false;
     }

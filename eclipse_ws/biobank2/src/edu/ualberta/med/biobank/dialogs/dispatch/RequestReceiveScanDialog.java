@@ -14,13 +14,13 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.util.RequestAliquotState;
+import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -39,8 +39,8 @@ public class RequestReceiveScanDialog extends
     private int errors;
 
     public RequestReceiveScanDialog(Shell parentShell,
-        final RequestWrapper currentShipment, SiteWrapper currentSite) {
-        super(parentShell, currentShipment, currentSite);
+        final RequestWrapper currentShipment, CenterWrapper<?> centerWrapper) {
+        super(parentShell, currentShipment, centerWrapper);
     }
 
     @Override
@@ -65,8 +65,8 @@ public class RequestReceiveScanDialog extends
         AliquotInfo info = RequestEntryFormBase.getInfoForInventoryId(
             currentShipment, cell.getValue());
         if (info.aliquot != null) {
-            cell.setAliquot(info.aliquot);
-            cell.setTitle(info.aliquot.getPatientVisit().getPatient()
+            cell.setSpecimen(info.aliquot);
+            cell.setTitle(info.aliquot.getCollectionEvent().getPatient()
                 .getPnumber());
         }
         switch (info.type) {
@@ -104,8 +104,8 @@ public class RequestReceiveScanDialog extends
     }
 
     @Override
-    protected void processScanResult(IProgressMonitor monitor, SiteWrapper site)
-        throws Exception {
+    protected void processScanResult(IProgressMonitor monitor,
+        CenterWrapper<?> site) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             processCells(cells.keySet(), monitor);
@@ -119,7 +119,7 @@ public class RequestReceiveScanDialog extends
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             setScanOkValue(false);
-            List<AliquotWrapper> newExtraAliquots = new ArrayList<AliquotWrapper>();
+            List<SpecimenWrapper> newExtraAliquots = new ArrayList<SpecimenWrapper>();
             for (RowColPos rcp : rcps) {
                 if (monitor != null) {
                     monitor.subTask("Processing position "
@@ -128,7 +128,7 @@ public class RequestReceiveScanDialog extends
                 PalletCell cell = cells.get(rcp);
                 processCellStatus(cell);
                 if (cell.getStatus() == CellStatus.EXTRA) {
-                    newExtraAliquots.add(cell.getAliquot());
+                    newExtraAliquots.add(cell.getSpecimen());
                 }
             }
             addExtraCells(newExtraAliquots);
@@ -136,7 +136,7 @@ public class RequestReceiveScanDialog extends
         }
     }
 
-    private void addExtraCells(final List<AliquotWrapper> extraAliquots) {
+    private void addExtraCells(final List<SpecimenWrapper> extraAliquots) {
         if (extraAliquots.size() > 0) {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
@@ -166,10 +166,10 @@ public class RequestReceiveScanDialog extends
 
     @Override
     protected void doProceed() {
-        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
         for (PalletCell cell : getCells().values()) {
             if (cell.getStatus() == CellStatus.IN_SHIPMENT_EXPECTED) {
-                aliquots.add(cell.getAliquot());
+                aliquots.add(cell.getSpecimen());
                 cell.setStatus(CellStatus.IN_SHIPMENT_RECEIVED);
             }
         }
@@ -200,18 +200,18 @@ public class RequestReceiveScanDialog extends
     @Override
     protected Map<RowColPos, PalletCell> getFakeScanCells() {
         Map<RowColPos, PalletCell> palletScanned = new TreeMap<RowColPos, PalletCell>();
-        if ((currentShipment).getRequestAliquotCollection(false).size() > 0) {
+        if ((currentShipment).getRequestSpecimenCollection(false).size() > 0) {
             int i = 0;
-            for (RequestAliquotWrapper dsa : (currentShipment)
-                .getRequestAliquotCollection(false)) {
+            for (RequestSpecimenWrapper dsa : (currentShipment)
+                .getRequestSpecimenCollection(false)) {
                 int row = i / 12;
                 int col = i % 12;
                 if (row > 7)
                     break;
-                if (!RequestAliquotState.UNAVAILABLE_STATE.isEquals(dsa
+                if (!RequestSpecimenState.UNAVAILABLE_STATE.isEquals(dsa
                     .getState()))
                     palletScanned.put(new RowColPos(row, col), new PalletCell(
-                        new ScanCell(row, col, dsa.getAliquot()
+                        new ScanCell(row, col, dsa.getSpecimen()
                             .getInventoryId())));
                 i++;
             }

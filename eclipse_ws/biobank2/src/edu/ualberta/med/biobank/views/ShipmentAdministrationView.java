@@ -17,8 +17,8 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectShipmentClinicDialog;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
@@ -125,7 +125,7 @@ public class ShipmentAdministrationView extends
         if (radioWaybill.getSelection()) {
             // with waybill, should find only one corresponding shipment, or
             // mutliple shipments from different clinics
-            List<ShipmentWrapper> shipments = ShipmentWrapper
+            List<CollectionEventWrapper> shipments = CollectionEventWrapper
                 .getShipmentsInSites(SessionManager.getAppService(),
                     text.trim());
             if (shipments.size() > 1) {
@@ -142,7 +142,7 @@ public class ShipmentAdministrationView extends
             // can find more than one shipments
             Date date = dateReceivedWidget.getDate();
             if (date != null) {
-                return ShipmentWrapper.getShipmentsInSites(
+                return CollectionEventWrapper.getShipmentsInSites(
                     SessionManager.getAppService(), date);
             }
         }
@@ -151,8 +151,9 @@ public class ShipmentAdministrationView extends
 
     public static AdapterBase addToNode(AdapterBase parentNode,
         ModelWrapper<?> wrapper) {
-        if (currentInstance != null && wrapper instanceof ShipmentWrapper) {
-            ShipmentWrapper shipment = (ShipmentWrapper) wrapper;
+        if (currentInstance != null
+            && wrapper instanceof CollectionEventWrapper) {
+            CollectionEventWrapper shipment = (CollectionEventWrapper) wrapper;
 
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
@@ -202,7 +203,7 @@ public class ShipmentAdministrationView extends
             boolean create = BioBankPlugin.openConfirm("Shipment not found",
                 "Do you want to create this shipment ?");
             if (create) {
-                ShipmentWrapper shipment = new ShipmentWrapper(
+                CollectionEventWrapper shipment = new CollectionEventWrapper(
                     SessionManager.getAppService());
                 if (radioWaybill.getSelection()) {
                     shipment.setWaybill(text);
@@ -229,7 +230,7 @@ public class ShipmentAdministrationView extends
         return new ShipmentSearchedNode(rootNode, 1);
     }
 
-    public static void showShipment(ShipmentWrapper shipment) {
+    public static void showShipment(CollectionEventWrapper shipment) {
         if (currentInstance != null) {
             currentInstance.showSearchedObjectsInTree(Arrays.asList(shipment),
                 false);

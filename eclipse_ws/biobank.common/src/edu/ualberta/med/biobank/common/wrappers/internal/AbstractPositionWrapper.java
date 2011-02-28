@@ -27,24 +27,20 @@ public abstract class AbstractPositionWrapper<E extends AbstractPosition>
         return AbstractPositionPeer.PROP_NAMES;
     }
 
-    public void setRow(Integer row) {
-        Integer oldRow = wrappedObject.getRow();
-        wrappedObject.setRow(row);
-        propertyChangeSupport.firePropertyChange("row", oldRow, row);
-    }
-
     public Integer getRow() {
-        return wrappedObject.getRow();
+        return getProperty(AbstractPositionPeer.ROW);
     }
 
-    public void setCol(Integer col) {
-        Integer oldCol = wrappedObject.getCol();
-        wrappedObject.setCol(col);
-        propertyChangeSupport.firePropertyChange("col", oldCol, col);
+    public void setRow(Integer row) {
+        setProperty(AbstractPositionPeer.ROW, row);
     }
 
     public Integer getCol() {
-        return wrappedObject.getCol();
+        return getProperty(AbstractPositionPeer.COL);
+    }
+
+    public void setCol(Integer col) {
+        setProperty(AbstractPositionPeer.COL, col);
     }
 
     public abstract ContainerWrapper getParent();

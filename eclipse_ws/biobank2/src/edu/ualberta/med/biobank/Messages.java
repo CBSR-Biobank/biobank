@@ -13,16 +13,13 @@ public class Messages {
     private Messages() {
     }
 
-    public static String getString(String key) {
+    public static String getString(String key, Object... args) {
+        String pattern;
         try {
-            return RESOURCE_BUNDLE.getString(key);
+            pattern = RESOURCE_BUNDLE.getString(key);
         } catch (MissingResourceException e) {
-            return '!' + key + '!';
+            pattern = '!' + key + '!';
         }
-    }
-
-    public static String getFormattedString(String key, Object... args) {
-        String pattern = getString(key);
         if (pattern != null && args != null && args.length > 0) {
             return MessageFormat.format(pattern, args);
         }

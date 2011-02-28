@@ -32,10 +32,11 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -118,13 +119,13 @@ public class ContainerViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Container " + container.getLabel() + " ("
-            + container.getContainerType().getNameShort() + ")");
+        form.setText(Messages.getString("ContainerViewForm.title",
+            container.getLabel(), container.getContainerType().getNameShort()));
         page.setLayout(new GridLayout(1, false));
 
         createContainerSection();
 
-        if (container.getContainerType().getSampleTypeCollection().size() > 0) {
+        if (container.getContainerType().getSpecimenTypeCollection().size() > 0) {
             // only show aliquots section this if this container type does not
             // have child containers
             createAliquotsSection();
@@ -141,19 +142,19 @@ public class ContainerViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Repository Site");
+            Messages.getString("container.field.label.site"));
         containerLabelLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Label");
+            Messages.getString("container.field.label.label"));
         productBarcodeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Product Bar Code");
+            Messages.getString("container.field.label.barcode"));
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity Status");
+            Messages.getString("label.activity"));
         commentsLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+            Messages.getString("label.comments"));
         containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Container Type");
+            Messages.getString("container.field.label.type"));
         temperatureLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Temperature");
+            Messages.getString("container.field.label.temperature"));
 
         setContainerValues();
 
@@ -494,8 +495,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createAliquotsSection() throws BiobankException {
         Composite parent = createSectionWithClient("Aliquots");
-        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>(container
-            .getAliquots().values());
+        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>(container
+            .getSpecimens().values());
         aliquotsWidget = new AliquotListInfoTable(parent, aliquots);
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addClickListener(collectionDoubleClickListener);
@@ -527,8 +528,8 @@ public class ContainerViewForm extends BiobankViewForm {
             }
 
             if (aliquotsWidget != null) {
-                aliquotsWidget.reloadCollection(new ArrayList<AliquotWrapper>(
-                    container.getAliquots().values()));
+                aliquotsWidget.reloadCollection(new ArrayList<SpecimenWrapper>(
+                    container.getSpecimens().values()));
             }
         }
     }

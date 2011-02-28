@@ -31,7 +31,7 @@ public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> 
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.getName();
+                    return item.getSourceVesselType().getName();
                 default:
                     return "";
                 }
@@ -43,7 +43,7 @@ public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> 
     protected String getCollectionModelObjectToString(Object o) {
         if (o == null)
             return null;
-        return ((SourceVesselWrapper) o).getName();
+        return ((SourceVesselWrapper) o).getSourceVesselType().getName();
     }
 
     @Override

@@ -82,7 +82,7 @@ public class PalletErrorFix {
         for (ContainerWrapper container : ContainerWrapper.getContainersInSite(
             appService, cbsrSite, "SSAD11")) {
             if ((container.getParent() == null)
-                && (container.getAliquots().size() > 0)) {
+                && (container.getSpecimens().size() > 0)) {
                 sourceContainer = container;
             } else if (container.getParent() != null) {
                 destContainer = container;

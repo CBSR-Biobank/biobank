@@ -63,10 +63,7 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
      * Set the position of this object
      */
     public void setPosition(RowColPos position) {
-        // RowColPos oldPosition = getPosition();
         this.rowColPosition = position;
-        // propertyChangeSupport.firePropertyChange("position", oldPosition,
-        // position);
         if (position == null) {
             positionWrapper = null;
             nullPositionSet = true;

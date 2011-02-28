@@ -9,17 +9,17 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 
 public class PatientWBCTest extends AbstractReportTest {
-    private static final Predicate<AliquotWrapper> ALIQUOT_IS_DNA_SAMPLE_TYPE = new Predicate<AliquotWrapper>() {
-        public boolean evaluate(AliquotWrapper aliquot) {
-            return aliquot.getSampleType().getName().contains("DNA");
+    private static final Predicate<SpecimenWrapper> ALIQUOT_IS_DNA_SAMPLE_TYPE = new Predicate<SpecimenWrapper>() {
+        public boolean evaluate(SpecimenWrapper aliquot) {
+            return aliquot.getSpecimenType().getName().contains("DNA");
         }
     };
-    private static final Predicate<AliquotWrapper> ALIQUOT_IN_CABINET = new Predicate<AliquotWrapper>() {
-        public boolean evaluate(AliquotWrapper aliquot) {
+    private static final Predicate<SpecimenWrapper> ALIQUOT_IN_CABINET = new Predicate<SpecimenWrapper>() {
+        public boolean evaluate(SpecimenWrapper aliquot) {
             return (aliquot.getParent() != null)
                 && aliquot.getParent().getLabel().contains("Cabinet");
         }
@@ -32,9 +32,9 @@ public class PatientWBCTest extends AbstractReportTest {
 
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
-        Collection<AliquotWrapper> allAliquots = getAliquots();
+        Collection<SpecimenWrapper> allAliquots = getSpecimens();
         @SuppressWarnings("unchecked")
-        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
+        Collection<SpecimenWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 aliquotSite(isInSite(), getSiteId()),
                 ALIQUOT_IS_DNA_SAMPLE_TYPE, ALIQUOT_IN_CABINET,
@@ -42,14 +42,14 @@ public class PatientWBCTest extends AbstractReportTest {
 
         List<Object> expectedResults = new ArrayList<Object>();
 
-        for (AliquotWrapper aliquot : filteredAliquots) {
-            PatientVisitWrapper visit = aliquot.getPatientVisit();
+        for (SpecimenWrapper aliquot : filteredAliquots) {
+            ProcessingEventWrapper visit = aliquot.getProcessingEvent();
             List<Object> objects = new ArrayList<Object>();
             objects.add(visit.getPatient().getStudy().getNameShort());
-            objects.add(visit.getShipment().getClinic().getNameShort());
+            objects.add(visit.getCenter().getNameShort());
             objects.add(visit.getPatient().getPnumber());
             objects.add(visit.getDateProcessed());
-            objects.add(aliquot.getSampleType().getName());
+            objects.add(aliquot.getSpecimenType().getName());
             objects.add(aliquot.getInventoryId());
             objects.add(aliquot.getParent().getLabel());
 

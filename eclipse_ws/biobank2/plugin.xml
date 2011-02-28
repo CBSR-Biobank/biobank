@@ -51,14 +51,14 @@
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective"
-            icon="icons/patientPerspective.png"
+            icon="icons/processingPerspective.png"
             id="edu.ualberta.med.biobank.perspective.processing"
             name="Processing View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective"
-            id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
-            name="Samples Management Perspective">
+            class="edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective"
+            id="edu.ualberta.med.biobank.perspective.linkAssign"
+            name="Link/Assign Perspective">
       </perspective>
    </extension>
    <extension
@@ -544,7 +544,7 @@
             commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd">
          <activeWhen>
             <and>
-              <reference
+              <reference	
                     definitionId="biobank2.processingPerspectiveSelected">
               </reference>
               <reference
@@ -1003,7 +1003,7 @@
             </command>
             <command
                commandId="edu.ualberta.med.biobank.commands.processingAdmin"
-               icon="icons/patientPerspective.png"
+               icon="icons/processingPerspective.png"
                label="Processing View"
                style="push">
             </command>
@@ -1122,7 +1122,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.processingAdmin"
-                  icon="icons/patientPerspective.png"
+                  icon="icons/processingPerspective.png"
                   label="Processing View"
                   style="push">
             </command>
@@ -1495,21 +1495,9 @@
                standalone="false"
                visible="true">
          </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.RequestAdminView"
-               minimized="false"
-               moveable="false"
-               ratio="0.20"
-               relationship="stack"
-               relative="edu.ualberta.med.biobank.views.DispatchAdministrationView"
-               showTitle="false"
-               standalone="false"
-               visible="true">
-         </view>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.aliquotsManagement">
+            targetID="edu.ualberta.med.biobank.perspective.linkAssign">
          <view
                closeable="false"
                id="org.eclipse.ui.console.ConsoleView"
@@ -1615,18 +1603,18 @@
             name="Patient Merge">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
+            class="edu.ualberta.med.biobank.forms.CollectionEventEntryForm"
             default="false"
             icon="icons/patientVisit.png"
-            id="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
-            name="Patient Visit Entry">
+            id="edu.ualberta.med.biobank.forms.CollectionEventEntryForm"
+            name="Collection Event Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
+            class="edu.ualberta.med.biobank.forms.CollectionEventViewForm"
             default="false"
             icon="icons/patientVisit.png"
-            id="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
-            name="Patient Visit View">
+            id="edu.ualberta.med.biobank.forms.CollectionEventViewForm"
+            name="Collection Event View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerEntryForm"
@@ -2285,7 +2273,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
-            icon="icons/patientPerspective.png"
+            icon="icons/patientView.png"
             id="edu.ualberta.med.biobank.views.PatientsAdminView"
             name="Patients"
             restorable="true">
@@ -2326,14 +2314,6 @@
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.views.LoggingView"
             name="Logging"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.RequestAdministrationView"
-            icon="icons/request.png"
-            id="edu.ualberta.med.biobank.views.RequestAdminView"
-            name="Requests"
             restorable="true">
       </view>
    </extension>

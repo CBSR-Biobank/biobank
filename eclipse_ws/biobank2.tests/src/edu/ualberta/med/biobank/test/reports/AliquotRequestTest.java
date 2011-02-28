@@ -13,7 +13,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.server.reports.AliquotRequest;
 import edu.ualberta.med.biobank.server.reports.AliquotRequestImpl;
 
@@ -23,7 +23,7 @@ public class AliquotRequestTest extends AbstractReportTest {
     @Test
     public void testResultsForOneSetOfParams() throws Exception {
         List<Object> params = new ArrayList<Object>();
-        for (AliquotWrapper aliquot : getAliquots()) {
+        for (SpecimenWrapper aliquot : getSpecimens()) {
             params.clear();
 
             addParams(params, aliquot, ALIQUOT_LIMIT);
@@ -36,7 +36,7 @@ public class AliquotRequestTest extends AbstractReportTest {
     public void testResultsForManySetsOfParams() throws Exception {
         List<Object> params = new ArrayList<Object>();
         int numIterations = 0;
-        for (AliquotWrapper aliquot : getAliquots()) {
+        for (SpecimenWrapper aliquot : getSpecimens()) {
             addParams(params, aliquot, ALIQUOT_LIMIT);
 
             if (++numIterations >= 3) {
@@ -53,9 +53,9 @@ public class AliquotRequestTest extends AbstractReportTest {
         calendar.setTime(new Date());
         calendar.add(Calendar.DAY_OF_MONTH, -1);
 
-        Assert.assertTrue(getAliquots().size() > 0);
+        Assert.assertTrue(getSpecimens().size() > 0);
 
-        AliquotWrapper aliquot = getAliquots().get(0);
+        SpecimenWrapper aliquot = getSpecimens().get(0);
         List<Object> params = new ArrayList<Object>();
         addParams(params, aliquot, ALIQUOT_LIMIT);
 
@@ -72,34 +72,34 @@ public class AliquotRequestTest extends AbstractReportTest {
         for (Object o : params) {
             AliquotRequest request = (AliquotRequest) o;
             final String pnumber = request.getPnumber();
-            final String typeName = request.getSampleTypeNameShort();
+            final String typeName = request.getSpecimenTypeNameShort();
             Date dateDrawn = request.getDateDrawn();
             Integer maxResults = (int) request.getMaxAliquots();
 
-            Predicate<AliquotWrapper> aliquotPnumber = new Predicate<AliquotWrapper>() {
-                public boolean evaluate(AliquotWrapper aliquot) {
-                    return aliquot.getPatientVisit().getPatient().getPnumber()
+            Predicate<SpecimenWrapper> aliquotPnumber = new Predicate<SpecimenWrapper>() {
+                public boolean evaluate(SpecimenWrapper aliquot) {
+                    return aliquot.getProcessingEvent().getPatient().getPnumber()
                         .equals(pnumber);
                 }
             };
 
-            Predicate<AliquotWrapper> aliquotSampleType = new Predicate<AliquotWrapper>() {
-                public boolean evaluate(AliquotWrapper aliquot) {
-                    return aliquot.getSampleType().getNameShort()
+            Predicate<SpecimenWrapper> aliquotSampleType = new Predicate<SpecimenWrapper>() {
+                public boolean evaluate(SpecimenWrapper aliquot) {
+                    return aliquot.getSpecimenType().getNameShort()
                         .equals(typeName);
                 }
             };
 
-            Collection<AliquotWrapper> allAliquots = getAliquots();
+            Collection<SpecimenWrapper> allAliquots = getSpecimens();
             @SuppressWarnings("unchecked")
-            List<AliquotWrapper> filteredAliquots = new ArrayList<AliquotWrapper>(
+            List<SpecimenWrapper> filteredAliquots = new ArrayList<SpecimenWrapper>(
                 PredicateUtil.filter(allAliquots, PredicateUtil.andPredicate(
                     AbstractReportTest.aliquotDrawnSameDay(dateDrawn),
                     ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER, ALIQUOT_HAS_POSITION,
                     aliquotPnumber, aliquotSampleType,
                     aliquotSite(isInSite(), getSiteId()))));
 
-            for (AliquotWrapper aliquot : filteredAliquots) {
+            for (SpecimenWrapper aliquot : filteredAliquots) {
                 expectedResults.add(aliquot.getWrappedObject());
             }
 
@@ -122,13 +122,13 @@ public class AliquotRequestTest extends AbstractReportTest {
         checkResults(EnumSet.noneOf(CompareResult.class));
     }
 
-    private static void addParams(List<Object> params, AliquotWrapper aliquot,
+    private static void addParams(List<Object> params, SpecimenWrapper aliquot,
         Integer limit) {
 
         AliquotRequest request = new AliquotRequest();
-        request.setPnumber(aliquot.getPatientVisit().getPatient().getPnumber());
-        request.setDateDrawn(aliquot.getPatientVisit().getDateDrawn());
-        request.setSampleTypeNameShort(aliquot.getSampleType().getNameShort());
+        request.setPnumber(aliquot.getProcessingEvent().getPatient().getPnumber());
+        request.setDateDrawn(aliquot.getProcessingEvent().getDateDrawn());
+        request.setSpecimenTypeNameShort(aliquot.getSpecimenType().getNameShort());
         request.setMaxAliquots(limit);
 
         params.add(request);

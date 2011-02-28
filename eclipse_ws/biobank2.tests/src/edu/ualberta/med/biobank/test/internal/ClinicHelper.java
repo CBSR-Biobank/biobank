@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 
 public class ClinicHelper extends DbHelper {
 
-    public static List<ClinicWrapper> createdClinics = new ArrayList<ClinicWrapper>();
+    private static List<ClinicWrapper> createdClinics = new ArrayList<ClinicWrapper>();
 
     public static ClinicWrapper newClinic(String name) throws Exception {
         ClinicWrapper clinic = new ClinicWrapper(appService);
@@ -21,7 +21,7 @@ public class ClinicHelper extends DbHelper {
             }
         }
         clinic.setCity("");
-        clinic.setSendsShipments(true);
+        clinic.setSendsShipments(false);
         clinic.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
             appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
 
@@ -48,6 +48,14 @@ public class ClinicHelper extends DbHelper {
 
     public static ClinicWrapper addClinic(String name) throws Exception {
         return addClinic(name, false);
+    }
+
+    public static ClinicWrapper addClinicWithShipments(String name)
+        throws Exception {
+        ClinicWrapper clinic = addClinic(name, false, true);
+        clinic.setSendsShipments(true);
+        clinic.persist();
+        return clinic;
     }
 
     public static void addClinics(String name, int count, boolean addContacts)

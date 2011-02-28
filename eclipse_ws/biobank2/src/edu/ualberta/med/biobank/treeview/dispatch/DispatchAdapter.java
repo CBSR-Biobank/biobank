@@ -17,10 +17,10 @@ import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
@@ -52,11 +52,7 @@ public class DispatchAdapter extends AdapterBase {
         DispatchWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "Dispatch is null");
         String label = new String();
-        StudyWrapper study = shipment.getStudy();
-
-        if (study != null) {
-            label += study.getNameShort() + " - ";
-        }
+        label += " - ";
 
         label += shipment.getFormattedDeparted();
         return label;
@@ -106,8 +102,7 @@ public class DispatchAdapter extends AdapterBase {
                 });
             }
             if (siteParent.equals(getWrapper().getReceiver())
-                && getWrapper().isInTransitState()
-                && getWrapper().canBeReceivedBy(SessionManager.getUser())) {
+                && getWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText("Receive");
                 mi.addSelectionListener(new SelectionAdapter() {
@@ -148,25 +143,25 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     public void doClose() {
-        getWrapper().setInCloseState();
+        getWrapper().setState(DispatchState.CLOSED);
         persistDispatch();
         openViewForm();
     }
 
     public void doSetAsLost() {
-        getWrapper().setInLostState();
+        getWrapper().setState(DispatchState.LOST);
         persistDispatch();
         openViewForm();
     }
 
     private void setDispatchAsReceived() {
         getWrapper().setDateReceived(new Date());
-        getWrapper().setInReceivedState();
+        getWrapper().setState(DispatchState.RECEIVED);
         persistDispatch();
     }
 
     private void setDispatchAsCreation() {
-        getWrapper().setInCreationState();
+        getWrapper().setState(DispatchState.CREATION);
         getWrapper().setDeparted(null);
         persistDispatch();
     }

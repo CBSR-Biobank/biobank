@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.dialogs.SourceVesselDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -44,8 +43,6 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
 
     private String editMessage;
 
-    private SiteWrapper currentSite;
-
     /**
      * 
      * @param parent a composite control which will be the parent of the new
@@ -55,12 +52,11 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
      */
     public SourceVesselEntryInfoTable(Composite parent,
         List<SourceVesselWrapper> globalSourceVessels, String addMessage,
-        String editMessage, SiteWrapper currentSite) {
+        String editMessage) {
         super(parent, null);
         setLists(globalSourceVessels);
         this.addMessage = addMessage;
         this.editMessage = editMessage;
-        this.currentSite = currentSite;
         addEditSupport();
     }
 
@@ -185,11 +181,11 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
         return true;
     }
 
-    public List<SourceVesselWrapper> getAddedOrModifiedSampleTypes() {
+    public List<SourceVesselWrapper> getAddedOrModifiedSourceVessels() {
         return addedOrModifiedSourceVessels;
     }
 
-    public List<SourceVesselWrapper> getDeletedSampleTypes() {
+    public List<SourceVesselWrapper> getDeletedSourceVessels() {
         return deletedSourceVessels;
     }
 
@@ -203,10 +199,6 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
         reloadCollection(sourceVesselCollection);
         addedOrModifiedSourceVessels = new ArrayList<SourceVesselWrapper>();
         deletedSourceVessels = new ArrayList<SourceVesselWrapper>();
-    }
-
-    public SiteWrapper getCurrentSite() {
-        return currentSite;
     }
 
     public void reload() {
