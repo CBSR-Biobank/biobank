@@ -16,15 +16,15 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 
 public class AliquotCountTest extends AbstractReportTest {
-    private static final Mapper<AliquotWrapper, String, Long> SAMPLE_TYPE_NAME_MAPPER = new Mapper<AliquotWrapper, String, Long>() {
-        public String getKey(AliquotWrapper aliquot) {
-            return aliquot.getSampleType().getName();
+    private static final Mapper<SpecimenWrapper, String, Long> SAMPLE_TYPE_NAME_MAPPER = new Mapper<SpecimenWrapper, String, Long>() {
+        public String getKey(SpecimenWrapper aliquot) {
+            return aliquot.getSpecimenType().getName();
         }
 
-        public Long getValue(AliquotWrapper type, Long oldValue) {
+        public Long getValue(SpecimenWrapper type, Long oldValue) {
             return oldValue != null ? new Long(oldValue + 1) : new Long(1);
         }
     };
@@ -41,19 +41,19 @@ public class AliquotCountTest extends AbstractReportTest {
 
     @Test
     public void testSmallDatePoint() throws Exception {
-        List<AliquotWrapper> aliquots = getAliquots();
+        List<SpecimenWrapper> aliquots = getSpecimens();
         Assert.assertTrue(aliquots.size() > 0);
 
-        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
+        SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
         checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
     }
 
     @Test
     public void testSmallDateRange() throws Exception {
-        List<AliquotWrapper> aliquots = getAliquots();
+        List<SpecimenWrapper> aliquots = getSpecimens();
         Assert.assertTrue(aliquots.size() > 0);
 
-        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
+        SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
 
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(aliquot.getLinkDate());
@@ -67,9 +67,9 @@ public class AliquotCountTest extends AbstractReportTest {
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
 
-        Collection<AliquotWrapper> allAliquots = getAliquots();
+        Collection<SpecimenWrapper> allAliquots = getSpecimens();
         @SuppressWarnings("unchecked")
-        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
+        Collection<SpecimenWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 AbstractReportTest.aliquotLinkedBetween(after, before),
                 ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER,

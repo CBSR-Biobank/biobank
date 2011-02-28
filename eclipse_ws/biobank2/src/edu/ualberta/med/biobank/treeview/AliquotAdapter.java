@@ -7,7 +7,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.AliquotEntryForm;
 import edu.ualberta.med.biobank.forms.AliquotViewForm;
@@ -15,12 +15,12 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AliquotAdapter extends AdapterBase {
 
-    public AliquotAdapter(AdapterBase parent, AliquotWrapper sample) {
+    public AliquotAdapter(AdapterBase parent, SpecimenWrapper sample) {
         super(parent, sample);
     }
 
-    public AliquotWrapper getAliquot() {
-        return (AliquotWrapper) modelObject;
+    public SpecimenWrapper getSpecimen() {
+        return (SpecimenWrapper) modelObject;
     }
 
     @Override
@@ -30,7 +30,7 @@ public class AliquotAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        AliquotWrapper aliquot = getAliquot();
+        SpecimenWrapper aliquot = getSpecimen();
         Assert.isNotNull(aliquot, "sample is null");
         return aliquot.getInventoryId();
     }

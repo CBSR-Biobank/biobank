@@ -1,63 +1,89 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
-import java.util.List;
+import java.util.Arrays;
+import java.util.Calendar;
 
 import org.junit.Assert;
-import org.junit.Before;
 import org.junit.Test;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
+import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
+import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
-import gov.nih.nci.system.applicationservice.ApplicationException;
+import edu.ualberta.med.biobank.test.internal.SourceVesselTypeHelper;
+import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestSourceVessel extends TestDatabase {
 
-    SourceVesselWrapper ssw;
-    SiteWrapper defaultSite;
-
-    @Override
-    @Before
-    public void setUp() throws Exception {
-        super.setUp();
-        ssw = SourceVesselHelper.addSourceVessel("SourceVesselName");
-        defaultSite = SiteHelper.addSite("Default");
-    }
-
     @Test
     public void testCompareTo() throws Exception {
-        SourceVesselWrapper newSourceVessel = SourceVesselHelper
-            .addSourceVessel(ssw.getName() + "1");
-        Assert.assertTrue(newSourceVessel.compareTo(ssw) > 0);
-        Assert.assertTrue(ssw.compareTo(newSourceVessel) < 0);
-        newSourceVessel.setName(ssw.getName());
-        Assert.assertTrue(newSourceVessel.compareTo(ssw) == 0);
+        String name = "testCompareTo" + r.nextInt();
+        PatientWrapper p1 = PatientHelper.newPatient(name);
+        SourceVesselTypeWrapper svType = SourceVesselTypeHelper
+            .addSourceVesselType(name);
+
+        Calendar calendar = Calendar.getInstance();
+        SourceVesselWrapper sv1 = SourceVesselHelper.newSourceVessel(p1,
+            svType, calendar.getTime(), 0.1);
+
+        calendar.add(Calendar.DATE, -1); // yesterday
+        SourceVesselWrapper sv2 = SourceVesselHelper.newSourceVessel(p1,
+            svType, calendar.getTime(), 0.1);
+
+        Assert.assertTrue(sv2.compareTo(sv1) < 0);
+        Assert.assertTrue(sv1.compareTo(sv2) > 0);
+
+        calendar.add(Calendar.DATE, 1); // back to today
+        SourceVesselWrapper sv3 = SourceVesselHelper.newSourceVessel(p1,
+            svType, calendar.getTime(), 0.1);
+
+        Assert.assertTrue(sv3.compareTo(sv1) == 0);
+        Assert.assertTrue(sv3.compareTo(sv2) > 0);
     }
 
     @Test
-    public void testResetAlreadyInDatabase() throws Exception {
-        String old = ssw.getName();
-        ssw.setName("toto");
-        ssw.reset();
-        Assert.assertEquals(old, ssw.getName());
-    }
+    public void testDelete() throws Exception {
+        String name = "testDelete" + r.nextInt();
+        SiteWrapper site = SiteHelper.addSite(name);
+        StudyWrapper study = StudyHelper.addStudy(name);
 
-    @Test
-    public void testResetNew() throws Exception {
-        SourceVesselWrapper ssw = SourceVesselHelper
-            .newSourceVessel("testResetNew");
-        ssw.setName("toto");
-        ssw.reset();
-        Assert.assertEquals(null, ssw.getName());
-    }
+        PatientWrapper p1 = PatientHelper.addPatient(name, study);
+        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(p1,
+            Utils.getRandomDate(), 0.1);
 
-    @Test
-    public void testGetAllSourceVessels() throws ApplicationException {
-        List<SourceVesselWrapper> list = SourceVesselWrapper
-            .getAllSourceVessels(appService);
-        Assert.assertTrue(list.contains(ssw));
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(site,
+                ShippingMethodWrapper.getShippingMethods(appService).get(0), sv);
+        sv.setCollectionEvent(cevent);
+        sv.persist();
 
+        ProcessingEventWrapper pevent = ProcessingEventHelper
+            .addProcessingEvent(site, p1, Utils.getRandomDate(),
+                Utils.getRandomDate());
+
+        pevent.addToSourceVesselCollection(Arrays.asList(sv));
+        sv.setProcessingEvent(pevent);
+        sv.persist();
+        sv.reload();
+
+        try {
+            sv.delete();
+            Assert
+                .fail("should not be allowed to delete a source vessel assocaited with a processing vent");
+        } catch (BiobankCheckException bce) {
+            Assert.assertTrue(true);
+        }
     }
 }

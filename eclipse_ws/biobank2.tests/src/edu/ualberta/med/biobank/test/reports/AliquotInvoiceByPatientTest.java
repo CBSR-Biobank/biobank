@@ -14,13 +14,14 @@ import junit.framework.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 
 public class AliquotInvoiceByPatientTest extends AbstractReportTest {
-    private static final Comparator<AliquotWrapper> ORDER_BY_ALIQUOT_PNUMBER = new Comparator<AliquotWrapper>() {
-        public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
-            int cmp = compareStrings(lhs.getPatientVisit().getPatient()
-                .getPnumber(), rhs.getPatientVisit().getPatient().getPnumber());
+    private static final Comparator<SpecimenWrapper> ORDER_BY_ALIQUOT_PNUMBER = new Comparator<SpecimenWrapper>() {
+        public int compare(SpecimenWrapper lhs, SpecimenWrapper rhs) {
+            int cmp = compareStrings(lhs.getProcessingEvent().getPatient()
+                .getPnumber(), rhs.getProcessingEvent().getPatient()
+                .getPnumber());
 
             if (cmp != 0) {
                 return cmp;
@@ -42,19 +43,19 @@ public class AliquotInvoiceByPatientTest extends AbstractReportTest {
 
     @Test
     public void testSmallDatePoint() throws Exception {
-        List<AliquotWrapper> aliquots = getAliquots();
+        List<SpecimenWrapper> aliquots = getSpecimens();
         Assert.assertTrue(aliquots.size() > 0);
 
-        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
+        SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
         checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
     }
 
     @Test
     public void testSmallDateRange() throws Exception {
-        List<AliquotWrapper> aliquots = getAliquots();
+        List<SpecimenWrapper> aliquots = getSpecimens();
         Assert.assertTrue(aliquots.size() > 0);
 
-        AliquotWrapper aliquot = aliquots.get(aliquots.size() / 2);
+        SpecimenWrapper aliquot = aliquots.get(aliquots.size() / 2);
         checkResults(aliquot.getLinkDate(), aliquot.getLinkDate());
     }
 
@@ -63,9 +64,9 @@ public class AliquotInvoiceByPatientTest extends AbstractReportTest {
         Date after = (Date) getReport().getParams().get(0);
         Date before = (Date) getReport().getParams().get(1);
 
-        Collection<AliquotWrapper> allAliquots = getAliquots();
+        Collection<SpecimenWrapper> allAliquots = getSpecimens();
         @SuppressWarnings("unchecked")
-        List<AliquotWrapper> filteredAliquots = new ArrayList<AliquotWrapper>(
+        List<SpecimenWrapper> filteredAliquots = new ArrayList<SpecimenWrapper>(
             PredicateUtil.filter(allAliquots, PredicateUtil.andPredicate(
                 AbstractReportTest.aliquotLinkedBetween(after, before),
                 ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER,
@@ -75,11 +76,11 @@ public class AliquotInvoiceByPatientTest extends AbstractReportTest {
 
         List<Object> expectedResults = new ArrayList<Object>();
 
-        for (AliquotWrapper aliquot : filteredAliquots) {
+        for (SpecimenWrapper aliquot : filteredAliquots) {
             expectedResults.add(new Object[] { aliquot.getInventoryId(),
-                aliquot.getPatientVisit().getPatient().getPnumber(),
-                aliquot.getPatientVisit().getShipment().getClinic().getName(),
-                aliquot.getLinkDate(), aliquot.getSampleType().getName() });
+                aliquot.getProcessingEvent().getPatient().getPnumber(),
+                aliquot.getProcessingEvent().getCenter().getName(),
+                aliquot.getLinkDate(), aliquot.getSpecimenType().getName() });
         }
 
         return expectedResults;

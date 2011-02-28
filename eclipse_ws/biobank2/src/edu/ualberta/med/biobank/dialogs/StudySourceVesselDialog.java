@@ -13,16 +13,16 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class StudySourceVesselDialog extends BiobankDialog {
 
     private static final String TITLE = "Study Source Vessel";
 
-    private StudySourceVesselWrapper origStudySourceVessel;
+    private SourceSpecimenWrapper origStudySourceVessel;
 
-    private StudySourceVesselWrapper studySourceVessel;
+    private SourceSpecimenWrapper studySourceVessel;
 
     private List<SourceVesselWrapper> allSourceVesselsMap;
 
@@ -31,13 +31,13 @@ public class StudySourceVesselDialog extends BiobankDialog {
     private String message;
 
     public StudySourceVesselDialog(Shell parent,
-        StudySourceVesselWrapper studySourceVessel,
+        SourceSpecimenWrapper studySourceVessel,
         List<SourceVesselWrapper> sourceVessels) {
         super(parent);
         Assert.isNotNull(studySourceVessel);
         Assert.isNotNull(sourceVessels);
         this.origStudySourceVessel = studySourceVessel;
-        this.studySourceVessel = new StudySourceVesselWrapper(null);
+        this.studySourceVessel = new SourceSpecimenWrapper(null);
         this.studySourceVessel.setStudy(studySourceVessel.getStudy());
         this.studySourceVessel.setSourceVessel(studySourceVessel
             .getSourceVessel());

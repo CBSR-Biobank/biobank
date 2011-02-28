@@ -17,20 +17,20 @@ import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
 public class SampleTypePvCountTest extends AbstractReportTest {
-    private static final Mapper<AliquotWrapper, List<Object>, Long> GROUP_BY_PV_AND_SAMPLE_TYPE = new Mapper<AliquotWrapper, List<Object>, Long>() {
-        public List<Object> getKey(AliquotWrapper aliquot) {
-            PatientVisitWrapper visit = aliquot.getPatientVisit();
+    private static final Mapper<SpecimenWrapper, List<Object>, Long> GROUP_BY_PV_AND_SAMPLE_TYPE = new Mapper<SpecimenWrapper, List<Object>, Long>() {
+        public List<Object> getKey(SpecimenWrapper aliquot) {
+            ProcessingEventWrapper visit = aliquot.getProcessingEvent();
             return Arrays.asList(new Object[] { visit.getId(),
                 visit.getPatient().getPnumber(), visit.getDateProcessed(),
-                visit.getDateDrawn(), aliquot.getSampleType().getName() });
+                visit.getDateDrawn(), aliquot.getSpecimenType().getName() });
         }
 
-        public Long getValue(AliquotWrapper aliquot, Long count) {
+        public Long getValue(SpecimenWrapper aliquot, Long count) {
             return count == null ? new Long(1) : new Long(count + 1);
         }
     };
@@ -67,10 +67,10 @@ public class SampleTypePvCountTest extends AbstractReportTest {
     protected Collection<Object> getExpectedResults() throws Exception {
         String studyNameShort = (String) getReport().getParams().get(0);
 
-        Collection<AliquotWrapper> allAliquots = getAliquots();
+        Collection<SpecimenWrapper> allAliquots = getSpecimens();
 
         @SuppressWarnings("unchecked")
-        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
+        Collection<SpecimenWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER,
                 aliquotStudyNameShortLike(studyNameShort),
@@ -105,11 +105,11 @@ public class SampleTypePvCountTest extends AbstractReportTest {
         checkResults(EnumSet.of(CompareResult.SIZE));
     }
 
-    private static Predicate<AliquotWrapper> aliquotStudyNameShortLike(
+    private static Predicate<SpecimenWrapper> aliquotStudyNameShortLike(
         final String studyNameShort) {
-        return new Predicate<AliquotWrapper>() {
-            public boolean evaluate(AliquotWrapper aliquot) {
-                return aliquot.getPatientVisit().getPatient().getStudy()
+        return new Predicate<SpecimenWrapper>() {
+            public boolean evaluate(SpecimenWrapper aliquot) {
+                return aliquot.getProcessingEvent().getPatient().getStudy()
                     .getNameShort().equals(studyNameShort);
             }
         };

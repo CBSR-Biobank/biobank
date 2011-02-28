@@ -7,19 +7,19 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
-import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyPvAttr;
+import edu.ualberta.med.biobank.model.StudyEventAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -57,6 +57,26 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         }
     }
 
+    public boolean isUsed() throws ApplicationException, BiobankException {
+        long usedCount = 0;
+
+        Class<?>[] classes = new Class[] { Specimen.class, Clinic.class,
+            Container.class, ContainerType.class, AliquotedSpecimen.class,
+            Site.class, Study.class, StudyEventAttr.class,
+            ProcessingEvent.class };
+
+        for (Class<?> clazz : classes) {
+            StringBuilder sb = new StringBuilder("select count(x) from ")
+                .append(clazz.getName()).append(
+                    " as x where x.activityStatus=?");
+            HQLCriteria c = new HQLCriteria(sb.toString(),
+                Arrays.asList(new Object[] { wrappedObject }));
+            usedCount += getCountResult(appService, c);
+        }
+
+        return usedCount > 0;
+    }
+
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
@@ -86,29 +106,6 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
         return 0;
     }
 
-    public boolean isUsed() throws ApplicationException, BiobankException {
-        long usedCount = 0;
-
-        Class<?>[] classes = new Class[] { Aliquot.class, Clinic.class,
-            Container.class, ContainerType.class, SampleStorage.class,
-            Site.class, Study.class, StudyPvAttr.class, PatientVisit.class };
-
-        for (Class<?> clazz : classes) {
-            StringBuilder sb = new StringBuilder("select count(x) from ")
-                .append(clazz.getName()).append(
-                    " as x where x.activityStatus=?");
-            HQLCriteria c = new HQLCriteria(sb.toString(),
-                Arrays.asList(new Object[] { wrappedObject }));
-            List<Long> results = appService.query(c);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            usedCount += results.get(0);
-        }
-
-        return usedCount > 0;
-    }
-
     private static final String ALL_ACTIVITY_STATUSES_QRY = "from "
         + ActivityStatus.class.getName();
 
@@ -131,24 +128,17 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
 
     public static ActivityStatusWrapper getActivityStatus(
         WritableApplicationService appService, String name)
-        throws ApplicationException, BiobankCheckException {
+        throws ApplicationException, BiobankFailedQueryException {
 
         HQLCriteria c = new HQLCriteria(ACTIVITY_STATUS_QRY,
             Arrays.asList(new Object[] { name }));
 
         List<ActivityStatus> result = appService.query(c);
-
-        if (result.size() == 1) {
-            return new ActivityStatusWrapper(appService, result.get(0));
-
-        } else if (result.size() == 0) {
-            throw new BiobankCheckException("activity status \"" + name
-                + "\" does not exist");
-        } else if (result.size() > 1) {
-            throw new BiobankCheckException(" Too many instances of \"" + name
-                + "\"");
+        if (result.size() != 1) {
+            throw new BiobankFailedQueryException(
+                "unexpected results from query");
         }
-        return null;
+        return new ActivityStatusWrapper(appService, result.get(0));
 
     }
 
@@ -161,7 +151,7 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
      */
     public static ActivityStatusWrapper getActiveActivityStatus(
         WritableApplicationService appService) throws ApplicationException,
-        BiobankCheckException {
+        BiobankFailedQueryException {
         return getActivityStatus(appService, ACTIVE_STATUS_STRING);
     }
 

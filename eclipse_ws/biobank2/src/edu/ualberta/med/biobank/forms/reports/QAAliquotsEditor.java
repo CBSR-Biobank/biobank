@@ -14,7 +14,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -62,7 +62,7 @@ public class QAAliquotsEditor extends ReportsEditor {
         List<Object> params = new ArrayList<Object>();
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
-        params.add(((SampleTypeWrapper) ((IStructuredSelection) sampleType
+        params.add(((SpecimenTypeWrapper) ((IStructuredSelection) sampleType
             .getSelection()).getFirstElement()).getNameShort());
         report.setContainerList(ReportsEditor
             .containerIdsToString(topContainers.getSelectedContainerIds()));
@@ -76,7 +76,7 @@ public class QAAliquotsEditor extends ReportsEditor {
         params.add(ReportsEditor.processDate(start.getDate(), true));
         params.add(ReportsEditor.processDate(end.getDate(), false));
         params.add(topContainers.getSelectedContainerNames());
-        params.add(((SampleTypeWrapper) ((IStructuredSelection) sampleType
+        params.add(((SpecimenTypeWrapper) ((IStructuredSelection) sampleType
             .getSelection()).getFirstElement()).getNameShort());
         params.add(Integer.parseInt((String) numAliquots.getValue()));
         return params;
@@ -84,14 +84,14 @@ public class QAAliquotsEditor extends ReportsEditor {
 
     protected ComboViewer createSampleTypeComboOption(String labelText,
         Composite parent) throws ApplicationException {
-        Collection<SampleTypeWrapper> sampleTypeWrappers = SampleTypeWrapper
-            .getAllSampleTypes(SessionManager.getAppService(), true);
+        Collection<SpecimenTypeWrapper> sampleTypeWrappers = SpecimenTypeWrapper
+            .getAllSpecimenTypes(SessionManager.getAppService(), true);
         ComboViewer widget = widgetCreator.createComboViewer(parent, labelText,
             sampleTypeWrappers, null, "No selection", null);
         widget.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((SampleTypeWrapper) element).getNameShort();
+                return ((SpecimenTypeWrapper) element).getNameShort();
             }
         });
 

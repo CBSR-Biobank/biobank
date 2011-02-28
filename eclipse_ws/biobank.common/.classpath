@@ -2,7 +2,6 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="conf"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/mysql-connector-java-5.1.7-bin.jar"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
 	<classpathentry exported="true" kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/acegi-security-1.0.4.jar"/>
@@ -20,7 +19,7 @@
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-lang-2.4.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/commons-logging-1.1.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/hibernate-validator.jar"/>
-	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/delphine/projects/sources/hibernate/hibernate-3.2"/>
+	<classpathentry exported="true" kind="lib" path="lib/client/hibernate3.jar" sourcepath="/home/jferland/proj/sources/hibernate-3.2"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/jaxrpc.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/log4j-1.2.14.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/client/sdk-client-framework.jar"/>
@@ -34,5 +33,6 @@
 	<classpathentry exported="true" kind="lib" path="lib/server/csmapi-4.1.jar" sourcepath="/home/delphine/projects/sources/CaCore/CSM/CSM_API_4_1_Source/src"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-core.jar"/>
 	<classpathentry exported="true" kind="lib" path="lib/server/sdk-writable-core.jar"/>
+	<classpathentry kind="lib" path="lib/client/mysql-connector-java-5.1.15-bin.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

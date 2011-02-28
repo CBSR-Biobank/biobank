@@ -1,50 +1,26 @@
 package edu.ualberta.med.biobank.test.internal;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 
+@Deprecated
 public class StudySourceVesselHelper extends DbHelper {
 
-    public static StudySourceVesselWrapper newStudySourceVessel(
-        StudyWrapper study, SourceVesselWrapper sourceVessel) {
-        StudySourceVesselWrapper source = new StudySourceVesselWrapper(
-            appService);
-        source.setStudy(study);
-        source.setSourceVessel(sourceVessel);
-        return source;
+    public static SourceSpecimenWrapper newStudySourceVessel(
+        StudyWrapper study, SourceVesselTypeWrapper svType,
+        boolean needTimeDrawn, boolean needOriginalVolume) {
+        return null;
     }
 
-    public static StudySourceVesselWrapper addStudySourceVessel(
-        StudyWrapper study, SourceVesselWrapper sourceVessel) throws Exception {
-        StudySourceVesselWrapper source = newStudySourceVessel(study,
-            sourceVessel);
-        source.persist();
-        return source;
+    public static SourceSpecimenWrapper addStudySourceVessel(
+        StudyWrapper study, SourceVesselTypeWrapper svType,
+        boolean needTimeDrawn, boolean needOriginalVolume) throws Exception {
+        return null;
     }
 
-    // public static void deleteCreatedSourceVessels() throws Exception {
-    // for (SourceVesselWrapper source : createdSourceVessels) {
-    // source.reload();
-    // source.delete();
-    // }
-    // createdSourceVessels.clear();
-    // }\
-
-    public static int addStudySourceVessels(StudyWrapper study, String name)
-        throws Exception {
-        int nber = r.nextInt(15) + 1;
-        List<StudySourceVesselWrapper> sources = new ArrayList<StudySourceVesselWrapper>();
-        for (int i = 0; i < nber; i++) {
-            SourceVesselWrapper sourceVessel = SourceVesselHelper
-                .addSourceVessel(name + i);
-            sources.add(addStudySourceVessel(study, sourceVessel));
-        }
-        study.addToStudySourceVesselCollection(sources);
-        study.persist();
-        return nber;
+    public static int addStudySourceVessels(StudyWrapper study, String name,
+        boolean needTimeDrawn, boolean needOriginalVolume) throws Exception {
+        return -1;
     }
 }

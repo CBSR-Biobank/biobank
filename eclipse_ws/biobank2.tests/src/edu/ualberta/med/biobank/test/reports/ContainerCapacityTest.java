@@ -50,12 +50,8 @@ public class ContainerCapacityTest extends AbstractReportTest {
                     .getRowCapacity()
                     * container.getContainerType().getColCapacity();
 
-                try {
-                    if (container.getAliquots() != null) {
-                        row.usedSlots += container.getAliquots().size();
-                    }
-                } catch (BiobankException e) {
-                    e.printStackTrace();
+                if (container.getSpecimens() != null) {
+                    row.usedSlots += container.getSpecimens().size();
                 }
 
                 return row;

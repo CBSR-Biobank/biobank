@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
@@ -19,26 +19,26 @@ public class SampleTypeDialog extends BiobankDialog {
     private static final String MSG_NO_ST_NAME = "Sample type must have a name.";
     private static final String MSG_NO_ST_SNAME = "Sample type must have a short name.";
 
-    private SampleTypeWrapper oldSampleType;
-    private SampleTypeWrapper origSampleType;
+    private SpecimenTypeWrapper oldSampleType;
+    private SpecimenTypeWrapper origSampleType;
 
     // this is the object that is modified via the bound widgets
-    private SampleTypeWrapper sampleType;
+    private SpecimenTypeWrapper sampleType;
 
     private String message;
 
     private String currentTitle;
 
-    public SampleTypeDialog(Shell parent, SampleTypeWrapper sampleType,
+    public SampleTypeDialog(Shell parent, SpecimenTypeWrapper sampleType,
         String message) {
         super(parent);
         Assert.isNotNull(sampleType);
         origSampleType = sampleType;
-        this.sampleType = new SampleTypeWrapper(null);
+        this.sampleType = new SpecimenTypeWrapper(null);
         this.sampleType.setName(sampleType.getName());
         this.sampleType.setNameShort(sampleType.getNameShort());
         this.message = message;
-        oldSampleType = new SampleTypeWrapper(SessionManager.getAppService());
+        oldSampleType = new SpecimenTypeWrapper(SessionManager.getAppService());
         currentTitle = ((origSampleType.getName() == null) ? "Add " : "Edit ")
             + TITLE;
     }
@@ -82,7 +82,7 @@ public class SampleTypeDialog extends BiobankDialog {
         super.okPressed();
     }
 
-    public SampleTypeWrapper getOrigSampleType() {
+    public SpecimenTypeWrapper getOrigSampleType() {
         return oldSampleType;
     }
 

@@ -2,22 +2,20 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
-import edu.ualberta.med.biobank.model.AbstractShipment;
-import edu.ualberta.med.biobank.model.Shipment;
+import edu.ualberta.med.biobank.common.wrappers.base.ShippingMethodBaseWrapper;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
+public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
 
     public static final String DROP_OFF_NAME = "Drop-off";
     public static final String PICK_UP_NAME = "Pick-up";
@@ -31,25 +29,13 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         super(appService, sc);
     }
 
-    @SuppressWarnings("rawtypes")
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        List<AbstractShipmentWrapper> shipments = getShipmentCollection();
+        List<CollectionEventWrapper> shipments = getCollectionEventCollection();
         if (shipments != null && shipments.size() > 0) {
             throw new BiobankCheckException(
                 "Cannot delete this shipping company: shipments are still using it");
         }
-
-    }
-
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return ShippingMethodPeer.PROP_NAMES;
-    }
-
-    @Override
-    public Class<ShippingMethod> getWrappedClass() {
-        return ShippingMethod.class;
     }
 
     @Override
@@ -67,16 +53,6 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         checkUnique();
     }
 
-    public String getName() {
-        return wrappedObject.getName();
-    }
-
-    public void setName(String name) {
-        String old = getName();
-        wrappedObject.setName(name);
-        propertyChangeSupport.firePropertyChange("name", old, name);
-    }
-
     @Override
     public int compareTo(ModelWrapper<ShippingMethod> o) {
         if (o instanceof ShippingMethodWrapper) {
@@ -85,46 +61,21 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         return 0;
     }
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public List<AbstractShipmentWrapper> getAllShipmentCollection(boolean sort) {
-        List<AbstractShipmentWrapper> shipmentCollection = (List<AbstractShipmentWrapper>) propertiesMap
-            .get("shipmentCollection");
-        if (shipmentCollection == null) {
-            Collection<AbstractShipment> children = wrappedObject
-                .getShipmentCollection();
-            if (children != null) {
-                shipmentCollection = new ArrayList<AbstractShipmentWrapper>();
-                for (AbstractShipment ship : children) {
-                    shipmentCollection.add(AbstractShipmentWrapper
-                        .createInstance(appService, ship));
-                }
-                propertiesMap.put("shipmentCollection", shipmentCollection);
-            }
-        }
-        if ((shipmentCollection != null) && sort)
-            Collections.sort(shipmentCollection);
-        return shipmentCollection;
+    @SuppressWarnings("unused")
+    @Deprecated
+    public List<ShipmentInfoWrapper> getAllShipmentCollection(boolean sort) {
+        return null;
     }
 
-    @SuppressWarnings("rawtypes")
-    public List<AbstractShipmentWrapper> getShipmentCollection() {
-        return getShipmentCollection(false);
+    public List<CollectionEventWrapper> getCollectionEventCollection() {
+        return getCollectionEventCollection(false);
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-    public List<AbstractShipmentWrapper> getShipmentCollection(boolean sort) {
-        List<AbstractShipmentWrapper> shipmentCollection = (List<AbstractShipmentWrapper>) propertiesMap
-            .get("shipmentCollection");
-        if (shipmentCollection == null) {
-            List<AbstractShipmentWrapper> allShipmentCollection = getAllShipmentCollection(sort);
-            shipmentCollection = new ArrayList<AbstractShipmentWrapper>();
-            for (AbstractShipmentWrapper ship : allShipmentCollection) {
-                if (ship instanceof ShipmentWrapper) {
-                    shipmentCollection.add(ship);
-                }
-            }
-        }
-        return shipmentCollection;
+    @SuppressWarnings("unused")
+    @Deprecated
+    public List<CollectionEventWrapper> getCollectionEventCollection(
+        boolean sort) {
+        return null;
     }
 
     public static List<ShippingMethodWrapper> getShippingMethods(
@@ -143,19 +94,14 @@ public class ShippingMethodWrapper extends ModelWrapper<ShippingMethod> {
         return getName();
     }
 
+    private static final String IS_USED_QRY = "select count(si) from "
+        + ShipmentInfo.class.getName() + " as si where si."
+        + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?";
+
     public boolean isUsed() throws ApplicationException, BiobankException {
-        String queryString = "select count(s) from " + Shipment.class.getName()
-            + " as s where s.shippingMethod=?)";
-        HQLCriteria c = new HQLCriteria(queryString,
+        HQLCriteria c = new HQLCriteria(IS_USED_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        if (results.get(0) > 0) {
-            return true;
-        }
-        return false;
+        return getCountResult(appService, c) > 0;
     }
 
     public static void persistShippingMethods(

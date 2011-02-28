@@ -7,7 +7,7 @@ import java.util.Random;
 
 import junit.framework.Assert;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 
 public class TestCommon {
@@ -21,7 +21,7 @@ public class TestCommon {
     public static List<String> usedWaybills;
 
     public static ContainerTypeWrapper addSampleTypes(ContainerTypeWrapper ct,
-        List<SampleTypeWrapper> sampleTypes) throws Exception {
+        List<SpecimenTypeWrapper> sampleTypes) throws Exception {
         Assert.assertTrue("not enough sample types for test", (sampleTypes
             .size() > 10));
         ct.addToSampleTypeCollection(sampleTypes);
@@ -30,10 +30,10 @@ public class TestCommon {
         return ct;
     }
 
-    public static List<SampleTypeWrapper> getRandomSampleTypeList(Random r,
-        List<SampleTypeWrapper> list) {
-        List<SampleTypeWrapper> result = new ArrayList<SampleTypeWrapper>();
-        for (SampleTypeWrapper st : list) {
+    public static List<SpecimenTypeWrapper> getRandomSampleTypeList(Random r,
+        List<SpecimenTypeWrapper> list) {
+        List<SpecimenTypeWrapper> result = new ArrayList<SpecimenTypeWrapper>();
+        for (SpecimenTypeWrapper st : list) {
             if (r.nextBoolean()) {
                 result.add(st);
             }

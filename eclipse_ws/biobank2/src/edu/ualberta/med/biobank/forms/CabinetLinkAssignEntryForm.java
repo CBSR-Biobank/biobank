@@ -37,14 +37,14 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
@@ -97,7 +97,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     private static IObservableValue canLaunchCheck = new WritableValue(
         Boolean.TRUE, Boolean.class);
 
-    private AliquotWrapper aliquot;
+    private SpecimenWrapper aliquot;
     private ContainerWrapper cabinet;
     private ContainerWrapper drawer;
     private ContainerWrapper bin;
@@ -120,7 +120,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
     private AbstractValidator oldCabinetPositionCheckValidator;
 
-    private List<SampleTypeWrapper> cabinetSampleTypes;
+    private List<SpecimenTypeWrapper> cabinetSpecimenTypes;
 
     private static final String SAMPLE_TYPE_LIST_BINDING = "sample-type-list-binding";
 
@@ -137,7 +137,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         super.init();
         aliquotMode = AliquotMode.NEW_ALIQUOT;
         setPartName(Messages.getString("Cabinet.tabTitle")); //$NON-NLS-1$
-        aliquot = new AliquotWrapper(appService);
+        aliquot = new SpecimenWrapper(appService);
         IPreferenceStore store = BioBankPlugin.getDefault()
             .getPreferenceStore();
         cabinetNameContains = store
@@ -162,7 +162,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             Messages.getString("Cabinet.checkButton.validationMsg"));
 
         radioNew.setSelection(true);
-        setAliquotMode(AliquotMode.NEW_ALIQUOT);
+        setSpecimenMode(AliquotMode.NEW_ALIQUOT);
     }
 
     private void createLocationSection() {
@@ -228,7 +228,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             public void widgetSelected(SelectionEvent e) {
                 newAliquotCreation = radioNew.getSelection();
                 if (radioNew.getSelection()) {
-                    setAliquotMode(AliquotMode.NEW_ALIQUOT);
+                    setSpecimenMode(AliquotMode.NEW_ALIQUOT);
                 }
             }
         });
@@ -242,7 +242,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             public void widgetSelected(SelectionEvent e) {
                 newAliquotCreation = radioNew.getSelection();
                 if (!radioNew.getSelection()) {
-                    setAliquotMode(AliquotMode.MOVE_ALIQUOT);
+                    setSpecimenMode(AliquotMode.MOVE_ALIQUOT);
                 }
             }
         });
@@ -267,7 +267,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 }
             });
 
-        linkFormPatientManagement.createVisitWidgets(fieldsComposite);
+        linkFormPatientManagement.createCollectionEventWidgets(fieldsComposite);
 
         // inventoryID
         inventoryIDValidator = new CabinetInventoryIDValidator();
@@ -472,8 +472,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 for (ContainerWrapper cont : ContainerWrapper
                     .getContainersInSite(appService, currentSite, binLabel)) {
                     boolean canContainSamples = cont.getContainerType()
-                        .getSampleTypeCollection() != null
-                        && cont.getContainerType().getSampleTypeCollection()
+                        .getSpecimenTypeCollection() != null
+                        && cont.getContainerType().getSpecimenTypeCollection()
                             .size() > 0;
                     if (canContainSamples) {
                         foundContainers.add(cont);
@@ -497,7 +497,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 cabinet = drawer.getParent();
             } else if (cabinetContainers.size() == 0) {
                 String errorMsg = Messages
-                    .getFormattedString(
+                    .getString(
                         "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested), currentSite.getNameShort()); //$NON-NLS-1$
                 BioBankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
@@ -531,7 +531,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         return res;
     }
 
-    protected void setAliquotMode(AliquotMode mode) {
+    protected void setSpecimenMode(AliquotMode mode) {
         try {
             aliquotMode = mode;
             reset();
@@ -589,7 +589,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 public void doSelection(Object selectedObject) {
                     if (aliquotMode == AliquotMode.MOVE_ALIQUOT)
                         return;
-                    aliquot.setSampleType((SampleTypeWrapper) selectedObject);
+                    aliquot
+                        .setSpecimenType((SpecimenTypeWrapper) selectedObject);
 
                 }
             }); //$NON-NLS-1$
@@ -616,22 +617,21 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 .getContainerTypesInSite(appService,
                     siteCombo.getSelectedSite(), cabinetNameContains, false);
             if (cabinetContainerTypes.size() == 0)
-                BioBankPlugin.openAsyncError(Messages
-                    .getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
-                    Messages.getFormattedString(
-                        "Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
+                BioBankPlugin.openAsyncError(
+                    Messages.getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
+                    Messages.getString("Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
                         cabinetNameContains));
         }
     }
 
-    private List<SampleTypeWrapper> getCabinetSampleTypes()
+    private List<SpecimenTypeWrapper> getCabinetSpecimenTypes()
         throws ApplicationException {
-        if (cabinetSampleTypes == null) {
-            cabinetSampleTypes = SampleTypeWrapper
-                .getSampleTypeForContainerTypes(appService,
+        if (cabinetSpecimenTypes == null) {
+            cabinetSpecimenTypes = SpecimenTypeWrapper
+                .getSpecimenTypeForContainerTypes(appService,
                     siteCombo.getSelectedSite(), cabinetNameContains);
         }
-        return cabinetSampleTypes;
+        return cabinetSpecimenTypes;
     }
 
     protected void checkPositionAndAliquot() {
@@ -640,9 +640,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             public void run() {
                 try {
                     appendLog("----"); //$NON-NLS-1$
-                    PatientVisitWrapper pv = linkFormPatientManagement
-                        .getSelectedPatientVisit();
-                    aliquot.setPatientVisit(pv);
+                    CollectionEventWrapper ce = linkFormPatientManagement
+                        .getSelectedCollectionEvent();
+                    aliquot.setCollectionEvent(ce);
                     if (radioNew.getSelection()) {
                         appendLogNLS("Cabinet.activitylog.checkingId", //$NON-NLS-1$
                             aliquot.getInventoryId());
@@ -656,7 +656,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                     }
                     appendLogNLS(
                         "Cabinet.activitylog.checkingPosition", positionString); //$NON-NLS-1$
-                    aliquot.setAliquotPositionFromString(positionString, bin);
+                    aliquot.setSpecimenPositionFromString(positionString, bin);
                     if (aliquot.isPositionFree(bin)) {
                         aliquot.setParent(bin);
                         displayPositions(true);
@@ -664,7 +664,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         cancelConfirmWidget.setFocus();
                     } else {
                         BioBankPlugin.openError("Position not free", Messages
-                            .getFormattedString(
+                            .getString(
                                 "Cabinet.checkStatus.error", positionString, //$NON-NLS-1$
                                 bin.getLabel()));
                         appendLogNLS(
@@ -711,11 +711,11 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             return -1;
 
         viewerSampleTypes.getCombo().setEnabled(true);
-        List<SampleTypeWrapper> studiesSampleTypes = new ArrayList<SampleTypeWrapper>();
+        List<SpecimenTypeWrapper> studiesSampleTypes = new ArrayList<SpecimenTypeWrapper>();
         if (linkFormPatientManagement.getCurrentPatient() != null
             && bin != null) {
-            List<SampleTypeWrapper> binTypes = bin.getContainerType()
-                .getSampleTypeCollection();
+            List<SpecimenTypeWrapper> binTypes = bin.getContainerType()
+                .getSpecimenTypeCollection();
             StudyWrapper study = linkFormPatientManagement.getCurrentPatient()
                 .getStudy();
             try {
@@ -726,9 +726,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             } catch (Exception e) {
                 BioBankPlugin.openAsyncError("Problem reloading study", e);
             }
-            for (SampleStorageWrapper ss : study.getSampleStorageCollection()) {
+            for (AliquotedSpecimenWrapper ss : study
+                .getAliquotedSpecimenCollection()) {
                 if (ss.getActivityStatus().isActive()) {
-                    SampleTypeWrapper type = ss.getSampleType();
+                    SpecimenTypeWrapper type = ss.getSpecimenType();
                     if (binTypes.contains(type)) {
                         studiesSampleTypes.add(type);
                     }
@@ -749,7 +750,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             }
             if (!radioNew.getSelection()) {
                 // Move
-                SampleTypeWrapper type = aliquot.getSampleType();
+                SpecimenTypeWrapper type = aliquot.getSpecimenType();
                 if (!studiesSampleTypes.contains(type)
                     && binTypes.contains(type)) {
                     // in move mode, the sample source could be deactivate
@@ -761,10 +762,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         viewerSampleTypes.getCombo().setEnabled(true);
         if (studiesSampleTypes.size() == 1) {
             viewerSampleTypes.getCombo().select(0);
-            aliquot.setSampleType(studiesSampleTypes.get(0));
+            aliquot.setSpecimenType(studiesSampleTypes.get(0));
         } else {
             viewerSampleTypes.getCombo().deselectAll();
-            aliquot.setSampleType(null);
+            aliquot.setSpecimenType(null);
         }
         return studiesSampleTypes.size();
     }
@@ -792,7 +793,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         appendLogNLS("Cabinet.activitylog.gettingInfoId", //$NON-NLS-1$
             aliquot.getInventoryId());
-        AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(appService,
+        SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(appService,
             aliquot.getInventoryId(), SessionManager.getUser());
         if (foundAliquot == null) {
             canLaunchCheck.setValue(false);
@@ -800,11 +801,11 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 + aliquot.getInventoryId());
         }
         aliquot.initObjectWith(foundAliquot);
-        List<SampleTypeWrapper> possibleTypes = getCabinetSampleTypes();
-        if (!possibleTypes.contains(aliquot.getSampleType())) {
+        List<SpecimenTypeWrapper> possibleTypes = getCabinetSpecimenTypes();
+        if (!possibleTypes.contains(aliquot.getSpecimenType())) {
             canLaunchCheck.setValue(false);
             throw new Exception(
-                "This aliquot is of type " + aliquot.getSampleType().getNameShort() //$NON-NLS-1$
+                "This aliquot is of type " + aliquot.getSpecimenType().getNameShort() //$NON-NLS-1$
                     + ": this is not a cabinet type");
         }
         if (aliquot.isUsedInDispatch()) {
@@ -813,9 +814,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 "This aliquot is currently in transit in a dispatch.");
         }
         canLaunchCheck.setValue(true);
-        PatientWrapper patient = aliquot.getPatientVisit().getPatient();
+        PatientWrapper patient = aliquot.getCollectionEvent().getPatient();
         linkFormPatientManagement.setCurrentPatientAndVisit(patient,
-            aliquot.getPatientVisit());
+            aliquot.getProcessingEvent());
         String positionString = aliquot.getPositionString(true, false);
         if (positionString == null) {
             widgetCreator.hideWidget(oldCabinetPositionCheckLabel);
@@ -829,7 +830,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 .getText());
         }
         oldCabinetPositionText.setText(positionString);
-        sampleTypeText.setText(aliquot.getSampleType().getName());
+        sampleTypeText.setText(aliquot.getSpecimenType().getName());
         page.layout(true, true);
         appendLogNLS(
             "Cabinet.activitylog.aliquotInfo", aliquot.getInventoryId(), //$NON-NLS-1$
@@ -886,7 +887,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     @Override
     protected void saveForm() throws Exception {
         if (newAliquotCreation) {
-            aliquot.setLinkDate(new Date());
+            aliquot.setCreatedAt(new Date());
             aliquot.setQuantityFromType();
             aliquot.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
@@ -903,10 +904,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             msgString = "Cabinet.activitylog.aliquot.saveMove"; //$NON-NLS-1$
         }
         appendLogNLS(msgString, posStr, aliquot.getInventoryId(), aliquot
-            .getSampleType().getName(), linkFormPatientManagement
-            .getCurrentPatient().getPnumber(), aliquot.getPatientVisit()
-            .getFormattedDateDrawn(), aliquot.getPatientVisit().getShipment()
-            .getClinic().getName());
+            .getSpecimenType().getName(), linkFormPatientManagement
+            .getCurrentPatient().getPnumber(), aliquot.getProcessingEvent()
+            .getFormattedCreatedAt(), aliquot.getCurrentCenter().getName());
         setFinished(false);
     }
 
@@ -962,11 +962,10 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     protected void siteComboSelectionChanged(SiteWrapper currentSelection)
         throws Exception {
         linkFormPatientManagement.setSite(currentSelection);
-        linkFormPatientManagement.setVisitsList();
         if (viewerSampleTypes != null) {
             initCabinetContainerTypesList();
             viewerSampleTypes.setInput(null);
-            aliquot.setSampleType(null);
+            aliquot.setSpecimenType(null);
             if (newCabinetPositionValidator.validate(
                 newCabinetPositionText.getText()).equals(Status.OK_STATUS)) {
                 initContainersFromPosition();

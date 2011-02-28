@@ -16,8 +16,8 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 
 /**
@@ -25,12 +25,12 @@ import edu.ualberta.med.biobank.dialogs.BiobankDialog;
  */
 
 public class SelectShipmentClinicDialog extends BiobankDialog {
-    private List<ShipmentWrapper> shipments;
+    private List<CollectionEventWrapper> shipments;
     private ComboViewer comboViewer;
-    protected ShipmentWrapper selectedShipment;
+    protected CollectionEventWrapper selectedShipment;
 
     public SelectShipmentClinicDialog(Shell parent,
-        List<ShipmentWrapper> shipments) {
+        List<CollectionEventWrapper> shipments) {
         super(parent);
         Assert.isNotNull(shipments);
         this.shipments = shipments;
@@ -67,7 +67,7 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                ClinicWrapper clinic = ((ShipmentWrapper) element)
+                ClinicWrapper clinic = ((CollectionEventWrapper) element)
                     .getClinic();
                 return clinic.getName();
             }
@@ -85,11 +85,11 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
     }
 
     private void saveSelectedShipment() {
-        selectedShipment = (ShipmentWrapper) ((IStructuredSelection) comboViewer
+        selectedShipment = (CollectionEventWrapper) ((IStructuredSelection) comboViewer
             .getSelection()).getFirstElement();
     }
 
-    public ShipmentWrapper getSelectedShipment() {
+    public CollectionEventWrapper getSelectedShipment() {
         return selectedShipment;
     }
 

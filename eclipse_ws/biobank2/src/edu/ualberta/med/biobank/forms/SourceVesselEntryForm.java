@@ -59,7 +59,7 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
         }
         globalSourceWidget = new SourceVesselEntryInfoTable(section,
             globalSourceVessels, "Add a new global source vessel",
-            "Edit the global source vessel", null);
+            "Edit the global source vessel");
         globalSourceWidget.adaptToToolkit(toolkit, true);
         globalSourceWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(globalSourceWidget);
@@ -77,8 +77,8 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
         SourceVesselWrapper.persistSourceVessels(
-            globalSourceWidget.getAddedOrModifiedSampleTypes(),
-            globalSourceWidget.getDeletedSampleTypes());
+            globalSourceWidget.getAddedOrModifiedSourceVessels(),
+            globalSourceWidget.getDeletedSourceVessels());
     }
 
     @Override

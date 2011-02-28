@@ -14,7 +14,7 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.StudySourceVesselDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -33,16 +33,16 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
 
     private List<SourceVesselWrapper> availableSourceVessels;
 
-    private List<StudySourceVesselWrapper> selectedStudySourceVessels;
+    private List<SourceSpecimenWrapper> selectedStudySourceVessels;
 
-    private List<StudySourceVesselWrapper> addedOrModifiedSourceVessels;
+    private List<SourceSpecimenWrapper> addedOrModifiedSourceVessels;
 
-    private List<StudySourceVesselWrapper> deletedSourceVessels;
+    private List<SourceSpecimenWrapper> deletedSourceVessels;
 
     private StudyWrapper study;
 
     public StudySourceVesselEntryInfoTable(Composite parent,
-        List<StudySourceVesselWrapper> collection) {
+        List<SourceSpecimenWrapper> collection) {
         super(parent, collection);
     }
 
@@ -63,11 +63,11 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
         initSourceVessels();
         selectedStudySourceVessels = study.getStudySourceVesselCollection();
         if (selectedStudySourceVessels == null) {
-            selectedStudySourceVessels = new ArrayList<StudySourceVesselWrapper>();
+            selectedStudySourceVessels = new ArrayList<SourceSpecimenWrapper>();
         }
         setCollection(selectedStudySourceVessels);
-        addedOrModifiedSourceVessels = new ArrayList<StudySourceVesselWrapper>();
-        deletedSourceVessels = new ArrayList<StudySourceVesselWrapper>();
+        addedOrModifiedSourceVessels = new ArrayList<SourceSpecimenWrapper>();
+        deletedSourceVessels = new ArrayList<SourceSpecimenWrapper>();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -81,14 +81,14 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
     }
 
     public void addStudySourceVessel() {
-        StudySourceVesselWrapper newStudySourcevessel = new StudySourceVesselWrapper(
+        SourceSpecimenWrapper newStudySourcevessel = new SourceSpecimenWrapper(
             SessionManager.getAppService());
         newStudySourcevessel.setStudy(study);
         addOrEditStudySourceVessel(true, newStudySourcevessel);
     }
 
     private void addOrEditStudySourceVessel(boolean add,
-        StudySourceVesselWrapper studySourceVessel) {
+        SourceSpecimenWrapper studySourceVessel) {
         List<SourceVesselWrapper> dialogSourceVessels = availableSourceVessels;
         if (!add) {
             dialogSourceVessels.add(studySourceVessel.getSourceVessel());
@@ -109,7 +109,7 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
     }
 
     private void addEditSupport() {
-        if (SessionManager.canCreate(StudySourceVesselWrapper.class, null)) {
+        if (SessionManager.canCreate(SourceSpecimenWrapper.class, null)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
@@ -117,21 +117,21 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
                 }
             });
         }
-        if (SessionManager.canUpdate(StudySourceVesselWrapper.class, null)) {
+        if (SessionManager.canUpdate(SourceSpecimenWrapper.class, null)) {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    StudySourceVesselWrapper studySourceVessel = getSelection();
+                    SourceSpecimenWrapper studySourceVessel = getSelection();
                     if (studySourceVessel != null)
                         addOrEditStudySourceVessel(false, studySourceVessel);
                 }
             });
         }
-        if (SessionManager.canDelete(StudySourceVesselWrapper.class, null)) {
+        if (SessionManager.canDelete(SourceSpecimenWrapper.class, null)) {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
-                    StudySourceVesselWrapper studySourceVessel = getSelection();
+                    SourceSpecimenWrapper studySourceVessel = getSelection();
                     if (studySourceVessel != null) {
                         if (!MessageDialog
                             .openConfirm(PlatformUI.getWorkbench()
@@ -157,10 +157,10 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
         try {
             availableSourceVessels = SourceVesselWrapper
                 .getAllSourceVessels(SessionManager.getAppService());
-            List<StudySourceVesselWrapper> studySourceVessels = study
+            List<SourceSpecimenWrapper> studySourceVessels = study
                 .getStudySourceVesselCollection();
             if (studySourceVessels != null) {
-                for (StudySourceVesselWrapper ssv : studySourceVessels) {
+                for (SourceSpecimenWrapper ssv : studySourceVessels) {
                     availableSourceVessels.remove(ssv.getSourceVessel());
                 }
             }
@@ -171,22 +171,22 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
         }
     }
 
-    public List<StudySourceVesselWrapper> getAddedOrModifiedStudySourceVessels() {
+    public List<SourceSpecimenWrapper> getAddedOrModifiedStudySourceVessels() {
         return addedOrModifiedSourceVessels;
     }
 
-    public List<StudySourceVesselWrapper> getDeletedStudySourceVessels() {
+    public List<SourceSpecimenWrapper> getDeletedStudySourceVessels() {
         return deletedSourceVessels;
     }
 
     public void reload() {
         selectedStudySourceVessels = study.getStudySourceVesselCollection();
         if (selectedStudySourceVessels == null) {
-            selectedStudySourceVessels = new ArrayList<StudySourceVesselWrapper>();
+            selectedStudySourceVessels = new ArrayList<SourceSpecimenWrapper>();
         }
         reloadCollection(selectedStudySourceVessels);
-        addedOrModifiedSourceVessels = new ArrayList<StudySourceVesselWrapper>();
-        deletedSourceVessels = new ArrayList<StudySourceVesselWrapper>();
+        addedOrModifiedSourceVessels = new ArrayList<SourceSpecimenWrapper>();
+        deletedSourceVessels = new ArrayList<SourceSpecimenWrapper>();
     }
 
     @Override
@@ -195,8 +195,8 @@ public class StudySourceVesselEntryInfoTable extends StudySourceVesselInfoTable 
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((StudySourceVesselWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((StudySourceVesselWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject((SourceSpecimenWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((SourceSpecimenWrapper) e2);
                     return super.compare(i1.name, i2.name);
                 } catch (Exception e) {
                     return 0;

@@ -9,34 +9,34 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.ClassUtils;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
+import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestActivityStatus extends TestDatabase {
@@ -81,24 +81,25 @@ public class TestActivityStatus extends TestDatabase {
         String name = "testDeleteFail" + r.nextInt();
 
         // should not be allowed to remove an activity status that is used
-        SiteWrapper site = SiteHelper.addSite(name);
-        StudyWrapper study = StudyHelper.addStudy(name, false);
-        ClinicWrapper clinic = ClinicHelper.addClinic(name, false, false);
+        SiteWrapper site = SiteHelper.addSite("site" + name);
+        StudyWrapper study = StudyHelper.addStudy("study" + name, false);
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name, false,
+            false);
         ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
             site, name, 2, 2);
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
-        topContainerType.addToSampleTypeCollection(SampleTypeWrapper.getAllSampleTypes(
-            appService, false));
+        topContainerType.addToSpecimenTypeCollection(SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false));
         topContainerType.persist();
 
-        study.setStudyPvAttr("worksheet", "text");
+        study.setStudyEventAttr("worksheet", "text");
         study.persist();
 
-        StudyPvAttrWrapper spa = StudyPvAttrWrapper.getStudyPvAttrCollection(
-            study).get(0);
+        StudyEventAttrWrapper spa = StudyEventAttrWrapper
+            .getStudyEventAttrCollection(study).get(0);
 
-        SampleTypeWrapper sampleType = SampleTypeWrapper.getAllSampleTypes(
-            appService, false).get(0);
+        SpecimenTypeWrapper sampleType = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false).get(0);
 
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
         study.addToContactCollection(Arrays.asList(contact));
@@ -106,13 +107,16 @@ public class TestActivityStatus extends TestDatabase {
         study.reload();
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        ShipmentWrapper shipment = ShipmentHelper.addShipment(site, clinic,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0),
-            patient);
-        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            shipment, Utils.getRandomDate(), Utils.getRandomDate());
+        SpecimenWrapper spc = SpecimenHelper.newSpecimen(SpecimenTypeHelper
+            .newSpecimenType(name));
 
-        AliquotWrapper aliquot = AliquotHelper.addAliquot(sampleType,
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(site, patient, 1, spc);
+
+        CollectionEventWrapper visit = CollectionEventHelper
+            .addCollectionEvent(site, patient, 1);
+
+        SpecimenWrapper aliquot = SpecimenHelper.addSpecimen(sampleType,
             topContainer, visit, 0, 0);
 
         ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { aliquot, spa,
@@ -123,10 +127,10 @@ public class TestActivityStatus extends TestDatabase {
                 name + ClassUtils.getClassName(wrapper.getClass()), null);
         }
 
-        // , clinic, study, site
+        // clinic, study, site
         testDeleteFail(clinic,
             name + ClassUtils.getClassName(clinic.getClass()),
-            new ModelWrapper<?>[] { visit, shipment, patient, study, contact });
+            new ModelWrapper<?>[] { visit, cevent, patient, study, contact });
     }
 
     private void testDeleteFail(ModelWrapper<?> wrapper, String asName,
@@ -136,10 +140,10 @@ public class TestActivityStatus extends TestDatabase {
         as.persist();
         as.reload();
 
-        if (wrapper instanceof AliquotWrapper) {
-            ((AliquotWrapper) wrapper).setActivityStatus(as);
-        } else if (wrapper instanceof StudyPvAttrWrapper) {
-            ((StudyPvAttrWrapper) wrapper).setActivityStatus(as);
+        if (wrapper instanceof SpecimenWrapper) {
+            ((SpecimenWrapper) wrapper).setActivityStatus(as);
+        } else if (wrapper instanceof StudyEventAttrWrapper) {
+            ((StudyEventAttrWrapper) wrapper).setActivityStatus(as);
         } else if (wrapper instanceof ContainerWrapper) {
             ((ContainerWrapper) wrapper).setActivityStatus(as);
         } else if (wrapper instanceof ContainerTypeWrapper) {
@@ -167,6 +171,11 @@ public class TestActivityStatus extends TestDatabase {
 
         if (deleteWrappers != null) {
             for (ModelWrapper<?> delWrapper : deleteWrappers) {
+                if (delWrapper instanceof CollectionEventWrapper) {
+                    DbHelper
+                        .deleteFromList(((CollectionEventWrapper) delWrapper)
+                            .getSpecimenCollection(false));
+                }
                 delWrapper.delete();
             }
         }
@@ -317,19 +326,30 @@ public class TestActivityStatus extends TestDatabase {
                 Utils.getRandomString(15, 20));
             Assert
                 .fail("should not be allowed to retreive invalid activity status");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankFailedQueryException bce) {
             Assert.assertTrue(true);
         }
     }
 
     @Test
-    public void testIsActive() throws Exception {
+    public void testActiveClosedFlagged() throws Exception {
         ActivityStatusWrapper active = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
         Assert.assertTrue(active.isActive());
+        Assert.assertFalse(active.isClosed());
+        Assert.assertFalse(active.isFlagged());
 
         ActivityStatusWrapper closed = ActivityStatusWrapper.getActivityStatus(
             appService, ActivityStatusWrapper.CLOSED_STATUS_STRING);
+        Assert.assertTrue(closed.isClosed());
         Assert.assertFalse(closed.isActive());
+        Assert.assertFalse(closed.isFlagged());
+
+        ActivityStatusWrapper flagged = ActivityStatusWrapper
+            .getActivityStatus(appService,
+                ActivityStatusWrapper.FLAGGED_STATUS_STRING);
+        Assert.assertTrue(flagged.isFlagged());
+        Assert.assertFalse(flagged.isClosed());
+        Assert.assertFalse(flagged.isActive());
     }
 }

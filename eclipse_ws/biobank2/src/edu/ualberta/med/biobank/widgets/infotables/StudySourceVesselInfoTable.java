@@ -6,16 +6,20 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
+@Deprecated
+/**
+ * this need to be rename ? to study source specimen ??
+ */
 public class StudySourceVesselInfoTable extends
-    InfoTableWidget<StudySourceVesselWrapper> {
+    InfoTableWidget<SourceSpecimenWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 5;
 
     protected class TableRowData {
-        StudySourceVesselWrapper studySourceVessel;
+        SourceSpecimenWrapper studySourceVessel;
         public String name;
         public String needTimeDrawn;
         public String needOriginalVolume;
@@ -34,7 +38,7 @@ public class StudySourceVesselInfoTable extends
         "Need Time Drawn", "Need Original Volume" };
 
     public StudySourceVesselInfoTable(Composite parent,
-        List<StudySourceVesselWrapper> collection) {
+        List<SourceSpecimenWrapper> collection) {
         super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
@@ -66,7 +70,7 @@ public class StudySourceVesselInfoTable extends
 
     @Override
     public TableRowData getCollectionModelObject(
-        StudySourceVesselWrapper studySourceVessel) throws Exception {
+        SourceSpecimenWrapper studySourceVessel) throws Exception {
         TableRowData info = new TableRowData();
         info.studySourceVessel = studySourceVessel;
         Assert.isNotNull(studySourceVessel.getSourceVessel(),
@@ -87,7 +91,7 @@ public class StudySourceVesselInfoTable extends
     }
 
     @Override
-    public StudySourceVesselWrapper getSelection() {
+    public SourceSpecimenWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

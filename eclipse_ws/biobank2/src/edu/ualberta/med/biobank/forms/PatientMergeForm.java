@@ -19,8 +19,8 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
@@ -57,7 +57,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private IObservableValue patientNotNullValue;
 
-    private AbstractInfoTableWidget<PatientVisitWrapper> patient1VisitsTable;
+    private AbstractInfoTableWidget<ProcessingEventWrapper> patient1VisitsTable;
 
     private boolean canMerge;
 
@@ -160,8 +160,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             "Study");
 
         patient1VisitsTable = new ClinicVisitInfoTable(patientArea1,
-            patient1Adapter.getWrapper().getPatientVisitCollection(true, true,
-                null));
+            patient1Adapter.getWrapper().getProcessingEventCollection(true));
         GridData gd1 = new GridData();
         gd1.horizontalSpan = 2;
         gd1.grabExcessHorizontalSpace = true;
@@ -170,7 +169,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1VisitsTable.adaptToToolkit(toolkit, true);
 
         patient2VisitsTable = new ClinicVisitInfoTable(patientArea2,
-            new ArrayList<PatientVisitWrapper>());
+            new ArrayList<ProcessingEventWrapper>());
         GridData gd2 = new GridData();
         gd2.horizontalSpan = 2;
         gd2.grabExcessHorizontalSpace = true;
@@ -180,7 +179,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     protected void populateFields(String pnumber) {
-        List<PatientVisitWrapper> newContents = new ArrayList<PatientVisitWrapper>();
+        List<ProcessingEventWrapper> newContents = new ArrayList<ProcessingEventWrapper>();
         try {
             patient2 = PatientWrapper.getPatient(
                 SessionManager.getAppService(), pnumber);
@@ -214,7 +213,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                 "Patients from different studies cannot be merged");
         } else {
             patient2VisitsTable.setCollection(patient2
-                .getPatientVisitCollection());
+                .getProcessingEventCollection());
             patientNotNullValue.setValue(Boolean.TRUE);
         }
     }
@@ -271,10 +270,11 @@ public class PatientMergeForm extends BiobankEntryForm {
         study1Text.setText(patient1Adapter.getWrapper().getStudy()
             .getNameShort());
         patient1VisitsTable.setCollection(patient1Adapter.getWrapper()
-            .getPatientVisitCollection(true, true, null));
+            .getProcessingEventCollection(true));
         pnumber2Text.setText("");
         study2Text.setText("");
-        patient2VisitsTable.setCollection(new ArrayList<PatientVisitWrapper>());
+        patient2VisitsTable
+            .setCollection(new ArrayList<ProcessingEventWrapper>());
         patient2 = null;
     }
 
