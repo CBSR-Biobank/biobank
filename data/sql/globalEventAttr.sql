@@ -1,6 +1,6 @@
-LOCK TABLES `GLOBAL_PV_ATTR` WRITE;
+LOCK TABLES `GLOBAL_EVENT_ATTR` WRITE;
 
-INSERT INTO `global_pv_attr` (ID, LABEL, PV_ATTR_TYPE_ID) VALUES
+INSERT INTO `global_event_attr` (ID, LABEL, EVENT_ATTR_TYPE_ID) VALUES
 (1,"PBMC Count (x10^6)",1),
 (2,"Worksheet",2),
 (3,"Consent",5),
