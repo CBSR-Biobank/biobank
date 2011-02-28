@@ -9,33 +9,33 @@ import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.forms.PatientVisitEntryForm;
-import edu.ualberta.med.biobank.forms.PatientVisitViewForm;
+import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
+import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
-public class PatientVisitAdapter extends AdapterBase {
+public class CollectionEventAdapter extends AdapterBase {
 
     /**
      * Aliquot selected in this patient visit
      */
     private SpecimenWrapper selectedAliquot;
 
-    public PatientVisitAdapter(AdapterBase parent,
-        ProcessingEventWrapper patientVisitWrapper) {
-        super(parent, patientVisitWrapper);
+    public CollectionEventAdapter(AdapterBase parent,
+        CollectionEventWrapper collectionEventWrapper) {
+        super(parent, collectionEventWrapper);
         setEditable(parent instanceof PatientAdapter || parent == null);
     }
 
-    public ProcessingEventWrapper getWrapper() {
-        return (ProcessingEventWrapper) modelObject;
+    public CollectionEventWrapper getWrapper() {
+        return (CollectionEventWrapper) modelObject;
     }
 
     @Override
     protected String getLabelInternal() {
-        ProcessingEventWrapper wrapper = getWrapper();
+        CollectionEventWrapper wrapper = getWrapper();
         Assert.isNotNull(wrapper, "patientVisit is null");
         String name = wrapper.getFormattedDateProcessed();
         Collection<SpecimenWrapper> samples = wrapper.getSpecimenCollection();
@@ -48,7 +48,7 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        ProcessingEventWrapper visit = getWrapper();
+        CollectionEventWrapper visit = getWrapper();
         if (visit != null) {
             PatientWrapper patient = visit.getPatient();
             if (patient != null) {
@@ -105,12 +105,12 @@ public class PatientVisitAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return PatientVisitEntryForm.ID;
+        return CollectionEventEntryForm.ID;
     }
 
     @Override
     public String getViewFormId() {
-        return PatientVisitViewForm.ID;
+        return CollectionEventViewForm.ID;
     }
 
     @Override

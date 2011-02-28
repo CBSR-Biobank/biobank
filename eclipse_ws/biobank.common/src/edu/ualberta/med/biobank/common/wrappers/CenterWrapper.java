@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -9,6 +11,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
@@ -28,6 +31,13 @@ public abstract class CenterWrapper<E extends Center> extends
 
     public CenterWrapper(WritableApplicationService appService, E c) {
         super(appService, c);
+    }
+
+    @Override
+    protected List<String> getPropertyChangeNames() {
+        List<String> all = new ArrayList<String>(super.getPropertyChangeNames());
+        all.addAll(AddressPeer.PROP_NAMES);
+        return all;
     }
 
     private AddressWrapper initAddress() {
@@ -92,7 +102,7 @@ public abstract class CenterWrapper<E extends Center> extends
 
     /**
      * fast = true will execute a hql query. fast = false will call the
-     * getShipmentCollection().size method
+     * getCollectionEventCollection().size method
      */
     public long getProcessingEventCount(boolean fast)
         throws ApplicationException, BiobankException {
@@ -106,6 +116,42 @@ public abstract class CenterWrapper<E extends Center> extends
             return 0;
         }
         return list.size();
+    }
+
+    public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
+        + Center.class.getName()
+        + " as center join center."
+        + CenterPeer.SPECIMEN_COLLECTION.getName()
+        + " as spcs join spcs."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cevent where center"
+        + CenterPeer.ID.getName() + "=?";
+
+    public long getCollectionEventCount() throws ApplicationException,
+        BiobankException {
+        HQLCriteria criteria = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
+            Arrays.asList(new Object[] { getId() }));
+        return getCountResult(appService, criteria);
+    }
+
+    @SuppressWarnings("unused")
+    @Deprecated
+    public long getCollectionEventCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        return -1;
+    }
+
+    @SuppressWarnings("unused")
+    @Deprecated
+    public CollectionEventWrapper getCollectionEvent(Date dateReceived) {
+        return null;
+    }
+
+    @SuppressWarnings("unused")
+    @Deprecated
+    public CollectionEventWrapper getCollectionEvent(Date dateReceived,
+        String patientNumber) {
+        return null;
     }
 
     @Override

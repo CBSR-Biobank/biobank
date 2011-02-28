@@ -27,8 +27,8 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.dialogs.ScanOneTubeDialog;
 import edu.ualberta.med.biobank.forms.utils.PalletScanManagement;
@@ -60,10 +60,10 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     private boolean scanTubeAloneMode = false;
     private boolean rescanMode = false;
 
-    protected SiteWrapper currentSite;
+    protected CenterWrapper<?> currentSite;
 
     public AbstractScanDialog(Shell parentShell, final T currentShipment,
-        SiteWrapper currentSite) {
+        CenterWrapper<?> currentSite) {
         super(parentShell);
         this.currentShipment = currentShipment;
         this.currentSite = currentSite;
@@ -126,7 +126,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         throws Exception;
 
     protected abstract void processScanResult(IProgressMonitor monitor,
-        SiteWrapper currentSite) throws Exception;
+        CenterWrapper<?> currentSite) throws Exception;
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {

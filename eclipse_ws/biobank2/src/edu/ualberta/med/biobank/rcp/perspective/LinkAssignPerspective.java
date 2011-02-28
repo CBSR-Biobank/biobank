@@ -6,9 +6,9 @@ import org.eclipse.ui.IPerspectiveFactory;
 /**
  * Perspective to manage samples using scanners
  */
-public class AliquotManagementPerspective implements IPerspectiveFactory {
+public class LinkAssignPerspective implements IPerspectiveFactory {
 
-    public final static String ID = "edu.ualberta.med.biobank.perspective.aliquotsManagement";
+    public final static String ID = "edu.ualberta.med.biobank.perspective.linkAssign";
 
     @Override
     public void createInitialLayout(IPageLayout layout) {

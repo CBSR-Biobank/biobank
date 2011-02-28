@@ -40,7 +40,6 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -267,7 +266,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 }
             });
 
-        linkFormPatientManagement.createVisitWidgets(fieldsComposite);
+        linkFormPatientManagement.createCollectionEventWidgets(fieldsComposite);
 
         // inventoryID
         inventoryIDValidator = new CabinetInventoryIDValidator();
@@ -497,7 +496,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 cabinet = drawer.getParent();
             } else if (cabinetContainers.size() == 0) {
                 String errorMsg = Messages
-                    .getFormattedString(
+                    .getString(
                         "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested), currentSite.getNameShort()); //$NON-NLS-1$
                 BioBankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
@@ -616,10 +615,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 .getContainerTypesInSite(appService,
                     siteCombo.getSelectedSite(), cabinetNameContains, false);
             if (cabinetContainerTypes.size() == 0)
-                BioBankPlugin.openAsyncError(Messages
-                    .getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
-                    Messages.getFormattedString(
-                        "Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
+                BioBankPlugin.openAsyncError(
+                    Messages.getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
+                    Messages.getString("Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
                         cabinetNameContains));
         }
     }
@@ -640,9 +638,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             public void run() {
                 try {
                     appendLog("----"); //$NON-NLS-1$
-                    ProcessingEventWrapper pv = linkFormPatientManagement
-                        .getSelectedPatientVisit();
-                    aliquot.setPatientVisit(pv);
+                    CollectionEventWrapper ce = linkFormPatientManagement
+                        .getSelectedCollectionEvent();
+                    aliquot.setCollectionEvent(ce);
                     if (radioNew.getSelection()) {
                         appendLogNLS("Cabinet.activitylog.checkingId", //$NON-NLS-1$
                             aliquot.getInventoryId());
@@ -664,7 +662,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         cancelConfirmWidget.setFocus();
                     } else {
                         BioBankPlugin.openError("Position not free", Messages
-                            .getFormattedString(
+                            .getString(
                                 "Cabinet.checkStatus.error", positionString, //$NON-NLS-1$
                                 bin.getLabel()));
                         appendLogNLS(
@@ -962,7 +960,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     protected void siteComboSelectionChanged(SiteWrapper currentSelection)
         throws Exception {
         linkFormPatientManagement.setSite(currentSelection);
-        linkFormPatientManagement.setVisitsList();
         if (viewerSampleTypes != null) {
             initCabinetContainerTypesList();
             viewerSampleTypes.setInput(null);

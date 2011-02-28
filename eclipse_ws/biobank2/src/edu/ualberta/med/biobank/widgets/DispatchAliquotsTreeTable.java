@@ -223,7 +223,6 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
                 if (newState != null)
                     dsa.setState(newState.ordinal());
             }
-            shipment.resetStateLists();
             tv.refresh();
             notifyListeners();
         }

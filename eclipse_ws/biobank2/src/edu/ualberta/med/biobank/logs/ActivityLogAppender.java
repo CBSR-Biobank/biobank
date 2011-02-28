@@ -14,12 +14,12 @@ import org.eclipse.ui.console.MessageConsoleStream;
 import edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm;
 import edu.ualberta.med.biobank.forms.ScanAssignEntryForm;
 import edu.ualberta.med.biobank.forms.ScanLinkEntryForm;
-import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 
 /**
  * Display in ConsoleView and possibly printed.
  * 
- * @see AliquotManagementPerspective
+ * @see LinkAssignPerspective
  * @see ScanLinkEntryForm
  * @see ScanAssignEntryForm
  * @see CabinetLinkAssignEntryForm

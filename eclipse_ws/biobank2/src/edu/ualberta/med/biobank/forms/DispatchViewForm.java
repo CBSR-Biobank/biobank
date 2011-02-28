@@ -252,7 +252,7 @@ public class DispatchViewForm extends BiobankViewForm {
                             public void run(final IProgressMonitor monitor) {
                                 monitor.beginTask("Saving...",
                                     IProgressMonitor.UNKNOWN);
-                                dispatch.setInTransitState();
+                                dispatch.setState(DispatchState.IN_TRANSIT);
                                 try {
                                     dispatch.persist();
                                 } catch (final RemoteConnectFailureException exp) {
@@ -333,7 +333,6 @@ public class DispatchViewForm extends BiobankViewForm {
     }
 
     private void setDispatchValues() {
-        setTextValue(studyLabel, dispatch.getStudy().getName());
         setTextValue(senderLabel,
             dispatch.getSender() == null ? " ACCESS DENIED" : dispatch
                 .getSender().getName());

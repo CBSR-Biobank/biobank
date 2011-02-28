@@ -349,13 +349,11 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             List<ContainerTypeWrapper> palletContainerTypes = ContainerTypeWrapper
                 .getContainerTypesPallet96(appService, site);
             if (palletContainerTypes.size() == 0) {
-                BioBankPlugin
-                    .openAsyncError(
-                        Messages
-                            .getString("ScanAssign.dialog.noPalletFoundError.title"), //$NON-NLS-1$
-                        Messages
-                            .getFormattedString("ScanAssign.dialog.noPalletFoundError.msg" //$NON-NLS-1$
-                            ));
+                BioBankPlugin.openAsyncError(Messages
+                    .getString("ScanAssign.dialog.noPalletFoundError.title"), //$NON-NLS-1$
+                    Messages
+                        .getString("ScanAssign.dialog.noPalletFoundError.msg" //$NON-NLS-1$
+                        ));
             }
             return palletContainerTypes;
         }
@@ -747,9 +745,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         scanCell.setTitle(foundAliquot.getProcessingEvent().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
-        scanCell
-            .setInformation(Messages
-                .getFormattedString("ScanAssign.scanStatus.aliquot.dispatchedError")); //$NON-NLS-1$
+        scanCell.setInformation(Messages
+            .getString("ScanAssign.scanStatus.aliquot.dispatchedError")); //$NON-NLS-1$
         appendLogNLS("ScanAssign.activitylog.aliquot.dispatchedError",
             positionString);
 
@@ -803,7 +800,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         scanCell.setTitle(foundAliquot.getProcessingEvent().getPatient()
             .getPnumber());
         scanCell.setStatus(CellStatus.ERROR);
-        scanCell.setInformation(Messages.getFormattedString(
+        scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.typeError", palletType, sampleType)); //$NON-NLS-1$
         appendLogNLS(
             "ScanAssign.activitylog.aliquot.typeError", position, palletType, //$NON-NLS-1$
@@ -820,7 +817,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         scanCell.setStatus(CellStatus.MOVED);
         scanCell.setTitle(foundAliquot.getProcessingEvent().getPatient()
             .getPnumber());
-        scanCell.setInformation(Messages.getFormattedString(
+        scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.moved", expectedPosition)); //$NON-NLS-1$
 
         appendLogNLS(
@@ -838,7 +835,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setTitle(foundAliquot.getProcessingEvent().getPatient()
             .getPnumber());
-        scanCell.setInformation(Messages.getFormattedString(
+        scanCell.setInformation(Messages.getString(
             "ScanAssign.scanStatus.aliquot.otherSite", siteName)); //$NON-NLS-1$
 
         appendLogNLS(
@@ -885,7 +882,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             scanCell.setStatus(CellStatus.MISSING);
             scanCell
                 .setInformation(Messages
-                    .getFormattedString(
+                    .getString(
                         "ScanAssign.scanStatus.aliquot.missing", missingAliquot.getInventoryId())); //$NON-NLS-1$
             scanCell.setTitle("?"); //$NON-NLS-1$
             appendLogNLS(
@@ -952,7 +949,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
         SpecimenWrapper aliquot, String posStr) {
         ProcessingEventWrapper visit = aliquot.getProcessingEvent();
-        sb.append(Messages.getFormattedString(
+        sb.append(Messages.getString(
             "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
             posStr, currentSiteSelected.getNameShort(), cell.getValue(),
             aliquot.getSpecimenType().getName(), visit.getPatient().getPnumber(),
@@ -1110,8 +1107,9 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
 
     private boolean openDialogPalletMoved() {
         return MessageDialog.openConfirm(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), "Pallet product barcode", //$NON-NLS-1$
-            Messages.getFormattedString(
+            .getActiveWorkbenchWindow().getShell(),
+            "Pallet product barcode", //$NON-NLS-1$
+            Messages.getString(
                 "ScanAssign.dialog.checkPallet.otherPosition", //$NON-NLS-1$
                 palletFoundWithProductBarcodeLabel,
                 currentPalletWrapper.getLabel()));
@@ -1237,7 +1235,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     Messages
                         .getString("ScanAssign.dialog.positionUsed.error.title"), //$NON-NLS-1$
                     Messages
-                        .getFormattedString(
+                        .getString(
                             "ScanAssign.dialog.positionUsed.error.msg", barcode, siteCombo.getSelectedSite().getNameShort())); //$NON-NLS-1$
             nextFocusWidget = palletPositionText;
             return false;

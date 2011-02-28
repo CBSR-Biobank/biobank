@@ -13,7 +13,9 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -29,11 +31,14 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class ClinicEntryForm extends AddressEntryFormCommon {
     public static final String ID = "edu.ualberta.med.biobank.forms.ClinicEntryForm";
 
-    private static final String MSG_NEW_CLINIC_OK = "New clinic information.";
+    private static final String MSG_NEW_CLINIC_OK = Messages
+        .getString("ClinicEntryForm.creation.msg");
 
-    private static final String MSG_CLINIC_OK = "Clinic information.";
+    private static final String MSG_CLINIC_OK = Messages
+        .getString("ClinicEntryForm.msg.ok");
 
-    private static final String MSG_NO_CLINIC_NAME = "Clinic must have a name";
+    private static final String MSG_NO_CLINIC_NAME = Messages
+        .getString("ClinicEntryForm.msg.noClinicName");
 
     private ClinicAdapter clinicAdapter;
 
@@ -63,9 +68,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
         String tabName;
         if (clinic.getId() == null)
-            tabName = "New Clinic";
+            tabName = Messages.getString("ClinicEntryForm.title.new");
         else
-            tabName = "Clinic " + clinic.getNameShort();
+            tabName = Messages.getString("ClinicEntryForm.title.edit",
+                clinic.getNameShort());
         setPartName(tabName);
     }
 
@@ -79,13 +85,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText("Clinic Information");
+        form.setText(Messages.getString("ClinicEntryForm.main.title"));
         page.setLayout(new GridLayout(1, false));
-        toolkit
-            .createLabel(
-                page,
-                "Clinics can be associated with studies after submitting this initial information.",
-                SWT.LEFT);
+        toolkit.createLabel(page,
+            Messages.getString("ClinicEntryForm.main.description"), SWT.LEFT);
         createClinicInfoSection();
         createAddressArea(clinic);
         createContactSection();
@@ -102,21 +105,25 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
         toolkit.paintBordersFor(client);
 
         setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null, clinic, "name",
-            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME)));
+            SWT.NONE, Messages.getString("label.name"), null, clinic,
+            ClinicPeer.NAME.getName(), new NonEmptyStringValidator(
+                MSG_NO_CLINIC_NAME)));
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null, clinic, "nameShort",
-            new NonEmptyStringValidator(MSG_NO_CLINIC_NAME));
+            Messages.getString("label.nameShort"), null, clinic,
+            ClinicPeer.NAME_SHORT.getName(), new NonEmptyStringValidator(
+                MSG_NO_CLINIC_NAME));
 
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            "Sends Shipments", null, clinic, "sendsShipments", null);
+            Messages.getString("clinic.field.label.sendsShipments"), null,
+            clinic, ClinicPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
         activityStatusComboViewer = createComboViewer(client,
-            "Activity Status",
+            Messages.getString("label.activity"),
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            clinic.getActivityStatus(), "Clinic must have an activity status",
+            clinic.getActivityStatus(),
+            Messages.getString("ClinicEntryForm.activity.validator.msg"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -126,22 +133,26 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, clinic, "comment", null);
+            Messages.getString("label.comments"), null, clinic,
+            ClinicPeer.COMMENT.getName(), null);
     }
 
     private void createContactSection() {
-        Section section = createSection("Contacts");
+        Section section = createSection(Messages
+            .getString("clinic.contact.title"));
 
         contactEntryWidget = new ContactEntryInfoTable(section, clinic);
         contactEntryWidget.adaptToToolkit(toolkit, true);
         contactEntryWidget.addSelectionChangedListener(listener);
 
-        addSectionToolbar(section, "Add Contact", new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                contactEntryWidget.addContact();
-            }
-        }, ContactWrapper.class);
+        addSectionToolbar(section,
+            Messages.getString("ClinicEntryForm.contact.button.add"),
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    contactEntryWidget.addContact();
+                }
+            }, ContactWrapper.class);
         section.setClient(contactEntryWidget);
     }
 
@@ -156,8 +167,10 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
 
     @Override
     public void saveForm() throws Exception {
-        clinic.addContacts(contactEntryWidget.getAddedOrModifedContacts());
-        clinic.removeContacts(contactEntryWidget.getDeletedContacts());
+        clinic.addToContactCollection(contactEntryWidget
+            .getAddedOrModifedContacts());
+        clinic.removeFromContactCollection(contactEntryWidget
+            .getDeletedContacts());
         clinic.persist();
         SessionManager.updateAllSimilarNodes(clinicAdapter, true);
     }

@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm.AliquotInfo;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -39,7 +38,7 @@ public class DispatchReceiveScanDialog extends
     private int errors;
 
     public DispatchReceiveScanDialog(Shell parentShell,
-        final DispatchWrapper currentShipment, SiteWrapper currentSite) {
+        final DispatchWrapper currentShipment, CenterWrapper<?> currentSite) {
         super(parentShell, currentShipment, currentSite);
     }
 
@@ -104,8 +103,8 @@ public class DispatchReceiveScanDialog extends
     }
 
     @Override
-    protected void processScanResult(IProgressMonitor monitor, SiteWrapper site)
-        throws Exception {
+    protected void processScanResult(IProgressMonitor monitor,
+        CenterWrapper<?> site) throws Exception {
         Map<RowColPos, PalletCell> cells = getCells();
         if (cells != null) {
             processCells(cells.keySet(), monitor);
@@ -148,8 +147,7 @@ public class DispatchReceiveScanDialog extends
                                 + " to be in this shipment. They will be added to the"
                                 + " extra-pending list.");
                     try {
-                        (currentShipment)
-                            .addExtraAliquots(extraAliquots, false);
+                        (currentShipment).addExtraAliquots(extraAliquots);
                     } catch (Exception e) {
                         BioBankPlugin.openAsyncError("Error flagging aliquots",
                             e);

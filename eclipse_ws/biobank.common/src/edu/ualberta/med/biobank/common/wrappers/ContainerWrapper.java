@@ -1143,4 +1143,5 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     public boolean checkSpecificAccess(User user, Integer siteId) {
         return user.isSiteAdministrator(siteId);
     }
+
 }

@@ -8,7 +8,8 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class ClinicVisitInfoTable extends InfoTableWidget<ProcessingEventWrapper> {
+public class ClinicVisitInfoTable extends
+    InfoTableWidget<ProcessingEventWrapper> {
 
     class TableRowData {
         public String clinicName;
@@ -56,7 +57,7 @@ public class ClinicVisitInfoTable extends InfoTableWidget<ProcessingEventWrapper
     public Object getCollectionModelObject(ProcessingEventWrapper p)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.clinicName = p.getCollectionEvent().getClinic().getNameShort();
+        info.clinicName = p.getCenter().getNameShort();
         info.visit = p.getFormattedDateProcessed();
         return info;
     }

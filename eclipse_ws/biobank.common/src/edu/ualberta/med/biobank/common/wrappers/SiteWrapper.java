@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.base.SiteBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Site;
@@ -58,15 +57,6 @@ public class SiteWrapper extends SiteBaseWrapper {
     @Override
     protected List<String> getPropertyChangeNames() {
         return PROP_NAMES;
-    }
-
-    private AddressWrapper initAddress() {
-        AddressWrapper address = getAddress();
-        if (address == null) {
-            address = new AddressWrapper(appService);
-            setAddress(address);
-        }
-        return address;
     }
 
     @Override
@@ -115,10 +105,6 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     public List<RequestWrapper> getApprovedRequestCollection() {
         return getRequestCollection(RequestState.APPROVED);
-    }
-
-    public List<RequestWrapper> getShippedRequestCollection() {
-        return getRequestCollection(RequestState.SHIPPED);
     }
 
     // due to bug in Hibernate when using elements in query must also use a left
@@ -175,6 +161,14 @@ public class SiteWrapper extends SiteBaseWrapper {
             propertiesMap.put("topContainerCollection", topContainerCollection);
         }
         return topContainerCollection;
+    }
+
+    public List<ContainerWrapper> getTopContainerCollection() throws Exception {
+        return getTopContainerCollection(false);
+    }
+
+    public void clearTopContainerCollection() {
+        propertiesMap.put("topContainerCollection", null);
     }
 
     @Override
@@ -431,8 +425,57 @@ public class SiteWrapper extends SiteBaseWrapper {
         return site.getInTransitSentDispatchCollection();
     }
 
-    public void clearTopContainerCollection() {
-        propertiesMap.put("topContainerCollection", null);
+    public List<StudyWrapper> getStudyCollection() {
+        return getStudyCollection(false);
     }
 
+    @Deprecated
+    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study) {
+        // TODO this can be removed once the gui doesn't use it anymore
+        return null;
+    }
+
+    @Deprecated
+    public Collection<? extends ModelWrapper<?>> getAcceptedRequestCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public List<StudyWrapper> getDispatchStudiesAsSender() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void addStudyDispatchSites(StudyWrapper study,
+        List<SiteWrapper> addedSites) throws BiobankCheckException {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void removeStudyDispatchSites(StudyWrapper study,
+        List<SiteWrapper> removedSites) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public Collection<? extends ModelWrapper<?>> getFilledRequestCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public String getShipmentCount() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public String getPatientVisitCount() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

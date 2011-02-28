@@ -545,4 +545,49 @@ public class StudyWrapper extends StudyBaseWrapper {
         return getName();
     }
 
+    public List<SampleStorageWrapper> getSampleStorageCollection() {
+        return getWrapperCollection(StudyPeer.SAMPLE_STORAGE_COLLECTION,
+            SampleStorageWrapper.class, false);
+    }
+
+    public List<ContactWrapper> getContactCollection() {
+        return getContactCollection(false);
+    }
+
+    @Deprecated
+    public Long getPatientCountForClinic(ClinicWrapper clinic) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public Long getPatientCountForSite(SiteWrapper site) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public Long getPatientVisitCountForSite(SiteWrapper site) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public Long getPatientVisitCount() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public Long getPatientVisitCountForClinic(ClinicWrapper clinic) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public List<StudySourceVesselWrapper> getStudySourceVesselCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

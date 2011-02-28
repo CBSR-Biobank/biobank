@@ -7,15 +7,15 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
 
     private class TableRowData {
-        ShipmentWrapper shipment;
+        CollectionEventWrapper shipment;
         String dateReceived;
         String waybill;
         String shippingCompany;
@@ -32,7 +32,7 @@ public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
         "Waybill", "Shipping company", "No. Patients" };
 
     public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, clinic.getShipmentCollection(), HEADINGS, 10);
+        super(parent, clinic.getCollectionEventCollection(), HEADINGS, 10);
     }
 
     @Override
@@ -68,7 +68,7 @@ public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
      * shipment.
      */
     @Override
-    public Object getCollectionModelObject(ShipmentWrapper shipment)
+    public Object getCollectionModelObject(CollectionEventWrapper shipment)
         throws Exception {
         TableRowData info = new TableRowData();
         info.shipment = shipment;
@@ -97,7 +97,7 @@ public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
     }
 
     @Override
-    public ShipmentWrapper getSelection() {
+    public CollectionEventWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

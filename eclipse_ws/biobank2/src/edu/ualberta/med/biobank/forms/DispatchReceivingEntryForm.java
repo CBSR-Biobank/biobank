@@ -167,11 +167,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
                 "Aliquot with inventory id " + inventoryId
                     + " has not been found in this dispatch."
                     + " It will be moved into the extra-pending list.");
-            try {
-                dispatch.addExtraAliquots(Arrays.asList(info.aliquot), false);
-            } catch (BiobankCheckException e) {
-                BioBankPlugin.openAsyncError("Eror adding extra aliquot", e);
-            }
+            dispatch.addExtraAliquots(Arrays.asList(info.aliquot));
             aliquotsTree.refresh();
             setDirty(true);
             break;

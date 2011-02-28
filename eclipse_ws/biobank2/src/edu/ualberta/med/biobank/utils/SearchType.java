@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.AliquotListViewForm;
-import edu.ualberta.med.biobank.forms.PvListViewForm;
+import edu.ualberta.med.biobank.forms.CeListViewForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -121,7 +121,7 @@ public enum SearchType {
             try {
                 PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                     .getActivePage()
-                    .openEditor(input, PvListViewForm.ID, false);
+                    .openEditor(input, CeListViewForm.ID, false);
             } catch (PartInitException e) {
                 logger.error("Can't open form with id "
                     + AliquotListViewForm.ID, e);

@@ -66,7 +66,7 @@ public class AliquotViewForm extends BiobankViewForm {
         aliquot = aliquotAdapter.getSpecimen();
         retrieveAliquot();
         try {
-            aliquot.logLookup(aliquot.getSiteString());
+            aliquot.logLookup(aliquot.getCenterString());
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Log lookup failed", e);
         }
@@ -183,13 +183,13 @@ public class AliquotViewForm extends BiobankViewForm {
         setTextValue(linkDateLabel, aliquot.getFormattedCreatedAt());
         setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
             : aliquot.getQuantity().toString());
-        setTextValue(shipmentWaybillLabel, aliquot.getProcessingEvent()
-            .getCollectionEvent().getWaybill());
-        setTextValue(studyLabel, aliquot.getProcessingEvent().getPatient()
+        setTextValue(shipmentWaybillLabel, aliquot.getCollectionEvent()
+            .getWaybill());
+        setTextValue(studyLabel, aliquot.getCollectionEvent().getPatient()
             .getStudy().getNameShort());
-        setTextValue(patientLabel, aliquot.getProcessingEvent().getPatient()
+        setTextValue(patientLabel, aliquot.getCollectionEvent().getPatient()
             .getPnumber());
-        setTextValue(dateProcessedLabel, aliquot.getProcessingEvent()
+        setTextValue(dateProcessedLabel, aliquot.getCollectionEvent()
             .getFormattedDateProcessed());
         setTextValue(dateDrawnLabel, aliquot.getProcessingEvent()
             .getFormattedCreatedAt());

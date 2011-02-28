@@ -7,11 +7,12 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
@@ -25,9 +26,11 @@ public class PatientViewForm extends BiobankViewForm {
 
     private BiobankText visitCountLabel;
 
-    private BiobankText sampleCountLabel;
+    private BiobankText sourceSpecimenCountLabel;
 
-    private PatientVisitInfoTable visitsTable;
+    private BiobankText aliquotedSpecimenCountLabel;
+
+    private CollectionEventInfoTable collectionEventTable;
 
     @Override
     public void init() throws Exception {
@@ -39,7 +42,8 @@ public class PatientViewForm extends BiobankViewForm {
         patient = patientAdapter.getWrapper();
         retrievePatient();
         patient.logLookup(null);
-        setPartName("Patient " + patient.getPnumber());
+        setPartName(Messages.getString("PatientViewForm.title",
+            patient.getPnumber()));
     }
 
     private void retrievePatient() throws Exception {
@@ -48,7 +52,8 @@ public class PatientViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Patient: " + patient.getPnumber());
+        form.setText(Messages.getString("PatientViewForm.title",
+            patient.getPnumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -65,29 +70,37 @@ public class PatientViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
+        studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("patient.field.label.study"));
         visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Visits");
-        sampleCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Samples");
+            Messages.getString("PatientViewForm.label.totalVisits"));
+        sourceSpecimenCountLabel = createReadOnlyLabelledField(client,
+            SWT.NONE,
+            Messages.getString("PatientViewForm.label.totalSourceSpecimens"));
+        aliquotedSpecimenCountLabel = createReadOnlyLabelledField(client,
+            SWT.NONE,
+            Messages.getString("PatientViewForm.label.totalAliquotedSpecimens"));
     }
 
     private void createPatientVisitSection() {
-        Section section = createSection("Patient Visits");
+        Section section = createSection(Messages
+            .getString("PatientViewForm.visits.title"));
 
-        visitsTable = new PatientVisitInfoTable(section,
-            patient.getPatientVisitCollection());
-        section.setClient(visitsTable);
-        visitsTable.adaptToToolkit(toolkit, true);
-        visitsTable.addClickListener(collectionDoubleClickListener);
+        collectionEventTable = new CollectionEventInfoTable(section,
+            patient.getCollectionEventCollection());
+        section.setClient(collectionEventTable);
+        collectionEventTable.adaptToToolkit(toolkit, true);
+        collectionEventTable.addClickListener(collectionDoubleClickListener);
     }
 
     private void setValues() throws BiobankException, ApplicationException {
         setTextValue(studyLabel, patient.getStudy().getName());
         setTextValue(visitCountLabel,
-            (patient.getPatientVisitCollection() == null) ? 0 : patient
-                .getPatientVisitCollection().size());
-        setTextValue(sampleCountLabel, patient.getSpecimensCount(true));
+            (patient.getProcessingEventCollection() == null) ? 0 : patient
+                .getProcessingEventCollection().size());
+        setTextValue(sourceSpecimenCountLabel, patient.getSourceSpecimenCount());
+        setTextValue(aliquotedSpecimenCountLabel,
+            patient.getAliquotedSpecimenCount());
     }
 
     @Override
@@ -96,7 +109,8 @@ public class PatientViewForm extends BiobankViewForm {
         retrievePatient();
         setPartName("Patient " + patient.getPnumber());
         form.setText("Patient: " + patient.getPnumber());
-        visitsTable.setCollection(patient.getPatientVisitCollection());
+        collectionEventTable.setCollection(patient
+            .getCollectionEventCollection());
     }
 
 }

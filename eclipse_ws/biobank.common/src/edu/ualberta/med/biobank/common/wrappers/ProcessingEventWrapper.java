@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -227,5 +228,47 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     @Override
     public CenterWrapper<?> getCenterLinkedToObject() {
         return getCenter();
+    }
+
+    public List<AliquotWrapper> getAliquotCollection() {
+        return getAliquotCollection(false);
+    }
+
+    @Deprecated
+    public CollectionEventWrapper getCollectionEvent() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void setShipment(CollectionEventWrapper shipmentToBeSaved) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public void addSourceVessels(List<SourceVesselWrapper> addedSourceVessels) {
+        // TODO Auto-generated method stub
+
+    }
+
+    @Deprecated
+    public static List<ProcessingEventWrapper> getPatientVisitsWithWorksheet(
+        BiobankApplicationService appService, String searchString) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public List<SourceVesselWrapper> getSourceVesselCollection() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void removeSourceVessels(
+        List<SourceVesselWrapper> removedPvSourceVessels) {
+        // TODO Auto-generated method stub
+
     }
 }

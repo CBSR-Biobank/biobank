@@ -5,10 +5,11 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
 public class PatientVisitAddHandler extends AbstractHandler {
@@ -21,11 +22,11 @@ public class PatientVisitAddHandler extends AbstractHandler {
         try {
             PatientAdapter patientAdapter = PatientAdministrationView
                 .getCurrentPatient();
-            ProcessingEventWrapper pvWrapper = new ProcessingEventWrapper(
+            CollectionEventWrapper ceWrapper = new CollectionEventWrapper(
                 SessionManager.getAppService());
-            pvWrapper.setPatient(patientAdapter.getWrapper());
-            PatientVisitAdapter adapter = new PatientVisitAdapter(
-                patientAdapter, pvWrapper);
+            ceWrapper.setPatient(patientAdapter.getWrapper());
+            CollectionEventAdapter adapter = new CollectionEventAdapter(
+                patientAdapter, ceWrapper);
             adapter.openEntryForm();
         } catch (Exception exp) {
             logger.error("Error while opening the patient visit entry form",

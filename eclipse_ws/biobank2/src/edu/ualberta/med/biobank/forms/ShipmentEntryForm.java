@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
@@ -47,7 +47,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ShipmentAdapter shipmentAdapter;
 
-    private ShipmentWrapper shipment;
+    private CollectionEventWrapper shipment;
 
     private ComboViewer clinicsComboViewer;
 

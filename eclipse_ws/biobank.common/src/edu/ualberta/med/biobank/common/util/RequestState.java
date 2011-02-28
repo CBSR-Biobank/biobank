@@ -1,8 +1,8 @@
 package edu.ualberta.med.biobank.common.util;
 
 public enum RequestState {
-    NEW(0, "New"), SUBMITTED(1, "Submitted"), APPROVED(2, "Approved"), SHIPPED(
-        3, "Shipped"), CLOSED(4, "Closed"), LOST(5, "Lost");
+    NEW(0, "New"), SUBMITTED(1, "Submitted"), APPROVED(2, "Approved"), CLOSED(
+        3, "Closed");
 
     private Integer id;
     private String label;

@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,7 +24,6 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
@@ -86,28 +84,11 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                 public void doSelection(Object selectedObject) {
                     SiteWrapper currentSite = siteCombo.getSelectedSite();
                     dispatch.setSender(currentSite);
-                    List<StudyWrapper> studies = currentSite
-                        .getDispatchStudiesAsSender();
-                    if ((studies == null) || (studies.size() == 0)) {
-                        BioBankPlugin.openAsyncError(
-                            "Sender Site Error",
-                            "Site "
-                                + currentSite.getNameShort()
-                                + " does not have any dispatch studies associated with it.\n");
-                    }
-                    studyComboViewer.setInput(studies);
-                    if (dispatch.getStudy() != null) {
-                        // will trigger the listener and set the value :
-                        studyComboViewer.setSelection(new StructuredSelection(
-                            dispatch.getStudy()));
-                    } else if (studies.size() == 1)
-                        studyComboViewer.setSelection(new StructuredSelection(
-                            studies.get(0)));
                 }
             });
         setFirstControl(siteCombo);
 
-        createStudyAndReceiverCombos(client);
+        createReceiverCombo(client);
 
         siteCombo.setSelectedSite(dispatch.getSender(), true);
 
@@ -137,52 +118,12 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
     }
 
-    private void createStudyAndReceiverCombos(Composite client) {
-        StudyWrapper study = dispatch.getStudy();
+    private void createReceiverCombo(Composite client) {
         if (dispatch.isInTransitState()) {
-            BiobankText studyLabel = createReadOnlyLabelledField(client,
-                SWT.NONE, "Study");
-            setTextValue(studyLabel, dispatch.getStudy().getNameShort());
             BiobankText receiverLabel = createReadOnlyLabelledField(client,
                 SWT.NONE, "Receiver Site");
             setTextValue(receiverLabel, dispatch.getReceiver().getNameShort());
         } else {
-            studyComboViewer = createComboViewer(client, "Study", null, study,
-                "Dispatch must have a receiving site",
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        StudyWrapper study = (StudyWrapper) selectedObject;
-                        if (destSiteComboViewer != null) {
-                            try {
-                                List<SiteWrapper> possibleDestSites;
-                                if (study != null)
-                                    possibleDestSites = siteCombo
-                                        .getSelectedSite()
-                                        .getStudyDispachSites(study);
-                                else
-                                    possibleDestSites = new ArrayList<SiteWrapper>();
-                                destSiteComboViewer.setInput(possibleDestSites);
-
-                                if (possibleDestSites.size() == 1) {
-                                    destSiteComboViewer
-                                        .setSelection(new StructuredSelection(
-                                            possibleDestSites.get(0)));
-                                } else {
-                                    destSiteComboViewer.setSelection(null);
-                                }
-                            } catch (Exception e) {
-                                logger
-                                    .error(
-                                        "Error while retrieving dispatch destination sites",
-                                        e);
-                            }
-                        }
-                        dispatch.setStudy(study);
-                        setDirty(true);
-                    }
-                });
-
             destSiteComboViewer = createComboViewer(client, "Receiver Site",
                 null, null, "Dispatch must have an associated study",
                 new ComboSelectionUpdate() {
@@ -296,7 +237,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
             return;
         }
         try {
-            dispatch.addNewAliquots(Arrays.asList(aliquot), true);
+            dispatch.addNewAliquots(Arrays.asList(aliquot));
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error adding aliquots", e);
         }
@@ -317,19 +258,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     public void reset() throws Exception {
         super.reset();
         dispatch.setSender(siteCombo.getSelectedSite());
-        if (studyComboViewer != null) {
-            StudyWrapper study = dispatch.getStudy();
-            if (study != null) {
-                studyComboViewer.setSelection(new StructuredSelection(study));
-            } else if (studyComboViewer.getCombo().getItemCount() == 1)
-                studyComboViewer.setSelection(new StructuredSelection(
-                    studyComboViewer.getElementAt(0)));
-            else
-                studyComboViewer.getCombo().deselectAll();
-
-        }
         if (destSiteComboViewer != null) {
-            SiteWrapper destSite = dispatch.getReceiver();
+            CenterWrapper<?> destSite = dispatch.getReceiver();
             if (destSite != null) {
                 destSiteComboViewer.setSelection(new StructuredSelection(
                     destSite));

@@ -111,7 +111,7 @@ public class BiobankLabelProvider extends LabelProvider implements
         } else if (element instanceof SourceVesselWrapper) {
             SourceVesselWrapper source = (SourceVesselWrapper) element;
             if (columnIndex == 0) {
-                return source.getName();
+                return source.getSourceVesselType().getName();
             } else {
                 Assert.isTrue(false, "invalid column index: " + columnIndex);
             }

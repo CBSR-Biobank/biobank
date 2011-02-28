@@ -179,4 +179,23 @@ public class AliquotWrapper {
 
     protected void resetInternalFields() {
     }
+
+    @Deprecated
+    public CenterWrapper getCenter() {
+        // TODO new method or old method?
+        return null;
+    }
+
+    @Deprecated
+    public CollectionEventWrapper getCollectionEvent() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Deprecated
+    public void setCollectionEvent(CollectionEventWrapper collectionEvent) {
+        // TODO Auto-generated method stub
+
+    }
+
 }
