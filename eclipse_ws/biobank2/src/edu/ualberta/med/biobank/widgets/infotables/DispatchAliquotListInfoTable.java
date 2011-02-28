@@ -65,7 +65,8 @@ public abstract class DispatchAliquotListInfoTable extends
                                         + " aliquots from this shipment ?"))
                                 return;
                             try {
-                                shipment.removeFromDispatchAliquotCollection(dsaList);
+                                shipment
+                                    .removeFromDispatchSpecimenCollection(dsaList);
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {
@@ -122,7 +123,7 @@ public abstract class DispatchAliquotListInfoTable extends
         TableRowData info = new TableRowData();
         info.dsa = dsa;
         info.inventoryId = dsa.getSpecimen().getInventoryId();
-        info.pnumber = dsa.getSpecimen().getProcessingEvent().getPatient()
+        info.pnumber = dsa.getSpecimen().getCollectionEvent().getPatient()
             .getPnumber();
         SpecimenTypeWrapper type = dsa.getSpecimen().getSpecimenType();
         Assert.isNotNull(type, "aliquot with null for sample type");

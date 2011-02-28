@@ -61,7 +61,7 @@ public class SelectPatientVisitWizard extends BiobankWizard {
 
             if (patient != null) {
                 pvPage.setCollectionEventList(patient
-                    .getCollectionEventCollection());
+                    .getCollectionEventCollection(true));
             } else {
                 pnumberPage.setErrorMessage("Patient does not exist.");
                 return false;

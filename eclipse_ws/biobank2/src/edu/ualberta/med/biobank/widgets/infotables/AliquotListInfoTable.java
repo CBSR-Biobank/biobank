@@ -8,8 +8,8 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class AliquotListInfoTable extends InfoTableWidget<SpecimenWrapper> {
@@ -108,13 +108,14 @@ public class AliquotListInfoTable extends InfoTableWidget<SpecimenWrapper> {
         Assert.isNotNull(type, "aliquot with null for sample type");
         info.type = type.getName();
         info.position = aliquot.getPositionString();
-        info.linkDate = DateFormatter.formatAsDateTime(aliquot.getLinkDate());
+        info.linkDate = DateFormatter.formatAsDateTime(aliquot.getCreatedAt());
         info.quantity = aliquot.getQuantity();
         info.activityStatus = aliquot.getActivityStatus().getName();
         info.comment = aliquot.getComment();
 
         if (showPatientNumber) {
-            info.pnumber = aliquot.getProcessingEvent().getPatient().getPnumber();
+            info.pnumber = aliquot.getCollectionEvent().getPatient()
+                .getPnumber();
         }
         return info;
     }

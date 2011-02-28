@@ -73,7 +73,7 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        SpecimenTypeWrapper.persistSampleTypes(
+        SpecimenTypeWrapper.persistSpecimenTypes(
             sampleWidget.getAddedOrModifiedSampleTypes(),
             sampleWidget.getDeletedSampleTypes());
     }
@@ -93,8 +93,8 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
         super.reset();
         List<SpecimenTypeWrapper> globalSampleTypes = null;
         try {
-            globalSampleTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
-                true);
+            globalSampleTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
+                appService, true);
         } catch (ApplicationException e) {
             logger.error("Can't reset global sample types", e);
         }

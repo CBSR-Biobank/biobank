@@ -25,13 +25,13 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
+import edu.ualberta.med.biobank.treeview.AliquotAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import edu.ualberta.med.biobank.wizards.SelectPatientVisitWizard;
 
-@Deprecated
-public class AliquotEntryForm extends BiobankEntryForm {
+public class SpecimenEntryForm extends BiobankEntryForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.AliquotEntryForm";
 
@@ -49,6 +49,10 @@ public class AliquotEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
+        AliquotAdapter aliquotAdapter = (AliquotAdapter) adapter;
+        aliquot = aliquotAdapter.getSpecimen();
+        aliquot.logEdit(aliquot.getCurrentCenter().getNameShort());
+        setPartName("Aliquot Entry");
     }
 
     @Override

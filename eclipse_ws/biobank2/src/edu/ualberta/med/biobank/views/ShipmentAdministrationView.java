@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -12,14 +11,12 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.dialogs.select.SelectShipmentClinicDialog;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -122,30 +119,31 @@ public class ShipmentAdministrationView extends
     @Override
     protected List<? extends ModelWrapper<?>> search(String text)
         throws Exception {
-        if (radioWaybill.getSelection()) {
-            // with waybill, should find only one corresponding shipment, or
-            // mutliple shipments from different clinics
-            List<CollectionEventWrapper> shipments = CollectionEventWrapper
-                .getShipmentsInSites(SessionManager.getAppService(),
-                    text.trim());
-            if (shipments.size() > 1) {
-                SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), shipments);
-                if (dlg.open() == Dialog.OK) {
-                    return Arrays.asList(dlg.getSelectedShipment());
-                }
-            } else {
-                return shipments;
-            }
-        } else {
-            // can find more than one shipments
-            Date date = dateReceivedWidget.getDate();
-            if (date != null) {
-                return CollectionEventWrapper.getShipmentsInSites(
-                    SessionManager.getAppService(), date);
-            }
-        }
+        // FIXME
+        // if (radioWaybill.getSelection()) {
+        // // with waybill, should find only one corresponding shipment, or
+        // // mutliple shipments from different clinics
+        // List<CollectionEventWrapper> shipments = CollectionEventWrapper
+        // .getShipmentsInSites(SessionManager.getAppService(),
+        // text.trim());
+        // if (shipments.size() > 1) {
+        // SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
+        // PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+        // .getShell(), shipments);
+        // if (dlg.open() == Dialog.OK) {
+        // return Arrays.asList(dlg.getSelectedShipment());
+        // }
+        // } else {
+        // return shipments;
+        // }
+        // } else {
+        // // can find more than one shipments
+        // Date date = dateReceivedWidget.getDate();
+        // if (date != null) {
+        // return CollectionEventWrapper.getShipmentsInSites(
+        // SessionManager.getAppService(), date);
+        // }
+        // }
         return null;
     }
 
@@ -203,14 +201,15 @@ public class ShipmentAdministrationView extends
             boolean create = BioBankPlugin.openConfirm("Shipment not found",
                 "Do you want to create this shipment ?");
             if (create) {
-                CollectionEventWrapper shipment = new CollectionEventWrapper(
-                    SessionManager.getAppService());
-                if (radioWaybill.getSelection()) {
-                    shipment.setWaybill(text);
-                }
-                ShipmentAdapter adapter = new ShipmentAdapter(searchedNode,
-                    shipment);
-                adapter.openEntryForm();
+                // FIXME
+                // CollectionEventWrapper shipment = new CollectionEventWrapper(
+                // SessionManager.getAppService());
+                // if (radioWaybill.getSelection()) {
+                // shipment.setWaybill(text);
+                // }
+                // ShipmentAdapter adapter = new ShipmentAdapter(searchedNode,
+                // shipment);
+                // adapter.openEntryForm();
             }
         } else {
             BioBankPlugin.openMessage(

@@ -19,11 +19,10 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
 
-@Deprecated
-public class AliquotViewForm extends BiobankViewForm {
+public class SpecimenViewForm extends BiobankViewForm {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(AliquotViewForm.class.getName());
+        .getLogger(SpecimenViewForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.AliquotViewForm";
 
@@ -179,6 +178,27 @@ public class AliquotViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
+        setTextValue(siteLabel, aliquot.getCurrentCenter().getNameShort());
+        setTextValue(sampleTypeLabel, aliquot.getSpecimenType().getName());
+        setTextValue(linkDateLabel, aliquot.getFormattedCreatedAt());
+        setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
+            : aliquot.getQuantity().toString());
+        setTextValue(shipmentWaybillLabel, aliquot.getOriginInfo()
+            .getShipmentInfo().getWaybill());
+        setTextValue(studyLabel, aliquot.getCollectionEvent().getPatient()
+            .getStudy().getNameShort());
+        setTextValue(patientLabel, aliquot.getCollectionEvent().getPatient()
+            .getPnumber());
+
+        // FIXME: what date should go here
+        // setTextValue(dateProcessedLabel, aliquot.getCollectionEvent()
+        // .getFormattedDateProcessed());
+
+        setTextValue(dateDrawnLabel, aliquot.getProcessingEvent()
+            .getFormattedCreatedAt());
+        setTextValue(activityStatusLabel, aliquot.getActivityStatus());
+        setTextValue(commentLabel, aliquot.getComment());
+        setTextValue(positionLabel, aliquot.getPositionString(true, false));
     }
 
     @Override

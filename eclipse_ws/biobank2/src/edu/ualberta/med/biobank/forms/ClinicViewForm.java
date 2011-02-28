@@ -107,7 +107,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());
         setTextValue(shipmentTotal, clinic.getCollectionEventCount(true));
-        setTextValue(patientTotal, clinic.getPatientCount(true));
+        setTextValue(patientTotal, clinic.getPatientCount());
         setTextValue(visitTotal, clinic.getProcessingEventCount());
     }
 

@@ -157,7 +157,7 @@ public class StudyViewForm extends BiobankViewForm {
             .getString("StudyViewForm.aliquoted.specimen.title")); //$NON-NLS-1$
 
         sampleStorageTable = new SampleStorageInfoTable(section,
-            study.getSampleStorageCollection(true));
+            study.getAliquotedSpecimenCollection());
         section.setClient(sampleStorageTable);
         sampleStorageTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(sampleStorageTable);
@@ -168,7 +168,7 @@ public class StudyViewForm extends BiobankViewForm {
             .getString("StudyViewForm.source.specimen.title")); //$NON-NLS-1$
 
         studySourceVesselsTable = new StudySourceVesselInfoTable(section,
-            study.getStudySourceVesselCollection(true));
+            study.getSourceSpecimenCollection(true));
         section.setClient(studySourceVesselsTable);
         studySourceVesselsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(studySourceVesselsTable);
@@ -186,12 +186,12 @@ public class StudyViewForm extends BiobankViewForm {
         combinedPvInfo.setType("date"); //$NON-NLS-1$
         pvCustomInfoList.add(combinedPvInfo);
 
-        for (String label : study.getStudyPvAttrLabels()) {
+        for (String label : study.getStudyEventAttrLabels()) {
             combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.setLabel(label);
-            combinedPvInfo.setType(study.getStudyPvAttrType(label));
+            combinedPvInfo.setType(study.getStudyEventAttrType(label));
             combinedPvInfo.setAllowedValues(study
-                .getStudyPvAttrPermissible(label));
+                .getStudyEventAttrPermissible(label));
             pvCustomInfoList.add(combinedPvInfo);
         }
 
@@ -225,8 +225,8 @@ public class StudyViewForm extends BiobankViewForm {
                 // skip this attribute since its already part of PatientVisit
                 continue;
             }
-            setTextValue(pvCustomInfo.wiget,
-                StringUtils.join(study.getStudyPvAttrPermissible(label), ";")); //$NON-NLS-1$
+            setTextValue(pvCustomInfo.wiget, StringUtils.join(
+                study.getStudyEventAttrPermissible(label), ";")); //$NON-NLS-1$
         }
     }
 
@@ -240,9 +240,9 @@ public class StudyViewForm extends BiobankViewForm {
         setStudySectionValues();
         setPvDataSectionValues();
         sampleStorageTable
-            .setCollection(study.getSampleStorageCollection(true));
+            .setCollection(study.getAliquotedSpecimenCollection());
         studySourceVesselsTable.setCollection(study
-            .getStudySourceVesselCollection(true));
+            .getSourceSpecimenCollection(true));
         contactsTable.setCollection(study.getContactCollection(true));
     }
 }
