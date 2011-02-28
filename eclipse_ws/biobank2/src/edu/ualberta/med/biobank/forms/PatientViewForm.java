@@ -98,9 +98,8 @@ public class PatientViewForm extends BiobankViewForm {
         setTextValue(visitCountLabel,
             (patient.getProcessingEventCollection() == null) ? 0 : patient
                 .getProcessingEventCollection().size());
-        setTextValue(sourceSpecimenCountLabel, patient.getSourceSpecimenCount());
         setTextValue(aliquotedSpecimenCountLabel,
-            patient.getAliquotedSpecimenCount());
+            patient.getSpecimensCount(true));
     }
 
     @Override

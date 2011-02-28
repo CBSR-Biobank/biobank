@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -301,11 +302,6 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     @Deprecated
-    public List<ProcessingEventWrapper> getProcessingEventCollection() {
-        return null;
-    }
-
-    @Deprecated
     public boolean canBeAddedToShipment(CollectionEventWrapper shipment) {
         // TODO Auto-generated method stub
         return false;
@@ -314,13 +310,6 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Deprecated
     public List<ProcessingEventWrapper> getLast7DaysPatientVisits(
         SiteWrapper site) throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public List<ProcessingEventWrapper> getProcessingEventCollection(boolean b,
-        boolean c, Object object) {
         // TODO Auto-generated method stub
         return null;
     }
@@ -337,4 +326,20 @@ public class PatientWrapper extends PatientBaseWrapper {
         return null;
     }
 
+    public List<CollectionEventWrapper> getCollectionEventCollection() {
+        return getCollectionEventCollection(false);
+    }
+
+    public List<ProcessingEventWrapper> getProcessingEventCollection() {
+        List<CollectionEventWrapper> ces = getCollectionEventCollection();
+        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
+        List<ProcessingEventWrapper> pes = new ArrayList<ProcessingEventWrapper>();
+        for (CollectionEventWrapper ce : ces)
+            specs.addAll(ce.getSpecimenCollection());
+        for (SpecimenWrapper spec : specs) {
+            pes.addAll(spec.getProcessingEventCollection());
+            pes.add(spec.getProcessingEvent());
+        }
+        return pes;
+    }
 }

@@ -485,4 +485,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     }
 
+    public Collection<? extends SpecimenWrapper> getSpecimenCollection() {
+        return getSpecimenCollection(false);
+    }
+
 }

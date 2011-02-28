@@ -515,4 +515,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     protected void resetInternalFields() {
         objectWithPositionManagement.resetInternalFields();
     }
+
+    public List<ProcessingEventWrapper> getProcessingEventCollection() {
+        return getProcessingEventCollection(false);
+    }
 }
