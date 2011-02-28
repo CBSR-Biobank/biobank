@@ -544,7 +544,6 @@ INSERT INTO `csm_user_group` VALUES (36,12,6);
 INSERT INTO `csm_user_group` VALUES (44,11,5);
 INSERT INTO `csm_user_group` VALUES (45,20,8);
 INSERT INTO `csm_user_group` VALUES (46,19,9);
-INSERT INTO `csm_user_group` VALUES (47,21,5);
 /*!40000 ALTER TABLE `csm_user_group` ENABLE KEYS */;
 UNLOCK TABLES;
 

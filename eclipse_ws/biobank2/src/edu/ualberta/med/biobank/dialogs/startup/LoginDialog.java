@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.dialogs.startup;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.StringTokenizer;
 
 import org.eclipse.core.databinding.AggregateValidationStatus;
@@ -40,6 +40,7 @@ import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
@@ -70,6 +71,8 @@ public class LoginDialog extends TitleAreaDialog {
     private static final String USER_NAME = "userName";
 
     private static final String LAST_USER_NAME = "lastUserName";
+
+    private static final String DEFAULT_SECURE_PORT = "8443";
 
     private static final BiobankLogger logger = BiobankLogger
         .getLogger(LoginDialog.class.getName());
@@ -127,10 +130,10 @@ public class LoginDialog extends TitleAreaDialog {
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitle("Login to a BioBank server");
+        setTitle(Messages.getString("LoginDialog.title"));
         setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
             .get(BioBankPlugin.IMG_COMPUTER_KEY));
-        setMessage("Enter server name and login details.");
+        setMessage(Messages.getString("LoginDialog.description"));
         return contents;
     }
 
@@ -155,8 +158,9 @@ public class LoginDialog extends TitleAreaDialog {
 
         String lastServer = pluginPrefs.get(LAST_SERVER, "");
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
-            "Server field cannot be empty");
-        serverWidget = createWritableCombo(contents, "&Server",
+            Messages.getString("LoginDialog.field.server.validation.msg"));
+        serverWidget = createWritableCombo(contents,
+            Messages.getString("LoginDialog.field.server.label"),
             servers.toArray(new String[0]), "server", lastServer, validator);
 
         NonEmptyStringValidator userNameValidator = null;
@@ -164,29 +168,33 @@ public class LoginDialog extends TitleAreaDialog {
         if (BioBankPlugin.getDefault().isDebugging()) {
             new Label(contents, SWT.NONE);
             secureConnectionButton = new Button(contents, SWT.CHECK);
-            secureConnectionButton.setText("Use secure connection");
-            secureConnectionButton.setSelection(lastServer.contains("8443"));
+            secureConnectionButton.setText(Messages
+                .getString("LoginDialog.field.secure.connection"));
+            secureConnectionButton.setSelection(lastServer
+                .contains(DEFAULT_SECURE_PORT));
 
             serverWidget.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
                     String lastServer = serverWidget.getText();
                     secureConnectionButton.setSelection(lastServer
-                        .contains("8443"));
+                        .contains(DEFAULT_SECURE_PORT));
                 }
             });
         } else {
             userNameValidator = new NonEmptyStringValidator(
-                "Username field cannot be empty");
+                Messages.getString("LoginDialog.field.user.validation.msg"));
             passwordValidator = new NonEmptyStringValidator(
-                "Password field cannot be empty");
+                Messages.getString("LoginDialog.field.password.validaton.msg"));
         }
 
-        userNameWidget = createWritableCombo(contents, "&User Name",
+        userNameWidget = createWritableCombo(contents,
+            Messages.getString("LoginDialog.field.user.label"),
             userNames.toArray(new String[0]), "username",
             pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator);
 
-        passwordWidget = createPassWordText(contents, "&Password", "password",
+        passwordWidget = createPassWordText(contents,
+            Messages.getString("LoginDialog.field.password.label"), "password",
             passwordValidator);
 
         bindChangeListener();
@@ -281,8 +289,9 @@ public class LoginDialog extends TitleAreaDialog {
         try {
             new URL("http://" + serverWidget.getText());
         } catch (MalformedURLException e) {
-            MessageDialog.openError(getShell(), "Invalid Server URL",
-                "Please enter a valid server URL.");
+            MessageDialog.openError(getShell(),
+                Messages.getString("LoginDialog.field.server.url.error.title"),
+                Messages.getString("LoginDialog.field.server.url.error.msg"));
             return;
         }
 
@@ -296,8 +305,9 @@ public class LoginDialog extends TitleAreaDialog {
             // return;
             // }
             if (userNameWidget.getText().equals("")) {
-                MessageDialog.openError(getShell(), "Invalid User Name",
-                    "User Name field must not be blank.");
+                MessageDialog.openError(getShell(),
+                    Messages.getString("LoginDialog.field.user.error.title"),
+                    Messages.getString("LoginDialog.field.user.error.msg"));
                 return;
             }
         }
@@ -312,44 +322,98 @@ public class LoginDialog extends TitleAreaDialog {
         BusyIndicator.showWhile(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
 
-        Collection<SiteWrapper> sites = sessionHelper.getSites();
-        if (sites != null) {
-            // login successful
-            pluginPrefs.put(LAST_SERVER, serverWidget.getText());
-            pluginPrefs.put(LAST_USER_NAME, userNameWidget.getText());
-
-            if ((serverWidget.getText().length() > 0)
-                && (serverWidget.getSelectionIndex() == -1)
-                && !servers.contains(serverWidget.getText())) {
-                IPreferenceStore prefsStore = BioBankPlugin.getDefault()
-                    .getPreferenceStore();
-                StringBuilder serverList = new StringBuilder();
-                for (String server : servers) {
-                    serverList.append(server);
-                    serverList.append("\n");
-                }
-                prefsStore.putValue(PreferenceConstants.SERVER_LIST, serverList
-                    .append(serverWidget.getText().trim()).toString());
-            }
-
-            if ((userNameWidget.getText().length() > 0)
-                && (userNameWidget.getSelectionIndex() == -1)
-                && !userNames.contains(userNameWidget.getText())) {
-                Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
-                Preferences prefsUserName = prefsUserNames.node(Integer
-                    .toString(userNames.size()));
-                prefsUserName.put(USER_NAME, userNameWidget.getText().trim());
-            }
-
+        if (sessionHelper.getUser() != null) {
+            List<SiteWrapper> workingCenters = null;
             try {
-                pluginPrefs.flush();
-            } catch (BackingStoreException e) {
-                logger.error("Could not save loggin preferences", e);
+                workingCenters = sessionHelper.getUser().getWorkingCenters(
+                    sessionHelper.getAppService());
+            } catch (Exception e) {
+                BioBankPlugin.openAsyncError(Messages
+                    .getString("LoginDialog.working.center.error.title"), e);
             }
+            if (workingCenters != null) {
+                if ((workingCenters.size() == 0)
+                    && !sessionHelper.getUser().isWebsiteAdministrator())
+                    // cannot access the application.
+                    BioBankPlugin
+                        .openAsyncError(
+                            Messages
+                                .getString("LoginDialog.working.center.error.title"),
+                            Messages
+                                .getString("LoginDialog.no.working.center.error.msg"));
+                else {
+                    // login successful
+                    pluginPrefs.put(LAST_SERVER, serverWidget.getText());
+                    pluginPrefs.put(LAST_USER_NAME, userNameWidget.getText());
 
-            SessionManager.getInstance().addSession(
-                sessionHelper.getAppService(), serverWidget.getText(),
-                sessionHelper.getUser(), sites);
+                    if ((serverWidget.getText().length() > 0)
+                        && (serverWidget.getSelectionIndex() == -1)
+                        && !servers.contains(serverWidget.getText())) {
+                        IPreferenceStore prefsStore = BioBankPlugin
+                            .getDefault().getPreferenceStore();
+                        StringBuilder serverList = new StringBuilder();
+                        for (String server : servers) {
+                            serverList.append(server);
+                            serverList.append("\n");
+                        }
+                        prefsStore.putValue(PreferenceConstants.SERVER_LIST,
+                            serverList.append(serverWidget.getText().trim())
+                                .toString());
+                    }
+
+                    if ((userNameWidget.getText().length() > 0)
+                        && (userNameWidget.getSelectionIndex() == -1)
+                        && !userNames.contains(userNameWidget.getText())) {
+                        Preferences prefsUserNames = pluginPrefs
+                            .node(SAVED_USER_NAMES);
+                        Preferences prefsUserName = prefsUserNames.node(Integer
+                            .toString(userNames.size()));
+                        prefsUserName.put(USER_NAME, userNameWidget.getText()
+                            .trim());
+                    }
+
+                    try {
+                        pluginPrefs.flush();
+                    } catch (BackingStoreException e) {
+                        logger.error("Could not save loggin preferences", e);
+                    }
+
+                    if (workingCenters.size() == 1) {
+                        sessionHelper.getUser().setCurrentWorkingSite(
+                            workingCenters.get(0));
+                    } else if (workingCenters.size() > 1) {
+                        new WorkingCentreSelectDialog(getShell(),
+                            sessionHelper.getAppService(),
+                            sessionHelper.getUser()).open();
+                    }
+                    boolean canAddSession = true;
+                    if (sessionHelper.getUser().getCurrentWorkingCentre() == null)
+                        if (sessionHelper.getUser().isWebsiteAdministrator())
+                            BioBankPlugin
+                                .openAsyncInformation(
+                                    Messages
+                                        .getString("LoginDialog.working.center.admin.title"),
+                                    Messages
+                                        .getString("LoginDialog.no.working.center.admin.msg"));
+                        else {
+                            canAddSession = false;
+                            BioBankPlugin
+                                .openAsyncError(
+                                    Messages
+                                        .getString("LoginDialog.working.center.selection.error.title"),
+                                    Messages
+                                        .getString("LoginDialog.working.center.selection.error.msg"));
+                        }
+                    if (canAddSession)
+                        // do that last, that way user has his working centre
+                        // set
+                        SessionManager.getInstance().addSession(
+                            sessionHelper.getAppService(),
+                            serverWidget.getText(), sessionHelper.getUser());
+
+                }
+
+            }
         }
         super.okPressed();
     }
