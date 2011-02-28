@@ -8,6 +8,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
+@Deprecated
 public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Source vessel" };
@@ -22,28 +23,31 @@ public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> 
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                SourceVesselWrapper item = (SourceVesselWrapper) ((BiobankCollectionModel) element).o;
-                if (item == null) {
-                    if (columnIndex == 0) {
-                        return "loading...";
-                    }
-                    return "";
-                }
-                switch (columnIndex) {
-                case 0:
-                    return item.getSourceVesselType().getName();
-                default:
-                    return "";
-                }
+                // SourceVesselWrapper item = (SourceVesselWrapper)
+                // ((BiobankCollectionModel) element).o;
+                // if (item == null) {
+                // if (columnIndex == 0) {
+                // return "loading...";
+                // }
+                // return "";
+                // }
+                // switch (columnIndex) {
+                // case 0:
+                // return item.getSourceVesselType().getName();
+                // default:
+                // return "";
+                // }
+                return null;
             }
         };
     }
 
     @Override
     protected String getCollectionModelObjectToString(Object o) {
-        if (o == null)
-            return null;
-        return ((SourceVesselWrapper) o).getSourceVesselType().getName();
+        // if (o == null)
+        // return null;
+        // return ((SourceVesselWrapper) o).getSourceVesselType().getName();
+        return null;
     }
 
     @Override

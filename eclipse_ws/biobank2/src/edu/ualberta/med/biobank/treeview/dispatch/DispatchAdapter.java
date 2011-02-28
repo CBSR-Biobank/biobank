@@ -155,14 +155,14 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     private void setDispatchAsReceived() {
-        getWrapper().setDateReceived(new Date());
+        getWrapper().getShipmentInfo().setReceivedAt(new Date());
         getWrapper().setState(DispatchState.RECEIVED);
         persistDispatch();
     }
 
     private void setDispatchAsCreation() {
         getWrapper().setState(DispatchState.CREATION);
-        getWrapper().setDeparted(null);
+        getWrapper().setDepartedAt(null);
         persistDispatch();
     }
 

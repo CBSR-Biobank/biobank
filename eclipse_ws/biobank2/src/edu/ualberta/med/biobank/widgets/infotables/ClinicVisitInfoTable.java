@@ -5,11 +5,11 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ClinicVisitInfoTable extends
-    InfoTableWidget<ProcessingEventWrapper> {
+    InfoTableWidget<CollectionEventWrapper> {
 
     class TableRowData {
         public String clinicName;
@@ -25,7 +25,7 @@ public class ClinicVisitInfoTable extends
         "Patient Visits (Date Processed)" };
 
     public ClinicVisitInfoTable(Composite parent,
-        List<ProcessingEventWrapper> collection) {
+        List<CollectionEventWrapper> collection) {
         super(parent, collection, HEADINGS);
     }
 
@@ -54,11 +54,12 @@ public class ClinicVisitInfoTable extends
     }
 
     @Override
-    public Object getCollectionModelObject(ProcessingEventWrapper p)
+    public Object getCollectionModelObject(CollectionEventWrapper p)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.clinicName = p.getCenter().getNameShort();
-        info.visit = p.getFormattedDateProcessed();
+        // FIXME: what should be displayed?
+        // info.clinicName = p.getCenter().getNameShort();
+        // info.visit = p.getFormattedDateProcessed();
         return info;
     }
 

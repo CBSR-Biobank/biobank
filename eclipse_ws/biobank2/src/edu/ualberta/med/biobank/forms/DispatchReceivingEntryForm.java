@@ -10,12 +10,11 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
@@ -82,15 +81,16 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
         setTextValue(departedLabel, dispatch.getFormattedDeparted());
         BiobankText shippingMethodLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Shipping Method");
-        setTextValue(shippingMethodLabel,
-            dispatch.getShippingMethod() == null ? "" : dispatch
-                .getShippingMethod().getName());
+        setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
+            .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
+            .getShippingMethod().getName());
         BiobankText waybillLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Waybill");
-        setTextValue(waybillLabel, dispatch.getWaybill());
+        setTextValue(waybillLabel, dispatch.getShipmentInfo().getWaybill());
         BiobankText dateReceivedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date received");
-        setTextValue(dateReceivedLabel, dispatch.getFormattedDateReceived());
+        setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
+            .getFormattedDateReceived());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null, dispatch, "comment", null);
@@ -189,7 +189,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
 
     @Override
     protected String getTextForPartName() {
-        return "Dispatch sent on " + dispatch.getDeparted();
+        return "Dispatch sent on " + dispatch.getDepartedAt();
     }
 
     @Override

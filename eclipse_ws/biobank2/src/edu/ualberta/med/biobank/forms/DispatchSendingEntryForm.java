@@ -290,7 +290,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         if (dispatch.isNew()) {
             return "New Dispatch";
         } else {
-            return "Dispatch " + dispatch.getFormattedDateReceived();
+            return "Dispatch "
+                + dispatch.getShipmentInfo().getFormattedDateReceived();
         }
     }
 }

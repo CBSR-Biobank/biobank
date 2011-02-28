@@ -7,8 +7,8 @@ import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -54,8 +54,8 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        List<SpecimenWrapper> aliquots = DebugUtil
-            .getRandomLinkedAliquots(appService, siteId);
+        List<SpecimenWrapper> aliquots = DebugUtil.getRandomLinkedSpecimens(
+            appService, siteId);
         if (aliquots.size() > 1) {
             int row = 2;
             int col = 3;
@@ -80,7 +80,7 @@ public class PalletCell extends Cell {
         throws Exception {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<SpecimenWrapper> randomAliquots = DebugUtil
-            .getRandomAssignedAliquots(appService, siteId, studyId);
+            .getRandomAssignedSpecimens(appService, siteId, studyId);
         if (randomAliquots.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
                 0, 0, randomAliquots.get(0).getInventoryId())));
@@ -97,7 +97,7 @@ public class PalletCell extends Cell {
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
         List<SpecimenWrapper> randomAliquots = DebugUtil
-            .getRandomNonAssignedNonDispatchedAliquots(appService, siteId);
+            .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId);
         int i = 0;
         while (i < randomAliquots.size() && i < 30) {
             int row = i / 12;

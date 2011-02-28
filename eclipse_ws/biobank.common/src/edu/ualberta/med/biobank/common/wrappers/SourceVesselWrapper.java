@@ -8,6 +8,7 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import java.util.List;
 
 @SuppressWarnings("unused")
+@Deprecated
 public class SourceVesselWrapper {
 
     private static class SourceVessel {

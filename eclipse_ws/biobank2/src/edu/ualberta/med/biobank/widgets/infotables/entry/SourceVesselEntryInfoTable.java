@@ -4,15 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
-import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
-import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.dialogs.SourceVesselDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -28,6 +24,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
  * Displays the current sample storage collection and allows the user to add
  * additional sample storage to the collection.
  */
+@Deprecated
 public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
 
     private static BiobankLogger logger = BiobankLogger
@@ -119,65 +116,65 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
-                SourceVesselWrapper sourceVessel = getSelection();
-                if (sourceVessel != null) {
-                    try {
-                        if (!sourceVessel.isNew() && sourceVessel.isUsed()) {
-                            BioBankPlugin
-                                .openError(
-                                    "Source Vessel Delete Error",
-                                    "Cannot delete source vessel \""
-                                        + sourceVessel.getName()
-                                        + "\" since studies and/or patient visits are using it.");
-                            return;
-                        }
-
-                        if (!MessageDialog.openConfirm(PlatformUI
-                            .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), "Delete Source Vessel",
-                            "Are you sure you want to delete source vessel \""
-                                + sourceVessel.getName() + "\"?")) {
-                            return;
-                        }
-
-                        // equals method now compare toString() results if both
-                        // ids are null.
-                        selectedSourceVessels.remove(sourceVessel);
-
-                        setCollection(selectedSourceVessels);
-                        deletedSourceVessels.add(sourceVessel);
-                        notifyListeners();
-                    } catch (final RemoteConnectFailureException exp) {
-                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
-                    } catch (Exception e) {
-                        logger.error("BioBankFormBase.createPartControl Error",
-                            e);
-                    }
-                }
+                // SourceVesselWrapper sourceVessel = getSelection();
+                // if (sourceVessel != null) {
+                // try {
+                // if (!sourceVessel.isNew() && sourceVessel.isUsed()) {
+                // BioBankPlugin
+                // .openError(
+                // "Source Vessel Delete Error",
+                // "Cannot delete source vessel \""
+                // + sourceVessel.getName()
+                // + "\" since studies and/or patient visits are using it.");
+                // return;
+                // }
+                //
+                // if (!MessageDialog.openConfirm(PlatformUI
+                // .getWorkbench().getActiveWorkbenchWindow()
+                // .getShell(), "Delete Source Vessel",
+                // "Are you sure you want to delete source vessel \""
+                // + sourceVessel.getName() + "\"?")) {
+                // return;
+                // }
+                //
+                // // equals method now compare toString() results if both
+                // // ids are null.
+                // selectedSourceVessels.remove(sourceVessel);
+                //
+                // setCollection(selectedSourceVessels);
+                // deletedSourceVessels.add(sourceVessel);
+                // notifyListeners();
+                // } catch (final RemoteConnectFailureException exp) {
+                // BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                // } catch (Exception e) {
+                // logger.error("BioBankFormBase.createPartControl Error",
+                // e);
+                // }
+                // }
             }
         });
     }
 
     private boolean addEditOk(SourceVesselWrapper type) {
-        try {
-            for (SourceVesselWrapper sv : selectedSourceVessels)
-                if (sv.getId() != type.getId()
-                    && sv.getName().equals(type.getName()))
-                    throw new BiobankCheckException(
-                        "That source vessel has already been added.");
-            for (SourceVesselWrapper sv : addedOrModifiedSourceVessels)
-                if (sv.getId() != type.getId()
-                    && sv.getName().equals(type.getName()))
-                    throw new BiobankCheckException(
-                        "That source vessel has already been added.");
-            type.checkUnique();
-        } catch (BiobankException bce) {
-            BioBankPlugin.openAsyncError("Check error", bce);
-            return false;
-        } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Check error", e);
-            return false;
-        }
+        // try {
+        // for (SourceVesselWrapper sv : selectedSourceVessels)
+        // if (sv.getId() != type.getId()
+        // && sv.getName().equals(type.getName()))
+        // throw new BiobankCheckException(
+        // "That source vessel has already been added.");
+        // for (SourceVesselWrapper sv : addedOrModifiedSourceVessels)
+        // if (sv.getId() != type.getId()
+        // && sv.getName().equals(type.getName()))
+        // throw new BiobankCheckException(
+        // "That source vessel has already been added.");
+        // type.checkUnique();
+        // } catch (BiobankException bce) {
+        // BioBankPlugin.openAsyncError("Check error", bce);
+        // return false;
+        // } catch (ApplicationException e) {
+        // BioBankPlugin.openAsyncError("Check error", e);
+        // return false;
+        // }
         return true;
     }
 

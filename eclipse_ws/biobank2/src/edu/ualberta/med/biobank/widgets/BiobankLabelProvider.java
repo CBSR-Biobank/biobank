@@ -8,16 +8,14 @@ import org.eclipse.swt.graphics.Image;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -75,8 +73,8 @@ public class BiobankLabelProvider extends LabelProvider implements
                 String position = aliquot.getPositionString();
                 return (position != null) ? position : "none";
             case 3:
-                return aliquot.getLinkDate() == null ? "" : DateFormatter
-                    .formatAsDateTime(aliquot.getLinkDate());
+                return aliquot.getCreatedAt() == null ? "" : DateFormatter
+                    .formatAsDateTime(aliquot.getCreatedAt());
             case 4:
                 return aliquot.getQuantity() == null ? "" : aliquot
                     .getQuantity().toString();
@@ -108,13 +106,6 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return "";
             }
             return getContactWrapperColumnIndex(info.contact, columnIndex);
-        } else if (element instanceof SourceVesselWrapper) {
-            SourceVesselWrapper source = (SourceVesselWrapper) element;
-            if (columnIndex == 0) {
-                return source.getSourceVesselType().getName();
-            } else {
-                Assert.isTrue(false, "invalid column index: " + columnIndex);
-            }
         } else if (element instanceof DispatchSpecimenWrapper) {
             DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) element;
             if (columnIndex == 0)
@@ -122,7 +113,7 @@ public class BiobankLabelProvider extends LabelProvider implements
             if (columnIndex == 1)
                 return dsa.getSpecimen().getSpecimenType().getNameShort();
             if (columnIndex == 2)
-                return dsa.getSpecimen().getProcessingEvent().getPatient()
+                return dsa.getSpecimen().getCollectionEvent().getPatient()
                     .getPnumber();
             if (columnIndex == 3)
                 return dsa.getSpecimen().getActivityStatus().toString();
@@ -163,9 +154,6 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((SiteWrapper) element).getName();
         } else if (element instanceof ActivityStatusWrapper) {
             return ((ActivityStatusWrapper) element).getName();
-        } else if (element instanceof SourceSpecimenWrapper) {
-            return ((SourceSpecimenWrapper) element).getSourceVessel()
-                .getName();
         } else if (element instanceof AdapterBase) {
             return ((AdapterBase) element).getLabel();
         }

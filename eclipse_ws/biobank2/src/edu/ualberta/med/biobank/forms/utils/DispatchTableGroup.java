@@ -9,32 +9,37 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 public enum DispatchTableGroup {
     ADDED("Added") {
         @Override
-        public List<DispatchSpecimenWrapper> getChildren(DispatchWrapper shipment) {
-            return shipment.getNonProcessedDispatchAliquotCollection();
+        public List<DispatchSpecimenWrapper> getChildren(
+            DispatchWrapper shipment) {
+            return shipment.getNonProcessedDispatchSpecimenCollection();
         }
     },
     NON_PROCESSED("Non Processed") {
         @Override
-        public List<DispatchSpecimenWrapper> getChildren(DispatchWrapper shipment) {
-            return shipment.getNonProcessedDispatchAliquotCollection();
+        public List<DispatchSpecimenWrapper> getChildren(
+            DispatchWrapper shipment) {
+            return shipment.getNonProcessedDispatchSpecimenCollection();
         }
     },
     RECEIVED("Received") {
         @Override
-        public List<DispatchSpecimenWrapper> getChildren(DispatchWrapper shipment) {
-            return shipment.getReceivedDispatchAliquots();
+        public List<DispatchSpecimenWrapper> getChildren(
+            DispatchWrapper shipment) {
+            return shipment.getReceivedDispatchSpecimens();
         }
     },
     EXTRA("Extra") {
         @Override
-        public List<DispatchSpecimenWrapper> getChildren(DispatchWrapper shipment) {
-            return shipment.getExtraDispatchAliquots();
+        public List<DispatchSpecimenWrapper> getChildren(
+            DispatchWrapper shipment) {
+            return shipment.getExtraDispatchSpecimens();
         }
     },
     MISSING("Missing") {
         @Override
-        public List<DispatchSpecimenWrapper> getChildren(DispatchWrapper shipment) {
-            return shipment.getMissingDispatchAliquots();
+        public List<DispatchSpecimenWrapper> getChildren(
+            DispatchWrapper shipment) {
+            return shipment.getMissingDispatchSpecimens();
         }
     };
 
