@@ -23,7 +23,7 @@ import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
+import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -48,7 +48,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private ComboViewer shippingMethodComboViewer;
 
-    private ShipmentPatientsWidget shipmentPatientsWidget;
+    private SpecimenEntryWidget shipmentPatientsWidget;
 
     private BiobankText waybillText;
 
@@ -270,7 +270,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        shipmentPatientsWidget = new ShipmentPatientsWidget(client, SWT.NONE,
+        shipmentPatientsWidget = new SpecimenEntryWidget(client, SWT.NONE,
             shipment, toolkit, true);
         shipmentPatientsWidget
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {

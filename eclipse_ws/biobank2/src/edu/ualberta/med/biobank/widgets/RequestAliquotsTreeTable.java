@@ -168,7 +168,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                     menuItem.dispose();
                 }
 
-                RequestAliquotWrapper ra = getSelectedAliquot();
+                RequestSpecimenWrapper ra = getSelectedAliquot();
                 if (ra != null) {
                     addClipboardCopySupport(menu, labelProvider);
                     addSetUnavailableMenu(menu);

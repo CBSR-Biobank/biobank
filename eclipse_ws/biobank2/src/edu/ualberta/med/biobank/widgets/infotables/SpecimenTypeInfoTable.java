@@ -5,17 +5,16 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-@Deprecated
-public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> {
+public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
 
     private static final String[] HEADINGS = new String[] { "Source vessel" };
 
-    public SourceVesselInfoTable(Composite parent,
-        List<SourceVesselWrapper> sampleStorageCollection) {
-        super(parent, sampleStorageCollection, HEADINGS, 10);
+    public SpecimenTypeInfoTable(Composite parent,
+        List<SpecimenTypeWrapper> specimenCollection) {
+        super(parent, specimenCollection, HEADINGS, 10);
     }
 
     @Override
@@ -51,11 +50,11 @@ public class SourceVesselInfoTable extends InfoTableWidget<SourceVesselWrapper> 
     }
 
     @Override
-    public SourceVesselWrapper getSelection() {
+    public SpecimenTypeWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
-        SourceVesselWrapper source = (SourceVesselWrapper) item.o;
+        SpecimenTypeWrapper source = (SpecimenTypeWrapper) item.o;
         Assert.isNotNull(source);
         return source;
     }

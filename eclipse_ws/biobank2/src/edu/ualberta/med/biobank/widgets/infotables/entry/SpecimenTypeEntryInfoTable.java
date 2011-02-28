@@ -9,32 +9,31 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.dialogs.SourceVesselDialog;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.dialogs.SpecimentTypeDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
-import edu.ualberta.med.biobank.widgets.infotables.SourceVesselInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenTypeInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
  * Displays the current sample storage collection and allows the user to add
  * additional sample storage to the collection.
  */
-@Deprecated
-public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
+public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(SourceVesselEntryInfoTable.class.getName());
+        .getLogger(SpecimenTypeEntryInfoTable.class.getName());
 
-    private List<SourceVesselWrapper> selectedSourceVessels;
+    private List<SpecimenTypeWrapper> selectedSourceVessels;
 
-    private List<SourceVesselWrapper> addedOrModifiedSourceVessels;
+    private List<SpecimenTypeWrapper> addedOrModifiedSourceVessels;
 
-    private List<SourceVesselWrapper> deletedSourceVessels;
+    private List<SpecimenTypeWrapper> deletedSourceVessels;
 
     private String addMessage;
 
@@ -47,8 +46,8 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
      * @param SampleTypeCollection the sample storage already selected and to be
      *            displayed in the table viewer (can be null).
      */
-    public SourceVesselEntryInfoTable(Composite parent,
-        List<SourceVesselWrapper> globalSourceVessels, String addMessage,
+    public SpecimenTypeEntryInfoTable(Composite parent,
+        List<SpecimenTypeWrapper> globalSourceVessels, String addMessage,
         String editMessage) {
         super(parent, null);
         setLists(globalSourceVessels);
@@ -67,14 +66,14 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
      * @param message The message to display in the SampleTypeDialog.
      */
     public void addSourceVessel() {
-        SourceVesselWrapper newST = new SourceVesselWrapper(
+        SpecimenTypeWrapper newST = new SpecimenTypeWrapper(
             SessionManager.getAppService());
         addOrEditSourceVessel(true, newST, addMessage);
     }
 
     private boolean addOrEditSourceVessel(boolean add,
-        SourceVesselWrapper sourceVessel, String message) {
-        SourceVesselDialog dlg = new SourceVesselDialog(PlatformUI
+        SpecimenTypeWrapper sourceVessel, String message) {
+        SpecimentTypeDialog dlg = new SpecimentTypeDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             sourceVessel, message);
         if (dlg.open() == Dialog.OK) {
@@ -88,7 +87,7 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
                 notifyListeners();
                 return true;
             } else {
-                SourceVesselWrapper orig = dlg.getOrigSourceVessel();
+                SpecimenTypeWrapper orig = dlg.getOrigSpecimenType();
                 sourceVessel.setName(orig.getName());
                 reloadCollection(selectedSourceVessels);
             }
@@ -107,7 +106,7 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
         addEditItemListener(new IInfoTableEditItemListener() {
             @Override
             public void editItem(InfoTableEvent event) {
-                SourceVesselWrapper type = getSelection();
+                SpecimenTypeWrapper type = getSelection();
                 if (type != null)
                     addOrEditSourceVessel(false, type, editMessage);
             }
@@ -116,7 +115,7 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
         addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
-                // SourceVesselWrapper sourceVessel = getSelection();
+                // SpecimenTypeWrapper sourceVessel = getSelection();
                 // if (sourceVessel != null) {
                 // try {
                 // if (!sourceVessel.isNew() && sourceVessel.isUsed()) {
@@ -155,14 +154,14 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
         });
     }
 
-    private boolean addEditOk(SourceVesselWrapper type) {
+    private boolean addEditOk(SpecimenTypeWrapper type) {
         // try {
-        // for (SourceVesselWrapper sv : selectedSourceVessels)
+        // for (SpecimenTypeWrapper sv : selectedSourceVessels)
         // if (sv.getId() != type.getId()
         // && sv.getName().equals(type.getName()))
         // throw new BiobankCheckException(
         // "That source vessel has already been added.");
-        // for (SourceVesselWrapper sv : addedOrModifiedSourceVessels)
+        // for (SpecimenTypeWrapper sv : addedOrModifiedSourceVessels)
         // if (sv.getId() != type.getId()
         // && sv.getName().equals(type.getName()))
         // throw new BiobankCheckException(
@@ -178,30 +177,30 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
         return true;
     }
 
-    public List<SourceVesselWrapper> getAddedOrModifiedSourceVessels() {
+    public List<SpecimenTypeWrapper> getAddedOrModifiedSourceVessels() {
         return addedOrModifiedSourceVessels;
     }
 
-    public List<SourceVesselWrapper> getDeletedSourceVessels() {
+    public List<SpecimenTypeWrapper> getDeletedSourceVessels() {
         return deletedSourceVessels;
     }
 
-    public void setLists(List<SourceVesselWrapper> sourceVesselCollection) {
+    public void setLists(List<SpecimenTypeWrapper> sourceVesselCollection) {
         if (sourceVesselCollection == null) {
-            selectedSourceVessels = new ArrayList<SourceVesselWrapper>();
+            selectedSourceVessels = new ArrayList<SpecimenTypeWrapper>();
         } else {
-            selectedSourceVessels = new ArrayList<SourceVesselWrapper>(
+            selectedSourceVessels = new ArrayList<SpecimenTypeWrapper>(
                 sourceVesselCollection);
         }
         reloadCollection(sourceVesselCollection);
-        addedOrModifiedSourceVessels = new ArrayList<SourceVesselWrapper>();
-        deletedSourceVessels = new ArrayList<SourceVesselWrapper>();
+        addedOrModifiedSourceVessels = new ArrayList<SpecimenTypeWrapper>();
+        deletedSourceVessels = new ArrayList<SpecimenTypeWrapper>();
     }
 
     public void reload() {
         try {
-            setLists(SourceVesselWrapper.getAllSourceVessels(SessionManager
-                .getAppService()));
+            setLists(SpecimenTypeWrapper.getAllSpecimenTypes(
+                SessionManager.getAppService(), true));
         } catch (ApplicationException e) {
             BioBankPlugin.openAsyncError("AppService unavailable", e);
         }
@@ -212,8 +211,8 @@ public class SourceVesselEntryInfoTable extends SourceVesselInfoTable {
         return new BiobankTableSorter() {
             @Override
             public int compare(Object e1, Object e2) {
-                return super.compare(((SourceVesselWrapper) e1).getName(),
-                    ((SourceVesselWrapper) e2).getName());
+                return super.compare(((SpecimenTypeWrapper) e1).getName(),
+                    ((SpecimenTypeWrapper) e2).getName());
             }
         };
     }

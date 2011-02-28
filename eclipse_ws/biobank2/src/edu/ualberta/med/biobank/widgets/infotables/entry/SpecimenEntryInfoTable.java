@@ -4,14 +4,14 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
-import edu.ualberta.med.biobank.widgets.infotables.PatientInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 
-public class PatientEntryInfoTable extends PatientInfoTable {
+public class SpecimenEntryInfoTable extends SpecimenInfoTable {
 
-    public PatientEntryInfoTable(Composite parent, List<PatientWrapper> patients) {
-        super(parent, patients);
+    public SpecimenEntryInfoTable(Composite parent, List<SpecimenWrapper> specs) {
+        super(parent, specs);
     }
 
     @Override
@@ -25,8 +25,8 @@ public class PatientEntryInfoTable extends PatientInfoTable {
             @Override
             public int compare(Object e1, Object e2) {
                 try {
-                    TableRowData i1 = getCollectionModelObject((PatientWrapper) e1);
-                    TableRowData i2 = getCollectionModelObject((PatientWrapper) e2);
+                    TableRowData i1 = getCollectionModelObject((SpecimenWrapper) e1);
+                    TableRowData i2 = getCollectionModelObject((SpecimenWrapper) e2);
                     return super.compare(i1.pnumber, i2.pnumber);
                 } catch (Exception e) {
                     return 0;

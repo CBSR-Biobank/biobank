@@ -30,7 +30,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SourceVesselEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 
@@ -59,8 +59,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private List<FormPvCustomInfo> pvCustomInfoList;
 
-    // FIXME should be source specimen table
-    private SourceVesselEntryInfoTable pvSourceVesseltable;
+    private SpecimenEntryWidget specimensWidget;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -68,8 +67,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             setDirty(true);
         }
     };
-
-    private DateTimeWidget dateDrawnWidget;
 
     private ComboViewer activityStatusComboViewer;
 
@@ -107,7 +104,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         } catch (Exception e) {
             logger.error(
                 "Error while retrieving patient visit "
-                    + cevent.getFormattedDateReceived() + " (Patient "
+                    + cevent.getVisitNumber() + " (Patient "
                     + cevent.getPatient() + ")", e);
         }
     }
@@ -297,7 +294,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         super.reset();
         cevent.setPatient(patient);
 
-        pvSourceVesseltable.reload();
+        specimensWidget.updateList();
         resetPvCustomInfo();
     }
 

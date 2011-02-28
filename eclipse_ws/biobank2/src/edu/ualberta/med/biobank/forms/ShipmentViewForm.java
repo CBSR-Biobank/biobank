@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.ShipmentPatientsWidget;
+import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 
 // FIXME: see below for commented out code
 public class ShipmentViewForm extends BiobankViewForm {
@@ -44,7 +44,7 @@ public class ShipmentViewForm extends BiobankViewForm {
 
     private BiobankText patientVisitCountLabel;
 
-    private ShipmentPatientsWidget shipPatientsWidget;
+    private SpecimenEntryWidget shipPatientsWidget;
 
     @Override
     protected void init() throws Exception {

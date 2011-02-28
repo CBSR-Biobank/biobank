@@ -8,38 +8,37 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
-public class SourceVesselDialog extends BiobankDialog {
+public class SpecimentTypeDialog extends BiobankDialog {
 
     private static final String TITLE = "Source Vessel ";
 
     private static final String MSG_NO_ST_NAME = "Source vessel must have a name.";
 
-    private SourceVesselWrapper origSourceVessel;
+    private SpecimenTypeWrapper origSpecimen;
 
     // this is the object that is modified via the bound widgets
-    private SourceVesselWrapper sourceVessel;
+    private SpecimenTypeWrapper specimenType;
 
     private String message;
 
-    private SourceVesselWrapper oldSourceVessel;
+    private SpecimenTypeWrapper oldSpecimen;
 
     private String currentTitle;
 
-    public SourceVesselDialog(Shell parent, SourceVesselWrapper sourceVessel,
+    public SpecimentTypeDialog(Shell parent, SpecimenTypeWrapper specimenType,
         String message) {
         super(parent);
-        Assert.isNotNull(sourceVessel);
-        origSourceVessel = sourceVessel;
-        this.sourceVessel = new SourceVesselWrapper(null);
-        this.sourceVessel.setName(sourceVessel.getName());
+        Assert.isNotNull(specimenType);
+        origSpecimen = specimenType;
+        this.specimenType = new SpecimenTypeWrapper(null);
+        this.specimenType.setName(specimenType.getName());
         this.message = message;
-        oldSourceVessel = new SourceVesselWrapper(
-            SessionManager.getAppService());
-        currentTitle = ((origSourceVessel.getName() == null) ? "Add " : "Edit ")
+        oldSpecimen = new SpecimenTypeWrapper(SessionManager.getAppService());
+        currentTitle = ((origSpecimen.getName() == null) ? "Add " : "Edit ")
             + TITLE;
     }
 
@@ -65,20 +64,20 @@ public class SourceVesselDialog extends BiobankDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Name", null, sourceVessel, "name", new NonEmptyStringValidator(
+            "Name", null, specimenType, "name", new NonEmptyStringValidator(
                 MSG_NO_ST_NAME));
 
     }
 
     @Override
     protected void okPressed() {
-        oldSourceVessel.setName(origSourceVessel.getName());
-        origSourceVessel.setName(sourceVessel.getName());
+        oldSpecimen.setName(origSpecimen.getName());
+        origSpecimen.setName(specimenType.getName());
         super.okPressed();
     }
 
-    public SourceVesselWrapper getOrigSourceVessel() {
-        return oldSourceVessel;
+    public SpecimenTypeWrapper getOrigSpecimenType() {
+        return oldSpecimen;
     }
 
 }

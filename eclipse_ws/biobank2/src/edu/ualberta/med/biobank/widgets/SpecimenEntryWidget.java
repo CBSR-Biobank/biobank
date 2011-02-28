@@ -33,21 +33,22 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
-import edu.ualberta.med.biobank.widgets.infotables.PatientInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.PatientEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ShipmentPatientsWidget extends BiobankWidget {
+public class SpecimenEntryWidget extends BiobankWidget {
 
     private CollectionEventWrapper shipment;
 
-    private PatientInfoTable patientTable;
+    private SpecimenInfoTable specTable;
 
     private BiobankText newPatientText;
 
@@ -60,7 +61,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
     private IObservableValue patientsAdded = new WritableValue(Boolean.FALSE,
         Boolean.class);
 
-    public ShipmentPatientsWidget(Composite parent, int style,
+    public SpecimenEntryWidget(Composite parent, int style,
         CollectionEventWrapper ship, FormToolkit toolkit, boolean editable) {
         super(parent, style);
         Assert.isNotNull(toolkit, "toolkit is null");
@@ -98,18 +99,18 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         }
 
         if (editable) {
-            patientTable = new PatientEntryInfoTable(this, null);
+            specTable = new SpecimenEntryInfoTable(this, null);
         } else {
-            patientTable = new PatientInfoTable(this, null);
+            specTable = new SpecimenInfoTable(this, null);
         }
         updateList();
 
-        patientTable.adaptToToolkit(toolkit, true);
+        specTable.adaptToToolkit(toolkit, true);
         GridData gd = new GridData();
         gd.horizontalSpan = 2;
         gd.horizontalAlignment = SWT.FILL;
         gd.grabExcessHorizontalSpace = true;
-        patientTable.setLayoutData(gd);
+        specTable.setLayoutData(gd);
         addDeleteSupport();
     }
 
@@ -187,7 +188,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
                 BioBankPlugin.openAsyncError("Cannot add patient", e);
                 return;
             }
-            patientTable.setCollection(shipment.getPatientCollection());
+            specTable.setCollection(shipment.getSpecimenCollection(true));
             notifyListeners();
             patientsAdded.setValue(true);
         } else {
@@ -202,17 +203,17 @@ public class ShipmentPatientsWidget extends BiobankWidget {
         if (!editable)
             return;
 
-        patientTable.addDeleteItemListener(new IInfoTableDeleteItemListener() {
+        specTable.addDeleteItemListener(new IInfoTableDeleteItemListener() {
             @Override
             public void deleteItem(InfoTableEvent event) {
-                PatientWrapper patient = patientTable.getSelection();
-                if (patient != null) {
-                    if (!MessageDialog.openConfirm(
-                        PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(),
+                SpecimenWrapper spec = specTable.getSelection();
+                if (spec != null) {
+                    if (!MessageDialog.openConfirm(PlatformUI.getWorkbench()
+                        .getActiveWorkbenchWindow().getShell(),
                         "Delete Patient",
                         "Are you sure you want to remove patient \""
-                            + patient.getPnumber() + "\" for this shipment ?")) {
+                            + spec.getCollectionEvent().getPatient()
+                                .getPnumber() + "\" for this shipment ?")) {
                         return;
                     }
                     try {
@@ -232,16 +233,16 @@ public class ShipmentPatientsWidget extends BiobankWidget {
     }
 
     public void updateList() {
-        List<PatientWrapper> patients = shipment.getPatientCollection();
+        List<SpecimenWrapper> patients = shipment.getSpecimenCollection(true);
         if (patients != null)
-            patientTable.setCollection(patients);
+            specTable.setCollection(patients);
         else
-            patientTable.setCollection(new ArrayList<PatientWrapper>());
+            specTable.setCollection(new ArrayList<SpecimenWrapper>());
         patientsAdded.setValue(patients != null && patients.size() > 0);
     }
 
     public void addDoubleClickListener(IDoubleClickListener listener) {
-        patientTable.addClickListener(listener);
+        specTable.addClickListener(listener);
     }
 
     public class PatientAddListener extends WrapperListenerAdapter {
@@ -257,7 +258,7 @@ public class ShipmentPatientsWidget extends BiobankWidget {
 
         @Override
         public void inserted(WrapperEvent event) {
-            if (!ShipmentPatientsWidget.this.isDisposed()) {
+            if (!SpecimenEntryWidget.this.isDisposed()) {
                 Display.getDefault().syncExec(new Runnable() {
                     @Override
                     public void run() {

@@ -15,8 +15,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SourceVesselInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
@@ -31,8 +30,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BiobankText studyLabel;
 
-    private AliquotListInfoTable aliquotWidget;
-
     private List<FormPvCustomInfo> pvCustomInfoList;
 
     private BiobankText patientLabel;
@@ -41,9 +38,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BiobankText commentLabel;
 
-    private BiobankText dateDrawnLabel;
-
-    private SourceVesselInfoTable table;
+    private SpecimenInfoTable table;
 
     private class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
@@ -60,17 +55,17 @@ public class CollectionEventViewForm extends BiobankViewForm {
         retrievePatientVisit();
         cevent.logLookup(null);
 
-        setPartName("Visit " + cevent.getFormattedDateReceived());
+        setPartName("Visit " + cevent.getVisitNumber());
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Patient Visit - Date Processed: "
-            + cevent.getFormattedDateReceived());
+            + cevent.getVisitNumber());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
-        createSourceSpecimensSection();
+        createSpecimensSection();
         createSpecimensSection();
     }
 
@@ -86,8 +81,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date Processed");
-        dateDrawnLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date Drawn");
 
         createPvDataSection(client);
 
@@ -135,7 +128,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     private void setCollectionEventValues() {
         setTextValue(studyLabel, cevent.getPatient().getStudy().getName());
         setTextValue(patientLabel, cevent.getPatient().getPnumber());
-        setTextValue(dateProcessedLabel, cevent.getFormattedDateReceived());
+        setTextValue(dateProcessedLabel, cevent.getVisitNumber());
 
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
@@ -143,28 +136,16 @@ public class CollectionEventViewForm extends BiobankViewForm {
         }
     }
 
-    private void createSourceSpecimensSection() {
-        // FIXME: should be source specimens
-        // Composite client = createSectionWithClient("Source Vessels");
-        // table = new SourceVesselInfoTable(client,
-        // cevent.getSpecimenCollection());
-        // table.adaptToToolkit(toolkit, true);
-    }
-
     private void createSpecimensSection() {
-        // FIXME: should be specimens
-        // Composite parent = createSectionWithClient("Aliquots");
-        // aliquotWidget = new AliquotListInfoTable(parent,
-        // cevent.getSpecimenCollection());
-        // aliquotWidget.adaptToToolkit(toolkit, true);
-        // aliquotWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
-        // aliquotWidget.addClickListener(collectionDoubleClickListener);
+        Composite client = createSectionWithClient("Source Vessels");
+        table = new SpecimenInfoTable(client, cevent.getSpecimenCollection());
+        table.adaptToToolkit(toolkit, true);
     }
 
     @Override
     public void reload() {
         retrievePatientVisit();
-        String date = cevent.getFormattedDateReceived();
+        String date = cevent.getVisitNumber().toString();
         setPartName("Visit " + date);
         form.setText("Visit Drawn Date: " + date);
         setCollectionEventValues();
@@ -180,7 +161,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         } catch (Exception ex) {
             logger.error(
                 "Error while retrieving patient visit "
-                    + cevent.getFormattedDateReceived() + "(patient "
+                    + cevent.getVisitNumber() + "(patient "
                     + cevent.getPatient() + ")", ex);
         }
     }

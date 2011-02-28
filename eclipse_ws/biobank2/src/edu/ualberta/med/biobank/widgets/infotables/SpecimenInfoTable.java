@@ -6,31 +6,31 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
+public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 5;
 
     protected class TableRowData {
-        PatientWrapper patient;
         public String pnumber;
-        public String studyNameShort;
+        public SpecimenWrapper spec;
+        public Integer pv;
+        public String type;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { pnumber, studyNameShort },
-                "\t");
+            return StringUtils.join(
+                new String[] { pnumber, pv.toString(), type }, "\t");
         }
     }
 
     private static final String[] HEADINGS = new String[] { "Patient Number",
         "Study" };
 
-    public PatientInfoTable(Composite parent, List<PatientWrapper> patients) {
-        super(parent, patients, HEADINGS, PAGE_SIZE_ROWS);
+    public SpecimenInfoTable(Composite parent, List<SpecimenWrapper> collection) {
+        super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override
@@ -49,8 +49,9 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
                 case 0:
                     return item.pnumber;
                 case 1:
-                    return item.studyNameShort;
-                case 3:
+                    return item.pv.toString();
+                case 2:
+                    return item.type;
                 default:
                     return "";
                 }
@@ -59,17 +60,13 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(PatientWrapper patient)
+    public TableRowData getCollectionModelObject(SpecimenWrapper spec)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.patient = patient;
-        info.pnumber = patient.getPnumber();
-        StudyWrapper study = patient.getStudy();
-        if (study != null) {
-            info.studyNameShort = study.getNameShort();
-        } else {
-            info.studyNameShort = new String();
-        }
+        info.spec = spec;
+        info.pnumber = spec.getCollectionEvent().getPatient().getPnumber();
+        info.pv = spec.getCollectionEvent().getVisitNumber();
+        info.type = spec.getSpecimenType().getName();
         return info;
     }
 
@@ -81,13 +78,13 @@ public class PatientInfoTable extends InfoTableWidget<PatientWrapper> {
     }
 
     @Override
-    public PatientWrapper getSelection() {
+    public SpecimenWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
-        return row.patient;
+        return row.spec;
     }
 
     @Override
