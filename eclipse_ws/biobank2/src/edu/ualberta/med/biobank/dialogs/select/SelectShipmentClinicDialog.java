@@ -24,6 +24,7 @@ import edu.ualberta.med.biobank.dialogs.BiobankDialog;
  * Allows the user to choose the clinic from which the shipment comes from
  */
 
+@Deprecated
 public class SelectShipmentClinicDialog extends BiobankDialog {
     private List<CollectionEventWrapper> shipments;
     private ComboViewer comboViewer;
@@ -43,9 +44,11 @@ public class SelectShipmentClinicDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return "More than one shipment with waybill '"
-            + shipments.get(0).getWaybill()
-            + "' found.\nPlease choose the clinic associated with this shipment.";
+        // return "More than one shipment with waybill '"
+        // + shipments.get(0).getWaybill()
+        // +
+        // "' found.\nPlease choose the clinic associated with this shipment.";
+        return null;
     }
 
     @Override

@@ -242,7 +242,7 @@ public class LinkFormPatientManagement {
         viewerCollectionEvents.setSelection(new StructuredSelection(
             patientVisit));
         if (cEventText != null) {
-            cEventText.setText(patientVisit.getFormattedDateDrawn());
+            cEventText.setText(patientVisit.getFormattedCreatedAt());
         }
     }
 

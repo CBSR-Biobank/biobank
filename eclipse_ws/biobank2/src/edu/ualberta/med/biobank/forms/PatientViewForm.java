@@ -87,7 +87,7 @@ public class PatientViewForm extends BiobankViewForm {
             .getString("PatientViewForm.visits.title"));
 
         collectionEventTable = new CollectionEventInfoTable(section,
-            patient.getCollectionEventCollection());
+            patient.getCollectionEventCollection(true));
         section.setClient(collectionEventTable);
         collectionEventTable.adaptToToolkit(toolkit, true);
         collectionEventTable.addClickListener(collectionDoubleClickListener);
@@ -110,7 +110,7 @@ public class PatientViewForm extends BiobankViewForm {
         setPartName("Patient " + patient.getPnumber());
         form.setText("Patient: " + patient.getPnumber());
         collectionEventTable.setCollection(patient
-            .getCollectionEventCollection());
+            .getCollectionEventCollection(true));
     }
 
 }

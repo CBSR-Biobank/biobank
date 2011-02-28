@@ -3,19 +3,15 @@ package edu.ualberta.med.biobank.dialogs;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 
+@Deprecated
 public class StudySourceVesselDialog extends BiobankDialog {
 
     private static final String TITLE = "Study Source Vessel";
@@ -39,21 +35,21 @@ public class StudySourceVesselDialog extends BiobankDialog {
         this.origStudySourceVessel = studySourceVessel;
         this.studySourceVessel = new SourceSpecimenWrapper(null);
         this.studySourceVessel.setStudy(studySourceVessel.getStudy());
-        this.studySourceVessel.setSourceVessel(studySourceVessel
-            .getSourceVessel());
+        // this.studySourceVessel.setSourceVessel(studySourceVessel
+        // .getSourceVessel());
         this.studySourceVessel.setNeedTimeDrawn(studySourceVessel
             .getNeedTimeDrawn());
         this.studySourceVessel.setNeedOriginalVolume(studySourceVessel
             .getNeedOriginalVolume());
         allSourceVesselsMap = sourceVessels;
         message = "source vessel to this study";
-        if (origStudySourceVessel.getSourceVessel() == null) {
-            currentTitle = "Add " + TITLE;
-            message = "Add " + message;
-        } else {
-            currentTitle = "Edit " + TITLE;
-            message = "Edit " + message;
-        }
+        // if (origStudySourceVessel.getSourceVessel() == null) {
+        // currentTitle = "Add " + TITLE;
+        // message = "Add " + message;
+        // } else {
+        // currentTitle = "Edit " + TITLE;
+        // message = "Edit " + message;
+        // }
     }
 
     @Override
@@ -80,38 +76,38 @@ public class StudySourceVesselDialog extends BiobankDialog {
 
     @Override
     protected void createDialogAreaInternal(Composite parent) throws Exception {
-        Composite contents = new Composite(parent, SWT.NONE);
-        contents.setLayout(new GridLayout(2, false));
-        contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-
-        getWidgetCreator().createComboViewer(contents, "Source Vessel",
-            allSourceVesselsMap, studySourceVessel.getSourceVessel(),
-            "A source vessel should be selected", new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    studySourceVessel
-                        .setSourceVessel((SourceVesselWrapper) selectedObject);
-                }
-            });
-
-        createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
-            "Need Time Drawn", new String[0], studySourceVessel,
-            "needTimeDrawn", null);
-
-        createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
-            "Need Original Volume", new String[0], studySourceVessel,
-            "needOriginalVolume", null);
+        // Composite contents = new Composite(parent, SWT.NONE);
+        // contents.setLayout(new GridLayout(2, false));
+        // contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
+        //
+        // getWidgetCreator().createComboViewer(contents, "Source Vessel",
+        // allSourceVesselsMap, studySourceVessel.getSourceVessel(),
+        // "A source vessel should be selected", new ComboSelectionUpdate() {
+        // @Override
+        // public void doSelection(Object selectedObject) {
+        // studySourceVessel
+        // .setSourceVessel((SourceVesselWrapper) selectedObject);
+        // }
+        // });
+        //
+        // createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
+        // "Need Time Drawn", new String[0], studySourceVessel,
+        // "needTimeDrawn", null);
+        //
+        // createBoundWidgetWithLabel(contents, Button.class, SWT.BORDER,
+        // "Need Original Volume", new String[0], studySourceVessel,
+        // "needOriginalVolume", null);
     }
 
     @Override
     protected void okPressed() {
-        origStudySourceVessel.setSourceVessel(studySourceVessel
-            .getSourceVessel());
-        origStudySourceVessel.setNeedTimeDrawn(studySourceVessel
-            .getNeedTimeDrawn());
-        origStudySourceVessel.setNeedOriginalVolume(studySourceVessel
-            .getNeedOriginalVolume());
-        super.okPressed();
+        // origStudySourceVessel.setSourceVessel(studySourceVessel
+        // .getSourceVessel());
+        // origStudySourceVessel.setNeedTimeDrawn(studySourceVessel
+        // .getNeedTimeDrawn());
+        // origStudySourceVessel.setNeedOriginalVolume(studySourceVessel
+        // .getNeedOriginalVolume());
+        // super.okPressed();
     }
 
 }

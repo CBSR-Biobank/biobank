@@ -71,16 +71,19 @@ public class StudySourceVesselInfoTable extends
     @Override
     public TableRowData getCollectionModelObject(
         SourceSpecimenWrapper studySourceVessel) throws Exception {
-        TableRowData info = new TableRowData();
-        info.studySourceVessel = studySourceVessel;
-        Assert.isNotNull(studySourceVessel.getSourceVessel(),
-            "study source vessel has null for source vessel");
-        info.name = studySourceVessel.getSourceVessel().getName();
-        info.needTimeDrawn = (studySourceVessel.getNeedTimeDrawn() != null) ? (studySourceVessel
-            .getNeedTimeDrawn() ? "Yes" : "No") : "No";
-        info.needOriginalVolume = (studySourceVessel.getNeedOriginalVolume() != null) ? (studySourceVessel
-            .getNeedOriginalVolume() ? "Yes" : "No") : "No";
-        return info;
+        // TableRowData info = new TableRowData();
+        // info.studySourceVessel = studySourceVessel;
+        // Assert.isNotNull(studySourceVessel.getSourceVessel(),
+        // "study source vessel has null for source vessel");
+        // info.name = studySourceVessel.getSourceVessel().getName();
+        // info.needTimeDrawn = (studySourceVessel.getNeedTimeDrawn() != null) ?
+        // (studySourceVessel
+        // .getNeedTimeDrawn() ? "Yes" : "No") : "No";
+        // info.needOriginalVolume = (studySourceVessel.getNeedOriginalVolume()
+        // != null) ? (studySourceVessel
+        // .getNeedOriginalVolume() ? "Yes" : "No") : "No";
+        // return info;
+        return null;
     }
 
     @Override

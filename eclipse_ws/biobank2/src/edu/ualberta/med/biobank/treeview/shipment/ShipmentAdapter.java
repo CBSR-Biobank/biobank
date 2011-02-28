@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 
+@Deprecated
 public class ShipmentAdapter extends AdapterBase {
 
     public ShipmentAdapter(AdapterBase parent, CollectionEventWrapper shipment) {
@@ -30,14 +31,14 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        CollectionEventWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment, "shipment is null");
-        String label = shipment.getFormattedDateReceived();
-        if (shipment.getWaybill() != null) {
-            label += " (" + shipment.getWaybill() + ")";
-        }
-        return label;
-
+        // CollectionEventWrapper shipment = getWrapper();
+        // Assert.isNotNull(shipment, "shipment is null");
+        // String label = shipment.getFormattedDateReceived();
+        // if (shipment.getWaybill() != null) {
+        // label += " (" + shipment.getWaybill() + ")";
+        // }
+        // return label;
+        return null;
     }
 
     @Override
@@ -81,8 +82,9 @@ public class ShipmentAdapter extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        getWrapper().reload();
-        return getWrapper().getSpecimenCollection();
+        // getWrapper().reload();
+        // return getWrapper().getSpecimenCollection();
+        return null;
     }
 
     @Override
