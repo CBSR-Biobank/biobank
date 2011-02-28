@@ -19,10 +19,10 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.treeview.AliquotAdapter;
@@ -37,7 +37,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
 
     public static final String OK_MESSAGE = "Edit aliquot";
 
-    private AliquotWrapper aliquot;
+    private SpecimenWrapper aliquot;
 
     private ComboViewer activityStatusComboViewer;
 
@@ -50,8 +50,8 @@ public class AliquotEntryForm extends BiobankEntryForm {
     @Override
     protected void init() throws Exception {
         AliquotAdapter aliquotAdapter = (AliquotAdapter) adapter;
-        aliquot = aliquotAdapter.getAliquot();
-        aliquot.logEdit(aliquot.getCenterString());
+        aliquot = aliquotAdapter.getSpecimen();
+        aliquot.logEdit(aliquot.getSiteString());
         setPartName("Aliquot Entry");
     }
 
@@ -73,42 +73,42 @@ public class AliquotEntryForm extends BiobankEntryForm {
             .getStudy();
         study.reload();
 
-        List<SampleStorageWrapper> allowedSampleStorage = study
+        List<AliquotedSpecimenWrapper> allowedSampleStorage = study
             .getSampleStorageCollection();
 
-        List<SampleTypeWrapper> containerSampleTypeList = null;
+        List<SpecimenTypeWrapper> containerSampleTypeList = null;
         if (aliquot.hasParent()) {
             ContainerTypeWrapper ct = aliquot.getParent().getContainerType();
             ct.reload();
-            containerSampleTypeList = ct.getSampleTypeCollection();
+            containerSampleTypeList = ct.getSpecimenTypeCollection();
         }
 
-        List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
-        for (SampleStorageWrapper ss : allowedSampleStorage) {
-            SampleTypeWrapper sst = ss.getSampleType();
+        List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
+        for (AliquotedSpecimenWrapper ss : allowedSampleStorage) {
+            SpecimenTypeWrapper sst = ss.getSpecimenType();
             if (containerSampleTypeList == null) {
                 sampleTypes.add(sst);
             } else {
-                for (SampleTypeWrapper st : containerSampleTypeList) {
+                for (SpecimenTypeWrapper st : containerSampleTypeList) {
                     if (sst.equals(st))
                         sampleTypes.add(st);
                 }
             }
         }
-        if (aliquot.getSampleType() != null
-            && !sampleTypes.contains(aliquot.getSampleType())) {
-            sampleTypes.add(aliquot.getSampleType());
+        if (aliquot.getSpecimenType() != null
+            && !sampleTypes.contains(aliquot.getSpecimenType())) {
+            sampleTypes.add(aliquot.getSpecimenType());
         }
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         setTextValue(siteLabel, aliquot.getCenterString());
 
         sampleTypeComboViewer = createComboViewer(client, "Type", sampleTypes,
-            aliquot.getSampleType(), "Aliquot must have a sample type",
+            aliquot.getSpecimenType(), "Aliquot must have a sample type",
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    aliquot.setSampleType((SampleTypeWrapper) selectedObject);
+                    aliquot.setSpecimenType((SpecimenTypeWrapper) selectedObject);
                     aliquot.setQuantityFromType();
                     Double volume = aliquot.getQuantity();
                     if (volumeField != null) {
@@ -122,7 +122,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
             });
 
         createReadOnlyLabelledField(client, SWT.NONE, "Link Date",
-            aliquot.getFormattedLinkDate());
+            aliquot.getFormattedCreatedAt());
 
         volumeField = createReadOnlyLabelledField(client, SWT.NONE,
             "Volume (ml)", aliquot.getQuantity() == null ? null : aliquot
@@ -160,7 +160,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
 
         final BiobankText dateDrawn = createReadOnlyLabelledField(client,
             SWT.NONE, "Date Drawn", aliquot.getProcessingEvent()
-                .getFormattedDateDrawn());
+                .getFormattedCreatedAt());
 
         editPatientButton.addListener(SWT.MouseUp, new Listener() {
             @Override
@@ -176,7 +176,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
                     dateProcessed.setText(aliquot.getProcessingEvent()
                         .getFormattedDateProcessed());
                     dateDrawn.setText(aliquot.getProcessingEvent()
-                        .getFormattedDateDrawn());
+                        .getFormattedCreatedAt());
 
                     setDirty(true); // so changes can be saved
                 }
@@ -237,7 +237,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
             activityStatusComboViewer.getCombo().deselectAll();
         }
 
-        SampleTypeWrapper currentSampleType = aliquot.getSampleType();
+        SpecimenTypeWrapper currentSampleType = aliquot.getSpecimenType();
         if (currentSampleType != null)
             sampleTypeComboViewer.setSelection(new StructuredSelection(
                 currentSampleType));

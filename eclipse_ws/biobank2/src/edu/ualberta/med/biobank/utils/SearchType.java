@@ -10,7 +10,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -27,8 +27,8 @@ public enum SearchType {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             SiteWrapper site) throws Exception {
-            List<AliquotWrapper> res = new ArrayList<AliquotWrapper>();
-            AliquotWrapper aliquot = AliquotWrapper.getAliquot(
+            List<SpecimenWrapper> res = new ArrayList<SpecimenWrapper>();
+            SpecimenWrapper aliquot = SpecimenWrapper.getSpecimen(
                 SessionManager.getAppService(), searchString,
                 SessionManager.getUser());
             if (aliquot != null) {
@@ -43,7 +43,7 @@ public enum SearchType {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             SiteWrapper site) throws Exception {
-            return AliquotWrapper.getAliquotsInSiteWithPositionLabel(
+            return SpecimenWrapper.getSpecimensInSiteWithPositionLabel(
                 SessionManager.getAppService(), site, searchString);
         }
     },
@@ -52,9 +52,8 @@ public enum SearchType {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
             SiteWrapper site) throws Exception {
-            List<AliquotWrapper> aliquots = AliquotWrapper
-                .getAliquotsNonActiveInSite(SessionManager.getAppService(),
-                    site);
+            List<SpecimenWrapper> aliquots = SpecimenWrapper
+                .getSpecimensNonActiveInSite(SessionManager.getAppService(), site);
             return aliquots;
         }
 

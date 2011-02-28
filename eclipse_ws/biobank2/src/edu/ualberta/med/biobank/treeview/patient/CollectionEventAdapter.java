@@ -7,11 +7,10 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
@@ -22,7 +21,7 @@ public class CollectionEventAdapter extends AdapterBase {
     /**
      * Aliquot selected in this patient visit
      */
-    private AliquotWrapper selectedAliquot;
+    private SpecimenWrapper selectedAliquot;
 
     public CollectionEventAdapter(AdapterBase parent,
         CollectionEventWrapper collectionEventWrapper) {
@@ -36,11 +35,13 @@ public class CollectionEventAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        CollectionEventWrapper wrapper = getWrapper();
-        Assert.isNotNull(wrapper, "patientVisit is null");
-        String name = wrapper.getFormattedDateProcessed();
-        Collection<SourceVesselWrapper> samples = wrapper
-            .getSourceVesselCollection();
+        CollectionEventWrapper cevent = getWrapper();
+        Assert.isNotNull(cevent, "collection event is null");
+        // FIXME: what should be used for a name now?
+        String name = "" + cevent.getVisitNumber();
+
+        Collection<SpecimenWrapper> samples = cevent
+            .getSpecimenCollection(true);
         int total = 0;
         if (samples != null) {
             total = samples.size();
@@ -76,11 +77,11 @@ public class CollectionEventAdapter extends AdapterBase {
         return "Are you sure you want to delete this visit?";
     }
 
-    public void setSelectedAliquot(AliquotWrapper aliquot) {
+    public void setSelectedAliquot(SpecimenWrapper aliquot) {
         this.selectedAliquot = aliquot;
     }
 
-    public AliquotWrapper getSelectedAliquot() {
+    public SpecimenWrapper getSelectedAliquot() {
         return selectedAliquot;
     }
 

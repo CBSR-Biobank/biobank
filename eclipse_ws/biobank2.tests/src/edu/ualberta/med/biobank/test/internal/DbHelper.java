@@ -6,8 +6,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import java.util.Collection;
@@ -49,8 +47,8 @@ public class DbHelper {
             if (container.hasChildren()) {
                 deleteContainers(container.getChildren().values());
             }
-            if (container.hasAliquots()) {
-                deleteFromList(container.getAliquots().values());
+            if (container.hasSpecimens()) {
+                deleteFromList(container.getSpecimens().values());
             }
             container.reload();
             container.delete();
@@ -90,28 +88,9 @@ public class DbHelper {
         // visites liees au ship avec patient de la visit non lie au shipment
         for (PatientWrapper patient : patients) {
             patient.reload();
-            deletePatientVisits(patient.getProcessingEventCollection(false));
-            patient.reload();
-            for (SourceVesselWrapper s : patient
-                .getSourceVesselCollection(false)) {
-                s.reload();
-                s.delete();
-            }
+            deleteCollectionEvents(patient.getCollectionEventCollection(false));
             patient.reload();
             patient.delete();
-        }
-    }
-
-    public static void deletePatientVisits(List<ProcessingEventWrapper> visits)
-        throws Exception {
-        Assert.assertNotNull("appService is null", appService);
-        if (visits == null)
-            return;
-
-        for (ProcessingEventWrapper visit : visits) {
-            deleteFromList(visit.getAliquotCollection(false));
-            visit.reload();
-            visit.delete();
         }
     }
 
@@ -119,7 +98,7 @@ public class DbHelper {
         List<CollectionEventWrapper> cevents) throws Exception {
 
         for (CollectionEventWrapper ce : cevents) {
-            deleteFromList(ce.getSourceVesselCollection(false));
+            deleteFromList(ce.getSpecimenCollection(false));
             ce.reload();
             ce.delete();
         }
@@ -130,7 +109,7 @@ public class DbHelper {
         Assert.assertNotNull("appService is null", appService);
         for (ClinicWrapper clinic : clinics) {
             clinic.reload();
-            deleteCollectionEvents(clinic.getCollectionEventCollection(false));
+            deleteFromList(clinic.getOriginInfoCollection(false));
             clinic.delete();
         }
     }

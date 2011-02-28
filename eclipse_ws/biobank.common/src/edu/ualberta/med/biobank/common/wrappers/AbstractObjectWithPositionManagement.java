@@ -88,6 +88,11 @@ public abstract class AbstractObjectWithPositionManagement<T extends AbstractPos
         else
             top = getParent();
 
+        ContainerPathWrapper path = top.getContainerPath();
+        if (path != null) {
+            return path.getTopContainer();
+        }
+
         while (top != null && top.getParent() != null) {
             top = top.getParent();
         }

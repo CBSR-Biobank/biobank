@@ -13,17 +13,15 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.peer.AliquotPeer;
+import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.peer.PvAttrPeer;
-import edu.ualberta.med.biobank.common.peer.StudyPvAttrPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.StudyEventAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.PvAttr;
+import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -31,11 +29,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
-    private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
-
-    private Map<String, PvAttrWrapper> pvAttrMap;
-
-    private Set<SourceVesselWrapper> deletedSourceVessels = new HashSet<SourceVesselWrapper>();
+    private Set<SpecimenWrapper> deletedChildSpecimens = new HashSet<SpecimenWrapper>();
 
     public ProcessingEventWrapper(WritableApplicationService appService,
         ProcessingEvent wrappedObject) {
@@ -51,220 +45,52 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      * 
      * @throws BiobankCheckException
      */
-    public void addAliquots(List<AliquotWrapper> aliquots)
+    public void addChildSpecimens(List<SpecimenWrapper> childSpecimens)
         throws BiobankCheckException {
-        if (aliquots != null && aliquots.size() > 0) {
-            List<SampleStorageWrapper> sampleStorages = getPatient().getStudy()
-                .getSampleStorageCollection(false);
-            if (sampleStorages == null || sampleStorages.size() == 0) {
-                throw new BiobankCheckException(
-                    "Can only add aliquots in a visit which study has sample storages");
-            }
+        SpecimenWrapper parentSpecimen = getParentSpecimen();
 
-            Collection<Aliquot> allAliquotObjects = new HashSet<Aliquot>();
-            List<AliquotWrapper> allAliquotWrappers = new ArrayList<AliquotWrapper>();
-            // already added
-            List<AliquotWrapper> currentList = getAliquotCollection(false);
-            if (currentList != null) {
-                for (AliquotWrapper aliquot : currentList) {
-                    allAliquotObjects.add(aliquot.getWrappedObject());
-                    allAliquotWrappers.add(aliquot);
-                }
-            }
-            // new added
-
-            // will set the adequate volume to the added aliquots
-            Map<Integer, Double> typesVolumes = new HashMap<Integer, Double>();
-            for (SampleStorageWrapper ss : sampleStorages) {
-                typesVolumes.put(ss.getSampleType().getId(), ss.getVolume());
-            }
-            for (AliquotWrapper aliquot : aliquots) {
-                aliquot.setQuantity(typesVolumes.get(aliquot.getSampleType()
-                    .getId()));
-                aliquot.setProcessingEvent(this);
-                allAliquotObjects.add(aliquot.getWrappedObject());
-                allAliquotWrappers.add(aliquot);
-            }
-            setWrapperCollection(ProcessingEventPeer.ALIQUOT_COLLECTION,
-                allAliquotWrappers);
-        }
-    }
-
-    private Map<String, StudyPvAttrWrapper> getStudyPvAttrMap() {
-        if (studyPvAttrMap != null)
-            return studyPvAttrMap;
-
-        studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
-        if (getPatient() != null && getPatient().getStudy() != null) {
-            Collection<StudyPvAttrWrapper> studyPvAttrCollection = getPatient()
-                .getStudy().getStudyPvAttrCollection();
-            if (studyPvAttrCollection != null) {
-                for (StudyPvAttrWrapper studyPvAttr : studyPvAttrCollection) {
-                    studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
-                }
-            }
-        }
-        return studyPvAttrMap;
-    }
-
-    private Map<String, PvAttrWrapper> getPvAttrMap() {
-        getStudyPvAttrMap();
-        if (pvAttrMap != null)
-            return pvAttrMap;
-
-        pvAttrMap = new HashMap<String, PvAttrWrapper>();
-        List<PvAttrWrapper> pvAttrCollection = getPvAttrCollection(false);
-        if (pvAttrCollection != null) {
-            for (PvAttrWrapper pvAttr : pvAttrCollection) {
-                pvAttrMap.put(pvAttr.getStudyPvAttr().getLabel(), pvAttr);
-            }
-        }
-        return pvAttrMap;
-    }
-
-    public String[] getPvAttrLabels() {
-        getPvAttrMap();
-        return pvAttrMap.keySet().toArray(new String[] {});
-    }
-
-    public String getPvAttrValue(String label) throws Exception {
-        getPvAttrMap();
-        PvAttrWrapper pvAttr = pvAttrMap.get(label);
-        if (pvAttr == null) {
-            StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
-            // make sure "label" is a valid study pv attr
-            if (studyPvAttr == null) {
-                throw new Exception("StudyPvAttr with label \"" + label
-                    + "\" is invalid");
-            }
-            // not assigned yet so return null
-            return null;
-        }
-        return pvAttr.getValue();
-    }
-
-    public String getPvAttrTypeName(String label) throws Exception {
-        getPvAttrMap();
-        PvAttrWrapper pvAttr = pvAttrMap.get(label);
-        StudyPvAttrWrapper studyPvAttr = null;
-        if (pvAttr != null) {
-            studyPvAttr = pvAttr.getStudyPvAttr();
-        } else {
-            studyPvAttr = studyPvAttrMap.get(label);
-            // make sure "label" is a valid study pv attr
-            if (studyPvAttr == null) {
-                throw new Exception("StudyPvAttr withr label \"" + label
-                    + "\" does not exist");
-            }
-        }
-        return studyPvAttr.getPvAttrType().getName();
-    }
-
-    public String[] getPvAttrPermissible(String label) throws Exception {
-        getPvAttrMap();
-        PvAttrWrapper pvAttr = pvAttrMap.get(label);
-        StudyPvAttrWrapper studyPvAttr = null;
-        if (pvAttr != null) {
-            studyPvAttr = pvAttr.getStudyPvAttr();
-        } else {
-            studyPvAttr = studyPvAttrMap.get(label);
-            // make sure "label" is a valid study pv attr
-            if (studyPvAttr == null) {
-                throw new Exception("PvAttr for label \"" + label
-                    + "\" does not exist");
-            }
-        }
-        String permissible = studyPvAttr.getPermissible();
-        if (permissible == null) {
-            return null;
-        }
-        return permissible.split(";");
-    }
-
-    /**
-     * Assigns a value to a patient visit attribute. The value is parsed for
-     * correctness.
-     * 
-     * @param label The attribute's label.
-     * @param value The value to assign.
-     * @throws Exception when assigning a label of type "select_single" or
-     *             "select_multiple" and the value is not one of the permissible
-     *             ones.
-     * @throws NumberFormatException when assigning a label of type "number" and
-     *             the value is not a valid double number.
-     * @throws ParseException when assigning a label of type "date_time" and the
-     *             value is not a valid date and time.
-     * @see edu.ualberta.med.biobank
-     *      .common.formatters.DateFormatter.DATE_TIME_FORMAT
-     */
-    public void setPvAttrValue(String label, String value) throws Exception {
-        getPvAttrMap();
-        PvAttrWrapper pvAttr = pvAttrMap.get(label);
-        StudyPvAttrWrapper studyPvAttr = null;
-
-        if (pvAttr != null) {
-            studyPvAttr = pvAttr.getStudyPvAttr();
-        } else {
-            studyPvAttr = studyPvAttrMap.get(label);
-            if (studyPvAttr == null) {
-                throw new Exception("no StudyPvAttr found for label \"" + label
-                    + "\"");
-            }
+        if (parentSpecimen == null) {
+            throw new NullPointerException();
         }
 
-        if (!studyPvAttr.getActivityStatus().isActive()) {
-            throw new Exception("attribute for label \"" + label
-                + "\" is locked, changes not premitted");
+        if (childSpecimens == null || childSpecimens.isEmpty()) {
+            return;
         }
 
-        if (value != null) {
-            // validate the value
-            value = value.trim();
-            if (value.length() > 0) {
-                String type = studyPvAttr.getPvAttrType().getName();
-                List<String> permissibleSplit = null;
+        List<AliquotedSpecimenWrapper> sampleStorages = getParentSpecimen()
+            .getCollectionEvent().getPatient().getStudy()
+            .getAliquotedSpecimenCollection(false);
+        if (sampleStorages == null || sampleStorages.size() == 0) {
+            throw new BiobankCheckException(
+                "Can only add aliquots in a visit which study has sample storages");
+        }
 
-                if (type.equals("select_single")
-                    || type.equals("select_multiple")) {
-                    String permissible = studyPvAttr.getPermissible();
-                    if (permissible != null) {
-                        permissibleSplit = Arrays
-                            .asList(permissible.split(";"));
-                    }
-                }
-
-                if (type.equals("select_single")) {
-                    if (!permissibleSplit.contains(value)) {
-                        throw new Exception("value " + value
-                            + "is invalid for label \"" + label + "\"");
-                    }
-                } else if (type.equals("select_multiple")) {
-                    for (String singleVal : value.split(";")) {
-                        if (!permissibleSplit.contains(singleVal)) {
-                            throw new Exception("value " + singleVal + " ("
-                                + value + ") is invalid for label \"" + label
-                                + "\"");
-                        }
-                    }
-                } else if (type.equals("number")) {
-                    Double.parseDouble(value);
-                } else if (type.equals("date_time")) {
-                    DateFormatter.dateFormatter.parse(value);
-                } else if (type.equals("text")) {
-                    // do nothing
-                } else {
-                    throw new Exception("type \"" + type + "\" not tested");
-                }
+        Collection<Specimen> allSpecimenObjects = new HashSet<Specimen>();
+        List<SpecimenWrapper> allSpecimenWrappers = new ArrayList<SpecimenWrapper>();
+        // already added
+        List<SpecimenWrapper> currentList = getChildSpecimenCollection(false);
+        if (currentList != null) {
+            for (SpecimenWrapper aliquot : currentList) {
+                allSpecimenObjects.add(aliquot.getWrappedObject());
+                allSpecimenWrappers.add(aliquot);
             }
         }
+        // new added
 
-        if (pvAttr == null) {
-            pvAttr = new PvAttrWrapper(appService);
-            pvAttr.setProcessingEvent(this);
-            pvAttr.setStudyPvAttr(studyPvAttr);
-            pvAttrMap.put(label, pvAttr);
+        // will set the adequate volume to the added aliquots
+        Map<Integer, Double> typesVolumes = new HashMap<Integer, Double>();
+        for (AliquotedSpecimenWrapper ss : sampleStorages) {
+            typesVolumes.put(ss.getSpecimenType().getId(), ss.getVolume());
         }
-        pvAttr.setValue(value);
+        for (SpecimenWrapper aliquot : childSpecimens) {
+            aliquot.setQuantity(typesVolumes.get(aliquot.getSpecimenType()
+                .getId()));
+            aliquot.setProcessingEvent(this);
+            allSpecimenObjects.add(aliquot.getWrappedObject());
+            allSpecimenWrappers.add(aliquot);
+        }
+        setWrapperCollection(ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION,
+            allSpecimenWrappers);
     }
 
     @Override
@@ -279,15 +105,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     @Override
     protected void persistDependencies(ProcessingEvent origObject)
         throws Exception {
-        if (pvAttrMap != null) {
-            setWrapperCollection(ProcessingEventPeer.PV_ATTR_COLLECTION,
-                pvAttrMap.values());
-        }
-        deleteSourceVessels();
+        deleteSpecimens();
     }
 
-    private void deleteSourceVessels() throws Exception {
-        for (SourceVesselWrapper ss : deletedSourceVessels) {
+    private void deleteSpecimens() throws Exception {
+        for (SpecimenWrapper ss : deletedChildSpecimens) {
             if (!ss.isNew()) {
                 ss.delete();
             }
@@ -296,37 +118,34 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (getAliquotsCount(false) > 0) {
-            throw new BiobankCheckException("Unable to delete patient visit "
-                + getDateProcessed()
-                + " since it has samples stored in database.");
+        if (getChildSpecimenCount(false) > 0) {
+            throw new BiobankCheckException(
+                "Unable to delete processing event " + getCreatedAt()
+                    + " since it has child specimens stored in database.");
         }
     }
 
-    private static final String ALIQUOT_COUNT_QRY = "select count(aliquot) from "
-        + Aliquot.class.getName()
+    private static final String CHILD_SPECIMEN_COUNT_QRY = "select count(aliquot) from "
+        + Specimen.class.getName()
         + " as aliquot where aliquot."
-        + Property.concatNames(AliquotPeer.PROCESSING_EVENT,
+        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
             ProcessingEventPeer.ID) + "=?";
 
-    public long getAliquotsCount(boolean fast) throws BiobankException,
+    public long getChildSpecimenCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
+            HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
-        List<AliquotWrapper> list = getAliquotCollection(false);
-        if (list == null)
-            return 0;
-        return getAliquotCollection(false).size();
+        return getChildSpecimenCollection(false).size();
     }
 
     @Override
     public int compareTo(ModelWrapper<ProcessingEvent> wrapper) {
         if (wrapper instanceof ProcessingEventWrapper) {
-            Date v1Date = getProperty(ProcessingEventPeer.DATE_PROCESSED);
-            Date v2Date = wrapper.wrappedObject.getDateProcessed();
+            Date v1Date = getCreatedAt();
+            Date v2Date = ((ProcessingEventWrapper) wrapper).getCreatedAt();
             if (v1Date != null && v2Date != null) {
                 return v1Date.compareTo(v2Date);
             }
@@ -336,42 +155,44 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     @Override
     public void resetInternalFields() {
-        pvAttrMap = null;
-        studyPvAttrMap = null;
-        deletedSourceVessels.clear();
+        deletedChildSpecimens.clear();
     }
 
     @Override
     public String toString() {
         return "Date Processed:" + getFormattedDateProcessed()
-            + " / Date Drawn: " + getFormattedDateDrawn();
+            + " / Date Drawn: " + getFormattedCreatedAt();
     }
 
-    public String getFormattedDateDrawn() {
-        return DateFormatter.formatAsDate(getDateDrawn());
+    public String getFormattedCreatedAt() {
+        return DateFormatter.formatAsDate(getCreatedAt());
     }
 
+    @Deprecated
     public String getFormattedDateProcessed() {
-        return DateFormatter.formatAsDate(getDateProcessed());
+        // use getFormattedCreatedAt()
+        return null;
     }
 
     @Override
     protected Log getLogMessage(String action, String site, String details) {
         Log log = new Log();
         log.setAction(action);
-        PatientWrapper patient = getPatient();
+        CollectionEventWrapper cevent = getParentSpecimen()
+            .getCollectionEvent();
+        PatientWrapper patient = cevent.getPatient();
         if (site == null) {
             log.setSite(getCenter().getNameShort());
         } else {
             log.setSite(site);
         }
         log.setPatientNumber(patient.getPnumber());
-        Date dateProcesssed = getDateProcessed();
-        if (dateProcesssed != null) {
-            details += " Date Processed: " + getFormattedDateProcessed();
+        Date createdAt = getCreatedAt();
+        if (createdAt != null) {
+            details += " Date Processed: " + getFormattedCreatedAt();
         }
         try {
-            String worksheet = getPvAttrValue("Worksheet");
+            String worksheet = cevent.getEventAttrValue("Worksheet");
             if (worksheet != null) {
                 details += " - Worksheet: " + worksheet;
             }
@@ -383,10 +204,12 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pva.processingEvent from "
-        + PvAttr.class.getName()
+        + EventAttr.class.getName()
         + " pva where pva."
-        + Property.concatNames(PvAttrPeer.STUDY_PV_ATTR, StudyPvAttrPeer.LABEL)
-        + "? and pva." + PvAttrPeer.VALUE.getName() + "=?";
+        + Property.concatNames(EventAttrPeer.STUDY_EVENT_ATTR,
+            StudyEventAttrPeer.LABEL)
+        + "? and pva."
+        + EventAttrPeer.VALUE.getName() + "=?";
 
     public static List<ProcessingEventWrapper> getProcessingEventsWithWorksheet(
         WritableApplicationService appService, String worksheetNumber)
@@ -407,8 +230,9 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return getCenter();
     }
 
-    public List<AliquotWrapper> getAliquotCollection() {
-        return getAliquotCollection(false);
+    @Deprecated
+    public List<SpecimenWrapper> getSpecimenCollection() {
+        return null;
     }
 
     @Deprecated

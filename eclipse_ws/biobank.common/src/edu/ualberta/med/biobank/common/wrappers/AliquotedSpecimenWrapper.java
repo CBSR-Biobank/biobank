@@ -1,19 +1,19 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.base.SampleStorageBaseWrapper;
-import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.common.wrappers.base.AliquotedSpecimenBaseWrapper;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class SampleStorageWrapper extends SampleStorageBaseWrapper {
+public class AliquotedSpecimenWrapper extends AliquotedSpecimenBaseWrapper {
 
-    public SampleStorageWrapper(WritableApplicationService appService,
-        SampleStorage wrappedObject) {
+    public AliquotedSpecimenWrapper(WritableApplicationService appService,
+        AliquotedSpecimen wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public SampleStorageWrapper(WritableApplicationService appService) {
+    public AliquotedSpecimenWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -23,10 +23,10 @@ public class SampleStorageWrapper extends SampleStorageBaseWrapper {
     }
 
     @Override
-    public int compareTo(ModelWrapper<SampleStorage> wrapper) {
-        if (wrapper instanceof SampleStorageWrapper) {
-            String name1 = wrappedObject.getSampleType().getName();
-            String name2 = wrapper.wrappedObject.getSampleType().getName();
+    public int compareTo(ModelWrapper<AliquotedSpecimen> wrapper) {
+        if (wrapper instanceof AliquotedSpecimenWrapper) {
+            String name1 = wrappedObject.getSpecimenType().getName();
+            String name2 = wrapper.wrappedObject.getSpecimenType().getName();
             if (name1 != null && name2 != null) {
                 return name1.compareTo(name2);
             }
@@ -36,7 +36,7 @@ public class SampleStorageWrapper extends SampleStorageBaseWrapper {
 
     @Override
     public String toString() {
-        return new StringBuilder(getSampleType().getName()).append("/")
+        return new StringBuilder(getSpecimenType().getName()).append("/")
             .append(getQuantity()).append("/").append(getActivityStatus())
             .toString();
     }

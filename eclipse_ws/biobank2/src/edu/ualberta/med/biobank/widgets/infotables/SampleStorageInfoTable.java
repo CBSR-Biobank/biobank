@@ -7,17 +7,18 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
+@Deprecated
 public class SampleStorageInfoTable extends
-    InfoTableWidget<SampleStorageWrapper> {
+    InfoTableWidget<AliquotedSpecimenWrapper> {
 
     private static final int PAGE_SIZE_ROWS = 5;
 
     protected class TableRowData {
-        public SampleStorageWrapper sampleStorage;
+        public AliquotedSpecimenWrapper sampleStorage;
         public String typeName;
         public Double volume;
         public Integer quantity;
@@ -35,16 +36,16 @@ public class SampleStorageInfoTable extends
         "Volume (ml)", "Quantity", "Activity status" };
 
     public SampleStorageInfoTable(Composite parent,
-        List<SampleStorageWrapper> sampleStorageCollection) {
+        List<AliquotedSpecimenWrapper> sampleStorageCollection) {
         super(parent, sampleStorageCollection, HEADINGS, PAGE_SIZE_ROWS);
     }
 
     @Override
     public TableRowData getCollectionModelObject(
-        SampleStorageWrapper sampleStorage) throws Exception {
+        AliquotedSpecimenWrapper sampleStorage) throws Exception {
         TableRowData info = new TableRowData();
         info.sampleStorage = sampleStorage;
-        SampleTypeWrapper type = sampleStorage.getSampleType();
+        SpecimenTypeWrapper type = sampleStorage.getSpecimenType();
         Assert.isNotNull(type, "sample storage - sample type is null");
         info.typeName = type.getName();
         info.volume = sampleStorage.getVolume();
@@ -92,7 +93,7 @@ public class SampleStorageInfoTable extends
     }
 
     @Override
-    public SampleStorageWrapper getSelection() {
+    public AliquotedSpecimenWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

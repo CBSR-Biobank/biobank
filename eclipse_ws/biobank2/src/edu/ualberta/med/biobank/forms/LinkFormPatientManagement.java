@@ -119,11 +119,9 @@ public class LinkFormPatientManagement {
         viewerCollectionEvents.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                if (element instanceof CollectionEventWrapper) {
-                    CollectionEventWrapper event = (CollectionEventWrapper) element;
-                    return Messages.getString("ScanLink.visit.label",
-                        event.getVisitNumber(), event.getFormattedDateDrawn());
-                }
+                if (element instanceof ProcessingEventWrapper)
+                    return ((ProcessingEventWrapper) element)
+                        .getFormattedCreatedAt();
                 return element.toString();
             }
         });

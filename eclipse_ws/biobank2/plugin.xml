@@ -165,18 +165,6 @@
                values="edu.ualberta.med.biobank.handlers.OpenSampleProcessParameters">
          </commandParameter>
       </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.debug.cbsrConfig"
-            name="Create CBSR Configuration">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
-            name="Create CBSR Configuration with data">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.debug.calgaryConfig"
-            name="Create Calgary Configuration">
-      </command>
        <command
              categoryId="org.eclipse.ui.category.edit"
              id="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
@@ -508,28 +496,6 @@
                 </reference>
                </or>
                </not>
-            </and>
-         </enabledWhen>
-      </handler>
-      <handler
-            class="org.eclipse.ui.internal.handlers.NewEditorHandler"
-            commandId="org.eclipse.ui.window.newEditor">
-         <enabledWhen>
-            <and>
-               <with
-                  variable="activeEditor">
-                  <instanceof
-                     value="org.eclipse.ui.IEditorPart">
-                  </instanceof>
-               </with>
-               <with
-                  variable="activeEditor">
-                  <not>
-                     <instanceof
-                        value="edu.ualberta.med.biobank.forms.BiobankFormBase">
-                     </instanceof>
-                  </not>
-               </with>
             </and>
          </enabledWhen>
       </handler>

@@ -11,20 +11,15 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -69,8 +64,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private DateTimeWidget dateReceivedWidget;
 
-    private ComboViewer activityStatusComboViewer;
-
     private Label departedLabel;
 
     private NotNullValidator departedValidator;
@@ -93,8 +86,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         String tabName;
         if (shipment.isNew()) {
             tabName = "New Shipment";
-            shipment.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
         } else {
             tabName = "Shipment " + shipment.getFormattedDateReceived();
         }
@@ -179,67 +170,67 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 selectedClinic));
         }
 
-        ShippingMethodWrapper selectedShippingMethod = shipment
-            .getShippingMethod();
-        shippingMethodComboViewer = createComboViewer(client,
-            "Shipping Method",
-            ShippingMethodWrapper.getShippingMethods(appService),
-            selectedShippingMethod, null, new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    shipment
-                        .setShippingMethod((ShippingMethodWrapper) selectedObject);
-                    if (shipment.getShippingMethod() != null) {
-                        if (departedWidget != null) {
-                            activateDepartedWidget(shipment.needDeparted());
-                        }
-                    }
-                }
-            });
-        if (getFirstControl() == null)
-            setFirstControl(shippingMethodComboViewer.getCombo());
-
-        if (shipment.getDeparted() == null)
-            shipment.setDeparted(new Date());
-
-        departedLabel = widgetCreator.createLabel(client, "Departed");
-        departedLabel.setLayoutData(new GridData(
-            GridData.VERTICAL_ALIGN_BEGINNING));
-        departedValidator = new NotNullValidator("Departed should be set");
-        departedWidget = createDateTimeWidget(client, departedLabel,
-            shipment.getDeparted(), shipment, "departed", departedValidator,
-            SWT.DATE | SWT.TIME, DATE_SHIPPED_BINDING);
-        activateDepartedWidget(shipment.needDeparted());
-
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Box Number", null, shipment, "boxNumber", null);
-
-        if (shipment.getDateReceived() == null)
-            shipment.setDateReceived(new Date());
-
-        dateReceivedWidget = createDateTimeWidget(client, "Date Received",
-            shipment.getDateReceived(), shipment, "dateReceived",
-            new NotNullValidator("Date received should be set"));
-
-        activityStatusComboViewer = createComboViewer(client,
-            "Activity Status",
-            ActivityStatusWrapper.getAllActivityStatuses(appService),
-            shipment.getActivityStatus(),
-            "Container must have an activity status",
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    shipment
-                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
-                }
-            });
-        if (shipment.getActivityStatus() != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                shipment.getActivityStatus()));
-        }
-
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, shipment, "comment", null);
+        // ShippingMethodWrapper selectedShippingMethod = shipment
+        // .getShippingMethod();
+        // shippingMethodComboViewer = createComboViewer(client,
+        // "Shipping Method",
+        // ShippingMethodWrapper.getShippingMethods(appService),
+        // selectedShippingMethod, null, new ComboSelectionUpdate() {
+        // @Override
+        // public void doSelection(Object selectedObject) {
+        // shipment
+        // .setShippingMethod((ShippingMethodWrapper) selectedObject);
+        // if (shipment.getShippingMethod() != null) {
+        // if (departedWidget != null) {
+        // activateDepartedWidget(shipment.needDeparted());
+        // }
+        // }
+        // }
+        // });
+        // if (getFirstControl() == null)
+        // setFirstControl(shippingMethodComboViewer.getCombo());
+        //
+        // if (shipment.getDeparted() == null)
+        // shipment.setDeparted(new Date());
+        //
+        // departedLabel = widgetCreator.createLabel(client, "Departed");
+        // departedLabel.setLayoutData(new GridData(
+        // GridData.VERTICAL_ALIGN_BEGINNING));
+        // departedValidator = new NotNullValidator("Departed should be set");
+        // departedWidget = createDateTimeWidget(client, departedLabel,
+        // shipment.getDeparted(), shipment, "departed", departedValidator,
+        // SWT.DATE | SWT.TIME, DATE_SHIPPED_BINDING);
+        // activateDepartedWidget(shipment.needDeparted());
+        //
+        // createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
+        // "Box Number", null, shipment, "boxNumber", null);
+        //
+        // if (shipment.getDateReceived() == null)
+        // shipment.setDateReceived(new Date());
+        //
+        // dateReceivedWidget = createDateTimeWidget(client, "Date Received",
+        // shipment.getDateReceived(), shipment, "dateReceived",
+        // new NotNullValidator("Date received should be set"));
+        //
+        // activityStatusComboViewer = createComboViewer(client,
+        // "Activity Status",
+        // ActivityStatusWrapper.getAllActivityStatuses(appService),
+        // shipment.getActivityStatus(),
+        // "Container must have an activity status",
+        // new ComboSelectionUpdate() {
+        // @Override
+        // public void doSelection(Object selectedObject) {
+        // shipment
+        // .setActivityStatus((ActivityStatusWrapper) selectedObject);
+        // }
+        // });
+        // if (shipment.getActivityStatus() != null) {
+        // activityStatusComboViewer.setSelection(new StructuredSelection(
+        // shipment.getActivityStatus()));
+        // }
+        //
+        // createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
+        // "Comments", null, shipment, "comment", null);
 
     }
 
@@ -306,24 +297,24 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        if (!Boolean.TRUE.equals(shipment.getClinic().getSendsShipments())) {
-            shipment.setWaybill(null);
-        }
-        if (!shipment.needDeparted()) {
-            shipment.setDeparted(null);
-        }
-
-        shipment.persist();
-
-        Display.getDefault().syncExec(new Runnable() {
-            @Override
-            public void run() {
-                ShipmentAdministrationView.reloadCurrent();
-                PatientAdministrationView.reloadCurrent();
-                if (!shipment.isReceivedToday())
-                    ShipmentAdministrationView.showShipment(shipment);
-            }
-        });
+        // if (!Boolean.TRUE.equals(shipment.getClinic().getSendsShipments())) {
+        // shipment.setWaybill(null);
+        // }
+        // if (!shipment.needDeparted()) {
+        // shipment.setDeparted(null);
+        // }
+        //
+        // shipment.persist();
+        //
+        // Display.getDefault().syncExec(new Runnable() {
+        // @Override
+        // public void run() {
+        // ShipmentAdministrationView.reloadCurrent();
+        // PatientAdministrationView.reloadCurrent();
+        // if (!shipment.isReceivedToday())
+        // ShipmentAdministrationView.showShipment(shipment);
+        // }
+        // });
     }
 
     @Override
@@ -337,20 +328,13 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         dateReceivedWidget.setDate(new Date());
 
         shipmentPatientsWidget.updateList();
-        ShippingMethodWrapper shipMethod = shipment.getShippingMethod();
-        if (shipMethod != null) {
-            shippingMethodComboViewer.setSelection(new StructuredSelection(
-                shipMethod));
-        } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
-            shippingMethodComboViewer.getCombo().deselectAll();
-        }
-        ActivityStatusWrapper activity = shipment.getActivityStatus();
-        if (activity != null) {
-            activityStatusComboViewer.setSelection(new StructuredSelection(
-                activity));
-        } else if (activityStatusComboViewer.getCombo().getItemCount() > 1) {
-            activityStatusComboViewer.getCombo().deselectAll();
-        }
+        // ShippingMethodWrapper shipMethod = shipment.getShippingMethod();
+        // if (shipMethod != null) {
+        // shippingMethodComboViewer.setSelection(new StructuredSelection(
+        // shipMethod));
+        // } else if (shippingMethodComboViewer.getCombo().getItemCount() > 1) {
+        // shippingMethodComboViewer.getCombo().deselectAll();
+        // }
     }
 
 }

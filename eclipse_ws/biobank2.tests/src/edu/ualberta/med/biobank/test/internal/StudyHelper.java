@@ -55,7 +55,8 @@ public class StudyHelper extends DbHelper {
         for (StudyWrapper study : createdStudies) {
             study.reload();
             deletePatients(study.getPatientCollection());
-            deleteFromList(study.getSampleStorageCollection(false));
+            deleteFromList(study.getAliquotedSpecimenCollection(false));
+            deleteFromList(study.getSourceSpecimenCollection(false));
             study.reload();
             study.delete();
         }

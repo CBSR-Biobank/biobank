@@ -6,10 +6,10 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ShippingMethodBaseWrapper;
-import edu.ualberta.med.biobank.model.CollectionEvent;
+import edu.ualberta.med.biobank.model.ShipmentInfo;
 import edu.ualberta.med.biobank.model.ShippingMethod;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -36,7 +36,6 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
             throw new BiobankCheckException(
                 "Cannot delete this shipping company: shipments are still using it");
         }
-
     }
 
     @Override
@@ -62,27 +61,21 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
         return 0;
     }
 
-    @SuppressWarnings("unchecked")
-    public List<AbstractShipmentWrapper<?>> getAllShipmentCollection(
-        boolean sort) {
-        return getWrapperCollection(ShippingMethodPeer.SHIPMENT_COLLECTION,
-            AbstractShipmentWrapper.class, sort);
+    @SuppressWarnings("unused")
+    @Deprecated
+    public List<ShipmentInfoWrapper> getAllShipmentCollection(boolean sort) {
+        return null;
     }
 
     public List<CollectionEventWrapper> getCollectionEventCollection() {
         return getCollectionEventCollection(false);
     }
 
+    @SuppressWarnings("unused")
+    @Deprecated
     public List<CollectionEventWrapper> getCollectionEventCollection(
         boolean sort) {
-        List<AbstractShipmentWrapper<?>> allShipmentCollection = getAllShipmentCollection(sort);
-        List<CollectionEventWrapper> shipmentCollection = new ArrayList<CollectionEventWrapper>();
-        for (AbstractShipmentWrapper<?> ship : allShipmentCollection) {
-            if (ship instanceof CollectionEventWrapper) {
-                shipmentCollection.add((CollectionEventWrapper) ship);
-            }
-        }
-        return shipmentCollection;
+        return null;
     }
 
     public static List<ShippingMethodWrapper> getShippingMethods(
@@ -101,9 +94,9 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
         return getName();
     }
 
-    private static final String IS_USED_QRY = "select count(ce) from "
-        + CollectionEvent.class.getName() + " as ce where ce."
-        + CollectionEventPeer.SHIPPING_METHOD.getName() + "=?)";
+    private static final String IS_USED_QRY = "select count(si) from "
+        + ShipmentInfo.class.getName() + " as si where si."
+        + ShipmentInfoPeer.SHIPPING_METHOD.getName() + "=?";
 
     public boolean isUsed() throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(IS_USED_QRY,

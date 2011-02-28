@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.layout.GridLayout;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
 
@@ -16,14 +16,14 @@ public class AliquotListViewForm extends BiobankViewForm {
 
     private AliquotListInfoTable aliquotsWidget;
 
-    private List<AliquotWrapper> aliquots;
+    private List<SpecimenWrapper> aliquots;
 
     @SuppressWarnings("unchecked")
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter == null, "adapter should be null");
         FormInput input = (FormInput) getEditorInput();
-        aliquots = (List<AliquotWrapper>) input.getAdapter(ArrayList.class);
+        aliquots = (List<SpecimenWrapper>) input.getAdapter(ArrayList.class);
         Assert.isNotNull(aliquots, "aliquots are null");
         setPartName("Non Active Aliquots");
     }

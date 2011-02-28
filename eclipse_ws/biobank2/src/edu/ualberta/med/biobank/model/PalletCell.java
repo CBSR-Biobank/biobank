@@ -7,8 +7,8 @@ import java.util.TreeMap;
 
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -21,13 +21,13 @@ public class PalletCell extends Cell {
 
     private String title;
 
-    private SampleTypeWrapper type;
+    private SpecimenTypeWrapper type;
 
-    private AliquotWrapper aliquot;
+    private SpecimenWrapper aliquot;
 
     private ScanCell scanCell;
 
-    private AliquotWrapper expectedAliquot;
+    private SpecimenWrapper expectedAliquot;
 
     public PalletCell(ScanCell scanCell) {
         this.scanCell = scanCell;
@@ -54,8 +54,8 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        List<AliquotWrapper> aliquots = DebugUtil.getRandomLinkedAliquots(
-            appService, siteId);
+        List<SpecimenWrapper> aliquots = DebugUtil
+            .getRandomLinkedAliquots(appService, siteId);
         if (aliquots.size() > 1) {
             int row = 2;
             int col = 3;
@@ -79,7 +79,7 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId, Integer studyId)
         throws Exception {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
-        List<AliquotWrapper> randomAliquots = DebugUtil
+        List<SpecimenWrapper> randomAliquots = DebugUtil
             .getRandomAssignedAliquots(appService, siteId, studyId);
         if (randomAliquots.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
@@ -96,7 +96,7 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
-        List<AliquotWrapper> randomAliquots = DebugUtil
+        List<SpecimenWrapper> randomAliquots = DebugUtil
             .getRandomNonAssignedNonDispatchedAliquots(appService, siteId);
         int i = 0;
         while (i < randomAliquots.size() && i < 30) {
@@ -149,19 +149,19 @@ public class PalletCell extends Cell {
         this.information = information;
     }
 
-    public SampleTypeWrapper getType() {
+    public SpecimenTypeWrapper getType() {
         return type;
     }
 
-    public void setType(SampleTypeWrapper type) {
+    public void setType(SpecimenTypeWrapper type) {
         this.type = type;
     }
 
-    public void setAliquot(AliquotWrapper aliquot) {
+    public void setSpecimen(SpecimenWrapper aliquot) {
         this.aliquot = aliquot;
     }
 
-    public AliquotWrapper getAliquot() {
+    public SpecimenWrapper getSpecimen() {
         return aliquot;
     }
 
@@ -208,11 +208,11 @@ public class PalletCell extends Cell {
         return cell != null && cell.getValue() != null;
     }
 
-    public void setExpectedAliquot(AliquotWrapper expectedAliquot) {
+    public void setExpectedAliquot(SpecimenWrapper expectedAliquot) {
         this.expectedAliquot = expectedAliquot;
     }
 
-    public AliquotWrapper getExpectedAliquot() {
+    public SpecimenWrapper getExpectedAliquot() {
         return expectedAliquot;
     }
 

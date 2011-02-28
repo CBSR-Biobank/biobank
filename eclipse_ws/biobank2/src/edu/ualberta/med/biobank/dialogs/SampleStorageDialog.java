@@ -15,8 +15,8 @@ import org.eclipse.swt.widgets.Shell;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -27,30 +27,30 @@ public class SampleStorageDialog extends BiobankDialog {
 
     private static final String TITLE = "Sample Storage";
 
-    private SampleStorageWrapper origSampleStorage;
+    private AliquotedSpecimenWrapper origSampleStorage;
 
-    private SampleStorageWrapper sampleStorage;
+    private AliquotedSpecimenWrapper sampleStorage;
 
     private ComboViewer sampleTypeComboViewer;
 
     private String currentTitle;
 
-    private Collection<SampleTypeWrapper> availableSampleTypes;
+    private Collection<SpecimenTypeWrapper> availableSampleTypes;
 
     public SampleStorageDialog(Shell parent,
-        SampleStorageWrapper sampleStorage,
-        Collection<SampleTypeWrapper> sampleTypes) {
+        AliquotedSpecimenWrapper sampleStorage,
+        Collection<SpecimenTypeWrapper> sampleTypes) {
         super(parent);
         Assert.isNotNull(sampleStorage);
         Assert.isNotNull(sampleTypes);
         this.availableSampleTypes = sampleTypes;
         this.origSampleStorage = sampleStorage;
-        this.sampleStorage = new SampleStorageWrapper(null);
-        this.sampleStorage.setSampleType(sampleStorage.getSampleType());
+        this.sampleStorage = new AliquotedSpecimenWrapper(null);
+        this.sampleStorage.setSpecimenType(sampleStorage.getSpecimenType());
         this.sampleStorage.setVolume(sampleStorage.getVolume());
         this.sampleStorage.setQuantity(sampleStorage.getQuantity());
         this.sampleStorage.setActivityStatus(sampleStorage.getActivityStatus());
-        if (origSampleStorage.getSampleType() == null) {
+        if (origSampleStorage.getSpecimenType() == null) {
             currentTitle = "Add " + TITLE;
 
             try {
@@ -97,18 +97,18 @@ public class SampleStorageDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         sampleTypeComboViewer = getWidgetCreator().createComboViewer(contents,
-            "Sample Type", availableSampleTypes, sampleStorage.getSampleType(),
+            "Sample Type", availableSampleTypes, sampleStorage.getSpecimenType(),
             "A sample type should be selected", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
                     sampleStorage
-                        .setSampleType((SampleTypeWrapper) selectedObject);
+                        .setSpecimenType((SpecimenTypeWrapper) selectedObject);
                 }
             });
         sampleTypeComboViewer.setLabelProvider(new BiobankLabelProvider() {
             @Override
             public String getText(Object element) {
-                return ((SampleTypeWrapper) element).getName();
+                return ((SpecimenTypeWrapper) element).getName();
             }
         });
 
@@ -149,7 +149,7 @@ public class SampleStorageDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        origSampleStorage.setSampleType(sampleStorage.getSampleType());
+        origSampleStorage.setSpecimenType(sampleStorage.getSpecimenType());
         origSampleStorage.setVolume(sampleStorage.getVolume());
         origSampleStorage.setQuantity(sampleStorage.getQuantity());
         origSampleStorage.setActivityStatus(sampleStorage.getActivityStatus());

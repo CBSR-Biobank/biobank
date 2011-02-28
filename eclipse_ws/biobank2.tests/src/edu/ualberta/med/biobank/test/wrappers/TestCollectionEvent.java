@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.test.TestDatabase;
@@ -26,9 +26,8 @@ import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
 public class TestCollectionEvent extends TestDatabase {
@@ -40,42 +39,16 @@ public class TestCollectionEvent extends TestDatabase {
 
         StudyWrapper study = StudyHelper.addStudy(name);
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
-            Utils.getRandomDate(), 0.1);
+        SpecimenWrapper spc = SpecimenHelper.newSpecimen(name);
 
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0), sv);
+            .addCollectionEvent(site, patient, 1, spc);
 
         testGettersAndSetters(cevent);
     }
 
     @Test
-    public void testGetSetShippingMethod() throws Exception {
-        String name = "testGetSetShippingMethod" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite(name);
-        ShippingMethodWrapper company = ShippingMethodHelper
-            .addShippingMethod(name);
-
-        StudyWrapper study = StudyHelper.addStudy(name);
-        PatientWrapper patient = PatientHelper.addPatient(name, study);
-        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
-            Utils.getRandomDate(), 0.1);
-
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0), sv);
-
-        cevent.setShippingMethod(company);
-        cevent.persist();
-
-        cevent.reload();
-
-        Assert.assertEquals(company, cevent.getShippingMethod());
-    }
-
-    @Test
-    public void testGetPatientCollection() throws Exception {
+    public void testGetPatient() throws Exception {
         String name = "testGetPatientCollection" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite(name);
         ClinicWrapper clinic1 = ClinicHelper.addClinic(name + "CLINIC1");
@@ -98,55 +71,19 @@ public class TestCollectionEvent extends TestDatabase {
         study2.persist();
         PatientWrapper patient3 = PatientHelper.addPatient(name + "_3", study2);
 
-        List<SourceVesselWrapper> svs = new ArrayList<SourceVesselWrapper>();
         for (PatientWrapper patient : new PatientWrapper[] { patient1,
             patient2, patient3 }) {
-            svs.add(SourceVesselHelper.newSourceVessel(patient,
-                Utils.getRandomDate(), 0.1));
+            SpecimenWrapper spc = SpecimenHelper.newSpecimen(patient
+                .getPnumber());
+            CollectionEventWrapper cevent = CollectionEventHelper
+                .addCollectionEvent(site, patient, 1, spc);
+            cevent.reload();
+            Assert.assertEquals(patient, cevent.getPatient());
         }
-
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                svs.get(0), svs.get(1), svs.get(2));
-
-        cevent.reload();
-        Assert.assertEquals(3, cevent.getPatientCollection().size());
     }
 
     @Test
-    public void testAddPatients() throws Exception {
-        String name = "testAddPatients" + r.nextInt();
-        SiteWrapper site = SiteHelper.addSite("site" + name);
-        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
-        StudyWrapper study = StudyHelper.addStudy("study" + name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
-        PatientWrapper firstPatient = PatientHelper.addPatient(name, study);
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel(firstPatient,
-                    Utils.getRandomDate(), 0.1));
-        cevent.reload();
-
-        PatientWrapper patient = PatientHelper.addPatient(name + "NewPatient",
-            study);
-        SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(patient,
-            Utils.getRandomDate(), 0.1);
-        cevent.addToSourceVesselCollection(Arrays.asList(sv));
-        sv.setCollectionEvent(cevent);
-        cevent.persist();
-
-        cevent.reload();
-        // one patient added
-        Assert.assertEquals(2, cevent.getPatientCollection().size());
-    }
-
-    @Test
-    public void testRemoveSourceVessels() throws Exception {
+    public void testRemoveSpecimens() throws Exception {
         String name = "testRemovePatients" + r.nextInt();
         SiteWrapper site = SiteHelper.addSite("site" + name);
         ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name);
@@ -160,18 +97,16 @@ public class TestCollectionEvent extends TestDatabase {
             .addCollectionEvent(
                 site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1),
-                SourceVesselHelper.newSourceVessel(patient2,
-                    Utils.getRandomDate(), 0.1));
+                SpecimenHelper.newSpecimen(patient1, Utils.getRandomDate(), 0.1),
+                SpecimenHelper.newSpecimen(patient2, Utils.getRandomDate(), 0.1));
         cevent.reload();
 
         PatientWrapper patient = DbHelper.chooseRandomlyInList(cevent
             .getPatientCollection());
 
         patient.reload();
-        cevent.removeFromSourceVesselCollection(patient
-            .getSourceVesselCollection(false));
+        cevent.removeFromSpecimenCollection(patient
+            .getSpecimenCollection(false));
         cevent.persist();
 
         cevent.reload();
@@ -193,20 +128,13 @@ public class TestCollectionEvent extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         CollectionEventHelper.addCollectionEvent(site, method,
-            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                0.1));
+            SpecimenHelper.newSpecimen(patient1, Utils.getRandomDate(), 0.1));
         CollectionEventWrapper ceventTest = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                method,
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1));
+            .addCollectionEvent(site, method, SpecimenHelper.newSpecimen(
+                patient1, Utils.getRandomDate(), 0.1));
         CollectionEventWrapper ceventWithDate = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                method,
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1));
+            .addCollectionEvent(site, method, SpecimenHelper.newSpecimen(
+                patient1, Utils.getRandomDate(), 0.1));
 
         String waybill = ceventTest.getWaybill();
 
@@ -264,16 +192,16 @@ public class TestCollectionEvent extends TestDatabase {
             .newCollectionEvent(site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0));
 
-        List<SourceVesselWrapper> svs = new ArrayList<SourceVesselWrapper>();
+        List<SpecimenWrapper> spcs = new ArrayList<SpecimenWrapper>();
         for (PatientWrapper patient : new PatientWrapper[] { patient1,
             patient2, patient3 }) {
-            SourceVesselWrapper sv = SourceVesselHelper.newSourceVessel(
-                patient, Utils.getRandomDate(), 0.1);
-            sv.setCollectionEvent(cevent);
-            svs.add(sv);
+            SpecimenWrapper spc = SpecimenHelper.newSpecimen(patient,
+                Utils.getRandomDate(), 0.1);
+            spc.setCollectionEvent(cevent);
+            spcs.add(spc);
         }
 
-        cevent.addToSourceVesselCollection(svs);
+        cevent.addToSpecimenCollection(spcs);
         cevent.persist();
 
         cevent.reload();
@@ -293,13 +221,8 @@ public class TestCollectionEvent extends TestDatabase {
             .getShippingMethods(appService).get(0);
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         CollectionEventWrapper cevent = CollectionEventHelper
-            .newCollectionEvent(
-                null,
-                method,
-                name,
-                Utils.getRandomDate(),
-                SourceVesselHelper.newSourceVessel(patient,
-                    Utils.getRandomDate(), 0.1));
+            .newCollectionEvent(null, method, name, Utils.getRandomDate(),
+                SpecimenHelper.newSpecimen(patient, Utils.getRandomDate(), 0.1));
 
         try {
             cevent.persist();
@@ -322,7 +245,7 @@ public class TestCollectionEvent extends TestDatabase {
         CollectionEventWrapper cevent = CollectionEventHelper
             .newCollectionEvent(clinic, ShippingMethodWrapper
                 .getShippingMethods(appService).get(0), null, Utils
-                .getRandomDate(), SourceVesselHelper.newSourceVessel(patient,
+                .getRandomDate(), SpecimenHelper.newSpecimen(patient,
                 Utils.getRandomDate(), 0.1));
 
         try {
@@ -346,8 +269,8 @@ public class TestCollectionEvent extends TestDatabase {
         CollectionEventWrapper cevent = CollectionEventHelper
             .newCollectionEvent(clinic, ShippingMethodWrapper
                 .getShippingMethods(appService).get(0), TestCommon
-                .getNewWaybill(r), Utils.getRandomDate(), SourceVesselHelper
-                .newSourceVessel(patient, Utils.getRandomDate(), 0.1));
+                .getNewWaybill(r), Utils.getRandomDate(), SpecimenHelper
+                .newSpecimen(patient, Utils.getRandomDate(), 0.1));
 
         try {
             cevent.persist();
@@ -373,23 +296,13 @@ public class TestCollectionEvent extends TestDatabase {
             .getShippingMethods(appService).get(0);
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         CollectionEventWrapper cevent = CollectionEventHelper
-            .newCollectionEvent(
-                clinic,
-                method,
-                name,
-                Utils.getRandomDate(),
-                SourceVesselHelper.newSourceVessel(patient,
-                    Utils.getRandomDate(), 0.1));
+            .newCollectionEvent(clinic, method, name, Utils.getRandomDate(),
+                SpecimenHelper.newSpecimen(patient, Utils.getRandomDate(), 0.1));
         cevent.persist();
 
         CollectionEventWrapper cevent2 = CollectionEventHelper
-            .newCollectionEvent(
-                clinic,
-                method,
-                name,
-                Utils.getRandomDate(),
-                SourceVesselHelper.newSourceVessel(patient,
-                    Utils.getRandomDate(), 0.1));
+            .newCollectionEvent(clinic, method, name, Utils.getRandomDate(),
+                SpecimenHelper.newSpecimen(patient, Utils.getRandomDate(), 0.1));
         try {
             cevent2.persist();
             Assert.fail("cevent with waybill '" + name
@@ -432,7 +345,7 @@ public class TestCollectionEvent extends TestDatabase {
         CollectionEventWrapper cevent = CollectionEventHelper
             .newCollectionEvent(clinic, ShippingMethodWrapper
                 .getShippingMethods(appService).get(0), name, Utils
-                .getRandomDate(), SourceVesselHelper.newSourceVessel(patient,
+                .getRandomDate(), SpecimenHelper.newSpecimen(patient,
                 Utils.getRandomDate(), 0.1));
 
         try {
@@ -457,23 +370,18 @@ public class TestCollectionEvent extends TestDatabase {
             .getShippingMethods(appService).get(0);
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         CollectionEventHelper.addCollectionEvent(site, method,
-            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                0.1));
+            SpecimenHelper.newSpecimen(patient1, Utils.getRandomDate(), 0.1));
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                method,
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1));
+            .addCollectionEvent(site, method, SpecimenHelper.newSpecimen(
+                patient1, Utils.getRandomDate(), 0.1));
         CollectionEventHelper.addCollectionEvent(site, method,
-            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                0.1));
+            SpecimenHelper.newSpecimen(patient1, Utils.getRandomDate(), 0.1));
 
         int countBefore = appService.search(CollectionEvent.class,
             new CollectionEvent()).size();
 
-        for (SourceVesselWrapper sv : cevent.getSourceVesselCollection(false)) {
-            sv.delete();
+        for (SpecimenWrapper spc : cevent.getSpecimenCollection(false)) {
+            spc.delete();
         }
 
         cevent.reload();
@@ -498,19 +406,13 @@ public class TestCollectionEvent extends TestDatabase {
             .getShippingMethods(appService).get(0);
         PatientWrapper patient1 = PatientHelper.addPatient(name, study);
         CollectionEventWrapper cevent1 = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                method,
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1));
+            .addCollectionEvent(site, method, SpecimenHelper.newSpecimen(
+                patient1, Utils.getRandomDate(), 0.1));
         cevent1.setDateReceived(DateFormatter.dateFormatter
             .parse("2010-02-01 23:00"));
         CollectionEventWrapper cevent2 = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                method,
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1));
+            .addCollectionEvent(site, method, SpecimenHelper.newSpecimen(
+                patient1, Utils.getRandomDate(), 0.1));
         cevent2.setDateReceived(DateFormatter.dateFormatter
             .parse("2009-12-01 23:00"));
 
@@ -535,8 +437,7 @@ public class TestCollectionEvent extends TestDatabase {
             .addCollectionEvent(
                 site,
                 ShippingMethodWrapper.getShippingMethods(appService).get(0),
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1));
+                SpecimenHelper.newSpecimen(patient1, Utils.getRandomDate(), 0.1));
         String oldWaybill = cevent1.getWaybill();
         cevent1.setWaybill("QQQQ");
         cevent1.reset();
@@ -570,25 +471,16 @@ public class TestCollectionEvent extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         CollectionEventHelper.addCollectionEvent(site, method,
-            SourceVesselHelper.newSourceVessel(patient1, Utils.getRandomDate(),
-                0.1)); // another
+            SpecimenHelper.newSpecimen(patient1, Utils.getRandomDate(), 0.1)); // another
         // day
         CollectionEventWrapper cevent2 = CollectionEventHelper
-            .newCollectionEvent(
-                site,
-                method,
-                "waybill_" + name + "_2",
-                new Date(),
-                SourceVesselHelper.newSourceVessel(patient1,
+            .newCollectionEvent(site, method, "waybill_" + name + "_2",
+                new Date(), SpecimenHelper.newSpecimen(patient1,
                     Utils.getRandomDate(), 0.1)); // today
         cevent2.persist();
         CollectionEventWrapper cevent3 = CollectionEventHelper
-            .newCollectionEvent(
-                site,
-                method,
-                "waybill_" + name + "_3",
-                new Date(),
-                SourceVesselHelper.newSourceVessel(patient2,
+            .newCollectionEvent(site, method, "waybill_" + name + "_3",
+                new Date(), SpecimenHelper.newSpecimen(patient2,
                     Utils.getRandomDate(), 0.1)); // today
         cevent3.persist();
 
@@ -618,28 +510,17 @@ public class TestCollectionEvent extends TestDatabase {
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
         CollectionEventWrapper cevent1 = CollectionEventHelper
-            .addCollectionEvent(
-                site,
-                method,
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1)); // another day
+            .addCollectionEvent(site, method, SpecimenHelper.newSpecimen(
+                patient1, Utils.getRandomDate(), 0.1)); // another day
         CollectionEventWrapper cevent2 = CollectionEventHelper
-            .newCollectionEvent(
-                site,
+            .newCollectionEvent(site,
 
-                method,
-                "waybill_" + name + "_2",
-                new Date(),
-                SourceVesselHelper.newSourceVessel(patient1,
-                    Utils.getRandomDate(), 0.1)); // today
+            method, "waybill_" + name + "_2", new Date(), SpecimenHelper
+                .newSpecimen(patient1, Utils.getRandomDate(), 0.1)); // today
         cevent2.persist();
         CollectionEventWrapper cevent3 = CollectionEventHelper
-            .newCollectionEvent(
-                site,
-                method,
-                "waybill_" + name + "_3",
-                new Date(),
-                SourceVesselHelper.newSourceVessel(patient2,
+            .newCollectionEvent(site, method, "waybill_" + name + "_3",
+                new Date(), SpecimenHelper.newSpecimen(patient2,
                     Utils.getRandomDate(), 0.1)); // today
         cevent3.persist();
 

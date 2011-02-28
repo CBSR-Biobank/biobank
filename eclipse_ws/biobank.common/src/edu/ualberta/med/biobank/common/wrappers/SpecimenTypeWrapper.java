@@ -9,23 +9,23 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.AliquotPeer;
-import edu.ualberta.med.biobank.common.peer.SampleTypePeer;
-import edu.ualberta.med.biobank.common.wrappers.base.SampleTypeBaseWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.SampleType;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
+import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
+import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.model.SpecimenType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class SampleTypeWrapper extends SampleTypeBaseWrapper {
+public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
 
-    public SampleTypeWrapper(WritableApplicationService appService,
-        SampleType wrappedObject) {
+    public SpecimenTypeWrapper(WritableApplicationService appService,
+        SpecimenType wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public SampleTypeWrapper(WritableApplicationService appService) {
+    public SpecimenTypeWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -33,33 +33,33 @@ public class SampleTypeWrapper extends SampleTypeBaseWrapper {
      * get all sample types in a site for containers which type name contains
      * "typeNameContains" (go recursively inside found containers)
      */
-    public static List<SampleTypeWrapper> getSampleTypeForContainerTypes(
+    public static List<SpecimenTypeWrapper> getSpecimenTypeForContainerTypes(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         String typeNameContains) throws ApplicationException {
         List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
             .getContainerTypesInSite(appService, siteWrapper, typeNameContains,
                 false);
-        Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
+        Set<SpecimenTypeWrapper> SpecimenTypes = new HashSet<SpecimenTypeWrapper>();
         for (ContainerTypeWrapper containerType : containerTypes) {
-            sampleTypes.addAll(containerType.getSampleTypesRecursively());
+            SpecimenTypes.addAll(containerType.getSpecimenTypesRecursively());
         }
-        return new ArrayList<SampleTypeWrapper>(sampleTypes);
+        return new ArrayList<SpecimenTypeWrapper>(SpecimenTypes);
     }
 
     /**
      * get all sample types in a site for pallet containers (8*12 size) (go
      * recursively inside found containers)
      */
-    public static List<SampleTypeWrapper> getSampleTypeForPallet96(
+    public static List<SpecimenTypeWrapper> getSpecimenTypeForPallet96(
         WritableApplicationService appService, SiteWrapper siteWrapper)
         throws ApplicationException {
         List<ContainerTypeWrapper> containerTypes = ContainerTypeWrapper
             .getContainerTypesPallet96(appService, siteWrapper);
-        Set<SampleTypeWrapper> sampleTypes = new HashSet<SampleTypeWrapper>();
+        Set<SpecimenTypeWrapper> SpecimenTypes = new HashSet<SpecimenTypeWrapper>();
         for (ContainerTypeWrapper containerType : containerTypes) {
-            sampleTypes.addAll(containerType.getSampleTypesRecursively());
+            SpecimenTypes.addAll(containerType.getSpecimenTypesRecursively());
         }
-        return new ArrayList<SampleTypeWrapper>(sampleTypes);
+        return new ArrayList<SpecimenTypeWrapper>(SpecimenTypes);
     }
 
     @Override
@@ -77,17 +77,17 @@ public class SampleTypeWrapper extends SampleTypeBaseWrapper {
     }
 
     public static final String ALL_SAMPLE_TYPES_QRY = "from "
-        + SampleType.class.getName();
+        + SpecimenType.class.getName();
 
-    public static List<SampleTypeWrapper> getAllSampleTypes(
+    public static List<SpecimenTypeWrapper> getAllSpecimenTypes(
         WritableApplicationService appService, boolean sort)
         throws ApplicationException {
         HQLCriteria c = new HQLCriteria(ALL_SAMPLE_TYPES_QRY);
 
-        List<SampleType> sampleTypes = appService.query(c);
-        List<SampleTypeWrapper> list = new ArrayList<SampleTypeWrapper>();
-        for (SampleType type : sampleTypes) {
-            list.add(new SampleTypeWrapper(appService, type));
+        List<SpecimenType> SpecimenTypes = appService.query(c);
+        List<SpecimenTypeWrapper> list = new ArrayList<SpecimenTypeWrapper>();
+        for (SpecimenType type : SpecimenTypes) {
+            list.add(new SpecimenTypeWrapper(appService, type));
         }
         if (sort)
             Collections.sort(list);
@@ -103,25 +103,25 @@ public class SampleTypeWrapper extends SampleTypeBaseWrapper {
     /**
      * This method should only be called to save the new sample type list.
      */
-    public static void persistSampleTypes(
-        List<SampleTypeWrapper> addedOrModifiedTypes,
-        List<SampleTypeWrapper> typesToDelete) throws BiobankCheckException,
+    public static void persistSpecimenTypes(
+        List<SpecimenTypeWrapper> addedOrModifiedTypes,
+        List<SpecimenTypeWrapper> typesToDelete) throws BiobankCheckException,
         Exception {
         if (addedOrModifiedTypes != null) {
-            for (SampleTypeWrapper ss : addedOrModifiedTypes) {
+            for (SpecimenTypeWrapper ss : addedOrModifiedTypes) {
                 ss.persist();
             }
         }
         if (typesToDelete != null) {
-            for (SampleTypeWrapper ss : typesToDelete) {
+            for (SpecimenTypeWrapper ss : typesToDelete) {
                 ss.delete();
             }
         }
     }
 
     @Override
-    public int compareTo(ModelWrapper<SampleType> wrapper) {
-        if (wrapper instanceof SampleTypeWrapper) {
+    public int compareTo(ModelWrapper<SpecimenType> wrapper) {
+        if (wrapper instanceof SpecimenTypeWrapper) {
             String name1 = wrappedObject.getName();
             String name2 = wrapper.wrappedObject.getName();
             if (name1 != null && name2 != null) {
@@ -137,8 +137,8 @@ public class SampleTypeWrapper extends SampleTypeBaseWrapper {
     }
 
     public static final String IS_USED_BY_SAMPLES_QRY = "select count(s) from "
-        + Aliquot.class.getName() + " as s where s."
-        + AliquotPeer.SAMPLE_TYPE.getName() + "=?)";
+        + Specimen.class.getName() + " as s where s."
+        + SpecimenPeer.SPECIMEN_TYPE.getName() + "=?)";
 
     public boolean isUsedBySamples() throws ApplicationException,
         BiobankException {
@@ -154,10 +154,10 @@ public class SampleTypeWrapper extends SampleTypeBaseWrapper {
 
     public void checkNameAndShortNameUnique() throws ApplicationException,
         BiobankException {
-        checkNoDuplicates(SampleType.class, SampleTypePeer.NAME.getName(),
+        checkNoDuplicates(SpecimenType.class, SpecimenTypePeer.NAME.getName(),
             getName(), "A sample type with name");
-        checkNoDuplicates(SampleType.class,
-            SampleTypePeer.NAME_SHORT.getName(), getNameShort(),
+        checkNoDuplicates(SpecimenType.class,
+            SpecimenTypePeer.NAME_SHORT.getName(), getNameShort(),
             "A sample type with name short");
     }
 

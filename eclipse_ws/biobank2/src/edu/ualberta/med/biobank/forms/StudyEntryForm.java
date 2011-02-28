@@ -21,8 +21,8 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.GlobalPvAttrWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -30,9 +30,9 @@ import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.PvInfoWidget;
+import edu.ualberta.med.biobank.widgets.infotables.entry.AliquotedSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.ClinicAddInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SampleStorageEntryInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.entry.StudySourceVesselEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.SourceSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -57,7 +57,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private List<StudyPvAttrCustom> pvCustomInfoList;
 
-    private SampleStorageEntryInfoTable sampleStorageEntryTable;
+    private AliquotedSpecimenEntryInfoTable aliquotedSpecimenEntryTable;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -68,7 +68,7 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private ComboViewer activityStatusComboViewer;
 
-    private StudySourceVesselEntryInfoTable studySourceVesselEntryTable;
+    private SourceSpecimenEntryInfoTable sourceSpecimenEntryTable;
 
     private class StudyPvAttrCustom extends PvAttrCustom {
         public PvInfoWidget widget;
@@ -174,10 +174,10 @@ public class StudyEntryForm extends BiobankEntryForm {
     private void createAliquotedSpecimensSection() {
         Section section = createSection(Messages
             .getString("StudyEntryForm.aliquoted.specimens.title")); //$NON-NLS-1$
-        sampleStorageEntryTable = new SampleStorageEntryInfoTable(section,
-            study);
-        sampleStorageEntryTable.adaptToToolkit(toolkit, true);
-        sampleStorageEntryTable.addSelectionChangedListener(listener);
+        aliquotedSpecimenEntryTable = new AliquotedSpecimenEntryInfoTable(
+            section, study);
+        aliquotedSpecimenEntryTable.adaptToToolkit(toolkit, true);
+        aliquotedSpecimenEntryTable.addSelectionChangedListener(listener);
 
         addSectionToolbar(
             section,
@@ -185,29 +185,29 @@ public class StudyEntryForm extends BiobankEntryForm {
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    sampleStorageEntryTable.addSampleStorage();
+                    aliquotedSpecimenEntryTable.addAliquotedSpecimen();
                 }
-            }, SampleStorageWrapper.class);
-        section.setClient(sampleStorageEntryTable);
+            }, AliquotedSpecimenWrapper.class);
+        section.setClient(aliquotedSpecimenEntryTable);
     }
 
     private void createSourceSpecimensSection() {
         Section section = createSection(Messages
             .getString("StudyEntryForm.source.specimens.title")); //$NON-NLS-1$
-        studySourceVesselEntryTable = new StudySourceVesselEntryInfoTable(
-            section, study);
-        studySourceVesselEntryTable.adaptToToolkit(toolkit, true);
-        studySourceVesselEntryTable.addSelectionChangedListener(listener);
+        sourceSpecimenEntryTable = new SourceSpecimenEntryInfoTable(section,
+            study);
+        sourceSpecimenEntryTable.adaptToToolkit(toolkit, true);
+        sourceSpecimenEntryTable.addSelectionChangedListener(listener);
 
         addSectionToolbar(
             section,
             Messages.getString("StudyEntryForm.source.specimens.button.add"), new SelectionAdapter() { //$NON-NLS-1$
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    studySourceVesselEntryTable.addStudySourceVessel();
+                    sourceSpecimenEntryTable.addSourceSpecimen();
                 }
             });
-        section.setClient(studySourceVesselEntryTable);
+        section.setClient(sourceSpecimenEntryTable);
     }
 
     private void createPvCustomInfoSection() throws Exception {
@@ -237,26 +237,26 @@ public class StudyEntryForm extends BiobankEntryForm {
         //
         // END KLUDGE
 
-        List<String> studyPvInfoLabels = Arrays.asList(study
-            .getStudyPvAttrLabels());
+        List<String> studyEventInfoLabels = Arrays.asList(study
+            .getStudyEventAttrLabels());
 
-        for (GlobalPvAttrWrapper pvAttr : GlobalPvAttrWrapper
-            .getAllGlobalPvAttrs(appService)) {
+        for (GlobalEventAttrWrapper pvAttr : GlobalEventAttrWrapper
+            .getAllGlobalEventAttrs(appService)) {
             String label = pvAttr.getLabel();
             boolean selected = false;
             studyPvAttrCustom = new StudyPvAttrCustom();
             studyPvAttrCustom.setLabel(label);
             studyPvAttrCustom.setType(pvAttr.getTypeName());
-            if (studyPvInfoLabels.contains(label)) {
+            if (studyEventInfoLabels.contains(label)) {
                 studyPvAttrCustom.setAllowedValues(study
-                    .getStudyPvAttrPermissible(label));
+                    .getStudyEventAttrPermissible(label));
                 selected = true;
             }
             studyPvAttrCustom.setIsDefault(false);
             studyPvAttrCustom.widget = new PvInfoWidget(client, SWT.NONE,
                 studyPvAttrCustom, selected);
             studyPvAttrCustom.widget.addSelectionChangedListener(listener);
-            studyPvAttrCustom.inStudy = studyPvInfoLabels.contains(label);
+            studyPvAttrCustom.inStudy = studyEventInfoLabels.contains(label);
             pvCustomInfoList.add(studyPvAttrCustom);
         }
     }
@@ -285,16 +285,16 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        study.addToStudySourceVesselCollection(studySourceVesselEntryTable
-            .getAddedOrModifiedStudySourceVessels());
-        study.removeFromStudySourceVesselCollection(studySourceVesselEntryTable
-            .getDeletedStudySourceVessels());
+        study.addToSourceSpecimenCollection(sourceSpecimenEntryTable
+            .getAddedOrModifiedSourceSpecimens());
+        study.removeFromSourceSpecimenCollection(sourceSpecimenEntryTable
+            .getDeletedSourceSpecimens());
 
         // sample storage
-        study.addToSampleStorageCollection(sampleStorageEntryTable
-            .getAddedOrModifiedSampleStorages());
-        study.removeFromSampleStorageCollection(sampleStorageEntryTable
-            .getDeletedSampleStorages());
+        study.addToAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
+            .getAddedOrModifiedAliquotedSpecimens());
+        study.removeFromAliquotedSpecimenCollection(aliquotedSpecimenEntryTable
+            .getDeletedAliquotedSpecimens());
         study.persist();
 
         SessionManager.updateAllSimilarNodes(studyAdapter, true);
@@ -310,7 +310,7 @@ public class StudyEntryForm extends BiobankEntryForm {
             if (!studyPvAttrCustom.widget.getSelected()
                 && studyPvAttrCustom.inStudy) {
                 try {
-                    study.deleteStudyPvAttr(studyPvAttrCustom.getLabel());
+                    study.deleteStudyEventAttr(studyPvAttrCustom.getLabel());
                 } catch (BiobankCheckException e) {
                     throw new UserUIException(
                         "Cannot delete " //$NON-NLS-1$
@@ -324,14 +324,14 @@ public class StudyEntryForm extends BiobankEntryForm {
                 if (studyPvAttrCustom.getType().equals("select_single") //$NON-NLS-1$
                     || studyPvAttrCustom.getType().equals("select_multiple")) { //$NON-NLS-1$
                     if (value.length() > 0) {
-                        study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
+                        study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
                             studyPvAttrCustom.getType(), value.split(";")); //$NON-NLS-1$
                     } else if (value.length() == 0) {
-                        study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
+                        study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
                             studyPvAttrCustom.getType(), null);
                     }
                 } else {
-                    study.setStudyPvAttr(studyPvAttrCustom.getLabel(),
+                    study.setStudyEventAttr(studyPvAttrCustom.getLabel(),
                         studyPvAttrCustom.getType());
                 }
             }
@@ -355,8 +355,8 @@ public class StudyEntryForm extends BiobankEntryForm {
         }
 
         contactEntryTable.reload();
-        sampleStorageEntryTable.reload();
-        studySourceVesselEntryTable.reload();
+        aliquotedSpecimenEntryTable.reload();
+        sourceSpecimenEntryTable.reload();
 
         resetPvCustomInfo();
 
@@ -364,14 +364,14 @@ public class StudyEntryForm extends BiobankEntryForm {
 
     private void resetPvCustomInfo() throws Exception {
         List<String> studyPvInfoLabels = Arrays.asList(study
-            .getStudyPvAttrLabels());
+            .getStudyEventAttrLabels());
 
         for (StudyPvAttrCustom studyPvAttrCustom : pvCustomInfoList) {
             boolean selected = false;
             String label = studyPvAttrCustom.getLabel();
             if (studyPvInfoLabels.contains(studyPvAttrCustom.getLabel())) {
                 studyPvAttrCustom.setAllowedValues(study
-                    .getStudyPvAttrPermissible(label));
+                    .getStudyEventAttrPermissible(label));
                 selected = true;
                 studyPvAttrCustom.inStudy = true;
             }

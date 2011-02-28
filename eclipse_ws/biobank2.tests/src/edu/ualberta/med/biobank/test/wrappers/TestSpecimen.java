@@ -16,35 +16,34 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
+import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
-import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
-public class TestAliquot extends TestDatabase {
+public class TestSpecimen extends TestDatabase {
 
-    private AliquotWrapper aliquot;
+    private SpecimenWrapper spc;
 
     private SiteWrapper site;
 
@@ -56,12 +55,12 @@ public class TestAliquot extends TestDatabase {
         super.setUp();
 
         site = SiteHelper.addSite("sitename" + r.nextInt());
-        SampleTypeWrapper sampleType = SampleTypeHelper
-            .addSampleType("sampletype" + r.nextInt());
+        SpecimenTypeWrapper sampleType = SpecimenTypeHelper
+            .addSpecimenType("sampletype" + r.nextInt());
 
         ContainerTypeWrapper typeChild = ContainerTypeHelper.addContainerType(
             site, "ctTypeChild" + r.nextInt(), "ctChild", 1, 4, 5, false);
-        typeChild.addToSampleTypeCollection(Arrays.asList(sampleType));
+        typeChild.addToSpecimenTypeCollection(Arrays.asList(sampleType));
         typeChild.persist();
 
         ContainerTypeWrapper topType = ContainerTypeHelper.addContainerType(
@@ -89,23 +88,23 @@ public class TestAliquot extends TestDatabase {
         site.persist();
         site.reload();
 
-        ProcessingEventWrapper pv = ProcessingEventHelper.addProcessingEvent(
-            site, patient, Utils.getRandomDate(), Utils.getRandomDate());
-        aliquot = AliquotHelper.newAliquot(sampleType, container, pv, 0, 0);
+        CollectionEventWrapper cevent = CollectionEventHelper
+            .addCollectionEvent(site, patient, 1);
+        spc = SpecimenHelper.newSpecimen(sampleType, container, cevent, 0, 0);
         container.reload();
     }
 
     @Test
     public void testGettersAndSetters() throws Exception {
-        aliquot.persist();
-        testGettersAndSetters(aliquot);
+        spc.persist();
+        testGettersAndSetters(spc);
     }
 
     @Test
     public void testPersistFailActivityStatusNull() throws Exception {
-        AliquotWrapper pAliquot = AliquotHelper.newAliquot(
-            aliquot.getSampleType(), null);
-        pAliquot.setProcessingEvent(aliquot.getProcessingEvent());
+        SpecimenWrapper pAliquot = SpecimenHelper.newSpecimen(
+            spc.getSpecimenType(), null);
+        pAliquot.setCollectionEvent(spc.getCollectionEvent());
 
         try {
             pAliquot.persist();
@@ -121,12 +120,12 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testCheckInventoryIdUnique() throws BiobankCheckException,
         Exception {
-        aliquot.persist();
-        AliquotWrapper duplicate = AliquotHelper.newAliquot(
-            aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getProcessingEvent(), 2, 2);
+        spc.persist();
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
+            spc.getSpecimenType(), spc.getParent(), spc.getCollectionEvent(),
+            2, 2);
 
-        duplicate.setInventoryId(aliquot.getInventoryId());
+        duplicate.setInventoryId(spc.getInventoryId());
         try {
             duplicate.checkInventoryIdUnique();
             Assert.fail("The check should detect that this is the same");
@@ -139,11 +138,11 @@ public class TestAliquot extends TestDatabase {
     public void testCheckInventoryIdUniqueCaseSensitive()
         throws BiobankCheckException, Exception {
         int i = r.nextInt();
-        aliquot.setInventoryId("toto" + i);
-        aliquot.persist();
-        AliquotWrapper duplicate = AliquotHelper.newAliquot(
-            aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getProcessingEvent(), 2, 2);
+        spc.setInventoryId("toto" + i);
+        spc.persist();
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
+            spc.getSpecimenType(), spc.getParent(), spc.getCollectionEvent(),
+            2, 2);
 
         duplicate.setInventoryId("TOTO" + i);
         try {
@@ -157,12 +156,12 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testPersistCheckInventoryIdUnique()
         throws BiobankCheckException, Exception {
-        aliquot.persist();
+        spc.persist();
 
-        AliquotWrapper duplicate = AliquotHelper.newAliquot(
-            aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getProcessingEvent(), 2, 2);
-        duplicate.setInventoryId(aliquot.getInventoryId());
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
+            spc.getSpecimenType(), spc.getParent(), spc.getCollectionEvent(),
+            2, 2);
+        duplicate.setInventoryId(spc.getInventoryId());
 
         try {
             duplicate.persist();
@@ -174,7 +173,7 @@ public class TestAliquot extends TestDatabase {
         duplicate.setInventoryId("qqqq" + r.nextInt());
         duplicate.persist();
 
-        duplicate.setInventoryId(aliquot.getInventoryId());
+        duplicate.setInventoryId(spc.getInventoryId());
         try {
             duplicate.persist();
             Assert
@@ -188,12 +187,12 @@ public class TestAliquot extends TestDatabase {
     public void testPersistCheckInventoryIdUniqueCaseSensitive()
         throws BiobankCheckException, Exception {
         int i = r.nextInt();
-        aliquot.setInventoryId("toto" + i);
-        aliquot.persist();
+        spc.setInventoryId("toto" + i);
+        spc.persist();
 
-        AliquotWrapper duplicate = AliquotHelper.newAliquot(
-            aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getProcessingEvent(), 2, 2);
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
+            spc.getSpecimenType(), spc.getParent(), spc.getCollectionEvent(),
+            2, 2);
         duplicate.setInventoryId("toto" + i);
 
         try {
@@ -210,12 +209,12 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testPersistPositionAlreadyUsed() throws BiobankCheckException,
         Exception {
-        aliquot.persist();
-        RowColPos pos = aliquot.getPosition();
+        spc.persist();
+        RowColPos pos = spc.getPosition();
 
-        AliquotWrapper duplicate = AliquotHelper.newAliquot(
-            aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getProcessingEvent(), pos.row, pos.col);
+        SpecimenWrapper duplicate = SpecimenHelper.newSpecimen(
+            spc.getSpecimenType(), spc.getParent(), spc.getCollectionEvent(),
+            pos.row, pos.col);
 
         try {
             duplicate.persist();
@@ -233,25 +232,25 @@ public class TestAliquot extends TestDatabase {
     }
 
     @Test
-    public void testPersistCheckParentAcceptSampleType()
+    public void testPersistCheckParentAcceptSpecimenType()
         throws BiobankCheckException, Exception {
-        SampleTypeWrapper oldSampleType = aliquot.getSampleType();
+        SpecimenTypeWrapper oldSpecimenType = spc.getSpecimenType();
 
-        SampleTypeWrapper type2 = SampleTypeHelper
-            .addSampleType("sampletype_2");
-        aliquot.setSampleType(type2);
+        SpecimenTypeWrapper type2 = SpecimenTypeHelper
+            .addSpecimenType("sampletype_2");
+        spc.setSpecimenType(type2);
         try {
-            aliquot.persist();
+            spc.persist();
             Assert.fail("Container can't hold this type !");
         } catch (BiobankCheckException bce) {
             Assert.assertTrue(true);
         }
 
-        aliquot.setSampleType(oldSampleType);
-        aliquot.persist();
+        spc.setSpecimenType(oldSpecimenType);
+        spc.persist();
 
         ContainerWrapper container = new ContainerWrapper(appService);
-        AliquotWrapper aliquot = new AliquotWrapper(appService);
+        SpecimenWrapper aliquot = new SpecimenWrapper(appService);
         aliquot.setParent(container);
         try {
             aliquot.persist();
@@ -264,9 +263,9 @@ public class TestAliquot extends TestDatabase {
     @Test
     public void testCheckProcessingEventNotNull() throws BiobankCheckException,
         Exception {
-        aliquot.setProcessingEvent(null);
+        spc.setCollectionEvent(null);
         try {
-            aliquot.persist();
+            spc.persist();
             Assert.fail("Patient visit should be set!");
         } catch (ValueNotSetException vnse) {
             Assert.assertTrue(true);
@@ -275,11 +274,11 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testDelete() throws Exception {
-        aliquot.persist();
-        SampleTypeWrapper type1 = aliquot.getSampleType();
-        SampleTypeWrapper type2 = SampleTypeHelper
-            .addSampleType("sampletype_2");
-        SampleTypeHelper.removeFromCreated(type2);
+        spc.persist();
+        SpecimenTypeWrapper type1 = spc.getSpecimenType();
+        SpecimenTypeWrapper type2 = SpecimenTypeHelper
+            .addSpecimenType("sampletype_2");
+        SpecimenTypeHelper.removeFromCreated(type2);
         type2.delete();
 
         try {
@@ -289,52 +288,51 @@ public class TestAliquot extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        aliquot.delete();
-        SampleTypeHelper.removeFromCreated(type1);
+        spc.delete();
+        SpecimenTypeHelper.removeFromCreated(type1);
         type1.delete();
     }
 
     @Test
-    public void testGetSetProcessingEvent() {
-        ProcessingEventWrapper pvw = new ProcessingEventWrapper(appService,
-            new ProcessingEvent());
-        aliquot.setProcessingEvent(pvw);
-        Assert.assertTrue(aliquot.getProcessingEvent().getId() == pvw.getId());
+    public void testGetSetCollectionEvent() {
+        CollectionEventWrapper cevent = new CollectionEventWrapper(appService);
+        spc.setCollectionEvent(cevent);
+        Assert.assertTrue(spc.getCollectionEvent().getId() == cevent.getId());
     }
 
     @Test
-    public void testSetAliquotPositionFromString() throws Exception {
-        aliquot.setAliquotPositionFromString("A1", aliquot.getParent());
-        aliquot.persist();
-        Assert.assertTrue(aliquot.getPositionString(false, false).equals("A1"));
-        RowColPos pos = aliquot.getPosition();
+    public void testSetSpecimenPositionFromString() throws Exception {
+        spc.setSpecimenPositionFromString("A1", spc.getParent());
+        spc.persist();
+        Assert.assertTrue(spc.getPositionString(false, false).equals("A1"));
+        RowColPos pos = spc.getPosition();
         Assert.assertTrue((pos.col == 0) && (pos.row == 0));
 
-        aliquot.setAliquotPositionFromString("C2", aliquot.getParent());
-        aliquot.persist();
-        Assert.assertTrue(aliquot.getPositionString(false, false).equals("C2"));
-        pos = aliquot.getPosition();
+        spc.setSpecimenPositionFromString("C2", spc.getParent());
+        spc.persist();
+        Assert.assertTrue(spc.getPositionString(false, false).equals("C2"));
+        pos = spc.getPosition();
         Assert.assertTrue((pos.col == 1) && (pos.row == 2));
 
         try {
-            aliquot.setAliquotPositionFromString("79", aliquot.getParent());
+            spc.setSpecimenPositionFromString("79", spc.getParent());
             Assert.fail("invalid position");
         } catch (Exception bce) {
             Assert.assertTrue(true);
         }
 
-        AliquotWrapper aliquot = new AliquotWrapper(appService);
+        SpecimenWrapper aliquot = new SpecimenWrapper(appService);
         Assert.assertNull(aliquot.getPositionString());
     }
 
     @Test
     public void testGetPositionString() throws Exception {
-        aliquot.setAliquotPositionFromString("A1", aliquot.getParent());
-        Assert.assertTrue(aliquot.getPositionString(false, false).equals("A1"));
-        String parentLabel = aliquot.getParent().getLabel();
-        Assert.assertTrue(aliquot.getPositionString(true, false).equals(
+        spc.setSpecimenPositionFromString("A1", spc.getParent());
+        Assert.assertTrue(spc.getPositionString(false, false).equals("A1"));
+        String parentLabel = spc.getParent().getLabel();
+        Assert.assertTrue(spc.getPositionString(true, false).equals(
             parentLabel + "A1"));
-        Assert.assertTrue(aliquot.getPositionString().equals(
+        Assert.assertTrue(spc.getPositionString().equals(
             parentLabel + "A1 ("
                 + topContainer.getContainerType().getNameShort() + ")"));
     }
@@ -344,159 +342,160 @@ public class TestAliquot extends TestDatabase {
         RowColPos position = new RowColPos();
         position.row = 1;
         position.col = 3;
-        aliquot.setPosition(position);
-        RowColPos newPosition = aliquot.getPosition();
+        spc.setPosition(position);
+        RowColPos newPosition = spc.getPosition();
         Assert.assertEquals(position.row, newPosition.row);
         Assert.assertEquals(position.col, newPosition.col);
 
         // ensure position remains after persist
-        aliquot.persist();
-        aliquot.reload();
-        newPosition = aliquot.getPosition();
+        spc.persist();
+        spc.reload();
+        newPosition = spc.getPosition();
         Assert.assertEquals(position.row, newPosition.row);
         Assert.assertEquals(position.col, newPosition.col);
 
         // test setting position to null
-        aliquot.setPosition(null);
-        aliquot.persist();
-        aliquot.reload();
-        Assert.assertEquals(null, aliquot.getPosition());
-        Assert.assertEquals(null, aliquot.getParent());
+        spc.setPosition(null);
+        spc.persist();
+        spc.reload();
+        Assert.assertEquals(null, spc.getPosition());
+        Assert.assertEquals(null, spc.getParent());
     }
 
     @Test
     public void testGetSetParent() throws Exception {
-        Assert.assertTrue(aliquot.hasParent());
-        ContainerWrapper oldParent = aliquot.getParent();
+        Assert.assertTrue(spc.hasParent());
+        ContainerWrapper oldParent = spc.getParent();
         ContainerTypeWrapper type = ContainerTypeHelper.addContainerType(site,
             "newCtType", "ctNew", 1, 4, 5, true);
-        type.addToSampleTypeCollection(Arrays.asList(aliquot.getSampleType()));
+        type.addToSpecimenTypeCollection(Arrays.asList(spc.getSpecimenType()));
         type.persist();
         ContainerWrapper parent = ContainerHelper.addContainer(
             "newcontainerParent", "ccNew", null, site, type);
 
-        aliquot.setParent(parent);
-        aliquot.persist();
+        spc.setParent(parent);
+        spc.persist();
         // check to make sure gone from old parent
         oldParent.reload();
-        Assert.assertTrue(oldParent.getAliquots().size() == 0);
+        Assert.assertTrue(oldParent.getSpecimens().size() == 0);
         // check to make sure added to new parent
         parent.reload();
-        Assert.assertTrue(aliquot.getParent() != null);
-        Collection<AliquotWrapper> sampleWrappers = parent.getAliquots()
+        Assert.assertTrue(spc.getParent() != null);
+        Collection<SpecimenWrapper> sampleWrappers = parent.getSpecimens()
             .values();
         boolean found = false;
-        for (AliquotWrapper sampleWrapper : sampleWrappers) {
-            if (sampleWrapper.getId().equals(aliquot.getId()))
+        for (SpecimenWrapper sampleWrapper : sampleWrappers) {
+            if (sampleWrapper.getId().equals(spc.getId()))
                 found = true;
         }
         Assert.assertTrue(found);
 
         // test for no parent
-        AliquotWrapper aliquot2 = new AliquotWrapper(appService);
+        SpecimenWrapper aliquot2 = new SpecimenWrapper(appService);
         Assert.assertFalse(aliquot2.hasParent());
     }
 
     @Test
-    public void testGetSetSampleType() throws BiobankCheckException, Exception {
-        SampleTypeWrapper stw = aliquot.getSampleType();
-        SampleTypeWrapper newType = SampleTypeHelper.addSampleType("newStw");
+    public void testGetSetSpecimenType() throws BiobankCheckException,
+        Exception {
+        SpecimenTypeWrapper stw = spc.getSpecimenType();
+        SpecimenTypeWrapper newType = SpecimenTypeHelper
+            .addSpecimenType("newStw");
         stw.persist();
         Assert.assertTrue(stw.getId() != newType.getId());
-        aliquot.setSampleType(newType);
-        Assert.assertTrue(newType.getId() == aliquot.getSampleType().getId());
+        spc.setSpecimenType(newType);
+        Assert.assertTrue(newType.getId() == spc.getSpecimenType().getId());
 
-        AliquotWrapper sample1 = new AliquotWrapper(appService);
-        sample1.setSampleType(null);
-        Assert.assertNull(sample1.getSampleType());
+        SpecimenWrapper sample1 = new SpecimenWrapper(appService);
+        sample1.setSpecimenType(null);
+        Assert.assertNull(sample1.getSpecimenType());
     }
 
     @Test
     public void testGetSetQuantityFromType() throws Exception {
-        Double quantity = aliquot.getQuantity();
-        aliquot.setQuantityFromType();
+        Double quantity = spc.getQuantity();
+        spc.setQuantityFromType();
         // no sample storages defined yet, should be null
         Assert.assertTrue(quantity == null);
 
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
 
-        SampleStorageWrapper ss1 = new SampleStorageWrapper(appService);
-        ss1.setSampleType(SampleTypeHelper.addSampleType("ss1"));
+        AliquotedSpecimenWrapper ss1 = new AliquotedSpecimenWrapper(appService);
+        ss1.setSpecimenType(SpecimenTypeHelper.addSpecimenType("ss1"));
         ss1.setVolume(1.0);
-        ss1.setStudy(aliquot.getProcessingEvent().getPatient().getStudy());
+        ss1.setStudy(spc.getCollectionEvent().getPatient().getStudy());
         ss1.setActivityStatus(activeStatus);
         ss1.persist();
-        SampleStorageWrapper ss2 = new SampleStorageWrapper(appService);
-        ss2.setSampleType(SampleTypeHelper.addSampleType("ss2"));
+        AliquotedSpecimenWrapper ss2 = new AliquotedSpecimenWrapper(appService);
+        ss2.setSpecimenType(SpecimenTypeHelper.addSpecimenType("ss2"));
         ss2.setVolume(2.0);
-        ss2.setStudy(aliquot.getProcessingEvent().getPatient().getStudy());
+        ss2.setStudy(spc.getCollectionEvent().getPatient().getStudy());
         ss2.setActivityStatus(activeStatus);
         ss2.persist();
-        SampleStorageWrapper ss3 = new SampleStorageWrapper(appService);
-        ss3.setSampleType(aliquot.getSampleType());
+        AliquotedSpecimenWrapper ss3 = new AliquotedSpecimenWrapper(appService);
+        ss3.setSpecimenType(spc.getSpecimenType());
         ss3.setVolume(3.0);
-        ss3.setStudy(aliquot.getProcessingEvent().getPatient().getStudy());
+        ss3.setStudy(spc.getCollectionEvent().getPatient().getStudy());
         ss3.setActivityStatus(activeStatus);
         ss3.persist();
-        aliquot.getProcessingEvent().getPatient().getStudy()
-            .addToSampleStorageCollection(Arrays.asList(ss1, ss2, ss3));
+        spc.getCollectionEvent().getPatient().getStudy()
+            .addToAliquotedSpecimenCollection(Arrays.asList(ss1, ss2, ss3));
         // should be 3
-        aliquot.setQuantityFromType();
-        Assert.assertTrue(aliquot.getQuantity().equals(3.0));
+        spc.setQuantityFromType();
+        Assert.assertTrue(spc.getQuantity().equals(3.0));
     }
 
     @Test
     public void testGetFormattedLinkDate() throws Exception {
         Date date = Utils.getRandomDate();
-        aliquot.setLinkDate(date);
+        spc.setCreatedAt(date);
 
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm");
-        Assert.assertTrue(sdf.format(date).equals(
-            aliquot.getFormattedLinkDate()));
+        Assert.assertTrue(sdf.format(date).equals(spc.getFormattedCreatedAt()));
     }
 
     @Test
     public void testCompareTo() throws BiobankCheckException, Exception {
-        aliquot.setInventoryId("defgh");
-        aliquot.persist();
-        AliquotWrapper sample2 = AliquotHelper.newAliquot(
-            aliquot.getSampleType(), aliquot.getParent(),
-            aliquot.getProcessingEvent(), 2, 3);
+        spc.setInventoryId("defgh");
+        spc.persist();
+        SpecimenWrapper sample2 = SpecimenHelper.newSpecimen(
+            spc.getSpecimenType(), spc.getParent(), spc.getCollectionEvent(),
+            2, 3);
         sample2.setInventoryId("awert");
         sample2.persist();
-        Assert.assertTrue(aliquot.compareTo(sample2) > 0);
+        Assert.assertTrue(spc.compareTo(sample2) > 0);
 
         sample2.setInventoryId("qwerty");
         sample2.persist();
-        Assert.assertTrue(aliquot.compareTo(sample2) < 0);
+        Assert.assertTrue(spc.compareTo(sample2) < 0);
     }
 
     @Test
-    public void testGetAliquot() throws Exception {
-        ContainerWrapper container = aliquot.getParent();
+    public void testGetSpecimen() throws Exception {
+        ContainerWrapper container = spc.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
-            false).get(0);
+        CollectionEventWrapper pv = spc.getCollectionEvent();
+        SpecimenTypeWrapper sampleType = containerType
+            .getSpecimenTypeCollection(false).get(0);
         Assert.assertNotNull(sampleType);
-        aliquot.setInventoryId(Utils.getRandomString(5));
-        aliquot.persist();
-        AliquotHelper.addAliquot(sampleType, container, pv, 3, 3);
+        spc.setInventoryId(Utils.getRandomString(5));
+        spc.persist();
+        SpecimenHelper.addSpecimen(sampleType, container, pv, 3, 3);
 
-        AliquotWrapper foundAliquot = AliquotWrapper.getAliquot(appService,
-            aliquot.getInventoryId(), null);
+        SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(appService,
+            spc.getInventoryId(), null);
         Assert.assertNotNull(foundAliquot);
-        Assert.assertEquals(foundAliquot, aliquot);
+        Assert.assertEquals(foundAliquot, spc);
     }
 
     @Test
-    public void testGetAliquotsNonActive() throws Exception {
-        ContainerWrapper container = aliquot.getParent();
+    public void testGetSpecimensNonActive() throws Exception {
+        ContainerWrapper container = spc.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
-            false).get(0);
+        CollectionEventWrapper pv = spc.getCollectionEvent();
+        SpecimenTypeWrapper sampleType = containerType
+            .getSpecimenTypeCollection(false).get(0);
         Assert.assertNotNull(sampleType);
 
         ActivityStatusWrapper activityStatusActive = ActivityStatusWrapper
@@ -510,76 +509,76 @@ public class TestAliquot extends TestDatabase {
             }
         }
 
-        List<AliquotWrapper> activeAliquots = new ArrayList<AliquotWrapper>();
-        List<AliquotWrapper> nonActiveAliquots = new ArrayList<AliquotWrapper>();
+        List<SpecimenWrapper> activeAliquots = new ArrayList<SpecimenWrapper>();
+        List<SpecimenWrapper> nonActiveAliquots = new ArrayList<SpecimenWrapper>();
 
-        activeAliquots.add(aliquot);
+        activeAliquots.add(spc);
         for (int i = 1, n = container.getColCapacity(); i < n; ++i) {
-            activeAliquots.add(AliquotHelper.addAliquot(sampleType, container,
-                pv, 0, i));
+            activeAliquots.add(SpecimenHelper.addSpecimen(sampleType,
+                container, pv, 0, i));
 
-            AliquotWrapper a = AliquotHelper.newAliquot(sampleType, container,
-                pv, 1, i);
+            SpecimenWrapper a = SpecimenHelper.newSpecimen(sampleType,
+                container, pv, 1, i);
             a.setActivityStatus(activityStatusNonActive);
             a.persist();
             a.reload();
             nonActiveAliquots.add(a);
         }
 
-        List<AliquotWrapper> aliquots = AliquotWrapper
-            .getAliquotsNonActiveInSite(appService, site);
+        List<SpecimenWrapper> aliquots = SpecimenWrapper
+            .getSpecimensNonActiveInSite(appService, site);
         Assert.assertEquals(nonActiveAliquots.size(), aliquots.size());
         Assert.assertTrue(aliquots.containsAll(nonActiveAliquots));
         Assert.assertFalse(aliquots.containsAll(activeAliquots));
     }
 
     @Test
-    public void testGetAliquotsInSiteWithPositionLabel() throws Exception {
-        ContainerWrapper container = aliquot.getParent();
+    public void testGetSpecimensInSiteWithPositionLabel() throws Exception {
+        ContainerWrapper container = spc.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
-            false).get(0);
+        CollectionEventWrapper pv = spc.getCollectionEvent();
+        SpecimenTypeWrapper sampleType = containerType
+            .getSpecimenTypeCollection(false).get(0);
         Assert.assertNotNull(sampleType);
-        aliquot.setInventoryId(Utils.getRandomString(5));
-        aliquot.persist();
+        spc.setInventoryId(Utils.getRandomString(5));
+        spc.persist();
 
-        AliquotHelper.addAliquot(sampleType, container, pv, 0, 1);
-        AliquotHelper.addAliquot(sampleType, container, pv, 1, 0);
-        aliquot = AliquotHelper.newAliquot(sampleType, container, pv, 0, 2);
-        aliquot.setInventoryId(Utils.getRandomString(5));
-        aliquot.persist();
+        SpecimenHelper.addSpecimen(sampleType, container, pv, 0, 1);
+        SpecimenHelper.addSpecimen(sampleType, container, pv, 1, 0);
+        spc = SpecimenHelper.newSpecimen(sampleType, container, pv, 0, 2);
+        spc.setInventoryId(Utils.getRandomString(5));
+        spc.persist();
 
-        List<AliquotWrapper> aliquots = AliquotWrapper
-            .getAliquotsInSiteWithPositionLabel(appService, site,
-                aliquot.getPositionString(true, false));
+        List<SpecimenWrapper> aliquots = SpecimenWrapper
+            .getSpecimensInSiteWithPositionLabel(appService, site,
+                spc.getPositionString(true, false));
         Assert.assertEquals(1, aliquots.size());
-        Assert.assertEquals(aliquots.get(0), aliquot);
+        Assert.assertEquals(aliquots.get(0), spc);
     }
 
     @Test
     public void testResetAlreadyInDatabase() throws Exception {
-        aliquot.persist();
-        String old = aliquot.getInventoryId();
-        aliquot.setInventoryId("toto");
-        aliquot.reset();
-        Assert.assertEquals(old, aliquot.getInventoryId());
+        spc.persist();
+        String old = spc.getInventoryId();
+        spc.setInventoryId("toto");
+        spc.reset();
+        Assert.assertEquals(old, spc.getInventoryId());
     }
 
     @Test
     public void testResetNew() throws Exception {
-        aliquot.setInventoryId("toto");
-        aliquot.reset();
-        Assert.assertEquals(null, aliquot.getInventoryId());
+        spc.setInventoryId("toto");
+        spc.reset();
+        Assert.assertEquals(null, spc.getInventoryId());
     }
 
     @Test
     public void testCheckPosition() throws BiobankCheckException, Exception {
-        aliquot.persist();
-        ContainerWrapper container = aliquot.getParent();
+        spc.persist();
+        ContainerWrapper container = spc.getParent();
 
-        AliquotWrapper aliquot2 = new AliquotWrapper(appService);
-        aliquot2.setPosition(aliquot.getPosition());
+        SpecimenWrapper aliquot2 = new SpecimenWrapper(appService);
+        aliquot2.setPosition(spc.getPosition());
 
         Assert.assertFalse(aliquot2.isPositionFree(container));
 
@@ -589,25 +588,25 @@ public class TestAliquot extends TestDatabase {
 
     @Test
     public void testDebugRandomMethods() throws Exception {
-        ContainerWrapper container = aliquot.getParent();
+        ContainerWrapper container = spc.getParent();
         ContainerTypeWrapper containerType = container.getContainerType();
-        ProcessingEventWrapper pv = aliquot.getProcessingEvent();
-        SampleTypeWrapper sampleType = containerType.getSampleTypeCollection(
-            false).get(0);
+        CollectionEventWrapper pv = spc.getCollectionEvent();
+        SpecimenTypeWrapper sampleType = containerType
+            .getSpecimenTypeCollection(false).get(0);
         Assert.assertNotNull(sampleType);
 
-        AliquotHelper.addAliquot(sampleType, container, pv, 0, 0);
-        AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType,
+        SpecimenHelper.addSpecimen(sampleType, container, pv, 0, 0);
+        SpecimenWrapper aliquot = SpecimenHelper.newSpecimen(sampleType,
             container, pv, 2, 3);
         aliquot.setInventoryId(Utils.getRandomString(5));
         aliquot.persist();
-        AliquotHelper.addAliquot(sampleType, null, pv, null, null);
+        SpecimenHelper.addSpecimen(sampleType, null, pv, null, null);
 
-        DebugUtil.getRandomLinkedAliquots(appService, site.getId());
-        DebugUtil.getRandomAssignedAliquots(appService, site.getId());
-        DebugUtil.getRandomNonAssignedNonDispatchedAliquots(appService,
+        DebugUtil.getRandomLinkedSpecimens(appService, site.getId());
+        DebugUtil.getRandomAssignedSpecimens(appService, site.getId());
+        DebugUtil.getRandomNonAssignedNonDispatchedSpecimens(appService,
             site.getId());
-        DebugUtil.getRandomDispatchedAliquots(appService, site.getId());
+        DebugUtil.getRandomDispatchedSpecimens(appService, site.getId());
 
         Assert.fail("not real tests here");
     }
@@ -617,7 +616,7 @@ public class TestAliquot extends TestDatabase {
         Assert.fail("test need to be rewritten");
         // String name = "testGetDispatchs" + r.nextInt();
         // SiteWrapper destSite = SiteHelper.addSite(name);
-        // StudyWrapper study = aliquot.getProcessingEvent().getPatient()
+        // StudyWrapper study = aliquot.getCollectionEvent().getPatient()
         // .getStudy();
         // destSite.addToStudyCollection(Arrays.asList(study));
         // destSite.persist();
@@ -631,7 +630,7 @@ public class TestAliquot extends TestDatabase {
         //
         // // add an aliquot that has not been persisted
         // try {
-        // dCollectionEvent.addAliquots(Arrays.asList(aliquot));
+        // dCollectionEvent.addSpecimens(Arrays.asList(aliquot));
         // Assert.fail("Should not be allowed to add aliquots not yet in DB");
         // } catch (BiobankCheckException bce) {
         // Assert.assertTrue(true);
@@ -642,7 +641,7 @@ public class TestAliquot extends TestDatabase {
         //
         // dCollectionEvent = DispatchHelper.newDispatch(site, destSite,
         // method);
-        // dCollectionEvent.addAliquots(Arrays.asList(aliquot));
+        // dCollectionEvent.addSpecimens(Arrays.asList(aliquot));
         // dCollectionEvent.persist();
         // aliquot.reload();
         //
@@ -674,7 +673,7 @@ public class TestAliquot extends TestDatabase {
         // DispatchWrapper dCollectionEvent2 = DispatchHelper.newDispatch(
         // destSite, destSite2, method);
         // try {
-        // dCollectionEvent2.addAliquots(Arrays.asList(aliquot));
+        // dCollectionEvent2.addSpecimens(Arrays.asList(aliquot));
         // Assert
         // .fail("Cannot reuse a aliquot if it has not been received (ie: need a 'Active' status)");
         // } catch (BiobankCheckException bce) {
@@ -694,15 +693,15 @@ public class TestAliquot extends TestDatabase {
         // topType.persist();
         // ContainerWrapper cont = ContainerHelper.addContainer("22", "22",
         // topCont, destSite, childType, 4, 5);
-        // childType.addToSampleTypeCollection(Arrays.asList(aliquot
-        // .getSampleType()));
+        // childType.addToSpecimenTypeCollection(Arrays.asList(aliquot
+        // .getSpecimenType()));
         // childType.persist();
         // cont.reload();
-        // cont.addAliquot(2, 3, aliquot);
+        // cont.addSpecimen(2, 3, aliquot);
         // aliquot.persist();
         //
         // // add to new shipment
-        // dCollectionEvent2.addAliquots(Arrays.asList(aliquot));
+        // dCollectionEvent2.addSpecimens(Arrays.asList(aliquot));
         // dCollectionEvent2.persist();
         //
         // aliquot.reload();

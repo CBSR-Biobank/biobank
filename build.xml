@@ -13,7 +13,7 @@
   <property name="java.client.version.num" value="1.4.0.pre" />
 
   <property environment="env" />
-  <property name="host" value="aicml-med.cs.ualberta.ca" />
+  <property name="host" value="aicml5.cs.ualberta.ca" />
   <!--property name="${host}/" value="" /-->
   <property name="cacore.sdk.dir" location="caCORE_SDK/sdk" />
   <property name="cacore.sdk.filename" value="caCORE_SDK_411.tar.gz" />
@@ -63,6 +63,12 @@
             casesensitive="true"
             trim="true" />
   </condition>
+  <condition property="isHostAicml5">
+    <equals arg1="${host.name}"
+            arg2="aicml5"
+            casesensitive="true"
+            trim="true" />
+  </condition>
   <condition property="isHostCbsr">
     <equals arg1="${host.name}"
             arg2="cbsr.med.ualberta.ca"
@@ -78,6 +84,7 @@
   <condition property="isHostLocal">
     <and>
       <isfalse value="${isHostAicmlMed}" />
+      <isfalse value="${isHostAicml5}" />
       <isfalse value="${isHostCbsr}" />
       <isfalse value="${isHostCbsrTraining}" />
     </and>
@@ -380,6 +387,11 @@
               srcfile="${cacore.sdk.dir}/output/biobank2/package/webapp/biobank2.war" />
   </target>
   <target name="hostAicmlMed" if="isHostAicmlMed">
+    <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
+          tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
+          overwrite="true" />
+  </target>
+  <target name="hostAicml5" if="isHostAicml5">
     <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />

@@ -85,15 +85,17 @@ public class CollectionEventInfoTable extends
     @Override
     public Object getCollectionModelObject(
         CollectionEventWrapper collectionEvent) throws Exception {
-        TableRowData info = new TableRowData();
-        info.collectionEvent = collectionEvent;
-        info.visitNumber = collectionEvent.getVisitNumber();
-        info.dateDrawn = collectionEvent.getFormattedDateDrawn();
-        info.sourceSpecimenCount = collectionEvent.getOriginalSpecimensCount();
-        info.aliquotedSpecimenCount = collectionEvent
-            .getAliquotedSpecimensCount();
-        info.comment = collectionEvent.getComment();
-        return info;
+        // FIXME
+        // TableRowData info = new TableRowData();
+        // info.collectionEvent = collectionEvent;
+        // info.visitNumber = collectionEvent.getVisitNumber();
+        // info.dateDrawn = collectionEvent.getFormattedDateDrawn();
+        // info.sourceSpecimenCount =
+        // collectionEvent.getOriginalSpecimensCount();
+        // info.aliquotedSpecimenCount = collectionEvent.getSpecimensCount();
+        // info.comment = collectionEvent.getComment();
+        // return info;
+        return null;
     }
 
     @Override

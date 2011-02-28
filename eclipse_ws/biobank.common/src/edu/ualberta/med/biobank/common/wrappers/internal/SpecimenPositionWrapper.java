@@ -4,27 +4,27 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.peer.AliquotPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
-import edu.ualberta.med.biobank.common.wrappers.base.AliquotPositionBaseWrapper;
-import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.common.wrappers.base.SpecimenPositionBaseWrapper;
+import edu.ualberta.med.biobank.model.SpecimenPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class AliquotPositionWrapper extends AliquotPositionBaseWrapper {
+public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
 
-    public AliquotPositionWrapper(WritableApplicationService appService,
-        AliquotPosition wrappedObject) {
+    public SpecimenPositionWrapper(WritableApplicationService appService,
+        SpecimenPosition wrappedObject) {
         super(appService, wrappedObject);
     }
 
-    public AliquotPositionWrapper(WritableApplicationService appService) {
+    public SpecimenPositionWrapper(WritableApplicationService appService) {
         super(appService);
     }
 
@@ -65,7 +65,7 @@ public class AliquotPositionWrapper extends AliquotPositionBaseWrapper {
     }
 
     @Override
-    public int compareTo(ModelWrapper<AliquotPosition> o) {
+    public int compareTo(ModelWrapper<SpecimenPosition> o) {
         return 0;
     }
 
@@ -80,10 +80,12 @@ public class AliquotPositionWrapper extends AliquotPositionBaseWrapper {
     }
 
     public static final String CHECK_POSITION_QRY = "from "
-        + AliquotPosition.class.getName() + " where "
-        + Property.concatNames(AliquotPositionPeer.CONTAINER, ContainerPeer.ID)
-        + "=? and " + AliquotPositionPeer.ROW.getName() + "=? and "
-        + AliquotPositionPeer.COL.getName() + "=?";
+        + SpecimenPosition.class.getName()
+        + " where "
+        + Property
+            .concatNames(SpecimenPositionPeer.CONTAINER, ContainerPeer.ID)
+        + "=? and " + SpecimenPositionPeer.ROW.getName() + "=? and "
+        + SpecimenPositionPeer.COL.getName() + "=?";
 
     @Override
     protected void checkObjectAtPosition() throws BiobankCheckException,
@@ -95,13 +97,13 @@ public class AliquotPositionWrapper extends AliquotPositionBaseWrapper {
             HQLCriteria criteria = new HQLCriteria(
                 CHECK_POSITION_QRY,
                 Arrays.asList(new Object[] { parent.getId(), getRow(), getCol() }));
-            List<AliquotPosition> positions = appService.query(criteria);
+            List<SpecimenPosition> positions = appService.query(criteria);
             if (positions.size() == 0) {
                 return;
             }
-            AliquotPositionWrapper aliquotPosition = new AliquotPositionWrapper(
+            SpecimenPositionWrapper specimenPosition = new SpecimenPositionWrapper(
                 appService, positions.get(0));
-            if (!aliquotPosition.getAliquot().equals(getAliquot())) {
+            if (!specimenPosition.getSpecimen().equals(getSpecimen())) {
                 throw new BiobankCheckException("Position " + getRow() + ":"
                     + getCol() + " in container " + getParent().toString()
                     + " is not available.");

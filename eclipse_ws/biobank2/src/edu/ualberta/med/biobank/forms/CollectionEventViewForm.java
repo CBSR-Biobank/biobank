@@ -27,11 +27,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private CollectionEventAdapter patientVisitAdapter;
 
-    private CollectionEventWrapper patientVisit;
+    private CollectionEventWrapper cevent;
 
     private BiobankText studyLabel;
-
-    private BiobankText activityStatusLabel;
 
     private AliquotListInfoTable aliquotWidget;
 
@@ -58,22 +56,22 @@ public class CollectionEventViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         patientVisitAdapter = (CollectionEventAdapter) adapter;
-        patientVisit = patientVisitAdapter.getWrapper();
+        cevent = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
-        patientVisit.logLookup(null);
+        cevent.logLookup(null);
 
-        setPartName("Visit " + patientVisit.getFormattedDateProcessed());
+        setPartName("Visit " + cevent.getFormattedDateReceived());
     }
 
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Patient Visit - Date Processed: "
-            + patientVisit.getFormattedDateProcessed());
+            + cevent.getFormattedDateReceived());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
-        createSourcesSection();
-        createAliquotsSection();
+        createSourceSpecimensSection();
+        createSpecimensSection();
     }
 
     private void createMainSection() throws Exception {
@@ -85,8 +83,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
-        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity Status");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date Processed");
@@ -102,8 +98,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void createPvDataSection(Composite client) throws Exception {
-        StudyWrapper study = patientVisit.getPatient().getStudy();
-        String[] labels = study.getStudyPvAttrLabels();
+        StudyWrapper study = cevent.getPatient().getStudy();
+        String[] labels = study.getStudyEventAttrLabels();
         if (labels == null)
             return;
 
@@ -112,14 +108,14 @@ public class CollectionEventViewForm extends BiobankViewForm {
         for (String label : labels) {
             FormPvCustomInfo combinedPvInfo = new FormPvCustomInfo();
             combinedPvInfo.setLabel(label);
-            combinedPvInfo.setType(study.getStudyPvAttrType(label));
+            combinedPvInfo.setType(study.getStudyEventAttrType(label));
 
             int style = SWT.NONE;
             if (combinedPvInfo.getType().equals("select_multiple")) {
                 style |= SWT.WRAP;
             }
 
-            String value = patientVisit.getPvAttrValue(label);
+            String value = cevent.getEventAttrValue(label);
             if (combinedPvInfo.getType().equals("select_multiple")
                 && (value != null)) {
                 combinedPvInfo.setValue(value.replace(';', '\n'));
@@ -137,12 +133,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
     }
 
     private void setCollectionEventValues() {
-        setTextValue(studyLabel, patientVisit.getPatient().getStudy().getName());
-        setTextValue(activityStatusLabel, patientVisit.getActivityStatus()
-            .getName());
-        setTextValue(patientLabel, patientVisit.getPatient().getPnumber());
-        setTextValue(dateDrawnLabel, patientVisit.getFormattedDateDrawn());
-        setTextValue(commentLabel, patientVisit.getComment());
+        setTextValue(studyLabel, cevent.getPatient().getStudy().getName());
+        setTextValue(patientLabel, cevent.getPatient().getPnumber());
+        setTextValue(dateProcessedLabel, cevent.getFormattedDateReceived());
 
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
@@ -150,41 +143,45 @@ public class CollectionEventViewForm extends BiobankViewForm {
         }
     }
 
-    private void createSourcesSection() {
-        Composite client = createSectionWithClient("Source Vessels");
-        table = new SourceVesselInfoTable(client,
-            patientVisit.getSourceVesselCollection());
-        table.adaptToToolkit(toolkit, true);
+    private void createSourceSpecimensSection() {
+        // FIXME: should be source specimens
+        // Composite client = createSectionWithClient("Source Vessels");
+        // table = new SourceVesselInfoTable(client,
+        // cevent.getSpecimenCollection());
+        // table.adaptToToolkit(toolkit, true);
     }
 
-    private void createAliquotsSection() {
-        Composite parent = createSectionWithClient("Aliquots");
-        aliquotWidget = new AliquotListInfoTable(parent,
-            patientVisit.getSpecimenCollection());
-        aliquotWidget.adaptToToolkit(toolkit, true);
-        aliquotWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
-        aliquotWidget.addClickListener(collectionDoubleClickListener);
+    private void createSpecimensSection() {
+        // FIXME: should be specimens
+        // Composite parent = createSectionWithClient("Aliquots");
+        // aliquotWidget = new AliquotListInfoTable(parent,
+        // cevent.getSpecimenCollection());
+        // aliquotWidget.adaptToToolkit(toolkit, true);
+        // aliquotWidget.setSelection(patientVisitAdapter.getSelectedAliquot());
+        // aliquotWidget.addClickListener(collectionDoubleClickListener);
     }
 
     @Override
     public void reload() {
         retrievePatientVisit();
-        String date = patientVisit.getFormattedDateProcessed();
+        String date = cevent.getFormattedDateReceived();
         setPartName("Visit " + date);
         form.setText("Visit Drawn Date: " + date);
         setCollectionEventValues();
-        table.setCollection(patientVisit.getSourceVesselCollection());
-        aliquotWidget.setCollection(patientVisit.getSpecimenCollection());
+
+        // FIXME: load tables
+        // table.setCollection(cevent.getPvSourceVesselCollection());
+        // aliquotWidget.setCollection(cevent.getSpecimenCollection());
     }
 
     private void retrievePatientVisit() {
         try {
-            patientVisit.reload();
+            cevent.reload();
         } catch (Exception ex) {
             logger.error(
                 "Error while retrieving patient visit "
-                    + patientVisit.getFormattedDateProcessed() + "(patient "
-                    + patientVisit.getPatient() + ")", ex);
+                    + cevent.getFormattedDateReceived() + "(patient "
+                    + cevent.getPatient() + ")", ex);
         }
     }
 

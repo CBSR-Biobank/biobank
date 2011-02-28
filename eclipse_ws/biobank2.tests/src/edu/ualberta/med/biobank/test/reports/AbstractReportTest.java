@@ -19,12 +19,12 @@ import edu.ualberta.med.biobank.common.util.AbstractRowPostProcess;
 import edu.ualberta.med.biobank.common.util.DateCompare;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
@@ -47,24 +47,24 @@ public abstract class AbstractReportTest {
     };
     public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
         public boolean evaluate(ContainerWrapper container) {
-            return (container.getContainerType().getSampleTypeCollection(false) != null)
-                && (container.getContainerType().getSampleTypeCollection(false)
+            return (container.getContainerType().getSpecimenTypeCollection(false) != null)
+                && (container.getContainerType().getSpecimenTypeCollection(false)
                     .size() > 0);
         }
     };
-    public static final Predicate<AliquotWrapper> ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER = new Predicate<AliquotWrapper>() {
-        public boolean evaluate(AliquotWrapper aliquot) {
+    public static final Predicate<SpecimenWrapper> ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER = new Predicate<SpecimenWrapper>() {
+        public boolean evaluate(SpecimenWrapper aliquot) {
             return (aliquot.getParent() == null)
                 || !aliquot.getParent().getLabel().startsWith("SS");
         }
     };
-    public static final Predicate<AliquotWrapper> ALIQUOT_HAS_POSITION = new Predicate<AliquotWrapper>() {
-        public boolean evaluate(AliquotWrapper aliquot) {
+    public static final Predicate<SpecimenWrapper> ALIQUOT_HAS_POSITION = new Predicate<SpecimenWrapper>() {
+        public boolean evaluate(SpecimenWrapper aliquot) {
             return aliquot.getParent() != null;
         }
     };
-    public static final Comparator<AliquotWrapper> ORDER_ALIQUOT_BY_PNUMBER = new Comparator<AliquotWrapper>() {
-        public int compare(AliquotWrapper lhs, AliquotWrapper rhs) {
+    public static final Comparator<SpecimenWrapper> ORDER_ALIQUOT_BY_PNUMBER = new Comparator<SpecimenWrapper>() {
+        public int compare(SpecimenWrapper lhs, SpecimenWrapper rhs) {
             return compareStrings(lhs.getProcessingEvent().getPatient()
                 .getPnumber(), rhs.getProcessingEvent().getPatient()
                 .getPnumber());
@@ -78,10 +78,10 @@ public abstract class AbstractReportTest {
         AbstractReportTest.dataSource = dataSource;
     }
 
-    public static Predicate<AliquotWrapper> aliquotSite(final boolean isIn,
+    public static Predicate<SpecimenWrapper> aliquotSite(final boolean isIn,
         final Integer siteId) {
-        return new Predicate<AliquotWrapper>() {
-            public boolean evaluate(AliquotWrapper aliquot) {
+        return new Predicate<SpecimenWrapper>() {
+            public boolean evaluate(SpecimenWrapper aliquot) {
                 return isIn == aliquot.getProcessingEvent().getCenter().getId()
                     .equals(siteId);
             }
@@ -106,14 +106,14 @@ public abstract class AbstractReportTest {
         };
     }
 
-    public static Predicate<AliquotWrapper> aliquotDrawnSameDay(final Date date) {
+    public static Predicate<SpecimenWrapper> aliquotDrawnSameDay(final Date date) {
         final Calendar wanted = Calendar.getInstance();
         wanted.setTime(date);
 
-        return new Predicate<AliquotWrapper>() {
+        return new Predicate<SpecimenWrapper>() {
             private Calendar drawn = Calendar.getInstance();
 
-            public boolean evaluate(AliquotWrapper aliquot) {
+            public boolean evaluate(SpecimenWrapper aliquot) {
                 drawn.setTime(aliquot.getProcessingEvent().getDateDrawn());
                 int drawnDayOfYear = drawn.get(Calendar.DAY_OF_YEAR);
                 int wantedDayOfYear = wanted.get(Calendar.DAY_OF_YEAR);
@@ -125,10 +125,10 @@ public abstract class AbstractReportTest {
         };
     }
 
-    public static Predicate<AliquotWrapper> aliquotLinkedBetween(
+    public static Predicate<SpecimenWrapper> aliquotLinkedBetween(
         final Date after, final Date before) {
-        return new Predicate<AliquotWrapper>() {
-            public boolean evaluate(AliquotWrapper aliquot) {
+        return new Predicate<SpecimenWrapper>() {
+            public boolean evaluate(SpecimenWrapper aliquot) {
                 Date linked = aliquot.getLinkDate();
                 return (DateCompare.compare(linked, after) <= 0)
                     && (DateCompare.compare(linked, before) >= 0);
@@ -136,10 +136,10 @@ public abstract class AbstractReportTest {
         };
     }
 
-    public static Predicate<AliquotWrapper> aliquotPvProcessedBetween(
+    public static Predicate<SpecimenWrapper> aliquotPvProcessedBetween(
         final Date after, final Date before) {
-        return new Predicate<AliquotWrapper>() {
-            public boolean evaluate(AliquotWrapper aliquot) {
+        return new Predicate<SpecimenWrapper>() {
+            public boolean evaluate(SpecimenWrapper aliquot) {
                 Date processed = aliquot.getProcessingEvent()
                     .getDateProcessed();
                 return (DateCompare.compare(processed, after) <= 0)
@@ -179,10 +179,10 @@ public abstract class AbstractReportTest {
         return topContainers;
     }
 
-    public static Predicate<AliquotWrapper> aliquotTopContainerIdIn(String list) {
+    public static Predicate<SpecimenWrapper> aliquotTopContainerIdIn(String list) {
         if ((list == null) || list.isEmpty()) {
-            return new Predicate<AliquotWrapper>() {
-                public boolean evaluate(AliquotWrapper aliquot) {
+            return new Predicate<SpecimenWrapper>() {
+                public boolean evaluate(SpecimenWrapper aliquot) {
                     return false;
                 }
             };
@@ -191,8 +191,8 @@ public abstract class AbstractReportTest {
         for (String id : list.split(",")) {
             topContainerIds.add(Integer.valueOf(id));
         }
-        return new Predicate<AliquotWrapper>() {
-            public boolean evaluate(AliquotWrapper aliquot) {
+        return new Predicate<SpecimenWrapper>() {
+            public boolean evaluate(SpecimenWrapper aliquot) {
                 ContainerWrapper top = aliquot.getTop();
                 return (top != null) && topContainerIds.contains(top.getId());
             }
@@ -304,17 +304,17 @@ public abstract class AbstractReportTest {
         return dataSource.getSites();
     }
 
-    protected final List<SampleTypeWrapper> getSampleTypes() throws Exception {
-        return dataSource.getSampleTypes();
+    protected final List<SpecimenTypeWrapper> getSpecimenTypes() throws Exception {
+        return dataSource.getSpecimenTypes();
     }
 
-    protected final List<SampleStorageWrapper> getSampleStorages()
+    protected final List<AliquotedSpecimenWrapper> getSampleStorages()
         throws Exception {
         return dataSource.getSampleStorages();
     }
 
-    protected final List<AliquotWrapper> getAliquots() throws Exception {
-        return dataSource.getAliquots();
+    protected final List<SpecimenWrapper> getSpecimens() throws Exception {
+        return dataSource.getSpecimens();
     }
 
     protected final List<ContainerWrapper> getContainers() throws Exception {

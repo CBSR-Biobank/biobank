@@ -4,20 +4,20 @@ package edu.ualberta.med.biobank.common.util;
  * Never remove one of these enum. Use deprecated if it should not be used
  * anymore.
  */
-public enum RequestAliquotState {
+public enum RequestSpecimenState {
     NONPROCESSED_STATE(0, "Non-Processed"), PROCESSED_STATE(1, "Processed"),
     UNAVAILABLE_STATE(2, "Unavailable");
 
     private Integer id;
     private String label;
 
-    private RequestAliquotState(Integer id, String label) {
+    private RequestSpecimenState(Integer id, String label) {
         this.id = id;
         this.label = label;
     }
 
-    public static RequestAliquotState getState(Integer state) {
-        for (RequestAliquotState das : values()) {
+    public static RequestSpecimenState getState(Integer state) {
+        for (RequestSpecimenState das : values()) {
             if (das.isEquals(state)) {
                 return das;
             }
