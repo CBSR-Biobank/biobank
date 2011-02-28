@@ -30,6 +30,17 @@ public class SourceSpecimenHelper extends DbHelper {
         return ssv;
     }
 
+    public static SourceSpecimenWrapper addSourceSpecimen(StudyWrapper study,
+        String spcTypeName, boolean needTimeDrawn, boolean needOriginalVolume)
+        throws Exception {
+        SpecimenTypeWrapper svType = SpecimenTypeHelper.addSpecimenType("newST"
+            + Utils.getRandomString(11));
+        SourceSpecimenWrapper ssv = newSourceSpecimen(study, svType,
+            needTimeDrawn, needOriginalVolume);
+        ssv.persist();
+        return ssv;
+    }
+
     public static int addSourceSpecimens(StudyWrapper study, String name,
         boolean needTimeDrawn, boolean needOriginalVolume) throws Exception {
         int nber = r.nextInt(15) + 1;

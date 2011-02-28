@@ -21,13 +21,13 @@ import edu.ualberta.med.biobank.test.wrappers.TestDispatch;
 import edu.ualberta.med.biobank.test.wrappers.TestModelWrapper;
 import edu.ualberta.med.biobank.test.wrappers.TestPatient;
 import edu.ualberta.med.biobank.test.wrappers.TestProcessingEvent;
-import edu.ualberta.med.biobank.test.wrappers.TestSampleStorage;
-import edu.ualberta.med.biobank.test.wrappers.TestSampleType;
+import edu.ualberta.med.biobank.test.wrappers.TestAliquotedSpecimen;
+import edu.ualberta.med.biobank.test.wrappers.TestSpecimenType;
 import edu.ualberta.med.biobank.test.wrappers.TestShippingMethod;
 import edu.ualberta.med.biobank.test.wrappers.TestSite;
 import edu.ualberta.med.biobank.test.wrappers.TestSourceVessel;
 import edu.ualberta.med.biobank.test.wrappers.TestStudy;
-import edu.ualberta.med.biobank.test.wrappers.TestStudySourceVessel;
+import edu.ualberta.med.biobank.test.wrappers.TestSourceSpecimen;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 @RunWith(Suite.class)
@@ -36,8 +36,8 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
     TestContainerLabelingScheme.class, TestContainerPath.class,
     TestContainerType.class, TestDispatch.class, TestModelWrapper.class,
     TestPatient.class, TestProcessingEvent.class, TestSourceVessel.class,
-    TestSampleStorage.class, TestSampleType.class, TestShippingMethod.class,
-    TestSite.class, TestStudy.class, TestStudySourceVessel.class })
+    TestAliquotedSpecimen.class, TestSpecimenType.class, TestShippingMethod.class,
+    TestSite.class, TestStudy.class, TestSourceSpecimen.class })
 public class AllTests {
     public static WritableApplicationService appService = null;
 
