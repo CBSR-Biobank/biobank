@@ -1057,34 +1057,6 @@
               name="edu.ualberta.med.biobank.menu.additions"
               visible="false">
          </separator>
-         <menu
-               id="edu.ualberta.med.biobank.menu.debug"
-               label="**Debug**">
-            <visibleWhen
-                  checkEnabled="true">
-               <reference
-                     definitionId="biobank2.debugState">
-               </reference>
-            </visibleWhen>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfig"
-                  id="edu.ualberta.med.biobank.menu.debug.cbsrConfig"
-                  label="Create CBSR Configuration"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
-                  id="edu.ualberta.med.biobank.menu.debug.cbsrConfigWithData"
-                  label="Create CBSR Configuration with data"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.debug.calgaryConfig"
-                  id="edu.ualberta.med.biobank.menu.debug.calgaryConfig"
-                  label="Create Calgary Configuration"
-                  style="push">
-            </command>
-         </menu>
       </menuContribution>
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar">

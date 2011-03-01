@@ -3,16 +3,21 @@ package edu.ualberta.med.biobank.widgets.infotables.entry;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
+import org.springframework.remoting.RemoteConnectFailureException;
 
+import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.dialogs.SourceSpecimenDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -20,19 +25,20 @@ import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableEditItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SourceSpecimenEntryInfoTable.class.getName());
 
-    private List<SpecimenTypeWrapper> availableSourceVessels;
+    private List<SpecimenTypeWrapper> availableSpecimenTypes;
 
-    private List<SourceSpecimenWrapper> selectedStudySourceVessels;
+    private List<SourceSpecimenWrapper> selectedSourceSpecimen;
 
-    private List<SourceSpecimenWrapper> addedOrModifiedSourceVessels;
+    private List<SourceSpecimenWrapper> addedOrModifiedSourceSpecimen;
 
-    private List<SourceSpecimenWrapper> deletedSourceVessels;
+    private List<SourceSpecimenWrapper> deletedSourceSpecimen;
 
     private StudyWrapper study;
 
@@ -55,14 +61,14 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
     public SourceSpecimenEntryInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null);
         this.study = study;
-        initSourceVessels();
-        selectedStudySourceVessels = study.getSourceSpecimenCollection(true);
-        if (selectedStudySourceVessels == null) {
-            selectedStudySourceVessels = new ArrayList<SourceSpecimenWrapper>();
+        initSpecimenTypes();
+        selectedSourceSpecimen = study.getSourceSpecimenCollection(true);
+        if (selectedSourceSpecimen == null) {
+            selectedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
         }
-        setCollection(selectedStudySourceVessels);
-        addedOrModifiedSourceVessels = new ArrayList<SourceSpecimenWrapper>();
-        deletedSourceVessels = new ArrayList<SourceSpecimenWrapper>();
+        setCollection(selectedSourceSpecimen);
+        addedOrModifiedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
+        deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -76,32 +82,32 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
     }
 
     public void addSourceSpecimen() {
-        SourceSpecimenWrapper newStudySourcevessel = new SourceSpecimenWrapper(
+        SourceSpecimenWrapper newSourceSpecimen = new SourceSpecimenWrapper(
             SessionManager.getAppService());
-        newStudySourcevessel.setStudy(study);
-        addOrEditStudySourceVessel(true, newStudySourcevessel);
+        newSourceSpecimen.setStudy(study);
+        addOrEditStudySourceSpecimen(true, newSourceSpecimen);
     }
 
-    private void addOrEditStudySourceVessel(boolean add,
-        SourceSpecimenWrapper studySourceVessel) {
-        List<SpecimenTypeWrapper> dialogSourceVessels = availableSourceVessels;
+    private void addOrEditStudySourceSpecimen(boolean add,
+        SourceSpecimenWrapper sourceSpecimen) {
+        List<SpecimenTypeWrapper> dialogSpecimenTypes = availableSpecimenTypes;
         if (!add) {
-            dialogSourceVessels.add(studySourceVessel.getSpecimenType());
+            dialogSpecimenTypes.add(sourceSpecimen.getSpecimenType());
         }
         // FIXME: create new dialog type
-        // StudySourceVesselDialog dlg = new StudySourceVesselDialog(PlatformUI
-        // .getWorkbench().getActiveWorkbenchWindow().getShell(),
-        // studySourceVessel, dialogSourceVessels);
-        // if (dlg.open() == Dialog.OK) {
-        // if (add) {
-        // // only add to the collection when adding and not editing
-        // selectedStudySourceVessels.add(studySourceVessel);
-        // }
-        // availableSourceVessels.remove(studySourceVessel.getSourceVessel());
-        // reloadCollection(selectedStudySourceVessels);
-        // addedOrModifiedSourceVessels.add(studySourceVessel);
-        // notifyListeners();
-        // }
+        SourceSpecimenDialog dlg = new SourceSpecimenDialog(PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+            sourceSpecimen, dialogSpecimenTypes);
+        if (dlg.open() == Dialog.OK) {
+            if (add) {
+                // only add to the collection when adding and not editing
+                selectedSourceSpecimen.add(sourceSpecimen);
+            }
+            availableSpecimenTypes.remove(sourceSpecimen.getSpecimenType());
+            reloadCollection(selectedSourceSpecimen);
+            addedOrModifiedSourceSpecimen.add(sourceSpecimen);
+            notifyListeners();
+        }
     }
 
     private void addEditSupport() {
@@ -117,9 +123,9 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    SourceSpecimenWrapper studySourceVessel = getSelection();
-                    if (studySourceVessel != null)
-                        addOrEditStudySourceVessel(false, studySourceVessel);
+                    SourceSpecimenWrapper sourceSpecimen = getSelection();
+                    if (sourceSpecimen != null)
+                        addOrEditStudySourceSpecimen(false, sourceSpecimen);
                 }
             });
         }
@@ -127,20 +133,23 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
-                    SourceSpecimenWrapper studySourceVessel = getSelection();
-                    if (studySourceVessel != null) {
+                    SourceSpecimenWrapper sourceSpecimen = getSelection();
+                    if (sourceSpecimen != null) {
                         if (!MessageDialog
-                            .openConfirm(PlatformUI.getWorkbench()
-                                .getActiveWorkbenchWindow().getShell(),
-                                "Delete Study Source Vessel",
-                                "Are you sure you want to delete this source vessel ?")) {
+                            .openConfirm(
+                                PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getShell(),
+                                Messages
+                                    .getString("SourceSpecimenEntryInfoTable.delete.title"),
+                                Messages
+                                    .getString("SourceSpecimenEntryInfoTable.delete.question"))) {
                             return;
                         }
 
-                        selectedStudySourceVessels.remove(studySourceVessel);
-                        setCollection(selectedStudySourceVessels);
-                        deletedSourceVessels.add(studySourceVessel);
-                        availableSourceVessels.add(studySourceVessel
+                        selectedSourceSpecimen.remove(sourceSpecimen);
+                        setCollection(selectedSourceSpecimen);
+                        deletedSourceSpecimen.add(sourceSpecimen);
+                        availableSpecimenTypes.add(sourceSpecimen
                             .getSpecimenType());
                         notifyListeners();
                     }
@@ -149,41 +158,40 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
         }
     }
 
-    private void initSourceVessels() {
-        // FIXME implemente this method
-        // try {
-        // availableSourceVessels = SourceVesselWrapper
-        // .getAllSourceVessels(SessionManager.getAppService());
-        // List<SourceSpecimenWrapper> studySourceVessels = study
-        // .getStudySourceVesselCollection();
-        // if (studySourceVessels != null) {
-        // for (SourceSpecimenWrapper ssv : studySourceVessels) {
-        // availableSourceVessels.remove(ssv.getSourceVessel());
-        // }
-        // }
-        // } catch (final RemoteConnectFailureException exp) {
-        // BioBankPlugin.openRemoteConnectErrorMessage(exp);
-        // } catch (ApplicationException e) {
-        // logger.error("initAllSourceVessel", e);
-        // }
+    private void initSpecimenTypes() {
+        try {
+            availableSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
+                SessionManager.getAppService(), false);
+            List<SourceSpecimenWrapper> sourceSpecimen = study
+                .getSourceSpecimenCollection(false);
+            if (sourceSpecimen != null) {
+                for (SourceSpecimenWrapper ssw : sourceSpecimen) {
+                    availableSpecimenTypes.remove(ssw.getSpecimenType());
+                }
+            }
+        } catch (final RemoteConnectFailureException exp) {
+            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+        } catch (ApplicationException e) {
+            logger.error("initSpecimenTypes", e);
+        }
     }
 
     public List<SourceSpecimenWrapper> getAddedOrModifiedSourceSpecimens() {
-        return addedOrModifiedSourceVessels;
+        return addedOrModifiedSourceSpecimen;
     }
 
     public List<SourceSpecimenWrapper> getDeletedSourceSpecimens() {
-        return deletedSourceVessels;
+        return deletedSourceSpecimen;
     }
 
     public void reload() {
-        selectedStudySourceVessels = study.getSourceSpecimenCollection(true);
-        if (selectedStudySourceVessels == null) {
-            selectedStudySourceVessels = new ArrayList<SourceSpecimenWrapper>();
+        selectedSourceSpecimen = study.getSourceSpecimenCollection(true);
+        if (selectedSourceSpecimen == null) {
+            selectedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
         }
-        reloadCollection(selectedStudySourceVessels);
-        addedOrModifiedSourceVessels = new ArrayList<SourceSpecimenWrapper>();
-        deletedSourceVessels = new ArrayList<SourceSpecimenWrapper>();
+        reloadCollection(selectedSourceSpecimen);
+        addedOrModifiedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
+        deletedSourceSpecimen = new ArrayList<SourceSpecimenWrapper>();
     }
 
     @Override

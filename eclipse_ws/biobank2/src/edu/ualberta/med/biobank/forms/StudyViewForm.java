@@ -20,10 +20,10 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
-import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.StudySourceVesselInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
@@ -43,8 +43,8 @@ public class StudyViewForm extends BiobankViewForm {
     private BiobankText visitTotal;
 
     private StudyContactInfoTable contactsTable;
-    private SampleStorageInfoTable sampleStorageTable;
-    private StudySourceVesselInfoTable studySourceVesselsTable;
+    private AliquotedSpecimenInfoTable aliquotedSpecimenTable;
+    private SourceSpecimenInfoTable sourceSpecimenTable;
 
     private class StudyPvCustomInfo extends PvAttrCustom {
         public BiobankText wiget;
@@ -148,30 +148,26 @@ public class StudyViewForm extends BiobankViewForm {
         setTextValue(visitTotal, study.getPatientVisitCount());
     }
 
-    @Deprecated
-    /**
-     * change sample storage info table into ?
-     */
     private void createAliquotedSpecimenSection() {
         Section section = createSection(Messages
             .getString("StudyViewForm.aliquoted.specimen.title")); //$NON-NLS-1$
 
-        sampleStorageTable = new SampleStorageInfoTable(section,
+        aliquotedSpecimenTable = new AliquotedSpecimenInfoTable(section,
             study.getAliquotedSpecimenCollection());
-        section.setClient(sampleStorageTable);
-        sampleStorageTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(sampleStorageTable);
+        section.setClient(aliquotedSpecimenTable);
+        aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(aliquotedSpecimenTable);
     }
 
     private void createSourceSpecimenSection() {
         Section section = createSection(Messages
             .getString("StudyViewForm.source.specimen.title")); //$NON-NLS-1$
 
-        studySourceVesselsTable = new StudySourceVesselInfoTable(section,
+        sourceSpecimenTable = new SourceSpecimenInfoTable(section,
             study.getSourceSpecimenCollection(true));
-        section.setClient(studySourceVesselsTable);
-        studySourceVesselsTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(studySourceVesselsTable);
+        section.setClient(sourceSpecimenTable);
+        sourceSpecimenTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(sourceSpecimenTable);
     }
 
     private void createPvCustomInfoSection() throws Exception {
@@ -239,9 +235,9 @@ public class StudyViewForm extends BiobankViewForm {
             Messages.getString("StudyViewForm.title"), study.getName())); //$NON-NLS-1$
         setStudySectionValues();
         setPvDataSectionValues();
-        sampleStorageTable
-            .setCollection(study.getAliquotedSpecimenCollection());
-        studySourceVesselsTable.setCollection(study
+        aliquotedSpecimenTable.setCollection(study
+            .getAliquotedSpecimenCollection());
+        sourceSpecimenTable.setCollection(study
             .getSourceSpecimenCollection(true));
         contactsTable.setCollection(study.getContactCollection(true));
     }

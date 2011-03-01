@@ -6,6 +6,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -31,8 +32,11 @@ public class AliquotedSpecimenInfoTable extends
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Sample type",
-        "Volume (ml)", "Quantity", "Activity status" };
+    private static final String[] HEADINGS = new String[] {
+        Messages.getString("AliquotedSpecimen.field.type.label"),
+        Messages.getString("AliquotedSpecimen.field.volume.label"),
+        Messages.getString("AliquotedSpecimen.field.quantity.label"),
+        Messages.getString("label.activity") };
 
     public AliquotedSpecimenInfoTable(Composite parent,
         List<AliquotedSpecimenWrapper> sampleStorageCollection) {
