@@ -623,6 +623,9 @@
                      </reference>
                   </or>
                </not>
+               <reference
+                     definitionId="biobank2.hasWorkingCenter">
+               </reference>
             </and>
          </enabledWhen>
       </handler>
@@ -2459,6 +2462,15 @@
            </iterate>
         </with>
      </definition>
+       <definition
+             id="biobank2.hasWorkingCenter">
+          <with
+                variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
+             <equals
+                   value="true">
+             </equals>
+          </with>
+       </definition>
    </extension>
    <extension
          point="org.eclipse.ui.startup">

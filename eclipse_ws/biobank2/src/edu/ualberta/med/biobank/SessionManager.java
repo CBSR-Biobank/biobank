@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -73,9 +72,8 @@ public class SessionManager {
     }
 
     public void addSession(final BiobankApplicationService appService,
-        String serverName, User user, Collection<SiteWrapper> sites) {
-        logger.debug("addSession: " + serverName + ", user/" + user.getLogin()
-            + " numSites/" + sites.size());
+        String serverName, User user) {
+        logger.debug("addSession: " + serverName + ", user/" + user.getLogin());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
         rootNode.addChild(sessionAdapter);
@@ -125,6 +123,8 @@ public class SessionManager {
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
         sessionSourceProvider.setWebAdmin(sessionAdapter != null
             && sessionAdapter.getUser().isWebsiteAdministrator());
+        sessionSourceProvider.setHasWorkingCentre(sessionAdapter != null
+            && sessionAdapter.getUser().getCurrentWorkingCentre() != null);
 
         // assign debug state
         DebugState debugStateSourceProvider = (DebugState) service

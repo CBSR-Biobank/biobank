@@ -25,6 +25,10 @@ public class User implements Serializable, NotAProxy {
     private String email;
     private boolean isLockedOut;
 
+    private List<SiteWrapper> workingSites;
+
+    private SiteWrapper currentWorkingSite;
+
     public boolean isLockedOut() {
         return isLockedOut;
     }
@@ -226,4 +230,27 @@ public class User implements Serializable, NotAProxy {
         return properties.toString();
     }
 
+    // FIXME list caching : what if a new site ? user should log off anyway ?
+    // Should return centres when the full security is set
+    public List<SiteWrapper> getWorkingCenters(
+        WritableApplicationService appService) throws Exception {
+        if (workingSites == null) {
+            List<SiteWrapper> allSites = SiteWrapper.getSites(appService);
+            workingSites = new ArrayList<SiteWrapper>();
+            for (SiteWrapper site : allSites) {
+                if (canUpdateSite(site.getId())) {
+                    workingSites.add(site);
+                }
+            }
+        }
+        return workingSites;
+    }
+
+    public void setCurrentWorkingSite(SiteWrapper site) {
+        this.currentWorkingSite = site;
+    }
+
+    public SiteWrapper getCurrentWorkingCentre() {
+        return currentWorkingSite;
+    }
 }
