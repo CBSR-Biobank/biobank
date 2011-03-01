@@ -864,7 +864,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         @SuppressWarnings("unchecked")
-        T value = (T) recall(property);
+        T value = (T) modelWrapper.recall(property);
 
         if (value == null && !modelWrapper.isCached(property)) {
             value = getModelProperty(modelWrapper, property);
