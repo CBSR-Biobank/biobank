@@ -319,7 +319,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     public String getChildLabelingSchemeName() {
-        return getChildLabelingScheme().getProperty(
+        return getProperty(getChildLabelingScheme(),
             ContainerLabelingSchemePeer.NAME);
     }
 
