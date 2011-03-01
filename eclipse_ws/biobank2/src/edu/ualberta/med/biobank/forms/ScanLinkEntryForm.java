@@ -554,7 +554,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             studiesSampleTypes = new ArrayList<SpecimenTypeWrapper>();
             for (AliquotedSpecimenWrapper ss : linkFormPatientManagement
                 .getCurrentPatient().getStudy()
-                .getAliquotedSpecimenCollection()) {
+                .getAliquotedSpecimenCollection(true)) {
                 if (ss.getActivityStatus().isActive()) {
                     SpecimenTypeWrapper type = ss.getSpecimenType();
                     if (authorizedSampleTypes.contains(type)) {

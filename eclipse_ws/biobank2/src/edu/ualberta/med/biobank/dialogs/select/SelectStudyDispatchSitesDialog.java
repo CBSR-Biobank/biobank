@@ -121,7 +121,7 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
                 selectedSites.add(site.getId());
             }
             currentAllSitesForStudy = new ArrayList<SiteWrapper>(
-                study.getSiteCollection());
+                study.getSiteCollection(false));
             currentAllSitesForStudy.remove(srcSite);
             for (SiteWrapper site : currentAllSitesForStudy) {
                 availableSites.put(site.getId(), site.getNameShort());

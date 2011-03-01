@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -189,9 +190,8 @@ public class SiteWrapper extends SiteBaseWrapper {
         + " as pevent join pevent."
         + ProcessingEventPeer.PARENT_SPECIMEN.getName()
         + " as spcs join spcs."
-        + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent join cevent."
-        + CollectionEventPeer.PATIENT.getName()
+        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+            CollectionEventPeer.PATIENT)
         + " as patients where site."
         + SitePeer.ID.getName() + "=?";
 
@@ -203,6 +203,7 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     // FIXME: this only returns specimens that have been aliquoted, it does
     // not return samples that have not been aliquoted (eg. paxgene)
+    // What should be do ?
     private static final String CHILD_SPECIMENS_COUNT_QRY = "select count(spcs) from "
         + Site.class.getName()
         + " site left join site."
@@ -467,15 +468,47 @@ public class SiteWrapper extends SiteBaseWrapper {
         return null;
     }
 
-    @Deprecated
-    public String getShipmentCount() {
-        // TODO Auto-generated method stub
-        return null;
+    public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.SPECIMEN_COLLECTION.getName()
+        + " as spcs join spcs."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cevent where site."
+        + SitePeer.ID.getName() + "=?";
+
+    /**
+     * Count events for specimen that are currently at this site
+     */
+    @Override
+    public long getCollectionEventCount() throws ApplicationException,
+        BiobankException {
+        HQLCriteria criteria = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
+            Arrays.asList(new Object[] { getId() }));
+        return getCountResult(appService, criteria);
     }
 
-    @Deprecated
-    public String getPatientVisitCount() {
-        // TODO Auto-generated method stub
-        return null;
+    private static final String COLLECTION_EVENT_COUNT_FOR_STUDY_QRY = "select count(distinct cEvent) from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.SPECIMEN_COLLECTION.getName()
+        + " as specimens join specimens."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cEvent where site."
+        + SitePeer.ID.getName()
+        + "=? and "
+        + "cEvent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.STUDY,
+            StudyPeer.ID) + "=?";
+
+    /**
+     * Count events for specimen that are currently at this site
+     */
+    @Override
+    public long getCollectionEventCountForStudy(StudyWrapper study)
+        throws ApplicationException, BiobankException {
+        HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_FOR_STUDY_QRY,
+            Arrays.asList(new Object[] { getId(), study.getId() }));
+        return getCountResult(appService, c);
     }
 }

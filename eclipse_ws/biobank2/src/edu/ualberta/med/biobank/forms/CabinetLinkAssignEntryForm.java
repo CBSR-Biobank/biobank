@@ -727,7 +727,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 BioBankPlugin.openAsyncError("Problem reloading study", e);
             }
             for (AliquotedSpecimenWrapper ss : study
-                .getAliquotedSpecimenCollection()) {
+                .getAliquotedSpecimenCollection(true)) {
                 if (ss.getActivityStatus().isActive()) {
                     SpecimenTypeWrapper type = ss.getSpecimenType();
                     if (binTypes.contains(type)) {

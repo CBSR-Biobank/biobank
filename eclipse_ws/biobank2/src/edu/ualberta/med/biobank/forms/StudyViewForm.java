@@ -145,7 +145,7 @@ public class StudyViewForm extends BiobankViewForm {
         setTextValue(activityStatusLabel, study.getActivityStatus());
         setTextValue(commentLabel, study.getComment());
         setTextValue(patientTotal, study.getPatientCount(true));
-        setTextValue(visitTotal, study.getPatientVisitCount());
+        setTextValue(visitTotal, study.getCollectionEventCount(true));
     }
 
     private void createAliquotedSpecimenSection() {
@@ -153,7 +153,7 @@ public class StudyViewForm extends BiobankViewForm {
             .getString("StudyViewForm.aliquoted.specimen.title")); //$NON-NLS-1$
 
         aliquotedSpecimenTable = new AliquotedSpecimenInfoTable(section,
-            study.getAliquotedSpecimenCollection());
+            study.getAliquotedSpecimenCollection(true));
         section.setClient(aliquotedSpecimenTable);
         aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(aliquotedSpecimenTable);
@@ -236,7 +236,7 @@ public class StudyViewForm extends BiobankViewForm {
         setStudySectionValues();
         setPvDataSectionValues();
         aliquotedSpecimenTable.setCollection(study
-            .getAliquotedSpecimenCollection());
+            .getAliquotedSpecimenCollection(true));
         sourceSpecimenTable.setCollection(study
             .getSourceSpecimenCollection(true));
         contactsTable.setCollection(study.getContactCollection(true));

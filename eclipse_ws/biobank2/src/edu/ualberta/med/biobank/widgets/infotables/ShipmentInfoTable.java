@@ -8,6 +8,8 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
+@Deprecated
+// FIXME shipment table should probably not contain collection events
 public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
 
     private class TableRowData {

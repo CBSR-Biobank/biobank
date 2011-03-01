@@ -84,7 +84,7 @@ public class ClinicInfoTable extends InfoTableWidget<ClinicWrapper> {
         }
         info.status = clinic.getActivityStatus().getName();
         info.patientCount = clinic.getPatientCount();
-        info.visitCount = clinic.getProcessingEventCount();
+        info.visitCount = clinic.getCollectionEventCount();
         return info;
     }
 

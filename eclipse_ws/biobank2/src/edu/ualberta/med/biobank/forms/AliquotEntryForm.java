@@ -70,7 +70,7 @@ public class AliquotEntryForm extends BiobankEntryForm {
         study.reload();
 
         List<AliquotedSpecimenWrapper> allowedSampleStorage = study
-            .getAliquotedSpecimenCollection();
+            .getAliquotedSpecimenCollection(true);
 
         List<SpecimenTypeWrapper> containerSampleTypeList = null;
         if (aliquot.hasParent()) {
