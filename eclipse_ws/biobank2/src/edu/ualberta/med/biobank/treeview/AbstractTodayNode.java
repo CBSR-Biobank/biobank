@@ -91,15 +91,16 @@ public abstract class AbstractTodayNode extends AdapterBase {
             }
 
             // add today elements is not yet there
-            for (ModelWrapper<?> wrapper : currentTodayElements) {
-                assert wrapper instanceof PatientWrapper
-                    || wrapper instanceof CollectionEventWrapper;
-                if (wrapper instanceof PatientWrapper) {
-                    PatientAdministrationView.addToNode(this, wrapper);
-                } else if (wrapper instanceof CollectionEventWrapper) {
-                    ShipmentAdministrationView.addToNode(this, wrapper);
+            if (currentTodayElements != null)
+                for (ModelWrapper<?> wrapper : currentTodayElements) {
+                    assert wrapper instanceof PatientWrapper
+                        || wrapper instanceof CollectionEventWrapper;
+                    if (wrapper instanceof PatientWrapper) {
+                        PatientAdministrationView.addToNode(this, wrapper);
+                    } else if (wrapper instanceof CollectionEventWrapper) {
+                        ShipmentAdministrationView.addToNode(this, wrapper);
+                    }
                 }
-            }
 
             // remove sub children without any children
             List<AdapterBase> children = new ArrayList<AdapterBase>(

@@ -12,11 +12,12 @@ import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.dialogs.SampleStorageDialog;
+import edu.ualberta.med.biobank.dialogs.AliquotedSpecimenDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
@@ -27,46 +28,35 @@ import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
- * Displays the current sample storage collection and allows the user to add
- * additional sample storage to the collection.
+ * Displays the current aliquoted specimen collection and allows the user to add
+ * additional aliquoted specimen to the collection.
  */
 public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AliquotedSpecimenEntryInfoTable.class.getName());
 
-    private List<SpecimenTypeWrapper> allSampleTypes;
+    private List<SpecimenTypeWrapper> allSpecimenTypes;
 
-    private List<AliquotedSpecimenWrapper> selectedSampleStorages;
+    private List<AliquotedSpecimenWrapper> selectedAliquotedSpecimen;
 
-    private List<AliquotedSpecimenWrapper> addedOrModifiedSampleStorages;
+    private List<AliquotedSpecimenWrapper> addedOrModifiedAliquotedSpecimen;
 
-    private List<AliquotedSpecimenWrapper> deletedSampleStorages;
+    private List<AliquotedSpecimenWrapper> deletedAliquotedSpecimen;
 
     private StudyWrapper study;
 
-    /**
-     * 
-     * @param parent a composite control which will be the parent of the new
-     *            instance (cannot be null)
-     * @param style the style of control to construct
-     * @param sampleStorageCollection the sample storage already selected and to
-     *            be displayed in the table viewer (can be null).
-     * @param toolkit The toolkit is responsible for creating SWT controls
-     *            adapted to work in Eclipse forms. If widget is not used in a
-     *            form this parameter should be null.
-     */
     public AliquotedSpecimenEntryInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null);
         getSpecimenTypes();
         this.study = study;
-        selectedSampleStorages = study.getAliquotedSpecimenCollection();
-        if (selectedSampleStorages == null) {
-            selectedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
+        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection();
+        if (selectedAliquotedSpecimen == null) {
+            selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }
-        setCollection(selectedSampleStorages);
-        addedOrModifiedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
-        deletedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
+        setCollection(selectedAliquotedSpecimen);
+        addedOrModifiedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+        deletedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
 
         setLayout(new GridLayout(1, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -80,29 +70,29 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public void addAliquotedSpecimen() {
-        addOrEditSampleStorage(true, new AliquotedSpecimenWrapper(
+        addOrEditAliquotedSpecimen(true, new AliquotedSpecimenWrapper(
             SessionManager.getAppService()));
     }
 
-    private void addOrEditSampleStorage(boolean add,
-        AliquotedSpecimenWrapper sampleStorage) {
-        List<SpecimenTypeWrapper> availableSampleTypes = new ArrayList<SpecimenTypeWrapper>();
-        availableSampleTypes.addAll(allSampleTypes);
-        for (AliquotedSpecimenWrapper ssw : selectedSampleStorages) {
-            if (add || !ssw.equals(sampleStorage)) {
-                availableSampleTypes.remove(ssw.getSpecimenType());
+    private void addOrEditAliquotedSpecimen(boolean add,
+        AliquotedSpecimenWrapper aliquotedSpecimen) {
+        List<SpecimenTypeWrapper> availableSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
+        availableSpecimenTypes.addAll(allSpecimenTypes);
+        for (AliquotedSpecimenWrapper ssw : selectedAliquotedSpecimen) {
+            if (add || !ssw.equals(aliquotedSpecimen)) {
+                availableSpecimenTypes.remove(ssw.getSpecimenType());
             }
         }
-        SampleStorageDialog dlg = new SampleStorageDialog(PlatformUI
+        AliquotedSpecimenDialog dlg = new AliquotedSpecimenDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            sampleStorage, availableSampleTypes);
+            aliquotedSpecimen, availableSpecimenTypes);
         if (dlg.open() == Dialog.OK) {
             if (add) {
                 // only add to the collection when adding and not editing
-                selectedSampleStorages.add(sampleStorage);
+                selectedAliquotedSpecimen.add(aliquotedSpecimen);
             }
-            reloadCollection(selectedSampleStorages);
-            addedOrModifiedSampleStorages.add(sampleStorage);
+            reloadCollection(selectedAliquotedSpecimen);
+            addedOrModifiedAliquotedSpecimen.add(aliquotedSpecimen);
             notifyListeners();
         }
     }
@@ -120,9 +110,9 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
-                    AliquotedSpecimenWrapper sampleStorage = getSelection();
-                    if (sampleStorage != null)
-                        addOrEditSampleStorage(false, sampleStorage);
+                    AliquotedSpecimenWrapper aliquotedSpecimen = getSelection();
+                    if (aliquotedSpecimen != null)
+                        addOrEditAliquotedSpecimen(false, aliquotedSpecimen);
                 }
             });
         }
@@ -130,20 +120,25 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {
-                    AliquotedSpecimenWrapper sampleStorage = getSelection();
-                    if (sampleStorage != null) {
-                        if (!MessageDialog.openConfirm(PlatformUI
-                            .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), "Delete Aliquot Storage",
-                            "Are you sure you want to delete sample storage \""
-                                + sampleStorage.getSpecimenType().getName()
-                                + "\"?")) {
+                    AliquotedSpecimenWrapper aliquotedSpecimen = getSelection();
+                    if (aliquotedSpecimen != null) {
+                        if (!MessageDialog
+                            .openConfirm(
+                                PlatformUI.getWorkbench()
+                                    .getActiveWorkbenchWindow().getShell(),
+                                Messages
+                                    .getString("AliquotedSpecimenEntryInfoTable.delete.title"),
+                                Messages
+                                    .getString(
+                                        "AliquotedSpecimenEntryInfoTable.delete.question",
+                                        aliquotedSpecimen.getSpecimenType()
+                                            .getName()))) {
                             return;
                         }
 
-                        selectedSampleStorages.remove(sampleStorage);
-                        setCollection(selectedSampleStorages);
-                        deletedSampleStorages.add(sampleStorage);
+                        selectedAliquotedSpecimen.remove(aliquotedSpecimen);
+                        setCollection(selectedAliquotedSpecimen);
+                        deletedAliquotedSpecimen.add(aliquotedSpecimen);
                         notifyListeners();
                     }
                 }
@@ -153,7 +148,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
 
     private void getSpecimenTypes() {
         try {
-            allSampleTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
+            allSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
                 SessionManager.getAppService(), true);
         } catch (final RemoteConnectFailureException exp) {
             BioBankPlugin.openRemoteConnectErrorMessage(exp);
@@ -163,21 +158,21 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public List<AliquotedSpecimenWrapper> getAddedOrModifiedAliquotedSpecimens() {
-        return addedOrModifiedSampleStorages;
+        return addedOrModifiedAliquotedSpecimen;
     }
 
     public List<AliquotedSpecimenWrapper> getDeletedAliquotedSpecimens() {
-        return deletedSampleStorages;
+        return deletedAliquotedSpecimen;
     }
 
     public void reload() {
-        selectedSampleStorages = study.getAliquotedSpecimenCollection();
-        if (selectedSampleStorages == null) {
-            selectedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
+        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection();
+        if (selectedAliquotedSpecimen == null) {
+            selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }
-        reloadCollection(selectedSampleStorages);
-        addedOrModifiedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
-        deletedSampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
+        reloadCollection(selectedAliquotedSpecimen);
+        addedOrModifiedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
+        deletedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
     }
 
     @Override

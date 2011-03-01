@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.helpers;
 
 import java.awt.Desktop;
 import java.net.URI;
-import java.util.Collection;
 
 import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
 import org.eclipse.core.runtime.Platform;
@@ -11,7 +10,6 @@ import org.springframework.remoting.RemoteAccessException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ClientVersionInvalidException;
@@ -33,8 +31,6 @@ public class SessionHelper implements Runnable {
 
     private BiobankApplicationService appService;
 
-    private Collection<SiteWrapper> siteWrappers;
-
     private User user;
 
     private static final String DOWNLOAD_URL = "http://aicml-med.cs.ualberta.ca/CBSR/latest.html";
@@ -51,8 +47,6 @@ public class SessionHelper implements Runnable {
         this.password = password;
 
         appService = null;
-        siteWrappers = null;
-
     }
 
     @Override
@@ -73,7 +67,6 @@ public class SessionHelper implements Runnable {
             String clientVersion = Platform.getProduct().getDefiningBundle()
                 .getVersion().toString();
             appService.checkVersion(clientVersion);
-            siteWrappers = SiteWrapper.getSites(appService);
             user = appService.getCurrentUser();
         } catch (ApplicationException exp) {
             if (exp instanceof ServerVersionInvalidException) {
@@ -122,10 +115,6 @@ public class SessionHelper implements Runnable {
 
     public BiobankApplicationService getAppService() {
         return appService;
-    }
-
-    public Collection<SiteWrapper> getSites() {
-        return siteWrappers;
     }
 
     public User getUser() {
