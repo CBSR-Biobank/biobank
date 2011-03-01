@@ -51,8 +51,6 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private DispatchWrapper dispatch;
 
-    private BiobankText studyLabel;
-
     private BiobankText senderLabel;
 
     private BiobankText receiverLabel;
@@ -313,7 +311,6 @@ public class DispatchViewForm extends BiobankViewForm {
             label.setLayoutData(gd);
         }
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
         receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Receiver");

@@ -17,7 +17,6 @@ import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 
 public class SiteViewForm extends AddressViewFormCommon {
@@ -52,8 +51,6 @@ public class SiteViewForm extends AddressViewFormCommon {
     private BiobankText activityStatusLabel;
 
     private BiobankText commentLabel;
-
-    private SiteDispatchInfoTable dispatchTable;
 
     @Override
     public void init() {
@@ -101,7 +98,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         patientCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Patients");
         patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Patient Visits");
+            "Total Processing Events");
         sampleCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Total Samples");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -121,7 +118,7 @@ public class SiteViewForm extends AddressViewFormCommon {
             .size());
         setTextValue(shipmentCountLabel, site.getShipmentCount());
         setTextValue(patientCountLabel, site.getPatientCount());
-        setTextValue(patientVisitCountLabel, site.getPatientVisitCount());
+        setTextValue(patientVisitCountLabel, site.getProcessingEventCount(true));
         setTextValue(sampleCountLabel, site.getSpecimenCount());
         setTextValue(activityStatusLabel, site.getActivityStatus().getName());
         setTextValue(commentLabel, site.getComment());

@@ -77,7 +77,7 @@ public class StudyInfoTable extends InfoTableWidget<StudyWrapper> {
             info.status = new String();
         }
         info.patientCount = study.getPatientCount(true);
-        info.visitCount = study.getPatientVisitCount();
+        info.visitCount = study.getProcessingEventCount();
         study.reload();
         return info;
     }

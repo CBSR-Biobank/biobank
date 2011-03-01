@@ -7,6 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -18,6 +19,7 @@ import org.eclipse.swt.widgets.Label;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -33,6 +35,7 @@ import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
+import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
 public class CollectionEventEntryForm extends BiobankEntryForm {
 
@@ -69,6 +72,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     };
 
     private ComboViewer activityStatusComboViewer;
+
+    private BiobankText pvWidget;
 
     @Override
     public void init() throws Exception {
@@ -135,8 +140,30 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Patient",
             patient.getPnumber());
 
-        // FIXME first control should be patient visit number
-        // setFirstControl(dateDrawnWidget);
+        pvWidget = (BiobankText) createBoundWidgetWithLabel(client,
+            BiobankText.class, SWT.MULTI, "Visit", null, cevent, "visitNumber",
+            null);
+        pvWidget.addSelectionChangedListener(listener);
+
+        setFirstControl(pvWidget);
+
+        activityStatusComboViewer = createComboViewer(client,
+            "Activity Status",
+            ActivityStatusWrapper.getAllActivityStatuses(appService),
+            cevent.getActivityStatus(),
+            "Container must have an activity status",
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    setDirty(true);
+                    cevent
+                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                }
+            });
+        if (cevent.getActivityStatus() != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                cevent.getActivityStatus()));
+        }
 
         createPvDataSection(client);
 
@@ -240,11 +267,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         if (patientAdapter != null)
             cevent.setPatient(patientAdapter.getWrapper());
 
-        // FIXME should be source specimens
-        // cevent.addToSourceVesselCollection(pvSourceVesseltable
-        // .getAddedOrModifiedSourceVessels());
-        // cevent.removeFromSourceVesselCollection(pvSourceVesseltable
-        // .getDeletedSourceVessels());
+        cevent.addToSpecimenCollection(specimensWidget
+            .getAddedOrModifiedSpecimens());
+        cevent.removeFromSpecimenCollection(specimensWidget
+            .getDeletedSpecimens());
         savePvCustomInfo();
     }
 

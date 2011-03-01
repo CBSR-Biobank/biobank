@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
-import edu.ualberta.med.biobank.treeview.AliquotAdapter;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
@@ -33,9 +33,9 @@ import edu.ualberta.med.biobank.wizards.SelectPatientVisitWizard;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.AliquotEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenEntryForm";
 
-    public static final String OK_MESSAGE = "Edit aliquot";
+    public static final String OK_MESSAGE = "Edit specimen";
 
     private SpecimenWrapper aliquot;
 
@@ -49,10 +49,10 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     @Override
     protected void init() throws Exception {
-        AliquotAdapter aliquotAdapter = (AliquotAdapter) adapter;
+        SpecimenAdapter aliquotAdapter = (SpecimenAdapter) adapter;
         aliquot = aliquotAdapter.getSpecimen();
         aliquot.logEdit(aliquot.getCurrentCenter().getNameShort());
-        setPartName("Aliquot Entry");
+        setPartName("Specimen Entry");
     }
 
     @Override
@@ -217,7 +217,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
     @Override
     public String getNextOpenedFormID() {
-        return AliquotViewForm.ID;
+        return SpecimenViewForm.ID;
     }
 
     @Override

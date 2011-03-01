@@ -144,6 +144,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             .getString(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS);
         linkFormPatientManagement = new LinkFormPatientManagement(
             widgetCreator, this);
+
     }
 
     @Override
@@ -154,6 +155,19 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
 
         createFieldsSection();
         createLocationSection();
+
+        linkFormPatientManagement.setSite(SessionManager.getUser()
+            .getCurrentWorkingCentre());
+        if (viewerSampleTypes != null) {
+            initCabinetContainerTypesList();
+            viewerSampleTypes.setInput(null);
+            aliquot.setSpecimenType(null);
+            if (newCabinetPositionValidator.validate(
+                newCabinetPositionText.getText()).equals(Status.OK_STATUS)) {
+                initContainersFromPosition();
+                setTypeCombosLists();
+            }
+        }
 
         cancelConfirmWidget = new CancelConfirmWidget(page, this, true);
 
@@ -246,8 +260,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 }
             }
         });
-
-        createSiteCombo(fieldsComposite, true);
 
         // Patient number + visits list
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
@@ -460,7 +472,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
             bin = null;
             drawer = null;
             cabinet = null;
-            SiteWrapper currentSite = siteCombo.getSelectedSite();
+            SiteWrapper currentSite = SessionManager.getUser()
+                .getCurrentWorkingCentre();
             String fullLabel = newCabinetPositionText.getText();
             List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
             int removeSize = 2;
@@ -610,12 +623,12 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     }
 
     private void initCabinetContainerTypesList() throws ApplicationException {
-        if (siteCombo.getSelectedSite() == null)
+        if (SessionManager.getUser().getCurrentWorkingCentre() == null)
             cabinetContainerTypes = new ArrayList<ContainerTypeWrapper>();
         else {
             cabinetContainerTypes = ContainerTypeWrapper
-                .getContainerTypesInSite(appService,
-                    siteCombo.getSelectedSite(), cabinetNameContains, false);
+                .getContainerTypesInSite(appService, SessionManager.getUser()
+                    .getCurrentWorkingCentre(), cabinetNameContains, false);
             if (cabinetContainerTypes.size() == 0)
                 BioBankPlugin.openAsyncError(
                     Messages.getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
@@ -628,8 +641,8 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         throws ApplicationException {
         if (cabinetSpecimenTypes == null) {
             cabinetSpecimenTypes = SpecimenTypeWrapper
-                .getSpecimenTypeForContainerTypes(appService,
-                    siteCombo.getSelectedSite(), cabinetNameContains);
+                .getSpecimenTypeForContainerTypes(appService, SessionManager
+                    .getUser().getCurrentWorkingCentre(), cabinetNameContains);
         }
         return cabinetSpecimenTypes;
     }
@@ -958,19 +971,4 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         return super.onClose();
     }
 
-    @Override
-    protected void siteComboSelectionChanged(SiteWrapper currentSelection)
-        throws Exception {
-        linkFormPatientManagement.setSite(currentSelection);
-        if (viewerSampleTypes != null) {
-            initCabinetContainerTypesList();
-            viewerSampleTypes.setInput(null);
-            aliquot.setSpecimenType(null);
-            if (newCabinetPositionValidator.validate(
-                newCabinetPositionText.getText()).equals(Status.OK_STATUS)) {
-                initContainersFromPosition();
-                setTypeCombosLists();
-            }
-        }
-    }
 }

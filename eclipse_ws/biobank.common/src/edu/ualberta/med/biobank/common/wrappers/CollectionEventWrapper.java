@@ -108,7 +108,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        // FIX: how do we know what clinic this CE is for?
+        // FIXME: how do we know what clinic this CE is for?
         // checkPatientsStudy(clinic);
     }
 

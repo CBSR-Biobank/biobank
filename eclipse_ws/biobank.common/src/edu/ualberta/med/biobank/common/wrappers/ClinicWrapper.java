@@ -137,8 +137,7 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     public long getPatientCount() throws BiobankException, ApplicationException {
         HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
-        // FIXME
-        return 0; // getCountResult(appService, criteria);
+        return getCountResult(appService, criteria);
     }
 
     private static final String ALL_CLINICS_QRY = "from "

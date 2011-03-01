@@ -29,7 +29,6 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
@@ -185,11 +184,6 @@ public class AliquotedSpecimenSelectionWidget {
     public SpecimenTypeWrapper getSelection() {
         return (SpecimenTypeWrapper) ((StructuredSelection) cvSource
             .getSelection()).getFirstElement();
-    }
-
-    @Deprecated
-    public SourceVesselWrapper getSourceSelection() {
-        return null;
     }
 
     public void addBinding(WidgetCreator dbc) {

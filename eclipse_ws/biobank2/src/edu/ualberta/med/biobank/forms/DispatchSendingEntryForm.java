@@ -27,7 +27,6 @@ import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
@@ -45,15 +44,11 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
     public static final String MSG_DISPATCH_OK = "Editing an existing dispatch record.";
 
-    private ComboViewer studyComboViewer;
-
     private ComboViewer destSiteComboViewer;
 
     protected DispatchAliquotListInfoTable aliquotsNonProcessedTable;
 
     private DispatchAliquotsTreeTable aliquotsTreeTable;
-
-    private BasicSiteCombo siteCombo;
 
     @Override
     public void createPartControl(Composite parent) {
@@ -79,19 +74,10 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        siteCombo = createBasicSiteCombo(client, true,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    SiteWrapper currentSite = siteCombo.getSelectedSite();
-                    dispatch.setSender(currentSite);
-                }
-            });
-        setFirstControl(siteCombo);
+        dispatch.setSender(SessionManager.getUser().getCurrentWorkingCentre());
+        setFirstControl(client);
 
         createReceiverCombo(client);
-
-        siteCombo.setSelectedSite(dispatch.getSender(), true);
 
         if (!dispatch.isNew() && !dispatch.isInCreationState()) {
             ShippingMethodWrapper selectedShippingMethod = dispatch
@@ -198,7 +184,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     protected void openScanDialog() {
         DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, siteCombo.getSelectedSite());
+            dispatch, SessionManager.getUser().getCurrentWorkingCentre());
         dialog.open();
         setDirty(true); // FIXME need to do this better !
         reloadAliquots();
@@ -238,7 +224,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
             return;
         }
         try {
-            dispatch.addNewAliquots(Arrays.asList(aliquot), true);
+            dispatch.addSpecimens(Arrays.asList(aliquot));
         } catch (Exception e) {
             BioBankPlugin.openAsyncError("Error adding aliquots", e);
         }
@@ -258,7 +244,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        dispatch.setSender(siteCombo.getSelectedSite());
+        dispatch.setSender(SessionManager.getUser().getCurrentWorkingCentre());
         if (destSiteComboViewer != null) {
             CenterWrapper<?> destSite = dispatch.getReceiver();
             if (destSite != null) {

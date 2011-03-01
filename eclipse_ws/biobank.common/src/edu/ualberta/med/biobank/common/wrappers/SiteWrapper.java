@@ -467,10 +467,8 @@ public class SiteWrapper extends SiteBaseWrapper {
         return null;
     }
 
-    @Deprecated
     public String getShipmentCount() {
-        // TODO Auto-generated method stub
-        return null;
+        return null; // FIXME: no way to determine destination of shipinfos...
     }
 
     @Deprecated

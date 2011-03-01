@@ -153,7 +153,7 @@ public class RequestEntryFormBase extends BiobankFormBase {
     public static AliquotInfo getInfoForInventoryId(
         ModelWrapper<?> currentShipment, String inventoryId) {
         RequestSpecimenWrapper dsa = ((RequestWrapper) currentShipment)
-            .getRequestAliquot(inventoryId);
+            .getRequestSpecimen(inventoryId);
         if (dsa == null) {
             // aliquot not in shipment. Check if exists in DB:
             SpecimenWrapper aliquot = null;
@@ -176,6 +176,5 @@ public class RequestEntryFormBase extends BiobankFormBase {
             return new AliquotInfo(dsa.getSpecimen(), ResType.EXTRA);
         }
         return new AliquotInfo(dsa.getSpecimen(), ResType.OK);
-        return null;
     }
 }

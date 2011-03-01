@@ -561,10 +561,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     }
 
-    @Deprecated
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
-        // TODO Auto-generated method stub
-        return null;
+        return getDispatchSpecimenCollection(false);
     }
 
     @Deprecated
