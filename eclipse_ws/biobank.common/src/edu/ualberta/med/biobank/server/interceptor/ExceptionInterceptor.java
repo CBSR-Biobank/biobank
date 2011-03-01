@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.server.interceptor;
 
+import java.sql.BatchUpdateException;
+
 import org.hibernate.PropertyValueException;
 import org.hibernate.validator.InvalidStateException;
 import org.hibernate.validator.InvalidValue;
@@ -7,6 +9,7 @@ import org.springframework.aop.ThrowsAdvice;
 import org.springframework.dao.DataIntegrityViolationException;
 
 import edu.ualberta.med.biobank.common.exception.ExceptionUtils;
+import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServerException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -48,10 +51,14 @@ public class ExceptionInterceptor implements ThrowsAdvice {
     }
 
     public void afterThrowing(DataIntegrityViolationException dive)
-        throws ValueNotSetException {
+        throws BiobankServerException {
         Throwable cause = ExceptionUtils.findCausesInThrowable(dive,
-            PropertyValueException.class);
+            PropertyValueException.class, BatchUpdateException.class);
         getNotNullPropertyValueException(cause, dive);
+        if (cause != null && cause instanceof BatchUpdateException) {
+            BatchUpdateException bue = (BatchUpdateException) cause;
+            throw new BiobankServerException(bue.getMessage(), dive);
+        }
         throw dive;
     }
 
