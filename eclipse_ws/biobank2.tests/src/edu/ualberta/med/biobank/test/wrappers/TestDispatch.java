@@ -10,7 +10,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -18,14 +18,14 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
@@ -290,14 +290,14 @@ public class TestDispatch extends TestDatabase {
         Assert.assertEquals(countBefore - 1, countAfter);
     }
 
-    private List<AliquotWrapper> addAliquotsToContainerRow(
+    private List<SpecimenWrapper> addAliquotsToContainerRow(
         ProcessingEventWrapper visit, ContainerWrapper container, int row,
-        List<SampleTypeWrapper> sampleTypes) throws Exception {
+        List<SpecimenTypeWrapper> sampleTypes) throws Exception {
         int numSampletypes = sampleTypes.size();
         int colCapacity = container.getColCapacity();
-        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
         for (int i = 0; i < colCapacity; ++i) {
-            aliquots.add(AliquotHelper.addAliquot(
+            aliquots.add(SpecimenHelper.addAliquot(
                 sampleTypes.get(r.nextInt(numSampletypes)),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, visit,
                 row, i));
@@ -308,8 +308,8 @@ public class TestDispatch extends TestDatabase {
     }
 
     @Test
-    public void testGetSetAliquotCollection() throws Exception {
-        String name = "testGetSetAliquotCollection" + r.nextInt();
+    public void testGetSetSpecimenCollection() throws Exception {
+        String name = "testGetSetSpecimenCollection" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         senderSite.persist();
@@ -321,8 +321,8 @@ public class TestDispatch extends TestDatabase {
         DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
             receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
                 .get(0));
-        List<SampleTypeWrapper> sampleTypes = SampleTypeWrapper
-            .getAllSampleTypes(appService, false);
+        List<SpecimenTypeWrapper> sampleTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
         ContainerTypeWrapper containerType = ContainerTypeHelper
             .addContainerType(senderSite, name, name, 1, 8, 12, false);
         containerType.addToSampleTypeCollection(sampleTypes);
@@ -349,25 +349,25 @@ public class TestDispatch extends TestDatabase {
             .addProcessingEvent(clinic, patient, Utils.getRandomDate(),
                 Utils.getRandomDate());
 
-        List<AliquotWrapper> aliquotSet1 = addAliquotsToContainerRow(visit,
+        List<SpecimenWrapper> aliquotSet1 = addAliquotsToContainerRow(visit,
             container, 0, sampleTypes);
-        List<AliquotWrapper> aliquotSet2 = addAliquotsToContainerRow(visit,
+        List<SpecimenWrapper> aliquotSet2 = addAliquotsToContainerRow(visit,
             container, 1, sampleTypes);
 
-        dispatch.addAliquots(aliquotSet1);
+        dispatch.addSpecimens(aliquotSet1);
         dispatch.persist();
         dispatch.reload();
 
-        List<AliquotWrapper> shipmentAliquots = dispatch.getAliquotCollection();
+        List<SpecimenWrapper> shipmentAliquots = dispatch.getSpecimenCollection();
         Assert.assertEquals(aliquotSet1.size(), shipmentAliquots.size());
 
         // add more aliquots to row 2
 
-        dispatch.addAliquots(aliquotSet2);
+        dispatch.addSpecimens(aliquotSet2);
         dispatch.persist();
         dispatch.reload();
 
-        shipmentAliquots = dispatch.getAliquotCollection();
+        shipmentAliquots = dispatch.getSpecimenCollection();
         Assert.assertEquals(aliquotSet1.size() + aliquotSet2.size(),
             shipmentAliquots.size());
 
@@ -375,7 +375,7 @@ public class TestDispatch extends TestDatabase {
         dispatch.persist();
         dispatch.reload();
 
-        shipmentAliquots = dispatch.getAliquotCollection();
+        shipmentAliquots = dispatch.getSpecimenCollection();
         Assert.assertEquals(aliquotSet2.size(), shipmentAliquots.size());
     }
 

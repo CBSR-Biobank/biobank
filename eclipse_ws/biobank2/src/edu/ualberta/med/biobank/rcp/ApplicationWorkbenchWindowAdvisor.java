@@ -22,8 +22,10 @@ import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
@@ -41,10 +43,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     private String username = null;
 
+    private String currentCentre = null;
+
     public ApplicationWorkbenchWindowAdvisor(
         IWorkbenchWindowConfigurer configurer) {
         super(configurer);
-        addScannerPreferencesPropertyListener();
+        addBiobankPreferencesPropertyListener();
     }
 
     @Override
@@ -89,8 +93,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IWorkbench workbench = PlatformUI.getWorkbench();
         IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
         IWorkbenchPage page = window.getActivePage();
-        if (page.getPerspective().getId()
-            .equals(AliquotManagementPerspective.ID)) {
+        if (page.getPerspective().getId().equals(LinkAssignPerspective.ID)) {
             // can't start on this perspective: switch to patient perspective
             try {
                 workbench.showPerspective(ProcessingPerspective.ID,
@@ -124,7 +127,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     if (sourceValue != null) {
                         if (sourceValue.equals(SessionState.LOGGED_IN))
                             mainWindowUpdateTitle(SessionManager.getServer(),
-                                SessionManager.getUser().getLogin());
+                                SessionManager.getUser());
                         else if (sourceValue.equals(SessionState.LOGGED_OUT))
                             mainWindowResetTitle();
                     }
@@ -150,9 +153,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         mainWindowUpdateTitle(null, null);
     }
 
-    private void mainWindowUpdateTitle(String server, String username) {
+    private void mainWindowUpdateTitle(String server, User user) {
         this.server = server;
-        this.username = username;
+        if (user == null) {
+            this.username = null;
+            this.currentCentre = null;
+        } else {
+            this.username = user.getLogin();
+            SiteWrapper site = user.getCurrentWorkingCentre();
+            this.currentCentre = site == null ? null : site.getNameShort();
+        }
         mainWindowUpdateTitle();
     }
 
@@ -164,13 +174,16 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         if ((server != null) && (username != null)) {
             newTitle += " - " + server + " [" + username + "]";
         }
+        if (currentCentre != null) {
+            newTitle += " - Centre " + currentCentre;
+        }
 
         if (!newTitle.equals(oldTitle)) {
             configurer.setTitle(newTitle);
         }
     }
 
-    private void addScannerPreferencesPropertyListener() {
+    private void addBiobankPreferencesPropertyListener() {
         propertyListener = new IPropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {

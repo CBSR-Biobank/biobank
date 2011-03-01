@@ -30,8 +30,8 @@ import org.eclipse.swt.widgets.TreeColumn;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.util.RequestAliquotState;
-import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
+import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.forms.utils.RequestTableGroup;
 import edu.ualberta.med.biobank.treeview.Node;
@@ -130,7 +130,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                             .getLabelInternal();
                     case 1:
                         return ((RequestAliquotAdapter) element)
-                            .getSampleType();
+                            .getSpecimenType();
                     case 2:
                         return ((RequestAliquotAdapter) element).getPosition();
                     case 3:
@@ -151,38 +151,36 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                 Object o = ((IStructuredSelection) tv.getSelection())
                     .getFirstElement();
                 if (o instanceof RequestAliquotAdapter) {
-                    RequestAliquotWrapper ra = ((RequestAliquotAdapter) o)
-                        .getAliquot();
-                    SessionManager.openViewForm(ra.getAliquot());
+                    RequestSpecimenWrapper ra = ((RequestAliquotAdapter) o)
+                        .getSpecimen();
+                    SessionManager.openViewForm(ra.getSpecimen());
                 }
             }
         });
 
-        if (shipment.isInAcceptedState()) {
-            final Menu menu = new Menu(this);
-            tv.getTree().setMenu(menu);
+        final Menu menu = new Menu(this);
+        tv.getTree().setMenu(menu);
 
-            menu.addListener(SWT.Show, new Listener() {
-                @Override
-                public void handleEvent(Event event) {
-                    for (MenuItem menuItem : menu.getItems()) {
-                        menuItem.dispose();
-                    }
+        menu.addListener(SWT.Show, new Listener() {
+            @Override
+            public void handleEvent(Event event) {
+                for (MenuItem menuItem : menu.getItems()) {
+                    menuItem.dispose();
+                }
 
-                    RequestAliquotWrapper ra = getSelectedAliquot();
-                    if (ra != null) {
-                        addClipboardCopySupport(menu, labelProvider);
-                        addSetUnavailableMenu(menu);
+                RequestSpecimenWrapper ra = getSelectedAliquot();
+                if (ra != null) {
+                    addClipboardCopySupport(menu, labelProvider);
+                    addSetUnavailableMenu(menu);
+                    addClaimMenu(menu);
+                } else {
+                    Object node = getSelectedNode();
+                    if (node != null) {
                         addClaimMenu(menu);
-                    } else {
-                        Object node = getSelectedNode();
-                        if (node != null) {
-                            addClaimMenu(menu);
-                        }
                     }
                 }
-            });
-        }
+            }
+        });
     }
 
     protected Object getSelectedNode() {
@@ -196,10 +194,10 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
         return null;
     }
 
-    protected RequestAliquotWrapper getSelectedAliquot() {
+    protected RequestSpecimenWrapper getSelectedAliquot() {
         Object node = getSelectedNode();
         if (node != null && node instanceof RequestAliquotAdapter) {
-            return ((RequestAliquotAdapter) node).getAliquot();
+            return ((RequestAliquotAdapter) node).getSpecimen();
         }
         return null;
     }
@@ -220,8 +218,8 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
     protected void claim(Object node) {
         try {
             if (node instanceof RequestAliquotAdapter) {
-                RequestAliquotWrapper a = ((RequestAliquotAdapter) node)
-                    .getAliquot();
+                RequestSpecimenWrapper a = ((RequestAliquotAdapter) node)
+                    .getSpecimen();
                 a.setClaimedBy(SessionManager.getUser().getFirstName());
                 a.persist();
             } else {
@@ -243,7 +241,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
             @Override
             public void widgetSelected(SelectionEvent event) {
                 getSelectedAliquot().setState(
-                    RequestAliquotState.UNAVAILABLE_STATE.getId());
+                    RequestSpecimenState.UNAVAILABLE_STATE.getId());
                 try {
                     getSelectedAliquot().persist();
                 } catch (Exception e) {

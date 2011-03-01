@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -12,6 +11,8 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
+import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ClinicBaseWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -95,11 +96,6 @@ public class ClinicWrapper extends ClinicBaseWrapper {
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        if (getCollectionEventCount() > 0) {
-            throw new BiobankCheckException("Unable to delete clinic "
-                + getName()
-                + ". All defined collection events must be removed first.");
-        }
         List<StudyWrapper> studies = getStudyCollection();
         if (studies != null && studies.size() > 0) {
             throw new BiobankCheckException("Unable to delete clinic "
@@ -118,14 +114,18 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return 0;
     }
 
-    public static final String PATIENT_COUNT_QRY = "select count(distinct svs.patient) from "
+    public static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
         + Clinic.class.getName()
         + " as clinic join clinic."
-        + ClinicPeer.COLLECTION_EVENT_COLLECTION.getName()
-        + " as shipments join shipments."
-        + CollectionEventPeer.SOURCE_VESSEL_COLLECTION.getName()
-        + " as svs"
-        + " where clinic." + ClinicPeer.ID.getName() + " = ?";
+        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+        + " as oi join oi."
+        + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+        + " as spcs join spcs."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cevents join cevents"
+        + CollectionEventPeer.PATIENT.getName()
+        + "as patients where clinic."
+        + ClinicPeer.ID.getName() + "=?";
 
     /**
      * fast = true will execute a hql query. fast = false will call the
@@ -134,25 +134,11 @@ public class ClinicWrapper extends ClinicBaseWrapper {
      * @throws BiobankCheckException
      * @throws ApplicationException
      */
-    public long getPatientCount(boolean fast) throws BiobankException,
-        ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        HashSet<PatientWrapper> uniquePatients = new HashSet<PatientWrapper>();
-        List<CollectionEventWrapper> ships = getCollectionEventCollection(false);
-        if (ships != null)
-            for (CollectionEventWrapper ship : ships) {
-                if (ship.getPatientCollection() != null) {
-                    Collection<SourceVesselWrapper> svCollection = ship
-                        .getSourceVesselCollection(false);
-                    for (SourceVesselWrapper sv : svCollection)
-                        uniquePatients.add(sv.getPatient());
-                }
-            }
-        return uniquePatients.size();
+    public long getPatientCount() throws BiobankException, ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
+            Arrays.asList(new Object[] { getId() }));
+        // FIXME
+        return 0; // getCountResult(appService, criteria);
     }
 
     private static final String ALL_CLINICS_QRY = "from "
@@ -181,7 +167,8 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         deletedContacts.clear();
     }
 
+    @Deprecated
     public List<CollectionEventWrapper> getCollectionEventCollection() {
-        return getCollectionEventCollection(false);
+        return null;
     }
 }

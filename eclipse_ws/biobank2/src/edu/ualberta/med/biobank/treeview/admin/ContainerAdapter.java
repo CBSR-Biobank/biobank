@@ -44,7 +44,9 @@ public class ContainerAdapter extends AdapterBase {
     @Override
     public void setModelObject(ModelWrapper<?> modelObject) {
         super.setModelObject(modelObject);
-        setHasChildren(((ContainerWrapper) modelObject).hasChildren());
+        // assume it has children for now and set it appropriately when user
+        // double clicks on node
+        setHasChildren(true);
     }
 
     public ContainerWrapper getContainer() {
@@ -97,7 +99,7 @@ public class ContainerAdapter extends AdapterBase {
             });
         }
 
-        if (isEditable() && getContainer().hasAliquots()) {
+        if (isEditable() && getContainer().hasSpecimens()) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Move All Aliquots To");
             mi.addSelectionListener(new SelectionAdapter() {
@@ -131,13 +133,19 @@ public class ContainerAdapter extends AdapterBase {
                             getContainer().moveAliquots(newContainer);
                             // newContainer.persist();
                             newContainer.reload();
+                            monitor.done();
+                            BioBankPlugin.openAsyncInformation(
+                                "Aliquots moved", newContainer.getSpecimens()
+                                    .size()
+                                    + " aliquots are now in "
+                                    + newContainer.getFullInfoLabel() + ".");
                         } catch (Exception e) {
                             BioBankPlugin.openAsyncError("Move problem", e);
                         }
                         monitor.done();
                         BioBankPlugin.openAsyncInformation(
                             "Aliquots moved",
-                            newContainer.getAliquots().size()
+                            newContainer.getSpecimens().size()
                                 + " aliquots are now in "
                                 + newContainer.getFullInfoLabel() + ".");
                     }

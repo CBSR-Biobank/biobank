@@ -51,14 +51,14 @@
       </perspective>
       <perspective
             class="edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective"
-            icon="icons/patientPerspective.png"
+            icon="icons/processingPerspective.png"
             id="edu.ualberta.med.biobank.perspective.processing"
             name="Processing View">
       </perspective>
       <perspective
-            class="edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective"
-            id="edu.ualberta.med.biobank.perspective.aliquotsManagement"
-            name="Samples Management Perspective">
+            class="edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective"
+            id="edu.ualberta.med.biobank.perspective.linkAssign"
+            name="Link/Assign Perspective">
       </perspective>
    </extension>
    <extension
@@ -164,18 +164,6 @@
                optional="false"
                values="edu.ualberta.med.biobank.handlers.OpenSampleProcessParameters">
          </commandParameter>
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.debug.cbsrConfig"
-            name="Create CBSR Configuration">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
-            name="Create CBSR Configuration with data">
-      </command>
-      <command
-            id="edu.ualberta.med.biobank.commands.debug.calgaryConfig"
-            name="Create Calgary Configuration">
       </command>
        <command
              categoryId="org.eclipse.ui.category.edit"
@@ -512,28 +500,6 @@
          </enabledWhen>
       </handler>
       <handler
-            class="org.eclipse.ui.internal.handlers.NewEditorHandler"
-            commandId="org.eclipse.ui.window.newEditor">
-         <enabledWhen>
-            <and>
-               <with
-                  variable="activeEditor">
-                  <instanceof
-                     value="org.eclipse.ui.IEditorPart">
-                  </instanceof>
-               </with>
-               <with
-                  variable="activeEditor">
-                  <not>
-                     <instanceof
-                        value="edu.ualberta.med.biobank.forms.BiobankFormBase">
-                     </instanceof>
-                  </not>
-               </with>
-            </and>
-         </enabledWhen>
-      </handler>
-      <handler
             class="edu.ualberta.med.biobank.handlers.MainAdministrationHandler"
             commandId="edu.ualberta.med.biobank.commands.mainAdmin">
          <enabledWhen>
@@ -657,6 +623,9 @@
                      </reference>
                   </or>
                </not>
+               <reference
+                     definitionId="biobank2.hasWorkingCenter">
+               </reference>
             </and>
          </enabledWhen>
       </handler>
@@ -1037,7 +1006,7 @@
             </command>
             <command
                commandId="edu.ualberta.med.biobank.commands.processingAdmin"
-               icon="icons/patientPerspective.png"
+               icon="icons/processingPerspective.png"
                label="Processing View"
                style="push">
             </command>
@@ -1088,34 +1057,6 @@
               name="edu.ualberta.med.biobank.menu.additions"
               visible="false">
          </separator>
-         <menu
-               id="edu.ualberta.med.biobank.menu.debug"
-               label="**Debug**">
-            <visibleWhen
-                  checkEnabled="true">
-               <reference
-                     definitionId="biobank2.debugState">
-               </reference>
-            </visibleWhen>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfig"
-                  id="edu.ualberta.med.biobank.menu.debug.cbsrConfig"
-                  label="Create CBSR Configuration"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.debug.cbsrConfigWithData"
-                  id="edu.ualberta.med.biobank.menu.debug.cbsrConfigWithData"
-                  label="Create CBSR Configuration with data"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.debug.calgaryConfig"
-                  id="edu.ualberta.med.biobank.menu.debug.calgaryConfig"
-                  label="Create Calgary Configuration"
-                  style="push">
-            </command>
-         </menu>
       </menuContribution>
       <menuContribution
             locationURI="toolbar:org.eclipse.ui.main.toolbar">
@@ -1156,7 +1097,7 @@
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.processingAdmin"
-                  icon="icons/patientPerspective.png"
+                  icon="icons/processingPerspective.png"
                   label="Processing View"
                   style="push">
             </command>
@@ -1529,21 +1470,9 @@
                standalone="false"
                visible="true">
          </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.RequestAdminView"
-               minimized="false"
-               moveable="false"
-               ratio="0.20"
-               relationship="stack"
-               relative="edu.ualberta.med.biobank.views.DispatchAdministrationView"
-               showTitle="false"
-               standalone="false"
-               visible="true">
-         </view>
       </perspectiveExtension>
       <perspectiveExtension
-            targetID="edu.ualberta.med.biobank.perspective.aliquotsManagement">
+            targetID="edu.ualberta.med.biobank.perspective.linkAssign">
          <view
                closeable="false"
                id="org.eclipse.ui.console.ConsoleView"
@@ -1649,18 +1578,18 @@
             name="Patient Merge">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
+            class="edu.ualberta.med.biobank.forms.CollectionEventEntryForm"
             default="false"
             icon="icons/patientVisit.png"
-            id="edu.ualberta.med.biobank.forms.PatientVisitEntryForm"
-            name="Patient Visit Entry">
+            id="edu.ualberta.med.biobank.forms.CollectionEventEntryForm"
+            name="Collection Event Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
+            class="edu.ualberta.med.biobank.forms.CollectionEventViewForm"
             default="false"
             icon="icons/patientVisit.png"
-            id="edu.ualberta.med.biobank.forms.PatientVisitViewForm"
-            name="Patient Visit View">
+            id="edu.ualberta.med.biobank.forms.CollectionEventViewForm"
+            name="Collection Event View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ContainerEntryForm"
@@ -2319,7 +2248,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.PatientAdministrationView"
-            icon="icons/patientPerspective.png"
+            icon="icons/patientView.png"
             id="edu.ualberta.med.biobank.views.PatientsAdminView"
             name="Patients"
             restorable="true">
@@ -2360,14 +2289,6 @@
             icon="icons/table_row_delete.png"
             id="edu.ualberta.med.biobank.views.LoggingView"
             name="Logging"
-            restorable="true">
-      </view>
-      <view
-            allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.RequestAdministrationView"
-            icon="icons/request.png"
-            id="edu.ualberta.med.biobank.views.RequestAdminView"
-            name="Requests"
             restorable="true">
       </view>
    </extension>
@@ -2513,6 +2434,15 @@
            </iterate>
         </with>
      </definition>
+       <definition
+             id="biobank2.hasWorkingCenter">
+          <with
+                variable="edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter">
+             <equals
+                   value="true">
+             </equals>
+          </with>
+       </definition>
    </extension>
    <extension
          point="org.eclipse.ui.startup">

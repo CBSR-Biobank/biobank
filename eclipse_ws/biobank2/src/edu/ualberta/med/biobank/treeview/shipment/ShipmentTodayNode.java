@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -31,12 +30,13 @@ public class ShipmentTodayNode extends AbstractTodayNode {
         return new ClinicAdapter(this, null);
     }
 
+    @Deprecated
     @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
-        return CollectionEventWrapper.getTodayShipments(SessionManager
-            .getAppService());
-
+        // return CollectionEventWrapper.getTodayShipments(SessionManager
+        // .getAppService());
+        return null;
     }
 
     @Override

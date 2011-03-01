@@ -4,7 +4,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -12,15 +12,15 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 import edu.ualberta.med.biobank.test.AllTests;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
@@ -29,7 +29,7 @@ import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
-import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
@@ -94,9 +94,9 @@ public final class TestReportsProcedurallyGeneratedData implements
     private final Random random = new Random(1); // consistent randomness (;
 
     private final List<SiteWrapper> sites = new ArrayList<SiteWrapper>();
-    private final List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
-    private final List<SampleStorageWrapper> sampleStorages = new ArrayList<SampleStorageWrapper>();
-    private final List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+    private final List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
+    private final List<AliquotedSpecimenWrapper> sampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
+    private final List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
     private final List<ContainerWrapper> containers = new ArrayList<ContainerWrapper>();
     private final List<StudyWrapper> studies = new ArrayList<StudyWrapper>();
     private final List<ProcessingEventWrapper> patientVisits = new ArrayList<ProcessingEventWrapper>();
@@ -157,12 +157,12 @@ public final class TestReportsProcedurallyGeneratedData implements
         return studies;
     }
 
-    private static List<SampleTypeWrapper> generateSampleTypes(
+    private static List<SpecimenTypeWrapper> generateSampleTypes(
         final int numSampleTypes) throws Exception {
-        List<SampleTypeWrapper> sampleTypes = new ArrayList<SampleTypeWrapper>();
+        List<SpecimenTypeWrapper> sampleTypes = new ArrayList<SpecimenTypeWrapper>();
 
         for (int i = 0; i < numSampleTypes; i++) {
-            sampleTypes.add(SampleTypeHelper.addSampleType(getInstance()
+            sampleTypes.add(SpecimenTypeHelper.addSampleType(getInstance()
                 .getRandString()));
         }
 
@@ -171,13 +171,13 @@ public final class TestReportsProcedurallyGeneratedData implements
             // "AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME" as some reports query
             // for this specific sample type; however, this sample type may
             // already exist
-            SampleTypeHelper
+            SpecimenTypeHelper
                 .addSampleType(AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
         } catch (Exception e) {
         }
 
-        for (SampleTypeWrapper sampleType : SampleTypeWrapper
-            .getAllSampleTypes(getInstance().getAppService(), true)) {
+        for (SpecimenTypeWrapper sampleType : SpecimenTypeWrapper
+            .getAllSpecimenTypes(getInstance().getAppService(), true)) {
             if (sampleType.getNameShort().equals(
                 AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME)) {
                 sampleTypes.add(sampleType);
@@ -187,8 +187,8 @@ public final class TestReportsProcedurallyGeneratedData implements
         // ensure there is one sample type named
         // "AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME"
         Assert.assertTrue(PredicateUtil.filter(sampleTypes,
-            new Predicate<SampleTypeWrapper>() {
-                public boolean evaluate(SampleTypeWrapper sampleType) {
+            new Predicate<SpecimenTypeWrapper>() {
+                public boolean evaluate(SpecimenTypeWrapper sampleType) {
                     return sampleType.getNameShort().equals(
                         AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
                 }
@@ -279,7 +279,7 @@ public final class TestReportsProcedurallyGeneratedData implements
      */
     private static List<ContainerTypeWrapper> generateChildContainerTypes(
         SiteWrapper site, ContainerTypeWrapper parentContainerType,
-        List<SampleTypeWrapper> sampleTypes, final int height)
+        List<SpecimenTypeWrapper> sampleTypes, final int height)
         throws BiobankCheckException, Exception {
 
         if (height == 0) {
@@ -446,17 +446,17 @@ public final class TestReportsProcedurallyGeneratedData implements
         return containers;
     }
 
-    private static List<SampleStorageWrapper> generateSampleStorages(
-        List<StudyWrapper> studies, List<SampleTypeWrapper> sampleTypes)
+    private static List<AliquotedSpecimenWrapper> generateSampleStorages(
+        List<StudyWrapper> studies, List<SpecimenTypeWrapper> sampleTypes)
         throws Exception {
-        List<SampleStorageWrapper> sampleStorages = new ArrayList<SampleStorageWrapper>();
+        List<AliquotedSpecimenWrapper> sampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
 
         for (StudyWrapper study : studies) {
             // leave the first SampleType unassociated with any Study via
             // SampleStorage since at least one report checks for these
             for (int sampleTypeIndex = 1, numSampleTypes = sampleTypes.size(); sampleTypeIndex < numSampleTypes; sampleTypeIndex++) {
-                SampleTypeWrapper type = sampleTypes.get(sampleTypeIndex);
-                SampleStorageWrapper sampleStorage = SampleStorageHelper
+                SpecimenTypeWrapper type = sampleTypes.get(sampleTypeIndex);
+                AliquotedSpecimenWrapper sampleStorage = SampleStorageHelper
                     .addSampleStorage(study, type);
                 sampleStorages.add(sampleStorage);
             }
@@ -618,11 +618,11 @@ public final class TestReportsProcedurallyGeneratedData implements
         return patientVisits;
     }
 
-    private static List<AliquotWrapper> generateAliquots(
+    private static List<SpecimenWrapper> generateAliquots(
         List<ContainerWrapper> containers,
         List<ProcessingEventWrapper> patientVisits,
-        List<SampleTypeWrapper> allSampleTypes) throws Exception {
-        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+        List<SpecimenTypeWrapper> allSampleTypes) throws Exception {
+        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
 
         // ignore the last PatientVisit
         Assert.assertTrue(patientVisits.size() > 1);
@@ -632,20 +632,20 @@ public final class TestReportsProcedurallyGeneratedData implements
 
         int aliquotsAdded = 0;
         for (ContainerWrapper container : containers) {
-            List<SampleTypeWrapper> sampleTypes = container.getContainerType()
-                .getSampleTypeCollection(false);
+            List<SpecimenTypeWrapper> sampleTypes = container.getContainerType()
+                .getSpecimenTypeCollection(false);
             if ((sampleTypes != null) && (sampleTypes.size() > 0)) {
                 for (int row = 0, numRows = container.getRowCapacity(); row < numRows; row++) {
                     for (int col = 0, numCols = container.getColCapacity(); col < numCols; col++) {
                         // cycle through sample types
-                        SampleTypeWrapper sampleType = sampleTypes
+                        SpecimenTypeWrapper sampleType = sampleTypes
                             .get(aliquotsAdded % sampleTypes.size());
 
                         // cycle through patient visits
                         ProcessingEventWrapper patientVisit = patientVisits
                             .get(aliquotsAdded % patientVisits.size());
 
-                        AliquotWrapper aliquot = AliquotHelper
+                        SpecimenWrapper aliquot = SpecimenHelper
                             .newAliquot(sampleType);
 
                         // leave some positions without an Aliquot (but still
@@ -679,12 +679,12 @@ public final class TestReportsProcedurallyGeneratedData implements
         }
 
         // add an Aliquot of each SampleType that is not in a Container
-        for (SampleTypeWrapper sampleType : allSampleTypes) {
+        for (SpecimenTypeWrapper sampleType : allSampleTypes) {
             // cycle through patient visits
             ProcessingEventWrapper patientVisit = patientVisits
                 .get(aliquotsAdded % patientVisits.size());
 
-            AliquotWrapper aliquot = AliquotHelper.newAliquot(sampleType);
+            SpecimenWrapper aliquot = SpecimenHelper.newAliquot(sampleType);
 
             aliquot.setProcessingEvent(patientVisit);
             aliquot.setInventoryId(getInstance().getRandString());
@@ -726,7 +726,7 @@ public final class TestReportsProcedurallyGeneratedData implements
 
         List<SiteWrapper> sites = generateSites(NUM_SITES);
         List<StudyWrapper> studies = generateStudies(NUM_STUDIES);
-        List<SampleTypeWrapper> sampleTypes = generateSampleTypes(NUM_SAMPLE_TYPES);
+        List<SpecimenTypeWrapper> sampleTypes = generateSampleTypes(NUM_SAMPLE_TYPES);
         List<ClinicWrapper> clinics = generateClinics(NUM_CLINICS);
 
         for (SiteWrapper site : sites) {
@@ -738,7 +738,7 @@ public final class TestReportsProcedurallyGeneratedData implements
 
             List<ContainerWrapper> containers = generateContainers(site, null,
                 containerTypes);
-            List<SampleStorageWrapper> sampleStorages = generateSampleStorages(
+            List<AliquotedSpecimenWrapper> sampleStorages = generateSampleStorages(
                 studies, sampleTypes);
             List<PatientWrapper> patients = generatePatients(studies,
                 PATIENTS_PER_STUDY);
@@ -749,7 +749,7 @@ public final class TestReportsProcedurallyGeneratedData implements
             List<ProcessingEventWrapper> patientVisits = generatePatientVisits(
                 shipments, patients);
 
-            List<AliquotWrapper> aliquots = generateAliquots(containers,
+            List<SpecimenWrapper> aliquots = generateAliquots(containers,
                 patientVisits, sampleTypes);
 
             getInstance().sampleStorages.addAll(sampleStorages);
@@ -771,7 +771,7 @@ public final class TestReportsProcedurallyGeneratedData implements
             StudyHelper.deleteCreatedStudies();
             SiteHelper.deleteCreatedSites();
             ClinicHelper.deleteCreatedClinics();
-            SampleTypeHelper.deleteCreatedSampleTypes();
+            SpecimenTypeHelper.deleteCreatedSampleTypes();
             SourceVesselHelper.deleteCreatedSourceVessels();
             ShippingMethodHelper.deleteCreateShippingMethods();
         } catch (Exception e) {
@@ -796,11 +796,11 @@ public final class TestReportsProcedurallyGeneratedData implements
         return sites;
     }
 
-    public List<SampleTypeWrapper> getSampleTypes() {
+    public List<SpecimenTypeWrapper> getSpecimenTypes() {
         return sampleTypes;
     }
 
-    public List<AliquotWrapper> getAliquots() {
+    public List<SpecimenWrapper> getSpecimens() {
         return aliquots;
     }
 
@@ -820,7 +820,7 @@ public final class TestReportsProcedurallyGeneratedData implements
         return patients;
     }
 
-    public List<SampleStorageWrapper> getSampleStorages() {
+    public List<AliquotedSpecimenWrapper> getSampleStorages() {
         return sampleStorages;
     }
 }

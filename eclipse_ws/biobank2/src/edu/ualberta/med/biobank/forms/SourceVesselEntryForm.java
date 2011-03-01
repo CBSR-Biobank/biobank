@@ -11,9 +11,9 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SourceVesselEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenTypeEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -26,7 +26,7 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.SourceVesselEntryForm";
     public static final String OK_MESSAGE = "View and edit source vessels.";
 
-    private SourceVesselEntryInfoTable globalSourceWidget;
+    private SpecimenTypeEntryInfoTable globalSourceWidget;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -52,14 +52,14 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
 
     private void createGlobalSourceVesselSection() throws Exception {
         Section section = createSection("Global source vessels");
-        List<SourceVesselWrapper> globalSourceVessels = SourceVesselWrapper
-            .getAllSourceVessels(appService);
+        List<SpecimenTypeWrapper> globalSourceVessels = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true);
         if (globalSourceVessels == null) {
-            globalSourceVessels = new ArrayList<SourceVesselWrapper>();
+            globalSourceVessels = new ArrayList<SpecimenTypeWrapper>();
         }
-        globalSourceWidget = new SourceVesselEntryInfoTable(section,
+        globalSourceWidget = new SpecimenTypeEntryInfoTable(section,
             globalSourceVessels, "Add a new global source vessel",
-            "Edit the global source vessel", null);
+            "Edit the global source vessel");
         globalSourceWidget.adaptToToolkit(toolkit, true);
         globalSourceWidget.addSelectionChangedListener(listener);
         toolkit.paintBordersFor(globalSourceWidget);
@@ -76,9 +76,9 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        SourceVesselWrapper.persistSourceVessels(
-            globalSourceWidget.getAddedOrModifiedSampleTypes(),
-            globalSourceWidget.getDeletedSampleTypes());
+        SpecimenTypeWrapper.persistSpecimenTypes(
+            globalSourceWidget.getAddedOrModifiedSourceVessels(),
+            globalSourceWidget.getDeletedSourceVessels());
     }
 
     @Override
@@ -94,10 +94,10 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        List<SourceVesselWrapper> globalSourceVessels = null;
+        List<SpecimenTypeWrapper> globalSourceVessels = null;
         try {
-            globalSourceVessels = SourceVesselWrapper
-                .getAllSourceVessels(appService);
+            globalSourceVessels = SpecimenTypeWrapper.getAllSpecimenTypes(
+                appService, true);
         } catch (ApplicationException e) {
             logger.error("Can't reset global source vessels", e);
         }
@@ -108,9 +108,9 @@ public class SourceVesselEntryForm extends BiobankEntryForm {
 
     @Override
     protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(SourceVesselWrapper.class, null)
-            && !SessionManager.canCreate(SourceVesselWrapper.class, null)
-            && !SessionManager.canDelete(SourceVesselWrapper.class, null)) {
+        if (!SessionManager.canUpdate(SpecimenTypeWrapper.class, null)
+            && !SessionManager.canCreate(SpecimenTypeWrapper.class, null)
+            && !SessionManager.canDelete(SpecimenTypeWrapper.class, null)) {
             BioBankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Source Vessel editor. Access Denied.");

@@ -10,12 +10,11 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.util.DispatchItemState;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchReceiveScanDialog;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
@@ -82,15 +81,16 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
         setTextValue(departedLabel, dispatch.getFormattedDeparted());
         BiobankText shippingMethodLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Shipping Method");
-        setTextValue(shippingMethodLabel,
-            dispatch.getShippingMethod() == null ? "" : dispatch
-                .getShippingMethod().getName());
+        setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
+            .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
+            .getShippingMethod().getName());
         BiobankText waybillLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Waybill");
-        setTextValue(waybillLabel, dispatch.getWaybill());
+        setTextValue(waybillLabel, dispatch.getShipmentInfo().getWaybill());
         BiobankText dateReceivedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Date received");
-        setTextValue(dateReceivedLabel, dispatch.getFormattedDateReceived());
+        setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
+            .getFormattedDateReceived());
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             "Comments", null, dispatch, "comment", null);
@@ -112,10 +112,10 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
     }
 
     public static class AliquotInfo {
-        public AliquotWrapper aliquot;
+        public SpecimenWrapper aliquot;
         public ResType type;
 
-        public AliquotInfo(AliquotWrapper aliquot, ResType type) {
+        public AliquotInfo(SpecimenWrapper aliquot, ResType type) {
             this.aliquot = aliquot;
             this.type = type;
         }
@@ -123,13 +123,13 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
 
     public static AliquotInfo getInfoForInventoryId(
         ModelWrapper<?> currentShipment, String inventoryId) {
-        DispatchAliquotWrapper dsa = ((DispatchWrapper) currentShipment)
-            .getDispatchAliquot(inventoryId);
+        DispatchSpecimenWrapper dsa = ((DispatchWrapper) currentShipment)
+            .getDispatchSpecimen(inventoryId);
         if (dsa == null) {
             // aliquot not in shipment. Check if exists in DB:
-            AliquotWrapper aliquot = null;
+            SpecimenWrapper aliquot = null;
             try {
-                aliquot = AliquotWrapper.getAliquot(
+                aliquot = SpecimenWrapper.getSpecimen(
                     currentShipment.getAppService(), inventoryId,
                     SessionManager.getUser());
             } catch (Exception ae) {
@@ -140,20 +140,20 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
             }
             return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
         }
-        if (DispatchItemState.RECEIVED.isEquals(dsa.getState())) {
-            return new AliquotInfo(dsa.getAliquot(), ResType.RECEIVED);
+        if (DispatchSpecimenState.RECEIVED.isEquals(dsa.getState())) {
+            return new AliquotInfo(dsa.getSpecimen(), ResType.RECEIVED);
         }
-        if (DispatchItemState.EXTRA.isEquals(dsa.getState())) {
-            return new AliquotInfo(dsa.getAliquot(), ResType.EXTRA);
+        if (DispatchSpecimenState.EXTRA.isEquals(dsa.getState())) {
+            return new AliquotInfo(dsa.getSpecimen(), ResType.EXTRA);
         }
-        return new AliquotInfo(dsa.getAliquot(), ResType.OK);
+        return new AliquotInfo(dsa.getSpecimen(), ResType.OK);
     }
 
     protected void receiveAliquot(String inventoryId) {
         AliquotInfo info = getInfoForInventoryId(dispatch, inventoryId);
         switch (info.type) {
         case OK:
-            dispatch.receiveAliquots(Arrays.asList(info.aliquot));
+            dispatch.receiveSpecimens(Arrays.asList(info.aliquot));
             aliquotsTree.refresh();
             setDirty(true);
             break;
@@ -167,11 +167,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
                 "Aliquot with inventory id " + inventoryId
                     + " has not been found in this dispatch."
                     + " It will be moved into the extra-pending list.");
-            try {
-                dispatch.addExtraAliquots(Arrays.asList(info.aliquot), false);
-            } catch (BiobankCheckException e) {
-                BioBankPlugin.openAsyncError("Eror adding extra aliquot", e);
-            }
+            dispatch.addExtraAliquots(Arrays.asList(info.aliquot));
             aliquotsTree.refresh();
             setDirty(true);
             break;
@@ -193,7 +189,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
 
     @Override
     protected String getTextForPartName() {
-        return "Dispatch sent on " + dispatch.getDeparted();
+        return "Dispatch sent on " + dispatch.getDepartedAt();
     }
 
     @Override

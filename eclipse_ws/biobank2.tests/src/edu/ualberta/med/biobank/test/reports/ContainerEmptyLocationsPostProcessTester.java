@@ -1,9 +1,9 @@
 package edu.ualberta.med.biobank.test.reports;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.model.Container;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -19,10 +19,10 @@ public class ContainerEmptyLocationsPostProcessTester implements
         List<Object> processedResults = new ArrayList<Object>();
 
         for (Object c : results) {
-            ContainerWrapper container =
-                new ContainerWrapper(appService, (Container) c);
+            ContainerWrapper container = new ContainerWrapper(appService,
+                (Container) c);
 
-            Map<RowColPos, AliquotWrapper> aliquots = container.getAliquots();
+            Map<RowColPos, SpecimenWrapper> aliquots = container.getSpecimens();
 
             for (int i = 0, numRows = container.getRowCapacity(); i < numRows; i++) {
                 for (int j = 0, numCols = container.getColCapacity(); j < numCols; j++) {

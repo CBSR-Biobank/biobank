@@ -1,15 +1,11 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
-import java.util.List;
-
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
@@ -68,25 +64,27 @@ public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
      * shipment.
      */
     @Override
-    public Object getCollectionModelObject(CollectionEventWrapper shipment)
+    public Object getCollectionModelObject(CollectionEventWrapper cevent)
         throws Exception {
-        TableRowData info = new TableRowData();
-        info.shipment = shipment;
-        info.dateReceived = shipment.getFormattedDateReceived();
-        info.waybill = shipment.getWaybill();
-        ShippingMethodWrapper company = shipment.getShippingMethod();
-        if (company != null) {
-            info.shippingCompany = company.getName();
-        } else {
-            info.shippingCompany = new String();
-        }
-        List<PatientWrapper> patients = shipment.getPatientCollection();
-        if (patients == null) {
-            info.numPatients = 0;
-        } else {
-            info.numPatients = patients.size();
-        }
-        return info;
+        // FIXME
+        // TableRowData info = new TableRowData();
+        // info.shipment = cevent;
+        // info.dateReceived = cevent.getFormattedDateReceived();
+        // info.waybill = cevent.getWaybill();
+        // ShippingMethodWrapper company = cevent.getShippingMethod();
+        // if (company != null) {
+        // info.shippingCompany = company.getName();
+        // } else {
+        // info.shippingCompany = new String();
+        // }
+        // List<PatientWrapper> patients = cevent.getPatientCollection();
+        // if (patients == null) {
+        // info.numPatients = 0;
+        // } else {
+        // info.numPatients = patients.size();
+        // }
+        // return info;
+        return null;
     }
 
     @Override

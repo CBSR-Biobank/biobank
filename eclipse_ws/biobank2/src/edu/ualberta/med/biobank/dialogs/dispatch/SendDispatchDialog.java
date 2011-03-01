@@ -48,15 +48,15 @@ public class SendDispatchDialog extends BiobankDialog {
         contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         ShippingMethodWrapper selectedShippingMethod = shipment
-            .getShippingMethod();
+            .getShipmentInfo().getShippingMethod();
         widgetCreator.createComboViewer(contents, "Shipping Method",
             ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()), selectedShippingMethod, null,
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    shipment
-                        .setShippingMethod((ShippingMethodWrapper) selectedObject);
+                    shipment.getShipmentInfo().setShippingMethod(
+                        (ShippingMethodWrapper) selectedObject);
                 }
             });
 
@@ -64,7 +64,7 @@ public class SendDispatchDialog extends BiobankDialog {
             "Waybill", null, shipment, "waybill", null);
 
         Date date = new Date();
-        shipment.setDeparted(date);
+        shipment.setDepartedAt(date);
         createDateTimeWidget(contents, "Departed", date, shipment, "departed",
             new NotNullValidator("Departed should be set"));
     }

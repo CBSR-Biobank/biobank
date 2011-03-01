@@ -16,16 +16,16 @@ import edu.ualberta.med.biobank.common.util.Mapper;
 import edu.ualberta.med.biobank.common.util.MapperUtil;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.server.reports.AbstractReport;
 
 public class FTAReportTest extends AbstractReportTest {
-    private static final Predicate<AliquotWrapper> ALIQUOT_FTA_SAMPLE_TYPE = new Predicate<AliquotWrapper>() {
-        public boolean evaluate(AliquotWrapper aliquot) {
-            return aliquot.getSampleType().getNameShort()
+    private static final Predicate<SpecimenWrapper> ALIQUOT_FTA_SAMPLE_TYPE = new Predicate<SpecimenWrapper>() {
+        public boolean evaluate(SpecimenWrapper aliquot) {
+            return aliquot.getSpecimenType().getNameShort()
                 .equals(AbstractReport.FTA_CARD_SAMPLE_TYPE_NAME);
         }
     };
@@ -42,13 +42,13 @@ public class FTAReportTest extends AbstractReportTest {
                     oldValue.getDateProcessed()) ? patientVisit : oldValue;
         }
     };
-    private static final Mapper<AliquotWrapper, String, AliquotWrapper> GROUP_ALIQUOTS_BY_PNUMBER = new Mapper<AliquotWrapper, String, AliquotWrapper>() {
-        public String getKey(AliquotWrapper aliquot) {
+    private static final Mapper<SpecimenWrapper, String, SpecimenWrapper> GROUP_ALIQUOTS_BY_PNUMBER = new Mapper<SpecimenWrapper, String, SpecimenWrapper>() {
+        public String getKey(SpecimenWrapper aliquot) {
             return aliquot.getProcessingEvent().getPatient().getPnumber();
         }
 
-        public AliquotWrapper getValue(AliquotWrapper aliquot,
-            AliquotWrapper oldValue) {
+        public SpecimenWrapper getValue(SpecimenWrapper aliquot,
+            SpecimenWrapper oldValue) {
             // keep the earliest patient visit (according to date processed)
             return (oldValue == null) || (aliquot.getId() < oldValue.getId()) ? aliquot
                 : oldValue;
@@ -63,13 +63,13 @@ public class FTAReportTest extends AbstractReportTest {
      */
     @SuppressWarnings("unused")
     @Deprecated
-    private static final Mapper<AliquotWrapper, String, AliquotWrapper> GROUP_ALIQUOTS_BY_PNUMBER_OLD = new Mapper<AliquotWrapper, String, AliquotWrapper>() {
-        public String getKey(AliquotWrapper aliquot) {
+    private static final Mapper<SpecimenWrapper, String, SpecimenWrapper> GROUP_ALIQUOTS_BY_PNUMBER_OLD = new Mapper<SpecimenWrapper, String, SpecimenWrapper>() {
+        public String getKey(SpecimenWrapper aliquot) {
             return aliquot.getProcessingEvent().getPatient().getPnumber();
         }
 
-        public AliquotWrapper getValue(AliquotWrapper aliquot,
-            AliquotWrapper oldValue) {
+        public SpecimenWrapper getValue(SpecimenWrapper aliquot,
+            SpecimenWrapper oldValue) {
             // keep aliquots with the earliest patient visit date processed
             // and
             // the smallest aliquot id
@@ -141,8 +141,8 @@ public class FTAReportTest extends AbstractReportTest {
             }
         };
 
-        Predicate<AliquotWrapper> pvProcessedAfter = new Predicate<AliquotWrapper>() {
-            public boolean evaluate(AliquotWrapper aliquot) {
+        Predicate<SpecimenWrapper> pvProcessedAfter = new Predicate<SpecimenWrapper>() {
+            public boolean evaluate(SpecimenWrapper aliquot) {
                 return aliquot.getProcessingEvent().getDateProcessed()
                     .after(firstPvDateProcessed);
             }
@@ -154,21 +154,21 @@ public class FTAReportTest extends AbstractReportTest {
         Map<String, ProcessingEventWrapper> groupedPatientVisits = MapperUtil
             .map(filteredPatientVisits, GROUP_PATIENT_VISITS_BY_PNUMBER);
 
-        Collection<AliquotWrapper> allAliquots = getAliquots();
+        Collection<SpecimenWrapper> allAliquots = getSpecimens();
         @SuppressWarnings("unchecked")
-        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
+        Collection<SpecimenWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(ALIQUOT_FTA_SAMPLE_TYPE,
                 pvProcessedAfter, ALIQUOT_HAS_POSITION));
-        Map<String, AliquotWrapper> groupedAliquots = MapperUtil.map(
+        Map<String, SpecimenWrapper> groupedAliquots = MapperUtil.map(
             filteredAliquots, GROUP_ALIQUOTS_BY_PNUMBER);
-        List<AliquotWrapper> filteredAndGroupedAliquots = new ArrayList<AliquotWrapper>(
+        List<SpecimenWrapper> filteredAndGroupedAliquots = new ArrayList<SpecimenWrapper>(
             groupedAliquots.values());
 
         Collections.sort(filteredAndGroupedAliquots, ORDER_ALIQUOT_BY_PNUMBER);
 
         List<Object> expectedResults = new ArrayList<Object>();
 
-        for (AliquotWrapper aliquot : filteredAndGroupedAliquots) {
+        for (SpecimenWrapper aliquot : filteredAndGroupedAliquots) {
             for (ProcessingEventWrapper patientVisit : groupedPatientVisits
                 .values()) {
                 if (patientVisit.getId().equals(

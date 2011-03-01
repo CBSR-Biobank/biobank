@@ -52,8 +52,8 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
         try {
             dispatch.reload();
         } catch (Exception ex) {
-            logger.error(
-                "Error while retrieving shipment " + dispatch.getWaybill(), ex);
+            logger.error("Error while retrieving shipment "
+                + dispatch.getShipmentInfo().getWaybill(), ex);
         }
     }
 

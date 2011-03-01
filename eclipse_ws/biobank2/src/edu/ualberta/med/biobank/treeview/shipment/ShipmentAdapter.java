@@ -15,8 +15,9 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 
+@Deprecated
 public class ShipmentAdapter extends AdapterBase {
 
     public ShipmentAdapter(AdapterBase parent, CollectionEventWrapper shipment) {
@@ -30,14 +31,14 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     protected String getLabelInternal() {
-        CollectionEventWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment, "shipment is null");
-        String label = shipment.getFormattedDateReceived();
-        if (shipment.getWaybill() != null) {
-            label += " (" + shipment.getWaybill() + ")";
-        }
-        return label;
-
+        // CollectionEventWrapper shipment = getWrapper();
+        // Assert.isNotNull(shipment, "shipment is null");
+        // String label = shipment.getFormattedDateReceived();
+        // if (shipment.getWaybill() != null) {
+        // label += " (" + shipment.getWaybill() + ")";
+        // }
+        // return label;
+        return null;
     }
 
     @Override
@@ -69,20 +70,21 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     protected AdapterBase createChildNode() {
-        return new PatientVisitAdapter(this, null);
+        return new CollectionEventAdapter(this, null);
     }
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
         Assert.isTrue(child instanceof ProcessingEventWrapper);
-        return new PatientVisitAdapter(this, (ProcessingEventWrapper) child);
+        return new CollectionEventAdapter(this, (CollectionEventWrapper) child);
     }
 
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        getWrapper().reload();
-        return getWrapper().getProcessingEventCollection();
+        // getWrapper().reload();
+        // return getWrapper().getSpecimenCollection();
+        return null;
     }
 
     @Override

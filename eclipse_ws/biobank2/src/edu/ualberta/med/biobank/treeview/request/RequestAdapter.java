@@ -4,26 +4,17 @@ import java.util.Collection;
 
 import org.acegisecurity.AccessDeniedException;
 import org.eclipse.core.runtime.Assert;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
-import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.util.RequestState;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankDialog;
-import edu.ualberta.med.biobank.dialogs.RequestShippedDialog;
 import edu.ualberta.med.biobank.forms.RequestEntryFormBase;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.views.RequestAdministrationView;
@@ -52,7 +43,7 @@ public class RequestAdapter extends AdapterBase {
 
         label += shipment.getId() + " - ";
         label += study.getNameShort() + " - ";
-        label += DateFormatter.formatAsDate(shipment.getDateCreated());
+        label += DateFormatter.formatAsDate(shipment.getCreated());
         return label;
 
     }
@@ -80,66 +71,6 @@ public class RequestAdapter extends AdapterBase {
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addViewMenu(menu, "Request");
-        final RequestWrapper request = getWrapper();
-        Integer orderState = request.getState();
-        if (RequestState.getState(orderState).equals(RequestState.APPROVED)) {
-            MenuItem mi = new MenuItem(menu, SWT.NONE);
-            mi.setText("Accept Order");
-            mi.addSelectionListener(new SelectionAdapter() {
-
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    request.setInAcceptedState();
-                    persistAndRebuild();
-                }
-
-            });
-        } else if (RequestState.getState(orderState).equals(
-            RequestState.ACCEPTED)) {
-            MenuItem mi = new MenuItem(menu, SWT.NONE);
-            mi.setText("Mark as Filled");
-            mi.addSelectionListener(new SelectionAdapter() {
-
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    request.setInFilledState();
-                    persistAndRebuild();
-                }
-
-            });
-            mi.setEnabled(request.isAllProcessed());
-        } else if (RequestState.getState(orderState)
-            .equals(RequestState.FILLED)) {
-            MenuItem mi = new MenuItem(menu, SWT.NONE);
-            mi.setText("Mark as Shipped");
-            mi.addSelectionListener(new SelectionAdapter() {
-
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    BiobankDialog rfd = new RequestShippedDialog(PlatformUI
-                        .getWorkbench().getActiveWorkbenchWindow().getShell(),
-                        request);
-                    if (rfd.open() == Dialog.OK) {
-                        request.setInShippedState();
-                        persistAndRebuild();
-                    }
-                }
-
-            });
-        } else if (RequestState.getState(orderState).equals(
-            RequestState.SHIPPED)) {
-            MenuItem mi = new MenuItem(menu, SWT.NONE);
-            mi.setText("Close");
-            mi.addSelectionListener(new SelectionAdapter() {
-
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    request.setInCloseState();
-                    persistAndRebuild();
-                }
-
-            });
-        }
     }
 
     private void persistRequest() {

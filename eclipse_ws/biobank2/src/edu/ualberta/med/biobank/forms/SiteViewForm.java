@@ -79,7 +79,6 @@ public class SiteViewForm extends AddressViewFormCommon {
         createStudySection();
         createContainerTypesSection();
         createContainerSection();
-        createDispatchSection();
     }
 
     private void createSiteSection() throws Exception {
@@ -123,7 +122,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         setTextValue(shipmentCountLabel, site.getShipmentCount());
         setTextValue(patientCountLabel, site.getPatientCount());
         setTextValue(patientVisitCountLabel, site.getPatientVisitCount());
-        setTextValue(sampleCountLabel, site.getAliquotCount());
+        setTextValue(sampleCountLabel, site.getSpecimenCount());
         setTextValue(activityStatusLabel, site.getActivityStatus().getName());
         setTextValue(commentLabel, site.getComment());
     }
@@ -170,15 +169,6 @@ public class SiteViewForm extends AddressViewFormCommon {
 
         topContainersTable.addClickListener(collectionDoubleClickListener);
         section.setClient(topContainersTable);
-    }
-
-    private void createDispatchSection() {
-        Section section = createSection("Dispatches");
-        dispatchTable = new SiteDispatchInfoTable(section, site);
-        dispatchTable.adaptToToolkit(toolkit, true);
-        dispatchTable.addClickListener(collectionDoubleClickListener);
-        section.setClient(dispatchTable);
-        section.setExpanded(false);
     }
 
     @Override

@@ -35,14 +35,14 @@ public class RequestContainerAdapter implements Node {
     public String getLabelInternal() {
         return container.getLabel() + " ("
             + container.getContainerType().getNameShort() + ")" + " ("
-            + getAliquotCount() + ")";
+            + getSpecimenCount() + ")";
     }
 
-    private Integer getAliquotCount() {
+    private Integer getSpecimenCount() {
         Integer aliquots = 0;
         for (Object child : getChildren()) {
             if (child instanceof RequestContainerAdapter)
-                aliquots += ((RequestContainerAdapter) child).getAliquotCount();
+                aliquots += ((RequestContainerAdapter) child).getSpecimenCount();
             else
                 aliquots++;
         }

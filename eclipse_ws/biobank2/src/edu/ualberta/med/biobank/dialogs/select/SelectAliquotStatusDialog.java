@@ -11,17 +11,17 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 
 public class SelectAliquotStatusDialog extends BiobankDialog {
 
-    private AliquotWrapper aliquot;
+    private SpecimenWrapper aliquot;
     private ActivityStatusWrapper activityStatus;
 
     private Map<ActivityStatusWrapper, Button> buttons;
 
-    public SelectAliquotStatusDialog(Shell parentShell, AliquotWrapper aliquot) {
+    public SelectAliquotStatusDialog(Shell parentShell, SpecimenWrapper aliquot) {
         super(parentShell);
         this.aliquot = aliquot;
         activityStatus = aliquot.getActivityStatus();

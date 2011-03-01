@@ -10,7 +10,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 
 public class AliquotsByPalletTest extends AbstractReportTest {
@@ -34,15 +34,15 @@ public class AliquotsByPalletTest extends AbstractReportTest {
         final String containerLabel = (String) getReport().getParams().get(0);
         final String topContainers = getReport().getContainerList();
 
-        Collection<AliquotWrapper> allAliquots = getAliquots();
-        Collection<AliquotWrapper> filteredAliquots = PredicateUtil.filter(
+        Collection<SpecimenWrapper> allAliquots = getSpecimens();
+        Collection<SpecimenWrapper> filteredAliquots = PredicateUtil.filter(
             allAliquots, PredicateUtil.andPredicate(
                 aliquotInContainerLabelled(containerLabel),
                 aliquotTopContainerIdIn(topContainers)));
 
         List<Object> expectedResults = new ArrayList<Object>();
 
-        for (AliquotWrapper aliquot : filteredAliquots) {
+        for (SpecimenWrapper aliquot : filteredAliquots) {
             expectedResults.add(aliquot.getWrappedObject());
         }
 
@@ -59,10 +59,10 @@ public class AliquotsByPalletTest extends AbstractReportTest {
         checkResults(EnumSet.of(CompareResult.SIZE));
     }
 
-    private static final Predicate<AliquotWrapper> aliquotInContainerLabelled(
+    private static final Predicate<SpecimenWrapper> aliquotInContainerLabelled(
         final String containerLabel) {
-        return new Predicate<AliquotWrapper>() {
-            public boolean evaluate(AliquotWrapper aliquot) {
+        return new Predicate<SpecimenWrapper>() {
+            public boolean evaluate(SpecimenWrapper aliquot) {
                 return (aliquot.getParent() != null)
                     && aliquot.getParent().getLabel().equals(containerLabel);
             }

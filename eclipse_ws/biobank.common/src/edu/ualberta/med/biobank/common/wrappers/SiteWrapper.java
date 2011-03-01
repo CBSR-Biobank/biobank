@@ -13,11 +13,13 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -69,16 +71,13 @@ public class SiteWrapper extends SiteBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankCheckException,
         ApplicationException {
-        if ((getContainerCollection(false) != null && getContainerCollection(
-            false).size() > 0)
-            || (getContainerTypeCollection(false) != null && getContainerTypeCollection(
-                false).size() > 0)
-            || (getCollectionEventCollection(false) != null && getCollectionEventCollection(
-                false).size() > 0)) {
+        if (!getContainerCollection(false).isEmpty()
+            || !getContainerTypeCollection(false).isEmpty()
+            || !getProcessingEventCollection(false).isEmpty()) {
             throw new BiobankCheckException(
                 "Unable to delete site "
                     + getName()
-                    + ". All defined children (shipments, container types, and containers) must be removed first.");
+                    + ". All defined children (processing events, container types, and containers) must be removed first.");
         }
     }
 
@@ -106,10 +105,6 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     public List<RequestWrapper> getApprovedRequestCollection() {
         return getRequestCollection(RequestState.APPROVED);
-    }
-
-    public List<RequestWrapper> getShippedRequestCollection() {
-        return getRequestCollection(RequestState.SHIPPED);
     }
 
     // due to bug in Hibernate when using elements in query must also use a left
@@ -192,8 +187,13 @@ public class SiteWrapper extends SiteBaseWrapper {
         + " as site join site."
         + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pevent join pevent."
-        + ProcessingEventPeer.PATIENT.getName()
-        + " as patients where site." + SitePeer.ID.getName() + "=?";
+        + ProcessingEventPeer.PARENT_SPECIMEN.getName()
+        + " as spcs join spcs."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.PATIENT.getName()
+        + " as patients where site."
+        + SitePeer.ID.getName() + "=?";
 
     public Long getPatientCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
@@ -201,16 +201,18 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getCountResult(appService, criteria);
     }
 
-    private static final String ALIQUOT_COUNT_QRY = "select count(aliquots) from "
+    // FIXME: this only returns specimens that have been aliquoted, it does
+    // not return samples that have not been aliquoted (eg. paxgene)
+    private static final String CHILD_SPECIMENS_COUNT_QRY = "select count(spcs) from "
         + Site.class.getName()
         + " site left join site."
         + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pevent join pevent."
-        + ProcessingEventPeer.ALIQUOT_COLLECTION.getName()
-        + " as aliquots where site." + SitePeer.ID.getName() + "=?";
+        + ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION.getName()
+        + " as spcs where site." + SitePeer.ID.getName() + "=?";
 
-    public Long getAliquotCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria(ALIQUOT_COUNT_QRY,
+    public Long getSpecimenCount() throws Exception {
+        HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMENS_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, criteria);
     }

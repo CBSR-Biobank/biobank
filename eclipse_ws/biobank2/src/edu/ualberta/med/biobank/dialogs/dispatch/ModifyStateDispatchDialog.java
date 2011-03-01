@@ -8,7 +8,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.common.util.DispatchItemState;
+import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -36,7 +36,7 @@ public class ModifyStateDispatchDialog extends BiobankDialog {
     private CommentValue commentValue = new CommentValue();
 
     public ModifyStateDispatchDialog(Shell parentShell,
-        DispatchItemState newState) {
+        DispatchSpecimenState newState) {
         super(parentShell);
         if (newState == null) {
             currentTitle = TITLE_COMMENT_ONLY;

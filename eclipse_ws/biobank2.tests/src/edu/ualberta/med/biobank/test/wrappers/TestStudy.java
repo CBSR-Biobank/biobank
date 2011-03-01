@@ -17,12 +17,12 @@ import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValidationException;
 import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSetException;
@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
-import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
@@ -198,7 +198,7 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         int nber = SampleStorageHelper.addSampleStorages(study, site, name);
 
-        List<SampleStorageWrapper> storages = study
+        List<AliquotedSpecimenWrapper> storages = study
             .getSampleStorageCollection(false);
         int sizeFound = storages.size();
 
@@ -212,12 +212,12 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         SampleStorageHelper.addSampleStorages(study, site, name);
 
-        List<SampleStorageWrapper> storages = study
+        List<AliquotedSpecimenWrapper> storages = study
             .getSampleStorageCollection(true);
         if (storages.size() > 1) {
             for (int i = 0; i < storages.size() - 1; i++) {
-                SampleStorageWrapper storage1 = storages.get(i);
-                SampleStorageWrapper storage2 = storages.get(i + 1);
+                AliquotedSpecimenWrapper storage1 = storages.get(i);
+                AliquotedSpecimenWrapper storage2 = storages.get(i + 1);
                 Assert.assertTrue(storage1.compareTo(storage2) <= 0);
             }
         }
@@ -230,8 +230,8 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         int nber = SampleStorageHelper.addSampleStorages(study, site, name);
 
-        SampleTypeWrapper type = SampleTypeHelper.addSampleType(name);
-        SampleStorageWrapper newStorage = SampleStorageHelper.newSampleStorage(
+        SpecimenTypeWrapper type = SpecimenTypeHelper.addSampleType(name);
+        AliquotedSpecimenWrapper newStorage = SampleStorageHelper.newSampleStorage(
             study, type);
         study.addToSampleStorageCollection(Arrays.asList(newStorage));
         study.persist();
@@ -249,15 +249,15 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         int nber = SampleStorageHelper.addSampleStorages(study, site, name);
 
-        List<SampleStorageWrapper> storages = study
+        List<AliquotedSpecimenWrapper> storages = study
             .getSampleStorageCollection(false);
-        SampleStorageWrapper storage = DbHelper.chooseRandomlyInList(storages);
+        AliquotedSpecimenWrapper storage = DbHelper.chooseRandomlyInList(storages);
         study.removeFromSampleStorageCollection(Arrays.asList(storage));
         study.persist();
 
         study.reload();
         // one storage removed
-        List<SampleStorageWrapper> ssList = study
+        List<AliquotedSpecimenWrapper> ssList = study
             .getSampleStorageCollection(false);
         Assert.assertEquals(nber - 1, ssList.size());
         Assert.assertTrue(!ssList.contains(storage));
@@ -270,7 +270,7 @@ public class TestStudy extends TestDatabase {
         int nber = StudySourceVesselHelper.addStudySourceVessels(study, name,
             true, true);
 
-        List<StudySourceVesselWrapper> storages = study
+        List<SourceSpecimenWrapper> storages = study
             .getStudySourceVesselCollection(false);
         int sizeFound = storages.size();
 
@@ -283,12 +283,12 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
         StudySourceVesselHelper.addStudySourceVessels(study, name, true, true);
 
-        List<StudySourceVesselWrapper> sources = study
+        List<SourceSpecimenWrapper> sources = study
             .getStudySourceVesselCollection(true);
         if (sources.size() > 1) {
             for (int i = 0; i < sources.size() - 1; i++) {
-                StudySourceVesselWrapper source1 = sources.get(i);
-                StudySourceVesselWrapper source2 = sources.get(i + 1);
+                SourceSpecimenWrapper source1 = sources.get(i);
+                SourceSpecimenWrapper source2 = sources.get(i + 1);
                 Assert.assertTrue(source1.compareTo(source2) <= 0);
             }
         }
@@ -316,9 +316,9 @@ public class TestStudy extends TestDatabase {
         int nber = StudySourceVesselHelper.addStudySourceVessels(study, name,
             true, true);
 
-        List<StudySourceVesselWrapper> sources = study
+        List<SourceSpecimenWrapper> sources = study
             .getStudySourceVesselCollection(false);
-        StudySourceVesselWrapper source = DbHelper
+        SourceSpecimenWrapper source = DbHelper
             .chooseRandomlyInList(sources);
         // don't have to delete the storage thanks to
         // deleteSourceVesselDifference method
@@ -337,7 +337,7 @@ public class TestStudy extends TestDatabase {
         String name = "testSetStudyPvAttr" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        Collection<String> types = PvAttrTypeWrapper.getAllPvAttrTypesMap(
+        Collection<String> types = EventAttrTypeWrapper.getAllPvAttrTypesMap(
             appService).keySet();
         Assert.assertTrue(types.contains("text"));
         Assert.assertTrue(types.contains("select_single"));
@@ -539,7 +539,7 @@ public class TestStudy extends TestDatabase {
         StudyWrapper study = StudyHelper.addStudy(name);
 
         int sizeOrig = study.getStudyPvAttrLabels().length;
-        Collection<String> types = PvAttrTypeWrapper.getAllPvAttrTypesMap(
+        Collection<String> types = EventAttrTypeWrapper.getAllPvAttrTypesMap(
             appService).keySet();
         if (types.size() < 2) {
             Assert.fail("Can't test without PvAttrTypes");

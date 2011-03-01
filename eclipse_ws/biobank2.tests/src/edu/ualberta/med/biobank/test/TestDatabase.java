@@ -5,11 +5,9 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankStringLengthException;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.SampleTypeHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
-import edu.ualberta.med.biobank.test.internal.SourceVesselTypeHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -60,10 +58,8 @@ public class TestDatabase {
             StudyHelper.deleteCreatedStudies();
             SiteHelper.deleteCreatedSites();
             ClinicHelper.deleteCreatedClinics();
-            SampleTypeHelper.deleteCreatedSampleTypes();
-            SourceVesselHelper.deleteCreatedSourceVessels();
+            SpecimenTypeHelper.deleteCreatedSpecimenTypes();
             ShippingMethodHelper.deleteCreateShippingMethods();
-            SourceVesselTypeHelper.deletedCreatedSourceVesselTypes();
         } catch (Exception e) {
             e.printStackTrace(System.err);
             Assert.fail();

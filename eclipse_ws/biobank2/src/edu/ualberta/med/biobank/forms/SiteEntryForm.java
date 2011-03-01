@@ -89,7 +89,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         createSiteSection();
         createAddressArea(site);
         createStudySection();
-        createDispatchSection();
 
         // When adding help uncomment line below
         // PlatformUI.getWorkbench().getHelpSystem().setHelp(composite,
@@ -146,22 +145,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         studiesTable.addClickListener(collectionDoubleClickListener);
         studiesTable.addSelectionChangedListener(listener);
         section.setClient(studiesTable);
-    }
-
-    private void createDispatchSection() {
-        Section section = createSection("Dispatches");
-        addSectionToolbar(section, "Add Dispatch Relation",
-            new SelectionAdapter() {
-                @Override
-                public void widgetSelected(SelectionEvent e) {
-                    dispatchTable.createDispatchDialog();
-                }
-            }, ContactWrapper.class);
-        dispatchTable = new SiteDispatchAddInfoTable(section, site);
-        dispatchTable.adaptToToolkit(toolkit, true);
-        dispatchTable.addClickListener(collectionDoubleClickListener);
-        dispatchTable.addSelectionChangedListener(listener);
-        section.setClient(dispatchTable);
     }
 
     @Override

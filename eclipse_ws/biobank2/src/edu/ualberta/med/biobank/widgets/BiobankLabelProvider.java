@@ -8,16 +8,14 @@ import org.eclipse.swt.graphics.Image;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.RequestAliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudySourceVesselWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.StudyContactInfo;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -63,28 +61,28 @@ public class BiobankLabelProvider extends LabelProvider implements
                     BioBankPlugin.openAsyncError("Error in count", e);
                 }
             }
-        } else if (element instanceof AliquotWrapper) {
-            final AliquotWrapper aliquot = (AliquotWrapper) element;
+        } else if (element instanceof SpecimenWrapper) {
+            final SpecimenWrapper aliquot = (SpecimenWrapper) element;
             switch (columnIndex) {
             case 0:
                 return aliquot.getInventoryId();
             case 1:
-                return aliquot.getSampleType() == null ? "" : aliquot
-                    .getSampleType().getName();
+                return aliquot.getSpecimenType() == null ? "" : aliquot
+                    .getSpecimenType().getName();
             case 2:
                 String position = aliquot.getPositionString();
                 return (position != null) ? position : "none";
             case 3:
-                return aliquot.getLinkDate() == null ? "" : DateFormatter
-                    .formatAsDateTime(aliquot.getLinkDate());
+                return aliquot.getCreatedAt() == null ? "" : DateFormatter
+                    .formatAsDateTime(aliquot.getCreatedAt());
             case 4:
                 return aliquot.getQuantity() == null ? "" : aliquot
                     .getQuantity().toString();
             case 6:
                 return aliquot.getComment() == null ? "" : aliquot.getComment();
             }
-        } else if (element instanceof SampleTypeWrapper) {
-            final SampleTypeWrapper st = (SampleTypeWrapper) element;
+        } else if (element instanceof SpecimenTypeWrapper) {
+            final SpecimenTypeWrapper st = (SpecimenTypeWrapper) element;
             switch (columnIndex) {
             case 0:
                 return st.getName();
@@ -108,34 +106,27 @@ public class BiobankLabelProvider extends LabelProvider implements
                 return "";
             }
             return getContactWrapperColumnIndex(info.contact, columnIndex);
-        } else if (element instanceof SourceVesselWrapper) {
-            SourceVesselWrapper source = (SourceVesselWrapper) element;
-            if (columnIndex == 0) {
-                return source.getSourceVesselType().getName();
-            } else {
-                Assert.isTrue(false, "invalid column index: " + columnIndex);
-            }
-        } else if (element instanceof DispatchAliquotWrapper) {
-            DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) element;
+        } else if (element instanceof DispatchSpecimenWrapper) {
+            DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) element;
             if (columnIndex == 0)
-                return dsa.getAliquot().getInventoryId();
+                return dsa.getSpecimen().getInventoryId();
             if (columnIndex == 1)
-                return dsa.getAliquot().getSampleType().getNameShort();
+                return dsa.getSpecimen().getSpecimenType().getNameShort();
             if (columnIndex == 2)
-                return dsa.getAliquot().getProcessingEvent().getPatient()
+                return dsa.getSpecimen().getCollectionEvent().getPatient()
                     .getPnumber();
             if (columnIndex == 3)
-                return dsa.getAliquot().getActivityStatus().toString();
+                return dsa.getSpecimen().getActivityStatus().toString();
             if (columnIndex == 4)
                 return dsa.getComment();
-        } else if (element instanceof RequestAliquotWrapper) {
-            RequestAliquotWrapper dsa = (RequestAliquotWrapper) element;
+        } else if (element instanceof RequestSpecimenWrapper) {
+            RequestSpecimenWrapper dsa = (RequestSpecimenWrapper) element;
             if (columnIndex == 0)
-                return dsa.getAliquot().getInventoryId();
+                return dsa.getSpecimen().getInventoryId();
             if (columnIndex == 1)
-                return dsa.getAliquot().getSampleType().getNameShort();
+                return dsa.getSpecimen().getSpecimenType().getNameShort();
             if (columnIndex == 2)
-                return dsa.getAliquot().getPositionString(true, true);
+                return dsa.getSpecimen().getPositionString(true, true);
             if (columnIndex == 3)
                 return dsa.getClaimedBy();
         } else if (element instanceof AdapterBase)
@@ -157,15 +148,12 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((ClinicWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getNameShort();
-        } else if (element instanceof SampleTypeWrapper) {
-            return ((SampleTypeWrapper) element).getNameShort();
+        } else if (element instanceof SpecimenTypeWrapper) {
+            return ((SpecimenTypeWrapper) element).getNameShort();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getName();
         } else if (element instanceof ActivityStatusWrapper) {
             return ((ActivityStatusWrapper) element).getName();
-        } else if (element instanceof StudySourceVesselWrapper) {
-            return ((StudySourceVesselWrapper) element).getSourceVesselType()
-                .getName();
         } else if (element instanceof AdapterBase) {
             return ((AdapterBase) element).getLabel();
         }

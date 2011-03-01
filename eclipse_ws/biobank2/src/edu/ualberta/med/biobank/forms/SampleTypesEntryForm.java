@@ -11,7 +11,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SampleTypeEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
@@ -51,10 +51,10 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     private void createGlobalSampleTypeSection() throws Exception {
         Section section = createSection("Sample Types");
-        List<SampleTypeWrapper> globalSampleTypes = SampleTypeWrapper
-            .getAllSampleTypes(appService, true);
+        List<SpecimenTypeWrapper> globalSampleTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, true);
         if (globalSampleTypes == null) {
-            globalSampleTypes = new ArrayList<SampleTypeWrapper>();
+            globalSampleTypes = new ArrayList<SpecimenTypeWrapper>();
         }
         sampleWidget = new SampleTypeEntryInfoTable(section, globalSampleTypes,
             "Add a new global sample type", "Edit the global sample type", null);
@@ -67,13 +67,13 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
             public void widgetSelected(SelectionEvent e) {
                 sampleWidget.addSampleType();
             }
-        }, SampleTypeWrapper.class);
+        }, SpecimenTypeWrapper.class);
         section.setClient(sampleWidget);
     }
 
     @Override
     public void saveForm() throws BiobankCheckException, Exception {
-        SampleTypeWrapper.persistSampleTypes(
+        SpecimenTypeWrapper.persistSpecimenTypes(
             sampleWidget.getAddedOrModifiedSampleTypes(),
             sampleWidget.getDeletedSampleTypes());
     }
@@ -91,10 +91,10 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        List<SampleTypeWrapper> globalSampleTypes = null;
+        List<SpecimenTypeWrapper> globalSampleTypes = null;
         try {
-            globalSampleTypes = SampleTypeWrapper.getAllSampleTypes(appService,
-                true);
+            globalSampleTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
+                appService, true);
         } catch (ApplicationException e) {
             logger.error("Can't reset global sample types", e);
         }
@@ -105,9 +105,9 @@ public class SampleTypesEntryForm extends BiobankEntryForm {
 
     @Override
     protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(SampleTypeWrapper.class, null)
-            && !SessionManager.canCreate(SampleTypeWrapper.class, null)
-            && !SessionManager.canDelete(SampleTypeWrapper.class, null)) {
+        if (!SessionManager.canUpdate(SpecimenTypeWrapper.class, null)
+            && !SessionManager.canCreate(SpecimenTypeWrapper.class, null)
+            && !SessionManager.canDelete(SpecimenTypeWrapper.class, null)) {
             BioBankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Sample Type editor. Access Denied.");
