@@ -1,5 +1,35 @@
 RENAME TABLE clinic_shipment_patient TO shipment_patient;
 RENAME TABLE dispatch_shipment_aliquot TO dispatch_aliquot;
+RENAME TABLE sample_type TO specimen_type;
+
+######################################################
+# EVENT ATTRIBUTES
+######################################################
+
+RENAME TABLE global_pv_attr TO global_event_attr;
+RENAME TABLE study_pv_attr TO study_event_attr;
+RENAME TABLE pv_attr TO event_attr;
+RENAME TABLE pv_attr_type TO event_attr_type;
+
+ALTER TABLE global_event_attr
+      CHANGE_COLUMN EVENT_ATTR_TYPE_ID PV_ATTR_TYPE_ID INT(11) NOT NULL,
+      DROP INDEX FKBE7ED6B25B770B31
+      INDEX FKBE7ED6B25B770B31 (EVENT_ATTR_TYPE_ID);
+
+ALTER TABLE study_event_attr
+      CHANGE_COLUMN EVENT_ATTR_TYPE_ID PV_ATTR_TYPE_ID INT(11) NOT NULL,
+      DROP INDEX FKBE7ED6B25B770B31
+      INDEX FKBE7ED6B25B770B31 (EVENT_ATTR_TYPE_ID);
+
+######################################################
+# EVENT ATTRIBUTES
+######################################################
+
+ALTER TABLE abstract_position
+      DROP INDEX FKBC4AE0A6898584F,
+      CHANGE COLUM ALIQUOT_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
+      ADD CONSTRAINT SPECIMEN_ID UNIQUE KEY(SPECIMEN_ID);
 
 ALTER TABLE abstract_shipment
       CHANGE COLUMN DATE_SHIPPED DEPARTED DATETIME NULL DEFAULT NULL COMMENT '';
@@ -65,6 +95,8 @@ CREATE TABLE property_modifier (
     INDEX FK5DF9160157C0C3B0 (PROPERTY_TYPE_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+
 
 CREATE TABLE property_type (
     ID INT(11) NOT NULL,
@@ -549,25 +581,25 @@ alter table Activity_Status
 alter table Aliquot
  change column INVENTORY_ID INVENTORY_ID varchar(100) not null unique;
 alter table Center
- change column NAME NAME varchar(255) not null unique, 
+ change column NAME NAME varchar(255) not null unique,
  change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
 alter table Container
  change column LABEL LABEL varchar(255) not null;
 alter table Container_Type
- change column NAME NAME varchar(255) not null, 
+ change column NAME NAME varchar(255) not null,
  change column NAME_SHORT NAME_SHORT varchar(50) not null,
  change column CHILD_LABELING_SCHEME_ID CHILD_LABELING_SCHEME_ID integer not null;
 alter table Patient
  change column PNUMBER PNUMBER varchar(100) not null unique;
 alter table Sample_Type
- change column NAME NAME varchar(100) not null unique, 
+ change column NAME NAME varchar(100) not null unique,
  change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
 alter table Shipping_Method
  change column NAME NAME varchar(255) not null unique;
 alter table Source_Vessel_Type
  change column NAME NAME varchar(100) not null unique;
 alter table Study
- change column NAME NAME varchar(255) not null unique, 
+ change column NAME NAME varchar(255) not null unique,
  change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
 
 -- unique constraint on multiple columns
