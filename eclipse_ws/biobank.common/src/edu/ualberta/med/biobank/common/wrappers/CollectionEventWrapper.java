@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -104,18 +102,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         if (sourceVessels != null && !sourceVessels.isEmpty()) {
             throw new BiobankCheckException(
                 "Source Vessels are still linked to this Collection Event. Delete them before attempting to remove this Collection Event");
-        }
-    }
-
-    public void checkPatientsStudy(ClinicWrapper clinic)
-        throws BiobankException, ApplicationException {
-        List<String> patientsInError = new ArrayList<String>();
-        PatientWrapper patient = getPatient();
-        if (!patient.canBeAddedToCollectionEvent(this)) {
-            throw new BiobankCheckException("Patient(s) "
-                + StringUtils.join(patientsInError, ", ")
-                + " are not part of a study that has contact with clinic "
-                + clinic.getName());
         }
     }
 

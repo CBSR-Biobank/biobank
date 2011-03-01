@@ -33,7 +33,7 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(SampleStorageEntryInfoTable.class.getName());
+        .getLogger(AliquotedSpecimenEntryInfoTable.class.getName());
 
     private List<SpecimenTypeWrapper> allSampleTypes;
 

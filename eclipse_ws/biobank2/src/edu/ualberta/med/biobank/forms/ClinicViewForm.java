@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.ShipmentInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.OriginInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
@@ -43,7 +43,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private BiobankText shipmentTotal;
 
-    private ShipmentInfoTable shipmentsTable;
+    private OriginInfoTable shipmentsTable;
 
     @Override
     protected void init() throws Exception {
@@ -106,7 +106,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());
-        setTextValue(shipmentTotal, clinic.getCollectionEventCount(true));
+        setTextValue(shipmentTotal, clinic.getOriginInfoCollection(true));
         setTextValue(patientTotal, clinic.getPatientCount());
         setTextValue(visitTotal, clinic.getProcessingEventCount());
     }
@@ -136,7 +136,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         Composite client = createSectionWithClient(Messages
             .getString("ClinicViewForm.shipments.title"));
 
-        shipmentsTable = new ShipmentInfoTable(client, clinic);
+        shipmentsTable = new OriginInfoTable(client, clinic);
         shipmentsTable.adaptToToolkit(toolkit, true);
         toolkit.paintBordersFor(shipmentsTable);
 
@@ -153,7 +153,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setClinicValues();
         setAdressValues(clinic);
         contactsTable.setCollection(clinic.getContactCollection(true));
-        shipmentsTable.setCollection(clinic.getCollectionEventCollection());
+        shipmentsTable.setCollection(clinic.getOriginInfoCollection(true));
         studiesTable.setCollection(clinic.getStudyCollection());
     }
 
