@@ -54,7 +54,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public void setStreet1(String street1) {
-        setProperty(initAddress(), AddressPeer.STREET1, street1);
+        initAddress().setProperty(AddressPeer.STREET1, street1);
     }
 
     public String getStreet2() {
@@ -62,7 +62,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public void setStreet2(String street2) {
-        setProperty(initAddress(), AddressPeer.STREET2, street2);
+        initAddress().setProperty(AddressPeer.STREET2, street2);
     }
 
     public String getCity() {
@@ -70,7 +70,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public void setCity(String city) {
-        setProperty(initAddress(), AddressPeer.CITY, city);
+        initAddress().setProperty(AddressPeer.CITY, city);
     }
 
     public String getProvince() {
@@ -78,7 +78,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public void setProvince(String province) {
-        setProperty(initAddress(), AddressPeer.PROVINCE, province);
+        initAddress().setProperty(AddressPeer.PROVINCE, province);
     }
 
     public String getPostalCode() {
@@ -86,7 +86,7 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     public void setPostalCode(String postalCode) {
-        setProperty(initAddress(), AddressPeer.POSTAL_CODE, postalCode);
+        initAddress().setProperty(AddressPeer.POSTAL_CODE, postalCode);
     }
 
     public static final String PROCESSING_EVENT_COUNT_QRY = "select count(proc) from "
