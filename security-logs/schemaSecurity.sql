@@ -1,9 +1,8 @@
-
--- MySQL dump 10.13  Distrib 5.1.41, for debian-linux-gnu (x86_64)
+-- MySQL dump 10.13  Distrib 5.1.49, for debian-linux-gnu (x86_64)
 --
 -- Host: localhost    Database: biobank2
 -- ------------------------------------------------------
--- Server version	5.1.41-3ubuntu12.9
+-- Server version	5.1.49-1ubuntu8.1
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
 /*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
@@ -139,7 +138,7 @@ CREATE TABLE `csm_pg_pe` (
   KEY `idx_PROTECTION_GROUP_ID` (`PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PROTECTION_ELEMENT_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_GROUP_PROTECTION_ELEMENT` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1146 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1192 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -156,13 +155,11 @@ INSERT INTO `csm_pg_pe` VALUES (838,48,14,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (839,48,36,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (840,48,15,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (841,48,34,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (844,46,62,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (877,50,19,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (878,50,65,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (879,50,7,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (881,50,151,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (882,50,34,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (883,50,62,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (935,49,24,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (936,49,12,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (937,49,3,'0000-00-00');
@@ -178,55 +175,52 @@ INSERT INTO `csm_pg_pe` VALUES (1017,45,25,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (1018,45,30,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (1019,45,20,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (1043,11,18,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1091,1,10,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1092,1,7,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1095,1,21,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1096,1,11,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1097,1,36,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1098,1,6,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1099,1,12,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1100,1,170,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1101,1,51,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1102,1,8,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1103,1,16,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1104,1,32,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1105,1,65,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1106,1,27,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1107,1,20,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1108,1,24,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1110,1,19,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1111,1,35,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1112,1,5,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1114,1,172,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1116,1,14,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1117,1,30,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1118,1,15,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1119,1,34,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1120,1,151,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1122,1,171,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1123,1,4,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1124,1,13,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1125,1,3,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1126,1,25,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1127,1,62,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1128,1,175,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1129,1,176,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1130,1,177,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1131,1,178,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1132,1,179,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1133,1,180,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1134,1,181,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1135,1,182,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1136,1,183,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1137,1,184,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1138,1,185,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1139,1,186,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1140,1,187,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1141,1,188,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1142,1,189,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1143,1,190,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1144,1,191,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1145,1,192,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1146,1,186,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1147,1,18,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1148,1,25,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1149,1,7,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1150,1,180,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1151,1,10,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1152,1,21,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1153,1,178,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1154,1,36,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1155,1,6,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1156,1,188,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1157,1,170,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1158,1,51,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1159,1,8,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1160,1,24,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1161,1,151,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1162,1,32,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1163,1,65,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1164,1,27,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1165,1,183,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1166,1,13,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1167,1,20,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1168,1,19,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1169,1,179,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1170,1,16,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1171,1,187,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1172,1,5,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1173,1,192,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1174,1,14,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1175,1,30,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1176,1,193,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1177,1,34,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1178,1,11,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1179,1,177,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1180,1,15,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1181,1,181,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1182,1,175,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1183,1,184,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1184,1,171,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1185,1,35,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1186,1,4,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1187,1,176,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1188,1,3,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1189,1,185,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1190,1,12,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1191,1,182,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -284,7 +278,7 @@ CREATE TABLE `csm_protection_element` (
   UNIQUE KEY `UQ_PE_PE_NAME_ATTRIBUTE_VALUE_APP_ID` (`OBJECT_ID`,`ATTRIBUTE`,`ATTRIBUTE_VALUE`,`APPLICATION_ID`),
   KEY `idx_APPLICATION_ID` (`APPLICATION_ID`),
   CONSTRAINT `FK_PE_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=193 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=194 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -301,32 +295,30 @@ INSERT INTO `csm_protection_element` VALUES (5,'edu.ualberta.med.biobank.model.C
 INSERT INTO `csm_protection_element` VALUES (6,'edu.ualberta.med.biobank.model.Clinic','edu.ualberta.med.biobank.model.Clinic','edu.ualberta.med.biobank.model.Clinic',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (7,'edu.ualberta.med.biobank.model.ContainerPosition','edu.ualberta.med.biobank.model.ContainerPosition','edu.ualberta.med.biobank.model.ContainerPosition',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (8,'edu.ualberta.med.biobank.model.Patient','edu.ualberta.med.biobank.model.Patient','edu.ualberta.med.biobank.model.Patient',NULL,NULL,NULL,2,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (10,'edu.ualberta.med.biobank.model.StudyPvAttr','edu.ualberta.med.biobank.model.StudyPvAttr','edu.ualberta.med.biobank.model.StudyPvAttr','','','',2,'2009-12-03');
-INSERT INTO `csm_protection_element` VALUES (11,'edu.ualberta.med.biobank.model.PvAttr','edu.ualberta.med.biobank.model.PvAttr','edu.ualberta.med.biobank.model.PvAttr','','','',2,'2009-12-03');
-INSERT INTO `csm_protection_element` VALUES (12,'edu.ualberta.med.biobank.model.GlobalPvAttr','edu.ualberta.med.biobank.model.GlobalPvAttr','edu.ualberta.med.biobank.model.GlobalPvAttr','','','',2,'2010-08-18');
-INSERT INTO `csm_protection_element` VALUES (13,'edu.ualberta.med.biobank.model.PvAttrType','edu.ualberta.med.biobank.model.PvAttrType','edu.ualberta.med.biobank.model.PvAttrType','','','',2,'2009-12-03');
+INSERT INTO `csm_protection_element` VALUES (10,'edu.ualberta.med.biobank.model.StudyEventAttr','edu.ualberta.med.biobank.model.StudyEventAttr','edu.ualberta.med.biobank.model.StudyEventAttr','','','',2,'2011-02-28');
+INSERT INTO `csm_protection_element` VALUES (11,'edu.ualberta.med.biobank.model.EventAttr','edu.ualberta.med.biobank.model.EventAttr','edu.ualberta.med.biobank.model.EventAttr','','','',2,'2011-02-28');
+INSERT INTO `csm_protection_element` VALUES (12,'edu.ualberta.med.biobank.model.GlobalEventAttr','edu.ualberta.med.biobank.model.GlobalEventAttr','edu.ualberta.med.biobank.model.GlobalEventAttr','','','',2,'2011-02-28');
+INSERT INTO `csm_protection_element` VALUES (13,'edu.ualberta.med.biobank.model.EventAttrType','edu.ualberta.med.biobank.model.EventAttrType','edu.ualberta.med.biobank.model.EventAttrType','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (14,'edu.ualberta.med.biobank.model.Aliquot','edu.ualberta.med.biobank.model.Aliquot','edu.ualberta.med.biobank.model.Aliquot',NULL,NULL,NULL,2,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (15,'edu.ualberta.med.biobank.model.AliquotPosition','edu.ualberta.med.biobank.model.AliquotPosition','edu.ualberta.med.biobank.model.AliquotPosition',NULL,NULL,NULL,2,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (16,'edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType','edu.ualberta.med.biobank.model.SampleType',NULL,NULL,NULL,2,'2009-07-22');
+INSERT INTO `csm_protection_element` VALUES (15,'edu.ualberta.med.biobank.model.SpecimenPosition','edu.ualberta.med.biobank.model.SpecimenPosition','edu.ualberta.med.biobank.model.SpecimenPosition','','','',2,'2011-02-28');
+INSERT INTO `csm_protection_element` VALUES (16,'edu.ualberta.med.biobank.model.OriginInfo','edu.ualberta.med.biobank.model.OriginInfo','edu.ualberta.med.biobank.model.OriginInfo','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (18,'edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (19,'edu.ualberta.med.biobank.model.Container','edu.ualberta.med.biobank.model.Container','edu.ualberta.med.biobank.model.Container','','','',2,'2010-08-19');
 INSERT INTO `csm_protection_element` VALUES (20,'edu.ualberta.med.biobank.model.ContainerType','edu.ualberta.med.biobank.model.ContainerType','edu.ualberta.med.biobank.model.ContainerType',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (21,'edu.ualberta.med.biobank.model.Study','edu.ualberta.med.biobank.model.Study','edu.ualberta.med.biobank.model.Study',NULL,NULL,NULL,2,'2009-07-22');
-INSERT INTO `csm_protection_element` VALUES (24,'edu.ualberta.med.biobank.model.SourceVessel','edu.ualberta.med.biobank.model.SourceVessel','edu.ualberta.med.biobank.model.SourceVessel','','','',2,'2009-07-23');
-INSERT INTO `csm_protection_element` VALUES (25,'edu.ualberta.med.biobank.model.SampleStorage','edu.ualberta.med.biobank.model.SampleStorage','edu.ualberta.med.biobank.model.SampleStorage','','','',2,'2009-07-23');
+INSERT INTO `csm_protection_element` VALUES (24,'edu.ualberta.med.biobank.model.Specimen','edu.ualberta.med.biobank.model.Specimen','edu.ualberta.med.biobank.model.Specimen','','','',2,'2011-02-28');
+INSERT INTO `csm_protection_element` VALUES (25,'edu.ualberta.med.biobank.model.AliquotedSpecimen','edu.ualberta.med.biobank.model.AliquotedSpecimen','edu.ualberta.med.biobank.model.AliquotedSpecimen','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (27,'edu.ualberta.med.biobank.model.ContainerLabelingScheme','edu.ualberta.med.biobank.model.ContainerLabelingScheme','edu.ualberta.med.biobank.model.ContainerLabelingScheme','','','',2,'2009-07-26');
 INSERT INTO `csm_protection_element` VALUES (30,'edu.ualberta.med.biobank.model.Contact','edu.ualberta.med.biobank.model.Contact','edu.ualberta.med.biobank.model.Contact','','','',2,'2009-08-24');
 INSERT INTO `csm_protection_element` VALUES (32,'edu.ualberta.med.biobank.model.ShippingMethod','edu.ualberta.med.biobank.model.ShippingMethod','edu.ualberta.med.biobank.model.ShippingMethod','','','',2,'2009-11-30');
 INSERT INTO `csm_protection_element` VALUES (34,'edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','edu.ualberta.med.biobank.model.ContainerPath','','','',2,'2010-01-11');
-INSERT INTO `csm_protection_element` VALUES (35,'edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','edu.ualberta.med.biobank.model.StudySourceVessel','','','',2,'2010-04-13');
+INSERT INTO `csm_protection_element` VALUES (35,'edu.ualberta.med.biobank.model.SourceSpecimen','edu.ualberta.med.biobank.model.SourceSpecimen','edu.ualberta.med.biobank.model.SourceSpecimen','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (36,'edu.ualberta.med.biobank.model.AbstractPosition','','edu.ualberta.med.biobank.model.AbstractPosition','','','',2,'2010-03-15');
 INSERT INTO `csm_protection_element` VALUES (51,'edu.ualberta.med.biobank.model.Log','','edu.ualberta.med.biobank.model.Log','','','',2,'2010-05-25');
-INSERT INTO `csm_protection_element` VALUES (62,'edu.ualberta.med.biobank.model.AbstractShipment','edu.ualberta.med.biobank.model.AbstractShipment','edu.ualberta.med.biobank.model.AbstractShipment','','','',2,'2010-08-18');
 INSERT INTO `csm_protection_element` VALUES (65,'edu.ualberta.med.biobank.model.Dispatch','edu.ualberta.med.biobank.model.Dispatch','edu.ualberta.med.biobank.model.Dispatch','','','',2,'2010-08-18');
-INSERT INTO `csm_protection_element` VALUES (151,'edu.ualberta.med.biobank.model.DispatchAliquot','edu.ualberta.med.biobank.model.DispatchAliquot','edu.ualberta.med.biobank.model.DispatchAliquot','','','',2,'2010-09-30');
+INSERT INTO `csm_protection_element` VALUES (151,'edu.ualberta.med.biobank.model.DispatchSpecimen','edu.ualberta.med.biobank.model.DispatchSpecimen','edu.ualberta.med.biobank.model.DispatchSpecimen','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (170,'edu.ualberta.med.biobank.model.ResearchGroup','','edu.ualberta.med.biobank.model.ResearchGroup','','','',2,'2010-12-07');
 INSERT INTO `csm_protection_element` VALUES (171,'edu.ualberta.med.biobank.model.Request','','edu.ualberta.med.biobank.model.Request','','','',2,'2010-12-08');
-INSERT INTO `csm_protection_element` VALUES (172,'edu.ualberta.med.biobank.model.RequestAliquot','','edu.ualberta.med.biobank.model.RequestAliquot','','','',2,'2010-12-08');
 INSERT INTO `csm_protection_element` VALUES (175,'edu.ualberta.med.biobank.model.Report','','edu.ualberta.med.biobank.model.Report','','','',2,'2011-01-13');
 INSERT INTO `csm_protection_element` VALUES (176,'edu.ualberta.med.biobank.model.ReportFilter','','edu.ualberta.med.biobank.model.ReportFilter','','','',2,'2011-01-13');
 INSERT INTO `csm_protection_element` VALUES (177,'edu.ualberta.med.biobank.model.ReportFilterValue','','edu.ualberta.med.biobank.model.ReportFilterValue','','','',2,'2011-01-13');
@@ -339,12 +331,10 @@ INSERT INTO `csm_protection_element` VALUES (183,'edu.ualberta.med.biobank.model
 INSERT INTO `csm_protection_element` VALUES (184,'edu.ualberta.med.biobank.model.PropertyType','','edu.ualberta.med.biobank.model.PropertyType','','','',2,'2011-01-13');
 INSERT INTO `csm_protection_element` VALUES (185,'edu.ualberta.med.biobank.model.CollectionEvent','','edu.ualberta.med.biobank.model.CollectionEvent','','','',2,'2011-02-15');
 INSERT INTO `csm_protection_element` VALUES (186,'edu.ualberta.med.biobank.model.ProcessingEvent','','edu.ualberta.med.biobank.model.ProcessingEvent','','','',2,'2011-02-15');
-INSERT INTO `csm_protection_element` VALUES (187,'edu.ualberta.med.biobank.model.SourceVesselType','','edu.ualberta.med.biobank.model.SourceVesselType','','','',2,'2011-02-15');
+INSERT INTO `csm_protection_element` VALUES (187,'edu.ualberta.med.biobank.model.SpecimenType','edu.ualberta.med.biobank.model.SpecimenType','edu.ualberta.med.biobank.model.SpecimenType','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (188,'edu.ualberta.med.biobank.model.Center','','edu.ualberta.med.biobank.model.Center','','','',2,'2011-02-15');
-INSERT INTO `csm_protection_element` VALUES (189,'edu.ualberta.med.biobank.model.DispatchItem','','edu.ualberta.med.biobank.model.DispatchItem','','','',2,'2011-02-15');
-INSERT INTO `csm_protection_element` VALUES (190,'edu.ualberta.med.biobank.model.RequestItem','','edu.ualberta.med.biobank.model.RequestItem','','','',2,'2011-02-15');
-INSERT INTO `csm_protection_element` VALUES (191,'edu.ualberta.med.biobank.model.DispatchSourceVessel','','edu.ualberta.med.biobank.model.DispatchSourceVessel','','','',2,'2011-02-15');
-INSERT INTO `csm_protection_element` VALUES (192,'edu.ualberta.med.biobank.model.RequestSourceVessel','','edu.ualberta.med.biobank.model.RequestSourceVessel','','','',2,'2011-02-15');
+INSERT INTO `csm_protection_element` VALUES (192,'edu.ualberta.med.biobank.model.RequestSpecimen','','edu.ualberta.med.biobank.model.RequestSpecimen','','','',2,'2011-02-28');
+INSERT INTO `csm_protection_element` VALUES (193,'edu.ualberta.med.biobank.model.ShipmentInfo','edu.ualberta.med.biobank.model.ShipmentInfo','edu.ualberta.med.biobank.model.ShipmentInfo','','','',2,'2011-02-28');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -638,4 +628,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-02-15 10:51:36
+-- Dump completed on 2011-02-28 17:30:16
