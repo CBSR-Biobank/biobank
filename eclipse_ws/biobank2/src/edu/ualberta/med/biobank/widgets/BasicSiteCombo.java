@@ -19,6 +19,7 @@ import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
+@Deprecated
 public class BasicSiteCombo extends BiobankWidget {
 
     private ComboViewer comboViewer;

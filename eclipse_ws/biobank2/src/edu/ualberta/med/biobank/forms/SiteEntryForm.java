@@ -12,6 +12,8 @@ import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -19,7 +21,6 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SiteDispatchAddInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.entry.StudyAddInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -33,9 +34,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm";
 
-    private static final String MSG_NEW_SITE_OK = "Create a new BioBank site.";
-    private static final String MSG_SITE_OK = "Edit a BioBank site.";
-    private static final String MSG_NO_SITE_NAME = "Site must have a name";
+    private static final String MSG_NEW_SITE_OK = Messages
+        .getString("SiteEntryForm.creation.msg");
+    private static final String MSG_SITE_OK = Messages
+        .getString("SiteEntryForm.edition.msg");
 
     private SiteAdapter siteAdapter;
 
@@ -46,8 +48,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     private ComboViewer activityStatusComboViewer;
 
     private StudyAddInfoTable studiesTable;
-
-    private SiteDispatchAddInfoTable dispatchTable;
 
     private BiobankEntryFormWidgetListener listener = new BiobankEntryFormWidgetListener() {
         @Override
@@ -72,20 +72,20 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
         String tabName;
         if (site.isNew()) {
-            tabName = "New Repository Site";
+            tabName = Messages.getString("SiteEntryForm.title.new");
             site.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            tabName = "Repository Site " + site.getNameShort();
+            tabName = Messages.getString("SiteEntryForm.title.edit",
+                site.getNameShort());
         }
         setPartName(tabName);
     }
 
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText("Repository Site Information");
+        form.setText(Messages.getString("SiteEntryForm.main.title"));
         page.setLayout(new GridLayout(1, false));
-        // currentActivityStatus = site.getActivityStatus();
         createSiteSection();
         createAddressArea(site);
         createStudySection();
@@ -96,11 +96,8 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     }
 
     private void createSiteSection() throws ApplicationException {
-        toolkit
-            .createLabel(
-                page,
-                "Studies, Clinics, and Container Types can be added after submitting this information.",
-                SWT.LEFT);
+        toolkit.createLabel(page,
+            Messages.getString("SiteEntryForm.main.description"), SWT.LEFT);
 
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -109,18 +106,33 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        setFirstControl(createBoundWidgetWithLabel(client, BiobankText.class,
-            SWT.NONE, "Name", null, site, "name", new NonEmptyStringValidator(
-                MSG_NO_SITE_NAME)));
+        setFirstControl(createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("label.name"),
+            null,
+            site,
+            SitePeer.NAME.getName(),
+            new NonEmptyStringValidator(Messages
+                .getString("SiteEntryForm.field.name.validation.msg"))));
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-            "Short Name", null, site, "nameShort", new NonEmptyStringValidator(
-                "Site short name cannot be blank"));
+        createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("label.nameShort"),
+            null,
+            site,
+            SitePeer.NAME_SHORT.getName(),
+            new NonEmptyStringValidator(Messages
+                .getString("SiteEntryForm.field.nameShort.validation.msg")));
 
         activityStatusComboViewer = createComboViewer(client,
-            "Activity Status",
+            Messages.getString("label.activity"),
             ActivityStatusWrapper.getAllActivityStatuses(appService),
-            site.getActivityStatus(), "Site must have an activity status",
+            site.getActivityStatus(),
+            Messages.getString("SiteEntryForm.field.activity.validation.msg"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -129,17 +141,21 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null, site, "comment", null);
+            Messages.getString("label.comments"), null, site,
+            SitePeer.COMMENT.getName(), null);
     }
 
     private void createStudySection() {
-        Section section = createSection("Studies");
-        addSectionToolbar(section, "Add Study", new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                studiesTable.createStudyDlg();
-            }
-        }, ContactWrapper.class);
+        Section section = createSection(Messages
+            .getString("SiteEntryForm.studies.title"));
+        addSectionToolbar(section,
+            Messages.getString("SiteEntryForm.studies.add"),
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    studiesTable.createStudyDlg();
+                }
+            }, ContactWrapper.class);
         studiesTable = new StudyAddInfoTable(section, site);
         studiesTable.adaptToToolkit(toolkit, true);
         studiesTable.addClickListener(collectionDoubleClickListener);
@@ -176,7 +192,6 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             activityStatusComboViewer.getCombo().deselectAll();
         }
         studiesTable.reload();
-        dispatchTable.reload();
         super.reset();
     }
 }

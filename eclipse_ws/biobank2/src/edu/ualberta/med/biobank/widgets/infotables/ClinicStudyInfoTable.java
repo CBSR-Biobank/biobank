@@ -75,6 +75,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
             info.studyShortName = new String();
         }
         info.patientCount = study.getPatientCountForCenter(clinic);
+        // FIXME I am sure the right method is called
         info.visitCount = study.getProcessingEventCountForCenter(clinic);
         return info;
     }

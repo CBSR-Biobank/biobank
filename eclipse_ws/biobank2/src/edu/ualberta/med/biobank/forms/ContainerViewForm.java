@@ -34,11 +34,10 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -50,7 +49,8 @@ import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
-import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -63,7 +63,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerWrapper container;
 
-    private AliquotListInfoTable aliquotsWidget;
+    private SpecimenInfoTable aliquotsWidget;
 
     private BiobankText siteLabel;
 
@@ -493,11 +493,12 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    private void createAliquotsSection() throws BiobankException {
+    private void createAliquotsSection() {
         Composite parent = createSectionWithClient("Aliquots");
-        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>(container
-            .getSpecimens().values());
-        aliquotsWidget = new AliquotListInfoTable(parent, aliquots);
+        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>(
+            container.getSpecimens().values());
+        aliquotsWidget = new SpecimenInfoTable(parent, aliquots,
+            ColumnsShown.ALL, 20);
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addClickListener(collectionDoubleClickListener);
     }

@@ -7,15 +7,15 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.forms.AliquotEntryForm;
-import edu.ualberta.med.biobank.forms.AliquotViewForm;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.forms.SpecimenEntryForm;
+import edu.ualberta.med.biobank.forms.SpecimenViewForm;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
-public class AliquotAdapter extends AdapterBase {
+public class SpecimenAdapter extends AdapterBase {
 
-    public AliquotAdapter(AdapterBase parent, SpecimenWrapper sample) {
+    public SpecimenAdapter(AdapterBase parent, SpecimenWrapper sample) {
         super(parent, sample);
     }
 
@@ -73,12 +73,12 @@ public class AliquotAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        return AliquotEntryForm.ID;
+        return SpecimenEntryForm.ID;
     }
 
     @Override
     public String getViewFormId() {
-        return AliquotViewForm.ID;
+        return SpecimenViewForm.ID;
     }
 
 }

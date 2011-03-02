@@ -16,22 +16,14 @@ public class CollectionEventInfoTable extends
     class TableRowData {
         CollectionEventWrapper collectionEvent;
         Integer visitNumber;
-        String dateDrawn;
-        Integer sourceSpecimenCount;
-        Integer aliquotedSpecimenCount;
+        Long specimenCount;
         String comment;
 
         @Override
         public String toString() {
-            return StringUtils.join(
-                new String[] {
-                    visitNumber.toString(),
-                    dateDrawn,
-                    (sourceSpecimenCount != null) ? sourceSpecimenCount
-                        .toString() : "0",
-                    comment,
-                    (aliquotedSpecimenCount != null) ? aliquotedSpecimenCount
-                        .toString() : "0" }, "\t");
+            return StringUtils.join(new String[] { visitNumber.toString(),
+                (specimenCount != null) ? specimenCount.toString() : "0",
+                comment }, "\t");
         }
     }
 
@@ -65,14 +57,9 @@ public class CollectionEventInfoTable extends
                 case 0:
                     return info.visitNumber.toString();
                 case 1:
-                    return info.dateDrawn;
+                    return (info.specimenCount != null) ? info.specimenCount
+                        .toString() : "0";
                 case 2:
-                    return (info.sourceSpecimenCount != null) ? info.sourceSpecimenCount
-                        .toString() : "0";
-                case 3:
-                    return (info.aliquotedSpecimenCount != null) ? info.aliquotedSpecimenCount
-                        .toString() : "0";
-                case 4:
                     return info.comment;
 
                 default:
@@ -85,17 +72,12 @@ public class CollectionEventInfoTable extends
     @Override
     public Object getCollectionModelObject(
         CollectionEventWrapper collectionEvent) throws Exception {
-        // FIXME
-        // TableRowData info = new TableRowData();
-        // info.collectionEvent = collectionEvent;
-        // info.visitNumber = collectionEvent.getVisitNumber();
-        // info.dateDrawn = collectionEvent.getFormattedDateDrawn();
-        // info.sourceSpecimenCount =
-        // collectionEvent.getOriginalSpecimensCount();
-        // info.aliquotedSpecimenCount = collectionEvent.getSpecimensCount();
-        // info.comment = collectionEvent.getComment();
-        // return info;
-        return null;
+        TableRowData info = new TableRowData();
+        info.collectionEvent = collectionEvent;
+        info.visitNumber = collectionEvent.getVisitNumber();
+        info.specimenCount = collectionEvent.getSpecimensCount(true);
+        info.comment = collectionEvent.getComment();
+        return info;
     }
 
     @Override

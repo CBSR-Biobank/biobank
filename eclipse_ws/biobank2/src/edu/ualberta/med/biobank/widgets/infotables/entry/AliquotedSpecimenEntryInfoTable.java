@@ -50,7 +50,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         super(parent, null);
         getSpecimenTypes();
         this.study = study;
-        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection();
+        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }
@@ -166,7 +166,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public void reload() {
-        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection();
+        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }

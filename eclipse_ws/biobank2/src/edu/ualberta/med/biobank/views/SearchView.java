@@ -31,7 +31,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.utils.SearchType;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
@@ -41,7 +40,6 @@ public class SearchView extends ViewPart {
 
     private BiobankText searchText;
     private ComboViewer searchTypeCombo;
-    private BasicSiteCombo siteCombo;
 
     private Button searchButton;
 
@@ -81,14 +79,6 @@ public class SearchView extends ViewPart {
             });
 
         Label label = widgetCreator.createLabel(parent, "Repository Site");
-        siteCombo = new BasicSiteCombo(parent, widgetCreator, null, label,
-            false, null);
-        // FIXME arrange site combo
-        // GridData gds = new GridData();
-        // gds.horizontalSpan = 2;
-        // gds.horizontalAlignment = SWT.FILL;
-        // gds.grabExcessHorizontalSpace = true;
-        // siteCombo.getCombo().setLayoutData(gds);
 
         searchTypeCombo = new ComboViewer(parent);
         searchTypeCombo.setContentProvider(new ArrayContentProvider());
@@ -164,7 +154,8 @@ public class SearchView extends ViewPart {
                     .getSelection()).getFirstElement();
                 try {
                     List<? extends ModelWrapper<?>> res = type.search(
-                        searchString, siteCombo.getSelectedSite());
+                        searchString, SessionManager.getUser()
+                            .getCurrentWorkingCentre());
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {
@@ -182,12 +173,7 @@ public class SearchView extends ViewPart {
         if (!searchText.isDisposed()) {
             searchText.setEnabled(loggedIn);
             searchTypeCombo.getCombo().setEnabled(loggedIn);
-            siteCombo.setEnabled(loggedIn);
             searchButton.setEnabled(loggedIn);
-            if (loggedIn) {
-                siteCombo.init(SessionManager.getAppService());
-                siteCombo.setSelectedSite(siteCombo.getFirstSite(), true);
-            }
         }
     }
 }
