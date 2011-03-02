@@ -97,20 +97,18 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        SiteWrapper selectedSite = SessionManager.getUser()
-            .getCurrentWorkingCentre();
-
         if (!container.hasParent()) {
             containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
-                appService, selectedSite);
+                appService, container.getSite());
         } else {
             containerTypes = container.getParent().getContainerType()
                 .getChildContainerTypeCollection();
         }
         if (container.isNew())
-            adapter.setParent(((SiteAdapter) SessionManager
-                .searchFirstNode(selectedSite)).getContainersGroupNode());
-        container.setSite(selectedSite);
+            adapter
+                .setParent(((SiteAdapter) SessionManager
+                    .searchFirstNode(container.getSite()))
+                    .getContainersGroupNode());
 
         setFirstControl(client);
 
