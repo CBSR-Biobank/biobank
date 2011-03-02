@@ -70,8 +70,10 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public void addAliquotedSpecimen() {
-        addOrEditAliquotedSpecimen(true, new AliquotedSpecimenWrapper(
-            SessionManager.getAppService()));
+        AliquotedSpecimenWrapper asw = new AliquotedSpecimenWrapper(
+            SessionManager.getAppService());
+        asw.setStudy(study);
+        addOrEditAliquotedSpecimen(true, asw);
     }
 
     private void addOrEditAliquotedSpecimen(boolean add,

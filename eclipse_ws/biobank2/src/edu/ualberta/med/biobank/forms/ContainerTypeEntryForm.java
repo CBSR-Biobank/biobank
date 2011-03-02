@@ -28,7 +28,6 @@ import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.admin.ContainerTypeAdapter;
@@ -133,18 +132,15 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         availSubContainerTypes = new ArrayList<ContainerTypeWrapper>();
-        SiteWrapper selectedSite = SessionManager.getUser()
-            .getCurrentWorkingCentre();
         adapter.setParent(((SiteAdapter) SessionManager
-            .searchFirstNode(selectedSite)).getContainerTypesGroupNode());
-        for (ContainerTypeWrapper type : selectedSite
+            .searchFirstNode(containerType.getSite()))
+            .getContainerTypesGroupNode());
+        for (ContainerTypeWrapper type : containerType.getSite()
             .getContainerTypeCollection()) {
             if (type.getTopLevel().equals(Boolean.FALSE)) {
                 availSubContainerTypes.add(type);
             }
         }
-        containerType.setSite(selectedSite);
-        setChildContainerTypeSelection();
         setDirty(true);
 
         setFirstControl(client);
