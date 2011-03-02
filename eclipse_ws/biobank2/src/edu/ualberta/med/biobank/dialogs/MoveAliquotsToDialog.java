@@ -29,11 +29,9 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -44,8 +42,6 @@ public class MoveAliquotsToDialog extends BiobankDialog {
     private ContainerWrapper oldContainer;
 
     private HashMap<String, ContainerWrapper> map = new HashMap<String, ContainerWrapper>();
-
-    private BasicSiteCombo siteCombo;
 
     private ListViewer lv;
 
@@ -88,17 +84,8 @@ public class MoveAliquotsToDialog extends BiobankDialog {
         Label siteLabel = widgetCreator
             .createLabel(contents, "Repository Site");
         siteLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_CENTER));
-        siteCombo = new BasicSiteCombo(contents, widgetCreator,
-            SessionManager.getAppService(), siteLabel, true,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    buildContainersMap();
-                }
-            });
-        siteCombo.setSelectedSite(oldContainer.getSite(), false);
+        buildContainersMap();
         if (!SessionManager.getUser().isWebsiteAdministrator()) {
-            siteCombo.setEnabled(false);
             siteLabel
                 .setToolTipText("Only Website administrator can move aliquot to another site");
         }
@@ -166,16 +153,15 @@ public class MoveAliquotsToDialog extends BiobankDialog {
         List<SpecimenTypeWrapper> typesFromOlContainer = oldContainer
             .getContainerType().getSpecimenTypeCollection();
         List<ContainerWrapper> conts = new ArrayList<ContainerWrapper>();
-        if (siteCombo.getSelectedSite() != null)
-            try {
-                conts = ContainerWrapper.getEmptyContainersHoldingSampleType(
-                    SessionManager.getAppService(),
-                    siteCombo.getSelectedSite(), typesFromOlContainer,
-                    oldContainer.getRowCapacity(),
-                    oldContainer.getColCapacity());
-            } catch (ApplicationException ae) {
-                BioBankPlugin.openAsyncError("Error retrieving containers", ae);
-            }
+        try {
+            conts = ContainerWrapper.getEmptyContainersHoldingSampleType(
+                SessionManager.getAppService(), SessionManager.getUser()
+                    .getCurrentWorkingCentre(), typesFromOlContainer,
+                oldContainer.getRowCapacity(), oldContainer.getColCapacity());
+        } catch (ApplicationException e) {
+            BioBankPlugin.openAsyncError("Error",
+                "Failed to retrieve empty containers.");
+        }
         for (ContainerWrapper cont : conts) {
             map.put(cont.getLabel(), cont);
         }

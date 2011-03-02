@@ -31,7 +31,7 @@ import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.AliquotAdapter;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.DateNode;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
@@ -202,7 +202,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             BioBankPlugin.IMG_REQUEST);
         classToImageKey.put(RequestAdapter.class.getName(),
             BioBankPlugin.IMG_REQUEST);
-        classToImageKey.put(AliquotAdapter.class.getName(),
+        classToImageKey.put(SpecimenAdapter.class.getName(),
             BioBankPlugin.IMG_ALIQUOT);
     };
 

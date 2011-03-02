@@ -511,4 +511,8 @@ public class SiteWrapper extends SiteBaseWrapper {
             Arrays.asList(new Object[] { getId(), study.getId() }));
         return getCountResult(appService, c);
     }
+
+    public String getShipmentCount() {
+        return null; // FIXME: no way to determine destination of shipinfos...
+    }
 }

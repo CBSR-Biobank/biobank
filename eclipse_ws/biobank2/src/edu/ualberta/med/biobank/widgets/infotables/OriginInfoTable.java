@@ -1,19 +1,21 @@
 package edu.ualberta.med.biobank.widgets.infotables;
 
+import java.util.List;
+
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
-@Deprecated
-// FIXME shipment table should probably not contain collection events
-public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
+public class OriginInfoTable extends InfoTableWidget<OriginInfoWrapper> {
 
     private class TableRowData {
-        CollectionEventWrapper shipment;
+        OriginInfoWrapper shipment;
         String dateReceived;
         String waybill;
         String shippingCompany;
@@ -29,8 +31,8 @@ public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
     private static final String[] HEADINGS = new String[] { "Date received",
         "Waybill", "Shipping company", "No. Patients" };
 
-    public ShipmentInfoTable(Composite parent, ClinicWrapper clinic) {
-        super(parent, clinic.getCollectionEventCollection(), HEADINGS, 10);
+    public OriginInfoTable(Composite parent, ClinicWrapper clinic) {
+        super(parent, clinic.getOriginInfoCollection(true), HEADINGS, 10);
     }
 
     @Override
@@ -66,27 +68,27 @@ public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
      * shipment.
      */
     @Override
-    public Object getCollectionModelObject(CollectionEventWrapper cevent)
+    public Object getCollectionModelObject(OriginInfoWrapper shipinfo)
         throws Exception {
-        // FIXME
-        // TableRowData info = new TableRowData();
-        // info.shipment = cevent;
-        // info.dateReceived = cevent.getFormattedDateReceived();
-        // info.waybill = cevent.getWaybill();
-        // ShippingMethodWrapper company = cevent.getShippingMethod();
-        // if (company != null) {
-        // info.shippingCompany = company.getName();
-        // } else {
-        // info.shippingCompany = new String();
-        // }
-        // List<PatientWrapper> patients = cevent.getPatientCollection();
-        // if (patients == null) {
-        // info.numPatients = 0;
-        // } else {
-        // info.numPatients = patients.size();
-        // }
-        // return info;
-        return null;
+        TableRowData info = new TableRowData();
+        info.shipment = shipinfo;
+        info.dateReceived = shipinfo.getShipmentInfo()
+            .getFormattedDateReceived();
+        info.waybill = shipinfo.getShipmentInfo().getWaybill();
+        ShippingMethodWrapper company = shipinfo.getShipmentInfo()
+            .getShippingMethod();
+        if (company != null) {
+            info.shippingCompany = company.getName();
+        } else {
+            info.shippingCompany = new String();
+        }
+        List<PatientWrapper> patients = shipinfo.getPatientCollection();
+        if (patients == null) {
+            info.numPatients = 0;
+        } else {
+            info.numPatients = patients.size();
+        }
+        return info;
     }
 
     @Override
@@ -97,7 +99,7 @@ public class ShipmentInfoTable extends InfoTableWidget<CollectionEventWrapper> {
     }
 
     @Override
-    public CollectionEventWrapper getSelection() {
+    public OriginInfoWrapper getSelection() {
         BiobankCollectionModel item = getSelectionInternal();
         if (item == null)
             return null;

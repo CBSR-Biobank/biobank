@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.AliquotAdapter;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchInfoTable;
@@ -26,7 +26,7 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.AliquotViewForm";
 
-    private AliquotAdapter aliquotAdapter;
+    private SpecimenAdapter aliquotAdapter;
 
     private SpecimenWrapper aliquot;
 
@@ -58,11 +58,11 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     @Override
     public void init() {
-        Assert.isTrue((adapter instanceof AliquotAdapter),
+        Assert.isTrue((adapter instanceof SpecimenAdapter),
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        aliquotAdapter = (AliquotAdapter) adapter;
+        aliquotAdapter = (SpecimenAdapter) adapter;
         aliquot = aliquotAdapter.getSpecimen();
         retrieveAliquot();
         try {
@@ -190,9 +190,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         setTextValue(patientLabel, aliquot.getCollectionEvent().getPatient()
             .getPnumber());
 
-        // FIXME: what date should go here
-        // setTextValue(dateProcessedLabel, aliquot.getCollectionEvent()
-        // .getFormattedDateProcessed());
+        setTextValue(dateProcessedLabel, aliquot.getFormattedCreatedAt());
 
         setTextValue(dateDrawnLabel, aliquot.getProcessingEvent()
             .getFormattedCreatedAt());

@@ -37,6 +37,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BiobankText dateProcessedLabel;
 
+    @SuppressWarnings("unused")
     private BiobankText commentLabel;
 
     private SpecimenInfoTableOld table;
@@ -67,7 +68,6 @@ public class CollectionEventViewForm extends BiobankViewForm {
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
-        createSpecimensSection();
         createSpecimensSection();
     }
 

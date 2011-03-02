@@ -67,9 +67,6 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Study");
-        setTextValue(studyLabel, dispatch.getStudy().getName());
         BiobankText senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Sender");
         setTextValue(senderLabel, dispatch.getSender().getName());

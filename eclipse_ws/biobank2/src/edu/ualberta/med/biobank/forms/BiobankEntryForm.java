@@ -59,7 +59,6 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.BiobankServ
 import edu.ualberta.med.biobank.sourceproviders.ConfirmState;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -542,12 +541,12 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
      */
     public abstract String getNextOpenedFormID();
 
-    protected BasicSiteCombo createBasicSiteCombo(Composite parent,
-        boolean canUpdateOnly, ComboSelectionUpdate csu) {
-        Label label = widgetCreator.createLabel(parent, "Repository Site");
-        BasicSiteCombo siteCombo = new BasicSiteCombo(parent, widgetCreator,
-            appService, label, canUpdateOnly, csu);
-        siteCombo.adaptToToolkit(toolkit, true);
-        return siteCombo;
-    }
+    // protected BasicSiteCombo createBasicSiteCombo(Composite parent,
+    // boolean canUpdateOnly, ComboSelectionUpdate csu) {
+    // Label label = widgetCreator.createLabel(parent, "Repository Site");
+    // BasicSiteCombo siteCombo = new BasicSiteCombo(parent, widgetCreator,
+    // appService, label, canUpdateOnly, csu);
+    // siteCombo.adaptToToolkit(toolkit, true);
+    // return siteCombo;
+    // }
 }

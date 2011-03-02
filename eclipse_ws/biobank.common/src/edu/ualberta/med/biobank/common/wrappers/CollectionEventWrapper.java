@@ -10,8 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.lang.StringUtils;
-
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -107,22 +105,10 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         }
     }
 
-    public void checkPatientsStudy(ClinicWrapper clinic)
-        throws BiobankException, ApplicationException {
-        List<String> patientsInError = new ArrayList<String>();
-        PatientWrapper patient = getPatient();
-        if (!patient.canBeAddedToCollectionEvent(this)) {
-            throw new BiobankCheckException("Patient(s) "
-                + StringUtils.join(patientsInError, ", ")
-                + " are not part of a study that has contact with clinic "
-                + clinic.getName());
-        }
-    }
-
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        // FIX: how do we know what clinic this CE is for?
+        // FIXME: how do we know what clinic this CE is for?
         // checkPatientsStudy(clinic);
     }
 

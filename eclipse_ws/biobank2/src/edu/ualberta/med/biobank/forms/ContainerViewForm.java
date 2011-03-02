@@ -34,11 +34,10 @@ import org.eclipse.ui.forms.widgets.Section;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -494,7 +493,7 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    private void createAliquotsSection() throws BiobankException {
+    private void createAliquotsSection() {
         Composite parent = createSectionWithClient("Aliquots");
         List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>(
             container.getSpecimens().values());
