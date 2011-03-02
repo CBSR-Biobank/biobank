@@ -121,7 +121,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createContainerTypeSection();
         createContainsSection();
-
+        setChildContainerTypeSelection();
     }
 
     protected void createContainerTypeSection() throws ApplicationException {
@@ -143,13 +143,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 availSubContainerTypes.add(type);
             }
         }
+
         containerType.setSite(selectedSite);
-        setChildContainerTypeSelection();
         setDirty(true);
 
-        setFirstControl(client);
-
-        createBoundWidgetWithLabel(
+        BiobankText name = (BiobankText) createBoundWidgetWithLabel(
             client,
             BiobankText.class,
             SWT.NONE,
@@ -159,6 +157,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             ContainerTypePeer.NAME.getName(),
             new NonEmptyStringValidator(Messages
                 .getString("ContainerTypeEntryForm.name.validation.msg")));
+
+        setFirstControl(name);
 
         createBoundWidgetWithLabel(
             client,

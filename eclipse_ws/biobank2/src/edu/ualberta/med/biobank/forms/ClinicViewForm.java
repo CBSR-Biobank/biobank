@@ -106,7 +106,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());
-        setTextValue(shipmentTotal, clinic.getOriginInfoCollection(true));
+        setTextValue(shipmentTotal, clinic.getOriginInfoCollection(true).size());
         setTextValue(patientTotal, clinic.getPatientCount());
         setTextValue(visitTotal, clinic.getCollectionEventCount());
     }

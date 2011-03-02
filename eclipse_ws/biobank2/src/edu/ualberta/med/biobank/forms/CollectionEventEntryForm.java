@@ -34,6 +34,7 @@ import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -147,26 +148,20 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         createReadOnlyLabelledField(client, SWT.NONE, "Patient",
             patient.getPnumber());
 
-        // FIXME : Delph: what value are suppose to be into the list ?
-        pvWidget = (BiobankText) createBoundWidgetWithLabel(client,
-            BiobankText.class, SWT.MULTI, "Visit", null, cevent, "visitNumber",
-            null);
+        pvWidget = (BiobankText) createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.NONE,
+            "Visit",
+            null,
+            cevent,
+            CollectionEventPeer.VISIT_NUMBER.getName(),
+            new NonEmptyStringValidator(
+                Messages
+                    .getString("CollectionEventEntryForm.field.visitNumber.validation.msg")));
+
         pvWidget.addSelectionChangedListener(listener);
         setFirstControl(pvWidget);
-
-        // FIXME Delph: I though it would be a textfield instead
-        // BiobankText visitNumberText = (BiobankText)
-        // createBoundWidgetWithLabel(
-        // client,
-        // BiobankText.class,
-        // SWT.NONE,
-        // "Visit#",
-        // null,
-        // cevent,
-        // CollectionEventPeer.VISIT_NUMBER.getName(),
-        // new NonEmptyStringValidator(
-        // Messages
-        // .getString("CollectionEventEntryForm.field.visitNumber.validation.msg")));
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.getString("label.activity"),

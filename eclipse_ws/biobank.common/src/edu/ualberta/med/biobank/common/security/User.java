@@ -251,6 +251,12 @@ public class User implements Serializable, NotAProxy {
     }
 
     public SiteWrapper getCurrentWorkingCentre() {
+        try {
+            currentWorkingSite.reload();
+        } catch (Exception e) {
+            // FIXME: how to handle?
+            e.printStackTrace();
+        }
         return currentWorkingSite;
     }
 }
