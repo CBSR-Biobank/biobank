@@ -76,6 +76,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
         dispatch.setSenderCenter(SessionManager.getUser()
             .getCurrentWorkingCentre());
+
         setFirstControl(client);
 
         createReceiverCombo(client);

@@ -103,10 +103,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             throw new BiobankCheckException("sender site cannot be null");
         }
         params.add(sender.getId());
-        if (getShipmentInfo() != null)
-            params.add(getShipmentInfo().getWaybill());
-        else
-            params.add("");
+        params.add(getShipmentInfo().getWaybill());
 
         StringBuilder qry = new StringBuilder(WAYBILL_UNIQUE_FOR_SENDER_QRY);
         if (!isNew()) {
