@@ -829,7 +829,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         canLaunchCheck.setValue(true);
         PatientWrapper patient = aliquot.getCollectionEvent().getPatient();
         linkFormPatientManagement.setCurrentPatientAndVisit(patient,
-            aliquot.getProcessingEvent());
+            aliquot.getParentProcessingEvent());
         String positionString = aliquot.getPositionString(true, false);
         if (positionString == null) {
             widgetCreator.hideWidget(oldCabinetPositionCheckLabel);
@@ -918,8 +918,9 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         }
         appendLogNLS(msgString, posStr, aliquot.getInventoryId(), aliquot
             .getSpecimenType().getName(), linkFormPatientManagement
-            .getCurrentPatient().getPnumber(), aliquot.getProcessingEvent()
-            .getFormattedCreatedAt(), aliquot.getCurrentCenter().getName());
+            .getCurrentPatient().getPnumber(), aliquot
+            .getParentProcessingEvent().getFormattedCreatedAt(), aliquot
+            .getCurrentCenter().getName());
         setFinished(false);
     }
 

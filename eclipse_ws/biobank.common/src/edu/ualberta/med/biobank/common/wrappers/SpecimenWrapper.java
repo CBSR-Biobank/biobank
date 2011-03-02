@@ -183,28 +183,30 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                     // FIXME what if can't read sender or receiver
                     SiteWrapper fakeSite = new SiteWrapper(appService);
                     fakeSite.setNameShort("In Transit ("
-                        + da.getDispatch().getSender().getNameShort() + " to "
-                        + da.getDispatch().getReceiver().getNameShort() + ")");
+                        + da.getDispatch().getSenderCenter().getNameShort()
+                        + " to "
+                        + da.getDispatch().getReceiverCenter().getNameShort()
+                        + ")");
                     return fakeSite;
                 } else if (DispatchState.RECEIVED.equals(da.getDispatch()
                     .getState())) {
                     switch (state) {
                     case EXTRA:
                         // Specimen has been accidentally dispatched
-                        return da.getDispatch().getReceiver();
+                        return da.getDispatch().getReceiverCenter();
                     case MISSING:
                         // Specimen is missing
-                        return da.getDispatch().getSender();
+                        return da.getDispatch().getSenderCenter();
                     case RECEIVED:
                     case NONE:
                         // Specimen has been intentionally dispatched and
                         // received
-                        return da.getDispatch().getReceiver();
+                        return da.getDispatch().getReceiverCenter();
                     }
                 }
             }
             // if not in a container or a dispatch, use the originating shipment
-            return getProcessingEvent().getCenter();
+            return getParentProcessingEvent().getCenter();
         }
     }
 
@@ -375,7 +377,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     private static final String SpecimenS_NON_ACTIVE_QRY = "from "
         + Specimen.class.getName()
         + " a where a."
-        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+        + Property.concatNames(SpecimenPeer.PARENT_PROCESSING_EVENT,
             ProcessingEventPeer.CENTER, CenterPeer.ID)
         + " = ? and "
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,

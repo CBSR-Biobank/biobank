@@ -156,11 +156,11 @@ public class SpecimenEntryForm extends BiobankEntryForm {
         toolkit.adapt(c);
 
         final BiobankText dateProcessed = createReadOnlyLabelledField(client,
-            SWT.NONE, "Date Processed", aliquot.getProcessingEvent()
+            SWT.NONE, "Date Processed", aliquot.getParentProcessingEvent()
                 .getFormattedDateProcessed());
 
         final BiobankText dateDrawn = createReadOnlyLabelledField(client,
-            SWT.NONE, "Date Drawn", aliquot.getProcessingEvent()
+            SWT.NONE, "Date Drawn", aliquot.getParentProcessingEvent()
                 .getFormattedCreatedAt());
 
         editPatientButton.addListener(SWT.MouseUp, new Listener() {
@@ -174,9 +174,9 @@ public class SpecimenEntryForm extends BiobankEntryForm {
                 if (res == Status.OK) {
                     aliquot.setCollectionEvent(wizard.getCollectionEvent());
 
-                    dateProcessed.setText(aliquot.getProcessingEvent()
+                    dateProcessed.setText(aliquot.getParentProcessingEvent()
                         .getFormattedDateProcessed());
-                    dateDrawn.setText(aliquot.getProcessingEvent()
+                    dateDrawn.setText(aliquot.getParentProcessingEvent()
                         .getFormattedCreatedAt());
 
                     setDirty(true); // so changes can be saved

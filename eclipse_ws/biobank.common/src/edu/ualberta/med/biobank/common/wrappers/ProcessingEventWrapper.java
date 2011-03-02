@@ -85,7 +85,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         for (SpecimenWrapper aliquot : childSpecimens) {
             aliquot.setQuantity(typesVolumes.get(aliquot.getSpecimenType()
                 .getId()));
-            aliquot.setProcessingEvent(this);
+            aliquot.setParentProcessingEvent(this);
             allSpecimenObjects.add(aliquot.getWrappedObject());
             allSpecimenWrappers.add(aliquot);
         }
@@ -128,7 +128,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     private static final String CHILD_SPECIMEN_COUNT_QRY = "select count(aliquot) from "
         + Specimen.class.getName()
         + " as aliquot where aliquot."
-        + Property.concatNames(SpecimenPeer.PROCESSING_EVENT,
+        + Property.concatNames(SpecimenPeer.PARENT_PROCESSING_EVENT,
             ProcessingEventPeer.ID) + "=?";
 
     public long getChildSpecimenCount(boolean fast) throws BiobankException,

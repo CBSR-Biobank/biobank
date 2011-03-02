@@ -74,7 +74,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        dispatch.setSender(SessionManager.getUser().getCurrentWorkingCentre());
+        dispatch.setSenderCenter(SessionManager.getUser()
+            .getCurrentWorkingCentre());
         setFirstControl(client);
 
         createReceiverCombo(client);
@@ -109,14 +110,16 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         if (dispatch.isInTransitState()) {
             BiobankText receiverLabel = createReadOnlyLabelledField(client,
                 SWT.NONE, "Receiver Site");
-            setTextValue(receiverLabel, dispatch.getReceiver().getNameShort());
+            setTextValue(receiverLabel, dispatch.getReceiverCenter()
+                .getNameShort());
         } else {
             destSiteComboViewer = createComboViewer(client, "Receiver Site",
                 null, null, "Dispatch must have an associated study",
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
-                        dispatch.setReceiver((SiteWrapper) selectedObject);
+                        dispatch
+                            .setReceiverCenter((SiteWrapper) selectedObject);
                         setDirty(true);
                     }
                 });
@@ -244,9 +247,10 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        dispatch.setSender(SessionManager.getUser().getCurrentWorkingCentre());
+        dispatch.setSenderCenter(SessionManager.getUser()
+            .getCurrentWorkingCentre());
         if (destSiteComboViewer != null) {
-            CenterWrapper<?> destSite = dispatch.getReceiver();
+            CenterWrapper<?> destSite = dispatch.getReceiverCenter();
             if (destSite != null) {
                 destSiteComboViewer.setSelection(new StructuredSelection(
                     destSite));

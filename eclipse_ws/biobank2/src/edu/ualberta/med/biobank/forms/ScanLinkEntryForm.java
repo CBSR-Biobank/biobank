@@ -609,10 +609,10 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                     appendLogNLS("ScanLink.activitylog.aliquot.existsError",
                         palletPosition, value, foundAliquot
-                            .getProcessingEvent().getFormattedDateProcessed(),
-                        foundAliquot.getCollectionEvent().getPatient()
-                            .getPnumber(), foundAliquot.getCurrentCenter()
-                            .getNameShort());
+                            .getParentProcessingEvent()
+                            .getFormattedDateProcessed(), foundAliquot
+                            .getCollectionEvent().getPatient().getPnumber(),
+                        foundAliquot.getCurrentCenter().getNameShort());
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);
                     if (independantProcess) {

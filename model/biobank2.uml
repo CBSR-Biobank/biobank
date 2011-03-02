@@ -27,7 +27,7 @@
       <fontsize>12</fontsize>
       <defaultstereotypeview>0</defaultstereotypeview>
       <generationoutputdir>/tmp</generationoutputdir>
-      <activediagram>DM-DISPATCH</activediagram>
+      <activediagram>DM-PROCESSING_EVENT</activediagram>
     </settings>
     <searchpath href="PROJECT_DIR" />
     <members>
@@ -177,7 +177,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Mar 01 17:30:21 MST 2011'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Tue Mar 01 18:00:50 MST 2011'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -3381,14 +3381,14 @@
                       <UML:ModelElement.taggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1--4e4c5b84:12141268b4b:-8000:000000000000163A'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Specimen.processingEvent</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Specimen.parentProcessingEvent</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-0-1-19a32e0:1151feda71c:-8000:000000000000100B'/>
                           </UML:TaggedValue.type>
                         </UML:TaggedValue>
                         <UML:TaggedValue xmi.id = '127-0-1-1-65660fbe:1229f7eac68:-8000:0000000000001398'
                           isSpecification = 'false'>
-                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Specimen.processingEvent</UML:TaggedValue.dataValue>
+                          <UML:TaggedValue.dataValue>edu.ualberta.med.biobank.model.Specimen.parentProcessingEvent</UML:TaggedValue.dataValue>
                           <UML:TaggedValue.type>
                             <UML:TagDefinition xmi.idref = '-64--88-1-107-8238f4:112105617ae:-8000:000000000000315F'/>
                           </UML:TaggedValue.type>
@@ -17166,14 +17166,14 @@
                                       name = '' isSpecification = 'false' isRoot = 'false' isLeaf = 'false' isAbstract = 'false'>
                                       <UML:Association.connection>
                                         <UML:AssociationEnd xmi.id = '127-0-1-1-62eafe98:12e5345d005:-8000:0000000000001C43'
-                                          name = 'processingEvent' visibility = 'public' isSpecification = 'false'
+                                          name = 'parentProcessingEvent' visibility = 'public' isSpecification = 'false'
                                           isNavigable = 'true' ordering = 'unordered' aggregation = 'none' targetScope = 'instance'
                                           changeability = 'changeable'>
                                           <UML:AssociationEnd.multiplicity>
-                                            <UML:Multiplicity xmi.id = '127-0-1-1-62eafe98:12e5345d005:-8000:0000000000001C44'>
+                                            <UML:Multiplicity xmi.id = '127-0-1-1--481db371:12e73566d41:-8000:0000000000001C05'>
                                               <UML:Multiplicity.range>
-                                                <UML:MultiplicityRange xmi.id = '127-0-1-1-62eafe98:12e5345d005:-8000:0000000000001C45'
-                                                  lower = '1' upper = '1'/>
+                                                <UML:MultiplicityRange xmi.id = '127-0-1-1--481db371:12e73566d41:-8000:0000000000001C04'
+                                                  lower = '0' upper = '1'/>
                                               </UML:Multiplicity.range>
                                             </UML:Multiplicity>
                                           </UML:AssociationEnd.multiplicity>
@@ -58899,12 +58899,12 @@
       stroke="1"
       strokecolor="black"
     >
-      <moveto x="360"
+      <moveto x="328"
               y="328" />
-      <lineto x="360"
-              y="208" />
+      <lineto x="328"
+              y="184" />
       <lineto x="544"
-              y="208" />
+              y="184" />
     </path>
   </group>
   <group name="Fig12"
