@@ -148,7 +148,8 @@ public class ShipmentViewForm extends BiobankViewForm {
         setPartName();
         setFormText();
         setShipmentValues();
-        shipPatientsWidget.updateList();
+        // TODO: fixme!
+        // shipPatientsWidget.setSpecimens(specimens)
     }
 
     private void setPartName() {

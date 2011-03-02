@@ -22,6 +22,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class CenterWrapper<E extends Center> extends
     CenterBaseWrapper<E> {
+    private static final String ALL_CENTERS_HQL_STRING = "from "
+        + Center.class.getName();
 
     private Set<CollectionEventWrapper> deletedCollectionEvents = new HashSet<CollectionEventWrapper>();
 
@@ -167,4 +169,16 @@ public abstract class CenterWrapper<E extends Center> extends
         }
     }
 
+    public static List<CenterWrapper<?>> getCenters(
+        WritableApplicationService appService) throws ApplicationException {
+        StringBuilder qry = new StringBuilder(ALL_CENTERS_HQL_STRING);
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            new ArrayList<Object>());
+
+        List<Center> centers = appService.query(criteria);
+        List<CenterWrapper<?>> centerWrappers = ModelWrapper
+            .wrapModelCollection(appService, centers, null);
+
+        return centerWrappers;
+    }
 }

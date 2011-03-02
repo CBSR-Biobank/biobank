@@ -294,7 +294,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         super.reset();
         cevent.setPatient(patient);
 
-        specimensWidget.updateList();
+        specimensWidget.setSpecimens(cevent.getSpecimenCollection());
         resetPvCustomInfo();
     }
 

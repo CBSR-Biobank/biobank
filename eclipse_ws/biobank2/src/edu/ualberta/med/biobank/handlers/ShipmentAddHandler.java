@@ -5,7 +5,8 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 
@@ -13,8 +14,11 @@ public class ShipmentAddHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        CollectionEventWrapper shipment = new CollectionEventWrapper(
+        OriginInfoWrapper shipment = new OriginInfoWrapper(
             SessionManager.getAppService());
+        ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
+            SessionManager.getAppService());
+        shipment.setShipmentInfo(shipmentInfo);
         ShipmentAdapter shipNode = new ShipmentAdapter(
             ShipmentAdministrationView.getCurrent().getSearchedNode(), shipment);
         shipNode.openEntryForm();
@@ -23,6 +27,6 @@ public class ShipmentAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(CollectionEventWrapper.class, null);
+        return SessionManager.canCreate(OriginInfoWrapper.class, null);
     }
 }
