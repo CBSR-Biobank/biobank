@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
@@ -69,7 +69,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     selectedUser.setLockedOut(false);
                     reloadCollection(getCollection(), selectedUser);
                 } catch (ApplicationException e) {
-                    BioBankPlugin.openAsyncError(MessageFormat.format(
+                    BiobankPlugin.openAsyncError(MessageFormat.format(
                         CANNOT_UNLOCK_USER, new Object[] { userName }), e);
                 }
             }
@@ -120,8 +120,8 @@ public class UserInfoTable extends InfoTableWidget<User> {
             public Image getColumnImage(Object element, int columnIndex) {
                 User user = (User) ((BiobankCollectionModel) element).o;
                 if (user != null && user.isLockedOut() && columnIndex == 0) {
-                    return BioBankPlugin.getDefault().getImage(
-                        BioBankPlugin.IMG_LOCK);
+                    return BiobankPlugin.getDefault().getImage(
+                        BiobankPlugin.IMG_LOCK);
                 }
                 return null;
             }
@@ -161,7 +161,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
         try {
             groups = SessionManager.getAppService().getSecurityGroups();
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
+            BiobankPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
             return Dialog.CANCEL;
         }
 
@@ -187,7 +187,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                     new Object[] { loginName });
             }
 
-            if (BioBankPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
+            if (BiobankPlugin.openConfirm(CONFIRM_DELETE_TITLE, message)) {
                 SessionManager.getAppService().deleteUser(loginName);
 
                 // remove the user from the collection
@@ -198,7 +198,7 @@ public class UserInfoTable extends InfoTableWidget<User> {
                 return true;
             }
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError(USER_DELETE_ERROR, e);
+            BiobankPlugin.openAsyncError(USER_DELETE_ERROR, e);
         }
         return false;
     }

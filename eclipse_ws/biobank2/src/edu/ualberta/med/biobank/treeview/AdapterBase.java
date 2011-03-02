@@ -23,7 +23,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -376,7 +376,7 @@ public abstract class AdapterBase {
         try {
             loadChildrenSemaphore.acquire();
         } catch (InterruptedException e) {
-            BioBankPlugin.openAsyncError("Could not load children", e);
+            BiobankPlugin.openAsyncError("Could not load children", e);
         }
 
         if (loadChildrenInBackground) {
@@ -400,7 +400,7 @@ public abstract class AdapterBase {
                 SessionManager.refreshTreeNode(AdapterBase.this);
             }
         } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             String text = getClass().getName();
             if (modelObject != null) {
@@ -472,7 +472,7 @@ public abstract class AdapterBase {
                             });
                         }
                     } catch (final RemoteAccessException exp) {
-                        BioBankPlugin.openRemoteAccessErrorMessage(exp);
+                        BiobankPlugin.openRemoteAccessErrorMessage(exp);
                     } catch (Exception e) {
                         String modelString = "'unknown'";
                         if (modelObject != null) {
@@ -693,7 +693,7 @@ public abstract class AdapterBase {
         }
         boolean doDelete = true;
         if (msg != null)
-            doDelete = BioBankPlugin.openConfirm("Confirm Delete", msg);
+            doDelete = BiobankPlugin.openConfirm("Confirm Delete", msg);
         if (doDelete) {
             BusyIndicator.showWhile(Display.getDefault(), new Runnable() {
                 @Override
@@ -706,9 +706,9 @@ public abstract class AdapterBase {
                             notifyListeners();
                         }
                     } catch (BiobankCheckException bce) {
-                        BioBankPlugin.openAsyncError("Delete failed", bce);
+                        BiobankPlugin.openAsyncError("Delete failed", bce);
                     } catch (Exception e) {
-                        BioBankPlugin.openAsyncError("Delete failed", e);
+                        BiobankPlugin.openAsyncError("Delete failed", e);
                     }
                 }
             });

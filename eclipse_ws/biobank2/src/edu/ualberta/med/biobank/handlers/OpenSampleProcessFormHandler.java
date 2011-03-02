@@ -16,7 +16,7 @@ import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.WorkbenchException;
 import org.eclipse.ui.console.IConsoleConstants;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
@@ -35,7 +35,7 @@ public class OpenSampleProcessFormHandler extends AbstractHandler implements IHa
         @SuppressWarnings({ "rawtypes" })
         final Map parameters = event.getParameters();
         final String editorId = (String) parameters.get(EDITOR_ID_PARAM);
-        IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
+        IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true)) {

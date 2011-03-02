@@ -10,7 +10,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -52,14 +52,14 @@ public abstract class DispatchAliquotListInfoTable extends
                         List<DispatchSpecimenWrapper> dsaList = getSelectedItems();
                         if (dsaList.size() > 0) {
                             if (dsaList.size() == 1
-                                && !BioBankPlugin.openConfirm("Remove Aliquot",
+                                && !BiobankPlugin.openConfirm("Remove Aliquot",
                                     "Are you sure you want to remove aliquot \""
                                         + dsaList.get(0).getSpecimen()
                                             .getInventoryId()
                                         + "\" from this shipment ?"))
                                 return;
                             if (dsaList.size() > 1
-                                && !BioBankPlugin.openConfirm("Remove Aliquot",
+                                && !BiobankPlugin.openConfirm("Remove Aliquot",
                                     "Are you sure you want to remove these "
                                         + dsaList.size()
                                         + " aliquots from this shipment ?"))
@@ -70,7 +70,7 @@ public abstract class DispatchAliquotListInfoTable extends
                                 reloadCollection();
                                 notifyListeners();
                             } catch (Exception e) {
-                                BioBankPlugin
+                                BiobankPlugin
                                     .openAsyncError("Delete failed", e);
                             }
                         }

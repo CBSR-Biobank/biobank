@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -142,7 +142,7 @@ public class DispatchCreateScanDialog extends
                 }
 
             } else {
-                BioBankPlugin.openAsyncError("Pallet error",
+                BiobankPlugin.openAsyncError("Pallet error",
                     "Can't find pallet with barcode '" + currentProductBarcode
                         + "'");
             }

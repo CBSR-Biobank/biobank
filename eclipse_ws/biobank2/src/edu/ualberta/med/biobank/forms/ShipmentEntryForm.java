@@ -13,7 +13,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -127,7 +127,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                             try {
                                 shipment.checkPatientsStudy();
                             } catch (Exception e) {
-                                BioBankPlugin.openAsyncError("Patients check",
+                                BiobankPlugin.openAsyncError("Patients check",
                                     e);
                             }
                             if (waybillText != null) {

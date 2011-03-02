@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.forms.AbstractAliquotAdminForm;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
@@ -54,14 +54,14 @@ public class CancelConfirmWidget extends BiobankWidget {
             @Override
             public void handleEvent(Event e) {
                 String text = confirmCancelText.getText();
-                if (BioBankPlugin.getDefault().isConfirmBarcode(text)
+                if (BiobankPlugin.getDefault().isConfirmBarcode(text)
                     && confirmButton.isEnabled()) {
                     form.confirm();
                     // form will be closed. Default following behaviours
                     // will send a disposed error if we don't set this to
                     // false
                     e.doit = false;
-                } else if (BioBankPlugin.getDefault().isCancelBarcode(text)) {
+                } else if (BiobankPlugin.getDefault().isCancelBarcode(text)) {
                     try {
                         form.reset();
                         form.setAfterKeyCancel();

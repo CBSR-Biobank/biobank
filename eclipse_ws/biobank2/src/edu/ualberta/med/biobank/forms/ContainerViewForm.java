@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -197,7 +197,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Positions errors",
+            BiobankPlugin.openAsyncError("Positions errors",
                 "Some child container has wrong position number");
             childrenOk = false;
         }
@@ -366,7 +366,7 @@ public class ContainerViewForm extends BiobankViewForm {
                         container.initChildrenWithType(type, positions);
                     } catch (Exception e) {
                         initDone = false;
-                        BioBankPlugin.openAsyncError(
+                        BiobankPlugin.openAsyncError(
                             "Error while creating children", e);
                     }
                     refresh(initDone, false);
@@ -382,7 +382,7 @@ public class ContainerViewForm extends BiobankViewForm {
             });
 
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error while creating children", e);
+            BiobankPlugin.openAsyncError("Error while creating children", e);
             refresh(false, false);
         }
     }
@@ -403,7 +403,7 @@ public class ContainerViewForm extends BiobankViewForm {
                         deleteDones = container.deleteChildrenWithType(type,
                             positions);
                     } catch (Exception ex) {
-                        BioBankPlugin.openAsyncError("Can't Delete Containers",
+                        BiobankPlugin.openAsyncError("Can't Delete Containers",
                             ex);
                     }
                     refresh(deleteDones, true);
@@ -418,7 +418,7 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             });
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Can't Delete Containers", e);
+            BiobankPlugin.openAsyncError("Can't Delete Containers", e);
             refresh(false, false);
         }
     }

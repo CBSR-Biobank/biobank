@@ -15,7 +15,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 
@@ -53,8 +53,8 @@ public class SelectParentContainerDialog extends BiobankDialog {
     @Override
     protected Image getTitleAreaImage() {
         // FIXME shoould use another icon
-        return BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_COMPUTER_KEY);
+        return BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override

@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -201,7 +201,7 @@ public class LinkFormPatientManagement {
                     currentPatient.getPnumber());
             }
         } catch (ApplicationException e) {
-            BioBankPlugin.openError(
+            BiobankPlugin.openError(
                 Messages.getString("ScanLink.dialog.patient.errorMsg"), e); //$NON-NLS-1$
         }
         setCollectionEventList();

@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -117,8 +117,8 @@ public class SpecimenDialog extends BiobankDialog {
     @Override
     protected Image getTitleAreaImage() {
         // FIXME should use another icon
-        return BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_COMPUTER_KEY);
+        return BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override
@@ -331,7 +331,7 @@ public class SpecimenDialog extends BiobankDialog {
             specimenTypeComboViewer.getCombo().setFocus();
             updateWidgetVisibilityAndValues();
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError(
+            BiobankPlugin.openAsyncError(
                 "Error opening dialog for new specimen", e);
         }
     }

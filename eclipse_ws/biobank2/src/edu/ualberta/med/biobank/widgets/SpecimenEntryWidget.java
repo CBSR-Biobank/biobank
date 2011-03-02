@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -89,8 +89,8 @@ public class SpecimenEntryWidget extends BiobankWidget {
                 }
             });
             addButton = toolkit.createButton(this, "", SWT.PUSH);
-            addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-                .get(BioBankPlugin.IMG_ADD));
+            addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+                .get(BiobankPlugin.IMG_ADD));
             addButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -133,7 +133,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
                     shipment.getAppService(), patientNumber,
                     SessionManager.getUser());
                 if (patient == null) {
-                    boolean create = BioBankPlugin.openConfirm(
+                    boolean create = BiobankPlugin.openConfirm(
                         "Patient not found",
                         "Do you want to create this patient ?");
                     if (create) {
@@ -152,7 +152,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
                     addPatient(patient);
                 }
             } catch (ApplicationException ae) {
-                BioBankPlugin.openAsyncError("Error while looking up patient",
+                BiobankPlugin.openAsyncError("Error while looking up patient",
                     ae);
             }
         }
@@ -170,7 +170,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
     private void addPatient(PatientWrapper patient) {
         List<PatientWrapper> patients = shipment.getPatientCollection();
         if (patients != null && patients.contains(patient)) {
-            BioBankPlugin.openAsyncError("Error",
+            BiobankPlugin.openAsyncError("Error",
                 "Patient " + patient.getPnumber()
                     + " has already been added to this shipment");
             return;
@@ -179,21 +179,21 @@ public class SpecimenEntryWidget extends BiobankWidget {
         try {
             canAdd = patient.canBeAddedToShipment(shipment);
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Can't add patient", e);
+            BiobankPlugin.openAsyncError("Can't add patient", e);
             return;
         }
         if (canAdd) {
             try {
                 shipment.addPatients(Arrays.asList(patient));
             } catch (Exception e) {
-                BioBankPlugin.openAsyncError("Cannot add patient", e);
+                BiobankPlugin.openAsyncError("Cannot add patient", e);
                 return;
             }
             specTable.setCollection(shipment.getSpecimenCollection(true));
             notifyListeners();
             patientsAdded.setValue(true);
         } else {
-            BioBankPlugin.openAsyncError("Error",
+            BiobankPlugin.openAsyncError("Error",
                 "Patient " + patient.getPnumber()
                     + " can't be added to this shipment. "
                     + "Patient study is not linked to this shipment clinic.");
@@ -222,7 +222,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
                         // shipment.checkCanRemovePatient(patient);
                         // shipment.removePatients(Arrays.asList(patient));
                     } catch (Exception e) {
-                        BioBankPlugin
+                        BiobankPlugin
                             .openAsyncError("Cannot remove patient", e);
                         return;
                     }

@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
@@ -70,8 +70,10 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public void addAliquotedSpecimen() {
-        addOrEditAliquotedSpecimen(true, new AliquotedSpecimenWrapper(
-            SessionManager.getAppService()));
+        AliquotedSpecimenWrapper asw = new AliquotedSpecimenWrapper(
+            SessionManager.getAppService());
+        asw.setStudy(study);
+        addOrEditAliquotedSpecimen(true, asw);
     }
 
     private void addOrEditAliquotedSpecimen(boolean add,
@@ -151,7 +153,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
             allSpecimenTypes = SpecimenTypeWrapper.getAllSpecimenTypes(
                 SessionManager.getAppService(), true);
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (ApplicationException e) {
             logger.error("getSpecimenTypes", e);
         }

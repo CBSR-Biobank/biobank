@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -111,7 +111,7 @@ public abstract class AbstractTodayNode extends AdapterBase {
                 }
             }
         } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             logger.error("Error while getting today's patients", e);
         }

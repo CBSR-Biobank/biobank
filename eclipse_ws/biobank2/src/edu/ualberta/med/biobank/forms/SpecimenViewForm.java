@@ -9,7 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -68,7 +68,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         try {
             aliquot.logLookup(aliquot.getCenterString());
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Log lookup failed", e);
+            BiobankPlugin.openAsyncError("Log lookup failed", e);
         }
         setPartName("Aliquot: " + aliquot.getInventoryId());
     }

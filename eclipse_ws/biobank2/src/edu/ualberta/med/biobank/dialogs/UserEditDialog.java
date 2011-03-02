@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
@@ -138,7 +138,7 @@ public class UserEditDialog extends BiobankDialog {
             if (SessionManager.getUser().getId().equals(originalUser.getId())) {
                 // if the User is making changes to himself, logout
 
-                BioBankPlugin.openInformation(USER_PERSIST_TITLE,
+                BiobankPlugin.openInformation(USER_PERSIST_TITLE,
                     USER_PERSIST_SELF_MESSAGE);
 
                 LogoutHandler lh = new LogoutHandler();
@@ -153,12 +153,12 @@ public class UserEditDialog extends BiobankDialog {
             close();
         } catch (ApplicationException e) {
             if (e.getMessage().contains("Duplicate entry")) {
-                BioBankPlugin.openAsyncError(
+                BiobankPlugin.openAsyncError(
                     USER_PERSIST_ERROR_TITLE,
                     MessageFormat.format(MSG_LOGIN_UNIQUE,
                         modifiedUser.getLogin()));
             } else {
-                BioBankPlugin.openAsyncError(USER_PERSIST_ERROR_TITLE, e);
+                BiobankPlugin.openAsyncError(USER_PERSIST_ERROR_TITLE, e);
             }
         }
     }
@@ -196,7 +196,7 @@ public class UserEditDialog extends BiobankDialog {
                         for (Integer id : groupsWidget.getRemovedToSelection()) {
                             Group group = allGroupsMap.get(id.longValue());
                             if (group != null && group.isWebsiteAdministrator()) {
-                                if (!BioBankPlugin.openConfirm(
+                                if (!BiobankPlugin.openConfirm(
                                     CONFIRM_DEMOTION_TITLE,
                                     CONFIRM_DEMOTION_MESSAGE)) {
                                     newGroups.add(group);

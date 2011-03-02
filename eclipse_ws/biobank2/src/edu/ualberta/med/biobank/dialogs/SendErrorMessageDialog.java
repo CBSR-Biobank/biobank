@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.EMailDescriptor;
@@ -78,8 +78,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
 
     @Override
     protected Image getTitleAreaImage() {
-        return BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_EMAIL_BANNER);
+        return BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_EMAIL_BANNER);
     }
 
     @Override
@@ -119,8 +119,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
         attachmentsComposite.setLayoutData(gd);
 
         Button addButton = new Button(contents, SWT.PUSH);
-        addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_ADD));
+        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_ADD));
         addButton.setToolTipText("Add attachment");
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -196,13 +196,13 @@ public class SendErrorMessageDialog extends BiobankDialog {
         try {
             sendMail();
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error sending mail", e);
+            BiobankPlugin.openAsyncError("Error sending mail", e);
         }
         super.okPressed();
     }
 
     private void initEmailDescriptor() {
-        IPreferenceStore node = BioBankPlugin.getDefault().getPreferenceStore();
+        IPreferenceStore node = BiobankPlugin.getDefault().getPreferenceStore();
         email = new EMailDescriptor();
         email.setSmtpServer(node
             .getString(PreferenceConstants.ISSUE_TRACKER_SMTP_SERVER));
@@ -246,14 +246,14 @@ public class SendErrorMessageDialog extends BiobankDialog {
                     Transport.send(getEmailMessage(session));
                     monitor.done();
                 } catch (AuthenticationFailedException afe) {
-                    BioBankPlugin.openAsyncError(
+                    BiobankPlugin.openAsyncError(
                         "Authentification Error",
                         "Wrong authentification for "
                             + email.getServerUsername());
                     monitor.setCanceled(true);
                     return;
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Error in sending email", e);
+                    BiobankPlugin.openAsyncError("Error in sending email", e);
                     monitor.setCanceled(true);
                     return;
                 }
@@ -281,7 +281,7 @@ public class SendErrorMessageDialog extends BiobankDialog {
         }
 
         text += "\nSent from BioBank2 Java Client, version "
-            + BioBankPlugin.getDefault().getBundle().getVersion();
+            + BiobankPlugin.getDefault().getBundle().getVersion();
 
         mbp1.setText(text);
         mp.addBodyPart(mbp1);
@@ -354,8 +354,8 @@ public class SendErrorMessageDialog extends BiobankDialog {
                 }
             });
             removeButton = new Button(this, SWT.PUSH);
-            removeButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-                .get(BioBankPlugin.IMG_DELETE));
+            removeButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+                .get(BiobankPlugin.IMG_DELETE));
             removeButton.setToolTipText("Remove this attachment");
             removeButton.addSelectionListener(new SelectionAdapter() {
                 @Override

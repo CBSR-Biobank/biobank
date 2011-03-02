@@ -157,4 +157,12 @@ public abstract class CenterWrapper<E extends Center> extends
         }
     }
 
+    public static List<CenterWrapper<?>> getAllCenters(
+        WritableApplicationService appService) throws ApplicationException {
+        HQLCriteria c = new HQLCriteria("from " + Center.class.getName());
+        List<Center> centers = appService.query(c);
+        List<CenterWrapper<?>> wrappedCenters = ModelWrapper
+            .wrapModelCollection(appService, centers, null);
+        return wrappedCenters;
+    }
 }

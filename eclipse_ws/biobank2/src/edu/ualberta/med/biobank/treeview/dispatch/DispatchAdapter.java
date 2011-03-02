@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -123,7 +123,7 @@ public class DispatchAdapter extends AdapterBase {
                 addEditMenu(menu, "Dispatch");
             }
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error checking permissions", e);
+            BiobankPlugin.openAsyncError("Error checking permissions", e);
         }
     }
 
@@ -170,13 +170,13 @@ public class DispatchAdapter extends AdapterBase {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BioBankPlugin.openAccessDeniedErrorMessage(ade);
+            BiobankPlugin.openAccessDeniedErrorMessage(ade);
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Save error", ex);
+            BiobankPlugin.openAsyncError("Save error", ex);
         }
         DispatchAdministrationView.getCurrent().reload();
     }

@@ -13,7 +13,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -128,7 +128,7 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
             }
             siteMultiSelect.setSelections(availableSites, selectedSites);
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error", e);
+            BiobankPlugin.openAsyncError("Error", e);
             return;
         }
     }
@@ -159,13 +159,13 @@ public class SelectStudyDispatchSitesDialog extends BiobankDialog {
                     newRelationsAdded = true;
                 }
             } catch (BiobankCheckException e) {
-                BioBankPlugin.openAsyncError("Error adding dispatch relation",
+                BiobankPlugin.openAsyncError("Error adding dispatch relation",
                     e);
             }
             srcSite.removeStudyDispatchSites(ss.study, ss.removedSites);
         }
         if (newRelationsAdded) {
-            BioBankPlugin
+            BiobankPlugin
                 .openAsyncInformation(
                     "New sites for dispatches",
                     "You might want to check users have access to the sites involved in dispatches.");

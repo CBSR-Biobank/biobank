@@ -18,12 +18,11 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -32,6 +31,7 @@ import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
@@ -109,20 +109,26 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     private void createReceiverCombo(Composite client) {
         if (dispatch.isInTransitState()) {
             BiobankText receiverLabel = createReadOnlyLabelledField(client,
-                SWT.NONE, "Receiver Site");
+                SWT.NONE, "Receiver Center");
             setTextValue(receiverLabel, dispatch.getReceiverCenter()
                 .getNameShort());
         } else {
-            destSiteComboViewer = createComboViewer(client, "Receiver Site",
-                null, null, "Dispatch must have an associated study",
-                new ComboSelectionUpdate() {
-                    @Override
-                    public void doSelection(Object selectedObject) {
-                        dispatch
-                            .setReceiverCenter((SiteWrapper) selectedObject);
-                        setDirty(true);
-                    }
-                });
+            try {
+                destSiteComboViewer = createComboViewer(client,
+                    "Receiver Site", CenterWrapper.getAllCenters(appService),
+                    null, "Dispatch must have an associated study",
+                    new ComboSelectionUpdate() {
+                        @Override
+                        public void doSelection(Object selectedObject) {
+                            dispatch
+                                .setReceiverCenter((CenterWrapper<?>) selectedObject);
+                            setDirty(true);
+                        }
+                    });
+            } catch (ApplicationException e) {
+                BiobankPlugin.openAsyncError("Error",
+                    "Unable to retrieve Centers");
+            }
         }
     }
 
@@ -139,7 +145,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                         public void widgetSelected(SelectionEvent e) {
                             openScanDialog();
                         }
-                    }, null, BioBankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT);
+                    }, null, BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT);
 
                 createAliquotsSelectionActions(composite, false);
                 createAliquotsNonProcessedSection(true);
@@ -205,14 +211,14 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                     dispatch.getAppService(), inventoryId,
                     SessionManager.getUser());
                 if (existingAliquot == null)
-                    BioBankPlugin.openError("Aliquot not found",
+                    BiobankPlugin.openError("Aliquot not found",
                         "Aliquot with inventory id " + inventoryId
                             + " has not been found.");
                 else
                     addAliquot(existingAliquot);
 
             } catch (Exception ae) {
-                BioBankPlugin.openAsyncError("Error while looking up patient",
+                BiobankPlugin.openAsyncError("Error while looking up patient",
                     ae);
             }
         }
@@ -221,7 +227,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     private void addAliquot(SpecimenWrapper aliquot) {
         List<SpecimenWrapper> aliquots = dispatch.getSpecimenCollection();
         if (aliquots != null && aliquots.contains(aliquot)) {
-            BioBankPlugin.openAsyncError("Error",
+            BiobankPlugin.openAsyncError("Error",
                 "Aliquot " + aliquot.getInventoryId()
                     + " has already been added to this dispatch");
             return;
@@ -229,7 +235,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         try {
             dispatch.addSpecimens(Arrays.asList(aliquot));
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error adding aliquots", e);
+            BiobankPlugin.openAsyncError("Error adding aliquots", e);
         }
         reloadAliquots();
     }

@@ -39,7 +39,7 @@ import org.eclipse.ui.PlatformUI;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -100,7 +100,7 @@ public class LoginDialog extends TitleAreaDialog {
         pluginPrefs = new InstanceScope().getNode(Application.PLUGIN_ID);
         Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
 
-        IPreferenceStore prefsStore = BioBankPlugin.getDefault()
+        IPreferenceStore prefsStore = BiobankPlugin.getDefault()
             .getPreferenceStore();
 
         String serverList = prefsStore
@@ -131,8 +131,8 @@ public class LoginDialog extends TitleAreaDialog {
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
         setTitle(Messages.getString("LoginDialog.title"));
-        setTitleImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_COMPUTER_KEY));
+        setTitleImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_COMPUTER_KEY));
         setMessage(Messages.getString("LoginDialog.description"));
         return contents;
     }
@@ -165,7 +165,7 @@ public class LoginDialog extends TitleAreaDialog {
 
         NonEmptyStringValidator userNameValidator = null;
         NonEmptyStringValidator passwordValidator = null;
-        if (BioBankPlugin.getDefault().isDebugging()) {
+        if (BiobankPlugin.getDefault().isDebugging()) {
             new Label(contents, SWT.NONE);
             secureConnectionButton = new Button(contents, SWT.CHECK);
             secureConnectionButton.setText(Messages
@@ -295,7 +295,7 @@ public class LoginDialog extends TitleAreaDialog {
             return;
         }
 
-        if (!BioBankPlugin.getDefault().isDebugging()) {
+        if (!BiobankPlugin.getDefault().isDebugging()) {
             // until further notice, we still want to be able to specify the
             // port, even in non debug mode
             // if (url.getPort() != -1) {
@@ -328,14 +328,14 @@ public class LoginDialog extends TitleAreaDialog {
                 workingCenters = sessionHelper.getUser().getWorkingCenters(
                     sessionHelper.getAppService());
             } catch (Exception e) {
-                BioBankPlugin.openAsyncError(Messages
+                BiobankPlugin.openAsyncError(Messages
                     .getString("LoginDialog.working.center.error.title"), e);
             }
             if (workingCenters != null) {
                 if ((workingCenters.size() == 0)
                     && !sessionHelper.getUser().isWebsiteAdministrator())
                     // cannot access the application.
-                    BioBankPlugin
+                    BiobankPlugin
                         .openAsyncError(
                             Messages
                                 .getString("LoginDialog.working.center.error.title"),
@@ -349,7 +349,7 @@ public class LoginDialog extends TitleAreaDialog {
                     if ((serverWidget.getText().length() > 0)
                         && (serverWidget.getSelectionIndex() == -1)
                         && !servers.contains(serverWidget.getText())) {
-                        IPreferenceStore prefsStore = BioBankPlugin
+                        IPreferenceStore prefsStore = BiobankPlugin
                             .getDefault().getPreferenceStore();
                         StringBuilder serverList = new StringBuilder();
                         for (String server : servers) {
@@ -389,7 +389,7 @@ public class LoginDialog extends TitleAreaDialog {
                     boolean canAddSession = true;
                     if (sessionHelper.getUser().getCurrentWorkingCentre() == null)
                         if (sessionHelper.getUser().isWebsiteAdministrator())
-                            BioBankPlugin
+                            BiobankPlugin
                                 .openAsyncInformation(
                                     Messages
                                         .getString("LoginDialog.working.center.admin.title"),
@@ -397,7 +397,7 @@ public class LoginDialog extends TitleAreaDialog {
                                         .getString("LoginDialog.no.working.center.admin.msg"));
                         else {
                             canAddSession = false;
-                            BioBankPlugin
+                            BiobankPlugin
                                 .openAsyncError(
                                     Messages
                                         .getString("LoginDialog.working.center.selection.error.title"),

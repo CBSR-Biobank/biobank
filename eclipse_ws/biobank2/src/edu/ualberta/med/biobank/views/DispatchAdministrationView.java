@@ -11,7 +11,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
@@ -55,7 +55,7 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
         try {
             siteNodes = SiteWrapper.getSites(SessionManager.getAppService());
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Failed to load sites", e);
+            BiobankPlugin.openAsyncError("Failed to load sites", e);
         }
         if (siteNodes != null) {
             for (SiteWrapper site : siteNodes) {
@@ -171,13 +171,13 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
                     msg += " for date "
                         + DateFormatter.formatAsDate(dateWidget.getDate());
                 }
-                BioBankPlugin.openMessage("Dispatch not found", msg);
+                BiobankPlugin.openMessage("Dispatch not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BioBankPlugin.openError("Search error", e);
+            BiobankPlugin.openError("Search error", e);
         }
     }
 

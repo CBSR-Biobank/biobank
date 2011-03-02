@@ -19,7 +19,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -97,7 +97,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         try {
             cevent.logEdit(null);
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Log edit failed", e);
+            BiobankPlugin.openAsyncError("Log edit failed", e);
         }
         String tabName;
         if (cevent.isNew()) {
@@ -124,7 +124,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Patient Visit Information");
+        form.setText("Collection Event Information");
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
@@ -209,7 +209,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     }
                 });
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Error retrievind source vessels", e);
+            BiobankPlugin.openAsyncError("Error retrievind source vessels", e);
         }
         section.setClient(specimensTable);
     }

@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public class CollectionEventAdapter extends AdapterBase {
 
     /**
-     * Aliquot selected in this patient visit
+     * Aliquot selected in this Collection Event
      */
     private SpecimenWrapper selectedAliquot;
 
@@ -37,7 +37,7 @@ public class CollectionEventAdapter extends AdapterBase {
     protected String getLabelInternal() {
         CollectionEventWrapper cevent = getWrapper();
         Assert.isNotNull(cevent, "collection event is null");
-        String name = cevent.getPatient().getPnumber() + " - "
+        String name = cevent.getPatient().getPnumber() + " - #"
             + cevent.getVisitNumber();
 
         Collection<SpecimenWrapper> samples = cevent
@@ -58,7 +58,7 @@ public class CollectionEventAdapter extends AdapterBase {
                 StudyWrapper study = patient.getStudy();
                 Assert.isNotNull(study, "study is null");
                 return study.getNameShort() + " - " + patient.getPnumber()
-                    + " - " + getTooltipText("Patient Visit");
+                    + " - " + getTooltipText("Collection Event");
 
             }
         }
@@ -67,14 +67,14 @@ public class CollectionEventAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addEditMenu(menu, "Visit");
-        addViewMenu(menu, "Visit");
-        addDeleteMenu(menu, "Visit");
+        addEditMenu(menu, "Collection Event");
+        addViewMenu(menu, "Collection Event");
+        addDeleteMenu(menu, "Collection Event");
     }
 
     @Override
     protected String getConfirmDeleteMessage() {
-        return "Are you sure you want to delete this visit?";
+        return "Are you sure you want to delete this collection event?";
     }
 
     public void setSelectedAliquot(SpecimenWrapper aliquot) {

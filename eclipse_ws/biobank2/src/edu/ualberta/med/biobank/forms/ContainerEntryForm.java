@@ -12,7 +12,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -97,20 +97,18 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        SiteWrapper selectedSite = SessionManager.getUser()
-            .getCurrentWorkingCentre();
-
         if (!container.hasParent()) {
             containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
-                appService, selectedSite);
+                appService, container.getSite());
         } else {
             containerTypes = container.getParent().getContainerType()
                 .getChildContainerTypeCollection();
         }
         if (container.isNew())
-            adapter.setParent(((SiteAdapter) SessionManager
-                .searchFirstNode(selectedSite)).getContainersGroupNode());
-        container.setSite(selectedSite);
+            adapter
+                .setParent(((SiteAdapter) SessionManager
+                    .searchFirstNode(container.getSite()))
+                    .getContainersGroupNode());
 
         setFirstControl(client);
 
@@ -223,7 +221,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
         doSave = true;
         if (container.hasChildren() && oldContainerLabel != null
             && !oldContainerLabel.equals(container.getLabel())) {
-            doSave = BioBankPlugin
+            doSave = BiobankPlugin
                 .openConfirm(
                     "Renaming container",
                     "This container has been renamed. Its children will also be renamed. Are you sure you want to continue ?");

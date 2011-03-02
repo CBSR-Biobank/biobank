@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -177,7 +177,7 @@ public class SessionAdapter extends AdapterBase {
         try {
             return ClinicWrapper.getAllClinics(appService);
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError(
+            BiobankPlugin.openAsyncError(
                 "Unable to load clinics from database", e);
         }
         return null;

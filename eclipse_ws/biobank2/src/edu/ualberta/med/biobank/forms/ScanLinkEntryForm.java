@@ -29,7 +29,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -207,7 +207,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         final Button radioCustomSelection = toolkit.createButton(
             radioComponents,
             Messages.getString("ScanLink.customChoice.label"), SWT.RADIO); //$NON-NLS-1$
-        IPreferenceStore store = BioBankPlugin.getDefault()
+        IPreferenceStore store = BiobankPlugin.getDefault()
             .getPreferenceStore();
         boolean hideRadio = store
             .getBoolean(PreferenceConstants.SCAN_LINK_ROW_SELECT_ONLY);
@@ -286,7 +286,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             authorizedSampleTypes = SpecimenTypeWrapper
                 .getSpecimenTypeForPallet96(appService, currentSite);
             if (authorizedSampleTypes.size() == 0) {
-                BioBankPlugin.openAsyncError(Messages
+                BiobankPlugin.openAsyncError(Messages
                     .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
                     Messages.getString("ScanLink.dialog.sampleTypesError.msg")); //$NON-NLS-1$
             }
@@ -495,7 +495,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
                 appService, currentSelectedSite.getId());
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
+            BiobankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }
         return null;
     }
@@ -564,7 +564,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 }
             }
             if (studiesSampleTypes.size() == 0) {
-                BioBankPlugin.openAsyncError("No sample types",
+                BiobankPlugin.openAsyncError("No sample types",
                     "There are no sample types that are defined in study '"
                         + linkFormPatientManagement.getCurrentPatient()
                             .getStudy().getNameShort()

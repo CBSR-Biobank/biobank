@@ -20,7 +20,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -72,7 +72,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         }
 
         if (fileAppender == null) {
-            String path = BioBankPlugin.getActivityLogPath();
+            String path = BiobankPlugin.getActivityLogPath();
             if (path != null) {
                 fileAppender = new FileAppender(ActivityLogAppender.layout,
                     path + File.separator + getClass().getSimpleName() + "_"
@@ -89,7 +89,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
         siteSession = SessionManager.getUser().getCurrentWorkingCentre();
         if (finished) {
             if (!printed && appender.getLogsList().size() > 0) {
-                if (BioBankPlugin.isAskPrintActivityLog()) {
+                if (BiobankPlugin.isAskPrintActivityLog()) {
                     boolean doPrint = MessageDialog.openQuestion(PlatformUI
                         .getWorkbench().getActiveWorkbenchWindow().getShell(),
                         "Print", "Do you want to print information ?");
@@ -113,7 +113,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     @Override
     public boolean print() {
         if (appender == null) {
-            BioBankPlugin.openError("Print error", "Can't print: log error.");
+            BiobankPlugin.openError("Print error", "Can't print: log error.");
         }
         try {
             Map<String, Object> map = new HashMap<String, Object>();
@@ -134,7 +134,7 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
             SessionManager.log("print", null, printName);
             return true;
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Print error", e);
+            BiobankPlugin.openAsyncError("Print error", e);
             printed = false;
             return false;
         }

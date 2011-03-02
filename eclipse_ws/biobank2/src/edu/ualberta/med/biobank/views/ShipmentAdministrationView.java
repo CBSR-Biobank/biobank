@@ -12,7 +12,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
@@ -198,7 +198,7 @@ public class ShipmentAdministrationView extends
     @Override
     protected void notFound(String text) {
         if (radioWaybill.getSelection()) {
-            boolean create = BioBankPlugin.openConfirm("Shipment not found",
+            boolean create = BiobankPlugin.openConfirm("Shipment not found",
                 "Do you want to create this shipment ?");
             if (create) {
                 // FIXME
@@ -212,7 +212,7 @@ public class ShipmentAdministrationView extends
                 // adapter.openEntryForm();
             }
         } else {
-            BioBankPlugin.openMessage(
+            BiobankPlugin.openMessage(
                 "Shipment not found",
                 "No shipment found for date "
                     + DateFormatter.formatAsDate(dateReceivedWidget.getDate()));
