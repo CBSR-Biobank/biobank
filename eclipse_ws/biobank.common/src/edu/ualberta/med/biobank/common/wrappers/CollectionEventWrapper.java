@@ -147,8 +147,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     @Override
     protected Log getLogMessage(String action, String site, String details) {
         // FIXME: what should be logged here
-        //
-        // Log log = new Log();
+        Log log = new Log();
         // log.setAction(action);
         // if (site == null) {
         // log.setSite(getSourceCenter().getNameShort());
@@ -162,8 +161,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         // }
         // log.setDetails(details);
         // log.setType("Shipment");
-        // return log;
-        return null;
+        return log;
     }
 
     @Deprecated

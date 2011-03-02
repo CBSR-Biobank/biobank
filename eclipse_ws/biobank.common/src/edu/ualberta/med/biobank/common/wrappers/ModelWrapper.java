@@ -561,9 +561,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrappedObject(otherWrapper.wrappedObject);
     }
 
-    public void logLookup(String site) throws Exception {
+    public void logLookup(String centre) throws Exception {
         ((BiobankApplicationService) appService).logActivity(getLogMessage(
-            "select", site, getWrappedClass().getSimpleName() + " LOOKUP"));
+            "select", centre, getWrappedClass().getSimpleName() + " LOOKUP"));
     }
 
     public void logEdit(String site) throws Exception {

@@ -4,33 +4,106 @@ import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.Assert;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
-    private static final int PAGE_SIZE_ROWS = 5;
+    public static enum ColumnsShown {
+        ALL(new String[] { "Inventory ID", "Type", "Patient", "Visit#",
+            "Position", "Creation Date", "Quantity (ml)", "Activity Status",
+            "Comment" }) {
+            @Override
+            public String getColumnValue(TableRowData row, int columnIndex) {
+                switch (columnIndex) {
+                case 0:
+                    return row.inventoryId;
+                case 1:
+                    return row.type;
+                case 2:
+                    return row.patient;
+                case 3:
+                    return row.pvNumber.toString();
+                case 4:
+                    return row.position;
+                case 5:
+                    return row.createdAt;
+                case 6:
+                    return row.quantity;
+                case 7:
+                    return row.activityStatus;
+                case 8:
+                    return row.comment;
+                default:
+                    return "";
+                }
+            }
+        },
+        CEVENT_FORM(new String[] { "Inventory ID", "Type", "Creation Date",
+            "Quantity (ml)" }) {
+            @Override
+            public String getColumnValue(TableRowData row, int columnIndex) {
+                switch (columnIndex) {
+                case 0:
+                    return row.inventoryId;
+                case 1:
+                    return row.type;
+                case 2:
+                    return row.createdAt;
+                case 3:
+                    return row.quantity;
+                default:
+                    return "";
+                }
+            }
+        };
+
+        private String[] headings;
+
+        private ColumnsShown(String[] headings) {
+            this.headings = headings;
+        }
+
+        public String[] getheadings() {
+            return headings;
+        }
+
+        public abstract String getColumnValue(TableRowData row, int columnIndex);
+    }
 
     protected class TableRowData {
-        public String pnumber;
-        public SpecimenWrapper spec;
-        public Integer pv;
+        public SpecimenWrapper specimen;
+        public String inventoryId;
         public String type;
+        public String patient;
+        public String pvNumber;
+        public String createdAt;
+        public String quantity;
+        public String position;
+        public String activityStatus;
+        public String comment;
 
         @Override
         public String toString() {
-            return StringUtils.join(
-                new String[] { pnumber, pv.toString(), type }, "\t");
+            return StringUtils.join(new String[] { inventoryId, type, patient,
+                pvNumber, createdAt, quantity, position, activityStatus,
+                comment }, "\t");
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Patient Number",
-        "Study" };
+    private ColumnsShown currentColumnsShowns;
 
-    public SpecimenInfoTable(Composite parent, List<SpecimenWrapper> collection) {
-        super(parent, collection, HEADINGS, PAGE_SIZE_ROWS);
+    public SpecimenInfoTable(Composite parent,
+        List<SpecimenWrapper> specimenCollection, ColumnsShown columnsShown,
+        int rowsPerPage) {
+        super(parent, specimenCollection, columnsShown.getheadings(),
+            rowsPerPage);
+        this.currentColumnsShowns = columnsShown;
     }
 
     @Override
@@ -38,35 +111,38 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                TableRowData item = (TableRowData) ((BiobankCollectionModel) element).o;
-                if (item == null) {
+                TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
+                if (info == null) {
                     if (columnIndex == 0) {
                         return "loading...";
                     }
                     return "";
                 }
-                switch (columnIndex) {
-                case 0:
-                    return item.pnumber;
-                case 1:
-                    return item.pv.toString();
-                case 2:
-                    return item.type;
-                default:
-                    return "";
-                }
+                return currentColumnsShowns.getColumnValue(info, columnIndex);
             }
         };
     }
 
     @Override
-    public TableRowData getCollectionModelObject(SpecimenWrapper spec)
+    public TableRowData getCollectionModelObject(SpecimenWrapper specimen)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.spec = spec;
-        info.pnumber = spec.getCollectionEvent().getPatient().getPnumber();
-        info.pv = spec.getCollectionEvent().getVisitNumber();
-        info.type = spec.getSpecimenType().getName();
+        info.specimen = specimen;
+        info.inventoryId = specimen.getInventoryId();
+        SpecimenTypeWrapper type = specimen.getSpecimenType();
+        Assert.isNotNull(type, "aliquot with null for sample type");
+        info.type = type.getName();
+        info.patient = specimen.getCollectionEvent().getPatient().getPnumber();
+        Integer visitNumber = specimen.getCollectionEvent().getVisitNumber();
+        info.pvNumber = (visitNumber == null) ? "" : visitNumber.toString();
+        info.createdAt = specimen.getFormattedCreatedAt();
+        Double quantity = specimen.getQuantity();
+        info.quantity = (quantity == null) ? "" : quantity.toString();
+        info.position = specimen.getPositionString();
+        ActivityStatusWrapper status = specimen.getActivityStatus();
+        info.activityStatus = (status == null) ? "" : status.getName();
+        info.comment = specimen.getComment();
+
         return info;
     }
 
@@ -74,7 +150,20 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
     protected String getCollectionModelObjectToString(Object o) {
         if (o == null)
             return null;
-        return ((TableRowData) o).toString();
+        TableRowData r = (TableRowData) o;
+        return r.toString();
+    }
+
+    public void setSelection(SpecimenWrapper selectedSample) {
+        if (selectedSample == null)
+            return;
+        for (BiobankCollectionModel item : model) {
+            TableRowData info = (TableRowData) item.o;
+            if (info.specimen == selectedSample) {
+                getTableViewer().setSelection(new StructuredSelection(item),
+                    true);
+            }
+        }
     }
 
     @Override
@@ -84,7 +173,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             return null;
         TableRowData row = (TableRowData) item.o;
         Assert.isNotNull(row);
-        return row.spec;
+        return row.specimen;
     }
 
     @Override

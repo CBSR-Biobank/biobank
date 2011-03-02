@@ -50,7 +50,8 @@ import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
-import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
 public class ContainerViewForm extends BiobankViewForm {
 
@@ -63,7 +64,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerWrapper container;
 
-    private AliquotListInfoTable aliquotsWidget;
+    private SpecimenInfoTable aliquotsWidget;
 
     private BiobankText siteLabel;
 
@@ -495,9 +496,10 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private void createAliquotsSection() throws BiobankException {
         Composite parent = createSectionWithClient("Aliquots");
-        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>(container
-            .getSpecimens().values());
-        aliquotsWidget = new AliquotListInfoTable(parent, aliquots);
+        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>(
+            container.getSpecimens().values());
+        aliquotsWidget = new SpecimenInfoTable(parent, aliquots,
+            ColumnsShown.ALL, 20);
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addClickListener(collectionDoubleClickListener);
     }

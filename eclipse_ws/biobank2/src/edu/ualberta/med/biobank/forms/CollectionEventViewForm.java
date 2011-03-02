@@ -9,17 +9,18 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTableOld;
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientVisitViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.CollectionEventViewForm";
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(CollectionEventViewForm.class.getName());
@@ -38,7 +39,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BiobankText commentLabel;
 
-    private SpecimenInfoTable table;
+    private SpecimenInfoTableOld table;
 
     private class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
@@ -53,7 +54,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
         patientVisitAdapter = (CollectionEventAdapter) adapter;
         cevent = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
-        cevent.logLookup(null);
+        cevent.logLookup(SessionManager.getUser().getCurrentWorkingCentre()
+            .getNameShort());
 
         setPartName("Visit " + cevent.getVisitNumber());
     }
@@ -138,7 +140,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createSpecimensSection() {
         Composite client = createSectionWithClient("Source Vessels");
-        table = new SpecimenInfoTable(client, cevent.getSpecimenCollection());
+        table = new SpecimenInfoTableOld(client, cevent.getSpecimenCollection());
         table.adaptToToolkit(toolkit, true);
     }
 

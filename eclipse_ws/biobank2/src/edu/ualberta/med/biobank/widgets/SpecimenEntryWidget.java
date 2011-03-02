@@ -40,6 +40,7 @@ import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -99,9 +100,9 @@ public class SpecimenEntryWidget extends BiobankWidget {
         }
 
         if (editable) {
-            specTable = new SpecimenEntryInfoTable(this, null);
+            specTable = new SpecimenEntryInfoTable(this, null, ColumnsShown.ALL);
         } else {
-            specTable = new SpecimenInfoTable(this, null);
+            specTable = new SpecimenInfoTable(this, null, ColumnsShown.ALL, 20);
         }
         updateList();
 

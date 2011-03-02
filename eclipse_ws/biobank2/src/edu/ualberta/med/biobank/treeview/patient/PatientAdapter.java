@@ -69,7 +69,7 @@ public class PatientAdapter extends AdapterBase {
         if (isEditable()
             && SessionManager.canCreate(ProcessingEventWrapper.class, null)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add Patient Visit");
+            mi.setText("Add collection event");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
