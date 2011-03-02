@@ -23,6 +23,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -32,6 +33,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SpecimenDialog extends BiobankDialog {
 
@@ -65,6 +67,10 @@ public class SpecimenDialog extends BiobankDialog {
 
     private BiobankText quantityText;
 
+    private List<ActivityStatusWrapper> allActivityStatus;
+
+    private ComboViewer activityStatusComboViewer;
+
     public SpecimenDialog(Shell parent, SpecimenWrapper specimen,
         List<SourceSpecimenWrapper> studySourceSpecimen,
         List<SpecimenTypeWrapper> allSpecimenTypes,
@@ -79,6 +85,8 @@ public class SpecimenDialog extends BiobankDialog {
             internalSpecimen.setInventoryId(specimen.getInventoryId());
             internalSpecimen.setQuantity(specimen.getQuantity());
             internalSpecimen.setCreatedAt(specimen.getCreatedAt());
+            internalSpecimen.setComment(specimen.getComment());
+            internalSpecimen.setActivityStatus(specimen.getActivityStatus());
             editedSpecimen = specimen;
             addMode = false;
         }
@@ -92,6 +100,14 @@ public class SpecimenDialog extends BiobankDialog {
             currentTitle = Messages.getString("SpecimenDialog.title.add");
         } else {
             currentTitle = Messages.getString("SpecimenDialog.title.edit");
+        }
+
+        try {
+            allActivityStatus = ActivityStatusWrapper
+                .getAllActivityStatuses(SessionManager.getAppService());
+        } catch (ApplicationException e) {
+            BioBankPlugin.openAsyncError("Problem retrieving activity status",
+                e);
         }
     }
 
@@ -155,6 +171,20 @@ public class SpecimenDialog extends BiobankDialog {
             internalSpecimen, SpecimenPeer.QUANTITY.getName(),
             quantityTextValidator);
         gd = (GridData) quantityText.getLayoutData();
+        gd.horizontalSpan = 2;
+
+        activityStatusComboViewer = widgetCreator.createComboViewer(contents,
+            Messages.getString("label.activity"), allActivityStatus,
+            internalSpecimen.getActivityStatus(),
+            "Specimen must have an activity status",
+            new ComboSelectionUpdate() {
+                @Override
+                public void doSelection(Object selectedObject) {
+                    internalSpecimen
+                        .setActivityStatus((ActivityStatusWrapper) selectedObject);
+                }
+            });
+        gd = (GridData) activityStatusComboViewer.getControl().getLayoutData();
         gd.horizontalSpan = 2;
 
         BiobankText commentWidget = (BiobankText) createBoundWidgetWithLabel(
@@ -293,6 +323,7 @@ public class SpecimenDialog extends BiobankDialog {
         editedSpecimen.setQuantity(internalSpecimen.getQuantity());
         editedSpecimen.setCreatedAt(internalSpecimen.getCreatedAt());
         editedSpecimen.setComment(internalSpecimen.getComment());
+        editedSpecimen.setActivityStatus(internalSpecimen.getActivityStatus());
         super.okPressed();
     }
 
@@ -322,6 +353,8 @@ public class SpecimenDialog extends BiobankDialog {
                 SessionManager.getAppService());
             newSpecimen.initObjectWith(internalSpecimen);
             newSpecimen.setCollectionEvent(cEvent);
+            newSpecimen.setCurrentCenter(SessionManager.getUser()
+                .getCurrentWorkingCentre());
             infotable.addSpecimen(newSpecimen);
             internalSpecimen.reset();
             quantityText.setText("");
@@ -329,6 +362,7 @@ public class SpecimenDialog extends BiobankDialog {
             quantityText.setText("");
             specimenTypeComboViewer.getCombo().deselectAll();
             specimenTypeComboViewer.getCombo().setFocus();
+            activityStatusComboViewer.getCombo().deselectAll();
             updateWidgetVisibilityAndValues();
         } catch (Exception e) {
             BioBankPlugin.openAsyncError(
