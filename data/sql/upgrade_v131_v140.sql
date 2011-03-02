@@ -2,9 +2,9 @@ RENAME TABLE clinic_shipment_patient TO shipment_patient;
 RENAME TABLE dispatch_shipment_aliquot TO dispatch_aliquot;
 RENAME TABLE sample_type TO specimen_type;
 
-######################################################
-# EVENT ATTRIBUTES
-######################################################
+/*****************************************************
+ *  EVENT ATTRIBUTES
+ ****************************************************/
 
 RENAME TABLE global_pv_attr TO global_event_attr;
 RENAME TABLE study_pv_attr TO study_event_attr;
@@ -12,23 +12,84 @@ RENAME TABLE pv_attr TO event_attr;
 RENAME TABLE pv_attr_type TO event_attr_type;
 
 ALTER TABLE global_event_attr
-      CHANGE_COLUMN PV_ATTR_TYPE_ID EVENT_ATTR_TYPE_ID INT(11) NOT NULL,
-      DROP INDEX FKBE7ED6B25B770B31
-      INDEX FKBE7ED6B25B770B31 (EVENT_ATTR_TYPE_ID);
+      CHANGE COLUMN PV_ATTR_TYPE_ID EVENT_ATTR_TYPE_ID INT(11) NOT NULL,
+      DROP INDEX FKEDC41FEE2496A267,
+      ADD INDEX FKBE7ED6B25B770B31 (EVENT_ATTR_TYPE_ID);
 
 ALTER TABLE study_event_attr
-      CHANGE_COLUMN PV_ATTR_TYPE_ID EVENT_ATTR_TYPE_ID INT(11) NOT NULL,
-      DROP INDEX FKBE7ED6B25B770B31
-      INDEX FKBE7ED6B25B770B31 (EVENT_ATTR_TYPE_ID);
+      CHANGE COLUMN PV_ATTR_TYPE_ID EVENT_ATTR_TYPE_ID INT(11) NOT NULL,
+      ADD CONSTRAINT uc_study_event_attr_label UNIQUE (label,study_id),
+      DROP INDEX FK669DD7F4F2A2464F,
+      DROP INDEX FK669DD7F42496A267,
+      DROP INDEX FK669DD7F4C449A4,
+      ADD INDEX FK3EACD8ECF2A2464F (STUDY_ID),
+      ADD INDEX FK3EACD8ECC449A4 (ACTIVITY_STATUS_ID),
+      ADD INDEX FK3EACD8EC5B770B31 (EVENT_ATTR_TYPE_ID);
 
 ALTER TABLE event_attr
-      CHANGE_COLUMN STUDY_PV_ATTR_ID STUDY_EVENT_ATTR_ID INT(11) NOT NULL,
-      INDEX FK59508C96A9CFCFDB (EVENT_ATTR_TYPE_ID);
+      CHANGE COLUMN STUDY_PV_ATTR_ID STUDY_EVENT_ATTR_ID INT(11) NOT NULL,
+      CHANGE COLUMN PATIENT_VISIT_ID COLLECTION_EVENT_ID INT(11) NOT NULL COMMENT '',
+      DROP INDEX FK200CD48ABFED96DB,
+      DROP INDEX FK200CD48AE5099AFA,
+      ADD INDEX FK59508C96280272F2 (COLLECTION_EVENT_ID),
+      ADD INDEX FK59508C96A9CFCFDB (STUDY_EVENT_ATTR_ID);
 
-######################################################
-# CLINIC SHIPMENTS
-######################################################
 
+/*****************************************************
+ * Merge clinics and sites into centers
+ ****************************************************/
+
+CREATE TABLE center (
+    ID INT(11) NOT NULL AUTO_INCREMENT,
+    DISCRIMINATOR VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+    NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+    NAME_SHORT VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+    COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    ADDRESS_ID INT(11) NOT NULL,
+    ACTIVITY_STATUS_ID INT(11) NOT NULL,
+    STUDY_ID INT(11) NULL DEFAULT NULL,
+    SENDS_SHIPMENTS TINYINT(1) NULL DEFAULT NULL,
+    CONSTRAINT STUDY_ID UNIQUE KEY(STUDY_ID),
+    INDEX FK7645C055C449A4 (ACTIVITY_STATUS_ID),
+    INDEX FK7645C055F2A2464F (STUDY_ID),
+    CONSTRAINT NAME UNIQUE KEY(NAME),
+    CONSTRAINT NAME_SHORT UNIQUE KEY(NAME_SHORT),
+    INDEX FK7645C0556AF2992F (ADDRESS_ID),
+    CONSTRAINT ADDRESS_ID UNIQUE KEY(ADDRESS_ID),
+    PRIMARY KEY (ID)
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+INSERT INTO center (DISCRIMINATOR,NAME,NAME_SHORT,COMMENT,ADDRESS_ID,ACTIVITY_STATUS_ID,SENDS_SHIPMENTS)
+SELECT 'Clinic',NAME,NAME_SHORT,COMMENT,ADDRESS_ID,ACTIVITY_STATUS_ID,SENDS_SHIPMENTS FROM clinic;
+
+INSERT INTO center (DISCRIMINATOR,NAME,NAME_SHORT,COMMENT,ADDRESS_ID,ACTIVITY_STATUS_ID)
+SELECT 'Site',NAME,NAME_SHORT,COMMENT,ADDRESS_ID,ACTIVITY_STATUS_ID from site;
+
+-- update site-study correlation table
+-- create center_id column which will alter be renamed to site_id
+
+ALTER TABLE site_study
+      ADD COLUMN CENTER_ID int(11) COMMENT '' NOT NULL;
+
+UPDATE site_study,center
+       SET center_id=(SELECT center.id FROM center
+       WHERE name=(SELECT name FROM site where id=site_study.site_id));
+
+ALTER TABLE site_study
+      DROP PRIMARY KEY,
+      DROP INDEX FK7A197EB13F52C885,
+      DROP COLUMN site_id,
+      CHANGE COLUMN center_id site_id int(11) NOT NULL,
+      ADD INDEX FK7A197EB13F52C885 (SITE_ID),
+      ADD PRIMARY KEY (`SITE_ID`,`STUDY_ID`);
+
+ALTER TABLE center MODIFY COLUMN ID INT(11) NOT NULL;
+
+/*****************************************************
+ * CLINIC SHIPMENTS
+ ****************************************************/
+
+-- old_id is temporary
 
 CREATE TABLE shipment_info (
     ID INT(11) NOT NULL AUTO_INCREMENT,
@@ -37,25 +98,122 @@ CREATE TABLE shipment_info (
     WAYBILL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
     BOX_NUMBER VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
     SHIPPING_METHOD_ID INT(11) NOT NULL,
-    CONSTRAINT SHIPPING_METHOD_ID UNIQUE KEY(SHIPPING_METHOD_ID),
+    OLD_ID INT(11) NOT NULL,
     INDEX FK95BCA433DCA49682 (SHIPPING_METHOD_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO shipment_info (RECEIVED_AT,SENT_AT,WAYBILL,BOX_NUMBER,SHIPPING_METHOD_ID)
-SELECT DATE_RECEIVED,DATE_SHIPPED,WAYBILL,BOX_NUMBER,SHIPPING_METHOD_ID FROM abstract_shipment
-WHERE DISCRIMINATOR='ClinicShipment';
+INSERT INTO shipment_info (old_id,received_at,sent_at,waybill,box_number,shipping_method_id)
+SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
+WHERE discriminator='ClinicShipment';
 
+CREATE TABLE origin_info (
+    ID INT(11) NOT NULL AUTO_INCREMENT,
+    SHIPMENT_INFO_ID INT(11) NULL DEFAULT NULL,
+    CENTER_ID INT(11) NOT NULL,
+    CONSTRAINT SHIPMENT_INFO_ID UNIQUE KEY(SHIPMENT_INFO_ID),
+    INDEX FKE92E7A2792FAA705 (CENTER_ID),
+    INDEX FKE92E7A27F59D873A (SHIPMENT_INFO_ID),
+    PRIMARY KEY (ID)
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-######################################################
+#INSERT INTO origin_info (center_id,shipment_info_id)
+#SELECT center.id,shipment_info.id FROM abstract_shipment
+#       JOIN clinic ON clinic.id=abstract_shipment.clinic_id
+#       JOIN center ON center.name=clinic.name
+#       join shipment_info on shipment_info.old_id=abstract_shipment.id
+#       WHERE abstract_shipment.discriminator='ClinicShipment';
 #
+#ALTER TABLE shipment_info MODIFY COLUMN ID INT(11) NOT NULL;
+#ALTER TABLE origin_info MODIFY COLUMN ID INT(11) NOT NULL;
+
+/*****************************************************
+ * Dispatches
+ ****************************************************/
+
+CREATE TABLE dispatch (
+    ID INT(11) NOT NULL auto_increment,
+    STATE INT(11) NULL DEFAULT NULL,
+    COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    DEPARTED_AT DATETIME NULL DEFAULT NULL,
+    ACTIVITY_STATUS_ID INT(11) NOT NULL,
+    RECEIVER_CENTER_ID INT(11) NULL DEFAULT NULL,
+    SHIPMENT_INFO_ID INT(11) NOT NULL,
+    SENDER_CENTER_ID INT(11) NULL DEFAULT NULL,
+    REQUEST_ID INT(11) NULL DEFAULT NULL,
+    INDEX FK3F9F347AC449A4 (ACTIVITY_STATUS_ID),
+    INDEX FK3F9F347A91BC3D7B (SENDER_CENTER_ID),
+    INDEX FK3F9F347AA2F14F4F (REQUEST_ID),
+    INDEX FK3F9F347A307B2CB5 (RECEIVER_CENTER_ID),
+    CONSTRAINT SHIPMENT_INFO_ID UNIQUE KEY(SHIPMENT_INFO_ID),
+    INDEX FK3F9F347AF59D873A (SHIPMENT_INFO_ID),
+    PRIMARY KEY (ID)
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+#INSERT INTO shipment_info (old_id,received_at,sent_at,waybill,box_number,shipping_method_id)
+#SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
+#WHERE discriminator='DispatchShipment';
+
+#INSERT INTO dispatch (sender_center_id,receiver_center_id,state,comment,activity_status_id,shipment_info_id)
+#SELECT sender_center.id,receiver_center.id,state FROM abstract_shipment
+#        JOIN site as sender_site on sender_site.id=abstract_shipment.dispatch_sender_id
+#        JOIN center as sender_center on sender_center.name=sender_site.name
+#        JOIN site as receiver_site on receiver_site.id=abstract_shipment.dispatch_receiver_id
+#        JOIN center as receiver_center on receiver_center.name=receiver_site.name
+#        WHERE abstract_shipment.discriminator='DispatchShipment';
+#
+#ALTER TABLE shipment_info
+#      DROP COLUMN old_id;
+
+/*****************************************************
+ *
+ ****************************************************/
+
+#ALTER TABLE abstract_position
+#      DROP INDEX FKBC4AE0A6898584F,
+#      CHANGE COLUMN ALIQUOT_ID SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
+#      ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
+#      ADD CONSTRAINT SPECIMEN_ID UNIQUE KEY(SPECIMEN_ID);
+
+ALTER TABLE abstract_position ADD COLUMN POSITION_STRING VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '';
+
+
+-- update `POSITION_STRING` values
+-- SBS Standard
+
+UPDATE abstract_position ap, container c, container_type ct
+       SET position_string = CONCAT(SUBSTR("ABCDEFGH", row + 1, 1), col + 1)
+       WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition'
+       AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 1;
+
+-- CBSR 2 Char Alphabetic
+
+UPDATE abstract_position ap, container c, container_type ct
+       SET position_string = CONCAT(SUBSTR("ABCDEFGHJKLMNPQRSTUVWXYZ", row div 24 + 1, 1),
+           SUBSTR("ABCDEFGHJKLMNPQRSTUVWXYZ", mod(row, 24) + 1, 1))
+       WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition'
+       AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 2;
+
+-- CBSR SBS
+
+UPDATE abstract_position ap, container c, container_type ct
+       SET position_string = CONCAT(SUBSTR("ABCDEFGHJ", row + 1, 1), col + 1)
+       WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition'
+       AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 5;
+
+alter table Abstract_Position
+ change column row row integer not null,
+ change column col col integer not null;
+
+
+######################################################
+--
 ######################################################
 
-ALTER TABLE abstract_position
-      DROP INDEX FKBC4AE0A6898584F,
-      CHANGE COLUM ALIQUOT_ID INT(11) NULL DEFAULT NULL COMMENT '',
-      ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
-      ADD CONSTRAINT SPECIMEN_ID UNIQUE KEY(SPECIMEN_ID);
+UPDATE abstract_position ap, container c, container_type ct
+       SET position_string = CONCAT(SUBSTR("ABCDEFGHJ", row + 1, 1), col + 1)
+       WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition'
+       AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 5;
 
 ALTER TABLE dispatch_aliquot
       CHANGE COLUMN DISPATCH_SHIPMENT_ID DISPATCH_ID INT(11) NOT NULL COMMENT '',
@@ -216,7 +374,6 @@ CREATE TABLE researcher (
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
 DROP TABLE order_aliquot;
-ALTER TABLE abstract_position ADD COLUMN POSITION_STRING VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '';
 ALTER TABLE container_path ADD COLUMN TOP_CONTAINER_ID INT(11) NOT NULL COMMENT '', ADD INDEX FKB2C64D431BE0C379 (TOP_CONTAINER_ID);
 ALTER TABLE patient ADD COLUMN CREATED_AT DATETIME NULL DEFAULT NULL COMMENT '';
 ALTER TABLE patient_visit ADD COLUMN ACTIVITY_STATUS_ID INT(11) NOT NULL COMMENT '', ADD INDEX FKA09CAF51C449A4 (ACTIVITY_STATUS_ID);
@@ -271,42 +428,6 @@ DROP TABLE tmp;
 -- end CREATED_AT update
 
 UPDATE container_path SET top_container_id = IF(LOCATE('/', path) = 0, path, SUBSTR(path, 1, LOCATE('/', path)));
-
--- update `POSITION_STRING` values
--- SBS Standard
-
-UPDATE abstract_position ap, container c, container_type ct SET position_string = CONCAT(SUBSTR("ABCDEFGH", row + 1, 1), col + 1) WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition' AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 1;
-
--- CBSR 2 Char Alphabetic
-
-UPDATE abstract_position ap, container c, container_type ct SET position_string = CONCAT(SUBSTR("ABCDEFGHJKLMNPQRSTUVWXYZ", row div 24 + 1, 1), SUBSTR("ABCDEFGHJKLMNPQRSTUVWXYZ", mod(row, 24) + 1, 1)) WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition' AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 2;
-
--- CBSR SBS
-
-UPDATE abstract_position ap, container c, container_type ct SET position_string = CONCAT(SUBSTR("ABCDEFGHJ", row + 1, 1), col + 1) WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition' AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 5;
-
--- insert report data
-
--- MySQL dump 10.13  Distrib 5.1.41, for debian-linux-gnu (x86_64)
---
--- Host: localhost    Database: biobank2
--- ------------------------------------------------------
--- Server version	5.1.41-3ubuntu12.8
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8 */;
-/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
-/*!40103 SET TIME_ZONE='+00:00' */;
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
-/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
-/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-
---
--- Table structure for table `report`
---
 
 DROP TABLE IF EXISTS `report`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -577,25 +698,10 @@ LOCK TABLES `entity` WRITE;
 INSERT INTO `entity` VALUES (1,'edu.ualberta.med.biobank.model.Aliquot','Aliquot'),(2,'edu.ualberta.med.biobank.model.Container','Container'),(3,'edu.ualberta.med.biobank.model.Patient','Patient'),(4,'edu.ualberta.med.biobank.model.PatientVisit','PatientVisit');
 /*!40000 ALTER TABLE `entity` ENABLE KEYS */;
 UNLOCK TABLES;
-/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
-
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
-
--- Dump completed on 2011-01-12 14:16:56
-
 
 -- update constraints (unique and not-null):
 -- also update ContainerType -> ContainerLabelingScheme relation replace 0..1 by 1 (so cannot be null)
 
-alter table Abstract_Position
- change column row row integer not null,
- change column col col integer not null;
 alter table Capacity
  change column ROW_CAPACITY ROW_CAPACITY integer not null,
  change column COL_CAPACITY COL_CAPACITY integer not null;
@@ -603,9 +709,11 @@ alter table Activity_Status
  change column NAME NAME varchar(50) not null unique;
 alter table Aliquot
  change column INVENTORY_ID INVENTORY_ID varchar(100) not null unique;
-alter table Center
- change column NAME NAME varchar(255) not null unique,
- change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
+
+#alter table Center
+# change column NAME NAME varchar(255) not null unique,
+# change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
+
 alter table Container
  change column LABEL LABEL varchar(255) not null;
 alter table Container_Type
@@ -614,13 +722,17 @@ alter table Container_Type
  change column CHILD_LABELING_SCHEME_ID CHILD_LABELING_SCHEME_ID integer not null;
 alter table Patient
  change column PNUMBER PNUMBER varchar(100) not null unique;
-alter table Sample_Type
- change column NAME NAME varchar(100) not null unique,
- change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
+
+#alter table Sample_Type
+# change column NAME NAME varchar(100) not null unique,
+# change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
+
 alter table Shipping_Method
  change column NAME NAME varchar(255) not null unique;
-alter table Source_Vessel_Type
- change column NAME NAME varchar(100) not null unique;
+
+#alter table Source_Vessel_Type
+# change column NAME NAME varchar(100) not null unique;
+
 alter table Study
  change column NAME NAME varchar(255) not null unique,
  change column NAME_SHORT NAME_SHORT varchar(50) not null unique;
@@ -634,5 +746,10 @@ ALTER TABLE container_type
   ADD CONSTRAINT uc_containertype_name UNIQUE (name,site_id),
   ADD CONSTRAINT uc_containertype_nameshort UNIQUE (name_short,site_id);
 
-ALTER TABLE Study_Pv_Attr
-  ADD CONSTRAINT uc_study_pv_attr_label UNIQUE (label,study_id);
+/*****************************************************
+ * drop tables that are no longer required
+ ****************************************************/
+
+#DROP TABLE clinic;
+#DROP TABLE site;
+#DROP TABLE abstract_shipment;
