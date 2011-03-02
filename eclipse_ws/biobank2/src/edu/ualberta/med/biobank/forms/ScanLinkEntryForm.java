@@ -280,7 +280,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     private void initAuthorizedSampleTypeList() throws ApplicationException {
-        SiteWrapper currentSite = siteCombo.getSelectedSite();
+        SiteWrapper currentSite = SessionManager.getUser()
+            .getCurrentWorkingCentre();
         if (currentSite != null) {
             authorizedSampleTypes = SpecimenTypeWrapper
                 .getSpecimenTypeForPallet96(appService, currentSite);
@@ -408,8 +409,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
 
-        // FIXME : get this on the user instead ?
-        createSiteCombo(fieldsComposite, true);
+        initAuthorizedSampleTypeList();
 
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
         linkFormPatientManagement.createCollectionEventWidgets(fieldsComposite);
@@ -478,7 +478,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     protected void beforeScanThreadStart() {
         isFakeScanRandom = fakeScanRandom != null
             && fakeScanRandom.getSelection();
-        currentSelectedSite = siteCombo.getSelectedSite();
+        currentSelectedSite = SessionManager.getUser()
+            .getCurrentWorkingCentre();
         preSelectedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
         for (AliquotedSpecimenSelectionWidget stw : sampleTypeWidgets) {
             preSelectedSampleTypes.add(stw.getSelection());
@@ -554,7 +555,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             studiesSampleTypes = new ArrayList<SpecimenTypeWrapper>();
             for (AliquotedSpecimenWrapper ss : linkFormPatientManagement
                 .getCurrentPatient().getStudy()
-                .getAliquotedSpecimenCollection()) {
+                .getAliquotedSpecimenCollection(true)) {
                 if (ss.getActivityStatus().isActive()) {
                     SpecimenTypeWrapper type = ss.getSpecimenType();
                     if (authorizedSampleTypes.contains(type)) {
@@ -608,10 +609,10 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                         .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
                     appendLogNLS("ScanLink.activitylog.aliquot.existsError",
                         palletPosition, value, foundAliquot
-                            .getProcessingEvent().getFormattedDateProcessed(),
-                        foundAliquot.getCollectionEvent().getPatient()
-                            .getPnumber(), foundAliquot.getCurrentCenter()
-                            .getNameShort());
+                            .getParentProcessingEvent()
+                            .getFormattedDateProcessed(), foundAliquot
+                            .getCollectionEvent().getPatient().getPnumber(),
+                        foundAliquot.getCurrentCenter().getNameShort());
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);
                     if (independantProcess) {
@@ -646,7 +647,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
         List<SpecimenWrapper> newAliquots = new ArrayList<SpecimenWrapper>();
-        SiteWrapper site = null; // FIXME get current site on current user !
+        SiteWrapper site = SessionManager.getUser().getCurrentWorkingCentre();
         for (PalletCell cell : cells.values()) {
             if (PalletCell.hasValue(cell)
                 && cell.getStatus() == CellStatus.TYPE) {
@@ -774,14 +775,6 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     @Override
     protected boolean fieldsValid() {
         return isPlateValid() && linkFormPatientManagement.fieldsValid();
-    }
-
-    @Override
-    protected void siteComboSelectionChanged(SiteWrapper currentSelection)
-        throws Exception {
-        linkFormPatientManagement.setSite(currentSelection);
-        linkFormPatientManagement.setCollectionEventList();
-        initAuthorizedSampleTypeList();
     }
 
 }

@@ -10,6 +10,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -17,7 +18,6 @@ import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContainerTypeInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyInfoTable;
 
 public class SiteViewForm extends AddressViewFormCommon {
@@ -41,19 +41,15 @@ public class SiteViewForm extends AddressViewFormCommon {
 
     private BiobankText topContainerCountLabel;
 
-    private BiobankText shipmentCountLabel;
-
     private BiobankText patientCountLabel;
 
     private BiobankText patientVisitCountLabel;
 
-    private BiobankText sampleCountLabel;
+    private BiobankText specimenCountLabel;
 
     private BiobankText activityStatusLabel;
 
     private BiobankText commentLabel;
-
-    private SiteDispatchInfoTable dispatchTable;
 
     @Override
     public void init() {
@@ -87,27 +83,26 @@ public class SiteViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("label.name"));
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Short Name");
+            Messages.getString("label.nameShort"));
         studyCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Studies");
+            Messages.getString("SiteViewForm.field.studyCount.label"));
         containerTypeCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Container Types");
+            Messages.getString("site.field.type.label"));
         topContainerCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Top Level Containers");
-        shipmentCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Shipments");
+            Messages.getString("SiteViewForm.field.topLevelCount.label"));
         patientCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Patients");
+            Messages.getString("SiteViewForm.field.patientCount.label"));
         patientVisitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Patient Visits");
-        sampleCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Samples");
+            Messages.getString("SiteViewForm.field.pvCount.label"));
+        specimenCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("SiteViewForm.field.totalSpecimen"));
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity Status");
+            Messages.getString("label.activity"));
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+            Messages.getString("label.comments"));
         setSiteSectionValues();
     }
 
@@ -119,10 +114,9 @@ public class SiteViewForm extends AddressViewFormCommon {
             .size());
         setTextValue(topContainerCountLabel, site.getTopContainerCollection()
             .size());
-        setTextValue(shipmentCountLabel, site.getShipmentCount());
         setTextValue(patientCountLabel, site.getPatientCount());
-        setTextValue(patientVisitCountLabel, site.getPatientVisitCount());
-        setTextValue(sampleCountLabel, site.getSpecimenCount());
+        setTextValue(patientVisitCountLabel, site.getCollectionEventCount());
+        setTextValue(specimenCountLabel, site.getSpecimenCount());
         setTextValue(activityStatusLabel, site.getActivityStatus().getName());
         setTextValue(commentLabel, site.getComment());
     }
@@ -136,8 +130,9 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createContainerTypesSection() {
-        Section section = createSection("Container Types");
-        addSectionToolbar(section, "Add Container Type",
+        Section section = createSection(Messages
+            .getString("SiteViewForm.types.title"));
+        addSectionToolbar(section, Messages.getString("SiteViewForm.type.add"),
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -154,14 +149,17 @@ public class SiteViewForm extends AddressViewFormCommon {
     }
 
     private void createContainerSection() throws Exception {
-        Section section = createSection("Top Level Containers");
-        addSectionToolbar(section, "Add Container", new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                siteAdapter.getContainersGroupNode().addContainer(siteAdapter,
-                    true);
-            }
-        }, ContainerWrapper.class);
+        Section section = createSection(Messages
+            .getString("SiteViewForm.topContainers.title"));
+        addSectionToolbar(section,
+            Messages.getString("SiteViewForm.topContainers.add"),
+            new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    siteAdapter.getContainersGroupNode().addContainer(
+                        siteAdapter, true);
+                }
+            }, ContainerWrapper.class);
 
         topContainersTable = new ContainerInfoTable(section, siteAdapter);
         topContainersTable.adaptToToolkit(toolkit, true);
@@ -174,8 +172,9 @@ public class SiteViewForm extends AddressViewFormCommon {
     @Override
     public void reload() throws Exception {
         retrieveSite();
-        setPartName("Repository Site " + site.getNameShort());
-        form.setText("Repository Site: " + site.getName());
+        setPartName(Messages.getString("SiteViewForm.title",
+            site.getNameShort()));
+        form.setText(Messages.getString("SiteViewForm.title", site.getName()));
         setSiteSectionValues();
         setAdressValues(site);
         studiesTable.setCollection(site.getStudyCollection());

@@ -67,7 +67,7 @@ public class DispatchAdapter extends AdapterBase {
     @Override
     public boolean isDeletable() {
         if (getSiteParent() != null)
-            return getSiteParent().equals(getWrapper().getSender())
+            return getSiteParent().equals(getWrapper().getSenderCenter())
                 && getWrapper().canDelete(SessionManager.getUser())
                 && getWrapper().isInCreationState();
         else
@@ -89,7 +89,7 @@ public class DispatchAdapter extends AdapterBase {
             if (isDeletable()) {
                 addDeleteMenu(menu, "Dispatch");
             }
-            if (siteParent.equals(getWrapper().getSender())
+            if (siteParent.equals(getWrapper().getSenderCenter())
                 && getWrapper().canUpdate(SessionManager.getUser())
                 && getWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -101,7 +101,7 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
             }
-            if (siteParent.equals(getWrapper().getReceiver())
+            if (siteParent.equals(getWrapper().getReceiverCenter())
                 && getWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText("Receive");

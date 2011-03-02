@@ -37,8 +37,8 @@ public class CollectionEventAdapter extends AdapterBase {
     protected String getLabelInternal() {
         CollectionEventWrapper cevent = getWrapper();
         Assert.isNotNull(cevent, "collection event is null");
-        // FIXME: what should be used for a name now?
-        String name = "" + cevent.getVisitNumber();
+        String name = cevent.getPatient().getPnumber() + " - "
+            + cevent.getVisitNumber();
 
         Collection<SpecimenWrapper> samples = cevent
             .getSpecimenCollection(true);

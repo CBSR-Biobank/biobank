@@ -196,7 +196,6 @@ public class AliquotWrapper {
     protected void resetInternalFields() {
     }
 
-    @Deprecated
     public CenterWrapper getCenter() {
         // TODO new method or old method?
         return null;

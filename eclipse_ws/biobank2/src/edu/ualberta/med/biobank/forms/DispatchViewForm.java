@@ -51,8 +51,6 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private DispatchWrapper dispatch;
 
-    private BiobankText studyLabel;
-
     private BiobankText senderLabel;
 
     private BiobankText receiverLabel;
@@ -109,7 +107,7 @@ public class DispatchViewForm extends BiobankViewForm {
             dateString = " on " + dispatch.getFormattedDeparted();
         }
         canSeeEverything = true;
-        if (dispatch.getSender() == null) {
+        if (dispatch.getSenderCenter() == null) {
             canSeeEverything = false;
             BioBankPlugin
                 .openAsyncError(
@@ -117,9 +115,9 @@ public class DispatchViewForm extends BiobankViewForm {
                     "It seems you don't have access to the sender site. Please see administrator to resolve this problem.");
         } else {
             form.setText("Dispatch sent" + dateString + " from "
-                + dispatch.getSender().getNameShort());
+                + dispatch.getSenderCenter().getNameShort());
         }
-        if (dispatch.getReceiver() == null) {
+        if (dispatch.getReceiverCenter() == null) {
             canSeeEverything = false;
             BioBankPlugin
                 .openAsyncError(
@@ -313,7 +311,6 @@ public class DispatchViewForm extends BiobankViewForm {
             label.setLayoutData(gd);
         }
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
         receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Receiver");
@@ -335,11 +332,11 @@ public class DispatchViewForm extends BiobankViewForm {
 
     private void setDispatchValues() {
         setTextValue(senderLabel,
-            dispatch.getSender() == null ? " ACCESS DENIED" : dispatch
-                .getSender().getName());
+            dispatch.getSenderCenter() == null ? " ACCESS DENIED" : dispatch
+                .getSenderCenter().getName());
         setTextValue(receiverLabel,
-            dispatch.getReceiver() == null ? "ACCESS DENIED" : dispatch
-                .getReceiver().getName());
+            dispatch.getReceiverCenter() == null ? "ACCESS DENIED" : dispatch
+                .getReceiverCenter().getName());
         if (departedLabel != null)
             setTextValue(departedLabel, dispatch.getFormattedDeparted());
         if (shippingMethodLabel != null)

@@ -13,23 +13,23 @@ import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -52,10 +52,6 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public StudyWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    public List<SiteWrapper> getSiteCollection() {
-        return getSiteCollection(true);
     }
 
     @Override
@@ -309,6 +305,10 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public List<ClinicWrapper> getClinicCollection() {
         // FIXME: is it faster to do an HQL query here?
+        // FIXME answer: might be faster but need to check when this is needed
+        // (what if
+        // want to show the current modification in the studyEntryform, before
+        // it is saved in the DB)
         List<ContactWrapper> contacts = getContactCollection(false);
         List<ClinicWrapper> clinicWrappers = new ArrayList<ClinicWrapper>();
         if (contacts != null)
@@ -316,19 +316,6 @@ public class StudyWrapper extends StudyBaseWrapper {
                 clinicWrappers.add(contact.getClinic());
             }
         return clinicWrappers;
-    }
-
-    public boolean hasClinic(String clinicNameShort) {
-        List<ClinicWrapper> clinics = getClinicCollection();
-        if (clinics != null)
-            for (ClinicWrapper c : clinics)
-                if (c.getNameShort().equals(clinicNameShort))
-                    return true;
-        return false;
-    }
-
-    public List<PatientWrapper> getPatientCollection() {
-        return getPatientCollection(false);
     }
 
     private static final String PATIENT_QRY = "select patients from "
@@ -342,7 +329,7 @@ public class StudyWrapper extends StudyBaseWrapper {
             Arrays.asList(new Object[] { patientNumber, getId() }));
         List<Patient> result = appService.query(criteria);
         if (result.size() > 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         } else if (result.size() == 1) {
             return new PatientWrapper(appService, result.get(0));
         }
@@ -360,10 +347,6 @@ public class StudyWrapper extends StudyBaseWrapper {
         HQLCriteria criteria = new HQLCriteria(HAS_PATIENTS_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, criteria) > 0;
-    }
-
-    public long getPatientCount() throws ApplicationException, BiobankException {
-        return getPatientCount(false);
     }
 
     public static final String PATIENT_COUNT_QRY = "select count(patients) from "
@@ -384,7 +367,7 @@ public class StudyWrapper extends StudyBaseWrapper {
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
-        List<PatientWrapper> list = getPatientCollection();
+        List<PatientWrapper> list = getPatientCollection(false);
         if (list == null) {
             return 0;
         }
@@ -412,42 +395,48 @@ public class StudyWrapper extends StudyBaseWrapper {
         return 0;
     }
 
-    private static final String PATIENT_COUNT_FOR_SITE_QRY = "select count(distinct patients) from "
+    private static final String PATIENT_COUNT_FOR_CENTER_QRY = "select count(distinct patient) from "
         + Center.class.getName()
         + " as center join center."
-        + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pes join pes.patient as patients where center."
+        + CenterPeer.SPECIMEN_COLLECTION.getName()
+        + " as specimens join specimens."
+        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+            CollectionEventPeer.PATIENT)
+        + " as patient where center."
         + CenterPeer.ID.getName()
         + "=? and "
-        + "patients."
+        + "patient."
         + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
 
-    // FIXME : We might want also to go through the CollectionEvent to count the
-    // patients ! (for clinics for example)
+    // FIXME is it correct to go through the specimen collection of the centre.
+    // Counting patients might be different for a site or a clinic, or a
+    // research group !
     public long getPatientCountForCenter(CenterWrapper<?> center)
         throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_SITE_QRY,
+        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_CENTER_QRY,
             Arrays.asList(new Object[] { center.getId(), getId() }));
         return getCountResult(appService, c);
     }
 
-    private static final String PROCESSING_EVENT_COUNT_FOR_SITE_QRY = "select count(distinct pes) from "
-        + Site.class.getName()
-        + " as site join site."
-        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
+    private static final String PROCESSING_EVENT_COUNT_FOR_CENTER_QRY = "select count(distinct pes) from "
+        + Center.class.getName()
+        + " as center join center."
+        + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pes join pes."
         + ProcessingEventPeer.PARENT_SPECIMEN.getName()
-        + " as parent_spcs join parent_spc."
+        + " as parent_spcs join parent_spcs."
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
             CollectionEventPeer.PATIENT, PatientPeer.STUDY)
         + " as study where study."
         + StudyPeer.ID.getName()
-        + "=? and site."
-        + SitePeer.ID.getName() + "=?";
+        + "=? and center."
+        + CenterPeer.ID.getName() + "=?";
 
+    @Deprecated
+    // not sure we need this method yet
     public long getProcessingEventCountForCenter(CenterWrapper<?> center)
         throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_COUNT_FOR_SITE_QRY,
+        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_COUNT_FOR_CENTER_QRY,
             Arrays.asList(new Object[] { getId(), center.getId() }));
         return getCountResult(appService, c);
     }
@@ -461,6 +450,8 @@ public class StudyWrapper extends StudyBaseWrapper {
             CollectionEventPeer.PATIENT, PatientPeer.STUDY)
         + " as study where study." + StudyPeer.ID.getName() + "=?";
 
+    @Deprecated
+    // not sure we need this method yet
     public long getProcessingEventCount() throws ApplicationException,
         BiobankException {
         HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_COUNT_QRY,
@@ -524,12 +515,9 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public static List<StudyWrapper> getAllStudies(
         WritableApplicationService appService) throws ApplicationException {
-        List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
         HQLCriteria c = new HQLCriteria(ALL_STUDIES_QRY);
-        List<Study> studies = appService.query(c);
-        for (Study study : studies)
-            wrappers.add(new StudyWrapper(appService, study));
-        return wrappers;
+        return ModelWrapper.wrapModelCollection(appService,
+            appService.query(c), StudyWrapper.class);
     }
 
     public static final String COUNT_QRY = "select count (*) from "
@@ -545,49 +533,28 @@ public class StudyWrapper extends StudyBaseWrapper {
         return getName();
     }
 
-    public List<AliquotedSpecimenWrapper> getAliquotedSpecimenCollection() {
-        return getWrapperCollection(StudyPeer.ALIQUOTED_SPECIMEN_COLLECTION,
-            AliquotedSpecimenWrapper.class, false);
+    private static final String COLLECTION_EVENT_COUNT_QRY = "select count(distinct ce) from "
+        + CollectionEvent.class.getName()
+        + " as ce where ce."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.STUDY,
+            StudyPeer.ID) + "=?";
+
+    public long getCollectionEventCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, c);
+        }
+        return getCollectionEventWrapper().size();
     }
 
-    public List<ContactWrapper> getContactCollection() {
-        return getContactCollection(false);
-    }
-
-    @Deprecated
-    public Long getPatientCountForClinic(ClinicWrapper clinic) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public Long getPatientCountForSite(SiteWrapper site) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public Long getPatientVisitCountForSite(SiteWrapper site) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public Long getPatientVisitCount() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public Long getPatientVisitCountForClinic(ClinicWrapper clinic) {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public List<StudySourceVesselWrapper> getStudySourceVesselCollection() {
-        // TODO Auto-generated method stub
-        return null;
+    public List<CollectionEventWrapper> getCollectionEventWrapper() {
+        List<CollectionEventWrapper> cEvents = new ArrayList<CollectionEventWrapper>();
+        for (PatientWrapper p : getPatientCollection(false)) {
+            cEvents.addAll(p.getCollectionEventCollection(false));
+        }
+        return cEvents;
     }
 
 }

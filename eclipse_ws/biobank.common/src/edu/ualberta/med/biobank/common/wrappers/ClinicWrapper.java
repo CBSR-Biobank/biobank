@@ -8,11 +8,14 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ClinicBaseWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
 import edu.ualberta.med.biobank.model.Contact;
@@ -122,23 +125,18 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
         + " as spcs join spcs."
         + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevents join cevents"
+        + " as cevents join cevents."
         + CollectionEventPeer.PATIENT.getName()
-        + "as patients where clinic."
+        + " as patients where clinic."
         + ClinicPeer.ID.getName() + "=?";
 
     /**
-     * fast = true will execute a hql query. fast = false will call the
-     * getCollectionEventCollection() method and loop on it to get patients
-     * 
-     * @throws BiobankCheckException
-     * @throws ApplicationException
+     * return number of patients that came for a visit in this clinic
      */
     public long getPatientCount() throws BiobankException, ApplicationException {
         HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
-        // FIXME
-        return 0; // getCountResult(appService, criteria);
+        return getCountResult(appService, criteria);
     }
 
     private static final String ALL_CLINICS_QRY = "from "
@@ -167,8 +165,53 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         deletedContacts.clear();
     }
 
-    @Deprecated
+    public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
+        + Clinic.class.getName()
+        + " as clinic join clinic."
+        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+        + " as origins join origins."
+        + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+        + " as spcs join spcs."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cevent where clinic."
+        + CenterPeer.ID.getName() + "=?";
+
+    @Override
+    public long getCollectionEventCount() throws ApplicationException,
+        BiobankException {
+        HQLCriteria criteria = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
+            Arrays.asList(new Object[] { getId() }));
+        return getCountResult(appService, criteria);
+    }
+
+    private static final String COLLECTION_EVENT_COUNT_FOR_STUDY_QRY = "select count(distinct cEvent) from "
+        + Clinic.class.getName()
+        + " as clinic join clinic."
+        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+        + " as origins join origins."
+        + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+        + " as specimens join specimens."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cEvent where clinic."
+        + ClinicPeer.ID.getName()
+        + "=? and "
+        + "cEvent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.STUDY,
+            StudyPeer.ID) + "=?";
+
+    /**
+     * Count events for specimen that are been drawn at this clinic
+     */
+    @Override
+    public long getCollectionEventCountForStudy(StudyWrapper study)
+        throws ApplicationException, BiobankException {
+        HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_FOR_STUDY_QRY,
+            Arrays.asList(new Object[] { getId(), study.getId() }));
+        return getCountResult(appService, c);
+    }
+
     public List<CollectionEventWrapper> getCollectionEventCollection() {
+        // TODO Auto-generated method stub
         return null;
     }
 }

@@ -16,6 +16,8 @@ import edu.ualberta.med.biobank.widgets.infotables.SiteDispatchInfoTable;
 /**
  * Allows the user to select a study and dest sites for dispatch relations.
  */
+
+@Deprecated
 public class SiteDispatchAddInfoTable extends SiteDispatchInfoTable {
 
     private SiteWrapper site;

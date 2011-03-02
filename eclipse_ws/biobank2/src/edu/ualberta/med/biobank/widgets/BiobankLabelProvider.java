@@ -14,6 +14,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -150,6 +151,9 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((SiteWrapper) element).getNameShort();
         } else if (element instanceof SpecimenTypeWrapper) {
             return ((SpecimenTypeWrapper) element).getNameShort();
+        } else if (element instanceof SourceSpecimenWrapper) {
+            return ((SourceSpecimenWrapper) element).getSpecimenType()
+                .getNameShort();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getName();
         } else if (element instanceof ActivityStatusWrapper) {

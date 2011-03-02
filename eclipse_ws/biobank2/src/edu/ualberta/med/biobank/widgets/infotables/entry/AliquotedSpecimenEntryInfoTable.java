@@ -50,7 +50,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
         super(parent, null);
         getSpecimenTypes();
         this.study = study;
-        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection();
+        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }
@@ -70,8 +70,10 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public void addAliquotedSpecimen() {
-        addOrEditAliquotedSpecimen(true, new AliquotedSpecimenWrapper(
-            SessionManager.getAppService()));
+        AliquotedSpecimenWrapper asw = new AliquotedSpecimenWrapper(
+            SessionManager.getAppService());
+        asw.setStudy(study);
+        addOrEditAliquotedSpecimen(true, asw);
     }
 
     private void addOrEditAliquotedSpecimen(boolean add,
@@ -166,7 +168,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     public void reload() {
-        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection();
+        selectedAliquotedSpecimen = study.getAliquotedSpecimenCollection(true);
         if (selectedAliquotedSpecimen == null) {
             selectedAliquotedSpecimen = new ArrayList<AliquotedSpecimenWrapper>();
         }

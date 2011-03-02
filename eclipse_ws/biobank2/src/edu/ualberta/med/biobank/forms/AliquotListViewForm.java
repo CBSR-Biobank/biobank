@@ -9,22 +9,22 @@ import org.eclipse.swt.layout.GridLayout;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
-import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 
 public class AliquotListViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.AliquotListViewForm";
 
-    private AliquotListInfoTable aliquotsWidget;
+    private SpecimenInfoTable specimensWidget;
 
-    private List<SpecimenWrapper> aliquots;
+    private List<SpecimenWrapper> speicmens;
 
     @SuppressWarnings("unchecked")
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter == null, "adapter should be null");
         FormInput input = (FormInput) getEditorInput();
-        aliquots = (List<SpecimenWrapper>) input.getAdapter(ArrayList.class);
-        Assert.isNotNull(aliquots, "aliquots are null");
+        speicmens = (List<SpecimenWrapper>) input.getAdapter(ArrayList.class);
+        Assert.isNotNull(speicmens, "aliquots are null");
         setPartName("Non Active Aliquots");
     }
 
@@ -35,10 +35,10 @@ public class AliquotListViewForm extends BiobankViewForm {
         form.setImage(BioBankPlugin.getDefault().getImage(
             BioBankPlugin.IMG_ALIQUOT));
 
-        aliquotsWidget = new AliquotListInfoTable(page, aliquots,
-            AliquotListInfoTable.ColumnsShown.PNUMBER);
-        aliquotsWidget.adaptToToolkit(toolkit, true);
-        aliquotsWidget.addClickListener(collectionDoubleClickListener);
+        specimensWidget = new SpecimenInfoTable(page, speicmens,
+            SpecimenInfoTable.ColumnsShown.ALL, 20);
+        specimensWidget.adaptToToolkit(toolkit, true);
+        specimensWidget.addClickListener(collectionDoubleClickListener);
     }
 
     @Override

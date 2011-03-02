@@ -105,6 +105,30 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         table.setLayoutData(gd);
 
+        setHeadings(headings, columnWidths);
+        tableViewer.setUseHashlookup(true);
+        tableViewer.setLabelProvider(getLabelProvider());
+        tableViewer.setContentProvider(new ArrayContentProvider());
+
+        addPaginationWidget();
+
+        if (collection != null)
+            setCollection(collection);
+
+        menu = new Menu(parent);
+        tableViewer.getTable().setMenu(menu);
+
+        autoSizeColumns = columnWidths == null ? true : false;
+
+        addClipboardCopySupport();
+
+    }
+
+    public void setHeadings(String[] headings) {
+        setHeadings(headings, null);
+    }
+
+    public void setHeadings(String[] headings, int[] columnWidths) {
         int index = 0;
         if (headings != null) {
             for (String name : headings) {
@@ -128,22 +152,6 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             }
             tableViewer.setColumnProperties(headings);
         }
-        tableViewer.setUseHashlookup(true);
-        tableViewer.setLabelProvider(getLabelProvider());
-        tableViewer.setContentProvider(new ArrayContentProvider());
-
-        addPaginationWidget();
-
-        if (collection != null)
-            setCollection(collection);
-
-        menu = new Menu(parent);
-        tableViewer.getTable().setMenu(menu);
-
-        autoSizeColumns = columnWidths == null ? true : false;
-
-        addClipboardCopySupport();
-
     }
 
     protected abstract boolean isEditMode();

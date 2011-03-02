@@ -318,7 +318,8 @@ public class DispatchCreateScanDialog extends
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell
                 .getRandomAliquotsAlreadyAssigned(SessionManager
-                    .getAppService(), (currentShipment).getSender().getId());
+                    .getAppService(), (currentShipment).getSenderCenter()
+                    .getId());
             return cells;
         } else {
             for (SpecimenWrapper aliquot : currentPallet.getSpecimens()

@@ -109,9 +109,9 @@ public class SpecimenEntryWidget extends BiobankWidget {
         }
 
         if (editable) {
-            specTable = new SpecimenEntryInfoTable(this, null);
+            specTable = new SpecimenEntryInfoTable(this, null, ColumnsShown.ALL);
         } else {
-            specTable = new SpecimenInfoTable(this, null);
+            specTable = new SpecimenInfoTable(this, null, ColumnsShown.ALL, 20);
         }
 
         specTable.adaptToToolkit(toolkit, true);

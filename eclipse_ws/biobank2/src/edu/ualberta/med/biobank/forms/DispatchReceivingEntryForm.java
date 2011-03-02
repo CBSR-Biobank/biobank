@@ -27,7 +27,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
     @Override
     protected void createFormContent() throws Exception {
         form.setText("Dispatch sent on " + dispatch.getFormattedDeparted()
-            + " from " + dispatch.getSender().getNameShort());
+            + " from " + dispatch.getSenderCenter().getNameShort());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
@@ -51,7 +51,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
     protected void openScanDialog() {
         DispatchReceiveScanDialog dialog = new DispatchReceiveScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, dispatch.getReceiver());
+            dispatch, dispatch.getReceiverCenter());
         dialog.open();
         if (dialog.hasReceivedAliquots()) {
             setDirty(true);
@@ -67,15 +67,12 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        BiobankText studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Study");
-        setTextValue(studyLabel, dispatch.getStudy().getName());
         BiobankText senderLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Sender");
-        setTextValue(senderLabel, dispatch.getSender().getName());
+        setTextValue(senderLabel, dispatch.getSenderCenter().getName());
         BiobankText receiverLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Receiver");
-        setTextValue(receiverLabel, dispatch.getReceiver().getName());
+        setTextValue(receiverLabel, dispatch.getReceiverCenter().getName());
         BiobankText departedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Departed");
         setTextValue(departedLabel, dispatch.getFormattedDeparted());

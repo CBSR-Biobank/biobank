@@ -13,14 +13,14 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.model.Study;
@@ -34,9 +34,9 @@ import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SampleStorageHelper;
-import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SourceVesselHelper;
+import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 import edu.ualberta.med.biobank.test.internal.StudySourceVesselHelper;
 
@@ -231,8 +231,8 @@ public class TestStudy extends TestDatabase {
         int nber = SampleStorageHelper.addSampleStorages(study, site, name);
 
         SpecimenTypeWrapper type = SpecimenTypeHelper.addSampleType(name);
-        AliquotedSpecimenWrapper newStorage = SampleStorageHelper.newSampleStorage(
-            study, type);
+        AliquotedSpecimenWrapper newStorage = SampleStorageHelper
+            .newSampleStorage(study, type);
         study.addToSampleStorageCollection(Arrays.asList(newStorage));
         study.persist();
 
@@ -251,7 +251,8 @@ public class TestStudy extends TestDatabase {
 
         List<AliquotedSpecimenWrapper> storages = study
             .getSampleStorageCollection(false);
-        AliquotedSpecimenWrapper storage = DbHelper.chooseRandomlyInList(storages);
+        AliquotedSpecimenWrapper storage = DbHelper
+            .chooseRandomlyInList(storages);
         study.removeFromSampleStorageCollection(Arrays.asList(storage));
         study.persist();
 
@@ -318,8 +319,7 @@ public class TestStudy extends TestDatabase {
 
         List<SourceSpecimenWrapper> sources = study
             .getStudySourceVesselCollection(false);
-        SourceSpecimenWrapper source = DbHelper
-            .chooseRandomlyInList(sources);
+        SourceSpecimenWrapper source = DbHelper.chooseRandomlyInList(sources);
         // don't have to delete the storage thanks to
         // deleteSourceVesselDifference method
         SourceVesselHelper.createdSourceVessels.remove(source);
@@ -1029,24 +1029,6 @@ public class TestStudy extends TestDatabase {
 
         Assert.assertTrue(study.compareTo(study2) > 0);
         Assert.assertTrue(study2.compareTo(study) < 0);
-    }
-
-    @Test
-    public void testHasClinic() throws Exception {
-        String name = "testHasClinic" + r.nextInt();
-        ClinicWrapper clinic1 = ClinicHelper.addClinic(name);
-        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
-        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
-        ContactHelper.addContact(clinic2, name);
-
-        StudyWrapper study = StudyHelper.addStudy(name);
-        study.addToContactCollection(Arrays.asList(contact1));
-        study.persist();
-
-        study.reload();
-
-        Assert.assertTrue(study.hasClinic(clinic1.getNameShort()));
-        Assert.assertFalse(study.hasClinic(clinic2.getNameShort()));
     }
 
     @Test

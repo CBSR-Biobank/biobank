@@ -33,7 +33,7 @@ public class StudySiteInfoTable extends InfoTableWidget<SiteWrapper> {
     public StudySiteInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null, HEADINGS, 10);
         this.study = study;
-        setCollection(study.getSiteCollection());
+        setCollection(study.getSiteCollection(true));
     }
 
     @Override
@@ -69,8 +69,8 @@ public class StudySiteInfoTable extends InfoTableWidget<SiteWrapper> {
         throws Exception {
         TableRowData info = new TableRowData();
         info.siteNameShort = site.getNameShort();
-        info.patientCount = study.getPatientCountForSite(site);
-        info.visitCount = study.getPatientVisitCountForSite(site);
+        info.patientCount = study.getPatientCountForCenter(site);
+        info.visitCount = site.getCollectionEventCountForStudy(study);
         return info;
     }
 

@@ -77,7 +77,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         PatientWrapper patient = getPatient(appService, patientNumber);
         if (patient != null) {
             StudyWrapper study = patient.getStudy();
-            List<SiteWrapper> sites = study.getSiteCollection();
+            List<SiteWrapper> sites = study.getSiteCollection(false);
             boolean canRead = false;
             for (SiteWrapper site : sites) {
                 if (user.hasPrivilegeOnObject(Privilege.READ, null, Site.class,
@@ -257,7 +257,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         // won't use siteId because patient is not site specific (will be null)
         StudyWrapper study = getStudy();
         if (study != null) {
-            List<SiteWrapper> sites = study.getSiteCollection();
+            List<SiteWrapper> sites = study.getSiteCollection(false);
             for (SiteWrapper site : sites) {
                 // if can update at least one site, then can add/update a
                 // patient to the linked study
@@ -338,8 +338,18 @@ public class PatientWrapper extends PatientBaseWrapper {
             specs.addAll(ce.getSpecimenCollection());
         for (SpecimenWrapper spec : specs) {
             pes.addAll(spec.getProcessingEventCollection());
-            pes.add(spec.getProcessingEvent());
+            pes.add(spec.getParentProcessingEvent());
         }
         return pes;
+    }
+
+    public int getSourceSpecimensCount() {
+        // FIXME Do we want to display that or something else ?
+        return -1;
+    }
+
+    public int getAliquotedSpecimensCount() {
+        // FIXME Do we want to display that or something else ?
+        return -1;
     }
 }

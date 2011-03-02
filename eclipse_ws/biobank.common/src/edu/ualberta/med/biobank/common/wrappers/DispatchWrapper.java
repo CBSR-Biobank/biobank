@@ -63,10 +63,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
-        if (getSender() == null) {
+        if (getSenderCenter() == null) {
             throw new BiobankCheckException("Sender should be set");
         }
-        if (getReceiver() == null) {
+        if (getReceiverCenter() == null) {
             throw new BiobankCheckException("Receiver should be set");
         }
 
@@ -74,7 +74,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             throw new BiobankCheckException("A dispatch with waybill "
                 + getShipmentInfo().getWaybill()
                 + " already exists for sending site "
-                + getSender().getNameShort());
+                + getSenderCenter().getNameShort());
         }
     }
 
@@ -89,13 +89,13 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private static final String WAYBILL_UNIQUE_FOR_SENDER_QRY = "from "
         + Dispatch.class.getName() + " where "
-        + Property.concatNames(DispatchPeer.SENDER, CenterPeer.ID) + "=? and "
-        + ShipmentInfoPeer.WAYBILL.getName() + "=?";
+        + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
+        + "=? and " + ShipmentInfoPeer.WAYBILL.getName() + "=?";
 
     private boolean checkWaybillUniqueForSender() throws ApplicationException,
         BiobankCheckException {
         List<Object> params = new ArrayList<Object>();
-        CenterWrapper<?> sender = getSender();
+        CenterWrapper<?> sender = getSenderCenter();
         if (sender == null) {
             throw new BiobankCheckException("sender site cannot be null");
         }
@@ -280,12 +280,12 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 + aliquot.getInventoryId()
                 + ": it has no position. A position should be first assigned.");
         }
-        if (!aliquot.getParent().getSite().equals(getSender())) {
+        if (!aliquot.getParent().getSite().equals(getSenderCenter())) {
             throw new BiobankCheckException("Aliquot "
                 + aliquot.getInventoryId() + " is currently assigned to site "
                 + aliquot.getParent().getSite().getNameShort()
                 + ". It should be first assigned to "
-                + getSender().getNameShort() + " site.");
+                + getSenderCenter().getNameShort() + " site.");
         }
         if (currentAliquots != null && currentAliquots.contains(aliquot)) {
             throw new BiobankCheckException(aliquot.getInventoryId()
@@ -371,9 +371,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private static final String DISPATCHES_IN_SITE_QRY = "from "
         + Dispatch.class.getName() + " where ("
-        + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID) + "=? or "
-        + Property.concatNames(DispatchPeer.RECEIVER, SitePeer.ID) + "=?) and "
-        + ShipmentInfoPeer.WAYBILL.getName() + "=?";
+        + Property.concatNames(DispatchPeer.SENDER_CENTER, SitePeer.ID)
+        + "=? or "
+        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, SitePeer.ID)
+        + "=?) and " + ShipmentInfoPeer.WAYBILL.getName() + "=?";
 
     /**
      * Search for shipments with the given waybill. Site can be the sender or
@@ -394,9 +395,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     private static final String DISPATCHES_IN_SITE_BY_DATE_SENT_QRY = "from "
         + Dispatch.class.getName() + " where ("
-        + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID) + "=? or "
-        + Property.concatNames(DispatchPeer.RECEIVER, SitePeer.ID) + "=?) and "
-        + ShipmentInfoPeer.RECEIVED_AT.getName() + ">=? and "
+        + Property.concatNames(DispatchPeer.SENDER_CENTER, SitePeer.ID)
+        + "=? or "
+        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, SitePeer.ID)
+        + "=?) and " + ShipmentInfoPeer.RECEIVED_AT.getName() + ">=? and "
         + ShipmentInfoPeer.RECEIVED_AT.getName() + "<=?";
 
     /**
@@ -431,9 +433,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     private static final String DISPATCHES_IN_SITE_BY_DATE_RECEIVED_QRY = "from "
         + Dispatch.class.getName()
         + " where ("
-        + Property.concatNames(DispatchPeer.SENDER, SitePeer.ID)
+        + Property.concatNames(DispatchPeer.SENDER_CENTER, SitePeer.ID)
         + "=? or "
-        + Property.concatNames(DispatchPeer.RECEIVER, SitePeer.ID)
+        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, SitePeer.ID)
         + "=?) and "
         + ShipmentInfoPeer.RECEIVED_AT.getName()
         + " >=? and "
@@ -472,15 +474,16 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
-        sb.append(getSender() == null ? "" : getSender().getNameShort() + "/");
-        sb.append(getReceiver() == null ? "" : getReceiver().getNameShort()
-            + "/");
+        sb.append(getSenderCenter() == null ? "" : getSenderCenter()
+            .getNameShort() + "/");
+        sb.append(getReceiverCenter() == null ? "" : getReceiverCenter()
+            .getNameShort() + "/");
         sb.append(getShipmentInfo().getFormattedDateReceived());
         return sb.toString();
     }
 
     public boolean canBeSentBy(User user, CenterWrapper<?> site) {
-        return canUpdate(user) && getSender().equals(site)
+        return canUpdate(user) && getSenderCenter().equals(site)
             && isInCreationState() && hasDispatchSpecimens();
     }
 
@@ -490,7 +493,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public boolean canBeReceivedBy(User user, CenterWrapper<?> site) {
-        return canUpdate(user) && getReceiver().equals(site)
+        return canUpdate(user) && getReceiverCenter().equals(site)
             && isInTransitState();
     }
 
@@ -561,10 +564,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     }
 
-    @Deprecated
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
-        // TODO Auto-generated method stub
-        return null;
+        return getDispatchSpecimenCollection(false);
     }
 
     @Deprecated

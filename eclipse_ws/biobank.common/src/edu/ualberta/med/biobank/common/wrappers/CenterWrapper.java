@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
@@ -120,28 +119,19 @@ public abstract class CenterWrapper<E extends Center> extends
         return list.size();
     }
 
-    public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
-        + Center.class.getName()
-        + " as center join center."
-        + CenterPeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs join spcs."
-        + SpecimenPeer.COLLECTION_EVENT.getName()
-        + " as cevent where center"
-        + CenterPeer.ID.getName() + "=?";
+    /**
+     * Collection event count for this centre. This count is different for each
+     * centre: the method should be defined in each centre type
+     */
+    public abstract long getCollectionEventCount() throws ApplicationException,
+        BiobankException;
 
-    public long getCollectionEventCount() throws ApplicationException,
-        BiobankException {
-        HQLCriteria criteria = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, criteria);
-    }
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    public long getCollectionEventCount(boolean fast)
-        throws ApplicationException, BiobankException {
-        return -1;
-    }
+    /**
+     * Collection event count for this centre. This count is different for each
+     * centre: the method should be defined in each centre type
+     */
+    public abstract long getCollectionEventCountForStudy(StudyWrapper study)
+        throws ApplicationException, BiobankException;
 
     @SuppressWarnings("unused")
     @Deprecated
