@@ -2,6 +2,9 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -9,12 +12,15 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -200,42 +206,44 @@ public class PatientWrapper extends PatientBaseWrapper {
         return null;
     }
 
-    // private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY =
-    // "select visits from "
-    // + Patient.class.getName()
-    // + " as p join p."
-    // + PatientPeer.PROCESSING_EVENT_COLLECTION.getName()
-    // + " as pes where p."
-    // + PatientPeer.ID.getName()
-    // + "=? and pes."
-    // + CollectionEventPeer.DATE_PROCESSED.getName()
-    // + ">? and pes."
-    // + CollectionEventPeer.DATE_PROCESSED.getName() + "<?";
+    private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY = "select pEvent from "
+        + Patient.class.getName()
+        + " as p join p."
+        + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
+        + " as ces join ces."
+        + CollectionEventPeer.SPECIMEN_COLLECTION.getName()
+        + " as specimens join specimens."
+        + SpecimenPeer.PROCESSING_EVENT_COLLECTION.getName()
+        + " as pes where p."
+        + PatientPeer.ID.getName()
+        + "=? and pes."
+        + ProcessingEventPeer.CREATED_AT.getName()
+        + ">? and pes."
+        + ProcessingEventPeer.CREATED_AT.getName() + "<?";
 
-    public List<CollectionEventWrapper> getLast7DaysCollectionEvents(
+    @Deprecated
+    // FIXME :in Scan Link, wants the collection event instead. What is a last 7
+    // days collection events if we don't have the date drawn on the collection
+    // event itself ?
+    public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
         SiteWrapper site) throws ApplicationException {
-        // Calendar cal = Calendar.getInstance();
-        // // today midnight
-        // cal.add(Calendar.DATE, 1);
-        // cal.set(Calendar.AM_PM, Calendar.AM);
-        // cal.set(Calendar.HOUR, 0);
-        // cal.set(Calendar.MINUTE, 0);
-        // cal.set(Calendar.SECOND, 0);
-        // Date endDate = cal.getTime();
-        // // 7 days ago, at midnight
-        // cal.add(Calendar.DATE, -8);
-        // Date startDate = cal.getTime();
-        // HQLCriteria criteria = new HQLCriteria(
-        // LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
-        // getId(), site.getId(), startDate, endDate }));
-        // List<CollectionEvent> res = appService.query(criteria);
-        // List<CollectionEventWrapper> visits = new
-        // ArrayList<CollectionEventWrapper>();
-        // for (CollectionEvent v : res) {
-        // visits.add(new CollectionEventWrapper(appService, v));
-        // }
-        // return visits;
-        return null;
+        Calendar cal = Calendar.getInstance();
+        // today midnight
+        cal.add(Calendar.DATE, 1);
+        cal.set(Calendar.AM_PM, Calendar.AM);
+        cal.set(Calendar.HOUR, 0);
+        cal.set(Calendar.MINUTE, 0);
+        cal.set(Calendar.SECOND, 0);
+        Date endDate = cal.getTime();
+        // 7 days ago, at midnight
+        cal.add(Calendar.DATE, -8);
+        Date startDate = cal.getTime();
+        HQLCriteria criteria = new HQLCriteria(
+            LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
+                getId(), site.getId(), startDate, endDate }));
+        List<ProcessingEvent> res = appService.query(criteria);
+        return ModelWrapper.wrapModelCollection(appService, res,
+            ProcessingEventWrapper.class);
     }
 
     @Override
@@ -308,13 +316,6 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     @Deprecated
-    public List<ProcessingEventWrapper> getLast7DaysPatientVisits(
-        SiteWrapper site) throws ApplicationException {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
     public String getSourceSpecimenCount() {
         // TODO New method. Need to be implemented !
         return null;
@@ -326,12 +327,27 @@ public class PatientWrapper extends PatientBaseWrapper {
         return null;
     }
 
-    public List<CollectionEventWrapper> getCollectionEventCollection() {
-        return getCollectionEventCollection(false);
+    public List<CollectionEventWrapper> getCollectionEventCollection(
+        boolean sort, final boolean ascending) {
+        List<CollectionEventWrapper> cEvents = getCollectionEventCollection(false);
+        if (sort) {
+            Collections.sort(cEvents, new Comparator<CollectionEventWrapper>() {
+                @Override
+                public int compare(CollectionEventWrapper ce1,
+                    CollectionEventWrapper ce2) {
+                    int res = ce1.compareTo(ce2);
+                    if (ascending) {
+                        return res;
+                    }
+                    return -res;
+                }
+            });
+        }
+        return cEvents;
     }
 
     public List<ProcessingEventWrapper> getProcessingEventCollection() {
-        List<CollectionEventWrapper> ces = getCollectionEventCollection();
+        List<CollectionEventWrapper> ces = getCollectionEventCollection(false);
         List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
         List<ProcessingEventWrapper> pes = new ArrayList<ProcessingEventWrapper>();
         for (CollectionEventWrapper ce : ces)
@@ -352,4 +368,5 @@ public class PatientWrapper extends PatientBaseWrapper {
         // FIXME Do we want to display that or something else ?
         return -1;
     }
+
 }
