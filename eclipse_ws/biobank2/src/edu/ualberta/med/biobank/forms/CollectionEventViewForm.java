@@ -16,7 +16,8 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTableOld;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
@@ -40,7 +41,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     @SuppressWarnings("unused")
     private BiobankText commentLabel;
 
-    private SpecimenInfoTableOld table;
+    private SpecimenInfoTable table;
 
     private class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
@@ -140,7 +141,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createSpecimensSection() {
         Composite client = createSectionWithClient("Source Vessels");
-        table = new SpecimenInfoTableOld(client, cevent.getSpecimenCollection());
+        table = new SpecimenInfoTable(client, cevent.getSpecimenCollection(),
+            ColumnsShown.CEVENT_FORM, 10);
         table.adaptToToolkit(toolkit, true);
     }
 
