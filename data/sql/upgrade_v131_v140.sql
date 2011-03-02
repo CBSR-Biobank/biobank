@@ -221,19 +221,19 @@ ALTER TABLE container_type
   ADD CONSTRAINT uc_containertype_nameshort UNIQUE KEY(name_short,site_id);
 
 /*****************************************************
- *
+ * positions
  ****************************************************/
 
-#ALTER TABLE abstract_position
-#      DROP INDEX FKBC4AE0A6898584F,
-#      CHANGE COLUMN ALIQUOT_ID SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
-#      ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
-#      ADD CONSTRAINT SPECIMEN_ID UNIQUE KEY(SPECIMEN_ID);
+ALTER TABLE abstract_position
+      DROP INDEX FKBC4AE0A6898584F,
+      CHANGE COLUMN row row INT(11) NOT NULL,
+      CHANGE COLUMN col col INT(11) NOT NULL,
+      CHANGE COLUMN ALIQUOT_ID SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN POSITION_STRING VARCHAR(50) NULL DEFAULT NULL COMMENT '',
+      ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
+      ADD CONSTRAINT SPECIMEN_ID UNIQUE KEY(SPECIMEN_ID);
 
-ALTER TABLE abstract_position ADD COLUMN POSITION_STRING VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL COMMENT '';
-
-
--- update POSITION_STRING values
+-- update position_string values
 -- SBS Standard
 
 UPDATE abstract_position ap, container c, container_type ct
@@ -256,19 +256,10 @@ UPDATE abstract_position ap, container c, container_type ct
        WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition'
        AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 5;
 
-alter table Abstract_Position
- change column row row integer not null,
- change column col col integer not null;
 
-
-######################################################
---
-######################################################
-
-UPDATE abstract_position ap, container c, container_type ct
-       SET position_string = CONCAT(SUBSTR("ABCDEFGHJ", row + 1, 1), col + 1)
-       WHERE ap.container_id = c.id AND ap.discriminator = 'AliquotPosition'
-       AND c.container_type_id = ct.id and ct.child_labeling_scheme_id = 5;
+/*****************************************************
+ *
+ ****************************************************/
 
 ALTER TABLE dispatch_aliquot
       CHANGE COLUMN DISPATCH_SHIPMENT_ID DISPATCH_ID INT(11) NOT NULL COMMENT '',
