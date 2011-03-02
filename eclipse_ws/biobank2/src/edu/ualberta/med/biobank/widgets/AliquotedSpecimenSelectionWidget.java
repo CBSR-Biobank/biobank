@@ -29,13 +29,14 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
- * Create 3 widgets to show types selection for samples on a pallet: one label,
- * one combo with different types and one text showing total number of samples
- * found
+ * Create widgets to show types selection for specimens on a pallet: one label,
+ * one combo with different source types, one combo with different result types
+ * and one text showing total number of samples found
  */
 public class AliquotedSpecimenSelectionWidget {
     private ComboViewer cvSource;
@@ -46,8 +47,10 @@ public class AliquotedSpecimenSelectionWidget {
 
     private IObservableValue selectionsDone = new WritableValue(Boolean.TRUE,
         Boolean.class);
+
     // [source|result]
     private Boolean[] selections = new Boolean[2];
+
     private Binding binding;
     private Object nextWidget;
 
@@ -76,8 +79,10 @@ public class AliquotedSpecimenSelectionWidget {
         setNumber(null);
 
         controlDecoration = BiobankWidget
-            .createDecorator(textNumber,
-                "A source specimen type and an aliquoted specimen type should be selected");
+            .createDecorator(
+                textNumber,
+                Messages
+                    .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
     }
 
     private void setComboProperties(ComboViewer cv, FormToolkit toolkit,
@@ -132,6 +137,7 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     public void addSelectionChangedListener(ISelectionChangedListener listener) {
+        cvSource.addSelectionChangedListener(listener);
         cvResult.addSelectionChangedListener(listener);
     }
 
@@ -148,7 +154,7 @@ public class AliquotedSpecimenSelectionWidget {
         } else {
             cvSource.getControl().setEnabled(true);
             cvResult.getControl().setEnabled(true);
-            selectionsDone.setValue(getResultSelection() != null);
+            selectionsDone.setValue(getResultTypeSelection() != null);
         }
         textNumber.setText(text);
     }
@@ -158,7 +164,7 @@ public class AliquotedSpecimenSelectionWidget {
             number = 0;
         number++;
         setNumber(number);
-        selectionsDone.setValue(getResultSelection() != null);
+        selectionsDone.setValue(getResultTypeSelection() != null);
     }
 
     public boolean canFocus() {
@@ -176,12 +182,12 @@ public class AliquotedSpecimenSelectionWidget {
         }
     }
 
-    public SpecimenTypeWrapper getResultSelection() {
+    public SpecimenTypeWrapper getResultTypeSelection() {
         return (SpecimenTypeWrapper) ((StructuredSelection) cvResult
             .getSelection()).getFirstElement();
     }
 
-    public SpecimenTypeWrapper getSelection() {
+    public SpecimenTypeWrapper getSourceTypeSelection() {
         return (SpecimenTypeWrapper) ((StructuredSelection) cvSource
             .getSelection()).getFirstElement();
     }
@@ -195,8 +201,8 @@ public class AliquotedSpecimenSelectionWidget {
                 public IStatus validate(Object value) {
                     if (value instanceof Boolean && !(Boolean) value) {
                         controlDecoration.show();
-                        return ValidationStatus
-                            .error("Type should be selected");
+                        return ValidationStatus.error(Messages
+                            .getString("AliquotedSpecimenSelectionWidget.selections.status.msg"));
                     } else {
                         controlDecoration.hide();
                         return Status.OK_STATUS;
@@ -245,8 +251,12 @@ public class AliquotedSpecimenSelectionWidget {
         this.nextWidget = nextWidget;
     }
 
-    public void setTypes(List<SpecimenTypeWrapper> types) {
+    public void setResultTypes(List<SpecimenTypeWrapper> types) {
         cvResult.setInput(types);
+    }
+
+    public void setSourceTypes(List<SpecimenTypeWrapper> types) {
+        cvSource.setInput(types);
     }
 
     public void setFocus() {
