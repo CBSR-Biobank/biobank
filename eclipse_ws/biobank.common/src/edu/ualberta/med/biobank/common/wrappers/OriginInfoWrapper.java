@@ -10,8 +10,9 @@ import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
-import edu.ualberta.med.biobank.model.OriginInfo;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -114,5 +115,21 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
             }
         }
 
+    }
+
+    public static List<OriginInfoWrapper> getTodayShipments(
+        BiobankApplicationService appService) throws ApplicationException {
+        StringBuilder qry = new StringBuilder(
+            "from "
+                + OriginInfo.class.getName()
+                + " as origin inner join fetch origin.shipmentInfo where origin.shipmentInfo is not null");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            new ArrayList<Object>());
+
+        List<OriginInfo> origins = appService.query(criteria);
+        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, OriginInfoWrapper.class);
+
+        return shipments;
     }
 }
