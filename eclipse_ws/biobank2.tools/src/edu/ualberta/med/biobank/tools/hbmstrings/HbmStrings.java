@@ -213,12 +213,8 @@ public class HbmStrings {
         reader.close();
     }
 
-    public static void main(String argv[]) {
-        try {
-            HbmStrings.getInstance().doWork(parseCommandLine(argv));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void main(String argv[]) throws URISyntaxException {
+        HbmStrings.getInstance().doWork(parseCommandLine(argv));
     }
 
     /*
