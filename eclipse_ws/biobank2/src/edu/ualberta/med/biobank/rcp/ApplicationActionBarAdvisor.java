@@ -23,7 +23,7 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 import org.eclipse.ui.commands.ICommandService;
 import org.eclipse.ui.handlers.IHandlerService;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
@@ -72,7 +72,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 try {
                     handlerService.executeCommand(commandId, null);
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Problem with command", e);
+                    BiobankPlugin.openAsyncError("Problem with command", e);
                 }
             }
         };
@@ -109,7 +109,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
                 try {
                     handlerService.executeCommand(cmd, null);
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Problem with command", e);
+                    BiobankPlugin.openAsyncError("Problem with command", e);
                 }
             }
         };

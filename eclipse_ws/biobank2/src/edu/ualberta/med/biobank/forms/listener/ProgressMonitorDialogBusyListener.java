@@ -8,7 +8,7 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.swt.widgets.Display;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.util.IBusyListener;
 
 public class ProgressMonitorDialogBusyListener implements IBusyListener {
@@ -40,12 +40,12 @@ public class ProgressMonitorDialogBusyListener implements IBusyListener {
                                 semaphore.release();
                                 monitor.done();
                             } catch (Exception e) {
-                                BioBankPlugin.openAsyncError("Thread Error", e);
+                                BiobankPlugin.openAsyncError("Thread Error", e);
                             }
                         }
                     });
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Loading Error", e);
+                    BiobankPlugin.openAsyncError("Loading Error", e);
                 }
             }
         });

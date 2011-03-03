@@ -63,7 +63,7 @@ import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
  * The activator class controls the plug-in life cycle
  */
 @SuppressWarnings("restriction")
-public class BioBankPlugin extends AbstractUIPlugin {
+public class BiobankPlugin extends AbstractUIPlugin {
 
     public static final String PLUGIN_ID = "biobank2";
 
@@ -150,83 +150,83 @@ public class BioBankPlugin extends AbstractUIPlugin {
     static {
         classToImageKey = new HashMap<String, String>();
         classToImageKey.put(SessionAdapter.class.getName(),
-            BioBankPlugin.IMG_SESSIONS);
+            BiobankPlugin.IMG_SESSIONS);
         classToImageKey
-            .put(SiteAdapter.class.getName(), BioBankPlugin.IMG_SITE);
-        classToImageKey.put(SiteGroup.class.getName(), BioBankPlugin.IMG_SITES);
+            .put(SiteAdapter.class.getName(), BiobankPlugin.IMG_SITE);
+        classToImageKey.put(SiteGroup.class.getName(), BiobankPlugin.IMG_SITES);
         classToImageKey.put(AbstractClinicGroup.class.getName(),
-            BioBankPlugin.IMG_CLINICS);
+            BiobankPlugin.IMG_CLINICS);
         classToImageKey.put(AbstractStudyGroup.class.getName(),
-            BioBankPlugin.IMG_STUDIES);
+            BiobankPlugin.IMG_STUDIES);
         classToImageKey.put(ContainerTypeGroup.class.getName(),
-            BioBankPlugin.IMG_CONTAINER_TYPES);
+            BiobankPlugin.IMG_CONTAINER_TYPES);
         classToImageKey.put(ContainerGroup.class.getName(),
-            BioBankPlugin.IMG_CONTAINERS);
+            BiobankPlugin.IMG_CONTAINERS);
         classToImageKey.put(ClinicAdapter.class.getName(),
-            BioBankPlugin.IMG_CLINIC);
+            BiobankPlugin.IMG_CLINIC);
         classToImageKey.put(StudyAdapter.class.getName(),
-            BioBankPlugin.IMG_STUDY);
+            BiobankPlugin.IMG_STUDY);
         classToImageKey.put(PatientAdapter.class.getName(),
-            BioBankPlugin.IMG_PATIENT);
+            BiobankPlugin.IMG_PATIENT);
         classToImageKey.put(CollectionEventAdapter.class.getName(),
-            BioBankPlugin.IMG_PATIENT_VISIT);
+            BiobankPlugin.IMG_PATIENT_VISIT);
         classToImageKey.put(ShipmentAdapter.class.getName(),
-            BioBankPlugin.IMG_CLINIC_SHIPMENT);
+            BiobankPlugin.IMG_CLINIC_SHIPMENT);
         classToImageKey.put(AbstractSearchedNode.class.getName(),
-            BioBankPlugin.IMG_SEARCH);
+            BiobankPlugin.IMG_SEARCH);
         classToImageKey.put(AbstractTodayNode.class.getName(),
-            BioBankPlugin.IMG_TODAY);
+            BiobankPlugin.IMG_TODAY);
         classToImageKey.put(DateNode.class.getName(),
-            BioBankPlugin.IMG_CALENDAR);
+            BiobankPlugin.IMG_CALENDAR);
         classToImageKey.put(OutgoingNode.class.getName(),
-            BioBankPlugin.IMG_SENT);
+            BiobankPlugin.IMG_SENT);
         classToImageKey.put(IncomingNode.class.getName(),
-            BioBankPlugin.IMG_RECEIVED);
+            BiobankPlugin.IMG_RECEIVED);
         classToImageKey.put(InCreationDispatchGroup.class.getName(),
-            BioBankPlugin.IMG_DISPATCH_SHIPMENT_CREATION);
+            BiobankPlugin.IMG_DISPATCH_SHIPMENT_CREATION);
         classToImageKey.put(ReceivingInTransitDispatchGroup.class.getName(),
-            BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
+            BiobankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
         classToImageKey.put(SentInTransitDispatchGroup.class.getName(),
-            BioBankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
+            BiobankPlugin.IMG_DISPATCH_SHIPMENT_TRANSIT);
         classToImageKey.put(ReceivingNoErrorsDispatchGroup.class.getName(),
-            BioBankPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
+            BiobankPlugin.IMG_DISPATCH_SHIPMENT_RECEIVING);
         classToImageKey.put(ReceivingWithErrorsDispatchGroup.class.getName(),
-            BioBankPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
+            BiobankPlugin.IMG_DISPATCH_SHIPMENT_ERROR);
         classToImageKey.put(DispatchAdapter.class.getName(),
-            BioBankPlugin.IMG_DISPATCH_SHIPMENT);
+            BiobankPlugin.IMG_DISPATCH_SHIPMENT);
         classToImageKey.put(DispatchSiteAdapter.class.getName(),
-            BioBankPlugin.IMG_SITE);
+            BiobankPlugin.IMG_SITE);
         classToImageKey.put(RequestSiteAdapter.class.getName(),
-            BioBankPlugin.IMG_SITE);
+            BiobankPlugin.IMG_SITE);
         classToImageKey.put(ApprovedRequestNode.class.getName(),
-            BioBankPlugin.IMG_REQUEST);
+            BiobankPlugin.IMG_REQUEST);
         classToImageKey.put(RequestAdapter.class.getName(),
-            BioBankPlugin.IMG_REQUEST);
+            BiobankPlugin.IMG_REQUEST);
         classToImageKey.put(SpecimenAdapter.class.getName(),
-            BioBankPlugin.IMG_ALIQUOT);
+            BiobankPlugin.IMG_ALIQUOT);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
-        BioBankPlugin.IMG_BIN, BioBankPlugin.IMG_BOX,
-        BioBankPlugin.IMG_CABINET, BioBankPlugin.IMG_DRAWER,
-        BioBankPlugin.IMG_FREEZER, BioBankPlugin.IMG_HOTEL,
-        BioBankPlugin.IMG_PALLET, };
+        BiobankPlugin.IMG_BIN, BiobankPlugin.IMG_BOX,
+        BiobankPlugin.IMG_CABINET, BiobankPlugin.IMG_DRAWER,
+        BiobankPlugin.IMG_FREEZER, BiobankPlugin.IMG_HOTEL,
+        BiobankPlugin.IMG_PALLET, };
 
-    public static final String BARCODES_FILE = BioBankPlugin.class.getPackage()
+    public static final String BARCODES_FILE = BiobankPlugin.class.getPackage()
         .getName() + ".barcode";
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(BioBankPlugin.class.getName());
+        .getLogger(BiobankPlugin.class.getName());
 
     // The shared instance
-    private static BioBankPlugin plugin;
+    private static BiobankPlugin plugin;
 
     private ServiceRegistration policyRegistration;
 
     /**
      * The constructor
      */
-    public BioBankPlugin() {
+    public BiobankPlugin() {
     }
 
     /*
@@ -359,7 +359,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
      * 
      * @return the shared instance
      */
-    public static BioBankPlugin getDefault() {
+    public static BiobankPlugin getDefault() {
         return plugin;
     }
 
@@ -538,7 +538,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
     }
 
     public static boolean isRealScanEnabled() {
-        String realScan = Platform.getDebugOption(BioBankPlugin.PLUGIN_ID
+        String realScan = Platform.getDebugOption(BiobankPlugin.PLUGIN_ID
             + "/realScan");
         if (realScan != null) {
             return Boolean.valueOf(realScan);
@@ -576,11 +576,11 @@ public class BioBankPlugin extends AbstractUIPlugin {
                 imageKey = (String) object;
             }
         }
-        return BioBankPlugin.getDefault().getImageRegistry().get(imageKey);
+        return BiobankPlugin.getDefault().getImageRegistry().get(imageKey);
     }
 
     public static ImageDescriptor getImageDescriptor(String key) {
-        return BioBankPlugin.getDefault().getImageRegistry().getDescriptor(key);
+        return BiobankPlugin.getDefault().getImageRegistry().getDescriptor(key);
     }
 
     private Image getIconForTypeName(String typeName) {
@@ -588,7 +588,7 @@ public class BioBankPlugin extends AbstractUIPlugin {
             return null;
         }
         if (classToImageKey.containsKey(typeName)) {
-            return BioBankPlugin.getDefault().getImageRegistry()
+            return BiobankPlugin.getDefault().getImageRegistry()
                 .get(classToImageKey.get(typeName));
         }
 
@@ -601,10 +601,10 @@ public class BioBankPlugin extends AbstractUIPlugin {
         }
 
         if (imageKey == null)
-            imageKey = BioBankPlugin.IMG_FREEZER;
+            imageKey = BiobankPlugin.IMG_FREEZER;
 
         classToImageKey.put(typeName, imageKey);
-        return BioBankPlugin.getDefault().getImageRegistry().get(imageKey);
+        return BiobankPlugin.getDefault().getImageRegistry().get(imageKey);
     }
 
     private void registerP2Policy(BundleContext context) {

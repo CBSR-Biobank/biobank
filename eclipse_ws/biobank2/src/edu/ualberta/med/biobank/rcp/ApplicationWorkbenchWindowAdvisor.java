@@ -20,7 +20,7 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.eclipse.ui.services.ISourceProviderService;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -61,7 +61,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IProduct product = Platform.getProduct();
         String windowTitle = product.getName();
 
-        if (BioBankPlugin.getDefault().windowTitleShowVersionEnabled()) {
+        if (BiobankPlugin.getDefault().windowTitleShowVersionEnabled()) {
             windowTitle += " " + product.getDefiningBundle().getVersion();
         }
         return windowTitle;
@@ -190,7 +190,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                 mainWindowUpdateTitle();
             }
         };
-        BioBankPlugin.getDefault().getPreferenceStore()
+        BiobankPlugin.getDefault().getPreferenceStore()
             .addPropertyChangeListener(propertyListener);
 
     }

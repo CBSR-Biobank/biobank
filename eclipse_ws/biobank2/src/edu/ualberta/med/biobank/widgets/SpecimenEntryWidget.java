@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
@@ -99,8 +99,8 @@ public class SpecimenEntryWidget extends BiobankWidget {
                     }
                 });
             addButton = toolkit.createButton(this, "", SWT.PUSH);
-            addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-                .get(BioBankPlugin.IMG_ADD));
+            addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+                .get(BiobankPlugin.IMG_ADD));
             addButton.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
@@ -144,7 +144,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
                     addSpecimen(specimen);
                 }
             } catch (Exception e) {
-                BioBankPlugin.openAsyncError("Error while looking up specimen",
+                BiobankPlugin.openAsyncError("Error while looking up specimen",
                     e);
             }
         }
@@ -153,7 +153,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
     private void addSpecimen(SpecimenWrapper specimen) {
         // TODO: move into a listener?
         if (specimen != null && specimens.contains(specimen)) {
-            BioBankPlugin.openAsyncError("Error",
+            BiobankPlugin.openAsyncError("Error",
                 "Specimen " + specimen.getInventoryId()
                     + " has already been added to this list");
             return;
@@ -177,7 +177,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
 
             vetoListenerSupport.notifyListeners(postAdd);
         } catch (VetoException e) {
-            BioBankPlugin.openAsyncError("Error", e.getMessage());
+            BiobankPlugin.openAsyncError("Error", e.getMessage());
         }
     }
 
@@ -216,7 +216,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
 
                         vetoListenerSupport.notifyListeners(postDelete);
                     } catch (VetoException e) {
-                        BioBankPlugin.openAsyncError("Error", e.getMessage());
+                        BiobankPlugin.openAsyncError("Error", e.getMessage());
                     }
                 }
             }

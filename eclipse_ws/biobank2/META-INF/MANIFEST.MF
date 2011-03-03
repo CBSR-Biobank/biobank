@@ -6,7 +6,7 @@ Bundle-ClassPath: .,lib/gluegen.jar,lib/jasperreports-3.7.0.jar,lib/co
  mmons-beanutils-1.8.0.jar,lib/commons-digester-1.7.jar,lib/iText-2.1.
  0.jar,lib/DynamicJasper-3.0.14.jar,lib/jdt-compiler-3.1.1.jar,lib/Sup
  erCSV-1.52.jar,lib/spiffy-all-0.05.jar,lib/mailapi.jar,lib/smtp.jar
-Bundle-Activator: edu.ualberta.med.biobank.BioBankPlugin
+Bundle-Activator: edu.ualberta.med.biobank.BiobankPlugin
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ManifestVersion: 2
 Bundle-SymbolicName: biobank2; singleton:=true

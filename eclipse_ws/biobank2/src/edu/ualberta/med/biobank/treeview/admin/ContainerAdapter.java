@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -134,16 +134,16 @@ public class ContainerAdapter extends AdapterBase {
                             // newContainer.persist();
                             newContainer.reload();
                             monitor.done();
-                            BioBankPlugin.openAsyncInformation(
+                            BiobankPlugin.openAsyncInformation(
                                 "Aliquots moved", newContainer.getSpecimens()
                                     .size()
                                     + " aliquots are now in "
                                     + newContainer.getFullInfoLabel() + ".");
                         } catch (Exception e) {
-                            BioBankPlugin.openAsyncError("Move problem", e);
+                            BiobankPlugin.openAsyncError("Move problem", e);
                         }
                         monitor.done();
-                        BioBankPlugin.openAsyncInformation(
+                        BiobankPlugin.openAsyncInformation(
                             "Aliquots moved",
                             newContainer.getSpecimens().size()
                                 + " aliquots are now in "
@@ -159,7 +159,7 @@ public class ContainerAdapter extends AdapterBase {
                 getContainer().reload();
                 SessionManager.openViewForm(getContainer());
             } catch (Exception e) {
-                BioBankPlugin.openError(e.getMessage(), e);
+                BiobankPlugin.openError(e.getMessage(), e);
             }
         }
     }
@@ -197,7 +197,7 @@ public class ContainerAdapter extends AdapterBase {
                     oldParent.performExpand();
                 }
             } catch (Exception e) {
-                BioBankPlugin.openError(e.getMessage(), e);
+                BiobankPlugin.openError(e.getMessage(), e);
             }
         }
     }
@@ -213,7 +213,7 @@ public class ContainerAdapter extends AdapterBase {
         List<ContainerWrapper> newParentContainers = container
             .getPossibleParents(newLabel);
         if (newParentContainers.size() == 0) {
-            BioBankPlugin.openError("Move Error",
+            BiobankPlugin.openError("Move Error",
                 "A parent container with child \"" + newLabel
                     + "\" does not exist.");
             return false;
@@ -234,7 +234,7 @@ public class ContainerAdapter extends AdapterBase {
 
         ContainerWrapper currentChild = newParent.getChildByLabel(newLabel);
         if (currentChild != null) {
-            BioBankPlugin.openError("Move Error", "Container position \""
+            BiobankPlugin.openError("Move Error", "Container position \""
                 + newLabel
                 + "\" is not empty. Please choose a different location.");
             return false;
@@ -253,10 +253,10 @@ public class ContainerAdapter extends AdapterBase {
                 try {
                     container.persist();
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Move problem", e);
+                    BiobankPlugin.openAsyncError("Move problem", e);
                 }
                 monitor.done();
-                BioBankPlugin.openAsyncInformation("Container moved",
+                BiobankPlugin.openAsyncInformation("Container moved",
                     "The container " + oldLabel + " has been moved to "
                         + container.getLabel());
             }

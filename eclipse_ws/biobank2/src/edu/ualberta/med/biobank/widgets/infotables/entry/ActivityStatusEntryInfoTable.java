@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -115,7 +115,7 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                 return true;
 
             } catch (BiobankCheckException e) {
-                BioBankPlugin.openAsyncError("Error: addOrEditActivityStatus",
+                BiobankPlugin.openAsyncError("Error: addOrEditActivityStatus",
                     e);
             }
         }
@@ -154,9 +154,9 @@ public class ActivityStatusEntryInfoTable extends ActivityStatusInfoTable {
                         try {
                             activityStatus.deleteChecks();
                         } catch (final RemoteConnectFailureException exp) {
-                            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                            BiobankPlugin.openRemoteConnectErrorMessage(exp);
                         } catch (Exception e) {
-                            BioBankPlugin.openAsyncError("Cannot delete", e);
+                            BiobankPlugin.openAsyncError("Cannot delete", e);
                             return;
                         }
                     }

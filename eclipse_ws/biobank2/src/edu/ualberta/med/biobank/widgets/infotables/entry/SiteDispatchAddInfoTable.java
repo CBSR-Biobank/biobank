@@ -6,7 +6,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.select.SelectStudyDispatchSitesDialog;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
@@ -50,7 +50,7 @@ public class SiteDispatchAddInfoTable extends SiteDispatchInfoTable {
             public void deleteItem(InfoTableEvent event) {
                 StudySiteDispatch ssd = getSelection();
                 if (ssd != null) {
-                    if (!BioBankPlugin.openConfirm(
+                    if (!BiobankPlugin.openConfirm(
                         "Delete Dispatch to this site",
                         "Are you sure you want to delete this dispatch configuration to \""
                             + ssd.destSite.getNameShort() + "\" ?")) {

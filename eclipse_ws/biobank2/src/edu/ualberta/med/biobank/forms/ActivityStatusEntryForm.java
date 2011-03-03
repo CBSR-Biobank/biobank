@@ -5,7 +5,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -93,7 +93,7 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
         if (!SessionManager.canUpdate(ActivityStatusWrapper.class, null)
             && !SessionManager.canCreate(ActivityStatusWrapper.class, null)
             && !SessionManager.canDelete(ActivityStatusWrapper.class, null)) {
-            BioBankPlugin.openAccessDeniedErrorMessage();
+            BiobankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Activity Status editor. Access Denied.");
         }

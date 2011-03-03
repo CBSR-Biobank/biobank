@@ -12,7 +12,7 @@ import org.eclipse.swt.custom.BusyIndicator;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
@@ -36,7 +36,7 @@ public class AddUserHandler extends AbstractHandler implements IHandler {
                 try {
                     groups = SessionManager.getAppService().getSecurityGroups();
                 } catch (ApplicationException e) {
-                    BioBankPlugin.openAsyncError(GROUP_LOAD_ERROR_TITLE,
+                    BiobankPlugin.openAsyncError(GROUP_LOAD_ERROR_TITLE,
                         GROUP_LOAD_ERROR_MESSAGE);
                 }
 
@@ -46,7 +46,7 @@ public class AddUserHandler extends AbstractHandler implements IHandler {
                     user, groups, true);
                 int res = dlg.open();
                 if (res == Status.OK) {
-                    BioBankPlugin.openAsyncInformation(
+                    BiobankPlugin.openAsyncInformation(
                         USER_ADDED_TITLE,
                         MessageFormat.format(USER_ADDED_MESSAGE,
                             user.getLogin()));

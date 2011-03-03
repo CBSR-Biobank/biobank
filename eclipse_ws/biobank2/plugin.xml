@@ -187,13 +187,13 @@
        </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
-            name="Add Patient Visit">
+            id="edu.ualberta.med.biobank.commands.patients.collectionEventAdd"
+            name="Add Collection Event">
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="edu.ualberta.med.biobank.commands.patients.patientVisitDelete"
-            name="Delete Patient Visit">
+            id="edu.ualberta.med.biobank.commands.patients.collectionEventDelete"
+            name="Delete Collection Event">
      </command>
      <command
            categoryId="org.eclipse.ui.category.window"
@@ -630,8 +630,8 @@
          </enabledWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.PatientVisitAddHandler"
-            commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd">
+            class="edu.ualberta.med.biobank.handlers.CollectionEventAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd">
          <activeWhen>
             <and>
                <reference
@@ -929,9 +929,9 @@
                   style="push">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
-                  icon="icons/patientVisit_add.png"
-                  label="Add Patient Visit"
+                  commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd"
+                  icon="icons/collectionEvent_add.png"
+                  label="Add Collection Event"
                   style="push">
             </command>
             <command
@@ -1182,9 +1182,9 @@
                   style="push">
             </command>
             <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
-                  icon="icons/patientVisit_add.png"
-                  label="Add Patient Visit"
+                  commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd"
+                  icon="icons/collectionEvent_add.png"
+                  label="Add Collection Event"
                   style="push">
             </command>
             <command
@@ -1580,14 +1580,14 @@
       <editor
             class="edu.ualberta.med.biobank.forms.CollectionEventEntryForm"
             default="false"
-            icon="icons/patientVisit.png"
+            icon="icons/collectionEvent.png"
             id="edu.ualberta.med.biobank.forms.CollectionEventEntryForm"
             name="Collection Event Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.CollectionEventViewForm"
             default="false"
-            icon="icons/patientVisit.png"
+            icon="icons/collectionEvent.png"
             id="edu.ualberta.med.biobank.forms.CollectionEventViewForm"
             name="Collection Event View">
       </editor>
@@ -1717,9 +1717,9 @@
       <editor
             class="edu.ualberta.med.biobank.forms.PvListViewForm"
             default="false"
-            icon="icons/patientVisit.png"
+            icon="icons/collectionEvent.png"
             id="edu.ualberta.med.biobank.forms.PvListViewForm"
-            name="Patient Visit List">
+            name="Collection Event List">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ScanPlateForm"
@@ -1978,7 +1978,7 @@
             sequence="M3+P">
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.patients.patientVisitAdd"
+            commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd"
             contextId="edu.ualberta.med.biobank.perspective.processing"
             schemeId="biobank2.scheme"
             sequence="M3+V">

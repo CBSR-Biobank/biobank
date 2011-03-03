@@ -5,14 +5,14 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 
 public class PalletScanPreferencePage extends FieldEditorPreferencePage
     implements IWorkbenchPreferencePage {
 
     public PalletScanPreferencePage() {
         super(GRID);
-        setPreferenceStore(BioBankPlugin.getDefault().getPreferenceStore());
+        setPreferenceStore(BiobankPlugin.getDefault().getPreferenceStore());
     }
 
     /**

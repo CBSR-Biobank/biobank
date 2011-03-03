@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
@@ -99,15 +99,15 @@ public class RequestEntryFormBase extends BiobankFormBase {
         final BiobankText newAliquotText = new BiobankText(addComposite,
             SWT.NONE, toolkit);
         Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
-        addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_ADD));
+        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
                 try {
                     request.receiveAliquot(newAliquotText.getText());
                 } catch (Exception e1) {
-                    BioBankPlugin.openAsyncError("Save Error", e1);
+                    BiobankPlugin.openAsyncError("Save Error", e1);
                 }
                 newAliquotText.setFocus();
                 newAliquotText.setText("");
@@ -118,8 +118,8 @@ public class RequestEntryFormBase extends BiobankFormBase {
         toolkit.createLabel(addComposite, "or open scan dialog:");
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH);
-        openScanButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
+        openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -162,7 +162,7 @@ public class RequestEntryFormBase extends BiobankFormBase {
                     currentShipment.getAppService(), inventoryId,
                     SessionManager.getUser());
             } catch (Exception ae) {
-                BioBankPlugin.openAsyncError("Error retrieving aliquot", ae);
+                BiobankPlugin.openAsyncError("Error retrieving aliquot", ae);
             }
             if (aliquot == null) {
                 return new AliquotInfo(null, ResType.NOT_IN_DB);

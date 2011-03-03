@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 
 public class ExportErrorsLogsDialog extends BiobankDialog {
 
@@ -87,7 +87,7 @@ public class ExportErrorsLogsDialog extends BiobankDialog {
             if (parentFolder.canWrite())
                 createZip(selected);
             else {
-                BioBankPlugin.openAsyncError("Path problem",
+                BiobankPlugin.openAsyncError("Path problem",
                     "Cannot write in '" + parentFolder.getAbsolutePath() + "'");
                 openFileSelection();
             }
@@ -132,7 +132,7 @@ public class ExportErrorsLogsDialog extends BiobankDialog {
                         if (out != null)
                             out.close();
                     } catch (IOException e) {
-                        BioBankPlugin.openAsyncError("Error closing files", e);
+                        BiobankPlugin.openAsyncError("Error closing files", e);
                     }
                 }
                 exportComplete(zipFile);
@@ -146,7 +146,7 @@ public class ExportErrorsLogsDialog extends BiobankDialog {
         files.add(Platform.getLogFileLocation().toFile());
         // activitylog files of the current day
         if (needActivityLogsInfos) {
-            String activityLogsPath = BioBankPlugin.getActivityLogPath();
+            String activityLogsPath = BiobankPlugin.getActivityLogPath();
             File activityLogsFolder = new File(activityLogsPath);
             if (activityLogsFolder.exists() && activityLogsFolder.isDirectory()) {
                 final Calendar todayDate = Calendar.getInstance();
@@ -179,7 +179,7 @@ public class ExportErrorsLogsDialog extends BiobankDialog {
             props.load(ExportErrorsLogsDialog.class
                 .getResourceAsStream("ExportErrorsLogs.properties"));
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error retrieving log file list", e);
+            BiobankPlugin.openAsyncError("Error retrieving log file list", e);
         }
         if (needExportScannerInfos)
             files.addAll(getFilesListFromPropertiesKey(props, "scanner_files"));
@@ -204,14 +204,14 @@ public class ExportErrorsLogsDialog extends BiobankDialog {
     }
 
     protected void exportComplete(String zipFile) {
-        BioBankPlugin.openInformation("Export complete",
+        BiobankPlugin.openInformation("Export complete",
             "Log informations have been successfully exported in file "
                 + zipFile);
 
     }
 
     protected void openError(Exception e) {
-        BioBankPlugin.openAsyncError("Problem while exporting", e);
+        BiobankPlugin.openAsyncError("Problem while exporting", e);
     }
 
     private String openFileSelection() {

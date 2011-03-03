@@ -12,7 +12,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.AliquotedSpecimenPeer;
@@ -63,7 +63,7 @@ public class AliquotedSpecimenDialog extends BiobankDialog {
                         .getActiveActivityStatus(origAliquotedSpecimen
                             .getAppService()));
             } catch (Exception e) {
-                BioBankPlugin.openAsyncError("Database Error",
+                BiobankPlugin.openAsyncError("Database Error",
                     "Error while retrieving activity status");
             }
         } else {
@@ -90,8 +90,8 @@ public class AliquotedSpecimenDialog extends BiobankDialog {
     @Override
     protected Image getTitleAreaImage() {
         // FIXME should use another icon
-        return BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_COMPUTER_KEY);
+        return BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override
@@ -134,7 +134,7 @@ public class AliquotedSpecimenDialog extends BiobankDialog {
                         newAliquotedSpecimen
                             .setActivityStatus((ActivityStatusWrapper) selectedObject);
                     } catch (Exception e) {
-                        BioBankPlugin.openAsyncError(
+                        BiobankPlugin.openAsyncError(
                             "Error setting activity status", e);
                     }
                 }

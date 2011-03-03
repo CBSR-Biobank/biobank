@@ -19,7 +19,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -120,7 +120,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
         createContainerTypeSection();
         createContainsSection();
-
+        setChildContainerTypeSelection();
     }
 
     protected void createContainerTypeSection() throws ApplicationException {
@@ -143,9 +143,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
         }
         setDirty(true);
 
-        setFirstControl(client);
-
-        createBoundWidgetWithLabel(
+        BiobankText name = (BiobankText) createBoundWidgetWithLabel(
             client,
             BiobankText.class,
             SWT.NONE,
@@ -155,6 +153,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             ContainerTypePeer.NAME.getName(),
             new NonEmptyStringValidator(Messages
                 .getString("ContainerTypeEntryForm.name.validation.msg")));
+
+        setFirstControl(name);
 
         createBoundWidgetWithLabel(
             client,
@@ -225,7 +225,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                         containerType
                             .setChildLabelingSchemeName((String) selectedObject);
                     } catch (Exception e) {
-                        BioBankPlugin.openAsyncError(
+                        BiobankPlugin.openAsyncError(
                             Messages
                                 .getString("ContainerTypeEntryForm.scheme.error.msg"),
                             e);

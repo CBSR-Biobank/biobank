@@ -11,7 +11,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -66,7 +66,7 @@ public class BasicSiteCombo extends BiobankWidget {
                 comboViewer.setInput(allSites);
             }
         } catch (Exception e1) {
-            BioBankPlugin.openAsyncError("Failed to load sites", e1);
+            BiobankPlugin.openAsyncError("Failed to load sites", e1);
         }
     }
 

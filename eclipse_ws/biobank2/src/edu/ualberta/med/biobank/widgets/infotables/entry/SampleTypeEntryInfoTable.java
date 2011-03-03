@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -133,7 +133,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                         try {
                             if (!sampleType.isNew()
                                 && sampleType.isUsedBySamples()) {
-                                BioBankPlugin.openError(
+                                BiobankPlugin.openError(
                                     "Sample Type Delete Error",
                                     "Cannot delete sample type \""
                                         + sampleType.getName()
@@ -156,7 +156,7 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                             deletedSampleTypes.add(sampleType);
                             notifyListeners();
                         } catch (final RemoteConnectFailureException exp) {
-                            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                            BiobankPlugin.openRemoteConnectErrorMessage(exp);
                         } catch (Exception e) {
                             logger.error(
                                 "BioBankFormBase.createPartControl Error", e);
@@ -183,10 +183,10 @@ public class SampleTypeEntryInfoTable extends SampleTypeInfoTable {
                         "That sample type has already been added.");
             type.checkNameAndShortNameUnique();
         } catch (BiobankException bce) {
-            BioBankPlugin.openAsyncError("Check error", bce);
+            BiobankPlugin.openAsyncError("Check error", bce);
             return false;
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Check error", e);
+            BiobankPlugin.openAsyncError("Check error", e);
             return false;
         }
         return true;
