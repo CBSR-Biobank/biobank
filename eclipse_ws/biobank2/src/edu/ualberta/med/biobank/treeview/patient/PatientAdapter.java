@@ -69,7 +69,7 @@ public class PatientAdapter extends AdapterBase {
         if (isEditable()
             && SessionManager.canCreate(ProcessingEventWrapper.class, null)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
-            mi.setText("Add collection event");
+            mi.setText("Add Collection Event");
             mi.addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent event) {
@@ -103,7 +103,7 @@ public class PatientAdapter extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         getWrapper().reload();
-        return getWrapper().getProcessingEventCollection();
+        return getWrapper().getCollectionEventCollection();
     }
 
     @Override

@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.peer.SourceSpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
@@ -74,8 +74,8 @@ public class SourceSpecimenDialog extends BiobankDialog {
     @Override
     protected Image getTitleAreaImage() {
         // FIXME should use another icon
-        return BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_COMPUTER_KEY);
+        return BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_COMPUTER_KEY);
     }
 
     @Override

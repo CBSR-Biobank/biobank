@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Label;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -109,7 +109,7 @@ public class DispatchViewForm extends BiobankViewForm {
         canSeeEverything = true;
         if (dispatch.getSenderCenter() == null) {
             canSeeEverything = false;
-            BioBankPlugin
+            BiobankPlugin
                 .openAsyncError(
                     "Access Denied",
                     "It seems you don't have access to the sender site. Please see administrator to resolve this problem.");
@@ -119,7 +119,7 @@ public class DispatchViewForm extends BiobankViewForm {
         }
         if (dispatch.getReceiverCenter() == null) {
             canSeeEverything = false;
-            BioBankPlugin
+            BiobankPlugin
                 .openAsyncError(
                     "Access Denied",
                     "It seems you don't have access to the receiver site. Please see administrator to resolve this problem.");
@@ -255,19 +255,19 @@ public class DispatchViewForm extends BiobankViewForm {
                                 try {
                                     dispatch.persist();
                                 } catch (final RemoteConnectFailureException exp) {
-                                    BioBankPlugin
+                                    BiobankPlugin
                                         .openRemoteConnectErrorMessage(exp);
                                     return;
                                 } catch (final RemoteAccessException exp) {
-                                    BioBankPlugin
+                                    BiobankPlugin
                                         .openRemoteAccessErrorMessage(exp);
                                     return;
                                 } catch (final AccessDeniedException ade) {
-                                    BioBankPlugin
+                                    BiobankPlugin
                                         .openAccessDeniedErrorMessage(ade);
                                     return;
                                 } catch (Exception ex) {
-                                    BioBankPlugin.openAsyncError("Save error",
+                                    BiobankPlugin.openAsyncError("Save error",
                                         ex);
                                     return;
                                 }
@@ -275,7 +275,7 @@ public class DispatchViewForm extends BiobankViewForm {
                             }
                         });
                     } catch (Exception e1) {
-                        BioBankPlugin.openAsyncError("Save error", e1);
+                        BiobankPlugin.openAsyncError("Save error", e1);
                     }
                     DispatchAdministrationView.getCurrent().reload();
                     dispatchAdapter.openViewForm();

@@ -8,7 +8,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.internal.WorkbenchMessages;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 
 @SuppressWarnings("restriction")
 public class GeneralPreferencePage extends FieldEditorPreferencePage implements
@@ -20,7 +20,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
 
     public GeneralPreferencePage() {
         super(GRID);
-        setPreferenceStore(BioBankPlugin.getDefault().getPreferenceStore());
+        setPreferenceStore(BiobankPlugin.getDefault().getPreferenceStore());
     }
 
     @Override
@@ -51,7 +51,7 @@ public class GeneralPreferencePage extends FieldEditorPreferencePage implements
         PlatformUI.getPreferenceStore().setValue(
             IWorkbenchPreferenceConstants.SHOW_MEMORY_MONITOR,
             showHeapFieldEditor.getBooleanValue());
-        BioBankPlugin.getDefault().updateHeapStatus(
+        BiobankPlugin.getDefault().updateHeapStatus(
             showHeapFieldEditor.getBooleanValue());
         return true;
     }

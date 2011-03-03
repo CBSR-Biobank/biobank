@@ -15,7 +15,7 @@ import org.eclipse.equinox.p2.query.QueryUtil;
 import org.eclipse.equinox.p2.ui.Policy;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 
 /**
@@ -27,7 +27,7 @@ import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 public class BiobankPolicy extends Policy {
 
     public BiobankPolicy() {
-        IPreferenceStore prefs = BioBankPlugin.getDefault()
+        IPreferenceStore prefs = BiobankPlugin.getDefault()
             .getPreferenceStore();
         setRepositoriesVisible(prefs
             .getBoolean(PreferenceConstants.REPOSITORIES_VISIBLE));

@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.utils.FilePromptUtil;
@@ -135,12 +135,12 @@ public class ActivityLogLocationDialog extends BiobankDialog {
                 return;
             }
 
-            BioBankPlugin
+            BiobankPlugin
                 .getDefault()
                 .getPreferenceStore()
                 .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH,
                     activityLogDir.toString());
-            BioBankPlugin
+            BiobankPlugin
                 .getDefault()
                 .getPreferenceStore()
                 .setValue(
@@ -149,11 +149,11 @@ public class ActivityLogLocationDialog extends BiobankDialog {
             super.okPressed();
 
         } else { /* don't save to a log file */
-            BioBankPlugin
+            BiobankPlugin
                 .getDefault()
                 .getPreferenceStore()
                 .setValue(PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_PATH, "");
-            BioBankPlugin
+            BiobankPlugin
                 .getDefault()
                 .getPreferenceStore()
                 .setValue(

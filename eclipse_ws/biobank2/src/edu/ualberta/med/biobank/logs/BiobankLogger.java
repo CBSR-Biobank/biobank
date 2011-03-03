@@ -7,7 +7,7 @@ import org.eclipse.core.runtime.ILog;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 
 /**
  * Log into Eclipse RCP logs (see Logs view) and .logs file
@@ -48,8 +48,8 @@ public class BiobankLogger {
     }
 
     public void addRcpLogStatus(int severity, String message, Throwable e) {
-        ILog rcpLogger = BioBankPlugin.getDefault().getLog();
-        IStatus status = new Status(severity, BioBankPlugin.PLUGIN_ID, name
+        ILog rcpLogger = BiobankPlugin.getDefault().getLog();
+        IStatus status = new Status(severity, BiobankPlugin.PLUGIN_ID, name
             + ": " + message, e);
         rcpLogger.log(status);
     }

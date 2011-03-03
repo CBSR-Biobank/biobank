@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -141,7 +141,7 @@ public class RequestReceiveScanDialog extends
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    BioBankPlugin.openInformation("Extra aliquots",
+                    BiobankPlugin.openInformation("Extra aliquots",
                         "Some of the aliquots in this pallet were not supposed"
                             + " to be in this shipment.");
                 }
@@ -180,7 +180,7 @@ public class RequestReceiveScanDialog extends
             setOkButtonEnabled(true);
             aliquotsReceived = true;
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error receiving aliquots", e);
+            BiobankPlugin.openAsyncError("Error receiving aliquots", e);
         }
         Button cancelButton = getButton(IDialogConstants.CANCEL_ID);
         cancelButton.setEnabled(false);

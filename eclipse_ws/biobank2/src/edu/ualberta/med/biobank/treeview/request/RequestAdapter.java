@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
@@ -57,7 +57,7 @@ public class RequestAdapter extends AdapterBase {
         try {
             persistRequest();
         } catch (Exception e1) {
-            BioBankPlugin.openAsyncError("Unable to save", e1);
+            BiobankPlugin.openAsyncError("Unable to save", e1);
         }
         getParent().getParent().rebuild();
         openViewForm();
@@ -77,13 +77,13 @@ public class RequestAdapter extends AdapterBase {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BioBankPlugin.openAccessDeniedErrorMessage(ade);
+            BiobankPlugin.openAccessDeniedErrorMessage(ade);
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Save error", ex);
+            BiobankPlugin.openAsyncError("Save error", ex);
         }
         RequestAdministrationView.getCurrent().reload();
     }

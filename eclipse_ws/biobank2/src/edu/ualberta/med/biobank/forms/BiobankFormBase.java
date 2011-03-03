@@ -43,7 +43,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.eclipse.ui.part.EditorPart;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
@@ -180,7 +180,7 @@ public abstract class BiobankFormBase extends EditorPart implements
         try {
             init();
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (Exception e) {
             logger.error("BioBankFormBase.createPartControl Error", e);
         }
@@ -230,13 +230,13 @@ public abstract class BiobankFormBase extends EditorPart implements
             @Override
             public void run() {
                 try {
-                    form.setImage(BioBankPlugin.getDefault().getImage(adapter));
+                    form.setImage(BiobankPlugin.getDefault().getImage(adapter));
                     createFormContent();
                     form.reflow(true);
                 } catch (final RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                    BiobankPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
-                    BioBankPlugin.openError(
+                    BiobankPlugin.openError(
                         "BioBankFormBase.createPartControl Error", e);
                 }
             }
@@ -299,9 +299,9 @@ public abstract class BiobankFormBase extends EditorPart implements
 
             ToolItem titem = new ToolItem(tbar, SWT.NULL);
             if (imageKey == null) {
-                imageKey = BioBankPlugin.IMG_ADD;
+                imageKey = BiobankPlugin.IMG_ADD;
             }
-            titem.setImage(BioBankPlugin.getDefault().getImageRegistry()
+            titem.setImage(BiobankPlugin.getDefault().getImageRegistry()
                 .get(imageKey));
             titem.setToolTipText(tooltip);
             titem.addSelectionListener(listener);

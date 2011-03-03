@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
@@ -127,7 +127,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                 if (shippingMethod != null) {
                     try {
                         if (!shippingMethod.isNew() && shippingMethod.isUsed()) {
-                            BioBankPlugin
+                            BiobankPlugin
                                 .openError(
                                     "Shipping Method Delete Error",
                                     "Cannot delete shipping method \""
@@ -152,7 +152,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                         deletedShippingMethods.add(shippingMethod);
                         notifyListeners();
                     } catch (final RemoteConnectFailureException exp) {
-                        BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                        BiobankPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
                         logger.error("BioBankFormBase.createPartControl Error",
                             e);
@@ -176,10 +176,10 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
                         "That shipping method has already been added.");
             type.checkUnique();
         } catch (BiobankException bce) {
-            BioBankPlugin.openAsyncError("Check error", bce);
+            BiobankPlugin.openAsyncError("Check error", bce);
             return false;
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Check error", e);
+            BiobankPlugin.openAsyncError("Check error", e);
             return false;
         }
         return true;
@@ -214,7 +214,7 @@ public class ShippingMethodEntryInfoTable extends ShippingMethodInfoTable {
             setLists(ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()));
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("AppService unavailable", e);
+            BiobankPlugin.openAsyncError("AppService unavailable", e);
         }
     }
 

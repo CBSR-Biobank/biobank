@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.views;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
@@ -70,7 +70,7 @@ public class PatientAdministrationView extends
 
     @Override
     protected void notFound(String text) {
-        boolean create = BioBankPlugin.openConfirm("Patient not found",
+        boolean create = BiobankPlugin.openConfirm("Patient not found",
             "Do you want to create this patient ?");
         if (create) {
             PatientWrapper patient = new PatientWrapper(

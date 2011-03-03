@@ -369,4 +369,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         return -1;
     }
 
+    public List<CollectionEventWrapper> getCollectionEventCollection() {
+        return getCollectionEventCollection(false);
+    }
+
 }

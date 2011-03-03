@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
@@ -138,7 +138,7 @@ public class GroupEditDialog extends BiobankDialog {
             try {
                 allSites = SiteWrapper.getSites(SessionManager.getAppService());
             } catch (Exception e) {
-                BioBankPlugin.openAsyncError(Messages
+                BiobankPlugin.openAsyncError(Messages
                     .getString("GroupEditDialog.msg.error.retrieve.sites"), e); //$NON-NLS-1$
             }
         }
@@ -159,10 +159,10 @@ public class GroupEditDialog extends BiobankDialog {
             close();
         } catch (ApplicationException e) {
             if (e.getMessage().contains("Duplicate entry")) { //$NON-NLS-1$
-                BioBankPlugin.openAsyncError(GROUP_PERSIST_ERROR_TITLE,
+                BiobankPlugin.openAsyncError(GROUP_PERSIST_ERROR_TITLE,
                     Messages.getString("GroupEditDialog.msg.error.name.used")); //$NON-NLS-1$
             } else {
-                BioBankPlugin.openAsyncError(GROUP_PERSIST_ERROR_TITLE, e);
+                BiobankPlugin.openAsyncError(GROUP_PERSIST_ERROR_TITLE, e);
             }
         }
     }

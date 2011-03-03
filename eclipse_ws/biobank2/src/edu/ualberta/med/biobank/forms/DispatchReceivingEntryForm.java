@@ -8,7 +8,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
@@ -130,7 +130,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
                     currentShipment.getAppService(), inventoryId,
                     SessionManager.getUser());
             } catch (Exception ae) {
-                BioBankPlugin.openAsyncError("Error retrieving aliquot", ae);
+                BiobankPlugin.openAsyncError("Error retrieving aliquot", ae);
             }
             if (aliquot == null) {
                 return new AliquotInfo(null, ResType.NOT_IN_DB);
@@ -155,12 +155,12 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
             setDirty(true);
             break;
         case RECEIVED:
-            BioBankPlugin.openInformation("Aliquot already accepted",
+            BiobankPlugin.openInformation("Aliquot already accepted",
                 "Aliquot with inventory id " + inventoryId
                     + " is already in received list.");
             break;
         case NOT_IN_SHIPMENT:
-            BioBankPlugin.openInformation("Aliquot not found",
+            BiobankPlugin.openInformation("Aliquot not found",
                 "Aliquot with inventory id " + inventoryId
                     + " has not been found in this dispatch."
                     + " It will be moved into the extra-pending list.");
@@ -169,15 +169,15 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
             setDirty(true);
             break;
         case NOT_IN_DB:
-            BioBankPlugin.openError("Aliquot not found",
+            BiobankPlugin.openError("Aliquot not found",
                 "This aliquot does not exists in the database.");
             break;
         case DUPLICATE:
-            BioBankPlugin.openError("Duplicate aliquot !",
+            BiobankPlugin.openError("Duplicate aliquot !",
                 "This aliquot exists more that once in the database !");
             break;
         case EXTRA:
-            BioBankPlugin.openInformation("Aliquot already extra",
+            BiobankPlugin.openInformation("Aliquot already extra",
                 "Aliquot with inventory id " + inventoryId
                     + " is already in extra list.");
             break;

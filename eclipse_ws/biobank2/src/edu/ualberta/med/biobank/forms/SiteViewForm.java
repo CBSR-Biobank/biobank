@@ -9,7 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
@@ -187,7 +187,7 @@ public class SiteViewForm extends AddressViewFormCommon {
         try {
             site.reload();
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Can't reload site", e);
+            BiobankPlugin.openAsyncError("Can't reload site", e);
         }
     }
 

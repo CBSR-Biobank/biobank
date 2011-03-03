@@ -13,7 +13,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -55,7 +55,7 @@ public class PatientEntryForm extends BiobankEntryForm {
         try {
             patientAdapter.getWrapper().logEdit(null);
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Log edit failed", e);
+            BiobankPlugin.openAsyncError("Log edit failed", e);
         }
         String tabName;
         if (patientAdapter.getWrapper().isNew()) {

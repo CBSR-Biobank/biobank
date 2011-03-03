@@ -9,7 +9,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.RequestWrapper;
@@ -44,7 +44,7 @@ public class RequestAdministrationView extends AbstractAdministrationView {
         try {
             siteNodes = SiteWrapper.getSites(SessionManager.getAppService());
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Failed to load sites", e);
+            BiobankPlugin.openAsyncError("Failed to load sites", e);
         }
         if (siteNodes != null) {
             for (SiteWrapper site : siteNodes) {
@@ -102,13 +102,13 @@ public class RequestAdministrationView extends AbstractAdministrationView {
                 String msg = "No Request found";
                 if (radioRequestNumber.getSelection())
                     msg += " for number " + treeText.getText();
-                BioBankPlugin.openMessage("Request not found", msg);
+                BiobankPlugin.openMessage("Request not found", msg);
             } else {
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BioBankPlugin.openError("Search error", e);
+            BiobankPlugin.openError("Search error", e);
         }
     }
 

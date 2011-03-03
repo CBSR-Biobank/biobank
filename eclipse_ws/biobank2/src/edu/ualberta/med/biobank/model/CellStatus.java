@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 
 public enum CellStatus {
     NOT_INITIALIZED(SWT.COLOR_WHITE, "Not Initialized"), INITIALIZED(
@@ -44,13 +44,13 @@ public enum CellStatus {
         EMPTY, DUPLICATE_SCAN, IN_SHIPMENT_EXPECTED, EXTRA, ERROR);
 
     private CellStatus(int color, String legend) {
-        this.color = BioBankPlugin.getDefault().getWorkbench().getDisplay()
+        this.color = BiobankPlugin.getDefault().getWorkbench().getDisplay()
             .getSystemColor(color);
         this.legend = legend;
     }
 
     private CellStatus(int red, int green, int blue, String legend) {
-        this.color = new Color(BioBankPlugin.getDefault().getWorkbench()
+        this.color = new Color(BiobankPlugin.getDefault().getWorkbench()
             .getDisplay(), red, green, blue);
         this.legend = legend;
     }

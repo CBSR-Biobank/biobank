@@ -26,7 +26,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.services.ISourceProviderService;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.LogWrapper;
@@ -396,7 +396,7 @@ public class LoggingView extends ViewPart {
         if (startDateWidget.getDate() != null
             && endDateWidget.getDate() != null
             && startDateWidget.getDate().after(endDateWidget.getDate())) {
-            BioBankPlugin.openAsyncError("Error",
+            BiobankPlugin.openAsyncError("Error",
                 "Error: start date cannot be ahead end date.");
             return;
         }
@@ -437,7 +437,7 @@ public class LoggingView extends ViewPart {
             PlatformUI.getWorkbench().getActiveWorkbenchWindow()
                 .getActivePage().openEditor(input, LoggingForm.ID);
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError(
+            BiobankPlugin.openAsyncError(
                 "Error",
                 "There was an error opening: LoggingForm.\n"
                     + ex.getLocalizedMessage());
@@ -484,7 +484,7 @@ public class LoggingView extends ViewPart {
             return result.toArray(new String[0]);
 
         } catch (ApplicationException ex) {
-            BioBankPlugin.openAsyncError("Error",
+            BiobankPlugin.openAsyncError("Error",
                 "There was an error: \n" + ex.getLocalizedMessage());
         }
         return null;

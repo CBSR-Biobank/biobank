@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
@@ -106,7 +106,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             scanButton.setText("Retry scan");
         } else {
             String scanButtonText = "Launch Scan";
-            if (!BioBankPlugin.isRealScanEnabled()) {
+            if (!BiobankPlugin.isRealScanEnabled()) {
                 scanButtonText = "Fake scan";
             }
             scanButton.setText(scanButtonText);
@@ -151,7 +151,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         });
 
         String scanButtonText = "Launch Scan";
-        if (!BioBankPlugin.isRealScanEnabled()) {
+        if (!BiobankPlugin.isRealScanEnabled()) {
             scanButtonText = "Fake scan"; //$NON-NLS-1$
         }
         scanButton = new Button(contents, SWT.PUSH);
@@ -297,7 +297,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
     }
 
     private boolean isPlateValid() {
-        return BioBankPlugin.getDefault().isValidPlateBarcode(
+        return BiobankPlugin.getDefault().isValidPlateBarcode(
             plateToScanText.getText());
     };
 
@@ -309,7 +309,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
             try {
                 doProceed();
             } catch (Exception e) {
-                BioBankPlugin.openAsyncError("Error", e);
+                BiobankPlugin.openAsyncError("Error", e);
             }
         } else if (IDialogConstants.FINISH_ID == buttonId) {
             setReturnCode(OK);
@@ -335,21 +335,21 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
         gd.verticalAlignment = SWT.TOP;
         scanTubeAloneSwitch.setLayoutData(gd);
         scanTubeAloneSwitch.setText("");
-        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
-            .getImageRegistry().get(BioBankPlugin.IMG_SCAN_EDIT));
+        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
+            .getImageRegistry().get(BiobankPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
                 if (isScanHasBeenLaunched()) {
                     scanTubeAloneMode = !scanTubeAloneMode;
                     if (scanTubeAloneMode) {
-                        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
                             .getImageRegistry()
-                            .get(BioBankPlugin.IMG_SCAN_CLOSE_EDIT));
+                            .get(BiobankPlugin.IMG_SCAN_CLOSE_EDIT));
                     } else {
-                        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
                             .getImageRegistry()
-                            .get(BioBankPlugin.IMG_SCAN_EDIT));
+                            .get(BiobankPlugin.IMG_SCAN_EDIT));
                     }
                 }
             }
@@ -380,7 +380,7 @@ public abstract class AbstractScanDialog<T extends ModelWrapper<?>> extends
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
-                            BioBankPlugin.openAsyncError("Scan tube error", ex);
+                            BiobankPlugin.openAsyncError("Scan tube error", ex);
                         }
                     }
                 }

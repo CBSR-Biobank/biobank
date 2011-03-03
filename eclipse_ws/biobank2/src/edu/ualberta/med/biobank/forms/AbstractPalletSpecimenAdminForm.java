@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
@@ -193,7 +193,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     @Override
     public boolean onClose() {
         plateToScanSessionString = (String) plateToScanValue.getValue();
-        if (finished || BioBankPlugin.getPlatesEnabledCount() != 1) {
+        if (finished || BiobankPlugin.getPlatesEnabledCount() != 1) {
             plateToScanSessionString = "";
         }
         return super.onClose();
@@ -209,7 +209,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
     protected void createScanButton(Composite parent) {
         scanButtonTitle = Messages.getString("linkAssign.scanButton.text");
-        if (!BioBankPlugin.isRealScanEnabled()) {
+        if (!BiobankPlugin.isRealScanEnabled()) {
             createFakeOptions(parent);
             scanButtonTitle = "Fake scan"; //$NON-NLS-1$
         }
@@ -372,7 +372,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     }
 
     protected boolean isPlateValid() {
-        return BioBankPlugin.getDefault().isValidPlateBarcode(
+        return BiobankPlugin.getDefault().isValidPlateBarcode(
             plateToScanText.getText());
     }
 
@@ -418,7 +418,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
                         try {
                             postprocessScanTubeAlone(cell);
                         } catch (Exception ex) {
-                            BioBankPlugin.openAsyncError("Scan tube error", ex);
+                            BiobankPlugin.openAsyncError("Scan tube error", ex);
                         }
                     }
                 }
@@ -442,21 +442,21 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         GridData gd = new GridData();
         gd.verticalAlignment = SWT.TOP;
         scanTubeAloneSwitch.setLayoutData(gd);
-        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
-            .getImageRegistry().get(BioBankPlugin.IMG_SCAN_EDIT));
+        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
+            .getImageRegistry().get(BiobankPlugin.IMG_SCAN_EDIT));
         scanTubeAloneSwitch.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseDown(MouseEvent e) {
                 if (isScanHasBeenLaunched()) {
                     scanTubeAloneMode = !scanTubeAloneMode;
                     if (scanTubeAloneMode) {
-                        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
                             .getImageRegistry()
-                            .get(BioBankPlugin.IMG_SCAN_CLOSE_EDIT));
+                            .get(BiobankPlugin.IMG_SCAN_CLOSE_EDIT));
                     } else {
-                        scanTubeAloneSwitch.setImage(BioBankPlugin.getDefault()
+                        scanTubeAloneSwitch.setImage(BiobankPlugin.getDefault()
                             .getImageRegistry()
-                            .get(BioBankPlugin.IMG_SCAN_EDIT));
+                            .get(BiobankPlugin.IMG_SCAN_EDIT));
                     }
                 }
             }

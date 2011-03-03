@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -138,7 +138,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         aliquotMode = AliquotMode.NEW_ALIQUOT;
         setPartName(Messages.getString("Cabinet.tabTitle")); //$NON-NLS-1$
         aliquot = new SpecimenWrapper(appService);
-        IPreferenceStore store = BioBankPlugin.getDefault()
+        IPreferenceStore store = BiobankPlugin.getDefault()
             .getPreferenceStore();
         cabinetNameContains = store
             .getString(PreferenceConstants.CABINET_CONTAINER_NAME_CONTAINS);
@@ -297,7 +297,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                     try {
                         retrieveAliquotDataForMoving();
                     } catch (Exception ex) {
-                        BioBankPlugin.openError("Move - aliquot error", ex); //$NON-NLS-1$
+                        BiobankPlugin.openError("Move - aliquot error", ex); //$NON-NLS-1$
                         focusControlInError(inventoryIdText);
                     }
                 }
@@ -510,13 +510,13 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 String errorMsg = Messages
                     .getString(
                         "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested), currentSite.getNameShort()); //$NON-NLS-1$
-                BioBankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
+                BiobankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
                 viewerSampleTypes.getCombo().setEnabled(false);
                 focusControlInError(newCabinetPositionText);
                 return;
             } else {
-                BioBankPlugin
+                BiobankPlugin
                     .openError(
                         "Container problem",
                         "More than one container found for " + getBinLabelMessage(labelsTested) //$NON-NLS-1$
@@ -526,7 +526,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 return;
             }
         } catch (Exception ex) {
-            BioBankPlugin.openError("Init container from position", ex);
+            BiobankPlugin.openError("Init container from position", ex);
             focusControlInError(newCabinetPositionText);
         }
     }
@@ -567,7 +567,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             }
             page.layout(true, true);
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError(
+            BiobankPlugin.openAsyncError(
                 "Error setting move mode " + aliquotMode, //$NON-NLS-1$
                 ex);
         }
@@ -628,7 +628,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 .getContainerTypesInSite(appService, SessionManager.getUser()
                     .getCurrentWorkingCentre(), cabinetNameContains, false);
             if (cabinetContainerTypes.size() == 0)
-                BioBankPlugin.openAsyncError(
+                BiobankPlugin.openAsyncError(
                     Messages.getString("Cabinet.dialog.noType.error.title"), //$NON-NLS-1$
                     Messages.getString("Cabinet.dialog.notType.error.msg", //$NON-NLS-1$
                         cabinetNameContains));
@@ -674,7 +674,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                         resultShownValue.setValue(Boolean.TRUE);
                         cancelConfirmWidget.setFocus();
                     } else {
-                        BioBankPlugin.openError("Position not free", Messages
+                        BiobankPlugin.openError("Position not free", Messages
                             .getString(
                                 "Cabinet.checkStatus.error", positionString, //$NON-NLS-1$
                                 bin.getLabel()));
@@ -685,15 +685,15 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                     }
                     setDirty(true);
                 } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                    BiobankPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (BiobankCheckException bce) {
-                    BioBankPlugin.openError(
+                    BiobankPlugin.openError(
                         "Error while checking position", bce); //$NON-NLS-1$
                     appendLog("ERROR: " + bce.getMessage()); //$NON-NLS-1$
                     resultShownValue.setValue(Boolean.FALSE);
                     focusControlInError(inventoryIdText);
                 } catch (Exception e) {
-                    BioBankPlugin.openError("Error while checking position", e); //$NON-NLS-1$
+                    BiobankPlugin.openError("Error while checking position", e); //$NON-NLS-1$
                     focusControlInError(newCabinetPositionText);
                 }
             }
@@ -735,7 +735,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 // same patient)
                 study.reload();
             } catch (Exception e) {
-                BioBankPlugin.openAsyncError("Problem reloading study", e);
+                BiobankPlugin.openAsyncError("Problem reloading study", e);
             }
             for (AliquotedSpecimenWrapper ss : study
                 .getAliquotedSpecimenCollection(true)) {
@@ -752,7 +752,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                     studyText = linkFormPatientManagement.getCurrentPatient()
                         .getStudy().getNameShort();
                 }
-                BioBankPlugin.openError(
+                BiobankPlugin.openError(
                     "No Sample Types",
                     "There are no sample types that "
                         + "are defined for current patient study (" + studyText

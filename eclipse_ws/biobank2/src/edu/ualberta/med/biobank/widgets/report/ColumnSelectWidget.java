@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.TreeItem;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.model.EntityColumn;
 import edu.ualberta.med.biobank.model.PropertyModifier;
@@ -213,8 +213,8 @@ public class ColumnSelectWidget extends Composite {
 
         createLabel(subContainer, "");
 
-        rightButton = createButton(subContainer, BioBankPlugin.IMG_ARROW_RIGHT);
-        leftButton = createButton(subContainer, BioBankPlugin.IMG_ARROW_LEFT);
+        rightButton = createButton(subContainer, BiobankPlugin.IMG_ARROW_RIGHT);
+        leftButton = createButton(subContainer, BiobankPlugin.IMG_ARROW_LEFT);
 
         rightButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -239,8 +239,8 @@ public class ColumnSelectWidget extends Composite {
 
         createLabel(subContainer, "");
 
-        upButton = createButton(subContainer, BioBankPlugin.IMG_UP);
-        downButton = createButton(subContainer, BioBankPlugin.IMG_DOWN);
+        upButton = createButton(subContainer, BiobankPlugin.IMG_UP);
+        downButton = createButton(subContainer, BiobankPlugin.IMG_DOWN);
 
         upButton.addListener(SWT.Selection, new Listener() {
             @Override
@@ -340,7 +340,7 @@ public class ColumnSelectWidget extends Composite {
 
     private static Button createButton(Composite parent, String imageName) {
         Button button = new Button(parent, SWT.PUSH);
-        button.setImage(BioBankPlugin.getDefault().getImageRegistry()
+        button.setImage(BiobankPlugin.getDefault().getImageRegistry()
             .get(imageName));
 
         return button;

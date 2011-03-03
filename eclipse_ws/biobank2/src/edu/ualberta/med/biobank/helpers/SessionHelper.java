@@ -7,7 +7,7 @@ import org.acegisecurity.providers.rcp.RemoteAuthenticationException;
 import org.eclipse.core.runtime.Platform;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -53,7 +53,7 @@ public class SessionHelper implements Runnable {
     public void run() {
         try {
             if (userName.length() == 0) {
-                if (BioBankPlugin.getDefault().isDebugging()) {
+                if (BiobankPlugin.getDefault().isDebugging()) {
                     userName = "testuser";
                     appService = ServiceConnection.getAppService(serverUrl,
                         userName, "test");
@@ -70,13 +70,13 @@ public class SessionHelper implements Runnable {
             user = appService.getCurrentUser();
         } catch (ApplicationException exp) {
             if (exp instanceof ServerVersionInvalidException) {
-                BioBankPlugin
+                BiobankPlugin
                     .openInformation(
                         "Server Version Error",
                         "The server you are connecting to does not have a version. Cannot authenticate.");
                 logger.error("Error while logging to application", exp);
             } else if (exp instanceof ServerVersionNewerException) {
-                if (BioBankPlugin.openConfirm("Server Version Error",
+                if (BiobankPlugin.openConfirm("Server Version Error",
                     "Cannot connect to this server because the Java Client version is too old.\n"
                         + "Would you like to download the latest version?")) {
                     try {
@@ -87,29 +87,29 @@ public class SessionHelper implements Runnable {
                     logger.error("Error while logging to application", exp);
                 }
             } else if (exp instanceof ServerVersionOlderException) {
-                BioBankPlugin
+                BiobankPlugin
                     .openInformation("Server Version Error",
                         "Cannot connect to this server because the Java Client version is too new.");
                 logger.error("Error while logging to application", exp);
             } else if (exp instanceof ClientVersionInvalidException) {
-                BioBankPlugin
+                BiobankPlugin
                     .openInformation("Client Version Error",
                         "Cannot connect to this server because the Java Client version is invalid.");
                 logger.error("Error while logging to application", exp);
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAuthenticationException) {
-                BioBankPlugin
+                BiobankPlugin
                     .openAsyncError(
                         "Login Failed",
                         "Bad credentials. Warning: You will be locked out after 3 failed login attempts.");
                 return;
             } else if (exp.getCause() != null
                 && exp.getCause() instanceof RemoteAccessException) {
-                BioBankPlugin.openAsyncError("Login Failed",
+                BiobankPlugin.openAsyncError("Login Failed",
                     "Error contacting server.");
             }
         } catch (Exception exp) {
-            BioBankPlugin.openAsyncError("Login Failed", exp);
+            BiobankPlugin.openAsyncError("Login Failed", exp);
         }
     }
 

@@ -4,7 +4,7 @@ import org.eclipse.core.databinding.validation.ValidationStatus;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 
 public class ScannerBarcodeValidator extends AbstractValidator {
 
@@ -21,7 +21,7 @@ public class ScannerBarcodeValidator extends AbstractValidator {
 
         String barcode = (String) value;
         if (barcode.length() != 0
-            && BioBankPlugin.getDefault().isValidPlateBarcode(barcode)) {
+            && BiobankPlugin.getDefault().isValidPlateBarcode(barcode)) {
             hideDecoration();
             return Status.OK_STATUS;
         }

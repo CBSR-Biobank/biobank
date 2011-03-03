@@ -88,9 +88,12 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     private static final String WAYBILL_UNIQUE_FOR_SENDER_QRY = "from "
-        + Dispatch.class.getName() + " where "
+        + Dispatch.class.getName()
+        + " where "
         + Property.concatNames(DispatchPeer.SENDER_CENTER, CenterPeer.ID)
-        + "=? and " + ShipmentInfoPeer.WAYBILL.getName() + "=?";
+        + "=? and "
+        + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
+            ShipmentInfoPeer.WAYBILL) + "=?";
 
     private boolean checkWaybillUniqueForSender() throws ApplicationException,
         BiobankCheckException {

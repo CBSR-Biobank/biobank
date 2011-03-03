@@ -129,7 +129,7 @@ public class SessionManager {
         // assign debug state
         DebugState debugStateSourceProvider = (DebugState) service
             .getSourceProvider(DebugState.SESSION_STATE);
-        debugStateSourceProvider.setState(BioBankPlugin.getDefault()
+        debugStateSourceProvider.setState(BiobankPlugin.getDefault()
             .isDebugging());
     }
 

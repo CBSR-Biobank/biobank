@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.PlatformUI;
 
 import ar.com.fdvs.dj.domain.constants.Font;
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
 public class ReportingUtils {
@@ -176,7 +176,7 @@ public class ReportingUtils {
                 try {
                     printViaPrinter(data, jasperPrint);
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Printing Error", "Error: "
+                    BiobankPlugin.openAsyncError("Printing Error", "Error: "
                         + e.toString() + "\n\n"
                         + "Select a file location to export the printed page.");
                     printViaFile(data, jasperPrint);

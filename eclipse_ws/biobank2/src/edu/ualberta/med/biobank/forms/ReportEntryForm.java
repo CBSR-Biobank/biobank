@@ -42,7 +42,7 @@ import org.eclipse.ui.forms.widgets.Section;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
@@ -308,7 +308,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                         }
                     });
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Report Generation Error", e);
+                    BiobankPlugin.openAsyncError("Report Generation Error", e);
                 }
                 monitor.done();
             }
@@ -592,7 +592,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                     try {
                         exportCsv(path.getValue(), getHeaders(), monitor);
                     } catch (Exception e) {
-                        BioBankPlugin.openAsyncError("Error exporting results",
+                        BiobankPlugin.openAsyncError("Error exporting results",
                             e);
                         return;
                     }

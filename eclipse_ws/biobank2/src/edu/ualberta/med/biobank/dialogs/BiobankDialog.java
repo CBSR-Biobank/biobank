@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Widget;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -107,13 +107,13 @@ public abstract class BiobankDialog extends TitleAreaDialog {
         try {
             createDialogAreaInternal(contents);
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BioBankPlugin.openAccessDeniedErrorMessage(ade);
+            BiobankPlugin.openAccessDeniedErrorMessage(ade);
         } catch (BiobankCheckException bce) {
-            BioBankPlugin.openAsyncError("Save error", bce);
+            BiobankPlugin.openAsyncError("Save error", bce);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

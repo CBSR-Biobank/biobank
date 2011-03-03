@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeColumn;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
 import edu.ualberta.med.biobank.common.wrappers.RequestSpecimenWrapper;
@@ -229,7 +229,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                     claim(child);
             }
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Failed to claim", e);
+            BiobankPlugin.openAsyncError("Failed to claim", e);
         }
     }
 
@@ -245,7 +245,7 @@ public class RequestAliquotsTreeTable extends BiobankWidget {
                 try {
                     getSelectedAliquot().persist();
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError("Save Error", e);
+                    BiobankPlugin.openAsyncError("Save Error", e);
                 }
                 refresh();
             }

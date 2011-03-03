@@ -6,7 +6,7 @@ import java.util.List;
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.layout.GridLayout;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
@@ -32,8 +32,8 @@ public class AliquotListViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         form.setText("Non Active Aliquots");
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImage(
-            BioBankPlugin.IMG_ALIQUOT));
+        form.setImage(BiobankPlugin.getDefault().getImage(
+            BiobankPlugin.IMG_ALIQUOT));
 
         specimensWidget = new SpecimenInfoTable(page, speicmens,
             SpecimenInfoTable.ColumnsShown.ALL, 20);

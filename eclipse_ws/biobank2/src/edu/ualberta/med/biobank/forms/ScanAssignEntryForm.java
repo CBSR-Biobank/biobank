@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.RowColPos;
@@ -274,7 +274,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     setCanLaunchScan(canLaunch);
                 }
             } catch (Exception ex) {
-                BioBankPlugin.openError("Values validation", ex); //$NON-NLS-1$
+                BiobankPlugin.openError("Values validation", ex); //$NON-NLS-1$
                 appendLogNLS("ScanAssign.activitylog.error", //$NON-NLS-1$
                     ex.getMessage());
                 if (ex.getMessage() != null
@@ -349,7 +349,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             List<ContainerTypeWrapper> palletContainerTypes = ContainerTypeWrapper
                 .getContainerTypesPallet96(appService, currentSiteSelected);
             if (palletContainerTypes.size() == 0) {
-                BioBankPlugin.openAsyncError(Messages
+                BiobankPlugin.openAsyncError(Messages
                     .getString("ScanAssign.dialog.noPalletFoundError.title"), //$NON-NLS-1$
                     Messages
                         .getString("ScanAssign.dialog.noPalletFoundError.msg" //$NON-NLS-1$
@@ -958,7 +958,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     private boolean saveEvenIfAliquotsMissing() {
         if (currentScanState == CellStatus.MISSING
             && movedAndMissingAliquotsFromPallet.size() > 0) {
-            boolean save = BioBankPlugin.openConfirm(
+            boolean save = BiobankPlugin.openConfirm(
                 Messages.getString("ScanAssign.dialog.reallySave.title"), //$NON-NLS-1$
                 Messages.getString("ScanAssign.dialog.saveWithMissing.msg")); //$NON-NLS-1$
             if (save) {
@@ -1189,7 +1189,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                 currentPalletWrapper.setProductBarcode(productBarcode);
             }
         } else {
-            BioBankPlugin.openError("Check position",
+            BiobankPlugin.openError("Check position",
                 "Found more than one pallet with position " + palletLabel);
             nextFocusWidget = palletPositionText;
             return false;
@@ -1228,7 +1228,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             return useNewProductBarcode;
         } else {
             // Position already use with a different barcode
-            BioBankPlugin
+            BiobankPlugin
                 .openError(
                     Messages
                         .getString("ScanAssign.dialog.positionUsed.error.title"), //$NON-NLS-1$

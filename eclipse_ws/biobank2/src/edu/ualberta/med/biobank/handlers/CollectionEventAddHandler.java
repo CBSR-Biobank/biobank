@@ -12,10 +12,10 @@ import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.views.PatientAdministrationView;
 
-public class PatientVisitAddHandler extends AbstractHandler {
+public class CollectionEventAddHandler extends AbstractHandler {
 
     private static BiobankLogger logger = BiobankLogger
-        .getLogger(PatientVisitAddHandler.class.getName());
+        .getLogger(CollectionEventAddHandler.class.getName());
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {

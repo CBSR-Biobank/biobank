@@ -7,7 +7,7 @@ import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -64,7 +64,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                     ContactWrapper contact = getSelection();
                     if (contact != null) {
                         if (!contact.deleteAllowed()) {
-                            BioBankPlugin
+                            BiobankPlugin
                                 .openError(
                                     "Contact Delete Error",
                                     "Cannot delete contact \""
@@ -73,7 +73,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
                             return;
                         }
 
-                        if (!BioBankPlugin.openConfirm("Delete Contact",
+                        if (!BiobankPlugin.openConfirm("Delete Contact",
                             "Are you sure you want to delete contact \""
                                 + contact.getName() + "\"")) {
                             return;
@@ -112,7 +112,7 @@ public class ContactEntryInfoTable extends ContactInfoTable {
             try {
                 contactWrapper.reload();
             } catch (Exception e) {
-                BioBankPlugin.openAsyncError("Cancel error", e);
+                BiobankPlugin.openAsyncError("Cancel error", e);
             }
             reloadCollection(selectedContacts, null);
         }

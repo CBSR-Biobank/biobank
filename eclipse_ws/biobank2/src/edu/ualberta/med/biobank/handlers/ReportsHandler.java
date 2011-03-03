@@ -6,7 +6,7 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.WorkbenchException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
 
@@ -14,7 +14,7 @@ public class ReportsHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        IWorkbench workbench = BioBankPlugin.getDefault().getWorkbench();
+        IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
                 .closeAllEditors(true))
