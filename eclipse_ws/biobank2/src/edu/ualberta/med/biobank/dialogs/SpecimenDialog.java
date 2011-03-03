@@ -106,7 +106,7 @@ public class SpecimenDialog extends BiobankDialog {
             allActivityStatus = ActivityStatusWrapper
                 .getAllActivityStatuses(SessionManager.getAppService());
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Problem retrieving activity status",
+            BiobankPlugin.openAsyncError("Problem retrieving activity status",
                 e);
         }
     }

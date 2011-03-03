@@ -6,15 +6,12 @@ import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
-import org.eclipse.swt.events.SelectionAdapter;
-import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
@@ -25,7 +22,6 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -34,21 +30,17 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class LinkFormPatientManagement {
 
-    private SiteWrapper site;
-
     private boolean patientNumberTextModified = false;
     protected BiobankText patientNumberText;
     protected ComboViewer viewerCollectionEvents;
     private Button cEventListCheck;
-
-    private static Boolean cEventListCheckSelection = true;
 
     // currentPatient
     protected PatientWrapper currentPatient;
 
     private WidgetCreator widgetCreator;
 
-    private AbstractAliquotAdminForm aliquotAdminForm;
+    private AbstractSpecimenAdminForm aliquotAdminForm;
 
     private PatientTextCallback patientTextCallback;
     private Label patientLabel;
@@ -58,10 +50,8 @@ public class LinkFormPatientManagement {
     private Label cEventComboLabel;
     protected CollectionEventWrapper currentCEventSelected;
 
-    private BiobankText worksheetText;
-
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
-        AbstractAliquotAdminForm aliquotAdminForm) {
+        AbstractSpecimenAdminForm aliquotAdminForm) {
         this.widgetCreator = widgetCreator;
         this.aliquotAdminForm = aliquotAdminForm;
     }
@@ -80,7 +70,7 @@ public class LinkFormPatientManagement {
             @Override
             public void focusLost(FocusEvent e) {
                 if (patientNumberTextModified) {
-                    setPatientSelected();
+                    initFieldWithPatientSelection();
                     if (patientTextCallback != null) {
                         patientTextCallback.focusLost();
                     }
@@ -99,8 +89,6 @@ public class LinkFormPatientManagement {
             }
         });
         patientNumberText.addKeyListener(aliquotAdminForm.textFieldKeyListener);
-        GridData gd = (GridData) patientNumberText.getLayoutData();
-        gd.horizontalSpan = 2;
         setFirstControl();
     }
 
@@ -116,15 +104,6 @@ public class LinkFormPatientManagement {
                     currentCEventSelected = (CollectionEventWrapper) selectedObject;
                 }
             }); //$NON-NLS-1$
-        viewerCollectionEvents.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                if (element instanceof ProcessingEventWrapper)
-                    return ((ProcessingEventWrapper) element)
-                        .getFormattedCreatedAt();
-                return element.toString();
-            }
-        });
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
@@ -150,16 +129,6 @@ public class LinkFormPatientManagement {
                 }
             }
         });
-        // FIXME what are these 7 days ? from where, since this can be dispatch
-        cEventListCheck = aliquotAdminForm.toolkit.createButton(
-            compositeFields, "Last 7 days", SWT.CHECK);
-        cEventListCheck.setSelection(cEventListCheckSelection);
-        cEventListCheck.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                setCollectionEventList();
-            }
-        });
 
         // Will replace the combo in some specific situations (like cabinet
         // form):
@@ -170,27 +139,15 @@ public class LinkFormPatientManagement {
         cEventText = (BiobankText) widgetCreator.createWidget(compositeFields,
             BiobankText.class, SWT.NONE, "");
         cEventText.setEnabled(false);
-        ((GridData) cEventText.getLayoutData()).horizontalSpan = 2;
         widgetCreator.hideWidget(cEventTextLabel);
         widgetCreator.hideWidget(cEventText);
-    }
-
-    protected void createWorksheetText(Composite parent) {
-        worksheetText = (BiobankText) widgetCreator.createBoundWidgetWithLabel(
-            parent, BiobankText.class, SWT.NONE,
-            Messages.getString("ScanLink.worksheet.label"), new String[0],
-            new WritableValue("", String.class), null);
-        worksheetText.addKeyListener(aliquotAdminForm.textFieldKeyListener);
-        GridData gd = (GridData) worksheetText.getLayoutData();
-        gd.horizontalSpan = 2;
-        setFirstControl();
     }
 
     protected CollectionEventWrapper getSelectedCollectionEvent() {
         return currentCEventSelected;
     }
 
-    protected void setPatientSelected() {
+    protected void initFieldWithPatientSelection() {
         currentPatient = null;
         try {
             currentPatient = PatientWrapper.getPatient(
@@ -205,14 +162,6 @@ public class LinkFormPatientManagement {
                 Messages.getString("ScanLink.dialog.patient.errorMsg"), e); //$NON-NLS-1$
         }
         setCollectionEventList();
-    }
-
-    public void onClose() {
-        if (aliquotAdminForm.finished) {
-            cEventListCheckSelection = true;
-        } else {
-            cEventListCheckSelection = cEventListCheck.getSelection();
-        }
     }
 
     public void reset(boolean resetAll) {
@@ -299,14 +248,26 @@ public class LinkFormPatientManagement {
             && selection.size() > 0;
     }
 
-    public void setSite(SiteWrapper site) {
-        this.site = site;
-    }
-
-    @Deprecated
     public void setCollectionEventList() {
-        // TODO Auto-generated method stub
+        if (viewerCollectionEvents != null) {
+            if (currentPatient != null) {
+                List<CollectionEventWrapper> collection = currentPatient
+                    .getCollectionEventCollection(true, false);
+                viewerCollectionEvents.setInput(collection);
+                viewerCollectionEvents.getCombo().setFocus();
+                if (collection != null && collection.size() == 1) {
+                    viewerCollectionEvents
+                        .setSelection(new StructuredSelection(collection.get(0)));
+                } else {
+                    viewerCollectionEvents.getCombo().deselectAll();
+                }
+            } else {
+                viewerCollectionEvents.setInput(null);
+            }
+            if (cEventText != null) {
+                cEventText.setText("");
+            }
+        }
 
     }
-
 }

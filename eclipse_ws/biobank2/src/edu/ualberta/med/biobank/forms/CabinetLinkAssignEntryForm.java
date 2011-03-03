@@ -59,7 +59,7 @@ import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
+public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
 
     public static final String ID = "edu.ualberta.med.biobank.forms.CabinetLinkAssignEntryForm"; //$NON-NLS-1$
 
@@ -156,8 +156,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         createFieldsSection();
         createLocationSection();
 
-        linkFormPatientManagement.setSite(SessionManager.getUser()
-            .getCurrentWorkingCentre());
         if (viewerSampleTypes != null) {
             initCabinetContainerTypesList();
             viewerSampleTypes.setInput(null);
@@ -964,12 +962,6 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
     @Override
     public BiobankLogger getErrorLogger() {
         return logger;
-    }
-
-    @Override
-    public boolean onClose() {
-        linkFormPatientManagement.onClose();
-        return super.onClose();
     }
 
 }
