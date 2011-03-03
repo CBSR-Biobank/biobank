@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -81,7 +81,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     private ComboViewer activityStatusComboViewer;
 
     private SpecimenEntryInfoTable specimensTable;
-    private BiobankText pvWidget;
+    private BiobankText visitNumberText;
 
     @Override
     public void init() throws Exception {
@@ -151,7 +151,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             Messages.getString("CollectionEventEntryForm.field.patient.label"),
             patient.getPnumber());
 
-        pvWidget = (BiobankText) createBoundWidgetWithLabel(
+        visitNumberText = (BiobankText) createBoundWidgetWithLabel(
             client,
             BiobankText.class,
             SWT.NONE,
@@ -160,12 +160,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             null,
             cevent,
             CollectionEventPeer.VISIT_NUMBER.getName(),
-            new NonEmptyStringValidator(
+            new IntegerNumberValidator(
                 Messages
-                    .getString("CollectionEventEntryForm.field.visitNumber.validation.msg")));
+                    .getString("CollectionEventEntryForm.field.visitNumber.validation.msg"),
+                false));
 
-        pvWidget.addSelectionChangedListener(listener);
-        setFirstControl(pvWidget);
+        visitNumberText.addSelectionChangedListener(listener);
+        setFirstControl(visitNumberText);
 
         activityStatusComboViewer = createComboViewer(client,
             Messages.getString("label.activity"),

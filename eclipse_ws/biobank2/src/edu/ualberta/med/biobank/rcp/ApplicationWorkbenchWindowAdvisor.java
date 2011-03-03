@@ -91,23 +91,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         statusline.setMessage(null, "Application ready");
 
         IWorkbench workbench = PlatformUI.getWorkbench();
-        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
+        IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
+        IWorkbenchPage page = activeWindow.getActivePage();
         if (page.getPerspective().getId().equals(LinkAssignPerspective.ID)) {
             // can't start on this perspective: switch to patient perspective
             try {
                 workbench.showPerspective(ProcessingPerspective.ID,
-                    workbench.getActiveWorkbenchWindow());
+                    activeWindow);
             } catch (WorkbenchException e) {
                 logger.error("Error while opening patients perpective", e);
             }
         }
         page.addPartListener(new BiobankPartListener());
-        window.addPerspectiveListener(new BiobankPerspectiveListener());
+        activeWindow.addPerspectiveListener(new BiobankPerspectiveListener());
 
         // to activate correct key bindings
-        String currentPerspectiveId = window.getActivePage().getPerspective()
-            .getId();
+        String currentPerspectiveId = activeWindow.getActivePage()
+            .getPerspective().getId();
         activateIfNotInPerspective(currentPerspectiveId, MainPerspective.ID);
         activateIfNotInPerspective(currentPerspectiveId,
             ProcessingPerspective.ID);
@@ -115,7 +115,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
 
-        ISourceProviderService service = (ISourceProviderService) window
+        ISourceProviderService service = (ISourceProviderService) activeWindow
             .getService(ISourceProviderService.class);
         SessionState sessionSourceProvider = (SessionState) service
             .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);

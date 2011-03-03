@@ -35,7 +35,11 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.WorkbenchException;
 import org.osgi.service.prefs.BackingStoreException;
 import org.osgi.service.prefs.Preferences;
 
@@ -47,6 +51,7 @@ import edu.ualberta.med.biobank.helpers.SessionHelper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
 import edu.ualberta.med.biobank.rcp.Application;
+import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 
@@ -388,14 +393,31 @@ public class LoginDialog extends TitleAreaDialog {
                     }
                     boolean canAddSession = true;
                     if (sessionHelper.getUser().getCurrentWorkingCentre() == null)
-                        if (sessionHelper.getUser().isWebsiteAdministrator())
+                        if (sessionHelper.getUser().isWebsiteAdministrator()) {
                             BiobankPlugin
                                 .openAsyncInformation(
                                     Messages
                                         .getString("LoginDialog.working.center.admin.title"),
                                     Messages
                                         .getString("LoginDialog.no.working.center.admin.msg"));
-                        else {
+                            // open the administration perspective if another
+                            // perspective is open
+                            IWorkbench workbench = PlatformUI.getWorkbench();
+                            IWorkbenchWindow activeWindow = workbench
+                                .getActiveWorkbenchWindow();
+                            IWorkbenchPage page = activeWindow.getActivePage();
+                            if (!page.getPerspective().getId()
+                                .equals(MainPerspective.ID)) {
+                                try {
+                                    workbench.showPerspective(
+                                        MainPerspective.ID, activeWindow);
+                                } catch (WorkbenchException e) {
+                                    BiobankPlugin.openAsyncError(
+                                        "Error while opening main perpective",
+                                        e);
+                                }
+                            }
+                        } else {
                             canAddSession = false;
                             BiobankPlugin
                                 .openAsyncError(

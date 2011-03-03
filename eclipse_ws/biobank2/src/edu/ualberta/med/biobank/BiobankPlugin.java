@@ -31,8 +31,8 @@ import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerGroup;
@@ -617,6 +617,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
      * 
      * @param selection
      */
+    @SuppressWarnings("restriction")
     public void updateHeapStatus(boolean selection) {
         for (IWorkbenchWindow window : PlatformUI.getWorkbench()
             .getWorkbenchWindows()) {
