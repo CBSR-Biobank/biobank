@@ -101,9 +101,10 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         }
         String tabName;
         if (cevent.isNew()) {
-            tabName = "New Collection Event";
+            tabName = Messages.getString("CollectionEventEntryForm.title.new");
         } else {
-            tabName = "Collection Event ";
+            tabName = Messages.getString("CollectionEventEntryForm.title.edit",
+                cevent.getVisitNumber());
         }
 
         setPartName(tabName);
@@ -124,7 +125,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Collection Event Information");
+        form.setText(Messages.getString("CollectionEventEntryForm.main.title"));
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
         createMainSection();
@@ -142,17 +143,20 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Study", patient
-            .getStudy().getName());
+        createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("CollectionEventEntryForm.field.study.label"),
+            patient.getStudy().getName());
 
-        createReadOnlyLabelledField(client, SWT.NONE, "Patient",
+        createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("CollectionEventEntryForm.field.patient.label"),
             patient.getPnumber());
 
         pvWidget = (BiobankText) createBoundWidgetWithLabel(
             client,
             BiobankText.class,
             SWT.NONE,
-            "Visit",
+            Messages
+                .getString("CollectionEventEntryForm.field.visitNumber.label"),
             null,
             cevent,
             CollectionEventPeer.VISIT_NUMBER.getName(),
@@ -209,7 +213,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     }
                 });
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Error retrievind source vessels", e);
+            BiobankPlugin.openAsyncError("Error retrieving source vessels", e);
         }
         section.setClient(specimensTable);
     }
