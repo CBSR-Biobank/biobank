@@ -47,7 +47,7 @@ public class LoggingForm extends BiobankViewForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         // FIXME study icon is not correct for the log form
         form.setImage(BiobankPlugin.getDefault().getImageRegistry()
-            .get(BiobankPlugin.IMG_STUDY));
+            .get(BiobankPlugin.IMG_LOGGING));
 
         Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));

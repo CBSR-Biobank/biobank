@@ -139,8 +139,6 @@ public class ContainerInfoTable extends InfoTableWidget<ContainerWrapper> {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
-
             }
         });
     }

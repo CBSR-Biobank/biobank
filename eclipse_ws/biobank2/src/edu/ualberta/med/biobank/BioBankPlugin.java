@@ -31,8 +31,8 @@ import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractStudyGroup;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerAdapter;
 import edu.ualberta.med.biobank.treeview.admin.ContainerGroup;
@@ -142,6 +142,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_REMOVE = "remove";
     public static final String IMG_WAND = "wand";
     public static final String IMG_HOURGLASS = "hourglass";
+    public static final String IMG_LOGGING = "logging";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -324,6 +325,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_REMOVE, "remove.png");
         registerImage(registry, IMG_WAND, "wand.png");
         registerImage(registry, IMG_HOURGLASS, "hourglass.png");
+        registerImage(registry, IMG_LOGGING, "table_row_delete.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,

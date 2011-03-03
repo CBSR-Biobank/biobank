@@ -315,8 +315,6 @@ public abstract class InfoTableWidget<T> extends AbstractInfoTableWidget<T> {
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                // TODO Auto-generated method stub
-
             }
         });
     }
