@@ -30,7 +30,9 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
@@ -55,7 +57,7 @@ public class AliquotedSpecimenSelectionWidget {
     private Object nextWidget;
 
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
-        List<SpecimenTypeWrapper> sourceTypes,
+        List<SpecimenWrapper> sourceSpecimens,
         List<SpecimenTypeWrapper> resultTypes, FormToolkit toolkit) {
 
         if (letter != null) {
@@ -64,11 +66,26 @@ public class AliquotedSpecimenSelectionWidget {
 
         cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
-        setComboProperties(cvSource, toolkit, sourceTypes, 0);
+        setComboProperties(cvSource, toolkit, sourceSpecimens, 0);
+        cvSource.setLabelProvider(new LabelProvider() {
+            @Override
+            public String getText(Object element) {
+                SpecimenWrapper spec = (SpecimenWrapper) element;
+                return spec.getInventoryId() + "*"
+                    + spec.getSpecimenType().getNameShort() + "*"
+                    + spec.getProcessingEventCollection(false).size();
+            }
+        });
 
         cvResult = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
         setComboProperties(cvResult, toolkit, resultTypes, 1);
+        cvResult.setLabelProvider(new LabelProvider() {
+            @Override
+            public String getText(Object element) {
+                return ((SpecimenTypeWrapper) element).getName();
+            }
+        });
 
         textNumber = toolkit.createLabel(parent, "", SWT.BORDER);
         GridData data = new GridData();
@@ -86,17 +103,11 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     private void setComboProperties(ComboViewer cv, FormToolkit toolkit,
-        List<?> types, final int selectionPosition) {
+        List<?> input, final int selectionPosition) {
         cv.getControl().setLayoutData(
             new GridData(SWT.FILL, SWT.TOP, true, false));
         toolkit.adapt(cv.getControl(), true, true);
         cv.setContentProvider(new ArrayContentProvider());
-        cv.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                return ((SpecimenTypeWrapper) element).getName();
-            }
-        });
         cv.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
@@ -110,16 +121,17 @@ public class AliquotedSpecimenSelectionWidget {
             }
         });
         cv.setComparator(new ViewerComparator());
-        cv.setInput(types);
-        cv.getControl().addTraverseListener(new TraverseListener() {
-            @Override
-            public void keyTraversed(TraverseEvent e) {
-                if (e.detail == SWT.TRAVERSE_TAB_NEXT
-                    || e.detail == SWT.TRAVERSE_RETURN) {
-                    e.doit = setNextFocus();
+        cv.setInput(input);
+        if (selectionPosition != 0)
+            cv.getControl().addTraverseListener(new TraverseListener() {
+                @Override
+                public void keyTraversed(TraverseEvent e) {
+                    if (e.detail == SWT.TRAVERSE_TAB_NEXT
+                        || e.detail == SWT.TRAVERSE_RETURN) {
+                        e.doit = setNextFocus();
+                    }
                 }
-            }
-        });
+            });
 
     }
 
@@ -182,14 +194,14 @@ public class AliquotedSpecimenSelectionWidget {
         }
     }
 
-    public SpecimenTypeWrapper getResultTypeSelection() {
+    private SpecimenTypeWrapper getResultTypeSelection() {
         return (SpecimenTypeWrapper) ((StructuredSelection) cvResult
             .getSelection()).getFirstElement();
     }
 
-    public SpecimenTypeWrapper getSourceTypeSelection() {
-        return (SpecimenTypeWrapper) ((StructuredSelection) cvSource
-            .getSelection()).getFirstElement();
+    private SpecimenWrapper getSourceSelection() {
+        return (SpecimenWrapper) ((StructuredSelection) cvSource.getSelection())
+            .getFirstElement();
     }
 
     public void addBinding(WidgetCreator dbc) {
@@ -255,11 +267,21 @@ public class AliquotedSpecimenSelectionWidget {
         cvResult.setInput(types);
     }
 
-    public void setSourceTypes(List<SpecimenTypeWrapper> types) {
+    public void setSourceTypes(List<SpecimenWrapper> types) {
         cvSource.setInput(types);
     }
 
     public void setFocus() {
         cvSource.getControl().setFocus();
+    }
+
+    /**
+     * @return an array of [Specimen (source), SpecimenType (result)]
+     */
+    public ModelWrapper<?>[] getSelection() {
+        if (getSourceSelection() != null && getResultTypeSelection() != null)
+            return new ModelWrapper<?>[] { getSourceSelection(),
+                getResultTypeSelection() };
+        return null;
     }
 }

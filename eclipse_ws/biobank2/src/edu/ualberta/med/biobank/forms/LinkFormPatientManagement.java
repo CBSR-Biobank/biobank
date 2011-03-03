@@ -49,6 +49,8 @@ public class LinkFormPatientManagement {
     private BiobankText cEventText;
     private Label cEventComboLabel;
     protected CollectionEventWrapper currentCEventSelected;
+    private BiobankText worksheetText;
+    protected String currentWorksheetNumber;
 
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
         AbstractSpecimenAdminForm aliquotAdminForm) {
@@ -89,6 +91,21 @@ public class LinkFormPatientManagement {
             }
         });
         patientNumberText.addKeyListener(aliquotAdminForm.textFieldKeyListener);
+        setFirstControl();
+    }
+
+    protected void createWorksheetText(Composite parent) {
+        worksheetText = (BiobankText) widgetCreator.createBoundWidgetWithLabel(
+            parent, BiobankText.class, SWT.NONE,
+            Messages.getString("ScanLink.worksheet.label"), new String[0],
+            new WritableValue("", String.class), null);
+        worksheetText.addModifyListener(new ModifyListener() {
+            @Override
+            public void modifyText(ModifyEvent e) {
+                currentWorksheetNumber = worksheetText.getText();
+            }
+        });
+        worksheetText.addKeyListener(aliquotAdminForm.textFieldKeyListener);
         setFirstControl();
     }
 
@@ -269,5 +286,9 @@ public class LinkFormPatientManagement {
             }
         }
 
+    }
+
+    public String getCurrentWorksheetNumber() {
+        return currentWorksheetNumber;
     }
 }
