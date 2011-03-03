@@ -228,6 +228,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                     break;
                 case POST_ADD:
                     shipment.addToSpecimenCollection(Arrays.asList(specimen));
+                    specimen.setOriginInfo(shipment);
                     break;
                 case PRE_DELETE:
                     break;
@@ -240,6 +241,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         };
 
         specimenEntryWidget.addVetoListener(ItemAction.PRE_ADD, vetoListener);
+        specimenEntryWidget.addVetoListener(ItemAction.POST_ADD, vetoListener);
+        specimenEntryWidget
+            .addVetoListener(ItemAction.PRE_DELETE, vetoListener);
+        specimenEntryWidget.addVetoListener(ItemAction.POST_DELETE,
+            vetoListener);
 
         specimenEntryWidget.setSpecimens(specimens);
     }

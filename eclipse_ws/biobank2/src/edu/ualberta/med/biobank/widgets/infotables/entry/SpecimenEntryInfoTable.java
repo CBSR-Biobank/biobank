@@ -37,7 +37,11 @@ public class SpecimenEntryInfoTable extends SpecimenInfoTable {
     public SpecimenEntryInfoTable(Composite parent,
         List<SpecimenWrapper> specs, ColumnsShown columnsShowns) {
         super(parent, specs, columnsShowns, 10);
-        currentSpecimens = new ArrayList<SpecimenWrapper>(specs);
+        currentSpecimens = new ArrayList<SpecimenWrapper>();
+
+        if (specs != null) {
+            currentSpecimens.addAll(specs);
+        }
     }
 
     @Override

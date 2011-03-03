@@ -6,6 +6,7 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableDeleteItemListener;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableEvent;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport;
 import edu.ualberta.med.biobank.widgets.listeners.VetoListenerSupport.VetoException;

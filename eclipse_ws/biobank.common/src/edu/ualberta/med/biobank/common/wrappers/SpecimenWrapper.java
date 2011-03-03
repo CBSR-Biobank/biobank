@@ -165,49 +165,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     private CenterWrapper<?> getLocation() {
-        List<DispatchSpecimenWrapper> dspcs = getDispatchSpecimenCollection();
-
-        // if in a container, use the container's site
-        if (getParent() != null) {
-            return getParent().getSite();
-        } else {
-            // dispatched Specimen?
-            for (DispatchSpecimenWrapper da : dspcs) {
-                DispatchSpecimenState state = DispatchSpecimenState.getState(da
-                    .getState());
-
-                if (DispatchState.IN_TRANSIT
-                    .equals(da.getDispatch().getState())
-                    && DispatchSpecimenState.NONE == state) {
-                    // Specimen is in transit
-                    // FIXME what if can't read sender or receiver
-                    SiteWrapper fakeSite = new SiteWrapper(appService);
-                    fakeSite.setNameShort("In Transit ("
-                        + da.getDispatch().getSenderCenter().getNameShort()
-                        + " to "
-                        + da.getDispatch().getReceiverCenter().getNameShort()
-                        + ")");
-                    return fakeSite;
-                } else if (DispatchState.RECEIVED.equals(da.getDispatch()
-                    .getState())) {
-                    switch (state) {
-                    case EXTRA:
-                        // Specimen has been accidentally dispatched
-                        return da.getDispatch().getReceiverCenter();
-                    case MISSING:
-                        // Specimen is missing
-                        return da.getDispatch().getSenderCenter();
-                    case RECEIVED:
-                    case NONE:
-                        // Specimen has been intentionally dispatched and
-                        // received
-                        return da.getDispatch().getReceiverCenter();
-                    }
-                }
-            }
-            // if not in a container or a dispatch, use the originating shipment
-            return getParentProcessingEvent().getCenter();
-        }
+        return getCurrentCenter();
     }
 
     /**

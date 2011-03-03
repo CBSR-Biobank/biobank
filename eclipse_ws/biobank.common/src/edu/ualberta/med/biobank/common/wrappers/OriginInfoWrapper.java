@@ -1,11 +1,10 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.util.Collection;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
+import edu.ualberta.med.biobank.model.OriginInfo;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class OriginInfoWrapper extends OriginInfoBaseWrapper {
@@ -14,13 +13,18 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         super(appService);
     }
 
+    public OriginInfoWrapper(WritableApplicationService appService,
+        OriginInfo originInfo) {
+        super(appService, originInfo);
+    }
+
     public List<SpecimenWrapper> getSpecimenCollection() {
         return getSpecimenCollection(false);
     }
 
-    public Collection<PatientWrapper> getPatientCollection() {
-        Collection<SpecimenWrapper> specimens = getSpecimenCollection();
-        Set<PatientWrapper> patients = new HashSet<PatientWrapper>();
+    public List<PatientWrapper> getPatientCollection() {
+        List<SpecimenWrapper> specimens = getSpecimenCollection();
+        List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
 
         for (SpecimenWrapper specimen : specimens) {
             PatientWrapper patient = specimen.getCollectionEvent().getPatient();
