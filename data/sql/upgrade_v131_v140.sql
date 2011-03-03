@@ -39,7 +39,7 @@ ALTER TABLE event_attr
 
 
 /*****************************************************
- * specimen
+ * specimens
  ****************************************************/
 
 CREATE TABLE specimen_type (
@@ -51,14 +51,13 @@ CREATE TABLE specimen_type (
   UNIQUE KEY NAME_SHORT (NAME_SHORT)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
+UPDATE source_vessel set name='CHILD Meconium' where name='Meconium';
+
 INSERT INTO specimen_type (name,name_short)
        SELECT name,name_short FROM sample_type;
 
 INSERT INTO specimen_type (name,name_short)
-       SELECT name,name FROM source_vessel WHERE name!='N/A' && name!='Meconium';
-
-INSERT INTO specimen_type (name,name_short) VALUES
-	('Meconium','CHILD Meconium');
+       SELECT name,name FROM source_vessel WHERE name!='N/A';
 
 ALTER TABLE specimen_type MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -86,10 +85,33 @@ CREATE TABLE specimen (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO specimen (inventory_id,comment,quantity,created_at,center_id,specimen_type_id,
-activity_status_id,pv_id)
-SELECT inventory_id,comment,quantity,created_at,center_id,specimen_type_id,
-activity_status_id,id FROM aliquot;
+INSERT INTO specimen (inventory_id,comment,quantity,created_at,specimen_type_id,
+activity_status_id,pv_id,sv_id)
+        SELECT inventory_id,comment,quantity,link_date,specimen_type.id,activity_status_id,
+        patient_visit_id,null
+        FROM aliquot
+        JOIN sample_type ON sample_type.id=aliquot.sample_type_id
+        JOIN specimen_type ON specimen_type.name=sample_type.name;
+
+INSERT INTO specimen (inventory_id,quantity,created_at,pv_id,sv_id)
+       SELECT concat("sw upgrade ",pv_source_vessel.id),volume,time_drawn,patient_visit_id,
+       source_vessel_id
+       FROM pv_source_vessel
+       join source_vessel on source_vessel.id=pv_source_vessel.source_vessel_id
+       join specimen_type on specimen_type.name=source_vessel.name;
+
+UPDATE specimen,patient_visit as pv, clinic_shipment_patient as cps,abstract_shipment as aship,
+clinic,center
+       SET center_id=center.id
+       where cps.id=pv.CLINIC_SHIPMENT_PATIENT_ID
+       and aship.id=cps.CLINIC_SHIPMENT_ID
+       and clinic.id=aship.clinic_id
+       and center.name=site.name
+       and pv.id=specimen.pv_id
+       and aship.discriminator='ClinicShipment';
+
+INSERT INTO specimen (inventory_id,quantity,created_at,pv_id,sv_id)
+SELECT concat("sw upgrade ",id,volume,time_drawn,patient_visit_id,source_vessel_id)
 
 ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -181,6 +203,16 @@ SELECT center.id,shipment_info.id FROM abstract_shipment
        JOIN center ON center.name=clinic.name
        join shipment_info on shipment_info.absship_id=abstract_shipment.id
        WHERE abstract_shipment.discriminator='ClinicShipment';
+
+UPDATE specimen set origin_info_id=(
+       select oi.id
+       from patient_visit as pv
+       join clinic_shipment_patient as cps on cps.id=pv.CLINIC_SHIPMENT_PATIENT_ID
+       join abstract_shipment as aship on aship.id=cps.CLINIC_SHIPMENT_ID
+       join shipment_info as si on si.absship_id=aship.id
+       join origin_info as oi on oi.shipment_info_id=si.id
+       where aship.discriminator='ClinicShipment'
+       and specimen.pv_id=pv.id and specimen.sv_id is null);
 
 ALTER TABLE origin_info MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -295,6 +327,9 @@ CREATE TABLE collection_event (
 INSERT INTO collection_event (visit_number,comment,pv_id)
        SELECT -1,patient_visit.comment,patient_visit.id
        FROM patient_visit;
+
+update specimen,collection_event as ce set collection_event_id=ce.id
+	where ce.pv_id=specimen.pv_id and specimen.sv_id=0;
 
 -- source vessels
 
@@ -839,3 +874,5 @@ UNLOCK TABLES;
 #DROP TABLE source_vessel;
 #DROP TABLE sample_storage
 #DROP TABLE study_source_vessel
+#DROP TABLE aliquot;
+#DROP TABLE pv_source_vessel;
