@@ -94,8 +94,8 @@ public class SpecimenEntryInfoTable extends SpecimenInfoTable {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
-                    // FIXME
-                    addOrEditSpecimen(true, null, null, null, null);
+                    SpecimenWrapper sw = getSelection();
+                    addOrEditSpecimen(true, sw, null, null, null);
                 }
             });
         }

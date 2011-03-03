@@ -274,7 +274,7 @@ public class DispatchCreateScanDialog extends
                 cell.setStatus(CellStatus.IN_SHIPMENT_ADDED);
             }
         }
-        (currentShipment).addNewAliquots(aliquots, true);
+        (currentShipment).addAliquots(aliquots);
         if (currentPallet != null) {
             removedPallets.add(currentPallet);
         }

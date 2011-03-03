@@ -552,24 +552,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return null;
     }
 
-    @Deprecated
-    public void addNewAliquots(List<SpecimenWrapper> asList, boolean b) {
-        // TODO this can be removed once the gui doesn't use it anymore
-
-    }
-
-    @Deprecated
-    public void setStudy(StudyWrapper study) {
-        // TODO this can be removed once the gui doesn't use it anymore
-    }
-
-    @Deprecated
-    public void addExtraAliquots(List<SpecimenWrapper> extraAliquots, boolean b)
-        throws BiobankCheckException {
-        // TODO Auto-generated method stub
-
-    }
-
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
         return getDispatchSpecimenCollection(false);
     }
