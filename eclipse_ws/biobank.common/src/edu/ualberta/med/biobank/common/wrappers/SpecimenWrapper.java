@@ -340,13 +340,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         throws ApplicationException, BiobankCheckException {
         HQLCriteria criteria = new HQLCriteria(Specimen_QRY,
             Arrays.asList(new Object[] { inventoryId }));
-        List<Specimen> Specimens = appService.query(criteria);
-        if (Specimens == null || Specimens.size() == 0)
+        List<Specimen> specimens = appService.query(criteria);
+        if (specimens == null || specimens.size() == 0)
             return null;
-        if (Specimens.size() == 1)
-            return new SpecimenWrapper(appService, Specimens.get(0));
-        throw new BiobankCheckException("Error retrieving Specimens: found "
-            + Specimens.size() + " results.");
+        if (specimens.size() == 1)
+            return new SpecimenWrapper(appService, specimens.get(0));
+        throw new BiobankCheckException("Error retrieving specimens: found "
+            + specimens.size() + " results.");
     }
 
     /**

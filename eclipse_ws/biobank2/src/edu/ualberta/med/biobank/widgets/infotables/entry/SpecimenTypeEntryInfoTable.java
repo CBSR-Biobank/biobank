@@ -14,7 +14,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.dialogs.SpecimentTypeDialog;
+import edu.ualberta.med.biobank.dialogs.SpecimenTypeDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -25,19 +25,19 @@ import edu.ualberta.med.biobank.widgets.infotables.SpecimenTypeInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
- * Displays the current sample storage collection and allows the user to add
- * additional sample storage to the collection.
+ * Displays the current specimen type collection and allows the user to add
+ * additional specimen type to the collection.
  */
 public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SpecimenTypeEntryInfoTable.class.getName());
 
-    private List<SpecimenTypeWrapper> selectedSourceVessels;
+    private List<SpecimenTypeWrapper> selectedSpecimenTypes;
 
-    private List<SpecimenTypeWrapper> addedOrModifiedSourceVessels;
+    private List<SpecimenTypeWrapper> addedOrModifiedSpecimenTypes;
 
-    private List<SpecimenTypeWrapper> deletedSourceVessels;
+    private List<SpecimenTypeWrapper> deletedSpecimenTypes;
 
     private String addMessage;
 
@@ -47,14 +47,14 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
      * 
      * @param parent a composite control which will be the parent of the new
      *            instance (cannot be null)
-     * @param SampleTypeCollection the sample storage already selected and to be
+     * @param SampleTypeCollection the specimen type already selected and to be
      *            displayed in the table viewer (can be null).
      */
     public SpecimenTypeEntryInfoTable(Composite parent,
-        List<SpecimenTypeWrapper> globalSourceVessels, String addMessage,
+        List<SpecimenTypeWrapper> globalSpecimenTypes, String addMessage,
         String editMessage) {
         super(parent, null);
-        setLists(globalSourceVessels);
+        setLists(globalSpecimenTypes);
         this.addMessage = addMessage;
         this.editMessage = editMessage;
         addEditSupport();
@@ -69,31 +69,31 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
      * 
      * @param message The message to display in the SampleTypeDialog.
      */
-    public void addSourceVessel() {
+    public void addSpecimenType() {
         SpecimenTypeWrapper newST = new SpecimenTypeWrapper(
             SessionManager.getAppService());
-        addOrEditSourceVessel(true, newST, addMessage);
+        addOrEditSpecimenType(true, newST, addMessage);
     }
 
-    private boolean addOrEditSourceVessel(boolean add,
-        SpecimenTypeWrapper sourceVessel, String message) {
-        SpecimentTypeDialog dlg = new SpecimentTypeDialog(PlatformUI
+    private boolean addOrEditSpecimenType(boolean add,
+        SpecimenTypeWrapper specimenType, String message) {
+        SpecimenTypeDialog dlg = new SpecimenTypeDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
-            sourceVessel, message);
+            specimenType, message);
         if (dlg.open() == Dialog.OK) {
-            if (addEditOk(sourceVessel)) {
+            if (addEditOk(specimenType)) {
                 if (add) {
                     // only add to the collection when adding and not editing
-                    selectedSourceVessels.add(sourceVessel);
+                    selectedSpecimenTypes.add(specimenType);
                 }
-                reloadCollection(selectedSourceVessels);
-                addedOrModifiedSourceVessels.add(sourceVessel);
+                reloadCollection(selectedSpecimenTypes);
+                addedOrModifiedSpecimenTypes.add(specimenType);
                 notifyListeners();
                 return true;
             } else {
                 SpecimenTypeWrapper orig = dlg.getOrigSpecimenType();
-                sourceVessel.setName(orig.getName());
-                reloadCollection(selectedSourceVessels);
+                specimenType.setName(orig.getName());
+                reloadCollection(selectedSpecimenTypes);
             }
         }
         return false;
@@ -103,7 +103,7 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
         addAddItemListener(new IInfoTableAddItemListener() {
             @Override
             public void addItem(InfoTableEvent event) {
-                addSourceVessel();
+                addSpecimenType();
             }
         });
 
@@ -112,7 +112,7 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
             public void editItem(InfoTableEvent event) {
                 SpecimenTypeWrapper type = getSelection();
                 if (type != null)
-                    addOrEditSourceVessel(false, type, editMessage);
+                    addOrEditSpecimenType(false, type, editMessage);
             }
         });
 
@@ -125,8 +125,8 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
                         if (!specType.isNew() && specType.isUsedBySamples()) {
                             BiobankPlugin
                                 .openError(
-                                    "Source Vessel Delete Error",
-                                    "Cannot delete source vessel \""
+                                    "Specimen Type Delete Error",
+                                    "Cannot delete specimen type \""
                                         + specType.getName()
                                         + "\" since studies and/or patient visits are using it.");
                             return;
@@ -134,18 +134,18 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
 
                         if (!MessageDialog.openConfirm(PlatformUI
                             .getWorkbench().getActiveWorkbenchWindow()
-                            .getShell(), "Delete Source Vessel",
-                            "Are you sure you want to delete source vessel \""
+                            .getShell(), "Delete Specimen Type",
+                            "Are you sure you want to delete specimen type \""
                                 + specType.getName() + "\"?")) {
                             return;
                         }
 
                         // equals method now compare toString() results if both
                         // ids are null.
-                        selectedSourceVessels.remove(specType);
+                        selectedSpecimenTypes.remove(specType);
 
-                        setCollection(selectedSourceVessels);
-                        deletedSourceVessels.add(specType);
+                        setCollection(selectedSpecimenTypes);
+                        deletedSpecimenTypes.add(specType);
                         notifyListeners();
                     } catch (final RemoteConnectFailureException exp) {
                         BiobankPlugin.openRemoteConnectErrorMessage(exp);
@@ -160,16 +160,16 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
 
     private boolean addEditOk(SpecimenTypeWrapper type) {
         try {
-            for (SpecimenTypeWrapper sv : selectedSourceVessels)
+            for (SpecimenTypeWrapper sv : selectedSpecimenTypes)
                 if (sv.getId() != type.getId()
                     && sv.getName().equals(type.getName()))
                     throw new BiobankCheckException(
-                        "That source vessel has already been added.");
-            for (SpecimenTypeWrapper sv : addedOrModifiedSourceVessels)
+                        "That specimen type has already been added.");
+            for (SpecimenTypeWrapper sv : addedOrModifiedSpecimenTypes)
                 if (sv.getId() != type.getId()
                     && sv.getName().equals(type.getName()))
                     throw new BiobankCheckException(
-                        "That source vessel has already been added.");
+                        "That specimen type has already been added.");
             type.checkNameAndShortNameUnique();
         } catch (BiobankException bce) {
             BiobankPlugin.openAsyncError("Check error", bce);
@@ -181,24 +181,24 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
         return true;
     }
 
-    public List<SpecimenTypeWrapper> getAddedOrModifiedSourceVessels() {
-        return addedOrModifiedSourceVessels;
+    public List<SpecimenTypeWrapper> getAddedOrModifiedSpecimenTypes() {
+        return addedOrModifiedSpecimenTypes;
     }
 
-    public List<SpecimenTypeWrapper> getDeletedSourceVessels() {
-        return deletedSourceVessels;
+    public List<SpecimenTypeWrapper> getDeletedSpecimenTypes() {
+        return deletedSpecimenTypes;
     }
 
-    public void setLists(List<SpecimenTypeWrapper> sourceVesselCollection) {
-        if (sourceVesselCollection == null) {
-            selectedSourceVessels = new ArrayList<SpecimenTypeWrapper>();
+    public void setLists(List<SpecimenTypeWrapper> specimenTypeCollection) {
+        if (specimenTypeCollection == null) {
+            selectedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
         } else {
-            selectedSourceVessels = new ArrayList<SpecimenTypeWrapper>(
-                sourceVesselCollection);
+            selectedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>(
+                specimenTypeCollection);
         }
-        reloadCollection(sourceVesselCollection);
-        addedOrModifiedSourceVessels = new ArrayList<SpecimenTypeWrapper>();
-        deletedSourceVessels = new ArrayList<SpecimenTypeWrapper>();
+        reloadCollection(specimenTypeCollection);
+        addedOrModifiedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
+        deletedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
     }
 
     public void reload() {

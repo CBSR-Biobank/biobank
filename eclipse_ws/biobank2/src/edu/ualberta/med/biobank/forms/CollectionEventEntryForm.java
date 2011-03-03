@@ -34,7 +34,7 @@ import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
-import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.validators.IntegerNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -156,7 +156,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             null,
             cevent,
             CollectionEventPeer.VISIT_NUMBER.getName(),
-            new NonEmptyStringValidator(
+            new IntegerNumberValidator(
                 Messages
                     .getString("CollectionEventEntryForm.field.visitNumber.validation.msg")));
 
@@ -198,16 +198,15 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         try {
             final List<SpecimenTypeWrapper> allSpecimenTypes = SpecimenTypeWrapper
                 .getAllSpecimenTypes(SessionManager.getAppService(), true);
-            addSectionToolbar(section, "Add Source Vessel",
-                new SelectionAdapter() {
-                    @Override
-                    public void widgetSelected(SelectionEvent e) {
-                        specimensTable.addOrEditSpecimen(true, null, cevent
-                            .getPatient().getStudy()
+            addSectionToolbar(section, "Add Specimen", new SelectionAdapter() {
+                @Override
+                public void widgetSelected(SelectionEvent e) {
+                    specimensTable.addOrEditSpecimen(true, null,
+                        cevent.getPatient().getStudy()
                             .getSourceSpecimenCollection(true),
-                            allSpecimenTypes, cevent);
-                    }
-                });
+                        allSpecimenTypes, cevent);
+                }
+            });
         } catch (ApplicationException e) {
             BiobankPlugin.openAsyncError("Error retrievind source vessels", e);
         }

@@ -121,14 +121,9 @@
       </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
-            id="edu.ualberta.med.biobank.commands.editSampleTypes"
-            name="Edit Sample Types">
+            id="edu.ualberta.med.biobank.commands.editSpecimenTypes"
+            name="Edit Specimen Types">
       		</command>
-      <command
-            categoryId="org.eclipse.ui.category.edit"
-            id="edu.ualberta.med.biobank.commands.editSourceVessels"
-            name="Edit Source Vessels">
-      </command>
       <command
             categoryId="org.eclipse.ui.category.edit"
             id="edu.ualberta.med.biobank.commands.editShippingMethods"
@@ -437,22 +432,8 @@
          </activeWhen>
       </handler>
       <handler
-            class="edu.ualberta.med.biobank.handlers.EditSampleTypesHandler"
-            commandId="edu.ualberta.med.biobank.commands.editSampleTypes">
-         <activeWhen>
-            <and>
-               <reference
-                     definitionId="biobank2.loggedIn">
-               </reference>
-               <reference
-                     definitionId="biobank2.mainPerspectiveSelected">
-               </reference>
-            </and>
-         </activeWhen>
-      </handler>
-      <handler
-            class="edu.ualberta.med.biobank.handlers.EditSourceVesselsHandler"
-            commandId="edu.ualberta.med.biobank.commands.editSourceVessels">
+            class="edu.ualberta.med.biobank.handlers.EditSpecimenTypesHandler"
+            commandId="edu.ualberta.med.biobank.commands.editSpecimenTypes">
          <activeWhen>
             <and>
                <reference
@@ -873,17 +854,11 @@
                      style="push">
                </command>
                 <command
-                     commandId="edu.ualberta.med.biobank.commands.editSampleTypes"
-                     id="edu.ualberta.med.biobank.menu.editSampleTypes"
-                     label="Edit Sample Types"
+                     commandId="edu.ualberta.med.biobank.commands.editSpecimenTypes"
+                     id="edu.ualberta.med.biobank.menu.editSpecimenTypes"
+                     label="Edit Specimen Types"
                      style="push">
                </command>
-                <command
-                      commandId="edu.ualberta.med.biobank.commands.editSourceVessels"
-                      id="edu.ualberta.med.biobank.menu.editSourceVessels"
-                      label="Edit Source Vessels"
-                      style="push">
-                </command>
                 <command
                       commandId="edu.ualberta.med.biobank.commands.editShippingMethods"
                       id="edu.ualberta.med.biobank.menu.editActivityStatusMethods"
@@ -1641,10 +1616,10 @@
             name="Aliquot Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
+            class="edu.ualberta.med.biobank.forms.SpecimenTypesEntryForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.SampleTypesEntryForm"
-            name="Sample Types Entry">
+            id="edu.ualberta.med.biobank.forms.SpecimenTypesEntryForm"
+            name="Specimen Types Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ShipmentEntryForm"
@@ -1687,12 +1662,6 @@
             icon="icons/reportsPerspective.png"
             id="edu.ualberta.med.biobank.editors.ReportsEditor"
             name="Reports Editor">
-      </editor>
-      <editor
-            class="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
-            default="false"
-            id="edu.ualberta.med.biobank.forms.SourceVesselEntryForm"
-            name="Source Vessel Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.ShippingMethodEntryForm"
@@ -2074,16 +2043,10 @@
             sequence="M3+N">
       </key>
       <key
-            commandId="edu.ualberta.med.biobank.commands.editSampleTypes"
+            commandId="edu.ualberta.med.biobank.commands.editSpecimenTypes"
             contextId="edu.ualberta.med.biobank.perspective.main"
             schemeId="biobank2.scheme"
             sequence="M3+L">
-      </key>    
-      <key
-            commandId="edu.ualberta.med.biobank.commands.editSourceVessels"
-            contextId="edu.ualberta.med.biobank.perspective.main"
-            schemeId="biobank2.scheme"
-            sequence="M3+V">
       </key>    
 	  <key
             commandId="edu.ualberta.med.biobank.commands.editShippingMethods"

@@ -8,12 +8,12 @@ import org.eclipse.ui.PlatformUI;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.forms.SourceVesselEntryForm;
+import edu.ualberta.med.biobank.forms.SpecimenTypesEntryForm;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
 
-public class EditSourceVesselsHandler extends AbstractHandler {
-    public static final String ID = "edu.ualberta.med.biobank.commands.editSourceVessels";
+public class EditSpecimenTypesHandler extends AbstractHandler {
+    public static final String ID = "edu.ualberta.med.biobank.commands.editSpecimenTypes";
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -26,10 +26,11 @@ public class EditSourceVesselsHandler extends AbstractHandler {
                 .getActiveWorkbenchWindow()
                 .getActivePage()
                 .openEditor(new FormInput(sessionAdapter),
-                    SourceVesselEntryForm.ID, false, 0);
+                    SpecimenTypesEntryForm.ID, false, 0);
         } catch (Exception e) {
             throw new ExecutionException("Could not execute handler.", e);
         }
+
         return null;
     }
 
@@ -38,6 +39,6 @@ public class EditSourceVesselsHandler extends AbstractHandler {
         return (SessionManager.canCreate(SpecimenTypeWrapper.class, null)
             || SessionManager.canUpdate(SpecimenTypeWrapper.class, null) || SessionManager
             .canDelete(SpecimenTypeWrapper.class, null))
-            && (SessionManager.getInstance().getSession() != null);
+            && SessionManager.getInstance().getSession() != null;
     }
 }

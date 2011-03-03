@@ -10,7 +10,8 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> {
 
-    private static final String[] HEADINGS = new String[] { "Source vessel" };
+    private static final String[] HEADINGS = new String[] { "Name",
+        "Short Name" };
 
     public SpecimenTypeInfoTable(Composite parent,
         List<SpecimenTypeWrapper> specimenCollection) {
@@ -22,21 +23,21 @@ public class SpecimenTypeInfoTable extends InfoTableWidget<SpecimenTypeWrapper> 
         return new BiobankLabelProvider() {
             @Override
             public String getColumnText(Object element, int columnIndex) {
-                // SourceVesselWrapper item = (SourceVesselWrapper)
-                // ((BiobankCollectionModel) element).o;
-                // if (item == null) {
-                // if (columnIndex == 0) {
-                // return "loading...";
-                // }
-                // return "";
-                // }
-                // switch (columnIndex) {
-                // case 0:
-                // return item.getSourceVesselType().getName();
-                // default:
-                // return "";
-                // }
-                return null;
+                SpecimenTypeWrapper item = (SpecimenTypeWrapper) ((BiobankCollectionModel) element).o;
+                if (item == null) {
+                    if (columnIndex == 0) {
+                        return "loading...";
+                    }
+                    return "";
+                }
+                switch (columnIndex) {
+                case 0:
+                    return item.getName();
+                case 1:
+                    return item.getNameShort();
+                default:
+                    return null;
+                }
             }
         };
     }

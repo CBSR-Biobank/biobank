@@ -12,34 +12,35 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 
-public class SampleTypeDialog extends BiobankDialog {
+public class SpecimenTypeDialog extends BiobankDialog {
 
-    private static final String TITLE = "Sample Type ";
+    private static final String TITLE = "Specimen Type ";
 
-    private static final String MSG_NO_ST_NAME = "Sample type must have a name.";
-    private static final String MSG_NO_ST_SNAME = "Sample type must have a short name.";
+    private static final String MSG_NO_ST_NAME = "Specimen type must have a name.";
+    private static final String MSG_NO_ST_SNAME = "Specimen type must have a short name.";
 
-    private SpecimenTypeWrapper oldSampleType;
-    private SpecimenTypeWrapper origSampleType;
+    private SpecimenTypeWrapper oldSpecimenType;
+    private SpecimenTypeWrapper origSpecimenType;
 
     // this is the object that is modified via the bound widgets
-    private SpecimenTypeWrapper sampleType;
+    private SpecimenTypeWrapper specimenType;
 
     private String message;
 
     private String currentTitle;
 
-    public SampleTypeDialog(Shell parent, SpecimenTypeWrapper sampleType,
+    public SpecimenTypeDialog(Shell parent, SpecimenTypeWrapper specimenType,
         String message) {
         super(parent);
-        Assert.isNotNull(sampleType);
-        origSampleType = sampleType;
-        this.sampleType = new SpecimenTypeWrapper(null);
-        this.sampleType.setName(sampleType.getName());
-        this.sampleType.setNameShort(sampleType.getNameShort());
+        Assert.isNotNull(specimenType);
+        origSpecimenType = specimenType;
+        this.specimenType = new SpecimenTypeWrapper(null);
+        this.specimenType.setName(specimenType.getName());
+        this.specimenType.setNameShort(specimenType.getNameShort());
         this.message = message;
-        oldSampleType = new SpecimenTypeWrapper(SessionManager.getAppService());
-        currentTitle = ((origSampleType.getName() == null) ? "Add " : "Edit ")
+        oldSpecimenType = new SpecimenTypeWrapper(
+            SessionManager.getAppService());
+        currentTitle = ((origSpecimenType.getName() == null) ? "Add " : "Edit ")
             + TITLE;
     }
 
@@ -65,25 +66,25 @@ public class SampleTypeDialog extends BiobankDialog {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Name", null, sampleType, "name", new NonEmptyStringValidator(
+            "Name", null, specimenType, "name", new NonEmptyStringValidator(
                 MSG_NO_ST_NAME));
 
         createBoundWidgetWithLabel(content, BiobankText.class, SWT.BORDER,
-            "Short Name", null, sampleType, "nameShort",
+            "Short Name", null, specimenType, "nameShort",
             new NonEmptyStringValidator(MSG_NO_ST_SNAME));
     }
 
     @Override
     protected void okPressed() {
-        oldSampleType.setName(origSampleType.getName());
-        oldSampleType.setNameShort(origSampleType.getNameShort());
-        origSampleType.setName(sampleType.getName());
-        origSampleType.setNameShort(sampleType.getNameShort());
+        oldSpecimenType.setName(origSpecimenType.getName());
+        oldSpecimenType.setNameShort(origSpecimenType.getNameShort());
+        origSpecimenType.setName(specimenType.getName());
+        origSpecimenType.setNameShort(specimenType.getNameShort());
         super.okPressed();
     }
 
-    public SpecimenTypeWrapper getOrigSampleType() {
-        return oldSampleType;
+    public SpecimenTypeWrapper getOrigSpecimenType() {
+        return oldSpecimenType;
     }
 
 }
