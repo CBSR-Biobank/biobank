@@ -1,5 +1,9 @@
-RENAME TABLE clinic_shipment_patient TO shipment_patient;
-RENAME TABLE dispatch_shipment_aliquot TO dispatch_aliquot;
+/*------------------------------------------------------------------------------
+ *
+ *  BioBank2 MySQL upgrade script for model version 1.3.1 to 1.4.0
+ *
+ *----------------------------------------------------------------------------*/
+
 
 /*****************************************************
  *  EVENT ATTRIBUTES
@@ -35,6 +39,83 @@ ALTER TABLE event_attr
 
 
 /*****************************************************
+ * specimens
+ ****************************************************/
+
+CREATE TABLE specimen_type (
+  ID int(11) NOT NULL auto_increment,
+  NAME varchar(100) NOT NULL,
+  NAME_SHORT varchar(50) NOT NULL,
+  PRIMARY KEY (ID),
+  UNIQUE KEY NAME (NAME),
+  UNIQUE KEY NAME_SHORT (NAME_SHORT)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+UPDATE source_vessel set name='CHILD Meconium' where name='Meconium';
+
+INSERT INTO specimen_type (name,name_short)
+       SELECT name,name_short FROM sample_type;
+
+INSERT INTO specimen_type (name,name_short)
+       SELECT name,name FROM source_vessel WHERE name!='N/A';
+
+ALTER TABLE specimen_type MODIFY COLUMN ID INT(11) NOT NULL;
+
+CREATE TABLE specimen (
+    ID INT(11) NOT NULL AUTO_INCREMENT,
+    INVENTORY_ID VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+    COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    QUANTITY DOUBLE NULL DEFAULT NULL,
+    CREATED_AT DATETIME NULL DEFAULT NULL,
+    CENTER_ID INT(11) NULL DEFAULT NULL,
+    SPECIMEN_TYPE_ID INT(11) NOT NULL,
+    ORIGIN_INFO_ID INT(11) NULL DEFAULT NULL,
+    PROCESSING_EVENT_ID INT(11) NULL DEFAULT NULL,
+    COLLECTION_EVENT_ID INT(11) NOT NULL,
+    ACTIVITY_STATUS_ID INT(11) NOT NULL,
+    PV_ID INT(11) NOT NULL,
+    SV_ID INT(11) NOT NULL,
+    INDEX FKAF84F30838445996 (SPECIMEN_TYPE_ID),
+    INDEX FKAF84F308280272F2 (COLLECTION_EVENT_ID),
+    INDEX FKAF84F308C449A4 (ACTIVITY_STATUS_ID),
+    INDEX FKAF84F30812E55F12 (ORIGIN_INFO_ID),
+    CONSTRAINT INVENTORY_ID UNIQUE KEY(INVENTORY_ID),
+    INDEX FKAF84F30892FAA705 (CENTER_ID),
+    INDEX FKAF84F30833126C8 (PROCESSING_EVENT_ID),
+    PRIMARY KEY (ID)
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+INSERT INTO specimen (inventory_id,comment,quantity,created_at,specimen_type_id,
+activity_status_id,pv_id,sv_id)
+        SELECT inventory_id,comment,quantity,link_date,specimen_type.id,activity_status_id,
+        patient_visit_id,null
+        FROM aliquot
+        JOIN sample_type ON sample_type.id=aliquot.sample_type_id
+        JOIN specimen_type ON specimen_type.name=sample_type.name;
+
+INSERT INTO specimen (inventory_id,quantity,created_at,pv_id,sv_id)
+       SELECT concat("sw upgrade ",pv_source_vessel.id),volume,time_drawn,patient_visit_id,
+       source_vessel_id
+       FROM pv_source_vessel
+       join source_vessel on source_vessel.id=pv_source_vessel.source_vessel_id
+       join specimen_type on specimen_type.name=source_vessel.name;
+
+UPDATE specimen,patient_visit as pv, clinic_shipment_patient as cps,abstract_shipment as aship,
+clinic,center
+       SET center_id=center.id
+       where cps.id=pv.CLINIC_SHIPMENT_PATIENT_ID
+       and aship.id=cps.CLINIC_SHIPMENT_ID
+       and clinic.id=aship.clinic_id
+       and center.name=site.name
+       and pv.id=specimen.pv_id
+       and aship.discriminator='ClinicShipment';
+
+INSERT INTO specimen (inventory_id,quantity,created_at,pv_id,sv_id)
+SELECT concat("sw upgrade ",id,volume,time_drawn,patient_visit_id,source_vessel_id)
+
+ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL;
+
+/*****************************************************
  * Merge clinics and sites into centers
  ****************************************************/
 
@@ -62,7 +143,7 @@ INSERT INTO center (discriminator,name,name_short,comment,address_id,activity_st
 SELECT 'Clinic',name,name_short,comment,address_id,activity_status_id,sends_shipments FROM clinic;
 
 INSERT INTO center (discriminator,name,name_short,comment,address_id,activity_status_id)
-SELECT 'Site',name,name_short,comment,address_id,activity_status_id from site;
+SELECT 'Site',name,name_short,comment,address_id,activity_status_id FROM site;
 
 -- update site-study correlation table
 -- create center_id column which will alter be renamed to site_id
@@ -123,6 +204,16 @@ SELECT center.id,shipment_info.id FROM abstract_shipment
        join shipment_info on shipment_info.absship_id=abstract_shipment.id
        WHERE abstract_shipment.discriminator='ClinicShipment';
 
+UPDATE specimen set origin_info_id=(
+       select oi.id
+       from patient_visit as pv
+       join clinic_shipment_patient as cps on cps.id=pv.CLINIC_SHIPMENT_PATIENT_ID
+       join abstract_shipment as aship on aship.id=cps.CLINIC_SHIPMENT_ID
+       join shipment_info as si on si.absship_id=aship.id
+       join origin_info as oi on oi.shipment_info_id=si.id
+       where aship.discriminator='ClinicShipment'
+       and specimen.pv_id=pv.id and specimen.sv_id is null);
+
 ALTER TABLE origin_info MODIFY COLUMN ID INT(11) NOT NULL;
 
 CREATE TABLE dispatch (
@@ -168,18 +259,6 @@ ALTER TABLE shipment_info
 
 ALTER TABLE shipping_method
       CHANGE COLUMN name name VARCHAR(255) NOT NULL UNIQUE;
-/*****************************************************
- * specimen types
- ****************************************************/
-
-CREATE TABLE specimen_type (
-  ID int(11) NOT NULL,
-  NAME varchar(100) NOT NULL,
-  NAME_SHORT varchar(50) NOT NULL,
-  PRIMARY KEY (ID),
-  UNIQUE KEY NAME (NAME),
-  UNIQUE KEY NAME_SHORT (NAME_SHORT)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
 /*****************************************************
  * study changes
@@ -249,9 +328,10 @@ INSERT INTO collection_event (visit_number,comment,pv_id)
        SELECT -1,patient_visit.comment,patient_visit.id
        FROM patient_visit;
 
--- source vessels
+update specimen,collection_event as ce set collection_event_id=ce.id
+	where ce.pv_id=specimen.pv_id and specimen.sv_id=0;
 
-INSERT INTO
+-- source vessels
 
 ALTER TABLE dispatch MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -266,7 +346,6 @@ ALTER TABLE container_type
       CHANGE COLUMN name name VARCHAR(255) NOT NULL,
       CHANGE COLUMN name_short name_short VARCHAR(50) NOT NULL,
       CHANGE COLUMN child_labeling_scheme_id child_labeling_scheme_id INTEGER NOT NULL;
-
 
 CREATE TABLE container_type_specimen_type (
     CONTAINER_TYPE_ID INT(11) NOT NULL,
@@ -338,25 +417,6 @@ UPDATE abstract_position ap, container c, container_type ct
 /*****************************************************
  *
  ****************************************************/
-
-ALTER TABLE dispatch_aliquot
-      CHANGE COLUMN DISPATCH_SHIPMENT_ID DISPATCH_ID INT(11) NOT NULL COMMENT '',
-      DROP INDEX FKB1B76907D8CEA57A,
-      DROP INDEX FKB1B76907898584F,
-      ADD INDEX FK40A7EAC2898584F (ALIQUOT_ID),
-      ADD INDEX FK40A7EAC2DE99CA25 (DISPATCH_ID);
-
-ALTER TABLE patient_visit
-      CHANGE COLUMN CLINIC_SHIPMENT_PATIENT_ID SHIPMENT_PATIENT_ID INT(11) NOT NULL COMMENT '',
-      DROP INDEX FKA09CAF5183AE7BBB,
-      ADD INDEX FKA09CAF51859BF35A (SHIPMENT_PATIENT_ID);
-
-ALTER TABLE shipment_patient
-      CHANGE COLUMN CLINIC_SHIPMENT_ID SHIPMENT_ID INT(11) NOT NULL COMMENT '',
-      DROP INDEX FKF4B18BB7E5B2B216,
-      DROP INDEX FKF4B18BB7B563F38F,
-      ADD INDEX FK68484540B1D3625 (SHIPMENT_ID),
-      ADD INDEX FK68484540B563F38F (PATIENT_ID);
 
 CREATE TABLE entity (
     ID INT(11) NOT NULL,
@@ -517,8 +577,6 @@ CREATE TABLE request_aliquot (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-UPDATE patient_visit SET ACTIVITY_STATUS_ID = (SELECT ID FROM activity_status WHERE NAME = 'Active');
-
 ALTER TABLE PATIENT
       CHANGE COLUMN PNUMBER PNUMBER VARCHAR(100) NOT NULL UNIQUE;
 
@@ -533,26 +591,6 @@ ALTER TABLE ALIQUOT
       CHANGE COLUMN INVENTORY_ID INVENTORY_ID VARCHAR(100) NOT NULL UNIQUE;
 
 
--- start CREATED_AT update
-
-DROP TABLE IF EXISTS tmp;
-
-CREATE TABLE tmp AS
-	SELECT p.ID, MIN(pv.DATE_PROCESSED) as created_at
-	FROM patient p, shipment_patient sp, patient_visit pv
-WHERE p.ID = sp.PATIENT_ID AND sp.ID = pv.SHIPMENT_PATIENT_ID
-GROUP BY p.ID;
-
-
-ALTER TABLE tmp ADD PRIMARY KEY(ID);
-
-UPDATE patient p
-INNER JOIN tmp ON p.ID = tmp.ID
-SET p.CREATED_AT = tmp.CREATED_AT;
-
-DROP TABLE tmp;
-
--- end CREATED_AT update
 
 DROP TABLE IF EXISTS report;
 
@@ -834,3 +872,7 @@ UNLOCK TABLES;
 #DROP TABLE abstract_shipment;
 #DROP TABLE sample_type;
 #DROP TABLE source_vessel;
+#DROP TABLE sample_storage
+#DROP TABLE study_source_vessel
+#DROP TABLE aliquot;
+#DROP TABLE pv_source_vessel;
