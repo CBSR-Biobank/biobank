@@ -23,13 +23,12 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.logs.ActivityLogAppender;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.logs.LogInfo;
 import edu.ualberta.med.biobank.reporting.ReportingUtils;
 
-public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
+public abstract class AbstractSpecimenAdminForm extends BiobankEntryForm {
 
     protected boolean finished = true;
     protected boolean printed = false;
@@ -56,8 +55,6 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
             afterInitialization = false;
         }
     };
-
-    private static SiteWrapper siteSession;
 
     @Override
     protected void init() throws Exception {
@@ -86,7 +83,6 @@ public abstract class AbstractAliquotAdminForm extends BiobankEntryForm {
     }
 
     public boolean onClose() {
-        siteSession = SessionManager.getUser().getCurrentWorkingCentre();
         if (finished) {
             if (!printed && appender.getLogsList().size() > 0) {
                 if (BioBankPlugin.isAskPrintActivityLog()) {

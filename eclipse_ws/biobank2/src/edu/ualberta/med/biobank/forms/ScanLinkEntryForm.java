@@ -86,11 +86,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     // button to choose a fake scan - debug only
     private Button fakeScanRandom;
 
-    @Deprecated
-    private List<SpecimenTypeWrapper> sourceSpecimenTypes;
-
     // sampleTypes for containers of type that contains 'palletNameContains'
-    private List<SpecimenTypeWrapper> authorizedSampleTypes;
+    private List<SpecimenTypeWrapper> authorizedPalletSpecimenTypes;
 
     private Composite fieldsComposite;
 
@@ -188,7 +185,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     /**
-     * Aliquot types selection.
+     * Specimen types selection.
      */
     private void createTypesSelectionSection(Composite parent) throws Exception {
         // Radio buttons
@@ -217,15 +214,12 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         final Composite selectionComp = toolkit.createComposite(parent);
         final StackLayout selectionStackLayout = new StackLayout();
         selectionComp.setLayout(selectionStackLayout);
-        gd = new GridData();
-        gd.horizontalSpan = 2;
-        selectionComp.setLayoutData(gd);
 
-        initAuthorizedSampleTypeList();
-        createTypeSelectionPerRowComposite(selectionComp, sourceSpecimenTypes,
-            authorizedSampleTypes);
-        createTypeSelectionCustom(selectionComp, sourceSpecimenTypes,
-            authorizedSampleTypes);
+        initAuthorizedPalletSpecimenTypeList();
+        createTypeSelectionPerRowComposite(selectionComp, null,
+            authorizedPalletSpecimenTypes);
+        createTypeSelectionCustom(selectionComp, null,
+            authorizedPalletSpecimenTypes);
         radioRowSelection.setSelection(true);
         selectionStackLayout.topControl = typesSelectionPerRowComposite;
 
@@ -279,13 +273,14 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         });
     }
 
-    private void initAuthorizedSampleTypeList() throws ApplicationException {
+    private void initAuthorizedPalletSpecimenTypeList()
+        throws ApplicationException {
         SiteWrapper currentSite = SessionManager.getUser()
             .getCurrentWorkingCentre();
         if (currentSite != null) {
-            authorizedSampleTypes = SpecimenTypeWrapper
+            authorizedPalletSpecimenTypes = SpecimenTypeWrapper
                 .getSpecimenTypeForPallet96(appService, currentSite);
-            if (authorizedSampleTypes.size() == 0) {
+            if (authorizedPalletSpecimenTypes.size() == 0) {
                 BioBankPlugin.openAsyncError(Messages
                     .getString("ScanLink.dialog.sampleTypesError.title"), //$NON-NLS-1$
                     Messages.getString("ScanLink.dialog.sampleTypesError.msg")); //$NON-NLS-1$
@@ -320,7 +315,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         applyType.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                SpecimenTypeWrapper type = customSelectionWidget.getSelection();
+                SpecimenTypeWrapper type = customSelectionWidget
+                    .getSourceTypeSelection();
                 if (type != null) {
                     for (Cell cell : spw.getMultiSelectionManager()
                         .getSelectedCells()) {
@@ -399,21 +395,17 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         toolkit.paintBordersFor(leftSideComposite);
 
         fieldsComposite = toolkit.createComposite(leftSideComposite);
-        layout = new GridLayout(3, false);
+        layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
         fieldsComposite.setLayout(layout);
         toolkit.paintBordersFor(fieldsComposite);
         gd = new GridData();
         gd.widthHint = 500;
         gd.verticalAlignment = SWT.TOP;
-        gd.horizontalSpan = 2;
         fieldsComposite.setLayoutData(gd);
-
-        initAuthorizedSampleTypeList();
 
         linkFormPatientManagement.createPatientNumberText(fieldsComposite);
         linkFormPatientManagement.createCollectionEventWidgets(fieldsComposite);
-        linkFormPatientManagement.createWorksheetText(fieldsComposite);
 
         createProfileComboBox(fieldsComposite);
         // specific for scan link:
@@ -423,7 +415,6 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 spw.loadProfile(profilesCombo.getCombo().getText());
             }
         });
-
         profilesCombo.getCombo().notifyListeners(666, new Event());
 
         createPlateToScanField(fieldsComposite);
@@ -482,7 +473,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             .getCurrentWorkingCentre();
         preSelectedSampleTypes = new ArrayList<SpecimenTypeWrapper>();
         for (AliquotedSpecimenSelectionWidget stw : sampleTypeWidgets) {
-            preSelectedSampleTypes.add(stw.getSelection());
+            preSelectedSampleTypes.add(stw.getSourceTypeSelection());
         }
     }
 
@@ -537,7 +528,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             Display.getDefault().asyncExec(new Runnable() {
                 @Override
                 public void run() {
-                    setTypeCombosLists(typesRows);
+                    setCombosLists(typesRows);
                 }
             });
             processScanResult = everythingOk;
@@ -545,33 +536,37 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     /**
-     * Get sample types only defined in the patient's study. Then set these
-     * types to the types combos
+     * Get types only defined in the patient's study. Then set these types to
+     * the types combos
      */
-    private void setTypeCombosLists(Map<Integer, Integer> typesRows) {
-        List<SpecimenTypeWrapper> studiesSampleTypes = null;
+    private void setCombosLists(Map<Integer, Integer> typesRows) {
+        List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         if (isFirstSuccessfulScan()) {
             // done at first successful scan
-            studiesSampleTypes = new ArrayList<SpecimenTypeWrapper>();
+            studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
             for (AliquotedSpecimenWrapper ss : linkFormPatientManagement
                 .getCurrentPatient().getStudy()
                 .getAliquotedSpecimenCollection(true)) {
                 if (ss.getActivityStatus().isActive()) {
                     SpecimenTypeWrapper type = ss.getSpecimenType();
-                    if (authorizedSampleTypes.contains(type)) {
-                        studiesSampleTypes.add(type);
+                    if (authorizedPalletSpecimenTypes.contains(type)) {
+                        studiesAliquotedTypes.add(type);
                     }
                 }
             }
-            if (studiesSampleTypes.size() == 0) {
-                BioBankPlugin.openAsyncError("No sample types",
-                    "There are no sample types that are defined in study '"
-                        + linkFormPatientManagement.getCurrentPatient()
-                            .getStudy().getNameShort()
-                        + "' and that are types possibles inside a pallet.");
+            if (studiesAliquotedTypes.size() == 0) {
+                BioBankPlugin.openAsyncError(Messages
+                    .getString("ScanLink.aliquotedSpecimenTypes.error.title"),
+                    Messages.getString(
+                        "ScanLink.aliquotedSpecimenTypes.error.msg",
+                        linkFormPatientManagement.getCurrentPatient()
+                            .getStudy().getNameShort()));
             }
         }
-        // set the list of sample type to all widget, in case the list is
+        List<SpecimenTypeWrapper> availableSourceTypes = linkFormPatientManagement
+            .getSelectedCollectionEvent().getSpecimenTypeInCollectionEvents(
+                true);
+        // set the list of aliquoted types to all widgets, in case the list is
         // activated using the handheld scanner
         for (int row = 0; row < sampleTypeWidgets.size(); row++) {
             AliquotedSpecimenSelectionWidget widget = sampleTypeWidgets
@@ -580,7 +575,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             if (number != null)
                 widget.setNumber(number);
             if (isFirstSuccessfulScan()) {
-                widget.setTypes(studiesSampleTypes);
+                widget.setSourceTypes(availableSourceTypes);
+                widget.setResultTypes(studiesAliquotedTypes);
             }
         }
     }
@@ -692,7 +688,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     private void updateRowType(AliquotedSpecimenSelectionWidget typeWidget,
         int indexRow) {
         if (typeWidget.needToSave()) {
-            SpecimenTypeWrapper type = typeWidget.getSelection();
+            SpecimenTypeWrapper type = typeWidget.getSourceTypeSelection();
             if (type != null) {
                 Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
                     .getCells();
@@ -754,12 +750,6 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     @Override
     public BiobankLogger getErrorLogger() {
         return logger;
-    }
-
-    @Override
-    public boolean onClose() {
-        linkFormPatientManagement.onClose();
-        return super.onClose();
     }
 
     @Override
