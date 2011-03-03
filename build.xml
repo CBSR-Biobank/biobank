@@ -968,7 +968,7 @@
       </fileset>
       <report format="noframes" todir="${test.output}/html" />
     </junitreport>
-    <java classname="emma" fork="true">
+    <java classname="emma" fork="true" failonerror="true">
       <arg value="report" />
       <arg value="-r" />
       <arg value="html" />

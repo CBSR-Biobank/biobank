@@ -38,12 +38,8 @@ public class ModelExtender {
         return instance;
     }
 
-    public static void main(String argv[]) {
-        try {
-            ModelExtender.getInstance().doWork(parseCommandLine(argv));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void main(String argv[]) throws URISyntaxException {
+        ModelExtender.getInstance().doWork(parseCommandLine(argv));
     }
 
     public void doWork(final AppArgs appArgs) {

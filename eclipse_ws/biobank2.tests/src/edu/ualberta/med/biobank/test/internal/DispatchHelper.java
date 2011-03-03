@@ -19,8 +19,8 @@ public class DispatchHelper extends DbHelper {
         String waybill, Date dateReceived, SpecimenWrapper... aliquots)
         throws Exception {
         DispatchWrapper dispatch = new DispatchWrapper(appService);
-        dispatch.setSender(sender);
-        dispatch.setReceiver(receiver);
+        dispatch.setSenderCenter(sender);
+        dispatch.setReceiverCenter(receiver);
 
         ShipmentInfoWrapper shipInfo = new ShipmentInfoWrapper(appService);
         dispatch.setShipmentInfo(shipInfo);

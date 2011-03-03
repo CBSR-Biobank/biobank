@@ -85,12 +85,8 @@ public class ValidatorGeneration {
         return instance;
     }
 
-    public static void main(String argv[]) throws IOException {
-        try {
-            ValidatorGeneration.getInstance().doWork(parseCommandLine(argv));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void main(String argv[]) throws Exception {
+        ValidatorGeneration.getInstance().doWork(parseCommandLine(argv));
     }
 
     public void doWork(AppArgs appArgs) {

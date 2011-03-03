@@ -22,9 +22,9 @@ public class TestCommon {
 
     public static ContainerTypeWrapper addSampleTypes(ContainerTypeWrapper ct,
         List<SpecimenTypeWrapper> sampleTypes) throws Exception {
-        Assert.assertTrue("not enough sample types for test", (sampleTypes
-            .size() > 10));
-        ct.addToSampleTypeCollection(sampleTypes);
+        Assert.assertTrue("not enough sample types for test",
+            (sampleTypes.size() > 10));
+        ct.addToSpecimenTypeCollection(sampleTypes);
         ct.persist();
         ct.reload();
         return ct;

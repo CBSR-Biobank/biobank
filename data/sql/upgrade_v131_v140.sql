@@ -1,5 +1,9 @@
-RENAME TABLE clinic_shipment_patient TO shipment_patient;
-RENAME TABLE dispatch_shipment_aliquot TO dispatch_aliquot;
+/*------------------------------------------------------------------------------
+ *
+ *  BioBank2 MySQL upgrade script for model version 1.3.1 to 1.4.0
+ *
+ *----------------------------------------------------------------------------*/
+
 
 /*****************************************************
  *  EVENT ATTRIBUTES
@@ -35,6 +39,61 @@ ALTER TABLE event_attr
 
 
 /*****************************************************
+ * specimen
+ ****************************************************/
+
+CREATE TABLE specimen_type (
+  ID int(11) NOT NULL auto_increment,
+  NAME varchar(100) NOT NULL,
+  NAME_SHORT varchar(50) NOT NULL,
+  PRIMARY KEY (ID),
+  UNIQUE KEY NAME (NAME),
+  UNIQUE KEY NAME_SHORT (NAME_SHORT)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+INSERT INTO specimen_type (name,name_short)
+       SELECT name,name_short FROM sample_type;
+
+INSERT INTO specimen_type (name,name_short)
+       SELECT name,name FROM source_vessel WHERE name!='N/A' && name!='Meconium';
+
+INSERT INTO specimen_type (name,name_short) VALUES
+	('Meconium','CHILD Meconium');
+
+ALTER TABLE specimen_type MODIFY COLUMN ID INT(11) NOT NULL;
+
+CREATE TABLE specimen (
+    ID INT(11) NOT NULL AUTO_INCREMENT,
+    INVENTORY_ID VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+    COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    QUANTITY DOUBLE NULL DEFAULT NULL,
+    CREATED_AT DATETIME NULL DEFAULT NULL,
+    CENTER_ID INT(11) NULL DEFAULT NULL,
+    SPECIMEN_TYPE_ID INT(11) NOT NULL,
+    ORIGIN_INFO_ID INT(11) NULL DEFAULT NULL,
+    PROCESSING_EVENT_ID INT(11) NULL DEFAULT NULL,
+    COLLECTION_EVENT_ID INT(11) NOT NULL,
+    ACTIVITY_STATUS_ID INT(11) NOT NULL,
+    PV_ID INT(11) NOT NULL,
+    SV_ID INT(11) NOT NULL,
+    INDEX FKAF84F30838445996 (SPECIMEN_TYPE_ID),
+    INDEX FKAF84F308280272F2 (COLLECTION_EVENT_ID),
+    INDEX FKAF84F308C449A4 (ACTIVITY_STATUS_ID),
+    INDEX FKAF84F30812E55F12 (ORIGIN_INFO_ID),
+    CONSTRAINT INVENTORY_ID UNIQUE KEY(INVENTORY_ID),
+    INDEX FKAF84F30892FAA705 (CENTER_ID),
+    INDEX FKAF84F30833126C8 (PROCESSING_EVENT_ID),
+    PRIMARY KEY (ID)
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+INSERT INTO specimen (inventory_id,comment,quantity,created_at,center_id,specimen_type_id,
+activity_status_id,pv_id)
+SELECT inventory_id,comment,quantity,created_at,center_id,specimen_type_id,
+activity_status_id,id FROM aliquot;
+
+ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL;
+
+/*****************************************************
  * Merge clinics and sites into centers
  ****************************************************/
 
@@ -62,7 +121,7 @@ INSERT INTO center (discriminator,name,name_short,comment,address_id,activity_st
 SELECT 'Clinic',name,name_short,comment,address_id,activity_status_id,sends_shipments FROM clinic;
 
 INSERT INTO center (discriminator,name,name_short,comment,address_id,activity_status_id)
-SELECT 'Site',name,name_short,comment,address_id,activity_status_id from site;
+SELECT 'Site',name,name_short,comment,address_id,activity_status_id FROM site;
 
 -- update site-study correlation table
 -- create center_id column which will alter be renamed to site_id
@@ -170,19 +229,76 @@ ALTER TABLE shipping_method
       CHANGE COLUMN name name VARCHAR(255) NOT NULL UNIQUE;
 
 /*****************************************************
- * specimen types
+ * study changes
  ****************************************************/
 
-CREATE TABLE specimen_type (
-  ID int(11) NOT NULL,
-  NAME varchar(100) NOT NULL,
-  NAME_SHORT varchar(50) NOT NULL,
-  PRIMARY KEY (ID),
-  UNIQUE KEY NAME (NAME),
-  UNIQUE KEY NAME_SHORT (NAME_SHORT)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+CREATE TABLE aliquoted_specimen (
+    ID INT(11) NOT NULL auto_increment,
+    QUANTITY INT(11) NULL DEFAULT NULL,
+    VOLUME DOUBLE NULL DEFAULT NULL,
+    SPECIMEN_TYPE_ID INT(11) NOT NULL,
+    ACTIVITY_STATUS_ID INT(11) NOT NULL,
+    STUDY_ID INT(11) NOT NULL,
+    INDEX FK75EACAC1F2A2464F (STUDY_ID),
+    INDEX FK75EACAC1C449A4 (ACTIVITY_STATUS_ID),
+    INDEX FK75EACAC138445996 (SPECIMEN_TYPE_ID),
+    PRIMARY KEY (ID)
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
+INSERT INTO aliquoted_specimen (quantity,volume,activity_status_id,study_id,specimen_type_id)
+       SELECT quantity,volume,activity_status_id,study_id,specimen_type.id
+       FROM sample_storage
+       JOIN sample_type ON sample_type.id=sample_storage.sample_type_id
+       JOIN specimen_type ON specimen_type.name=sample_type.name;
 
+ALTER TABLE aliquoted_specimen MODIFY COLUMN ID INT(11) NOT NULL;
+
+CREATE TABLE source_specimen (
+    ID INT(11) NOT NULL AUTO_INCREMENT,
+    NEED_TIME_DRAWN TINYINT(1) NULL DEFAULT NULL,
+    NEED_ORIGINAL_VOLUME TINYINT(1) NULL DEFAULT NULL,
+    STUDY_ID INT(11) NOT NULL,
+    SPECIMEN_TYPE_ID INT(11) NOT NULL,
+    INDEX FK28D36ACF2A2464F (STUDY_ID),
+    INDEX FK28D36AC38445996 (SPECIMEN_TYPE_ID),
+    PRIMARY KEY (ID)
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+INSERT INTO source_specimen (need_time_drawn,need_original_volume,study_id,specimen_type_id)
+       SELECT need_time_drawn,need_original_volume,study_id,specimen_type.id
+       FROM study_source_vessel
+       JOIN source_vessel on source_vessel.id=study_source_vessel.source_vessel_id
+       JOIN specimen_type ON specimen_type.name=source_vessel.name;
+
+ALTER TABLE source_specimen MODIFY COLUMN ID INT(11) NOT NULL;
+
+ALTER TABLE STUDY
+      CHANGE COLUMN NAME NAME VARCHAR(255) NOT NULL UNIQUE,
+      CHANGE COLUMN NAME_SHORT NAME_SHORT VARCHAR(50) NOT NULL UNIQUE;
+
+/*****************************************************
+ * collection events
+ ****************************************************/
+
+CREATE TABLE collection_event (
+    ID INT(11) NOT NULL AUTO_INCREMENT,
+    VISIT_NUMBER INT(11) NULL DEFAULT NULL,
+    COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    PATIENT_ID INT(11) NOT NULL,
+    ACTIVITY_STATUS_ID INT(11) NOT NULL,
+    PV_ID INT(11) NOT NULL,
+    INDEX FKEDAD8999C449A4 (ACTIVITY_STATUS_ID),
+    INDEX FKEDAD8999B563F38F (PATIENT_ID),
+    PRIMARY KEY (ID)
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+INSERT INTO collection_event (visit_number,comment,pv_id)
+       SELECT -1,patient_visit.comment,patient_visit.id
+       FROM patient_visit;
+
+-- source vessels
+
+ALTER TABLE dispatch MODIFY COLUMN ID INT(11) NOT NULL;
 
 /*****************************************************
  * container types and containers
@@ -195,7 +311,6 @@ ALTER TABLE container_type
       CHANGE COLUMN name name VARCHAR(255) NOT NULL,
       CHANGE COLUMN name_short name_short VARCHAR(50) NOT NULL,
       CHANGE COLUMN child_labeling_scheme_id child_labeling_scheme_id INTEGER NOT NULL;
-
 
 CREATE TABLE container_type_specimen_type (
     CONTAINER_TYPE_ID INT(11) NOT NULL,
@@ -213,12 +328,19 @@ INSERT INTO container_type_specimen_type (container_type_id,specimen_type_id)
 
 -- unique constraint on multiple columns
 ALTER TABLE container
-  ADD CONSTRAINT uc_container_label UNIQUE KEY(label,container_type_id),
-  ADD CONSTRAINT uc_container_productbarcode UNIQUE KEY(product_barcode,site_id);
+      ADD CONSTRAINT uc_container_label UNIQUE KEY(label,container_type_id),
+      ADD CONSTRAINT uc_container_productbarcode UNIQUE KEY(product_barcode,site_id);
 
 ALTER TABLE container_type
-  ADD CONSTRAINT uc_containertype_name UNIQUE KEY(name,site_id),
-  ADD CONSTRAINT uc_containertype_nameshort UNIQUE KEY(name_short,site_id);
+      ADD CONSTRAINT uc_containertype_name UNIQUE KEY(name,site_id),
+      ADD CONSTRAINT uc_containertype_nameshort UNIQUE KEY(name_short,site_id);
+
+ALTER TABLE container_path
+      ADD COLUMN TOP_CONTAINER_ID INT(11) NOT NULL COMMENT '',
+      ADD INDEX FKB2C64D431BE0C379 (TOP_CONTAINER_ID);
+
+UPDATE container_path
+       SET top_container_id = IF(LOCATE('/', path) = 0, path, SUBSTR(path, 1, LOCATE('/', path)));
 
 /*****************************************************
  * positions
@@ -260,25 +382,6 @@ UPDATE abstract_position ap, container c, container_type ct
 /*****************************************************
  *
  ****************************************************/
-
-ALTER TABLE dispatch_aliquot
-      CHANGE COLUMN DISPATCH_SHIPMENT_ID DISPATCH_ID INT(11) NOT NULL COMMENT '',
-      DROP INDEX FKB1B76907D8CEA57A,
-      DROP INDEX FKB1B76907898584F,
-      ADD INDEX FK40A7EAC2898584F (ALIQUOT_ID),
-      ADD INDEX FK40A7EAC2DE99CA25 (DISPATCH_ID);
-
-ALTER TABLE patient_visit
-      CHANGE COLUMN CLINIC_SHIPMENT_PATIENT_ID SHIPMENT_PATIENT_ID INT(11) NOT NULL COMMENT '',
-      DROP INDEX FKA09CAF5183AE7BBB,
-      ADD INDEX FKA09CAF51859BF35A (SHIPMENT_PATIENT_ID);
-
-ALTER TABLE shipment_patient
-      CHANGE COLUMN CLINIC_SHIPMENT_ID SHIPMENT_ID INT(11) NOT NULL COMMENT '',
-      DROP INDEX FKF4B18BB7E5B2B216,
-      DROP INDEX FKF4B18BB7B563F38F,
-      ADD INDEX FK68484540B1D3625 (SHIPMENT_ID),
-      ADD INDEX FK68484540B563F38F (PATIENT_ID);
 
 CREATE TABLE entity (
     ID INT(11) NOT NULL,
@@ -378,15 +481,6 @@ CREATE TABLE report_filter_value (
 
 # sample order tables
 
-DROP TABLE IF EXISTS order_aliquot;
-
-CREATE TABLE order_aliquot (
-    ALIQUOT_ID INT(11) NOT NULL,
-    ORDER_ID INT(11) NOT NULL,
-    INDEX FK74AC5176898584F (ALIQUOT_ID),
-    PRIMARY KEY (ORDER_ID, ALIQUOT_ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
 DROP TABLE IF EXISTS research_group;
 
 CREATE TABLE research_group (
@@ -419,10 +513,8 @@ CREATE TABLE researcher (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-DROP TABLE order_aliquot;
-ALTER TABLE container_path ADD COLUMN TOP_CONTAINER_ID INT(11) NOT NULL COMMENT '', ADD INDEX FKB2C64D431BE0C379 (TOP_CONTAINER_ID);
 ALTER TABLE patient ADD COLUMN CREATED_AT DATETIME NULL DEFAULT NULL COMMENT '';
-ALTER TABLE patient_visit ADD COLUMN ACTIVITY_STATUS_ID INT(11) NOT NULL COMMENT '', ADD INDEX FKA09CAF51C449A4 (ACTIVITY_STATUS_ID);
+
 CREATE TABLE request (
     ID INT(11) NOT NULL,
     SUBMITTED DATETIME NULL DEFAULT NULL,
@@ -450,34 +542,23 @@ CREATE TABLE request_aliquot (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-UPDATE patient_visit SET ACTIVITY_STATUS_ID = (SELECT ID FROM activity_status WHERE NAME = 'Active');
+ALTER TABLE PATIENT
+      CHANGE COLUMN PNUMBER PNUMBER VARCHAR(100) NOT NULL UNIQUE;
 
--- start CREATED_AT update
+ALTER TABLE CAPACITY
+      CHANGE COLUMN ROW_CAPACITY ROW_CAPACITY INTEGER NOT NULL,
+      CHANGE COLUMN COL_CAPACITY COL_CAPACITY INTEGER NOT NULL;
 
-DROP TABLE IF EXISTS tmp;
+ALTER TABLE ACTIVITY_STATUS
+      CHANGE COLUMN NAME NAME VARCHAR(50) NOT NULL UNIQUE;
 
-CREATE TABLE tmp AS
-	SELECT p.ID, MIN(pv.DATE_PROCESSED) as created_at
-	FROM patient p, shipment_patient sp, patient_visit pv
-WHERE p.ID = sp.PATIENT_ID AND sp.ID = pv.SHIPMENT_PATIENT_ID
-GROUP BY p.ID;
+ALTER TABLE ALIQUOT
+      CHANGE COLUMN INVENTORY_ID INVENTORY_ID VARCHAR(100) NOT NULL UNIQUE;
 
 
-ALTER TABLE tmp ADD PRIMARY KEY(ID);
-
-UPDATE patient p
-INNER JOIN tmp ON p.ID = tmp.ID
-SET p.CREATED_AT = tmp.CREATED_AT;
-
-DROP TABLE tmp;
-
--- end CREATED_AT update
-
-UPDATE container_path SET top_container_id = IF(LOCATE('/', path) = 0, path, SUBSTR(path, 1, LOCATE('/', path)));
 
 DROP TABLE IF EXISTS report;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
+
 CREATE TABLE report (
   ID int(11) NOT NULL,
   NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
@@ -489,7 +570,6 @@ CREATE TABLE report (
   PRIMARY KEY (ID),
   KEY FK8FDF493491CFD445 (ENTITY_ID)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
 
 --
 -- Dumping data for table report
@@ -748,25 +828,6 @@ UNLOCK TABLES;
 -- update constraints (unique and not-null):
 -- also update ContainerType -> ContainerLabelingScheme relation replace 0..1 by 1 (so cannot be null)
 
-ALTER TABLE PATIENT
- CHANGE COLUMN PNUMBER PNUMBER VARCHAR(100) NOT NULL UNIQUE;
-
-ALTER TABLE CAPACITY
- CHANGE COLUMN ROW_CAPACITY ROW_CAPACITY INTEGER NOT NULL,
- CHANGE COLUMN COL_CAPACITY COL_CAPACITY INTEGER NOT NULL;
-ALTER TABLE ACTIVITY_STATUS
- CHANGE COLUMN NAME NAME VARCHAR(50) NOT NULL UNIQUE;
-ALTER TABLE ALIQUOT
- CHANGE COLUMN INVENTORY_ID INVENTORY_ID VARCHAR(100) NOT NULL UNIQUE;
-
-#ALTER TABLE CENTER
-# CHANGE COLUMN NAME NAME VARCHAR(255) NOT NULL UNIQUE,
-# CHANGE COLUMN NAME_SHORT NAME_SHORT VARCHAR(50) NOT NULL UNIQUE;
-
-ALTER TABLE STUDY
- CHANGE COLUMN NAME NAME VARCHAR(255) NOT NULL UNIQUE,
- CHANGE COLUMN NAME_SHORT NAME_SHORT VARCHAR(50) NOT NULL UNIQUE;
-
 /*****************************************************
  * drop tables that are no longer required
  ****************************************************/
@@ -776,3 +837,5 @@ ALTER TABLE STUDY
 #DROP TABLE abstract_shipment;
 #DROP TABLE sample_type;
 #DROP TABLE source_vessel;
+#DROP TABLE sample_storage
+#DROP TABLE study_source_vessel

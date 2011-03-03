@@ -619,6 +619,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
      * 
      * @param selection
      */
+    @SuppressWarnings("restriction")
     public void updateHeapStatus(boolean selection) {
         for (IWorkbenchWindow window : PlatformUI.getWorkbench()
             .getWorkbenchWindows()) {
