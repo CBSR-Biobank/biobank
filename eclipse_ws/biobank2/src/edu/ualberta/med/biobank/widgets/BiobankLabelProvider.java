@@ -9,6 +9,7 @@ import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
@@ -149,6 +150,9 @@ public class BiobankLabelProvider extends LabelProvider implements
             return ((ClinicWrapper) element).getName();
         } else if (element instanceof SiteWrapper) {
             return ((SiteWrapper) element).getNameShort();
+        } else if (element instanceof CollectionEventWrapper) {
+            return ((CollectionEventWrapper) element).getVisitNumber()
+                .toString();
         } else if (element instanceof SpecimenTypeWrapper) {
             return ((SpecimenTypeWrapper) element).getNameShort();
         } else if (element instanceof SourceSpecimenWrapper) {

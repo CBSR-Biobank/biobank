@@ -19,7 +19,6 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -45,7 +44,7 @@ import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import edu.ualberta.med.scannerconfig.preferences.scanner.profiles.ProfileManager;
 
 public abstract class AbstractPalletSpecimenAdminForm extends
-    AbstractAliquotAdminForm {
+    AbstractSpecimenAdminForm {
 
     private BiobankText plateToScanText;
     private Button scanButton;
@@ -260,9 +259,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
 
         GridData gd = new GridData();
         gd.horizontalAlignment = SWT.FILL;
-        if (((GridLayout) fieldsComposite.getLayout()).numColumns == 3) {
-            gd.horizontalSpan = 2;
-        }
         profilesCombo.getCombo().setLayoutData(gd);
         loadProfileCombo();
     }
@@ -299,9 +295,6 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         });
         GridData gd = (GridData) plateToScanText.getLayoutData();
         gd.horizontalAlignment = SWT.FILL;
-        if (((GridLayout) fieldsComposite.getLayout()).numColumns == 3) {
-            gd.horizontalSpan = 2;
-        }
         plateToScanText.setLayoutData(gd);
     }
 

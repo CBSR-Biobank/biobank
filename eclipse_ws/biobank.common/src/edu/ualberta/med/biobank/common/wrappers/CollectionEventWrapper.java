@@ -473,4 +473,25 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return getSpecimenCollection(false);
     }
 
+    @Override
+    public int compareTo(ModelWrapper<CollectionEvent> wrapper) {
+        if (wrapper instanceof CollectionEventWrapper) {
+            Integer nber1 = wrappedObject.getVisitNumber();
+            Integer nber2 = wrapper.wrappedObject.getVisitNumber();
+            if (nber1 != null && nber2 != null) {
+                return nber1.compareTo(nber2);
+            }
+        }
+        return 0;
+    }
+
+    public List<SpecimenTypeWrapper> getSpecimenTypeInCollectionEvents(
+        boolean activeOnly) {
+        Set<SpecimenTypeWrapper> types = new HashSet<SpecimenTypeWrapper>();
+        for (SpecimenWrapper spec : getSpecimenCollection()) {
+            if (!activeOnly || spec.isActive())
+                types.add(spec.getSpecimenType());
+        }
+        return new ArrayList<SpecimenTypeWrapper>(types);
+    }
 }
