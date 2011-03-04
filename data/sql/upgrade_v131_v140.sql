@@ -20,11 +20,12 @@ ALTER TABLE global_event_attr
       ADD INDEX FKBE7ED6B25B770B31 (EVENT_ATTR_TYPE_ID);
 
 ALTER TABLE study_event_attr
+      MODIFY COLUMN LABEL VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
       CHANGE COLUMN PV_ATTR_TYPE_ID EVENT_ATTR_TYPE_ID INT(11) NOT NULL,
-      ADD CONSTRAINT uc_study_event_attr_label UNIQUE (label,study_id),
       DROP INDEX FK669DD7F4F2A2464F,
       DROP INDEX FK669DD7F42496A267,
       DROP INDEX FK669DD7F4C449A4,
+      ADD CONSTRAINT uc_label UNIQUE KEY(LABEL, STUDY_ID),
       ADD INDEX FK3EACD8ECF2A2464F (STUDY_ID),
       ADD INDEX FK3EACD8ECC449A4 (ACTIVITY_STATUS_ID),
       ADD INDEX FK3EACD8EC5B770B31 (EVENT_ATTR_TYPE_ID);
@@ -82,7 +83,7 @@ ALTER TABLE site_study
       DROP PRIMARY KEY,
       DROP INDEX FK7A197EB13F52C885,
       DROP COLUMN site_id,
-      CHANGE COLUMN center_id site_id INT(11) NOT NULL,
+      CHANGE COLUMN center_id SITE_ID INT(11) NOT NULL,
       ADD INDEX FK7A197EB13F52C885 (SITE_ID),
       ADD PRIMARY KEY (SITE_ID,STUDY_ID);
 
@@ -122,22 +123,24 @@ CREATE TABLE specimen (
     ORIGIN_INFO_ID INT(11) NULL DEFAULT NULL,
     SPECIMEN_LINK_ID INT(11) NULL DEFAULT NULL COMMENT '',
     COLLECTION_EVENT_ID INT(11) NOT NULL,
+    SOURCE_COLLECTION_EVENT_ID INT(11) NULL DEFAULT NULL,
     ACTIVITY_STATUS_ID INT(11) NOT NULL,
     PV_ID INT(11),
     SV_ID INT(11),
     INDEX FKAF84F30838445996 (SPECIMEN_TYPE_ID),
-    INDEX FKAF84F308280272F2 (COLLECTION_EVENT_ID),
     INDEX FKAF84F308C449A4 (ACTIVITY_STATUS_ID),
     INDEX FKAF84F30812E55F12 (ORIGIN_INFO_ID),
     CONSTRAINT INVENTORY_ID UNIQUE KEY(INVENTORY_ID),
-    INDEX FKAF84F30892FAA705 (CURRENT_CENTER_ID),
+    INDEX FKAF84F308FBB79BBF (CURRENT_CENTER_ID),
     INDEX FKAF84F30875A7A196 (SPECIMEN_LINK_ID),
+    INDEX FKAF84F308280272F2 (COLLECTION_EVENT_ID),
+    INDEX FKAF84F308777F4CCE (SOURCE_COLLECTION_EVENT_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
 INSERT INTO specimen (inventory_id,comment,quantity,created_at,specimen_type_id,
-activity_status_id,collection_event_id,pv_id)
-        SELECT inventory_id,comment,quantity,link_date,specimen_type.id,activity_status_id,0,
+activity_status_id,collection_event_id,source_collection_event_id,pv_id)
+        SELECT inventory_id,comment,quantity,link_date,specimen_type.id,activity_status_id,0,0,
         patient_visit_id
         FROM aliquot
         JOIN sample_type ON sample_type.id=aliquot.sample_type_id
@@ -231,7 +234,7 @@ CREATE TABLE dispatch (
     COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
     DEPARTED_AT DATETIME NULL DEFAULT NULL,
     RECEIVER_CENTER_ID INT(11) NULL DEFAULT NULL,
-    SHIPMENT_INFO_ID INT(11) NOT NULL,
+    SHIPMENT_INFO_ID INT(11)  NULL DEFAULT NULL,
     SENDER_CENTER_ID INT(11) NULL DEFAULT NULL,
     REQUEST_ID INT(11) NULL DEFAULT NULL,
     ASHIP_ID INT(11) NOT NULL,
@@ -287,8 +290,8 @@ ALTER TABLE shipment_info
       DROP COLUMN aship_id;
 
 ALTER TABLE shipping_method
-      CHANGE COLUMN name name VARCHAR(255) NOT NULL,
-     ADD CONSTRAINT NAME UNIQUE KEY(NAME);
+      CHANGE COLUMN name NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT '',
+      ADD CONSTRAINT NAME UNIQUE KEY(NAME);
 
 /*****************************************************
  * study changes
@@ -344,7 +347,7 @@ ALTER TABLE STUDY
 
 CREATE TABLE collection_event (
     ID INT(11) NOT NULL AUTO_INCREMENT,
-    VISIT_NUMBER INT(11) NULL DEFAULT NULL,
+    VISIT_NUMBER INT(11) NOT NULL,
     COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
     PATIENT_ID INT(11) NOT NULL,
     ACTIVITY_STATUS_ID INT(11) NOT NULL,
@@ -369,7 +372,7 @@ update specimen,collection_event as ce set specimen.collection_event_id=ce.id
 drop index pv_id_idx on collection_event;
 drop index pv_id_idx on specimen;
 
-ALTER TABLE dispatch MODIFY COLUMN ID INT(11) NOT NULL;
+ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
 
 /*****************************************************
  * processing events
@@ -407,14 +410,14 @@ CREATE TABLE specimen_link (
  ****************************************************/
 
 ALTER TABLE container
-      CHANGE COLUMN label label VARCHAR(255) NOT NULL,
+      CHANGE COLUMN label LABEL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT '',
       ADD CONSTRAINT uc_label UNIQUE KEY(LABEL, CONTAINER_TYPE_ID),
       ADD CONSTRAINT uc_productbarcode UNIQUE KEY(PRODUCT_BARCODE, SITE_ID);
 
 ALTER TABLE container_type
-      CHANGE COLUMN name name VARCHAR(255) NOT NULL,
-      CHANGE COLUMN name_short name_short VARCHAR(50) NOT NULL,
-      CHANGE COLUMN child_labeling_scheme_id child_labeling_scheme_id INT(11) NOT NULL COMMENT '',
+      CHANGE COLUMN name NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT '',
+      CHANGE COLUMN name_short NAME_SHORT VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT '',
+      CHANGE COLUMN child_labeling_scheme_id CHILD_LABELING_SCHEME_ID INT(11) NOT NULL COMMENT '',
       ADD CONSTRAINT uc_name UNIQUE KEY(NAME, SITE_ID),
       ADD CONSTRAINT uc_nameshort UNIQUE KEY(NAME_SHORT, SITE_ID);
 
@@ -431,15 +434,6 @@ INSERT INTO container_type_specimen_type (container_type_id,specimen_type_id)
        FROM container_type_sample_type
        JOIN sample_type ON sample_type.id=container_type_sample_type.sample_type_id
        JOIN specimen_type ON specimen_type.name=sample_type.name;
-
--- unique constraint on multiple columns
-ALTER TABLE container
-      ADD CONSTRAINT uc_container_label UNIQUE KEY(label,container_type_id),
-      ADD CONSTRAINT uc_container_productbarcode UNIQUE KEY(product_barcode,site_id);
-
-ALTER TABLE container_type
-      ADD CONSTRAINT uc_containertype_name UNIQUE KEY(name,site_id),
-      ADD CONSTRAINT uc_containertype_nameshort UNIQUE KEY(name_short,site_id);
 
 ALTER TABLE container_path
       ADD COLUMN TOP_CONTAINER_ID INT(11) NOT NULL COMMENT '',
@@ -942,6 +936,8 @@ ALTER TABLE origin_info DROP COLUMN ASHIP_ID;
 ALTER TABLE collection_event DROP COLUMN PV_ID;
 
 ALTER TABLE dispatch DROP COLUMN ASHIP_ID;
+
+ALTER TABLE specimen DROP COLUMN PV_ID, DROP COLUMN SV_ID;
 
 #DROP TABLE abstract_shipment;
 #DROP TABLE aliquot;
