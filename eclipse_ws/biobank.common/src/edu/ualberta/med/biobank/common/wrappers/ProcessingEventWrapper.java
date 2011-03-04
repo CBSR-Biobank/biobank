@@ -11,9 +11,12 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenLinkPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
+import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -120,23 +123,30 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         }
     }
 
-    // private static final String CHILD_SPECIMEN_COUNT_QRY =
-    // "select count(specimen) from "
-    // + Specimen.class.getName()
-    // + " as specimen where specimen."
-    // + Property.concatNames(SpecimenPeer.PARENT_PROCESSING_EVENT,
-    // ProcessingEventPeer.ID) + "=?";
+    private static final String CHILD_SPECIMEN_COUNT_QRY = "select count(specimen) from "
+        + Specimen.class.getName()
+        + " as specimen where specimen."
+        + Property.concatNames(SpecimenPeer.PARENT_SPECIMEN_LINK,
+            SpecimenLinkPeer.PROCESSING_EVENT, ProcessingEventPeer.ID) + "=?";
 
     public long getChildSpecimenCount(boolean fast) throws BiobankException,
         ApplicationException {
-        // FIXME
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        return getChildSpecimenCollection(false).size();
+    }
+
+    @Deprecated
+    private List<SpecimenWrapper> getChildSpecimenCollection(boolean fast) {
         // if (fast) {
-        // HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMEN_COUNT_QRY,
-        // Arrays.asList(new Object[] { getId() }));
-        // return getCountResult(appService, criteria);
+        // // TODO
         // }
-        // return getChildSpecimenCollection(false).size();
-        return -1L;
+        // for (SpecimenLinkWrapper sLink:ge)
+        // return null;
+        return null;
     }
 
     @Override

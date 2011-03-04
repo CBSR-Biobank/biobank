@@ -177,7 +177,7 @@
 			UML 1.4
 		</plugin>
 </profile>
-<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Fri Mar 04 12:39:51 MST 2011'>
+<XMI xmi.version = '1.2' xmlns:UML = 'org.omg.xmi.namespace.UML' timestamp = 'Fri Mar 04 13:10:37 MST 2011'>
   <XMI.header>    <XMI.documentation>
       <XMI.exporter>ArgoUML (using Netbeans XMI Writer version 1.0)</XMI.exporter>
       <XMI.exporterVersion>0.26.2(6) revised on $Date: 2007-05-12 08:08:08 +0200 (Sat, 12 May 2007) $ </XMI.exporterVersion>
@@ -12340,7 +12340,7 @@
                   <UML:Association.connection>
                     <UML:AssociationEnd xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C86'
                       name = 'PK_COLLECTION_EVENT' visibility = 'public' isSpecification = 'false'
-                      isNavigable = 'false' ordering = 'unordered' aggregation = 'none' targetScope = 'instance'
+                      isNavigable = 'true' ordering = 'unordered' aggregation = 'none' targetScope = 'instance'
                       changeability = 'changeable'>
                       <UML:AssociationEnd.multiplicity>
                         <UML:Multiplicity xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C87'>
@@ -12359,10 +12359,10 @@
                       isNavigable = 'true' ordering = 'unordered' aggregation = 'none' targetScope = 'instance'
                       changeability = 'changeable'>
                       <UML:AssociationEnd.multiplicity>
-                        <UML:Multiplicity xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C8A'>
+                        <UML:Multiplicity xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C8F'>
                           <UML:Multiplicity.range>
-                            <UML:MultiplicityRange xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C8B'
-                              lower = '1' upper = '1'/>
+                            <UML:MultiplicityRange xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C8E'
+                              lower = '0' upper = '-1'/>
                           </UML:Multiplicity.range>
                         </UML:Multiplicity>
                       </UML:AssociationEnd.multiplicity>
@@ -18214,10 +18214,10 @@
                                           isNavigable = 'true' ordering = 'unordered' aggregation = 'none' targetScope = 'instance'
                                           changeability = 'changeable'>
                                           <UML:AssociationEnd.multiplicity>
-                                            <UML:Multiplicity xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C75'>
+                                            <UML:Multiplicity xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C8D'>
                                               <UML:Multiplicity.range>
-                                                <UML:MultiplicityRange xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C76'
-                                                  lower = '1' upper = '1'/>
+                                                <UML:MultiplicityRange xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C8C'
+                                                  lower = '0' upper = '-1'/>
                                               </UML:Multiplicity.range>
                                             </UML:Multiplicity>
                                           </UML:AssociationEnd.multiplicity>
@@ -19632,9 +19632,21 @@
           lower = '1' upper = '1'/>
       </UML:Multiplicity.range>
     </UML:Multiplicity>
+    <UML:Multiplicity xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C75'>
+      <UML:Multiplicity.range>
+        <UML:MultiplicityRange xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C76'
+          lower = '1' upper = '1'/>
+      </UML:Multiplicity.range>
+    </UML:Multiplicity>
     <UML:Multiplicity xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C78'>
       <UML:Multiplicity.range>
         <UML:MultiplicityRange xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C79'
+          lower = '1' upper = '1'/>
+      </UML:Multiplicity.range>
+    </UML:Multiplicity>
+    <UML:Multiplicity xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C8A'>
+      <UML:Multiplicity.range>
+        <UML:MultiplicityRange xmi.id = '127-0-1-1--45758438:12e81c8ad8a:-8000:0000000000001C8B'
           lower = '1' upper = '1'/>
       </UML:Multiplicity.range>
     </UML:Multiplicity>
