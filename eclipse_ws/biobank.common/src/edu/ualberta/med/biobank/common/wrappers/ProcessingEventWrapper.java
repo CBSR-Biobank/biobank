@@ -199,10 +199,10 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return log;
     }
 
-    private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pe from "
+    private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pEvent from "
         + ProcessingEvent.class.getName()
-        + " pe where pe."
-        + ProcessingEventPeer.WORKSHEET.getName() + "= ?";
+        + " pEvent where pEvent."
+        + ProcessingEventPeer.WORKSHEET.getName() + "=?";
 
     public static List<ProcessingEventWrapper> getProcessingEventsWithWorksheet(
         WritableApplicationService appService, String worksheetNumber)
@@ -221,11 +221,6 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     @Override
     public CenterWrapper<?> getCenterLinkedToObject() {
         return getCenter();
-    }
-
-    @Deprecated
-    public List<SpecimenWrapper> getSpecimenCollection() {
-        return null;
     }
 
 }

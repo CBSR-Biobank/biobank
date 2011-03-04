@@ -59,7 +59,7 @@ public class WorkingCentreSelectDialog extends BiobankDialog {
 
     @Override
     protected void okPressed() {
-        user.setCurrentWorkingSite(currentCentre);
+        user.setCurrentWorkingCentre(currentCentre);
         super.okPressed();
     }
 }

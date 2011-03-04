@@ -99,7 +99,7 @@ public class SearchView extends ViewPart {
                     SearchType searchType = (SearchType) selection
                         .getFirstElement();
                     searchText
-                        .setEnabled(searchType != SearchType.ALIQUOT_NON_ACTIVE);
+                        .setEnabled(searchType != SearchType.SPECIMEN_NON_ACTIVE);
                     searchText.setText("");
                 }
             });

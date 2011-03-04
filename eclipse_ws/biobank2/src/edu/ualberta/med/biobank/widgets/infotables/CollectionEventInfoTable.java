@@ -57,9 +57,11 @@ public class CollectionEventInfoTable extends
                 case 0:
                     return info.visitNumber.toString();
                 case 1:
+                    return "?";
+                case 2:
                     return (info.specimenCount != null) ? info.specimenCount
                         .toString() : "0";
-                case 2:
+                case 3:
                     return info.comment;
 
                 default:

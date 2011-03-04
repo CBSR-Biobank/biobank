@@ -485,13 +485,18 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return 0;
     }
 
-    public List<SpecimenTypeWrapper> getSpecimenTypeInCollectionEvents(
-        boolean activeOnly) {
-        Set<SpecimenTypeWrapper> types = new HashSet<SpecimenTypeWrapper>();
+    public List<SpecimenWrapper> getSpecimensInCollectionEventsForWorksheet(
+        boolean activeOnly, String worksheet) {
+        List<SpecimenWrapper> specList = new ArrayList<SpecimenWrapper>();
         for (SpecimenWrapper spec : getSpecimenCollection()) {
-            if (!activeOnly || spec.isActive())
-                types.add(spec.getSpecimenType());
+            if (!activeOnly || spec.isActive()) {
+                if (worksheet == null
+                    || worksheet.isEmpty()
+                    || spec.getProcessingEventCollectionForWorksheet(worksheet)
+                        .size() > 0)
+                    specList.add(spec);
+            }
         }
-        return new ArrayList<SpecimenTypeWrapper>(types);
+        return specList;
     }
 }

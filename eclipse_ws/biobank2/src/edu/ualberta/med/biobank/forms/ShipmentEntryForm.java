@@ -108,8 +108,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         if (clinicsComboViewer != null)
+            // FIXME only for site ?
             clinicsComboViewer.setInput(SessionManager.getUser()
-                .getCurrentWorkingCentre().getWorkingClinicCollection());
+                .getCurrentWorkingSite().getWorkingClinicCollection());
 
         setFirstControl(client);
 

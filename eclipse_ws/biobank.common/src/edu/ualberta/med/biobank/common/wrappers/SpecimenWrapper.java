@@ -383,12 +383,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + " != ?";
 
-    // FIXME : do we want this search to be specific to a site ?
-    public static List<SpecimenWrapper> getSpecimensNonActiveInSite(
-        WritableApplicationService appService, SiteWrapper site)
+    public static List<SpecimenWrapper> getSpecimensNonActiveInCentre(
+        WritableApplicationService appService, CenterWrapper<?> centre)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(SpecimenS_NON_ACTIVE_QRY,
-            Arrays.asList(new Object[] { site.getId(),
+            Arrays.asList(new Object[] { centre.getId(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Specimen> Specimens = appService.query(criteria);
         List<SpecimenWrapper> list = new ArrayList<SpecimenWrapper>();
@@ -518,7 +517,14 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
     }
 
-    public List<ProcessingEventWrapper> getProcessingEventCollection() {
-        return getProcessingEventCollection(false);
+    public List<ProcessingEventWrapper> getProcessingEventCollectionForWorksheet(
+        String worksheet) {
+        List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
+        for (ProcessingEventWrapper pe : getProcessingEventCollection(false)) {
+            String peWorksheet = pe.getWorksheet();
+            if (peWorksheet != null && peWorksheet.equals(worksheet))
+                peList.add(pe);
+        }
+        return peList;
     }
 }

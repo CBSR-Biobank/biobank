@@ -315,18 +315,6 @@ public class PatientWrapper extends PatientBaseWrapper {
         return false;
     }
 
-    @Deprecated
-    public String getSourceSpecimenCount() {
-        // TODO New method. Need to be implemented !
-        return null;
-    }
-
-    @Deprecated
-    public String getAliquotedSpecimenCount() {
-        // TODO New method. Need to be implemented !
-        return null;
-    }
-
     public List<CollectionEventWrapper> getCollectionEventCollection(
         boolean sort, final boolean ascending) {
         List<CollectionEventWrapper> cEvents = getCollectionEventCollection(false);
@@ -353,7 +341,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         for (CollectionEventWrapper ce : ces)
             specs.addAll(ce.getSpecimenCollection());
         for (SpecimenWrapper spec : specs) {
-            pes.addAll(spec.getProcessingEventCollection());
+            pes.addAll(spec.getProcessingEventCollection(false));
             pes.add(spec.getParentProcessingEvent());
         }
         return pes;
