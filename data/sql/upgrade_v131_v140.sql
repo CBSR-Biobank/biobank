@@ -82,9 +82,9 @@ ALTER TABLE site_study
       DROP PRIMARY KEY,
       DROP INDEX FK7A197EB13F52C885,
       DROP COLUMN site_id,
-      CHANGE COLUMN center_id site_id int(11) NOT NULL,
+      CHANGE COLUMN center_id site_id INT(11) NOT NULL,
       ADD INDEX FK7A197EB13F52C885 (SITE_ID),
-      ADD PRIMARY KEY (`SITE_ID`,`STUDY_ID`);
+      ADD PRIMARY KEY (SITE_ID,STUDY_ID);
 
 ALTER TABLE center MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -230,13 +230,11 @@ CREATE TABLE dispatch (
     STATE INT(11) NULL DEFAULT NULL,
     COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
     DEPARTED_AT DATETIME NULL DEFAULT NULL,
-    ACTIVITY_STATUS_ID INT(11) NOT NULL,
     RECEIVER_CENTER_ID INT(11) NULL DEFAULT NULL,
     SHIPMENT_INFO_ID INT(11) NOT NULL,
     SENDER_CENTER_ID INT(11) NULL DEFAULT NULL,
     REQUEST_ID INT(11) NULL DEFAULT NULL,
     ASHIP_ID INT(11) NOT NULL,
-    INDEX FK3F9F347AC449A4 (ACTIVITY_STATUS_ID),
     INDEX FK3F9F347A91BC3D7B (SENDER_CENTER_ID),
     INDEX FK3F9F347AA2F14F4F (REQUEST_ID),
     INDEX FK3F9F347A307B2CB5 (RECEIVER_CENTER_ID),
@@ -272,17 +270,14 @@ CREATE TABLE dispatch_specimen (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-quit;
-
 insert into dispatch_specimen (state,comment,specimen_id,dispatch_id)
        select dsa.state,dsa.comment,specimen.id,dispatch.id
-       from dispatch_shipment_aliquot as dsa,
+       from dispatch_shipment_aliquot as dsa
        join abstract_shipment as aship on aship.id=dsa.dispatch_shipment_id
        join aliquot on aliquot.id=dsa.aliquot_id
        join specimen on specimen.inventory_id=aliquot.inventory_id
        join dispatch on dispatch.aship_id=aship.id
        where discriminator='DispatchShipment';
-
 
 ALTER TABLE dispatch_specimen MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -293,7 +288,8 @@ ALTER TABLE shipment_info
       DROP COLUMN aship_id;
 
 ALTER TABLE shipping_method
-      CHANGE COLUMN name name VARCHAR(255) NOT NULL UNIQUE;
+      CHANGE COLUMN name name VARCHAR(255) NOT NULL,
+     ADD CONSTRAINT NAME UNIQUE KEY(NAME);
 
 /*****************************************************
  * study changes
@@ -377,16 +373,52 @@ drop index pv_id_idx on specimen;
 ALTER TABLE dispatch MODIFY COLUMN ID INT(11) NOT NULL;
 
 /*****************************************************
+ * processing events
+ ****************************************************/
+
+CREATE TABLE processing_event (
+    ID INT(11) NOT NULL auto_increment,
+    CREATED_AT DATETIME NOT NULL,
+    WORKSHEET VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
+    COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
+    CENTER_ID INT(11) NOT NULL,
+    ACTIVITY_STATUS_ID INT(11) NOT NULL,
+    INDEX FK327B1E4EC449A4 (ACTIVITY_STATUS_ID),
+    INDEX FK327B1E4E92FAA705 (CENTER_ID),
+    PRIMARY KEY (ID),
+    ADD CONSTRAINT WORKSHEET UNIQUE KEY(WORKSHEET);
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+insert into processing_event (created_at,worksheet,comment,center_id)
+select pv.date_processed,
+
+ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
+
+CREATE TABLE specimen_link (
+    ID INT(11) NOT NULL,
+    PROCESSING_EVENT_ID INT(11) NOT NULL,
+    PARENT_SPECIMEN_ID INT(11) NOT NULL,
+    INDEX FK1FA012D161674F50 (PARENT_SPECIMEN_ID),
+    INDEX FK1FA012D133126C8 (PROCESSING_EVENT_ID),
+    PRIMARY KEY (ID)
+) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+/*****************************************************
  * container types and containers
  ****************************************************/
 
 ALTER TABLE container
-      CHANGE COLUMN label label VARCHAR(255) NOT NULL;
+      CHANGE COLUMN label label VARCHAR(255) NOT NULL,
+      ADD CONSTRAINT uc_label UNIQUE KEY(LABEL, CONTAINER_TYPE_ID),
+      ADD CONSTRAINT uc_productbarcode UNIQUE KEY(PRODUCT_BARCODE, SITE_ID);
 
 ALTER TABLE container_type
       CHANGE COLUMN name name VARCHAR(255) NOT NULL,
       CHANGE COLUMN name_short name_short VARCHAR(50) NOT NULL,
-      CHANGE COLUMN child_labeling_scheme_id child_labeling_scheme_id INTEGER NOT NULL;
+      CHANGE COLUMN child_labeling_scheme_id child_labeling_scheme_id INT(11) NOT NULL COMMENT '',
+      ADD CONSTRAINT uc_name UNIQUE KEY(NAME, SITE_ID),
+      ADD INDEX FKB2C878585D63DFF0 (CHILD_LABELING_SCHEME_ID),
+      ADD CONSTRAINT uc_nameshort UNIQUE KEY(NAME_SHORT, SITE_ID);
 
 CREATE TABLE container_type_specimen_type (
     CONTAINER_TYPE_ID INT(11) NOT NULL,
@@ -425,8 +457,8 @@ UPDATE container_path
 ALTER TABLE abstract_position
       DROP INDEX FKBC4AE0A6898584F,
       DROP KEY ALIQUOT_ID,
-      CHANGE COLUMN row row INT(11) NOT NULL,
-      CHANGE COLUMN col col INT(11) NOT NULL,
+      CHANGE COLUMN row row INT(11) NOT NULL COMMENT '',
+      CHANGE COLUMN col col INT(11) NOT NULL COMMENT '',
       CHANGE COLUMN ALIQUOT_ID SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
       ADD COLUMN POSITION_STRING VARCHAR(50) NULL DEFAULT NULL COMMENT '',
       ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
@@ -457,7 +489,7 @@ UPDATE abstract_position ap, container c, container_type ct
 
 
 /*****************************************************
- *
+ * advanced reports
  ****************************************************/
 
 CREATE TABLE entity (
@@ -502,8 +534,6 @@ CREATE TABLE property_modifier (
     INDEX FK5DF9160157C0C3B0 (PROPERTY_TYPE_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
-
-
 
 CREATE TABLE property_type (
     ID INT(11) NOT NULL,
@@ -556,7 +586,10 @@ CREATE TABLE report_filter_value (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-# sample order tables
+
+/*****************************************************
+ * research groups and sample orders
+ ****************************************************/
 
 DROP TABLE IF EXISTS research_group;
 
@@ -906,9 +939,11 @@ UNLOCK TABLES;
  * cleantup and drop tables that are no longer required
  ****************************************************/
 
+ALTER TABLE origin_info DROP COLUMN ASHIP_ID;
+
 ALTER TABLE collection_event DROP COLUMN PV_ID;
 
-ALTER TABLE origin_info DROP COLUMN ASHIP_ID;
+ALTER TABLE dispatch DROP COLUMN ASHIP_ID;
 
 #DROP TABLE abstract_shipment;
 #DROP TABLE aliquot;
