@@ -184,30 +184,26 @@ public class SiteWrapper extends SiteBaseWrapper {
         return 0;
     }
 
-    // private static final String PATIENT_COUNT_QRY =
-    // "select count(distinct patients) from "
-    // + Site.class.getName()
-    // + " as site join site."
-    // + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
-    // + " as pevent join pevent."
-    // + ProcessingEventPeer.PARENT_SPECIMEN.getName()
-    // + " as spcs join spcs."
-    // + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-    // CollectionEventPeer.PATIENT)
-    // + " as patients where site."
-    // + SitePeer.ID.getName() + "=?";
+    private static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
+        + " as pevent join pevent."
+        + ProcessingEventPeer.SPECIMEN_LINK_COLLECTION.getName()
+        + " as link join link."
+        + SpecimenLinkPeer.PARENT_SPECIMEN
+        + " as spcs join spcs."
+        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+            CollectionEventPeer.PATIENT)
+        + " as patients where site."
+        + SitePeer.ID.getName() + "=?";
 
     public Long getPatientCount() throws Exception {
-        // FIXME
-        // HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
-        // Arrays.asList(new Object[] { getId() }));
-        // return getCountResult(appService, criteria);
-        return -1L;
+        HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
+            Arrays.asList(new Object[] { getId() }));
+        return getCountResult(appService, criteria);
     }
 
-    // FIXME: this only returns specimens that have been aliquoted, it does
-    // not return samples that have not been aliquoted (eg. paxgene)
-    // What should be do ?
     private static final String CHILD_SPECIMENS_COUNT_QRY = "select count(spcs) from "
         + Site.class.getName()
         + " site left join site."
@@ -218,7 +214,7 @@ public class SiteWrapper extends SiteBaseWrapper {
         + SpecimenLinkPeer.CHILD_SPECIMEN_COLLECTION.getName()
         + " as spcs where site." + SitePeer.ID.getName() + "=?";
 
-    public Long getSpecimenCount() throws Exception {
+    public Long getAliquotedSpecimenCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMENS_COUNT_QRY,
             Arrays.asList(new Object[] { getId() }));
         return getCountResult(appService, criteria);

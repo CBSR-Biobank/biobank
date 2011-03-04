@@ -115,10 +115,10 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMoreCollectionEvents();
-        if (getSpecimensCount(false) > 0)
+        if (getAllSpecimensCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
-                + " because patient has samples stored in database.");
+                + " because patient has specimens stored in database.");
     }
 
     private void checkNoMoreCollectionEvents() throws BiobankCheckException {
@@ -130,18 +130,18 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
     }
 
-    private static final String SPECIMEN_COUNT_QRY = "select count(spcs) from "
-        + CollectionEvent.class.getName() + " as cevent join cevent."
+    private static final String ALL_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
         + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
         + " as spcs where cevent."
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
         + "=?";
 
-    // FIXME do we want to count all, source only or result only ?
-    public long getSpecimensCount(boolean fast) throws BiobankException,
+    public long getAllSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SPECIMEN_COUNT_QRY,
+            HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
@@ -149,6 +149,32 @@ public class PatientWrapper extends PatientBaseWrapper {
         for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
             total += cevent.getAllSpecimensCount(false);
         return total;
+    }
+
+    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.SOURCE_SPECIMEN_COLLECTION.getName()
+        + " as spcs where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=?";
+
+    public long getSourceSpecimensCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(SOURCE_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        long total = 0;
+        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
+            total += cevent.getSourceSpecimensCount(false);
+        return total;
+    }
+
+    public int getAliquotedSpecimensCount() {
+        // FIXME do we need that ?
+        return -1;
     }
 
     @Deprecated
@@ -228,7 +254,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         + ProcessingEventPeer.CREATED_AT.getName() + "<?";
 
     @Deprecated
-    // FIXME :in Scan Link, wants the collection event instead. What is a last 7
+    // FIXME :in Scan Link, wants the collection event instead. ? What is a last
+    // 7
     // days collection events if we don't have the date drawn on the collection
     // event itself ?
     public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
@@ -340,22 +367,11 @@ public class PatientWrapper extends PatientBaseWrapper {
         Set<ProcessingEventWrapper> pes = new HashSet<ProcessingEventWrapper>();
         for (CollectionEventWrapper ce : ces)
             specs.addAll(ce.getAllSpecimenCollection(false));
-        // FIXME
-        // for (SpecimenWrapper spec : specs) {
-        // addAll(spec.getSpciProcessingEventCollection(false));
-        // pes.add(spec.getParentProcessingEvent());
-        // }
+        for (SpecimenWrapper spec : specs) {
+            pes.addAll(spec.getProcessingEventCollectionAsParent());
+            pes.add(spec.getProcessingEventAsChild());
+        }
         return new ArrayList<ProcessingEventWrapper>(pes);
-    }
-
-    public int getSourceSpecimensCount() {
-        // FIXME Do we want to display that or something else ?
-        return -1;
-    }
-
-    public int getAliquotedSpecimensCount() {
-        // FIXME Do we want to display that or something else ?
-        return -1;
     }
 
     public List<CollectionEventWrapper> getCollectionEventCollection() {

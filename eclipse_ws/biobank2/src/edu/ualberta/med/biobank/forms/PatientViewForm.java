@@ -8,10 +8,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
+import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm";
@@ -91,13 +93,13 @@ public class PatientViewForm extends BiobankViewForm {
         collectionEventTable.addClickListener(collectionDoubleClickListener);
     }
 
-    private void setValues() {
+    private void setValues() throws ApplicationException, BiobankException {
         setTextValue(studyLabel, patient.getStudy().getName());
         setTextValue(visitCountLabel,
             (patient.getProcessingEventCollection() == null) ? 0 : patient
                 .getProcessingEventCollection().size());
         setTextValue(sourceSpecimenCountLabel,
-            patient.getSourceSpecimensCount());
+            patient.getSourceSpecimensCount(true));
         setTextValue(aliquotedSpecimenCountLabel,
             patient.getAliquotedSpecimensCount());
     }

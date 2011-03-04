@@ -679,11 +679,12 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             }
         }
 
-        for (ProcessingEventWrapper pe : processingEvents.values()) {
-            pe.addChildSpecimens(newSpecimens.get(pe.getId()));
-            pe.persist();
-        }
-        appendLog(sb.toString());
+        // FIXME
+        // for (ProcessingEventWrapper pe : processingEvents.values()) {
+        // pe.addChildSpecimens(newSpecimens.get(pe.getId()));
+        // pe.persist();
+        // }
+        // appendLog(sb.toString());
 
         // FIXME uncomment this log message after fixing
         // appendLogNLS("ScanLink.activitylog.save.summary", nber,
