@@ -39,6 +39,7 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -194,15 +195,16 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private void createSpecimensSection() {
         Section section = createSection("Source Vessels");
-        // FIXME
-        // specimensTable = new SpecimenEntryInfoTable(section,
-        // cevent.getSpecimenCollection(true), ColumnsShown.CEVENT_FORM);
+        specimensTable = new SpecimenEntryInfoTable(section,
+            cevent.getSourceSpecimenCollection(true), ColumnsShown.CEVENT_FORM);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
 
         try {
             final List<SpecimenTypeWrapper> allSpecimenTypes = SpecimenTypeWrapper
                 .getAllSpecimenTypes(SessionManager.getAppService(), true);
+            specimensTable.addEditSupport(cevent.getPatient().getStudy()
+                .getSourceSpecimenCollection(true), allSpecimenTypes);
             addSectionToolbar(section, "Add Source Vessel",
                 new SelectionAdapter() {
                     @Override

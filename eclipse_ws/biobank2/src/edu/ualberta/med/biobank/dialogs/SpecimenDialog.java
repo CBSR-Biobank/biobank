@@ -71,6 +71,8 @@ public class SpecimenDialog extends BiobankDialog {
 
     private ComboViewer activityStatusComboViewer;
 
+    private BiobankText inventoryIdWidget;
+
     public SpecimenDialog(Shell parent, SpecimenWrapper specimen,
         List<SourceSpecimenWrapper> studySourceSpecimen,
         List<SpecimenTypeWrapper> allSpecimenTypes,
@@ -143,8 +145,8 @@ public class SpecimenDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        BiobankText inventoryIdWidget = (BiobankText) createBoundWidgetWithLabel(
-            contents, BiobankText.class, SWT.NONE,
+        inventoryIdWidget = (BiobankText) createBoundWidgetWithLabel(contents,
+            BiobankText.class, SWT.NONE,
             Messages.getString("SourceSpecimen.field.inventoryId.label"), null,
             internalSpecimen, SpecimenPeer.INVENTORY_ID.getName(), null);
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
@@ -357,6 +359,7 @@ public class SpecimenDialog extends BiobankDialog {
                 .getCurrentWorkingCentre());
             infotable.addSpecimen(newSpecimen);
             internalSpecimen.reset();
+            inventoryIdWidget.setText("");
             quantityText.setText("");
             timeDrawnWidget.setDate(null);
             quantityText.setText("");

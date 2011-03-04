@@ -17,6 +17,7 @@ import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
 public class CollectionEventViewForm extends BiobankViewForm {
 
@@ -40,7 +41,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
     @SuppressWarnings("unused")
     private BiobankText commentLabel;
 
-    private SpecimenInfoTable table;
+    private SpecimenInfoTable sourceSpecimenTable;
 
     private class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
@@ -68,7 +69,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
-        createSpecimensSection();
+        createSourceSpecimensSection();
     }
 
     private void createMainSection() throws Exception {
@@ -138,12 +139,12 @@ public class CollectionEventViewForm extends BiobankViewForm {
         }
     }
 
-    private void createSpecimensSection() {
-        Composite client = createSectionWithClient("Source Vessels");
-        // FIXME
-        // table = new SpecimenInfoTable(client, cevent.getSpecimenCollection(),
-        // ColumnsShown.CEVENT_FORM, 10);
-        table.adaptToToolkit(toolkit, true);
+    private void createSourceSpecimensSection() {
+        Composite client = createSectionWithClient("Source Specimens");
+        sourceSpecimenTable = new SpecimenInfoTable(client,
+            cevent.getSourceSpecimenCollection(true), ColumnsShown.CEVENT_FORM,
+            10);
+        sourceSpecimenTable.adaptToToolkit(toolkit, true);
     }
 
     @Override
@@ -153,10 +154,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setPartName("Visit " + date);
         form.setText("Visit Drawn Date: " + date);
         setCollectionEventValues();
-
-        // FIXME: load tables
-        // table.setCollection(cevent.getPvSourceVesselCollection());
-        // aliquotWidget.setCollection(cevent.getSpecimenCollection());
+        sourceSpecimenTable.setCollection(cevent
+            .getSourceSpecimenCollection(true));
     }
 
     private void retrievePatientVisit() {

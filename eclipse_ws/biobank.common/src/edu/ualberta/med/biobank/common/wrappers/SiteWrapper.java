@@ -191,7 +191,7 @@ public class SiteWrapper extends SiteBaseWrapper {
         + " as pevent join pevent."
         + ProcessingEventPeer.SPECIMEN_LINK_COLLECTION.getName()
         + " as link join link."
-        + SpecimenLinkPeer.PARENT_SPECIMEN
+        + SpecimenLinkPeer.PARENT_SPECIMEN.getName()
         + " as spcs join spcs."
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
             CollectionEventPeer.PATIENT)

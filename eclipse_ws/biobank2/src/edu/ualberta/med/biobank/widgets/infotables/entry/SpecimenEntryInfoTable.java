@@ -93,13 +93,15 @@ public class SpecimenEntryInfoTable extends SpecimenInfoTable {
         }
     }
 
-    private void addEditSupport() {
+    public void addEditSupport(
+        final List<SourceSpecimenWrapper> studySourceTypes,
+        final List<SpecimenTypeWrapper> allSpecimenTypes) {
         if (SessionManager.canCreate(SpecimenWrapper.class, null)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
-                    // FIXME
-                    addOrEditSpecimen(true, null, null, null, null);
+                    addOrEditSpecimen(true, null, studySourceTypes,
+                        allSpecimenTypes, null);
                 }
             });
         }
@@ -110,7 +112,8 @@ public class SpecimenEntryInfoTable extends SpecimenInfoTable {
                     SpecimenWrapper sw = getSelection();
                     if (sw != null)
                         // FIXME
-                        addOrEditSpecimen(false, sw, null, null, null);
+                        addOrEditSpecimen(false, sw, studySourceTypes,
+                            allSpecimenTypes, null);
                 }
             });
         }
