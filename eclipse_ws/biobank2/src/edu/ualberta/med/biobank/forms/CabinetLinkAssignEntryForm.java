@@ -914,11 +914,12 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         } else {
             msgString = "Cabinet.activitylog.aliquot.saveMove"; //$NON-NLS-1$
         }
-        appendLogNLS(msgString, posStr, specimen.getInventoryId(), specimen
-            .getSpecimenType().getName(), linkFormPatientManagement
-            .getCurrentPatient().getPnumber(), specimen
-            .getParentProcessingEvent().getFormattedCreatedAt(), specimen
-            .getCurrentCenter().getName());
+        // FIXME
+        // appendLogNLS(msgString, posStr, specimen.getInventoryId(), specimen
+        // .getSpecimenType().getName(), linkFormPatientManagement
+        // .getCurrentPatient().getPnumber(), specimen
+        // .getParentProcessingEvent().getFormattedCreatedAt(), specimen
+        // .getCurrentCenter().getName());
         setFinished(false);
     }
 

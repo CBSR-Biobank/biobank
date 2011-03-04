@@ -71,7 +71,8 @@ public class CeListInfoTable extends InfoTableWidget<CollectionEventWrapper> {
         } else {
             info.studyNameShort = new String();
         }
-        info.numSVs = pv.getSpecimenCollection(false).size();
+        // FIXME
+        // info.numSVs = pv.getSpecimenCollection(false).size();
         return info;
     }
 

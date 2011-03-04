@@ -189,7 +189,8 @@ public class SpecimenEntryWidget extends BiobankWidget {
                 BiobankPlugin.openAsyncError("Cannot add patient", e);
                 return;
             }
-            specTable.setCollection(shipment.getSpecimenCollection(true));
+            // FIXME
+            // specTable.setCollection(shipment.getSpecimenCollection(true));
             notifyListeners();
             patientsAdded.setValue(true);
         } else {
@@ -234,12 +235,14 @@ public class SpecimenEntryWidget extends BiobankWidget {
     }
 
     public void updateList() {
-        List<SpecimenWrapper> patients = shipment.getSpecimenCollection(true);
-        if (patients != null)
-            specTable.setCollection(patients);
-        else
-            specTable.setCollection(new ArrayList<SpecimenWrapper>());
-        patientsAdded.setValue(patients != null && patients.size() > 0);
+        // FIXME
+        // List<SpecimenWrapper> patients =
+        // shipment.getSpecimenCollection(true);
+        // if (patients != null)
+        // specTable.setCollection(patients);
+        // else
+        // specTable.setCollection(new ArrayList<SpecimenWrapper>());
+        // patientsAdded.setValue(patients != null && patients.size() > 0);
     }
 
     public void addDoubleClickListener(IDoubleClickListener listener) {

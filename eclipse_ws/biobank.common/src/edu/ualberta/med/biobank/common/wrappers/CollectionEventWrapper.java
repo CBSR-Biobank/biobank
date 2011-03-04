@@ -14,8 +14,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
-import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.CollectionEventBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrWrapper;
@@ -61,27 +59,31 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         throws BiobankCheckException {
     }
 
-    @Override
+    // FIXME
+    // @Override
     public void addToSpecimenCollection(List<SpecimenWrapper> specimenCollection) {
-        super.addToSpecimenCollection(specimenCollection);
+
+        // super.addToSpecimenCollection(specimenCollection);
 
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
         deletedSpecimens.removeAll(specimenCollection);
     }
 
-    @Override
+    // @Override
     public void removeFromSpecimenCollection(
         List<SpecimenWrapper> specimenCollection) {
-        deletedSpecimens.addAll(specimenCollection);
-        super.removeFromSpecimenCollection(specimenCollection);
+        // FIXME
+        // deletedSpecimens.addAll(specimenCollection);
+        // super.removeFromSpecimenCollection(specimenCollection);
     }
 
-    @Override
+    // @Override
     public void removeFromSpecimenCollectionWithCheck(
         List<SpecimenWrapper> specimenCollection) throws BiobankCheckException {
-        deletedSpecimens.addAll(specimenCollection);
-        super.removeFromSpecimenCollectionWithCheck(specimenCollection);
+        // FIXME
+        // deletedSpecimens.addAll(specimenCollection);
+        // super.removeFromSpecimenCollectionWithCheck(specimenCollection);
     }
 
     private void deleteSourceVessels() throws Exception {
@@ -98,11 +100,12 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     private void checkNoMoreSpecimens() throws BiobankCheckException {
-        List<SpecimenWrapper> sourceVessels = getSpecimenCollection(false);
-        if (sourceVessels != null && !sourceVessels.isEmpty()) {
-            throw new BiobankCheckException(
-                "Source Vessels are still linked to this Collection Event. Delete them before attempting to remove this Collection Event");
-        }
+        // FIXME
+        // List<SpecimenWrapper> sourceVessels = getSpecimenCollection(false);
+        // if (sourceVessels != null && !sourceVessels.isEmpty()) {
+        // throw new BiobankCheckException(
+        // "Source Vessels are still linked to this Collection Event. Delete them before attempting to remove this Collection Event");
+        // }
     }
 
     @Override
@@ -123,11 +126,12 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     public void checkAtLeastOneSpecimen() throws BiobankCheckException {
-        List<SpecimenWrapper> spc = getSpecimenCollection(false);
-        if (spc == null || spc.isEmpty()) {
-            throw new BiobankCheckException(
-                "At least one specimen should be added to this Collection Event.");
-        }
+        // FIXME
+        // List<SpecimenWrapper> spc = getSpecimenCollection(false);
+        // if (spc == null || spc.isEmpty()) {
+        // throw new BiobankCheckException(
+        // "At least one specimen should be added to this Collection Event.");
+        // }
     }
 
     @Override
@@ -162,47 +166,52 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return null;
     }
 
-    private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from "
-        + CollectionEvent.class.getName() + " ce join ce."
-        + CollectionEventPeer.SPECIMEN_COLLECTION + " as spcs join spcs."
-        + SpecimenPeer.ORIGIN_INFO.getName() + " as oi join oi."
-        + OriginInfoPeer.SHIPMENT_INFO.getName()
-        + " as shipinfo where shipinfo." + ShipmentInfoPeer.WAYBILL + "=?";
+    // private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from "
+    // + CollectionEvent.class.getName() + " ce join ce."
+    // + CollectionEventPeer.SPECIMEN_COLLECTION + " as spcs join spcs."
+    // + SpecimenPeer.ORIGIN_INFO.getName() + " as oi join oi."
+    // + OriginInfoPeer.SHIPMENT_INFO.getName()
+    // + " as shipinfo where shipinfo." + ShipmentInfoPeer.WAYBILL + "=?";
 
     public static List<CollectionEventWrapper> getCollectionEvents(
         WritableApplicationService appService, String waybill)
         throws ApplicationException {
-        HQLCriteria c = new HQLCriteria(COLLECTION_EVENTS_BY_WAYBILL_QRY,
-            Arrays.asList(new Object[] { waybill }));
-        List<CollectionEvent> raw = appService.query(c);
-        if (raw == null) {
-            return new ArrayList<CollectionEventWrapper>();
-        }
-        return wrapModelCollection(appService, raw,
-            CollectionEventWrapper.class);
+        // FIXME
+        // HQLCriteria c = new HQLCriteria(COLLECTION_EVENTS_BY_WAYBILL_QRY,
+        // Arrays.asList(new Object[] { waybill }));
+        // List<CollectionEvent> raw = appService.query(c);
+        // if (raw == null) {
+        // return new ArrayList<CollectionEventWrapper>();
+        // }
+        // return wrapModelCollection(appService, raw,
+        // CollectionEventWrapper.class);
+        return null;
     }
 
-    private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY = "from "
-        + CollectionEvent.class.getName()
-        + " ce join ce."
-        + CollectionEventPeer.SPECIMEN_COLLECTION
-        + " as spcs join spcs."
-        + SpecimenPeer.ORIGIN_INFO.getName()
-        + " as oi join oi."
-        + OriginInfoPeer.SHIPMENT_INFO.getName()
-        + " as shipinfo where shipinfo." + ShipmentInfoPeer.RECEIVED_AT + "=?";
+    // private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY =
+    // "from "
+    // + CollectionEvent.class.getName()
+    // + " ce join ce."
+    // + CollectionEventPeer.SPECIMEN_COLLECTION
+    // + " as spcs join spcs."
+    // + SpecimenPeer.ORIGIN_INFO.getName()
+    // + " as oi join oi."
+    // + OriginInfoPeer.SHIPMENT_INFO.getName()
+    // + " as shipinfo where shipinfo." + ShipmentInfoPeer.RECEIVED_AT + "=?";
 
     public static List<CollectionEventWrapper> getCollectionEvents(
         WritableApplicationService appService, Date dateReceived)
         throws ApplicationException {
-        List<CollectionEvent> raw = appService.query(new HQLCriteria(
-            COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY, Arrays
-                .asList(new Object[] { dateReceived })));
-        if (raw == null) {
-            return new ArrayList<CollectionEventWrapper>();
-        }
-        return wrapModelCollection(appService, raw,
-            CollectionEventWrapper.class);
+        // FIXME
+        // List<CollectionEvent> raw = appService.query(new HQLCriteria(
+        // COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY, Arrays
+        // .asList(new Object[] { dateReceived })));
+        // if (raw == null) {
+        // return new ArrayList<CollectionEventWrapper>();
+        // }
+        // return wrapModelCollection(appService, raw,
+        // CollectionEventWrapper.class);
+        return null;
     }
 
     private static final String SPECIMEN_COUNT_QRY = "select count(spc) from "
@@ -218,10 +227,12 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
-        List<SpecimenWrapper> list = getSpecimenCollection(false);
-        if (list == null)
-            return 0;
-        return getSpecimenCollection(false).size();
+        // FIXME
+        // List<SpecimenWrapper> list = getSpecimenCollection(false);
+        // if (list == null)
+        // return 0;
+        // return getSpecimenCollection(false).size();
+        return -1;
     }
 
     @Deprecated
@@ -469,10 +480,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     }
 
-    public List<SpecimenWrapper> getSpecimenCollection() {
-        return getSpecimenCollection(false);
-    }
-
     @Override
     public int compareTo(ModelWrapper<CollectionEvent> wrapper) {
         if (wrapper instanceof CollectionEventWrapper) {
@@ -488,15 +495,16 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     public List<SpecimenWrapper> getSpecimensInCollectionEventsForWorksheet(
         boolean activeOnly, String worksheet) {
         List<SpecimenWrapper> specList = new ArrayList<SpecimenWrapper>();
-        for (SpecimenWrapper spec : getSpecimenCollection()) {
-            if (!activeOnly || spec.isActive()) {
-                if (worksheet == null
-                    || worksheet.isEmpty()
-                    || spec.getProcessingEventCollectionForWorksheet(worksheet)
-                        .size() > 0)
-                    specList.add(spec);
-            }
-        }
+        // FIXME
+        // for (SpecimenWrapper spec : getSpecimenCollection(false)) {
+        // if (!activeOnly || spec.isActive()) {
+        // if (worksheet == null
+        // || worksheet.isEmpty()
+        // || spec.getProcessingEventCollectionForWorksheet(worksheet)
+        // .size() > 0)
+        // specList.add(spec);
+        // }
+        // }
         return specList;
     }
 }

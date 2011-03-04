@@ -5,17 +5,20 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenLinkPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.Property;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -24,20 +27,21 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DebugUtil {
 
-    // FIXME: this only gets aliquoted specimens - does not retrieve paxgene,
-    // etc.
-    private static final String RANDOM_LINKED_SPECIMENS_QRY = "select aliquots from "
-        + Site.class.getName()
-        + " as s join s."
-        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
+    private static final String RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY = "select aliquots from "
+        + Center.class.getName()
+        + " as c join c."
+        + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pevents join pevents."
-        + ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION.getName()
-        + "as spc where s." + SitePeer.ID.getName() + "=?";
+        + ProcessingEventPeer.SPECIMEN_LINK_COLLECTION.getName()
+        + "as spLink join spLink."
+        + SpecimenLinkPeer.CHILD_SPECIMEN_COLLECTION.getName()
+        + " as children where c." + CenterPeer.ID.getName() + "=?";
 
-    public static List<SpecimenWrapper> getRandomLinkedSpecimens(
+    public static List<SpecimenWrapper> getRandomLinkedAliquotedSpecimens(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(RANDOM_LINKED_SPECIMENS_QRY,
+        HQLCriteria criteria = new HQLCriteria(
+            RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY,
             Arrays.asList(new Object[] { siteId }));
         List<Specimen> aliquots = appService.query(criteria);
 
@@ -93,7 +97,9 @@ public class DebugUtil {
         + " as s left join s."
         + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pe left join pe."
-        + ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION.getName()
+        + ProcessingEventPeer.SPECIMEN_LINK_COLLECTION.getName()
+        + " as spLink left join spLink."
+        + SpecimenLinkPeer.CHILD_SPECIMEN_COLLECTION.getName()
         + " as spc left join spc."
         + SpecimenPeer.SPECIMEN_POSITION.getName()
         + " as spcpos where spcpos is null"
@@ -114,28 +120,30 @@ public class DebugUtil {
             SpecimenWrapper.class);
     }
 
-    private static final String RANDOM_DISPATCHED_SPECIMENS_QRY = "select aliquots from "
-        + Site.class.getName()
-        + " as s join s."
-        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pe join pe."
-        + ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION.getName()
-        + " as aliquots where s."
-        + SitePeer.ID.getName()
-        + "=? and aliquots."
-        + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + "='Dispatched'";
-
-    public static List<SpecimenWrapper> getRandomDispatchedSpecimens(
-        WritableApplicationService appService, Integer siteId)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(RANDOM_DISPATCHED_SPECIMENS_QRY,
-            Arrays.asList(new Object[] { siteId }));
-        List<Specimen> aliquots = appService.query(criteria);
-
-        int items = aliquots.size();
-        int maxItems = items > 10 ? 10 : items;
-        return ModelWrapper.wrapModelCollection(appService,
-            aliquots.subList(0, maxItems), SpecimenWrapper.class);
-    }
+    // FIXME still needed ?
+    // private static final String RANDOM_DISPATCHED_SPECIMENS_QRY =
+    // "select aliquots from "
+    // + Site.class.getName()
+    // + " as s join s."
+    // + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
+    // + " as pe join pe."
+    // + ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION.getName()
+    // + " as aliquots where s."
+    // + SitePeer.ID.getName()
+    // + "=? and aliquots."
+    // + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
+    // ActivityStatusPeer.NAME) + "='Dispatched'";
+    //
+    // public static List<SpecimenWrapper> getRandomDispatchedSpecimens(
+    // WritableApplicationService appService, Integer siteId)
+    // throws ApplicationException {
+    // HQLCriteria criteria = new HQLCriteria(RANDOM_DISPATCHED_SPECIMENS_QRY,
+    // Arrays.asList(new Object[] { siteId }));
+    // List<Specimen> aliquots = appService.query(criteria);
+    //
+    // int items = aliquots.size();
+    // int maxItems = items > 10 ? 10 : items;
+    // return ModelWrapper.wrapModelCollection(appService,
+    // aliquots.subList(0, maxItems), SpecimenWrapper.class);
+    // }
 }
