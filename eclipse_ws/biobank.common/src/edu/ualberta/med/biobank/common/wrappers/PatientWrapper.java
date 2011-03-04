@@ -315,18 +315,6 @@ public class PatientWrapper extends PatientBaseWrapper {
         return false;
     }
 
-    @Deprecated
-    public String getSourceSpecimenCount() {
-        // TODO New method. Need to be implemented !
-        return null;
-    }
-
-    @Deprecated
-    public String getAliquotedSpecimenCount() {
-        // TODO New method. Need to be implemented !
-        return null;
-    }
-
     public List<CollectionEventWrapper> getCollectionEventCollection(
         boolean sort, final boolean ascending) {
         List<CollectionEventWrapper> cEvents = getCollectionEventCollection(false);

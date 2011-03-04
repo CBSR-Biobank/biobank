@@ -13,12 +13,9 @@ import java.util.Set;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.peer.StudyEventAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
-import edu.ualberta.med.biobank.model.EventAttr;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
@@ -202,13 +199,10 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return log;
     }
 
-    private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pva.processingEvent from "
-        + EventAttr.class.getName()
-        + " pva where pva."
-        + Property.concatNames(EventAttrPeer.STUDY_EVENT_ATTR,
-            StudyEventAttrPeer.LABEL)
-        + "? and pva."
-        + EventAttrPeer.VALUE.getName() + "=?";
+    private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pEvent from "
+        + ProcessingEvent.class.getName()
+        + " pEvent where pEvent."
+        + ProcessingEventPeer.WORKSHEET.getName() + "=?";
 
     public static List<ProcessingEventWrapper> getProcessingEventsWithWorksheet(
         WritableApplicationService appService, String worksheetNumber)

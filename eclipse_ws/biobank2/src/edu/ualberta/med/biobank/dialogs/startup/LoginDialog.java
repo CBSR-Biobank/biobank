@@ -384,7 +384,7 @@ public class LoginDialog extends TitleAreaDialog {
                     }
 
                     if (workingCenters.size() == 1) {
-                        sessionHelper.getUser().setCurrentWorkingSite(
+                        sessionHelper.getUser().setCurrentWorkingCentre(
                             workingCenters.get(0));
                     } else if (workingCenters.size() > 1) {
                         new WorkingCentreSelectDialog(getShell(),

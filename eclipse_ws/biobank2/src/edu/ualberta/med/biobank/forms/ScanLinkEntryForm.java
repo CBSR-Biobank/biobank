@@ -35,7 +35,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
@@ -100,7 +100,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     private List<ModelWrapper<?>[]> preSelections;
 
-    private SiteWrapper currentSelectedSite;
+    private CenterWrapper<?> currentSelectedCentre;
 
     @Override
     protected void init() throws Exception {
@@ -134,7 +134,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
         addBooleanBinding(new WritableValue(Boolean.TRUE, Boolean.class),
             typesFilledValue,
-            Messages.getString("ScanLink.sampleType.select.validationMsg"));
+            Messages.getString("ScanLink.sampleType.select.validationMsg")); //$NON-NLS-1$
     }
 
     /**
@@ -277,8 +277,10 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     private void initAuthorizedPalletSpecimenTypeList()
         throws ApplicationException {
         SiteWrapper currentSite = SessionManager.getUser()
-            .getCurrentWorkingCentre();
+            .getCurrentWorkingSite();
         if (currentSite != null) {
+            // FIXME should not need check on container types when is in a
+            // clinic
             authorizedPalletSpecimenTypes = SpecimenTypeWrapper
                 .getSpecimenTypeForPallet96(appService, currentSite);
             if (authorizedPalletSpecimenTypes.size() == 0) {
@@ -348,12 +350,12 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         gd.widthHint = 500;
         typesSelectionPerRowComposite.setLayoutData(gd);
 
-        toolkit.createLabel(typesSelectionPerRowComposite, "");
+        toolkit.createLabel(typesSelectionPerRowComposite, ""); //$NON-NLS-1$
         toolkit.createLabel(typesSelectionPerRowComposite,
-            "Source Specimen Types");
+            Messages.getString("ScanLink.source.column.title")); //$NON-NLS-1$
         toolkit.createLabel(typesSelectionPerRowComposite,
-            "Aliquoted Specimen Types");
-        toolkit.createLabel(typesSelectionPerRowComposite, "");
+            Messages.getString("ScanLink.result.column.title")); //$NON-NLS-1$
+        toolkit.createLabel(typesSelectionPerRowComposite, ""); //$NON-NLS-1$
 
         specimenTypesWidgets = new ArrayList<AliquotedSpecimenSelectionWidget>();
         AliquotedSpecimenSelectionWidget precedent = null;
@@ -470,7 +472,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     protected void beforeScanThreadStart() {
         isFakeScanRandom = fakeScanRandom != null
             && fakeScanRandom.getSelection();
-        currentSelectedSite = SessionManager.getUser()
+        currentSelectedCentre = SessionManager.getUser()
             .getCurrentWorkingCentre();
         preSelections = new ArrayList<ModelWrapper<?>[]>();
         for (AliquotedSpecimenSelectionWidget stw : specimenTypesWidgets) {
@@ -485,7 +487,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         }
         try {
             return PalletCell.getRandomScanLinkWithAliquotsAlreadyLinked(
-                appService, currentSelectedSite.getId());
+                appService, currentSelectedCentre.getId());
         } catch (Exception ex) {
             BiobankPlugin.openAsyncError("Fake Scan problem", ex); //$NON-NLS-1$
         }
@@ -504,8 +506,9 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         if (cells != null) {
             final Map<Integer, Integer> typesRows = new HashMap<Integer, Integer>();
             for (RowColPos rcp : cells.keySet()) {
-                monitor.subTask("Processing position "
-                    + ContainerLabelingSchemeWrapper.rowColToSbs(rcp));
+                monitor.subTask(Messages.getString(
+                    "ScanLink.scan.monitor.position", //$NON-NLS-1$
+                    ContainerLabelingSchemeWrapper.rowColToSbs(rcp)));
                 Integer typesRowsCount = typesRows.get(rcp.row);
                 if (typesRowsCount == null) {
                     typesRowsCount = 0;
@@ -557,17 +560,15 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             }
             if (studiesAliquotedTypes.size() == 0) {
                 BiobankPlugin.openAsyncError(Messages
-                    .getString("ScanLink.aliquotedSpecimenTypes.error.title"),
+                    .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
                     Messages.getString(
-                        "ScanLink.aliquotedSpecimenTypes.error.msg",
+                        "ScanLink.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
                         linkFormPatientManagement.getCurrentPatient()
                             .getStudy().getNameShort()));
             }
         }
         List<SpecimenWrapper> availableSourceSpecimens = linkFormPatientManagement
-            .getSelectedCollectionEvent()
-            .getSpecimensInCollectionEventsForWorksheet(true,
-                linkFormPatientManagement.getCurrentWorksheetNumber());
+            .getSpecimensInCollectionEventsForWorksheet();
         // set the list of aliquoted types to all widgets, in case the list is
         // activated using the handheld scanner
         for (int row = 0; row < specimenTypesWidgets.size(); row++) {
@@ -636,9 +637,6 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     protected void saveForm() throws Exception {
         Map<RowColPos, PalletCell> cells = (Map<RowColPos, PalletCell>) spw
             .getCells();
-        CollectionEventWrapper collectionEvent = linkFormPatientManagement
-            .getSelectedCollectionEvent();
-
         StringBuffer sb = new StringBuffer("ALIQUOTED SPECIMENS:\n"); //$NON-NLS-1$
         int nber = 0;
         ActivityStatusWrapper activeStatus = ActivityStatusWrapper
@@ -666,6 +664,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 aliquotedSpecimen.setInventoryId(cell.getValue());
                 aliquotedSpecimen.setCreatedAt(new Date());
                 aliquotedSpecimen.setActivityStatus(activeStatus);
+                aliquotedSpecimen.setCurrentCenter(currentSelectedCentre);
                 aliquotedSpecimens.add(aliquotedSpecimen);
 
                 // FIXME find out correct messaging
@@ -697,7 +696,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     /**
-     * update sample type of aliquots of one given row
+     * update types of specimens of one given row
      */
     @SuppressWarnings("unchecked")
     private void updateRowType(AliquotedSpecimenSelectionWidget typeWidget,

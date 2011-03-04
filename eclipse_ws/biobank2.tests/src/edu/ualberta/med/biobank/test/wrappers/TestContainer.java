@@ -1836,22 +1836,22 @@ public class TestContainer extends TestDatabase {
         top.persist();
 
         List<ContainerWrapper> emptyContainers = ContainerWrapper
-            .getEmptyContainersHoldingSampleType(appService, site,
+            .getEmptyContainersHoldingSpecimenType(appService, site,
                 Arrays.asList(allSampleTypes.get(0)), 2, 2);
         Assert.assertEquals(2, emptyContainers.size());
         Assert.assertTrue(emptyContainers.contains(child));
         Assert.assertTrue(emptyContainers.contains(child2));
 
-        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSampleType(
+        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
             appService, site, Arrays.asList(allSampleTypes.get(1)), 2, 2);
         Assert.assertEquals(1, emptyContainers.size());
         Assert.assertTrue(emptyContainers.contains(child3));
 
-        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSampleType(
+        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
             appService, site, Arrays.asList(allSampleTypes.get(0)), 5, 2);
         Assert.assertEquals(0, emptyContainers.size());
 
-        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSampleType(
+        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
             appService, site, Arrays.asList(allSampleTypes.get(1)), 2, 10);
         Assert.assertEquals(0, emptyContainers.size());
     }

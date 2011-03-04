@@ -960,7 +960,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * @param minRowCapacity min row capacity
      * @param minColCapacity min col capacity
      */
-    public static List<ContainerWrapper> getEmptyContainersHoldingSampleType(
+    public static List<ContainerWrapper> getEmptyContainersHoldingSpecimenType(
         WritableApplicationService appService, SiteWrapper siteWrapper,
         List<SpecimenTypeWrapper> sampleTypes, Integer minRowCapacity,
         Integer minColCapacity) throws ApplicationException {

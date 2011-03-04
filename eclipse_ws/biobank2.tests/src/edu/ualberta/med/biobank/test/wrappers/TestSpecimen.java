@@ -526,7 +526,7 @@ public class TestSpecimen extends TestDatabase {
         }
 
         List<SpecimenWrapper> aliquots = SpecimenWrapper
-            .getSpecimensNonActiveInSite(appService, site);
+            .getSpecimensNonActiveInCentre(appService, site);
         Assert.assertEquals(nonActiveAliquots.size(), aliquots.size());
         Assert.assertTrue(aliquots.containsAll(nonActiveAliquots));
         Assert.assertFalse(aliquots.containsAll(activeAliquots));
