@@ -518,7 +518,14 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
     }
 
-    public List<ProcessingEventWrapper> getProcessingEventCollection() {
-        return getProcessingEventCollection(false);
+    public List<ProcessingEventWrapper> getProcessingEventCollectionForWorksheet(
+        String worksheet) {
+        List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
+        for (ProcessingEventWrapper pe : getProcessingEventCollection(false)) {
+            String peWorksheet = pe.getWorksheet();
+            if (peWorksheet != null && peWorksheet.equals(worksheet))
+                peList.add(pe);
+        }
+        return peList;
     }
 }

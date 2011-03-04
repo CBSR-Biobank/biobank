@@ -454,7 +454,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     // do something ?
                     break;
                 case MISSING:
-                    SessionManager.openViewForm(cell.getExpectedAliquot());
+                    SessionManager.openViewForm(cell.getExpectedSpecimen());
                     break;
                 }
             }
@@ -621,7 +621,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                                     rcp.col, null));
                                 getCells().put(rcp, cell);
                             }
-                            cell.setExpectedAliquot(expectedAliquot);
+                            cell.setExpectedSpecimen(expectedAliquot);
                         }
                     }
                     if (cell != null) {
@@ -687,7 +687,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
      * set the status of the cell
      */
     protected void processCellStatus(PalletCell scanCell) throws Exception {
-        SpecimenWrapper expectedAliquot = scanCell.getExpectedAliquot();
+        SpecimenWrapper expectedAliquot = scanCell.getExpectedSpecimen();
         String value = scanCell.getValue();
         String positionString = currentPalletWrapper.getLabel()
             + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell

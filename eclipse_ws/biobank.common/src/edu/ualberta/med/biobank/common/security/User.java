@@ -252,7 +252,8 @@ public class User implements Serializable, NotAProxy {
 
     public SiteWrapper getCurrentWorkingCentre() {
         try {
-            currentWorkingSite.reload();
+            if (currentWorkingSite != null)
+                currentWorkingSite.reload();
         } catch (Exception e) {
             // FIXME: how to handle?
             e.printStackTrace();
