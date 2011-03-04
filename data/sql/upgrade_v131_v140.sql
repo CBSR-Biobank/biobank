@@ -139,15 +139,15 @@ CREATE TABLE specimen (
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
 INSERT INTO specimen (inventory_id,comment,quantity,created_at,specimen_type_id,
-activity_status_id,collection_event_id,source_collection_event_id,pv_id)
-        SELECT inventory_id,comment,quantity,link_date,specimen_type.id,activity_status_id,0,0,
+activity_status_id,source_collection_event_id,pv_id)
+        SELECT inventory_id,comment,quantity,link_date,specimen_type.id,activity_status_id,0,
         patient_visit_id
         FROM aliquot
         JOIN sample_type ON sample_type.id=aliquot.sample_type_id
         JOIN specimen_type ON specimen_type.name=sample_type.name;
 
-INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id,
-specimen_type_id,pv_id,sv_id)
+INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id
+source_collection_event_id,specimen_type_id,pv_id,sv_id)
        SELECT concat("sw upgrade ",pvsv.id),volume,time_drawn,
        (select id from activity_status where name='Active'),0,0,patient_visit_id,source_vessel_id
        FROM pv_source_vessel as pvsv
@@ -366,8 +366,18 @@ INSERT INTO collection_event (visit_number,comment,patient_id,activity_status_id
 create index pv_id_idx on collection_event(pv_id);
 create index pv_id_idx on specimen(pv_id);
 
-update specimen,collection_event as ce set specimen.collection_event_id=ce.id
-	where ce.pv_id=specimen.pv_id and specimen.sv_id is null;
+-- set specimen.source_collection_event_id, and specimen.collection_event_id for aliquoted
+-- specimens
+
+update specimen,collection_event as ce
+       set specimen.source_collection_event_id=ce.id,specimen.collection_event_id=ce.id
+       where ce.pv_id=specimen.pv_id and specimen.sv_id is null;
+
+-- set specimen.source_collection_event_id for source specimens
+
+update specimen,collection_event as ce
+       set specimen.source_collection_event_id=ce.id
+       where ce.pv_id=specimen.pv_id and specimen.sv_id is not null;
 
 drop index pv_id_idx on collection_event;
 drop index pv_id_idx on specimen;
@@ -391,8 +401,24 @@ CREATE TABLE processing_event (
     UNIQUE KEY `WORKSHEET` (`WORKSHEET`)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
--- insert into processing_event (created_at,worksheet,comment,center_id)
--- select pv.date_processed,
+insert into processing_event (created_at,worksheet,comment,center_id)
+       select pv.date_processed
+       from patient_visit as pv
+       join pv_
+
+/*
+
+-- select count(*)
+select pv.date_processed,event_attr.value as worksheet,pv.comment,aship.clinic_id
+from patient_visit as pv
+join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
+join abstract_shipment as aship on aship.id=csp.CLINIC_SHIPMENT_ID
+join event_attr on event_attr.collection_event_id=pv.id
+join study_event_attr on study_event_attr.id=event_attr.study_event_attr_id
+join event_attr_type on event_attr_type.id=study_event_attr.EVENT_ATTR_TYPE_ID
+where label='Worksheet';
+
+*/
 
 ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -949,18 +975,12 @@ ALTER TABLE specimen DROP COLUMN PV_ID, DROP COLUMN SV_ID;
 #DROP TABLE dispatch_shipment_aliquot;
 #DROP TABLE patient_visit;
 #DROP TABLE pv_source_vessel;
-#DROP TABLE pv_source_vessel;
 #DROP TABLE research_group;
 #DROP TABLE research_group_researcher;
 #DROP TABLE researcher;
 #DROP TABLE sample_storage
-#DROP TABLE sample_storage;
-#DROP TABLE sample_type;
 #DROP TABLE sample_type;
 #DROP TABLE site;
-#DROP TABLE site;
 #DROP TABLE source_vessel;
-#DROP TABLE source_vessel;
-#DROP TABLE study_source_vessel
 #DROP TABLE study_source_vessel;
 
