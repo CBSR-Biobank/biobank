@@ -9,9 +9,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -206,7 +203,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 }
             }
             // if not in a container or a dispatch, use the originating shipment
-            return getParentProcessingEvent().getCenter();
+            // FIXME
+            // return getParentProcessingEvent().getCenter();
+            return null;
         }
     }
 
@@ -374,28 +373,30 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return Specimen;
     }
 
-    private static final String SpecimenS_NON_ACTIVE_QRY = "from "
-        + Specimen.class.getName()
-        + " a where a."
-        + Property.concatNames(SpecimenPeer.PARENT_PROCESSING_EVENT,
-            ProcessingEventPeer.CENTER, CenterPeer.ID)
-        + " = ? and "
-        + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
-            ActivityStatusPeer.NAME) + " != ?";
+    // private static final String SpecimenS_NON_ACTIVE_QRY = "from "
+    // + Specimen.class.getName()
+    // + " a where a."
+    // + Property.concatNames(SpecimenPeer.PARENT_PROCESSING_EVENT,
+    // ProcessingEventPeer.CENTER, CenterPeer.ID)
+    // + " = ? and "
+    // + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
+    // ActivityStatusPeer.NAME) + " != ?";
 
     public static List<SpecimenWrapper> getSpecimensNonActiveInCentre(
         WritableApplicationService appService, CenterWrapper<?> centre)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(SpecimenS_NON_ACTIVE_QRY,
-            Arrays.asList(new Object[] { centre.getId(),
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
-        List<Specimen> Specimens = appService.query(criteria);
-        List<SpecimenWrapper> list = new ArrayList<SpecimenWrapper>();
-
-        for (Specimen Specimen : Specimens) {
-            list.add(new SpecimenWrapper(appService, Specimen));
-        }
-        return list;
+        // FIXME
+        // HQLCriteria criteria = new HQLCriteria(SpecimenS_NON_ACTIVE_QRY,
+        // Arrays.asList(new Object[] { centre.getId(),
+        // ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
+        // List<Specimen> Specimens = appService.query(criteria);
+        // List<SpecimenWrapper> list = new ArrayList<SpecimenWrapper>();
+        //
+        // for (Specimen Specimen : Specimens) {
+        // list.add(new SpecimenWrapper(appService, Specimen));
+        // }
+        // return list;
+        return null;
     }
 
     public static List<SpecimenWrapper> getSpecimensInSiteWithPositionLabel(
@@ -520,11 +521,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public List<ProcessingEventWrapper> getProcessingEventCollectionForWorksheet(
         String worksheet) {
         List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
-        for (ProcessingEventWrapper pe : getProcessingEventCollection(false)) {
-            String peWorksheet = pe.getWorksheet();
-            if (peWorksheet != null && peWorksheet.equals(worksheet))
-                peList.add(pe);
-        }
+        // FIXME
+        // for (ProcessingEventWrapper pe : getProcessingEventCollection(false))
+        // {
+        // String peWorksheet = pe.getWorksheet();
+        // if (peWorksheet != null && peWorksheet.equals(worksheet))
+        // peList.add(pe);
+        // }
         return peList;
     }
 }

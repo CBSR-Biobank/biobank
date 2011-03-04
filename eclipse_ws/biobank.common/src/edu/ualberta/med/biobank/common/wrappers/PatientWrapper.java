@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -10,17 +9,12 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
-import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -127,24 +121,28 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
     }
 
-    private static final String SPECIMEN_COUNT_QRY = "select count(spcs) from "
-        + CollectionEvent.class.getName() + " as cevent join cevent."
-        + CollectionEventPeer.SPECIMEN_COLLECTION.getName()
-        + " as spcs where cevent."
-        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
-        + "=?";
+    // private static final String SPECIMEN_COUNT_QRY =
+    // "select count(spcs) from "
+    // + CollectionEvent.class.getName() + " as cevent join cevent."
+    // + CollectionEventPeer.SPECIMEN_COLLECTION.getName()
+    // + " as spcs where cevent."
+    // + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+    // + "=?";
 
     public long getSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        long total = 0;
-        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
-            total += cevent.getSpecimensCount(false);
-        return total;
+        // FIXME
+        // if (fast) {
+        // HQLCriteria criteria = new HQLCriteria(SPECIMEN_COUNT_QRY,
+        // Arrays.asList(new Object[] { getId() }));
+        // return getCountResult(appService, criteria);
+        // }
+        // long total = 0;
+        // for (CollectionEventWrapper cevent :
+        // getCollectionEventCollection(false))
+        // total += cevent.getSpecimensCount(false);
+        // return total;
+        return -1;
     }
 
     @Deprecated
@@ -206,20 +204,21 @@ public class PatientWrapper extends PatientBaseWrapper {
         return null;
     }
 
-    private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY = "select pEvent from "
-        + Patient.class.getName()
-        + " as p join p."
-        + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
-        + " as ces join ces."
-        + CollectionEventPeer.SPECIMEN_COLLECTION.getName()
-        + " as specimens join specimens."
-        + SpecimenPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pes where p."
-        + PatientPeer.ID.getName()
-        + "=? and pes."
-        + ProcessingEventPeer.CREATED_AT.getName()
-        + ">? and pes."
-        + ProcessingEventPeer.CREATED_AT.getName() + "<?";
+    // private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY =
+    // "select pEvent from "
+    // + Patient.class.getName()
+    // + " as p join p."
+    // + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
+    // + " as ces join ces."
+    // + CollectionEventPeer.SPECIMEN_COLLECTION.getName()
+    // + " as specimens join specimens."
+    // + SpecimenPeer.PROCESSING_EVENT_COLLECTION.getName()
+    // + " as pes where p."
+    // + PatientPeer.ID.getName()
+    // + "=? and pes."
+    // + ProcessingEventPeer.CREATED_AT.getName()
+    // + ">? and pes."
+    // + ProcessingEventPeer.CREATED_AT.getName() + "<?";
 
     @Deprecated
     // FIXME :in Scan Link, wants the collection event instead. What is a last 7
@@ -227,23 +226,25 @@ public class PatientWrapper extends PatientBaseWrapper {
     // event itself ?
     public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
         SiteWrapper site) throws ApplicationException {
-        Calendar cal = Calendar.getInstance();
-        // today midnight
-        cal.add(Calendar.DATE, 1);
-        cal.set(Calendar.AM_PM, Calendar.AM);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        Date endDate = cal.getTime();
-        // 7 days ago, at midnight
-        cal.add(Calendar.DATE, -8);
-        Date startDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria(
-            LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
-                getId(), site.getId(), startDate, endDate }));
-        List<ProcessingEvent> res = appService.query(criteria);
-        return ModelWrapper.wrapModelCollection(appService, res,
-            ProcessingEventWrapper.class);
+        // FIXME
+        // Calendar cal = Calendar.getInstance();
+        // // today midnight
+        // cal.add(Calendar.DATE, 1);
+        // cal.set(Calendar.AM_PM, Calendar.AM);
+        // cal.set(Calendar.HOUR, 0);
+        // cal.set(Calendar.MINUTE, 0);
+        // cal.set(Calendar.SECOND, 0);
+        // Date endDate = cal.getTime();
+        // // 7 days ago, at midnight
+        // cal.add(Calendar.DATE, -8);
+        // Date startDate = cal.getTime();
+        // HQLCriteria criteria = new HQLCriteria(
+        // LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
+        // getId(), site.getId(), startDate, endDate }));
+        // List<ProcessingEvent> res = appService.query(criteria);
+        // return ModelWrapper.wrapModelCollection(appService, res,
+        // ProcessingEventWrapper.class);
+        return null;
     }
 
     @Override
@@ -338,12 +339,13 @@ public class PatientWrapper extends PatientBaseWrapper {
         List<CollectionEventWrapper> ces = getCollectionEventCollection(false);
         List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
         List<ProcessingEventWrapper> pes = new ArrayList<ProcessingEventWrapper>();
-        for (CollectionEventWrapper ce : ces)
-            specs.addAll(ce.getSpecimenCollection());
-        for (SpecimenWrapper spec : specs) {
-            pes.addAll(spec.getProcessingEventCollection(false));
-            pes.add(spec.getParentProcessingEvent());
-        }
+        // FIXME
+        // for (CollectionEventWrapper ce : ces)
+        // specs.addAll(ce.getSpecimenCollection());
+        // for (SpecimenWrapper spec : specs) {
+        // pes.addAll(spec.getProcessingEventCollection(false));
+        // pes.add(spec.getParentProcessingEvent());
+        // }
         return pes;
     }
 

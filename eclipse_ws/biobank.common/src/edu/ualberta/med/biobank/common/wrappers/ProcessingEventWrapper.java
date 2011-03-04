@@ -2,23 +2,18 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -41,52 +36,56 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
      * 
      * @throws BiobankCheckException
      */
+    @Deprecated
+    // FIXME should be modified to use the new model changes
     public void addChildSpecimens(List<SpecimenWrapper> childSpecimens)
         throws BiobankCheckException {
-        SpecimenWrapper parentSpecimen = getParentSpecimen();
-
-        if (parentSpecimen == null) {
-            throw new NullPointerException();
-        }
-
-        if (childSpecimens == null || childSpecimens.isEmpty()) {
-            return;
-        }
-
-        List<AliquotedSpecimenWrapper> sampleStorages = getParentSpecimen()
-            .getCollectionEvent().getPatient().getStudy()
-            .getAliquotedSpecimenCollection(false);
-        if (sampleStorages == null || sampleStorages.size() == 0) {
-            throw new BiobankCheckException(
-                "Can only add aliquots in a visit which study has sample storages");
-        }
-
-        Collection<Specimen> allSpecimenObjects = new HashSet<Specimen>();
-        List<SpecimenWrapper> allSpecimenWrappers = new ArrayList<SpecimenWrapper>();
-        // already added
-        List<SpecimenWrapper> currentList = getChildSpecimenCollection(false);
-        if (currentList != null) {
-            for (SpecimenWrapper aliquot : currentList) {
-                allSpecimenObjects.add(aliquot.getWrappedObject());
-                allSpecimenWrappers.add(aliquot);
-            }
-        }
-        // new added
-
-        // will set the adequate volume to the added aliquots
-        Map<Integer, Double> typesVolumes = new HashMap<Integer, Double>();
-        for (AliquotedSpecimenWrapper ss : sampleStorages) {
-            typesVolumes.put(ss.getSpecimenType().getId(), ss.getVolume());
-        }
-        for (SpecimenWrapper aliquot : childSpecimens) {
-            aliquot.setQuantity(typesVolumes.get(aliquot.getSpecimenType()
-                .getId()));
-            aliquot.setParentProcessingEvent(this);
-            allSpecimenObjects.add(aliquot.getWrappedObject());
-            allSpecimenWrappers.add(aliquot);
-        }
-        setWrapperCollection(ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION,
-            allSpecimenWrappers);
+        // SpecimenWrapper parentSpecimen = getParentSpecimen();
+        //
+        // if (parentSpecimen == null) {
+        // throw new NullPointerException();
+        // }
+        //
+        // if (childSpecimens == null || childSpecimens.isEmpty()) {
+        // return;
+        // }
+        //
+        // List<AliquotedSpecimenWrapper> sampleStorages = getParentSpecimen()
+        // .getCollectionEvent().getPatient().getStudy()
+        // .getAliquotedSpecimenCollection(false);
+        // if (sampleStorages == null || sampleStorages.size() == 0) {
+        // throw new BiobankCheckException(
+        // "Can only add aliquots in a visit which study has sample storages");
+        // }
+        //
+        // Collection<Specimen> allSpecimenObjects = new HashSet<Specimen>();
+        // List<SpecimenWrapper> allSpecimenWrappers = new
+        // ArrayList<SpecimenWrapper>();
+        // // already added
+        // List<SpecimenWrapper> currentList =
+        // getChildSpecimenCollection(false);
+        // if (currentList != null) {
+        // for (SpecimenWrapper aliquot : currentList) {
+        // allSpecimenObjects.add(aliquot.getWrappedObject());
+        // allSpecimenWrappers.add(aliquot);
+        // }
+        // }
+        // // new added
+        //
+        // // will set the adequate volume to the added aliquots
+        // Map<Integer, Double> typesVolumes = new HashMap<Integer, Double>();
+        // for (AliquotedSpecimenWrapper ss : sampleStorages) {
+        // typesVolumes.put(ss.getSpecimenType().getId(), ss.getVolume());
+        // }
+        // for (SpecimenWrapper aliquot : childSpecimens) {
+        // aliquot.setQuantity(typesVolumes.get(aliquot.getSpecimenType()
+        // .getId()));
+        // aliquot.setParentProcessingEvent(this);
+        // allSpecimenObjects.add(aliquot.getWrappedObject());
+        // allSpecimenWrappers.add(aliquot);
+        // }
+        // setWrapperCollection(ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION,
+        // allSpecimenWrappers);
     }
 
     @Override
@@ -121,20 +120,23 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         }
     }
 
-    private static final String CHILD_SPECIMEN_COUNT_QRY = "select count(aliquot) from "
-        + Specimen.class.getName()
-        + " as aliquot where aliquot."
-        + Property.concatNames(SpecimenPeer.PARENT_PROCESSING_EVENT,
-            ProcessingEventPeer.ID) + "=?";
+    // private static final String CHILD_SPECIMEN_COUNT_QRY =
+    // "select count(specimen) from "
+    // + Specimen.class.getName()
+    // + " as specimen where specimen."
+    // + Property.concatNames(SpecimenPeer.PARENT_PROCESSING_EVENT,
+    // ProcessingEventPeer.ID) + "=?";
 
     public long getChildSpecimenCount(boolean fast) throws BiobankException,
         ApplicationException {
-        if (fast) {
-            HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMEN_COUNT_QRY,
-                Arrays.asList(new Object[] { getId() }));
-            return getCountResult(appService, criteria);
-        }
-        return getChildSpecimenCollection(false).size();
+        // FIXME
+        // if (fast) {
+        // HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMEN_COUNT_QRY,
+        // Arrays.asList(new Object[] { getId() }));
+        // return getCountResult(appService, criteria);
+        // }
+        // return getChildSpecimenCollection(false).size();
+        return -1L;
     }
 
     @Override
@@ -174,28 +176,29 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     protected Log getLogMessage(String action, String site, String details) {
         Log log = new Log();
         log.setAction(action);
-        CollectionEventWrapper cevent = getParentSpecimen()
-            .getCollectionEvent();
-        PatientWrapper patient = cevent.getPatient();
-        if (site == null) {
-            log.setSite(getCenter().getNameShort());
-        } else {
-            log.setSite(site);
-        }
-        log.setPatientNumber(patient.getPnumber());
-        Date createdAt = getCreatedAt();
-        if (createdAt != null) {
-            details += " Date Processed: " + getFormattedCreatedAt();
-        }
-        try {
-            String worksheet = cevent.getEventAttrValue("Worksheet");
-            if (worksheet != null) {
-                details += " - Worksheet: " + worksheet;
-            }
-        } catch (Exception e) {
-        }
-        log.setDetails(details);
-        log.setType("Visit");
+        // FIXME
+        // CollectionEventWrapper cevent = getParentSpecimen()
+        // .getCollectionEvent();
+        // PatientWrapper patient = cevent.getPatient();
+        // if (site == null) {
+        // log.setSite(getCenter().getNameShort());
+        // } else {
+        // log.setSite(site);
+        // }
+        // log.setPatientNumber(patient.getPnumber());
+        // Date createdAt = getCreatedAt();
+        // if (createdAt != null) {
+        // details += " Date Processed: " + getFormattedCreatedAt();
+        // }
+        // try {
+        // String worksheet = cevent.getEventAttrValue("Worksheet");
+        // if (worksheet != null) {
+        // details += " - Worksheet: " + worksheet;
+        // }
+        // } catch (Exception e) {
+        // }
+        // log.setDetails(details);
+        // log.setType("Visit");
         return log;
     }
 

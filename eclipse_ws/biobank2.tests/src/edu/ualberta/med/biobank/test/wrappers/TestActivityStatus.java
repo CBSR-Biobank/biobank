@@ -32,7 +32,6 @@ import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
-import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
@@ -172,9 +171,10 @@ public class TestActivityStatus extends TestDatabase {
         if (deleteWrappers != null) {
             for (ModelWrapper<?> delWrapper : deleteWrappers) {
                 if (delWrapper instanceof CollectionEventWrapper) {
-                    DbHelper
-                        .deleteFromList(((CollectionEventWrapper) delWrapper)
-                            .getSpecimenCollection(false));
+                    // FIXME
+                    // DbHelper
+                    // .deleteFromList(((CollectionEventWrapper) delWrapper)
+                    // .getSpecimenCollection(false));
                 }
                 delWrapper.delete();
             }

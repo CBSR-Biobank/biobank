@@ -67,15 +67,16 @@ public class AliquotedSpecimenSelectionWidget {
         cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
         setComboProperties(cvSource, toolkit, sourceSpecimens, 0);
-        cvSource.setLabelProvider(new LabelProvider() {
-            @Override
-            public String getText(Object element) {
-                SpecimenWrapper spec = (SpecimenWrapper) element;
-                return spec.getInventoryId() + "*"
-                    + spec.getSpecimenType().getNameShort() + "*"
-                    + spec.getProcessingEventCollection(false).size();
-            }
-        });
+        // FIXME
+        // cvSource.setLabelProvider(new LabelProvider() {
+        // @Override
+        // public String getText(Object element) {
+        // SpecimenWrapper spec = (SpecimenWrapper) element;
+        // return spec.getInventoryId() + "*"
+        // + spec.getSpecimenType().getNameShort() + "*"
+        // + spec.getProcessingEventCollection(false).size();
+        // }
+        // });
 
         cvResult = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);

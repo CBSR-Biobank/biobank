@@ -882,11 +882,12 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     .getString(
                         "ScanAssign.scanStatus.aliquot.missing", missingAliquot.getInventoryId())); //$NON-NLS-1$
             scanCell.setTitle("?"); //$NON-NLS-1$
-            appendLogNLS(
-                "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
-                    .getInventoryId(), missingAliquot
-                    .getParentProcessingEvent().getFormattedDateProcessed(),
-                missingAliquot.getCollectionEvent().getPatient().getPnumber());
+            // FIXME
+            // appendLogNLS(
+            //                "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
+            // .getInventoryId(), missingAliquot
+            // .getParentProcessingEvent().getFormattedDateProcessed(),
+            // missingAliquot.getCollectionEvent().getPatient().getPnumber());
             movedAndMissingAliquotsFromPallet.put(rcp, scanCell);
         } else {
             movedAndMissingAliquotsFromPallet.remove(rcp);

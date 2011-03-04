@@ -39,7 +39,6 @@ import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
-import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -195,8 +194,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private void createSpecimensSection() {
         Section section = createSection("Source Vessels");
-        specimensTable = new SpecimenEntryInfoTable(section,
-            cevent.getSpecimenCollection(true), ColumnsShown.CEVENT_FORM);
+        // FIXME
+        // specimensTable = new SpecimenEntryInfoTable(section,
+        // cevent.getSpecimenCollection(true), ColumnsShown.CEVENT_FORM);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
 
@@ -348,7 +348,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         cevent.reload();
         super.reset();
         cevent.setPatient(patient);
-        specimensTable.reload(cevent.getSpecimenCollection());
+        // FIXME
+        // specimensTable.reload(cevent.getSpecimenCollection());
         resetPvCustomInfo();
     }
 

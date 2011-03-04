@@ -40,13 +40,15 @@ public class CollectionEventAdapter extends AdapterBase {
         String name = cevent.getPatient().getPnumber() + " - #"
             + cevent.getVisitNumber();
 
-        Collection<SpecimenWrapper> samples = cevent
-            .getSpecimenCollection(true);
-        int total = 0;
-        if (samples != null) {
-            total = samples.size();
-        }
-        return name + " [" + total + "]";
+        // FIXME
+        // Collection<SpecimenWrapper> samples = cevent
+        // .getSpecimenCollection(true);
+        // int total = 0;
+        // if (samples != null) {
+        // total = samples.size();
+        // }
+        // return name + " [" + total + "]";
+        return "??";
     }
 
     @Override
