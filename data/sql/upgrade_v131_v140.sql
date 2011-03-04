@@ -120,7 +120,7 @@ CREATE TABLE specimen (
     CURRENT_CENTER_ID INT(11) NULL DEFAULT NULL,
     SPECIMEN_TYPE_ID INT(11) NOT NULL,
     ORIGIN_INFO_ID INT(11) NULL DEFAULT NULL,
-    PROCESSING_EVENT_ID INT(11) NULL DEFAULT NULL,
+    SPECIMEN_LINK_ID INT(11) NULL DEFAULT NULL COMMENT '',
     COLLECTION_EVENT_ID INT(11) NOT NULL,
     ACTIVITY_STATUS_ID INT(11) NOT NULL,
     PV_ID INT(11),
@@ -131,7 +131,7 @@ CREATE TABLE specimen (
     INDEX FKAF84F30812E55F12 (ORIGIN_INFO_ID),
     CONSTRAINT INVENTORY_ID UNIQUE KEY(INVENTORY_ID),
     INDEX FKAF84F30892FAA705 (CURRENT_CENTER_ID),
-    INDEX FKAF84F30833126C8 (PROCESSING_EVENT_ID),
+    INDEX FKAF84F30875A7A196 (SPECIMEN_LINK_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
@@ -247,10 +247,9 @@ INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,shipp
 SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
 WHERE discriminator='DispatchShipment';
 
-INSERT INTO dispatch (sender_center_id,receiver_center_id,state,comment,activity_status_id,
-shipment_info_id,aship_id)
+INSERT INTO dispatch (sender_center_id,receiver_center_id,state,comment,shipment_info_id,aship_id)
 SELECT sender_center.id,receiver_center.id,state,abstract_shipment.comment,
-abstract_shipment.activity_status_id,shipment_info.id,abstract_shipment.id
+shipment_info.id,abstract_shipment.id
 	FROM abstract_shipment
         JOIN site as sender_site on sender_site.id=abstract_shipment.dispatch_sender_id
         JOIN center as sender_center on sender_center.name=sender_site.name
@@ -386,11 +385,11 @@ CREATE TABLE processing_event (
     INDEX FK327B1E4EC449A4 (ACTIVITY_STATUS_ID),
     INDEX FK327B1E4E92FAA705 (CENTER_ID),
     PRIMARY KEY (ID),
-    ADD CONSTRAINT WORKSHEET UNIQUE KEY(WORKSHEET);
+    UNIQUE KEY `WORKSHEET` (`WORKSHEET`)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-insert into processing_event (created_at,worksheet,comment,center_id)
-select pv.date_processed,
+-- insert into processing_event (created_at,worksheet,comment,center_id)
+-- select pv.date_processed,
 
 ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -417,7 +416,6 @@ ALTER TABLE container_type
       CHANGE COLUMN name_short name_short VARCHAR(50) NOT NULL,
       CHANGE COLUMN child_labeling_scheme_id child_labeling_scheme_id INT(11) NOT NULL COMMENT '',
       ADD CONSTRAINT uc_name UNIQUE KEY(NAME, SITE_ID),
-      ADD INDEX FKB2C878585D63DFF0 (CHILD_LABELING_SCHEME_ID),
       ADD CONSTRAINT uc_nameshort UNIQUE KEY(NAME_SHORT, SITE_ID);
 
 CREATE TABLE container_type_specimen_type (
@@ -457,8 +455,8 @@ UPDATE container_path
 ALTER TABLE abstract_position
       DROP INDEX FKBC4AE0A6898584F,
       DROP KEY ALIQUOT_ID,
-      CHANGE COLUMN row row INT(11) NOT NULL COMMENT '',
-      CHANGE COLUMN col col INT(11) NOT NULL COMMENT '',
+      CHANGE COLUMN row ROW INT(11) NOT NULL COMMENT '',
+      CHANGE COLUMN col COL INT(11) NOT NULL COMMENT '',
       CHANGE COLUMN ALIQUOT_ID SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
       ADD COLUMN POSITION_STRING VARCHAR(50) NULL DEFAULT NULL COMMENT '',
       ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
