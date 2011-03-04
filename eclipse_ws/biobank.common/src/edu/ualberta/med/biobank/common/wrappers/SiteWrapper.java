@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenLinkPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -183,22 +184,25 @@ public class SiteWrapper extends SiteBaseWrapper {
         return 0;
     }
 
-    private static final String PATIENT_COUNT_QRY = "select count(distinct patients) from "
-        + Site.class.getName()
-        + " as site join site."
-        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pevent join pevent."
-        + ProcessingEventPeer.PARENT_SPECIMEN.getName()
-        + " as spcs join spcs."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.PATIENT)
-        + " as patients where site."
-        + SitePeer.ID.getName() + "=?";
+    // private static final String PATIENT_COUNT_QRY =
+    // "select count(distinct patients) from "
+    // + Site.class.getName()
+    // + " as site join site."
+    // + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
+    // + " as pevent join pevent."
+    // + ProcessingEventPeer.PARENT_SPECIMEN.getName()
+    // + " as spcs join spcs."
+    // + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+    // CollectionEventPeer.PATIENT)
+    // + " as patients where site."
+    // + SitePeer.ID.getName() + "=?";
 
     public Long getPatientCount() throws Exception {
-        HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, criteria);
+        // FIXME
+        // HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
+        // Arrays.asList(new Object[] { getId() }));
+        // return getCountResult(appService, criteria);
+        return -1L;
     }
 
     // FIXME: this only returns specimens that have been aliquoted, it does
@@ -209,7 +213,9 @@ public class SiteWrapper extends SiteBaseWrapper {
         + " site left join site."
         + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pevent join pevent."
-        + ProcessingEventPeer.CHILD_SPECIMEN_COLLECTION.getName()
+        + ProcessingEventPeer.SPECIMEN_LINK_COLLECTION.getName()
+        + " as spLink join spLink."
+        + SpecimenLinkPeer.CHILD_SPECIMEN_COLLECTION.getName()
         + " as spcs where site." + SitePeer.ID.getName() + "=?";
 
     public Long getSpecimenCount() throws Exception {

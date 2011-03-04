@@ -154,9 +154,9 @@ public class MoveAliquotsToDialog extends BiobankDialog {
             .getContainerType().getSpecimenTypeCollection();
         List<ContainerWrapper> conts = new ArrayList<ContainerWrapper>();
         try {
-            conts = ContainerWrapper.getEmptyContainersHoldingSampleType(
+            conts = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
                 SessionManager.getAppService(), SessionManager.getUser()
-                    .getCurrentWorkingCentre(), typesFromOlContainer,
+                    .getCurrentWorkingSite(), typesFromOlContainer,
                 oldContainer.getRowCapacity(), oldContainer.getColCapacity());
         } catch (ApplicationException e) {
             BiobankPlugin.openAsyncError("Error",

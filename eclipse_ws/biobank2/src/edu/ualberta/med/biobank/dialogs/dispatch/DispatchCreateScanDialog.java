@@ -168,7 +168,7 @@ public class DispatchCreateScanDialog extends
                     cell = new PalletCell(new ScanCell(rcp.row, rcp.col, null));
                     getCells().put(rcp, cell);
                 }
-                cell.setExpectedAliquot(expectedAliquot);
+                cell.setExpectedSpecimen(expectedAliquot);
             }
         }
         if (cell != null) {
@@ -180,7 +180,7 @@ public class DispatchCreateScanDialog extends
      * set the status of the cell
      */
     protected void processCellStatus(PalletCell scanCell) throws Exception {
-        SpecimenWrapper expectedAliquot = scanCell.getExpectedAliquot();
+        SpecimenWrapper expectedAliquot = scanCell.getExpectedSpecimen();
         String value = scanCell.getValue();
         if (value == null) { // no aliquot scanned
             scanCell.setStatus(CellStatus.MISSING);

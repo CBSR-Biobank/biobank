@@ -42,7 +42,7 @@ public class SampleTypeSUsageTest extends AbstractReportTest {
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
         List<AliquotedSpecimenWrapper> allSampleStorages = new ArrayList<AliquotedSpecimenWrapper>(
-            getSampleStorages());
+            getAliquotedSpecimens());
         Collections.sort(allSampleStorages, ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT);
 
         List<Object> expectedResults = new ArrayList<Object>();

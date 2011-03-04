@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.Arrays;
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
@@ -19,8 +18,8 @@ public class DispatchHelper extends DbHelper {
         String waybill, Date dateReceived, SpecimenWrapper... aliquots)
         throws Exception {
         DispatchWrapper dispatch = new DispatchWrapper(appService);
-        dispatch.setSender(sender);
-        dispatch.setReceiver(receiver);
+        dispatch.setSenderCenter(sender);
+        dispatch.setReceiverCenter(receiver);
 
         ShipmentInfoWrapper shipInfo = new ShipmentInfoWrapper(appService);
         dispatch.setShipmentInfo(shipInfo);
@@ -28,8 +27,6 @@ public class DispatchHelper extends DbHelper {
         shipInfo.setShippingMethod(method);
         shipInfo.setWaybill(waybill);
 
-        dispatch.setActivityStatus(ActivityStatusWrapper.getActivityStatus(
-            appService, ActivityStatusWrapper.ACTIVE_STATUS_STRING));
         if (dateReceived != null) {
             shipInfo.setReceivedAt(dateReceived);
         }

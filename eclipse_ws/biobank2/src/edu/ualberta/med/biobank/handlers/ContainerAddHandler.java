@@ -16,7 +16,7 @@ public class ContainerAddHandler extends AbstractHandler {
         ContainerAdapter containerAdapter = new ContainerAdapter(null,
             new ContainerWrapper(SessionManager.getAppService()));
         containerAdapter.getContainer().setSite(
-            SessionManager.getUser().getCurrentWorkingCentre());
+            SessionManager.getUser().getCurrentWorkingSite());
         containerAdapter.openEntryForm(false);
         return null;
     }

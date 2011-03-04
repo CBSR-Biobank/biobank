@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -21,13 +22,13 @@ public class PalletCell extends Cell {
 
     private String title;
 
-    private SpecimenTypeWrapper type;
+    private SpecimenWrapper sourceSpecimen;
 
-    private SpecimenWrapper aliquot;
+    private SpecimenWrapper specimen;
 
     private ScanCell scanCell;
 
-    private SpecimenWrapper expectedAliquot;
+    private SpecimenWrapper expectedSpecimen;
 
     public PalletCell(ScanCell scanCell) {
         this.scanCell = scanCell;
@@ -54,19 +55,20 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        List<SpecimenWrapper> aliquots = DebugUtil.getRandomLinkedSpecimens(
-            appService, siteId);
-        if (aliquots.size() > 1) {
-            int row = 2;
-            int col = 3;
-            ScanCell scanCell = new ScanCell(row, col, aliquots.get(0)
-                .getInventoryId());
-            cells.put(new RowColPos(row, col), new PalletCell(scanCell));
-            row = 3;
-            col = 1;
-            scanCell = new ScanCell(row, col, aliquots.get(1).getInventoryId());
-            cells.put(new RowColPos(row, col), new PalletCell(scanCell));
-        }
+        // FIXME
+        // List<SpecimenWrapper> aliquots = DebugUtil.getRandomLinkedSpecimens(
+        // appService, siteId);
+        // if (aliquots.size() > 1) {
+        // int row = 2;
+        // int col = 3;
+        // ScanCell scanCell = new ScanCell(row, col, aliquots.get(0)
+        // .getInventoryId());
+        // cells.put(new RowColPos(row, col), new PalletCell(scanCell));
+        // row = 3;
+        // col = 1;
+        // scanCell = new ScanCell(row, col, aliquots.get(1).getInventoryId());
+        // cells.put(new RowColPos(row, col), new PalletCell(scanCell));
+        // }
         return cells;
     }
 
@@ -128,7 +130,8 @@ public class PalletCell extends Cell {
     }
 
     public String getTitle() {
-        if (type != null) {
+        if (specimen != null && specimen.getSpecimenType() != null) {
+            SpecimenTypeWrapper type = specimen.getSpecimenType();
             if (type.getNameShort() != null) {
                 return type.getNameShort();
             }
@@ -150,19 +153,24 @@ public class PalletCell extends Cell {
     }
 
     public SpecimenTypeWrapper getType() {
-        return type;
+        if (specimen == null)
+            return null;
+        return specimen.getSpecimenType();
     }
 
-    public void setType(SpecimenTypeWrapper type) {
-        this.type = type;
+    public void setSpecimenType(SpecimenTypeWrapper type) {
+        if (specimen == null) {
+            specimen = new SpecimenWrapper(SessionManager.getAppService());
+        }
+        specimen.setSpecimenType(type);
     }
 
     public void setSpecimen(SpecimenWrapper aliquot) {
-        this.aliquot = aliquot;
+        this.specimen = aliquot;
     }
 
     public SpecimenWrapper getSpecimen() {
-        return aliquot;
+        return specimen;
     }
 
     public String getValue() {
@@ -208,12 +216,20 @@ public class PalletCell extends Cell {
         return cell != null && cell.getValue() != null;
     }
 
-    public void setExpectedAliquot(SpecimenWrapper expectedAliquot) {
-        this.expectedAliquot = expectedAliquot;
+    public void setExpectedSpecimen(SpecimenWrapper expectedSpecimen) {
+        this.expectedSpecimen = expectedSpecimen;
     }
 
-    public SpecimenWrapper getExpectedAliquot() {
-        return expectedAliquot;
+    public SpecimenWrapper getExpectedSpecimen() {
+        return expectedSpecimen;
+    }
+
+    public void setSourceSpecimen(SpecimenWrapper sourceSpecimen) {
+        this.sourceSpecimen = sourceSpecimen;
+    }
+
+    public SpecimenWrapper getSourceSpecimen() {
+        return sourceSpecimen;
     }
 
 }
