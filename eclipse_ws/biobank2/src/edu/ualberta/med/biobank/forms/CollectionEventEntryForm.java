@@ -95,7 +95,6 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         cevent = ceventAdapter.getWrapper();
         patient = cevent.getPatient();
         retrieve();
-        patient = cevent.getPatient();
         try {
             cevent.logEdit(null);
         } catch (Exception e) {
@@ -117,6 +116,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             if (!cevent.isNew()) {
                 cevent.reload();
             }
+            patient.reload();
         } catch (Exception e) {
             logger.error(
                 "Error while retrieving patient visit "
