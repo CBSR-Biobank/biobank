@@ -8,6 +8,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
@@ -132,8 +133,9 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         SpecimenTypeWrapper type = specimen.getSpecimenType();
         Assert.isNotNull(type, "aliquot with null for sample type");
         info.type = type.getName();
-        info.patient = specimen.getCollectionEvent().getPatient().getPnumber();
-        Integer visitNumber = specimen.getCollectionEvent().getVisitNumber();
+        CollectionEventWrapper cEvent = specimen.getCollectionEvent();
+        info.patient = cEvent == null ? "" : cEvent.getPatient().getPnumber();
+        Integer visitNumber = cEvent == null ? null : cEvent.getVisitNumber();
         info.pvNumber = (visitNumber == null) ? "" : visitNumber.toString();
         info.createdAt = specimen.getFormattedCreatedAt();
         Double quantity = specimen.getQuantity();
