@@ -933,7 +933,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     }
                 }
             } catch (Exception ex) {
-                setScanHasBeenLauched(false);
+                setScanHasBeenLauched(false, true);
                 throw ex;
             }
             appendLog(sb.toString());
@@ -947,12 +947,13 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
         SpecimenWrapper aliquot, String posStr) {
         CollectionEventWrapper visit = aliquot.getCollectionEvent();
-        sb.append(Messages.getString(
-            "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
-            posStr, currentPalletWrapper.getSite().getNameShort(), cell
-                .getValue(), aliquot.getSpecimenType().getName(), visit
-                .getPatient().getPnumber(), visit.getFormattedDateReceived(),
-            visit.getClinic().getName()));
+        // FIXME what log message ?
+        // sb.append(Messages.getString(
+        //            "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
+        // posStr, currentPalletWrapper.getSite().getNameShort(), cell
+        // .getValue(), aliquot.getSpecimenType().getName(), visit
+        // .getPatient().getPnumber(), visit.getFormattedDateReceived(),
+        // visit.getClinic().getName()));
     }
 
     private boolean saveEvenIfAliquotsMissing() {

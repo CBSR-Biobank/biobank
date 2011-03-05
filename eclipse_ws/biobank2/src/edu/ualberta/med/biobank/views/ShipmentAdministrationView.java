@@ -117,7 +117,6 @@ public class ShipmentAdministrationView extends
     @Override
     protected List<? extends ModelWrapper<?>> search(String text)
         throws Exception {
-        // FIXME
         // if (radioWaybill.getSelection()) {
         // // with waybill, should find only one corresponding shipment, or
         // // mutliple shipments from different clinics

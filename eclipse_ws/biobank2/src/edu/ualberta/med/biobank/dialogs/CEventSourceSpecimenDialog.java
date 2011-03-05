@@ -63,15 +63,24 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
 
     private NewSpecimenListener newSpecimenListener;
 
+    private ActivityStatusWrapper activeActivityStatus;
+
     public CEventSourceSpecimenDialog(Shell parent, SpecimenWrapper specimen,
         List<SourceSpecimenWrapper> studySourceSpecimen,
         List<SpecimenTypeWrapper> allSpecimenTypes, NewSpecimenListener listener) {
         super(parent);
+        try {
+            activeActivityStatus = ActivityStatusWrapper
+                .getActiveActivityStatus(SessionManager.getAppService());
+        } catch (Exception e) {
+            // ok if don't find default
+        }
         Assert.isNotNull(studySourceSpecimen);
         newSpecimenListener = listener;
         internalSpecimen = new SpecimenWrapper(SessionManager.getAppService());
         if (specimen == null) {
             addMode = true;
+            internalSpecimen.setActivityStatus(activeActivityStatus);
         } else {
             internalSpecimen.setSpecimenType(specimen.getSpecimenType());
             internalSpecimen.setInventoryId(specimen.getInventoryId());
@@ -355,6 +364,8 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
             specimenTypeComboViewer.getCombo().deselectAll();
             specimenTypeComboViewer.getCombo().setFocus();
             activityStatusComboViewer.getCombo().deselectAll();
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                activeActivityStatus));
             updateWidgetVisibilityAndValues();
         } catch (Exception e) {
             BiobankPlugin.openAsyncError(

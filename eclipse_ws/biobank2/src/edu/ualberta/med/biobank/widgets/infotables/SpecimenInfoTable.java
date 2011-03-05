@@ -46,7 +46,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
             }
         },
         CEVENT_FORM(new String[] { "Inventory ID", "Type", "Creation Date",
-            "Quantity (ml)" }) {
+            "Quantity (ml)", "Activity Status" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -58,6 +58,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                     return row.createdAt;
                 case 3:
                     return row.quantity;
+                case 4:
+                    return row.activityStatus;
                 default:
                     return "";
                 }

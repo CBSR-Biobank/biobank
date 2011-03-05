@@ -31,8 +31,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenLinkWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
@@ -57,7 +57,7 @@ public class AliquotedSpecimenSelectionWidget {
     private Object nextWidget;
 
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
-        List<SpecimenWrapper> sourceSpecimens,
+        List<SpecimenLinkWrapper> sourceSpecimensLink,
         List<SpecimenTypeWrapper> resultTypes, FormToolkit toolkit) {
 
         if (letter != null) {
@@ -66,17 +66,20 @@ public class AliquotedSpecimenSelectionWidget {
 
         cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
-        setComboProperties(cvSource, toolkit, sourceSpecimens, 0);
-        // FIXME
-        // cvSource.setLabelProvider(new LabelProvider() {
-        // @Override
-        // public String getText(Object element) {
-        // SpecimenWrapper spec = (SpecimenWrapper) element;
-        // return spec.getInventoryId() + "*"
-        // + spec.getSpecimenType().getNameShort() + "*"
-        // + spec.getProcessingEventCollection(false).size();
-        // }
-        // });
+        setComboProperties(cvSource, toolkit, sourceSpecimensLink, 0);
+        cvSource.setLabelProvider(new LabelProvider() {
+            @Override
+            public String getText(Object element) {
+                SpecimenLinkWrapper link = (SpecimenLinkWrapper) element;
+                return link.getParentSpecimen().getInventoryId()
+                    + " type:"
+                    + link.getParentSpecimen().getSpecimenType().getNameShort()
+                    + " visit#"
+                    + link.getParentSpecimen().getCollectionEvent()
+                        .getVisitNumber() + " worksheet#"
+                    + link.getProcessingEvent().getWorksheet();
+            }
+        });
 
         cvResult = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
@@ -200,9 +203,9 @@ public class AliquotedSpecimenSelectionWidget {
             .getSelection()).getFirstElement();
     }
 
-    private SpecimenWrapper getSourceSelection() {
-        return (SpecimenWrapper) ((StructuredSelection) cvSource.getSelection())
-            .getFirstElement();
+    private SpecimenLinkWrapper getSourceSelection() {
+        return (SpecimenLinkWrapper) ((StructuredSelection) cvSource
+            .getSelection()).getFirstElement();
     }
 
     public void addBinding(WidgetCreator dbc) {
@@ -268,8 +271,8 @@ public class AliquotedSpecimenSelectionWidget {
         cvResult.setInput(types);
     }
 
-    public void setSourceTypes(List<SpecimenWrapper> types) {
-        cvSource.setInput(types);
+    public void setSourceSpecimenLinks(List<SpecimenLinkWrapper> sourceLinks) {
+        cvSource.setInput(sourceLinks);
     }
 
     public void setFocus() {
@@ -277,7 +280,7 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     /**
-     * @return an array of [Specimen (source), SpecimenType (result)]
+     * @return an array of [SpecimenLink (source), SpecimenType (result)]
      */
     public ModelWrapper<?>[] getSelection() {
         if (getSourceSelection() != null && getResultTypeSelection() != null)

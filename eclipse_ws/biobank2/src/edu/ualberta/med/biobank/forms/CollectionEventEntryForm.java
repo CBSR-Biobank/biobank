@@ -370,8 +370,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         cevent.reload();
         super.reset();
         cevent.setPatient(patient);
-        // FIXME
-        // specimensTable.reload(cevent.getSpecimenCollection());
+        if (cevent.getActivityStatus() != null) {
+            activityStatusComboViewer.setSelection(new StructuredSelection(
+                cevent.getActivityStatus()));
+        }
+        specimensTable.reload(cevent.getSourceSpecimenCollection(true));
         resetPvCustomInfo();
     }
 

@@ -437,21 +437,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return 0;
     }
 
-    public List<SpecimenWrapper> getSpecimensInCollectionEventsForWorksheet(
-        boolean activeOnly, String worksheet) {
-        List<SpecimenWrapper> specList = new ArrayList<SpecimenWrapper>();
-        for (SpecimenWrapper spec : getAllSpecimenCollection(false)) {
-            if (!activeOnly || spec.isActive()) {
-                if (worksheet == null
-                    || worksheet.isEmpty()
-                    || spec.getProcessingEventCollectionForWorksheet(worksheet)
-                        .size() > 0)
-                    specList.add(spec);
-            }
-        }
-        return specList;
-    }
-
     @Deprecated
     public void setClinic(ClinicWrapper selectedObject) {
         // TODO Auto-generated method stub
@@ -476,4 +461,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return null;
     }
 
+    public List<SpecimenLinkWrapper> getSourceSpecimenLinkCollection() {
+        List<SpecimenLinkWrapper> links = new ArrayList<SpecimenLinkWrapper>();
+        for (SpecimenWrapper spec : getSourceSpecimenCollection(true)) {
+            links.addAll(spec.getSpecimenLinkCollection(false));
+        }
+        return links;
+    }
 }

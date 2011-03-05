@@ -165,6 +165,8 @@ public class ContainerEntryForm extends BiobankEntryForm {
             containerTypes = container.getParent().getContainerType()
                 .getChildContainerTypeCollection();
         }
+        if (container.isNew() && containerTypes.size() == 1)
+            currentType = containerTypes.get(0);
 
         containerTypeComboViewer = createComboViewer(client, "Container Type",
             containerTypes, currentType, MSG_CONTAINER_TYPE_EMPTY,
@@ -186,7 +188,6 @@ public class ContainerEntryForm extends BiobankEntryForm {
                     }
                 }
             });
-
         tempWidget = (BiobankText) createBoundWidgetWithLabel(client,
             BiobankText.class, SWT.NONE, "Temperature (Celcius)", null,
             container, "temperature", new DoubleNumberValidator(

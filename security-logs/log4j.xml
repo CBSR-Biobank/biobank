@@ -50,7 +50,7 @@
   </logger>
 
   <logger name="org.hibernate.SQL">
-    <level value="warn" />
+    <level value="debug" />
   </logger>
 
   <logger name="org.hibernate.type">

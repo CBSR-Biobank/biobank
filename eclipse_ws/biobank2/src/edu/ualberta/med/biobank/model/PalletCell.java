@@ -8,6 +8,7 @@ import java.util.TreeMap;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenLinkWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -22,7 +23,7 @@ public class PalletCell extends Cell {
 
     private String title;
 
-    private SpecimenWrapper sourceSpecimen;
+    private SpecimenLinkWrapper sourceSpecimenLink;
 
     private SpecimenWrapper specimen;
 
@@ -224,12 +225,12 @@ public class PalletCell extends Cell {
         return expectedSpecimen;
     }
 
-    public void setSourceSpecimen(SpecimenWrapper sourceSpecimen) {
-        this.sourceSpecimen = sourceSpecimen;
+    public void setSourceSpecimenLink(SpecimenLinkWrapper sourceSpecimenLink) {
+        this.sourceSpecimenLink = sourceSpecimenLink;
     }
 
-    public SpecimenWrapper getSourceSpecimen() {
-        return sourceSpecimen;
+    public SpecimenLinkWrapper getSourceSpecimenLink() {
+        return sourceSpecimenLink;
     }
 
 }

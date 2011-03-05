@@ -92,20 +92,20 @@ public class DebugUtil {
             aliquots.subList(0, maxItems), SpecimenWrapper.class);
     }
 
-    private static final String RANDOM_NON_ASSIGNED_NON_DISPATCHED_SPECIMENS_QRY = "select a from "
+    private static final String RANDOM_NON_ASSIGNED_NON_DISPATCHED_SPECIMENS_QRY = "select spec from "
         + Site.class.getName()
-        + " as s left join s."
+        + " as site left join site."
         + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pe left join pe."
         + ProcessingEventPeer.SPECIMEN_LINK_COLLECTION.getName()
         + " as spLink left join spLink."
         + SpecimenLinkPeer.CHILD_SPECIMEN_COLLECTION.getName()
-        + " as spc left join spc."
+        + " as spec left join spec."
         + SpecimenPeer.SPECIMEN_POSITION.getName()
         + " as spcpos where spcpos is null"
-        + " and s."
+        + " and site."
         + SitePeer.ID.getName()
-        + "=? and spc."
+        + "=? and spec."
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + "!='Dispatched'";
 

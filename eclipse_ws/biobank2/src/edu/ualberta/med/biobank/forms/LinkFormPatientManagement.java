@@ -19,11 +19,10 @@ import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
-import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenLinkWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -51,10 +50,8 @@ public class LinkFormPatientManagement {
     private BiobankText cEventText;
     private Label cEventComboLabel;
     protected CollectionEventWrapper currentCEventSelected;
-    private BiobankText worksheetText;
     protected String currentWorksheetNumber;
     protected boolean worksheetNumberModified;
-    private List<SpecimenWrapper> cEventSpecimensForWorksheet;
 
     public LinkFormPatientManagement(WidgetCreator widgetCreator,
         AbstractSpecimenAdminForm aliquotAdminForm) {
@@ -96,70 +93,6 @@ public class LinkFormPatientManagement {
         });
         patientNumberText.addKeyListener(aliquotAdminForm.textFieldKeyListener);
         setFirstControl();
-    }
-
-    protected void createWorksheetText(Composite parent) {
-        worksheetText = (BiobankText) widgetCreator.createBoundWidgetWithLabel(
-            parent, BiobankText.class, SWT.NONE,
-            Messages.getString("ScanLink.worksheet.label"), new String[0], //$NON-NLS-1$
-            new WritableValue("", String.class), null); //$NON-NLS-1$
-        worksheetText.addFocusListener(new FocusAdapter() {
-            @Override
-            public void focusLost(FocusEvent e) {
-                if (worksheetNumberModified) {
-                    currentWorksheetNumber = worksheetText.getText();
-                    checkWorksheetNumber();
-                }
-                worksheetNumberModified = false;
-            }
-        });
-        worksheetText.addModifyListener(new ModifyListener() {
-            @Override
-            public void modifyText(ModifyEvent e) {
-                worksheetNumberModified = true;
-            }
-        });
-        worksheetText.addKeyListener(aliquotAdminForm.textFieldKeyListener);
-        setFirstControl();
-    }
-
-    protected void checkWorksheetNumber() {
-        boolean ok = true;
-        try {
-            if (getSelectedCollectionEvent() != null) {
-                cEventSpecimensForWorksheet = getSelectedCollectionEvent()
-                    .getSpecimensInCollectionEventsForWorksheet(true,
-                        currentWorksheetNumber);
-                if (cEventSpecimensForWorksheet.size() == 0) {
-                    BiobankPlugin.openAsyncError(Messages
-                        .getString("ScanLink.worksheet.specimens.error.title"), //$NON-NLS-1$
-                        Messages.getString(
-                            "ScanLink.worksheet.specimens.error.msg", //$NON-NLS-1$
-                            currentWorksheetNumber));
-                    ok = false;
-                }
-            } else {
-                cEventSpecimensForWorksheet = null;
-                List<ProcessingEventWrapper> peList = ProcessingEventWrapper
-                    .getProcessingEventsWithWorksheet(
-                        SessionManager.getAppService(), currentWorksheetNumber);
-                if (peList.size() == 0) {
-                    BiobankPlugin.openAsyncError(Messages
-                        .getString("ScanLink.worksheet.error.title"), Messages //$NON-NLS-1$
-                        .getString("ScanLink.worksheet.error.msg", //$NON-NLS-1$
-                            currentWorksheetNumber));
-                    ok = false;
-                }
-            }
-        } catch (Exception e) {
-            BiobankPlugin.openAsyncError(
-                Messages.getString("ScanLink.worksheet.error.title"), e); //$NON-NLS-1$
-            ok = false;
-        } finally {
-            if (!ok) {
-                // FIXME don't hit scan
-            }
-        }
     }
 
     protected void createCollectionEventWidgets(Composite compositeFields) {
@@ -343,11 +276,7 @@ public class LinkFormPatientManagement {
         return currentWorksheetNumber;
     }
 
-    public List<SpecimenWrapper> getSpecimensInCollectionEventsForWorksheet() {
-        if (cEventSpecimensForWorksheet == null)
-            cEventSpecimensForWorksheet = getSelectedCollectionEvent()
-                .getSpecimensInCollectionEventsForWorksheet(true,
-                    currentWorksheetNumber);
-        return cEventSpecimensForWorksheet;
+    public List<SpecimenLinkWrapper> getSpecimenLinksInCollectionEvent() {
+        return getSelectedCollectionEvent().getSourceSpecimenLinkCollection();
     }
 }
