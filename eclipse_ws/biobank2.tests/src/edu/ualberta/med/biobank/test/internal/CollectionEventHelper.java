@@ -19,7 +19,7 @@ public class CollectionEventHelper extends DbHelper {
         cevent.setVisitNumber(visitNumber);
 
         if ((spcs != null) && (spcs.length != 0)) {
-            cevent.addToSpecimenCollection(Arrays.asList(spcs));
+            cevent.addToSourceSpecimenCollection(Arrays.asList(spcs));
             for (SpecimenWrapper spc : spcs) {
                 spc.setCollectionEvent(cevent);
                 spc.setCurrentCenter(center);

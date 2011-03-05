@@ -26,8 +26,10 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
@@ -40,7 +42,7 @@ import edu.ualberta.med.biobank.widgets.ComboAndQuantityWidget;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SelectMultipleWidget;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.entry.CEventSpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -80,7 +82,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
 
     private ComboViewer activityStatusComboViewer;
 
-    private SpecimenEntryInfoTable specimensTable;
+    private CEventSpecimenEntryInfoTable specimensTable;
     private BiobankText visitNumberText;
 
     @Override
@@ -194,8 +196,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     }
 
     private void createSpecimensSection() {
-        Section section = createSection("Source Vessels");
-        specimensTable = new SpecimenEntryInfoTable(section,
+        Section section = createSection(Messages
+            .getString("CollectionEventEntryForm.specimens.title"));
+        specimensTable = new CEventSpecimenEntryInfoTable(section,
             cevent.getSourceSpecimenCollection(true), ColumnsShown.CEVENT_FORM);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
@@ -205,7 +208,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 .getAllSpecimenTypes(SessionManager.getAppService(), true);
             specimensTable.addEditSupport(cevent.getPatient().getStudy()
                 .getSourceSpecimenCollection(true), allSpecimenTypes);
-            addSectionToolbar(section, "Add Source Vessel",
+            addSectionToolbar(section,
+                Messages
+                    .getString("CollectionEventEntryForm.specimens.add.title"),
                 new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
@@ -216,7 +221,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                     }
                 });
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Error retrieving source vessels", e);
+            BiobankPlugin
+                .openAsyncError(
+                    Messages
+                        .getString("CollectionEventEntryForm.specimenstypes.error.msg"),
+                    e);
         }
         section.setClient(specimensTable);
     }
@@ -297,16 +306,27 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             .getParent();
         if (patientAdapter != null)
             cevent.setPatient(patientAdapter.getWrapper());
-
         cevent
-            .addToSpecimenCollection(specimensTable.getAddedPvSourceVessels());
-        cevent.removeFromSpecimenCollection(specimensTable
-            .getRemovedPvSourceVessels());
+            .addToSourceSpecimenCollection(specimensTable.getAddedSpecimens());
+        cevent.removeFromSourceSpecimenCollection(specimensTable
+            .getRemovedSpecimens());
         savePvCustomInfo();
     }
 
     @Override
     protected void saveForm() throws Exception {
+        // create the origin info to be used
+        if (specimensTable.getAddedSpecimens().size() > 0) {
+            OriginInfoWrapper originInfo = new OriginInfoWrapper(
+                SessionManager.getAppService());
+            originInfo.setCenter(SessionManager.getUser()
+                .getCurrentWorkingCentre());
+            originInfo.persist();
+            for (SpecimenWrapper spec : specimensTable.getAddedSpecimens()) {
+                spec.setOriginInfo(originInfo);
+            }
+        }
+        // save the collection event
         cevent.persist();
         SessionManager.updateAllSimilarNodes(ceventAdapter, true);
     }

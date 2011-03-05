@@ -588,24 +588,22 @@ public final class TestReportsProcedurallyGeneratedData implements
         for (int shipmentIndex = 0, numShipments = shipments.size()
             - NUM_SHIPMENTS_WITHOUT_PVS; shipmentIndex < numShipments; shipmentIndex++) {
             CollectionEventWrapper shipment = shipments.get(shipmentIndex);
-            List<PatientWrapper> patients = shipment.getPatientCollection();
+            // FIXME
+            // List<PatientWrapper> patients = shipment.getPatientCollection();
+            // for (PatientWrapper patient : patients) {
+            // calendar.setTime(shipment.getDeparted());
+            // calendar.add(Calendar.DAY_OF_YEAR, -1);
+            //
+            // TODO: more appropriate Date-s?
+            // Date drawn = calendar.getTime();
+            // calendar.add(Calendar.DAY_OF_YEAR, 2);
+            // Date processed = calendar.getTime();
 
-            for (PatientWrapper patient : patients) {
-                // FIXME
-                // calendar.setTime(shipment.getDeparted());
-                calendar.add(Calendar.DAY_OF_YEAR, -1);
-
-                // TODO: more appropriate Date-s?
-                Date drawn = calendar.getTime();
-                calendar.add(Calendar.DAY_OF_YEAR, 2);
-                Date processed = calendar.getTime();
-
-                // FIXME
-                // ProcessingEventWrapper patientVisit = ProcessingEventHelper
-                // .addProcessingEvent(shipment.getSourceCenter(), patient,
-                // drawn, processed);
-                // patientVisits.add(patientVisit);
-            }
+            // ProcessingEventWrapper patientVisit = ProcessingEventHelper
+            // .addProcessingEvent(shipment.getSourceCenter(), patient,
+            // drawn, processed);
+            // patientVisits.add(patientVisit);
+            // }
         }
 
         // reload all patients since Shipment-s have been added involving them

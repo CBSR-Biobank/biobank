@@ -127,7 +127,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             });
         setFirstControl(senderComboViewer.getControl());
 
-        // TODO: leave waybill always optional? Required flag on shipment type?
+        // FIXME: leave waybill always optional? Required flag on shipment type?
         waybillLabel = widgetCreator.createLabel(client, "Waybill");
         waybillLabel.setLayoutData(new GridData(
             GridData.VERTICAL_ALIGN_BEGINNING));

@@ -453,32 +453,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Deprecated
-    public void addPatients(List<PatientWrapper> asList) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public List<PatientWrapper> getPatientCollection() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public void addToSpecimenCollection(
-        List<SpecimenWrapper> addedPvSourceVessels) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public void removeFromSpecimenCollection(
-        List<SpecimenWrapper> removedPvSourceVessels) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
     public void setClinic(ClinicWrapper selectedObject) {
         // TODO Auto-generated method stub
 
@@ -502,9 +476,4 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return null;
     }
 
-    @Deprecated
-    public Long getSpecimensCount(boolean b) {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

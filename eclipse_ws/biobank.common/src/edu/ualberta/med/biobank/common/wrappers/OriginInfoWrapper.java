@@ -48,11 +48,12 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     public void checkAtLeastOneSpecimen() throws BiobankCheckException {
-        List<SpecimenWrapper> spc = getSpecimenCollection(false);
-        if (spc == null || spc.isEmpty()) {
-            throw new BiobankCheckException(
-                "At least one specimen should be added to this Collection Event.");
-        }
+        // FIXME don't want that when create form collection event
+        // List<SpecimenWrapper> spc = getSpecimenCollection(false);
+        // if (spc == null || spc.isEmpty()) {
+        // throw new BiobankCheckException(
+        // "At least one specimen should be added to this Collection Event.");
+        // }
     }
 
     private static final String WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY = "from "

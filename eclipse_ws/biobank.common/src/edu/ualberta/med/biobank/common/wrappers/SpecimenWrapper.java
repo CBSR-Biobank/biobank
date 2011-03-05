@@ -482,7 +482,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public ProcessingEventWrapper getProcessingEventAsChild() {
-        return getParentSpecimenLink().getProcessingEvent();
+        return getParentSpecimenLink() == null ? null : getParentSpecimenLink()
+            .getProcessingEvent();
     }
 
     // only for parent specimen

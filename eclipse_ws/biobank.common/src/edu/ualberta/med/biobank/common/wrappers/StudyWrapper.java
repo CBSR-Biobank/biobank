@@ -396,29 +396,6 @@ public class StudyWrapper extends StudyBaseWrapper {
         return 0;
     }
 
-    private static final String PATIENT_COUNT_FOR_CENTER_QRY = "select count(distinct patient) from "
-        + Center.class.getName()
-        + " as center join center."
-        + CenterPeer.SPECIMEN_COLLECTION.getName()
-        + " as specimens join specimens."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.PATIENT)
-        + " as patient where center."
-        + CenterPeer.ID.getName()
-        + "=? and "
-        + "patient."
-        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
-
-    // FIXME is it correct to go through the specimen collection of the centre.
-    // Counting patients might be different for a site or a clinic, or a
-    // research group !
-    public long getPatientCountForCenter(CenterWrapper<?> center)
-        throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_CENTER_QRY,
-            Arrays.asList(new Object[] { center.getId(), getId() }));
-        return getCountResult(appService, c);
-    }
-
     private static final String PROCESSING_EVENT_COUNT_FOR_CENTER_QRY = "select count(distinct pes) from "
         + Center.class.getName()
         + " as center join center."

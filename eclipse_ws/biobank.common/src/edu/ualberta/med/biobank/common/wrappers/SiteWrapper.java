@@ -517,4 +517,24 @@ public class SiteWrapper extends SiteBaseWrapper {
     public String getShipmentCount() {
         return null; // FIXME: no way to determine destination of shipinfos...
     }
+
+    public static final String PATIENT_COUNT_FOR_STUDY_QRY = "select count(distinct patient) from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.SPECIMEN_COLLECTION.getName()
+        + " as specimens where site."
+        + SitePeer.ID.getName()
+        + "=? and "
+        + "specimens."
+        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+            CollectionEventPeer.PATIENT, PatientPeer.STUDY, StudyPeer.ID)
+        + "=?";
+
+    @Override
+    public long getPatientCountForStudy(StudyWrapper study)
+        throws ApplicationException, BiobankException {
+        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_STUDY_QRY,
+            Arrays.asList(new Object[] { getId(), study.getId() }));
+        return getCountResult(appService, c);
+    }
 }

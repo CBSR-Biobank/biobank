@@ -133,6 +133,13 @@ public abstract class CenterWrapper<E extends Center> extends
     public abstract long getCollectionEventCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;
 
+    /**
+     * Collection event count for this centre. This count is different for each
+     * centre: the method should be defined in each centre type
+     */
+    public abstract long getPatientCountForStudy(StudyWrapper study)
+        throws ApplicationException, BiobankException;
+
     @SuppressWarnings("unused")
     @Deprecated
     public CollectionEventWrapper getCollectionEvent(Date dateReceived) {
@@ -170,7 +177,7 @@ public abstract class CenterWrapper<E extends Center> extends
             .wrapModelCollection(appService, centers, null);
 
         return centerWrappers;
-	}
+    }
 
     public static List<CenterWrapper<?>> getAllCenters(
         WritableApplicationService appService) throws ApplicationException {
