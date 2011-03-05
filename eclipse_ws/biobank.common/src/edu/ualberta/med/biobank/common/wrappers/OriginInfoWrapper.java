@@ -11,6 +11,8 @@ import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -21,24 +23,37 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         super(appService);
     }
 
+    public OriginInfoWrapper(WritableApplicationService appService,
+        OriginInfo originInfo) {
+        super(appService, originInfo);
+    }
+
     public List<SpecimenWrapper> getSpecimenCollection() {
         return getSpecimenCollection(false);
     }
 
     public List<PatientWrapper> getPatientCollection() {
-        List<SpecimenWrapper> specs = getSpecimenCollection();
+        List<SpecimenWrapper> specimens = getSpecimenCollection();
         List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
-        for (SpecimenWrapper spec : specs)
-            patients.add(spec.getCollectionEvent().getPatient());
+
+        for (SpecimenWrapper specimen : specimens) {
+            PatientWrapper patient = specimen.getCollectionEvent().getPatient();
+
+            if (!patients.contains(patient)) {
+                patients.add(patient);
+            }
+        }
+
         return patients;
     }
 
     public void checkAtLeastOneSpecimen() throws BiobankCheckException {
-        List<SpecimenWrapper> spc = getSpecimenCollection(false);
-        if (spc == null || spc.isEmpty()) {
-            throw new BiobankCheckException(
-                "At least one specimen should be added to this Collection Event.");
-        }
+        // FIXME don't want that when create form collection event
+        // List<SpecimenWrapper> spc = getSpecimenCollection(false);
+        // if (spc == null || spc.isEmpty()) {
+        // throw new BiobankCheckException(
+        // "At least one specimen should be added to this Collection Event.");
+        // }
     }
 
     private static final String WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY = "from "
@@ -101,5 +116,21 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
             }
         }
 
+    }
+
+    public static List<OriginInfoWrapper> getTodayShipments(
+        BiobankApplicationService appService) throws ApplicationException {
+        StringBuilder qry = new StringBuilder(
+            "from "
+                + OriginInfo.class.getName()
+                + " as origin inner join fetch origin.shipmentInfo where origin.shipmentInfo is not null");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            new ArrayList<Object>());
+
+        List<OriginInfo> origins = appService.query(criteria);
+        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, OriginInfoWrapper.class);
+
+        return shipments;
     }
 }

@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
-public class AliquotedSpecimenDialog extends BiobankDialog {
+public class StudyAliquotedSpecimenDialog extends BiobankDialog {
 
     private AliquotedSpecimenWrapper origAliquotedSpecimen;
 
@@ -37,7 +37,7 @@ public class AliquotedSpecimenDialog extends BiobankDialog {
 
     private Collection<SpecimenTypeWrapper> availableSpecimenTypes;
 
-    public AliquotedSpecimenDialog(Shell parent,
+    public StudyAliquotedSpecimenDialog(Shell parent,
         AliquotedSpecimenWrapper origAliquotedSpecimen,
         Collection<SpecimenTypeWrapper> specimenTypes) {
         super(parent);

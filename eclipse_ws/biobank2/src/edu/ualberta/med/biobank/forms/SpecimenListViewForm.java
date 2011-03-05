@@ -11,8 +11,8 @@ import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 
-public class AliquotListViewForm extends BiobankViewForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.AliquotListViewForm";
+public class SpecimenListViewForm extends BiobankViewForm {
+    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenListViewForm";
 
     private SpecimenInfoTable specimensWidget;
 

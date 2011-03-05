@@ -16,14 +16,15 @@ public class CollectionEventInfoTable extends
     class TableRowData {
         CollectionEventWrapper collectionEvent;
         Integer visitNumber;
-        Long specimenCount;
+        Long sourcespecimenCount;
         String comment;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { visitNumber.toString(),
-                (specimenCount != null) ? specimenCount.toString() : "0",
-                comment }, "\t");
+            return StringUtils.join(new String[] {
+                visitNumber.toString(),
+                (sourcespecimenCount != null) ? sourcespecimenCount.toString()
+                    : "0", comment }, "\t");
         }
     }
 
@@ -57,9 +58,13 @@ public class CollectionEventInfoTable extends
                 case 0:
                     return info.visitNumber.toString();
                 case 1:
-                    return (info.specimenCount != null) ? info.specimenCount
-                        .toString() : "0";
+                    return "date drawn?";
                 case 2:
+                    return (info.sourcespecimenCount != null) ? info.sourcespecimenCount
+                        .toString() : "0";
+                case 3:
+                    return "?";
+                case 4:
                     return info.comment;
 
                 default:
@@ -75,7 +80,8 @@ public class CollectionEventInfoTable extends
         TableRowData info = new TableRowData();
         info.collectionEvent = collectionEvent;
         info.visitNumber = collectionEvent.getVisitNumber();
-        info.specimenCount = collectionEvent.getSpecimensCount(true);
+        info.sourcespecimenCount = collectionEvent
+            .getSourceSpecimensCount(true);
         info.comment = collectionEvent.getComment();
         return info;
     }

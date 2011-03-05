@@ -6,13 +6,16 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenLinkPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
@@ -112,10 +115,10 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMoreCollectionEvents();
-        if (getSpecimensCount(false) > 0)
+        if (getAllSpecimensCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
-                + " because patient has samples stored in database.");
+                + " because patient has specimens stored in database.");
     }
 
     private void checkNoMoreCollectionEvents() throws BiobankCheckException {
@@ -127,24 +130,51 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
     }
 
-    private static final String SPECIMEN_COUNT_QRY = "select count(spcs) from "
-        + CollectionEvent.class.getName() + " as cevent join cevent."
-        + CollectionEventPeer.SPECIMEN_COLLECTION.getName()
+    private static final String ALL_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
         + " as spcs where cevent."
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
         + "=?";
 
-    public long getSpecimensCount(boolean fast) throws BiobankException,
+    public long getAllSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SPECIMEN_COUNT_QRY,
+            HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
         long total = 0;
         for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
-            total += cevent.getSpecimensCount(false);
+            total += cevent.getAllSpecimensCount(false);
         return total;
+    }
+
+    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.SOURCE_SPECIMEN_COLLECTION.getName()
+        + " as spcs where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=?";
+
+    public long getSourceSpecimensCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(SOURCE_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        long total = 0;
+        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
+            total += cevent.getSourceSpecimensCount(false);
+        return total;
+    }
+
+    public int getAliquotedSpecimensCount() {
+        // FIXME do we need that ?
+        return -1;
     }
 
     @Deprecated
@@ -211,9 +241,11 @@ public class PatientWrapper extends PatientBaseWrapper {
         + " as p join p."
         + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
         + " as ces join ces."
-        + CollectionEventPeer.SPECIMEN_COLLECTION.getName()
+        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
         + " as specimens join specimens."
-        + SpecimenPeer.PROCESSING_EVENT_COLLECTION.getName()
+        + SpecimenPeer.SPECIMEN_LINK_COLLECTION.getName()
+        + " as spLink join spLink."
+        + SpecimenLinkPeer.PROCESSING_EVENT
         + " as pes where p."
         + PatientPeer.ID.getName()
         + "=? and pes."
@@ -222,7 +254,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         + ProcessingEventPeer.CREATED_AT.getName() + "<?";
 
     @Deprecated
-    // FIXME :in Scan Link, wants the collection event instead. What is a last 7
+    // FIXME :in Scan Link, wants the collection event instead. ? What is a last
+    // 7
     // days collection events if we don't have the date drawn on the collection
     // event itself ?
     public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
@@ -309,24 +342,6 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
     }
 
-    @Deprecated
-    public boolean canBeAddedToShipment(CollectionEventWrapper shipment) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Deprecated
-    public String getSourceSpecimenCount() {
-        // TODO New method. Need to be implemented !
-        return null;
-    }
-
-    @Deprecated
-    public String getAliquotedSpecimenCount() {
-        // TODO New method. Need to be implemented !
-        return null;
-    }
-
     public List<CollectionEventWrapper> getCollectionEventCollection(
         boolean sort, final boolean ascending) {
         List<CollectionEventWrapper> cEvents = getCollectionEventCollection(false);
@@ -349,28 +364,24 @@ public class PatientWrapper extends PatientBaseWrapper {
     public List<ProcessingEventWrapper> getProcessingEventCollection() {
         List<CollectionEventWrapper> ces = getCollectionEventCollection(false);
         List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
-        List<ProcessingEventWrapper> pes = new ArrayList<ProcessingEventWrapper>();
+        Set<ProcessingEventWrapper> pes = new HashSet<ProcessingEventWrapper>();
         for (CollectionEventWrapper ce : ces)
-            specs.addAll(ce.getSpecimenCollection());
+            specs.addAll(ce.getAllSpecimenCollection(false));
         for (SpecimenWrapper spec : specs) {
-            pes.addAll(spec.getProcessingEventCollection());
-            pes.add(spec.getParentProcessingEvent());
+            pes.addAll(spec.getProcessingEventCollectionAsParent());
+            pes.add(spec.getProcessingEventAsChild());
         }
-        return pes;
-    }
-
-    public int getSourceSpecimensCount() {
-        // FIXME Do we want to display that or something else ?
-        return -1;
-    }
-
-    public int getAliquotedSpecimensCount() {
-        // FIXME Do we want to display that or something else ?
-        return -1;
+        return new ArrayList<ProcessingEventWrapper>(pes);
     }
 
     public List<CollectionEventWrapper> getCollectionEventCollection() {
         return getCollectionEventCollection(false);
+    }
+
+    @Deprecated
+    public boolean canBeAddedToShipment(CollectionEventWrapper shipment) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
 }

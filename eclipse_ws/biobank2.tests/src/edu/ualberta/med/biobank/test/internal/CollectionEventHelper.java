@@ -5,8 +5,6 @@ import java.util.Arrays;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SourceVesselWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -21,7 +19,7 @@ public class CollectionEventHelper extends DbHelper {
         cevent.setVisitNumber(visitNumber);
 
         if ((spcs != null) && (spcs.length != 0)) {
-            cevent.addToSpecimenCollection(Arrays.asList(spcs));
+            cevent.addToSourceSpecimenCollection(Arrays.asList(spcs));
             for (SpecimenWrapper spc : spcs) {
                 spc.setCollectionEvent(cevent);
                 spc.setCurrentCenter(center);
@@ -47,15 +45,14 @@ public class CollectionEventHelper extends DbHelper {
 
     @Deprecated
     public static CollectionEventWrapper addCollectionEvent(
-        CenterWrapper<?> center, ShippingMethodWrapper method,
-        SourceVesselWrapper... svs) throws Exception {
+        CenterWrapper<?> center, SpecimenWrapper... svs) throws Exception {
         return null;
     }
 
     @Deprecated
     public static CollectionEventWrapper addCollectionEvent(
-        CenterWrapper<?> center, ShippingMethodWrapper method, String waybill,
-        SourceVesselWrapper... svs) throws Exception {
+        CenterWrapper<?> center, String waybill, SpecimenWrapper... svs)
+        throws Exception {
         return null;
     }
 
@@ -74,8 +71,7 @@ public class CollectionEventHelper extends DbHelper {
 
     @Deprecated
     public static CollectionEventWrapper addCollectionEventNoWaybill(
-        CenterWrapper<?> center, ShippingMethodWrapper method,
-        SourceVesselWrapper... svs) throws Exception {
+        CenterWrapper<?> center, SpecimenWrapper... svs) throws Exception {
         return null;
     }
 }

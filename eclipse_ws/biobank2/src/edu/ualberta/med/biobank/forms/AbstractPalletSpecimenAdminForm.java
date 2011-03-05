@@ -208,7 +208,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     protected abstract void disableFields();
 
     protected void createScanButton(Composite parent) {
-        scanButtonTitle = Messages.getString("linkAssign.scanButton.text");
+        scanButtonTitle = Messages.getString("linkAssign.scanButton.text");//$NON-NLS-1$
         if (!BiobankPlugin.isRealScanEnabled()) {
             createFakeOptions(parent);
             scanButtonTitle = "Fake scan"; //$NON-NLS-1$

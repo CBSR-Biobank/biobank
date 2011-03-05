@@ -24,18 +24,16 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
-import edu.ualberta.med.biobank.widgets.infotables.entry.SpecimenEntryInfoTable;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class SpecimenDialog extends BiobankDialog {
+public class CEventSourceSpecimenDialog extends BiobankDialog {
 
     private SpecimenWrapper editedSpecimen;
 
@@ -45,17 +43,9 @@ public class SpecimenDialog extends BiobankDialog {
 
     private Map<String, SourceSpecimenWrapper> mapStudySourceSpecimen;
 
-    private DateTimeWidget timeDrawnWidget;
-
     private List<SpecimenTypeWrapper> allSpecimenTypes;
 
-    private Label timeDrawnLabel;
-
-    private Label quantityLabel;
-
-    private SpecimenEntryInfoTable infotable;
-
-    private CollectionEventWrapper cEvent;
+    private List<ActivityStatusWrapper> allActivityStatus;
 
     private boolean addMode;
 
@@ -63,20 +53,22 @@ public class SpecimenDialog extends BiobankDialog {
 
     private boolean dialogCreated = false;
 
-    private DoubleNumberValidator quantityTextValidator;
-
+    private DateTimeWidget timeDrawnWidget;
+    private Label timeDrawnLabel;
+    private Label quantityLabel;
+    private BiobankText inventoryIdWidget;
     private BiobankText quantityText;
-
-    private List<ActivityStatusWrapper> allActivityStatus;
-
+    private DoubleNumberValidator quantityTextValidator;
     private ComboViewer activityStatusComboViewer;
 
-    public SpecimenDialog(Shell parent, SpecimenWrapper specimen,
+    private NewSpecimenListener newSpecimenListener;
+
+    public CEventSourceSpecimenDialog(Shell parent, SpecimenWrapper specimen,
         List<SourceSpecimenWrapper> studySourceSpecimen,
-        List<SpecimenTypeWrapper> allSpecimenTypes,
-        SpecimenEntryInfoTable infoTable) {
+        List<SpecimenTypeWrapper> allSpecimenTypes, NewSpecimenListener listener) {
         super(parent);
         Assert.isNotNull(studySourceSpecimen);
+        newSpecimenListener = listener;
         internalSpecimen = new SpecimenWrapper(SessionManager.getAppService());
         if (specimen == null) {
             addMode = true;
@@ -95,7 +87,6 @@ public class SpecimenDialog extends BiobankDialog {
             mapStudySourceSpecimen.put(ssw.getSpecimenType().getName(), ssw);
         }
         this.allSpecimenTypes = allSpecimenTypes;
-        this.infotable = infoTable;
         if (addMode) {
             currentTitle = Messages.getString("SpecimenDialog.title.add");
         } else {
@@ -143,8 +134,8 @@ public class SpecimenDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        BiobankText inventoryIdWidget = (BiobankText) createBoundWidgetWithLabel(
-            contents, BiobankText.class, SWT.NONE,
+        inventoryIdWidget = (BiobankText) createBoundWidgetWithLabel(contents,
+            BiobankText.class, SWT.NONE,
             Messages.getString("SourceSpecimen.field.inventoryId.label"), null,
             internalSpecimen, SpecimenPeer.INVENTORY_ID.getName(), null);
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
@@ -352,11 +343,12 @@ public class SpecimenDialog extends BiobankDialog {
             SpecimenWrapper newSpecimen = new SpecimenWrapper(
                 SessionManager.getAppService());
             newSpecimen.initObjectWith(internalSpecimen);
-            newSpecimen.setCollectionEvent(cEvent);
-            newSpecimen.setCurrentCenter(SessionManager.getUser()
-                .getCurrentWorkingCentre());
-            infotable.addSpecimen(newSpecimen);
+            if (newSpecimenListener != null)
+                newSpecimenListener.newSpecimenAdded(newSpecimen);
+
+            // then reset fields
             internalSpecimen.reset();
+            inventoryIdWidget.setText("");
             quantityText.setText("");
             timeDrawnWidget.setDate(null);
             quantityText.setText("");
@@ -370,7 +362,11 @@ public class SpecimenDialog extends BiobankDialog {
         }
     }
 
-    public void setPatientVisit(CollectionEventWrapper cEvent) {
-        this.cEvent = cEvent;
+    public void setNewSpecimenListener(NewSpecimenListener newListener) {
+        this.newSpecimenListener = newListener;
+    }
+
+    public static abstract class NewSpecimenListener {
+        public abstract void newSpecimenAdded(SpecimenWrapper spec);
     }
 }

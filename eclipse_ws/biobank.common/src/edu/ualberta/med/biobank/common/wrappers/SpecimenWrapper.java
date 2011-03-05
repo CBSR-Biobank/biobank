@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -165,49 +164,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     private CenterWrapper<?> getLocation() {
-        List<DispatchSpecimenWrapper> dspcs = getDispatchSpecimenCollection();
-
-        // if in a container, use the container's site
-        if (getParent() != null) {
-            return getParent().getSite();
-        } else {
-            // dispatched Specimen?
-            for (DispatchSpecimenWrapper da : dspcs) {
-                DispatchSpecimenState state = DispatchSpecimenState.getState(da
-                    .getState());
-
-                if (DispatchState.IN_TRANSIT
-                    .equals(da.getDispatch().getState())
-                    && DispatchSpecimenState.NONE == state) {
-                    // Specimen is in transit
-                    // FIXME what if can't read sender or receiver
-                    SiteWrapper fakeSite = new SiteWrapper(appService);
-                    fakeSite.setNameShort("In Transit ("
-                        + da.getDispatch().getSenderCenter().getNameShort()
-                        + " to "
-                        + da.getDispatch().getReceiverCenter().getNameShort()
-                        + ")");
-                    return fakeSite;
-                } else if (DispatchState.RECEIVED.equals(da.getDispatch()
-                    .getState())) {
-                    switch (state) {
-                    case EXTRA:
-                        // Specimen has been accidentally dispatched
-                        return da.getDispatch().getReceiverCenter();
-                    case MISSING:
-                        // Specimen is missing
-                        return da.getDispatch().getSenderCenter();
-                    case RECEIVED:
-                    case NONE:
-                        // Specimen has been intentionally dispatched and
-                        // received
-                        return da.getDispatch().getReceiverCenter();
-                    }
-                }
-            }
-            // if not in a container or a dispatch, use the originating shipment
-            return getParentProcessingEvent().getCenter();
-        }
+        return getCurrentCenter();
     }
 
     /**
@@ -374,21 +331,19 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return Specimen;
     }
 
-    private static final String SpecimenS_NON_ACTIVE_QRY = "from "
+    private static final String SPECIMENS_NON_ACTIVE_QRY = "from "
         + Specimen.class.getName()
-        + " a where a."
-        + Property.concatNames(SpecimenPeer.PARENT_PROCESSING_EVENT,
-            ProcessingEventPeer.CENTER, CenterPeer.ID)
+        + " spec where spec."
+        + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
         + " = ? and "
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + " != ?";
 
-    // FIXME : do we want this search to be specific to a site ?
-    public static List<SpecimenWrapper> getSpecimensNonActiveInSite(
-        WritableApplicationService appService, SiteWrapper site)
+    public static List<SpecimenWrapper> getSpecimensNonActiveInCentre(
+        WritableApplicationService appService, CenterWrapper<?> centre)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(SpecimenS_NON_ACTIVE_QRY,
-            Arrays.asList(new Object[] { site.getId(),
+        HQLCriteria criteria = new HQLCriteria(SPECIMENS_NON_ACTIVE_QRY,
+            Arrays.asList(new Object[] { centre.getId(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Specimen> Specimens = appService.query(criteria);
         List<SpecimenWrapper> list = new ArrayList<SpecimenWrapper>();
@@ -518,7 +473,28 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
     }
 
-    public List<ProcessingEventWrapper> getProcessingEventCollection() {
-        return getProcessingEventCollection(false);
+    public List<ProcessingEventWrapper> getProcessingEventCollectionAsParent() {
+        List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
+        for (SpecimenLinkWrapper link : getSpecimenLinkCollection(false)) {
+            peList.add(link.getProcessingEvent());
+        }
+        return peList;
+    }
+
+    public ProcessingEventWrapper getProcessingEventAsChild() {
+        return getParentSpecimenLink() == null ? null : getParentSpecimenLink()
+            .getProcessingEvent();
+    }
+
+    // only for parent specimen
+    public List<ProcessingEventWrapper> getProcessingEventCollectionForWorksheet(
+        String worksheet) {
+        List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
+        for (ProcessingEventWrapper pe : getProcessingEventCollectionAsParent()) {
+            String peWorksheet = pe.getWorksheet();
+            if (peWorksheet != null && peWorksheet.equals(worksheet))
+                peList.add(pe);
+        }
+        return peList;
     }
 }

@@ -1604,14 +1604,14 @@
       <editor
             class="edu.ualberta.med.biobank.forms.AliquotViewForm"
             default="false"
-            icon="icons/aliquot.png"
+            icon="icons/specimen.png"
             id="edu.ualberta.med.biobank.forms.AliquotViewForm"
             name="Aliquot View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.AliquotEntryForm"
             default="false"
-            icon="icons/aliquot.png"
+            icon="icons/specimen.png"
             id="edu.ualberta.med.biobank.forms.AliquotEntryForm"
             name="Aliquot Entry">
       </editor>
@@ -1677,11 +1677,11 @@
             name="Decode Plate">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.AliquotListViewForm"
+            class="edu.ualberta.med.biobank.forms.SpecimenListViewForm"
             default="false"
-            icon="icons/aliquot.png"
-            id="edu.ualberta.med.biobank.forms.AliquotListViewForm"
-            name="Aliquot List">
+            icon="icons/specimen.png"
+            id="edu.ualberta.med.biobank.forms.SpecimenListViewForm"
+            name="Specimen List">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.PvListViewForm"

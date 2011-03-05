@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.dialogs.AliquotedSpecimenDialog;
+import edu.ualberta.med.biobank.dialogs.StudyAliquotedSpecimenDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
@@ -85,7 +85,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                 availableSpecimenTypes.remove(ssw.getSpecimenType());
             }
         }
-        AliquotedSpecimenDialog dlg = new AliquotedSpecimenDialog(PlatformUI
+        StudyAliquotedSpecimenDialog dlg = new StudyAliquotedSpecimenDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             aliquotedSpecimen, availableSpecimenTypes);
         if (dlg.open() == Dialog.OK) {

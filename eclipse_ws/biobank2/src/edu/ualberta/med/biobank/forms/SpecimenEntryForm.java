@@ -4,19 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
@@ -24,12 +20,10 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.dialogs.BiobankWizardDialog;
 import edu.ualberta.med.biobank.treeview.SpecimenAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
-import edu.ualberta.med.biobank.wizards.SelectPatientVisitWizard;
 
 public class SpecimenEntryForm extends BiobankEntryForm {
 
@@ -155,34 +149,35 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         toolkit.adapt(c);
 
-        final BiobankText dateProcessed = createReadOnlyLabelledField(client,
-            SWT.NONE, "Date Processed", aliquot.getParentProcessingEvent()
-                .getFormattedDateProcessed());
-
-        final BiobankText dateDrawn = createReadOnlyLabelledField(client,
-            SWT.NONE, "Date Drawn", aliquot.getParentProcessingEvent()
-                .getFormattedCreatedAt());
-
-        editPatientButton.addListener(SWT.MouseUp, new Listener() {
-            @Override
-            public void handleEvent(Event event) {
-                SelectPatientVisitWizard wizard = new SelectPatientVisitWizard(
-                    appService);
-                WizardDialog dialog = new BiobankWizardDialog(page.getShell(),
-                    wizard);
-                int res = dialog.open();
-                if (res == Status.OK) {
-                    aliquot.setCollectionEvent(wizard.getCollectionEvent());
-
-                    dateProcessed.setText(aliquot.getParentProcessingEvent()
-                        .getFormattedDateProcessed());
-                    dateDrawn.setText(aliquot.getParentProcessingEvent()
-                        .getFormattedCreatedAt());
-
-                    setDirty(true); // so changes can be saved
-                }
-            }
-        });
+        // FIXME
+        // final BiobankText dateProcessed = createReadOnlyLabelledField(client,
+        // SWT.NONE, "Date Processed", aliquot.getParentProcessingEvent()
+        // .getFormattedDateProcessed());
+        //
+        // final BiobankText dateDrawn = createReadOnlyLabelledField(client,
+        // SWT.NONE, "Date Drawn", aliquot.getParentProcessingEvent()
+        // .getFormattedCreatedAt());
+        //
+        // editPatientButton.addListener(SWT.MouseUp, new Listener() {
+        // @Override
+        // public void handleEvent(Event event) {
+        // SelectPatientVisitWizard wizard = new SelectPatientVisitWizard(
+        // appService);
+        // WizardDialog dialog = new BiobankWizardDialog(page.getShell(),
+        // wizard);
+        // int res = dialog.open();
+        // if (res == Status.OK) {
+        // aliquot.setCollectionEvent(wizard.getCollectionEvent());
+        //
+        // dateProcessed.setText(aliquot.getParentProcessingEvent()
+        // .getFormattedDateProcessed());
+        // dateDrawn.setText(aliquot.getParentProcessingEvent()
+        // .getFormattedCreatedAt());
+        //
+        // setDirty(true); // so changes can be saved
+        // }
+        // }
+        // });
 
         createReadOnlyLabelledField(client, SWT.NONE, "Position",
             aliquot.getPositionString(true, false));

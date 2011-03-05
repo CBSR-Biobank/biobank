@@ -41,7 +41,7 @@ public class CollectionEventAdapter extends AdapterBase {
             + cevent.getVisitNumber();
 
         Collection<SpecimenWrapper> samples = cevent
-            .getSpecimenCollection(true);
+            .getSourceSpecimenCollection(true);
         int total = 0;
         if (samples != null) {
             total = samples.size();

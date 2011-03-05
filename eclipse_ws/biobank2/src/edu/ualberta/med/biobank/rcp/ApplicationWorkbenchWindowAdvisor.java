@@ -23,7 +23,7 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
@@ -43,7 +43,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     private String username = null;
 
-    private String currentCentre = null;
+    private String currentCentreText = null;
 
     public ApplicationWorkbenchWindowAdvisor(
         IWorkbenchWindowConfigurer configurer) {
@@ -91,23 +91,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         statusline.setMessage(null, "Application ready");
 
         IWorkbench workbench = PlatformUI.getWorkbench();
-        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
+        IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
+        IWorkbenchPage page = activeWindow.getActivePage();
         if (page.getPerspective().getId().equals(LinkAssignPerspective.ID)) {
             // can't start on this perspective: switch to patient perspective
             try {
                 workbench.showPerspective(ProcessingPerspective.ID,
-                    workbench.getActiveWorkbenchWindow());
+                    activeWindow);
             } catch (WorkbenchException e) {
                 logger.error("Error while opening patients perpective", e);
             }
         }
         page.addPartListener(new BiobankPartListener());
-        window.addPerspectiveListener(new BiobankPerspectiveListener());
+        activeWindow.addPerspectiveListener(new BiobankPerspectiveListener());
 
         // to activate correct key bindings
-        String currentPerspectiveId = window.getActivePage().getPerspective()
-            .getId();
+        String currentPerspectiveId = activeWindow.getActivePage()
+            .getPerspective().getId();
         activateIfNotInPerspective(currentPerspectiveId, MainPerspective.ID);
         activateIfNotInPerspective(currentPerspectiveId,
             ProcessingPerspective.ID);
@@ -115,7 +115,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
 
-        ISourceProviderService service = (ISourceProviderService) window
+        ISourceProviderService service = (ISourceProviderService) activeWindow
             .getService(ISourceProviderService.class);
         SessionState sessionSourceProvider = (SessionState) service
             .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
@@ -157,11 +157,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         this.server = server;
         if (user == null) {
             this.username = null;
-            this.currentCentre = null;
+            this.currentCentreText = null;
         } else {
             this.username = user.getLogin();
-            SiteWrapper site = user.getCurrentWorkingCentre();
-            this.currentCentre = site == null ? null : site.getNameShort();
+            CenterWrapper<?> centre = user.getCurrentWorkingCentre();
+            this.currentCentreText = centre == null ? null : centre
+                .getNameShort();
         }
         mainWindowUpdateTitle();
     }
@@ -174,8 +175,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         if ((server != null) && (username != null)) {
             newTitle += " - " + server + " [" + username + "]";
         }
-        if (currentCentre != null) {
-            newTitle += " - Centre " + currentCentre;
+        if (currentCentreText != null) {
+            newTitle += " - Centre " + currentCentreText;
         }
 
         if (!newTitle.equals(oldTitle)) {

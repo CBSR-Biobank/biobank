@@ -192,8 +192,9 @@ public class SpecimenViewForm extends BiobankViewForm {
 
         setTextValue(dateProcessedLabel, aliquot.getFormattedCreatedAt());
 
-        setTextValue(dateDrawnLabel, aliquot.getParentProcessingEvent()
-            .getFormattedCreatedAt());
+        // FIXME
+        // setTextValue(dateDrawnLabel, aliquot.getParentProcessingEvent()
+        // .getFormattedCreatedAt());
         setTextValue(activityStatusLabel, aliquot.getActivityStatus());
         setTextValue(commentLabel, aliquot.getComment());
         setTextValue(positionLabel, aliquot.getPositionString(true, false));

@@ -4,9 +4,11 @@ import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
@@ -34,9 +36,8 @@ public class ShipmentTodayNode extends AbstractTodayNode {
     @Override
     protected List<? extends ModelWrapper<?>> getTodayElements()
         throws ApplicationException {
-        // return CollectionEventWrapper.getTodayShipments(SessionManager
-        // .getAppService());
-        return null;
+        return OriginInfoWrapper.getTodayShipments(SessionManager
+            .getAppService());
     }
 
     @Override

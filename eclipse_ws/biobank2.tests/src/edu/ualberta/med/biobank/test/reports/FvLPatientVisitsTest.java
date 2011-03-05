@@ -1,7 +1,6 @@
 package edu.ualberta.med.biobank.test.reports;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Date;
 import java.util.EnumSet;
@@ -18,26 +17,30 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 public class FvLPatientVisitsTest extends AbstractReportTest {
     private static final Mapper<ProcessingEventWrapper, List<String>, List<Date>> GROUP_PVS_BY_STUDY_CLINIC = new Mapper<ProcessingEventWrapper, List<String>, List<Date>>() {
         public List<String> getKey(ProcessingEventWrapper patientVisit) {
-            return Arrays.asList(patientVisit.getPatient().getStudy()
-                .getNameShort(), patientVisit.getCenter().getNameShort());
+            // FIXME
+            // return Arrays.asList(patientVisit.getPatient().getStudy()
+            // .getNameShort(), patientVisit.getCenter().getNameShort());
+            return null;
         }
 
         public List<Date> getValue(ProcessingEventWrapper patientVisit,
             List<Date> stats) {
-            Date newDateReceived = patientVisit.getDateDrawn();
-            if (stats == null) {
-                return Arrays.asList(newDateReceived, newDateReceived);
-            } else {
-                Date minDateReceived = stats.get(0);
-                Date maxDateReceived = stats.get(1);
-                if (newDateReceived.before(minDateReceived)) {
-                    minDateReceived = newDateReceived;
-                }
-                if (newDateReceived.after(maxDateReceived)) {
-                    maxDateReceived = newDateReceived;
-                }
-                return Arrays.asList(minDateReceived, maxDateReceived);
-            }
+            // FIXME
+            // Date newDateReceived = patientVisit.getDateDrawn();
+            // if (stats == null) {
+            // return Arrays.asList(newDateReceived, newDateReceived);
+            // } else {
+            // Date minDateReceived = stats.get(0);
+            // Date maxDateReceived = stats.get(1);
+            // if (newDateReceived.before(minDateReceived)) {
+            // minDateReceived = newDateReceived;
+            // }
+            // if (newDateReceived.after(maxDateReceived)) {
+            // maxDateReceived = newDateReceived;
+            // }
+            // return Arrays.asList(minDateReceived, maxDateReceived);
+            // }
+            return null;
         }
     };
 

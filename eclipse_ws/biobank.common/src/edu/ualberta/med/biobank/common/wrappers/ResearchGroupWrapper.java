@@ -25,4 +25,10 @@ public class ResearchGroupWrapper extends ResearchGroupBaseWrapper {
         return -1;
     }
 
+    @Override
+    public long getPatientCountForStudy(StudyWrapper study)
+        throws ApplicationException, BiobankException {
+        return -1;
+    }
+
 }

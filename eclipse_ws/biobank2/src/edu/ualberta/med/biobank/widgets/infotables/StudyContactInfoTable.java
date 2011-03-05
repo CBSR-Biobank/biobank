@@ -94,7 +94,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         ClinicWrapper clinic = contact.getClinic();
         if (clinic != null) {
             info.clinicNameShort = clinic.getNameShort();
-            info.patientCount = study.getPatientCountForCenter(clinic);
+            info.patientCount = clinic.getPatientCountForStudy(study);
             info.visitCount = clinic.getCollectionEventCountForStudy(study);
         }
         info.contactName = contact.getName();

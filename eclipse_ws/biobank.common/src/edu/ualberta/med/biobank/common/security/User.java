@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Site;
@@ -27,7 +28,7 @@ public class User implements Serializable, NotAProxy {
 
     private List<SiteWrapper> workingSites;
 
-    private SiteWrapper currentWorkingSite;
+    private CenterWrapper<?> currentWorkingCentre;
 
     public boolean isLockedOut() {
         return isLockedOut;
@@ -246,17 +247,24 @@ public class User implements Serializable, NotAProxy {
         return workingSites;
     }
 
-    public void setCurrentWorkingSite(SiteWrapper site) {
-        this.currentWorkingSite = site;
+    public void setCurrentWorkingCentre(CenterWrapper<?> centre) {
+        this.currentWorkingCentre = centre;
     }
 
-    public SiteWrapper getCurrentWorkingCentre() {
+    public CenterWrapper<?> getCurrentWorkingCentre() {
         try {
-            currentWorkingSite.reload();
+            if (currentWorkingCentre != null)
+                currentWorkingCentre.reload();
         } catch (Exception e) {
             // FIXME: how to handle?
             e.printStackTrace();
         }
-        return currentWorkingSite;
+        return currentWorkingCentre;
+    }
+
+    public SiteWrapper getCurrentWorkingSite() {
+        if (currentWorkingCentre instanceof SiteWrapper)
+            return (SiteWrapper) currentWorkingCentre;
+        return null;
     }
 }

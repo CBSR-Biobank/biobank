@@ -17,7 +17,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.dialogs.SourceSpecimenDialog;
+import edu.ualberta.med.biobank.dialogs.StudySourceSpecimenDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.infotables.BiobankTableSorter;
 import edu.ualberta.med.biobank.widgets.infotables.IInfoTableAddItemListener;
@@ -95,7 +95,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
             dialogSpecimenTypes.add(sourceSpecimen.getSpecimenType());
         }
         // FIXME: create new dialog type
-        SourceSpecimenDialog dlg = new SourceSpecimenDialog(PlatformUI
+        StudySourceSpecimenDialog dlg = new StudySourceSpecimenDialog(PlatformUI
             .getWorkbench().getActiveWorkbenchWindow().getShell(),
             sourceSpecimen, dialogSpecimenTypes);
         if (dlg.open() == Dialog.OK) {

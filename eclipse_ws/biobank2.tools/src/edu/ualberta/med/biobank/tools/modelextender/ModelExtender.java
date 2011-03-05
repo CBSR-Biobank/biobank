@@ -38,34 +38,24 @@ public class ModelExtender {
         return instance;
     }
 
-    public static void main(String argv[]) {
-        try {
-            ModelExtender.getInstance().doWork(parseCommandLine(argv));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void main(String argv[]) throws Exception {
+        ModelExtender.getInstance().doWork(parseCommandLine(argv));
     }
 
-    public void doWork(final AppArgs appArgs) {
+    public void doWork(final AppArgs appArgs) throws Exception {
         LOGGER.info("UML file: " + appArgs.modelFileName);
         LOGGER.info("peer class output dir:  " + appArgs.peerOutDir);
         LOGGER.info("wrapper base class output dir:  "
             + appArgs.wrapperBaseOutDir);
 
-        try {
-            modelClasses = ModelUmlParser.getInstance().geLogicalModel(
-                appArgs.modelFileName);
+        modelClasses = ModelUmlParser.getInstance().geLogicalModel(
+            appArgs.modelFileName);
 
-            new PeerBuilder(appArgs.peerOutDir, PEER_PACKAGE, modelClasses)
-                .generateFiles();
+        new PeerBuilder(appArgs.peerOutDir, PEER_PACKAGE, modelClasses)
+            .generateFiles();
 
-            new BaseWrapperBuilder(appArgs.wrapperBaseOutDir,
-                WRAPPER_BASE_PACKAGE, PEER_PACKAGE, modelClasses)
-                .generateFiles();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        new BaseWrapperBuilder(appArgs.wrapperBaseOutDir, WRAPPER_BASE_PACKAGE,
+            PEER_PACKAGE, modelClasses).generateFiles();
     }
 
     private static AppArgs parseCommandLine(String argv[])
