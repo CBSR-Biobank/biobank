@@ -35,7 +35,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -233,10 +232,10 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                     selectionStackLayout.topControl = typesSelectionPerRowComposite;
                     selectionComp.layout();
                     for (AliquotedSpecimenSelectionWidget sampleType : specimenTypesWidgets) {
-                        sampleType.addBinding(widgetCreator);
+                        sampleType.addBindings();
                         sampleType.resetValues(true, false);
                     }
-                    customSelectionWidget.addBinding(widgetCreator);
+                    customSelectionWidget.addBindings();
                     spw.getMultiSelectionManager().disableMultiSelection();
                     typesFilledValue.setValue(Boolean.TRUE);
                     spw.redraw();
@@ -249,10 +248,10 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 if (radioCustomSelection.getSelection()) {
                     selectionStackLayout.topControl = typesSelectionCustomComposite;
                     selectionComp.layout();
-                    for (AliquotedSpecimenSelectionWidget sampleType : specimenTypesWidgets) {
-                        sampleType.removeBinding(widgetCreator);
+                    for (AliquotedSpecimenSelectionWidget selectionWidget : specimenTypesWidgets) {
+                        selectionWidget.removeBindings();
                     }
-                    customSelectionWidget.addBinding(widgetCreator);
+                    customSelectionWidget.addBindings();
                     spw.getMultiSelectionManager().enableMultiSelection(
                         new MultiSelectionSpecificBehaviour() {
                             @Override
@@ -312,7 +311,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
         customSelectionWidget = new AliquotedSpecimenSelectionWidget(
             typesSelectionCustomComposite, null, sourceSpecimenLinks,
-            resultSpecimenTypes, toolkit);
+            resultSpecimenTypes, widgetCreator, true);
         customSelectionWidget.resetValues(true, true);
 
         Button applyType = toolkit.createButton(typesSelectionCustomComposite,
@@ -366,7 +365,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 typesSelectionPerRowComposite,
                 ContainerLabelingSchemeWrapper.SBS_ROW_LABELLING_PATTERN
                     .charAt(i), sourceSpecimenLinks, resultSpecimenTypes,
-                toolkit);
+                widgetCreator, true);
             final int indexRow = i;
             typeWidget
                 .addSelectionChangedListener(new ISelectionChangedListener() {
@@ -379,7 +378,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                     }
 
                 });
-            typeWidget.addBinding(widgetCreator);
+            typeWidget.addBindings();
             specimenTypesWidgets.add(typeWidget);
             if (precedent != null) {
                 precedent.setNextWidget(typeWidget);
@@ -548,26 +547,8 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
     private void setCombosLists(Map<Integer, Integer> typesRows) {
         List<SpecimenTypeWrapper> studiesAliquotedTypes = null;
         if (isFirstSuccessfulScan()) {
-            // done at first successful scan
-            studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
-            for (AliquotedSpecimenWrapper ss : linkFormPatientManagement
-                .getCurrentPatient().getStudy()
-                .getAliquotedSpecimenCollection(true)) {
-                if (ss.getActivityStatus().isActive()) {
-                    SpecimenTypeWrapper type = ss.getSpecimenType();
-                    if (authorizedPalletSpecimenTypes.contains(type)) {
-                        studiesAliquotedTypes.add(type);
-                    }
-                }
-            }
-            if (studiesAliquotedTypes.size() == 0) {
-                BiobankPlugin.openAsyncError(Messages
-                    .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
-                    Messages.getString(
-                        "ScanLink.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
-                        linkFormPatientManagement.getCurrentPatient()
-                            .getStudy().getNameShort()));
-            }
+            studiesAliquotedTypes = linkFormPatientManagement
+                .getStudyAliquotedTypes(authorizedPalletSpecimenTypes);
         }
         List<SpecimenLinkWrapper> availableSourceSpecimenLinks = linkFormPatientManagement
             .getSpecimenLinksInCollectionEvent();

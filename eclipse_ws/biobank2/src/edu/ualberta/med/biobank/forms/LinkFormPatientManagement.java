@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.forms;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -13,16 +14,18 @@ import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
-import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenLinkWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -34,7 +37,6 @@ public class LinkFormPatientManagement {
     private boolean patientNumberTextModified = false;
     protected BiobankText patientNumberText;
     protected ComboViewer viewerCollectionEvents;
-    private Button cEventListCheck;
 
     // currentPatient
     protected PatientWrapper currentPatient;
@@ -202,7 +204,6 @@ public class LinkFormPatientManagement {
 
     public void enabledVisitsList(boolean enabled) {
         viewerCollectionEvents.getCombo().setEnabled(enabled);
-        cEventListCheck.setEnabled(enabled);
         showVisitText(!enabled);
     }
 
@@ -229,7 +230,6 @@ public class LinkFormPatientManagement {
 
     public void showVisitText(boolean show) {
         widgetCreator.showWidget(cEventComboLabel, !show);
-        widgetCreator.showWidget(cEventListCheck, !show);
         widgetCreator.showWidget(viewerCollectionEvents.getCombo(), !show);
         if (cEventText != null) {
             widgetCreator.showWidget(cEventTextLabel, show);
@@ -278,5 +278,42 @@ public class LinkFormPatientManagement {
 
     public List<SpecimenLinkWrapper> getSpecimenLinksInCollectionEvent() {
         return getSelectedCollectionEvent().getSourceSpecimenLinkCollection();
+    }
+
+    /**
+     * get the list of aliquoted specimen type the study wants and that the
+     * container authorized
+     */
+    public List<SpecimenTypeWrapper> getStudyAliquotedTypes(
+        List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer) {
+        // FIXME really need to reload ?
+        StudyWrapper study = getCurrentPatient().getStudy();
+        try {
+            // need to reload study to avoid performance problem when using
+            // the same lots of time (like is try differents positions for
+            // same patient)
+            study.reload();
+        } catch (Exception e) {
+            BiobankPlugin.openAsyncError("Problem reloading study", e);
+        }
+        List<SpecimenTypeWrapper> studiesAliquotedTypes;
+        // done at first successful scan
+        studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
+        for (AliquotedSpecimenWrapper ss : getCurrentPatient().getStudy()
+            .getAliquotedSpecimenCollection(true)) {
+            if (ss.getActivityStatus().isActive()) {
+                SpecimenTypeWrapper type = ss.getSpecimenType();
+                if (authorizedSpecimenTypesInContainer.contains(type)) {
+                    studiesAliquotedTypes.add(type);
+                }
+            }
+        }
+        if (studiesAliquotedTypes.size() == 0) {
+            BiobankPlugin.openAsyncError(Messages
+                .getString("ScanLink.aliquotedSpecimenTypes.error.title"), //$NON-NLS-1$
+                Messages.getString("ScanLink.aliquotedSpecimenTypes.error.msg", //$NON-NLS-1$
+                    getCurrentPatient().getStudy().getNameShort()));
+        }
+        return studiesAliquotedTypes;
     }
 }
