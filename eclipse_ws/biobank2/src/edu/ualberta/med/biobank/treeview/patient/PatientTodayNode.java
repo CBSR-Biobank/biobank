@@ -13,9 +13,10 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
+import edu.ualberta.med.biobank.views.PatientAdministrationView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class PatientTodayNode extends AbstractTodayNode {
+public class PatientTodayNode extends AbstractTodayNode<PatientWrapper> {
 
     public PatientTodayNode(AdapterBase parent, int id) {
         super(parent, id);
@@ -34,8 +35,7 @@ public class PatientTodayNode extends AbstractTodayNode {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
+    protected Collection<PatientWrapper> getWrapperChildren() throws Exception {
         return null;
     }
 
@@ -45,13 +45,13 @@ public class PatientTodayNode extends AbstractTodayNode {
     }
 
     @Override
-    protected List<? extends ModelWrapper<?>> getTodayElements()
+    protected List<PatientWrapper> getTodayElements()
         throws ApplicationException {
         if (SessionManager.getInstance().isConnected())
             return PatientWrapper
                 .getPatientsInTodayCollectionEvents(SessionManager
                     .getAppService());
-        return new ArrayList<ModelWrapper<?>>();
+        return new ArrayList<PatientWrapper>();
     }
 
     @Override
@@ -67,4 +67,8 @@ public class PatientTodayNode extends AbstractTodayNode {
         return findChildFromClass(searchedObject, StudyWrapper.class);
     }
 
+    @Override
+    protected void addChild(PatientWrapper child) {
+        PatientAdministrationView.addToNode(this, child);
+    }
 }
