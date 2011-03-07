@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -10,20 +9,17 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public abstract class AbstractTodayNode extends AdapterBase {
+public abstract class AbstractTodayNode<E extends ModelWrapper<?>> extends
+    AdapterBase {
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(AbstractTodayNode.class.getName());
 
-    private List<? extends ModelWrapper<?>> currentTodayElements;
+    private List<E> currentTodayElements;
 
     public AbstractTodayNode(AdapterBase parent, int id) {
         super(parent, id, "Today", true, false);
@@ -39,8 +35,7 @@ public abstract class AbstractTodayNode extends AdapterBase {
     }
 
     @Override
-    protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
-        throws Exception {
+    protected Collection<E> getWrapperChildren() throws Exception {
         return null;
     }
 
@@ -78,57 +73,51 @@ public abstract class AbstractTodayNode extends AdapterBase {
             for (AdapterBase child : getChildren()) {
                 ModelWrapper<?> childWrapper = child.getModelObject();
                 childWrapper.reload();
-                List<AdapterBase> subChildren = new ArrayList<AdapterBase>(
-                    child.getChildren());
-                for (AdapterBase subChild : subChildren) {
-                    ModelWrapper<?> subChildWrapper = subChild.getModelObject();
-                    subChildWrapper.reload();
-                    if (!currentTodayElements.contains(subChildWrapper)
-                        || !isParentTo(childWrapper, subChildWrapper)) {
-                        subChild.getParent().removeChild(subChild);
+
+                for (AdapterBase grandchild : child.getChildren()) {
+                    ModelWrapper<?> grandchildWrapper = grandchild
+                        .getModelObject();
+                    grandchildWrapper.reload();
+                    if (!currentTodayElements.contains(grandchildWrapper)
+                        || !isParentTo(childWrapper, grandchildWrapper)) {
+                        grandchild.getParent().removeChild(grandchild);
                     }
                 }
             }
 
             // add today elements is not yet there
-            if (currentTodayElements != null)
-                for (ModelWrapper<?> wrapper : currentTodayElements) {
-                    assert wrapper instanceof PatientWrapper
-                        || wrapper instanceof CollectionEventWrapper;
-                    if (wrapper instanceof PatientWrapper) {
-                        PatientAdministrationView.addToNode(this, wrapper);
-                    } else if (wrapper instanceof CollectionEventWrapper) {
-                        ShipmentAdministrationView.addToNode(this, wrapper);
-                    }
+            if (currentTodayElements != null) {
+                for (E wrapper : currentTodayElements) {
+                    addChild(wrapper);
                 }
+            }
 
             // remove sub children without any children
-            List<AdapterBase> children = new ArrayList<AdapterBase>(
-                getChildren());
-            for (AdapterBase child : children) {
-                if (child.getChildren().size() == 0) {
+            for (AdapterBase child : getChildren()) {
+                if (child.getChildren().isEmpty()) {
                     removeChild(child);
                 }
             }
         } catch (final RemoteAccessException exp) {
             BiobankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
-            logger.error("Error while getting today's patients", e);
+            logger.error("Error while getting " + getLabel(), e);
         }
     }
 
     protected abstract boolean isParentTo(ModelWrapper<?> parent,
         ModelWrapper<?> child);
 
-    protected abstract List<? extends ModelWrapper<?>> getTodayElements()
-        throws ApplicationException;
+    protected abstract List<E> getTodayElements() throws ApplicationException;
+
+    protected abstract void addChild(E child);
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
         return searchChildren(searchedObject);
     }
 
-    public List<? extends ModelWrapper<?>> getCurrentTodayElements() {
+    public List<E> getCurrentTodayElements() {
         return currentTodayElements;
     }
 }

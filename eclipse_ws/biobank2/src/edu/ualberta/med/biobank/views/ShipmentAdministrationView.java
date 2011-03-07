@@ -15,11 +15,14 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.shipment.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
@@ -137,7 +140,7 @@ public class ShipmentAdministrationView extends
         // // can find more than one shipments
         // Date date = dateReceivedWidget.getDate();
         // if (date != null) {
-        // return CollectionEventWrapper.getShipmentsInSites(
+        // return OriginInfoWrapper.getShipmentsInSites(
         // SessionManager.getAppService(), date);
         // }
         // }
@@ -146,50 +149,54 @@ public class ShipmentAdministrationView extends
 
     public static AdapterBase addToNode(AdapterBase parentNode,
         ModelWrapper<?> wrapper) {
-        // FIXME: reimplement when I learn what this does
-        // if (currentInstance != null
-        // && wrapper instanceof OriginInfoWrapper) {
-        // OriginInfoWrapper originInfo = (OriginInfoWrapper) wrapper;
-        //
-        // AdapterBase topNode = parentNode;
-        // if (parentNode.equals(currentInstance.searchedNode)
-        // && !currentInstance.radioWaybill.getSelection()) {
-        // Date date = currentInstance.dateReceivedWidget.getDate();
-        // List<AdapterBase> dateNodeRes = parentNode.search(date);
-        // AdapterBase dateNode = null;
-        // if (dateNodeRes.size() > 0)
-        // dateNode = dateNodeRes.get(0);
-        // else {
-        // dateNode = new DateNode(parentNode,
-        // currentInstance.dateReceivedWidget.getDate());
-        // parentNode.addChild(dateNode);
-        // }
-        // topNode = dateNode;
-        // }
-        // List<AdapterBase> clinicAdapterList = topNode.search(originInfo
-        // .getCenter());
-        // ClinicWithShipmentAdapter clinicAdapter = null;
-        // if (clinicAdapterList.size() > 0)
-        // clinicAdapter = (ClinicWithShipmentAdapter) clinicAdapterList
-        // .get(0);
-        // else {
-        // clinicAdapter = new ClinicWithShipmentAdapter(topNode,
-        // originInfo.getClinic());
-        // clinicAdapter.setEditable(false);
-        // clinicAdapter.setLoadChildrenInBackground(false);
-        // topNode.addChild(clinicAdapter);
-        // }
-        // ShipmentAdapter shipmentAdapter = null;
-        // List<AdapterBase> shipmentAdapterList = clinicAdapter
-        // .search(originInfo);
-        // if (shipmentAdapterList.size() > 0)
-        // shipmentAdapter = (ShipmentAdapter) shipmentAdapterList.get(0);
-        // else {
-        // shipmentAdapter = new ShipmentAdapter(clinicAdapter, originInfo);
-        // clinicAdapter.addChild(shipmentAdapter);
-        // }
-        // return shipmentAdapter;
-        // }
+        if (currentInstance != null && wrapper instanceof OriginInfoWrapper) {
+            OriginInfoWrapper originInfo = (OriginInfoWrapper) wrapper;
+
+            AdapterBase topNode = parentNode;
+            if (parentNode.equals(currentInstance.searchedNode)
+                && !currentInstance.radioWaybill.getSelection()) {
+                Date date = currentInstance.dateReceivedWidget.getDate();
+                List<AdapterBase> dateNodeRes = parentNode.search(date);
+                AdapterBase dateNode = null;
+                if (dateNodeRes.size() > 0)
+                    dateNode = dateNodeRes.get(0);
+                else {
+                    dateNode = new DateNode(parentNode,
+                        currentInstance.dateReceivedWidget.getDate());
+                    parentNode.addChild(dateNode);
+                }
+                topNode = dateNode;
+            }
+
+            List<AdapterBase> clinicAdapterList = topNode.search(originInfo
+                .getCenter());
+            ClinicWithShipmentAdapter clinicAdapter = null;
+            if (clinicAdapterList.size() > 0)
+                clinicAdapter = (ClinicWithShipmentAdapter) clinicAdapterList
+                    .get(0);
+            else if (originInfo.getCenter() instanceof ClinicWrapper) {
+                clinicAdapter = new ClinicWithShipmentAdapter(topNode,
+                    (ClinicWrapper) originInfo.getCenter());
+                clinicAdapter.setEditable(false);
+                clinicAdapter.setLoadChildrenInBackground(false);
+                topNode.addChild(clinicAdapter);
+            }
+
+            if (clinicAdapter != null) {
+                ShipmentAdapter shipmentAdapter = null;
+                List<AdapterBase> shipmentAdapterList = clinicAdapter
+                    .search(originInfo);
+                if (shipmentAdapterList.size() > 0)
+                    shipmentAdapter = (ShipmentAdapter) shipmentAdapterList
+                        .get(0);
+                else {
+                    shipmentAdapter = new ShipmentAdapter(clinicAdapter,
+                        originInfo);
+                    clinicAdapter.addChild(shipmentAdapter);
+                }
+                return shipmentAdapter;
+            }
+        }
         return null;
     }
 

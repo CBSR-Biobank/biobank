@@ -6,7 +6,6 @@ import java.util.List;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
@@ -65,7 +64,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     private boolean checkWaybillUniqueForClinic(ClinicWrapper clinic)
         throws ApplicationException {
-        String isSameShipment = "";
         List<Object> params = new ArrayList<Object>();
         params.add(clinic.getId());
         params.add(getShipmentInfo().getWaybill());
@@ -73,12 +71,11 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         StringBuilder qry = new StringBuilder(
             WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY);
         if (!isNew()) {
-            qry.append(" and ce.").append(CollectionEventPeer.ID.getName())
+            qry.append(" and oi.").append(OriginInfoPeer.ID.getName())
                 .append(" <> ?");
             params.add(getId());
         }
-        HQLCriteria c = new HQLCriteria(WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY
-            + isSameShipment, params);
+        HQLCriteria c = new HQLCriteria(qry.toString(), params);
 
         List<Object> results = appService.query(c);
         return results.size() == 0;

@@ -6,15 +6,15 @@ import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
+import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
-public class ShipmentTodayNode extends AbstractTodayNode {
+public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
 
     public ShipmentTodayNode(AdapterBase parent, int id) {
         super(parent, id);
@@ -32,9 +32,8 @@ public class ShipmentTodayNode extends AbstractTodayNode {
         return new ClinicAdapter(this, null);
     }
 
-    @Deprecated
     @Override
-    protected List<? extends ModelWrapper<?>> getTodayElements()
+    protected List<OriginInfoWrapper> getTodayElements()
         throws ApplicationException {
         return OriginInfoWrapper.getTodayShipments(SessionManager
             .getAppService());
@@ -42,8 +41,8 @@ public class ShipmentTodayNode extends AbstractTodayNode {
 
     @Override
     protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
-        if (child instanceof CollectionEventWrapper) {
-            return parent.equals(((CollectionEventWrapper) child).getClinic());
+        if (child instanceof OriginInfoWrapper) {
+            return parent.equals(((OriginInfoWrapper) child).getCenter());
         }
         return false;
     }
@@ -53,4 +52,8 @@ public class ShipmentTodayNode extends AbstractTodayNode {
         return findChildFromClass(searchedObject, ClinicWrapper.class);
     }
 
+    @Override
+    protected void addChild(OriginInfoWrapper child) {
+        ShipmentAdministrationView.addToNode(this, child);
+    }
 }
