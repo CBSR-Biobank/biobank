@@ -57,15 +57,15 @@ public class DebugUtil {
         return getRandomAssignedSpecimens(appService, siteId, null);
     }
 
-    private static final String RANDOM_ASSIGNED_SPECIMENS_BASE_QRY = "select aliquots from "
+    private static final String RANDOM_ASSIGNED_SPECIMENS_BASE_QRY = "select specimen from "
         + Site.class.getName()
-        + " as s join s."
+        + " as site join site."
         + SitePeer.CONTAINER_COLLECTION.getName()
-        + " as cc join cc."
+        + " as cont join cont."
         + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
-        + " as spcpos as spcpos."
+        + " as spcpos join spcpos."
         + SpecimenPositionPeer.SPECIMEN.getName()
-        + "as spc where s." + SitePeer.ID.getName() + "=?";
+        + " as specimen where site." + SitePeer.ID.getName() + "=?";
 
     public static List<SpecimenWrapper> getRandomAssignedSpecimens(
         WritableApplicationService appService, Integer siteId, Integer studyId)

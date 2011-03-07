@@ -109,12 +109,8 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         if (cells != null) {
             PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
                 indexCol));
-            if (cell != null) {
-                String title = cell.getTitle();
-                if (title != null) {
-                    return title;
-                }
-            }
+            if (cell != null)
+                return cell.getTitle();
         }
         return "";
     }
@@ -133,13 +129,8 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         if (cells != null) {
             PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
                 indexCol));
-            if (cell != null) {
-                // FIXME getTitle already return this...
-                // SpecimenWrapper aliquot = cell.getSpecimen();
-                // if (aliquot != null) {
-                // return aliquot.getSpecimenType().getNameShort();
-                // }
-            }
+            if (cell != null)
+                return cell.getTypeString();
         }
         return "";
     }

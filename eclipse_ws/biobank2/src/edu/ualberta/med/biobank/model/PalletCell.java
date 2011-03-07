@@ -21,7 +21,7 @@ public class PalletCell extends Cell {
 
     private String information;
 
-    private String title;
+    private String title = "";
 
     private SpecimenLinkWrapper sourceSpecimenLink;
 
@@ -130,14 +130,10 @@ public class PalletCell extends Cell {
         this.status = status;
     }
 
+    /**
+     * usually displayed in the middle of the cell
+     */
     public String getTitle() {
-        if (specimen != null && specimen.getSpecimenType() != null) {
-            SpecimenTypeWrapper type = specimen.getSpecimenType();
-            if (type.getNameShort() != null) {
-                return type.getNameShort();
-            }
-            return type.getName();
-        }
         return title;
     }
 
@@ -145,12 +141,28 @@ public class PalletCell extends Cell {
         this.title = title;
     }
 
+    /**
+     * Usually used for the tooltip of the cell
+     * 
+     * @return
+     */
     public String getInformation() {
         return information;
     }
 
     public void setInformation(String information) {
         this.information = information;
+    }
+
+    public String getTypeString() {
+        if (specimen != null && specimen.getSpecimenType() != null) {
+            SpecimenTypeWrapper type = specimen.getSpecimenType();
+            if (type.getNameShort() != null) {
+                return type.getNameShort();
+            }
+            return type.getName();
+        }
+        return "";
     }
 
     public SpecimenTypeWrapper getType() {

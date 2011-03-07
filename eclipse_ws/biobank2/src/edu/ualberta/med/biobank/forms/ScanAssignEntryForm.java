@@ -43,7 +43,6 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -546,6 +545,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     @Override
     protected void beforeScanThreadStart() {
         showOnlyPallet(false, false);
+        currentPalletWrapper.setSite(SessionManager.getUser()
+            .getCurrentWorkingSite());
         currentPalletWrapper
             .setContainerType((ContainerTypeWrapper) ((IStructuredSelection) palletTypesViewer
                 .getSelection()).getFirstElement());
@@ -947,13 +948,10 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
         SpecimenWrapper aliquot, String posStr) {
         CollectionEventWrapper visit = aliquot.getCollectionEvent();
-        // FIXME what log message ?
-        // sb.append(Messages.getString(
-        //            "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
-        // posStr, currentPalletWrapper.getSite().getNameShort(), cell
-        // .getValue(), aliquot.getSpecimenType().getName(), visit
-        // .getPatient().getPnumber(), visit.getFormattedDateReceived(),
-        // visit.getClinic().getName()));
+        sb.append(Messages.getString("ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
+            posStr, currentPalletWrapper.getSite().getNameShort(), cell
+                .getValue(), aliquot.getSpecimenType().getName(), visit
+                .getPatient().getPnumber(), visit.getVisitNumber()));
     }
 
     private boolean saveEvenIfAliquotsMissing() {
@@ -1000,13 +998,11 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     public void reset(boolean beforeScan) {
-        SiteWrapper site = null;
         String productBarcode = ""; //$NON-NLS-1$
         String label = ""; //$NON-NLS-1$
         ContainerTypeWrapper type = null;
 
         if (beforeScan) { // keep fields values
-            site = currentPalletWrapper.getSite();
             productBarcode = palletproductBarcodeText.getText();
             label = palletPositionText.getText();
             type = currentPalletWrapper.getContainerType();
@@ -1029,7 +1025,6 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         palletPositionText.setText(label);
         palletLabelValidator.validate(label);
         currentPalletWrapper.setContainerType(type);
-        currentPalletWrapper.setSite(site);
         if (!beforeScan) {
             setDirty(false);
             setFocus();
