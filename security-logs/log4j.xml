@@ -32,21 +32,21 @@
   </category>
 
   <category name="org.apache.dbcp">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="@LOG4J_LEVEL_DEBUG@" />
     <appender-ref ref="CONSOLE" />
   </category>
 
   <category name="com.mchange.v2.c3p0">
-    <level value="warn" />
+    <level value="@LOG4J_LEVEL_WARN@" />
     <appender-ref ref="CONSOLE" />
   </category>
 
   <logger name="org.hibernate">
-    <level value="warn" />
+    <level value="@LOG4J_LEVEL_WARN@" />
   </logger>
 
   <logger name="org.apache">
-    <level value="warn" />
+    <level value="@LOG4J_LEVEL_WARN@" />
   </logger>
 
   <logger name="org.hibernate.SQL">
@@ -54,27 +54,27 @@
   </logger>
 
   <logger name="org.hibernate.type">
-    <level value="warn" />
+    <level value="@LOG4J_LEVEL_WARN@" />
   </logger>
 
   <logger name="org.hibernate.tool.hbm2ddl">
-    <level value="warn" />
+    <level value="@LOG4J_LEVEL_WARN@" />
   </logger>
 
   <logger name="org.hibernate.cache">
-    <level value="warn" />
+    <level value="@LOG4J_LEVEL_WARN@" />
   </logger>
 
   <logger name="org.hibernate.jdbc">
-    <level value="warn" />
+    <level value="@LOG4J_LEVEL_WARN@" />
   </logger>
 
   <logger name="org.hibernate.connection.DriverManagerConnectionProvider">
-    <level value="@LOG4J_LEVEL@" />
+    <level value="@LOG4J_LEVEL_DEBUG@" />
   </logger>
 
   <logger name="gov.nih.nci">
-    <level value="warn" />
+    <level value="@LOG4J_LEVEL_WARN@" />
   </logger>
 
   <category name="org.springframework">
@@ -82,7 +82,7 @@
   </category>
 
   <root>
-    <priority value="@LOG4J_LEVEL@" />
+    <priority value="@LOG4J_LEVEL_DEBUG@" />
     <appender-ref ref="CONSOLE" />
   </root>
 </log4j:configuration>
