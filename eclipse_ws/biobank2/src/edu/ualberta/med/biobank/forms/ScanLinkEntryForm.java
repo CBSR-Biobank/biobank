@@ -26,6 +26,7 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
@@ -419,7 +420,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
             }
         });
         // FIXME 666 ????? what is this suppose to do ?
-        // profilesCombo.getCombo().notifyListeners(666, new Event());
+        profilesCombo.getCombo().notifyListeners(666, new Event());
 
         createPlateToScanField(fieldsComposite);
 
@@ -604,16 +605,14 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                     cell.setStatus(CellStatus.ERROR);
                     cell.setInformation(Messages
                         .getString("ScanLink.scanStatus.aliquot.alreadyExists")); //$NON-NLS-1$
-                    // FIXME what log ?
-                    // String palletPosition = ContainerLabelingSchemeWrapper
-                    // .rowColToSbs(new RowColPos(cell.getRow(),
-                    // cell.getCol()));
-                    // appendLogNLS("ScanLink.activitylog.aliquot.existsError",
-                    // palletPosition, value, foundAliquot
-                    // .getParentProcessingEvent()
-                    // .getFormattedDateProcessed(), foundAliquot
-                    // .getCollectionEvent().getPatient().getPnumber(),
-                    // foundAliquot.getCurrentCenter().getNameShort());
+                    String palletPosition = ContainerLabelingSchemeWrapper
+                        .rowColToSbs(new RowColPos(cell.getRow(), cell.getCol()));
+                    appendLogNLS("ScanLink.activitylog.aliquot.existsError",
+                        palletPosition, value, foundAliquot
+                            .getCollectionEvent().getVisitNumber(),
+                        foundAliquot.getCollectionEvent().getPatient()
+                            .getPnumber(), foundAliquot.getCurrentCenter()
+                            .getNameShort());
                 } else {
                     cell.setStatus(CellStatus.NO_TYPE);
                     if (independantProcess) {
@@ -674,14 +673,15 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                     .getParentSpecimen().getCollectionEvent());
                 aliquotedSpecimens.add(aliquotedSpecimen);
 
-                // FIXME find out correct messaging
-                // sb.append(Messages.getString(
-                //                    "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
-                // cell.getValue(), collectionEvent.getPatient().getPnumber(),
-                // site.getNameShort(), collectionEvent
-                // .getFormattedDateDrawn(), collectionEvent
-                // .getCollectionEvent().getClinic().getName(), cell
-                // .getType().getName()));
+                // LINKED\: {0} - Type: {1} - Patient\: {2} - Visit\: {3} -
+                // Centre: {4} \n
+                sb.append(Messages.getString(
+                    "ScanLink.activitylog.aliquot.linked", //$NON-NLS-1$
+                    cell.getValue(), cell.getType().getName(),
+                    sourceSpecimenLink.getParentSpecimen().getCollectionEvent()
+                        .getPatient().getPnumber(), sourceSpecimenLink
+                        .getParentSpecimen().getCollectionEvent()
+                        .getVisitNumber(), currentSelectedCentre.getNameShort()));
                 nber++;
             }
         }
@@ -692,13 +692,10 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         }
         appendLog(sb.toString());
 
-        // FIXME uncomment this log message after fixing
-        // appendLogNLS("ScanLink.activitylog.save.summary", nber,
-        // collectionEvent
-        // .getPatient().getPnumber(), site.getNameShort(),
-        // collectionEvent.getFormattedCreatedAt(),
-        //            collectionEvent.getFormattedDateProcessed()); //$NON-NLS-1$
-
+        // SCAN-LINK\: {0} specimens linked to patient {1} on centre {2}
+        appendLogNLS("ScanLink.activitylog.save.summary", nber, //$NON-NLS-1$
+            linkFormPatientManagement.getCurrentPatient().getPnumber(),
+            currentSelectedCentre.getNameShort());
         setFinished(false);
     }
 

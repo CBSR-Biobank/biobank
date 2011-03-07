@@ -36,6 +36,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.ContainerLabelSearchException;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -278,14 +279,9 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                         Messages.getString("ScanAssign.validation.error.title"), ex); //$NON-NLS-1$
                 appendLogNLS("ScanAssign.activitylog.error", //$NON-NLS-1$
                     ex.getMessage());
-                if (ex.getMessage() != null
-                    && ex.getMessage().startsWith(
-                        "Can't find container with label")) {
-                    // FIXME: find a better way than that ? Add info inside the
-                    // BiobankCheckException ?
+                if (ex instanceof ContainerLabelSearchException) {
                     nextFocusWidget = palletPositionText;
                 }
-
                 setCanLaunchScan(false);
             }
             if (nextFocusWidget != null) {
@@ -694,7 +690,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         if (value == null) { // no aliquot scanned
             updateCellAsMissing(positionString, scanCell, expectedAliquot);
         } else {
-            // FIXME test what happen if can't read site
+            // FIXME test what happen if don't have read rights on the site
             SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(
                 appService, value, SessionManager.getUser());
             if (foundAliquot == null) {
@@ -883,12 +879,13 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     .getString(
                         "ScanAssign.scanStatus.aliquot.missing", missingAliquot.getInventoryId())); //$NON-NLS-1$
             scanCell.setTitle("?"); //$NON-NLS-1$
-            // FIXME
-            // appendLogNLS(
-            //                "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
-            // .getInventoryId(), missingAliquot
-            // .getParentProcessingEvent().getFormattedDateProcessed(),
-            // missingAliquot.getCollectionEvent().getPatient().getPnumber());
+            // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
+            // missing
+            appendLogNLS(
+                "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
+                    .getInventoryId(), missingAliquot.getCollectionEvent()
+                    .getVisitNumber(), missingAliquot.getCollectionEvent()
+                    .getPatient().getPnumber());
             movedAndMissingAliquotsFromPallet.put(rcp, scanCell);
         } else {
             movedAndMissingAliquotsFromPallet.remove(rcp);
