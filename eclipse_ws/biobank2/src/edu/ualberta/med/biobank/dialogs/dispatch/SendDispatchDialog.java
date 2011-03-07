@@ -9,7 +9,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -47,8 +49,12 @@ public class SendDispatchDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        ShippingMethodWrapper selectedShippingMethod = shipment
-            .getShipmentInfo().getShippingMethod();
+        ShipmentInfoWrapper shipInfo = new ShipmentInfoWrapper(
+            SessionManager.getAppService());
+        shipment.setShipmentInfo(shipInfo);
+
+        ShippingMethodWrapper selectedShippingMethod = shipInfo
+            .getShippingMethod();
         widgetCreator.createComboViewer(contents, "Shipping Method",
             ShippingMethodWrapper.getShippingMethods(SessionManager
                 .getAppService()), selectedShippingMethod, null,
@@ -61,12 +67,13 @@ public class SendDispatchDialog extends BiobankDialog {
             });
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
-            "Waybill", null, shipment, "waybill", null);
+            "Waybill", null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
         shipment.setDepartedAt(date);
-        createDateTimeWidget(contents, "Departed", date, shipment, "departed",
-            new NotNullValidator("Departed should be set"));
+        createDateTimeWidget(contents, "Departed", date, shipInfo,
+            ShipmentInfoPeer.SENT_AT.getName(), new NotNullValidator(
+                "Departed should be set"));
     }
 
 }

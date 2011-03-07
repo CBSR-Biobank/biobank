@@ -18,9 +18,9 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
@@ -42,7 +42,8 @@ public class DispatchAdapter extends AdapterBase {
         boolean editable = super.isEditable();
         if (getWrapper() != null) {
             return editable
-                && (getWrapper().isNew() || !getWrapper().isInTransitState());
+                && (getWrapper().isNew() || getWrapper().isInCreationState() || getWrapper()
+                    .isInTransitState());
         }
         return editable;
     }
@@ -52,9 +53,13 @@ public class DispatchAdapter extends AdapterBase {
         DispatchWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "Dispatch is null");
         String label = new String();
-        label += " - ";
+        if (shipment.getSenderCenter() != null
+            && shipment.getReceiverCenter() != null)
+            label += shipment.getSenderCenter().getNameShort() + " -> "
+                + shipment.getReceiverCenter().getNameShort();
 
-        label += shipment.getFormattedDeparted();
+        if (shipment.getDepartedAt() != null)
+            label += " [" + shipment.getFormattedDeparted() + "]";
         return label;
 
     }
@@ -66,24 +71,24 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        if (getSiteParent() != null)
-            return getSiteParent().equals(getWrapper().getSenderCenter())
+        if (getCenterParent() != null)
+            return getCenterParent().equals(getWrapper().getSenderCenter())
                 && getWrapper().canDelete(SessionManager.getUser())
                 && getWrapper().isInCreationState();
         else
             return false;
     }
 
-    private SiteWrapper getSiteParent() {
+    private CenterWrapper<?> getCenterParent() {
         if (getParent().getParent().getParent() != null)
-            return (SiteWrapper) getParent().getParent().getParent()
+            return (CenterWrapper<?>) getParent().getParent().getParent()
                 .getModelObject();
         return null;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        SiteWrapper siteParent = getSiteParent();
+        CenterWrapper<?> siteParent = getCenterParent();
         addViewMenu(menu, "Dispatch");
         try {
             if (isDeletable()) {
@@ -209,9 +214,11 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        if (getWrapper().isInCreationState())
+        if (getWrapper().isInCreationState()
+            || (getWrapper().isInTransitState() && SessionManager.getUser()
+                .getCurrentWorkingCentre()
+                .equals(getWrapper().getSenderCenter())))
             return DispatchSendingEntryForm.ID;
         return DispatchReceivingEntryForm.ID;
     }
-
 }

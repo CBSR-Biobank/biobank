@@ -155,59 +155,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public String getCenterString() {
-        CenterWrapper<?> center = getLocation();
+        CenterWrapper<?> center = getCurrentCenter();
         if (center != null) {
             return center.getNameShort();
         }
         // FIXME should never see that ? should never retrieve an Specimen which
         // site cannot be displayed ?
         return "CANNOT DISPLAY INFORMATION";
-    }
-
-    private CenterWrapper<?> getLocation() {
-        List<DispatchSpecimenWrapper> dspcs = getDispatchSpecimenCollection();
-
-        // if in a container, use the container's site
-        if (getParent() != null) {
-            return getParent().getSite();
-        } else {
-            // dispatched Specimen?
-            for (DispatchSpecimenWrapper da : dspcs) {
-                DispatchSpecimenState state = DispatchSpecimenState.getState(da
-                    .getState());
-
-                if (DispatchState.IN_TRANSIT
-                    .equals(da.getDispatch().getState())
-                    && DispatchSpecimenState.NONE == state) {
-                    // Specimen is in transit
-                    // FIXME what if can't read sender or receiver
-                    SiteWrapper fakeSite = new SiteWrapper(appService);
-                    fakeSite.setNameShort("In Transit ("
-                        + da.getDispatch().getSenderCenter().getNameShort()
-                        + " to "
-                        + da.getDispatch().getReceiverCenter().getNameShort()
-                        + ")");
-                    return fakeSite;
-                } else if (DispatchState.RECEIVED.equals(da.getDispatch()
-                    .getState())) {
-                    switch (state) {
-                    case EXTRA:
-                        // Specimen has been accidentally dispatched
-                        return da.getDispatch().getReceiverCenter();
-                    case MISSING:
-                        // Specimen is missing
-                        return da.getDispatch().getSenderCenter();
-                    case RECEIVED:
-                    case NONE:
-                        // Specimen has been intentionally dispatched and
-                        // received
-                        return da.getDispatch().getReceiverCenter();
-                    }
-                }
-            }
-            // if not in a container or a dispatch, use the originating shipment
-            return getParentProcessingEvent().getCenter();
-        }
     }
 
     /**
@@ -359,9 +313,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public static SpecimenWrapper getSpecimen(
         WritableApplicationService appService, String inventoryId, User user)
         throws ApplicationException, BiobankCheckException {
-        SpecimenWrapper Specimen = getSpecimen(appService, inventoryId);
-        if (Specimen != null && user != null) {
-            CenterWrapper<?> center = Specimen.getLocation();
+        SpecimenWrapper specimen = getSpecimen(appService, inventoryId);
+        if (specimen != null && user != null) {
+            CenterWrapper<?> center = specimen.getCurrentCenter();
             // site might be null if can't access it !
             if (center == null) {
                 throw new ApplicationException(
@@ -371,7 +325,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                         + " Its current site location should be a site you can access.");
             }
         }
-        return Specimen;
+        return specimen;
     }
 
     private static final String SpecimenS_NON_ACTIVE_QRY = "from "

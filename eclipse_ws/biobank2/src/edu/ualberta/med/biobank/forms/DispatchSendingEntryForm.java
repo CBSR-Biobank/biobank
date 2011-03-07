@@ -4,6 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -20,6 +21,9 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.peer.DispatchPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
@@ -75,10 +79,13 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        dispatch.setSenderCenter(SessionManager.getUser()
-            .getCurrentWorkingCentre());
-        dispatch.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        if (dispatch.isNew()) {
+            dispatch.setSenderCenter(SessionManager.getUser()
+                .getCurrentWorkingCentre());
+            dispatch.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
+            dispatch.setState(DispatchState.CREATION);
+        }
 
         setFirstControl(client);
 
@@ -99,12 +106,18 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                 });
 
             createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
-                "Waybill", null, dispatch, "waybill", null);
+                "Waybill", null, dispatch.getShipmentInfo(),
+                ShipmentInfoPeer.WAYBILL.getName(), null);
         }
 
-        createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            "Comments", null,
-            BeansObservables.observeValue(dispatch, "comment"), null);
+        createBoundWidgetWithLabel(
+            client,
+            BiobankText.class,
+            SWT.MULTI,
+            "Comments",
+            null,
+            BeansObservables.observeValue(dispatch,
+                DispatchPeer.COMMENT.getName()), null);
 
         createAliquotsSelectionSection();
 
@@ -129,6 +142,9 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                             setDirty(true);
                         }
                     });
+                if (dispatch.getReceiverCenter() != null)
+                    destSiteComboViewer.setSelection(new StructuredSelection(
+                        dispatch.getReceiverCenter()));
             } catch (ApplicationException e) {
                 BiobankPlugin.openAsyncError("Error",
                     "Unable to retrieve Centers");
@@ -290,8 +306,14 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         if (dispatch.isNew()) {
             return "New Dispatch";
         } else {
-            return "Dispatch "
-                + dispatch.getShipmentInfo().getFormattedDateReceived();
+            Assert.isNotNull(dispatch, "Dispatch is null");
+            String label = new String();
+            label += dispatch.getSenderCenter().getNameShort() + " -> "
+                + dispatch.getReceiverCenter().getNameShort();
+
+            if (dispatch.getDepartedAt() != null)
+                label += "[" + dispatch.getFormattedDeparted() + "]";
+            return label;
         }
     }
 }

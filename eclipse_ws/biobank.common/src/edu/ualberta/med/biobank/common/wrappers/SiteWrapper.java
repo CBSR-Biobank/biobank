@@ -265,7 +265,8 @@ public class SiteWrapper extends SiteBaseWrapper {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.IN_TRANSIT.equals(dispatch.getState())) {
+                    if (DispatchState.IN_TRANSIT.equals(dispatch
+                        .getDispatchState())) {
                         shipCollection.add(dispatch);
                     }
                 }
@@ -285,7 +286,8 @@ public class SiteWrapper extends SiteBaseWrapper {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.IN_TRANSIT.equals(dispatch.getState())) {
+                    if (DispatchState.IN_TRANSIT.equals(dispatch
+                        .getDispatchState())) {
                         shipCollection.add(dispatch);
                     }
                 }
@@ -305,8 +307,8 @@ public class SiteWrapper extends SiteBaseWrapper {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.RECEIVED.equals(dispatch.getState())
-                        && !dispatch.hasErrors()) {
+                    if (DispatchState.RECEIVED.equals(dispatch
+                        .getDispatchState()) && !dispatch.hasErrors()) {
                         shipCollection.add(dispatch);
                     }
                 }
@@ -326,8 +328,8 @@ public class SiteWrapper extends SiteBaseWrapper {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.RECEIVED.equals(dispatch.getState())
-                        && dispatch.hasErrors()) {
+                    if (DispatchState.RECEIVED.equals(dispatch
+                        .getDispatchState()) && dispatch.hasErrors()) {
                         shipCollection.add(dispatch);
                     }
                 }
@@ -347,7 +349,8 @@ public class SiteWrapper extends SiteBaseWrapper {
             if (children != null) {
                 shipCollection = new ArrayList<DispatchWrapper>();
                 for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.CREATION.equals(dispatch.getState())) {
+                    if (DispatchState.CREATION.equals(dispatch
+                        .getDispatchState())) {
                         shipCollection.add(dispatch);
                     }
                 }
