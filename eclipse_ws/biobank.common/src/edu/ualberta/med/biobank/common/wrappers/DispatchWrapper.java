@@ -29,7 +29,7 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DispatchWrapper extends DispatchBaseWrapper {
 
-    public final Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap = new HashMap<DispatchSpecimenState, List<DispatchSpecimenWrapper>>();
+    private final Map<DispatchSpecimenState, List<DispatchSpecimenWrapper>> dispatchSpecimenMap = new HashMap<DispatchSpecimenState, List<DispatchSpecimenWrapper>>();
 
     private List<DispatchSpecimenWrapper> deletedDispatchedSpecimens = new ArrayList<DispatchSpecimenWrapper>();
 
@@ -151,6 +151,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             }
             return tmp;
         }
+    }
+
+    public void resetMap() {
+        dispatchSpecimenMap.clear();
     }
 
     public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {

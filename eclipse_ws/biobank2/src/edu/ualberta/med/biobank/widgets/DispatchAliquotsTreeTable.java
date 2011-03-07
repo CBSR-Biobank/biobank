@@ -216,8 +216,8 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
         int res = dialog.open();
         if (res == Dialog.OK) {
             String comment = dialog.getComment();
-            for (@SuppressWarnings("rawtypes")
-            Iterator iter = iStructuredSelection.iterator(); iter.hasNext();) {
+            for (Iterator<?> iter = iStructuredSelection.iterator(); iter
+                .hasNext();) {
                 DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) iter
                     .next();
                 dsa.setComment(comment);
@@ -225,7 +225,8 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
                     dsa.setDispatchSpecimenState(newState);
                 }
             }
-            shipment.refresh();
+            shipment.resetMap();
+            tv.refresh();
             notifyListeners();
         }
     }

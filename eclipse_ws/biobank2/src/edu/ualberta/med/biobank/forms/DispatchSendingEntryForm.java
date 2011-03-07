@@ -64,6 +64,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         if (dispatch.isNew()) {
             setDirty(true);
         }
+
     }
 
     @Override
@@ -149,6 +150,16 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                 BiobankPlugin.openAsyncError("Error",
                     "Unable to retrieve Centers");
             }
+        }
+    }
+
+    @Override
+    public void formClosed() {
+        try {
+            dispatch.reload();
+            dispatch.resetMap();
+        } catch (Exception e) {
+            BiobankPlugin.openAsyncError("Error", "Unable to reload dispatch");
         }
     }
 

@@ -8,6 +8,7 @@ import org.eclipse.ui.WorkbenchException;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.forms.AbstractSpecimenAdminForm;
+import edu.ualberta.med.biobank.forms.BiobankEntryForm;
 import edu.ualberta.med.biobank.forms.BiobankFormBase;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
@@ -51,6 +52,8 @@ public class BiobankPartListener implements IPartListener {
         if (part instanceof BiobankFormBase) {
             ((BiobankFormBase) part).setDeactivated();
         }
+        if (part instanceof BiobankEntryForm)
+            ((BiobankEntryForm) part).formClosed();
     }
 
     @Override

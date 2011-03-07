@@ -134,6 +134,10 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
         widgetCreator.setSelectionListener(selectionListener);
     }
 
+    public void formClosed() {
+        // do nothing by default
+    }
+
     @Override
     public void doSave(IProgressMonitor monitor) {
         setDirty(false);
