@@ -379,9 +379,6 @@ update specimen,collection_event as ce
        set specimen.source_collection_event_id=ce.id
        where ce.pv_id=specimen.pv_id and specimen.sv_id is not null;
 
-drop index pv_id_idx on collection_event;
-drop index pv_id_idx on specimen;
-
 ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
 
 /*****************************************************
@@ -389,24 +386,20 @@ ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
  ****************************************************/
 
 CREATE TABLE processing_event (
-    ID INT(11) NOT NULL auto_increment,
-    CREATED_AT DATETIME NOT NULL,
-    WORKSHEET VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
-    COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    CENTER_ID INT(11) NOT NULL,
-    ACTIVITY_STATUS_ID INT(11) NOT NULL,
-    INDEX FK327B1E4EC449A4 (ACTIVITY_STATUS_ID),
-    INDEX FK327B1E4E92FAA705 (CENTER_ID),
-    PRIMARY KEY (ID),
-    UNIQUE KEY `WORKSHEET` (`WORKSHEET`)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
+  ID int(11) NOT NULL auto_increment,
+  WORKSHEET varchar(100) COLLATE latin1_general_cs DEFAULT NULL,
+  CREATED_AT datetime NOT NULL,
+  COMMENT text COLLATE latin1_general_cs,
+  CENTER_ID int(11) NOT NULL,
+  ACTIVITY_STATUS_ID int(11) NOT NULL,
+  PV_ID INT(11),
+  PRIMARY KEY (ID),
+  KEY FK327B1E4EC449A4 (ACTIVITY_STATUS_ID),
+  KEY FK327B1E4E92FAA705 (CENTER_ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-/*
-
--- multiple patient visits with worksheet BB01AE12DM
-
-insert into processing_event (created_at,worksheet,comment,center_id)
-       select pv.date_processed,event_attr.value as worksheet,pv.comment,center.id
+insert into processing_event (created_at,worksheet,comment,center_id,pv_id)
+       select pv.date_processed,event_attr.value as worksheet,pv.comment,center.id,pv.id
        from patient_visit as pv
        join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
        join abstract_shipment as aship on aship.id=csp.CLINIC_SHIPMENT_ID
@@ -417,18 +410,37 @@ insert into processing_event (created_at,worksheet,comment,center_id)
        join event_attr_type on event_attr_type.id=study_event_attr.EVENT_ATTR_TYPE_ID
        where label='Worksheet';
 
-*/
-
 ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
 
+create index pv_id_idx on processing_event(pv_id);
+
+/*
 CREATE TABLE specimen_link (
-    ID INT(11) NOT NULL,
+    ID INT(11) NOT NULL auto_increment,
     PROCESSING_EVENT_ID INT(11) NOT NULL,
     PARENT_SPECIMEN_ID INT(11) NOT NULL,
+    PV_ID INT(11),
     INDEX FK1FA012D161674F50 (PARENT_SPECIMEN_ID),
     INDEX FK1FA012D133126C8 (PROCESSING_EVENT_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
+
+insert into specimen_link (processing_event_id,parent_specimen_id,pv_id)
+       select pe.id,spc.id,pe.pv_id
+       from processing_event as pe
+       join specimen as spc on spc.pv_id=pe.pv_id
+       where spc.sv_id is not null;
+
+update specimen as spc,specimen_link as sl
+       set spc.specimen_link_id=sl.id
+       where spc.pv_id=sl.pv_id and spc.sv_id is null;
+
+ALTER TABLE specimen_link MODIFY COLUMN ID INT(11) NOT NULL;
+
+ALTER TABLE processing_event DROP COLUMN PV_ID;
+
+ALTER TABLE specimen_link DROP COLUMN PV_ID;
+*/
 
 /*****************************************************
  * container types and containers
@@ -955,6 +967,11 @@ UNLOCK TABLES;
 /*****************************************************
  * cleantup and drop tables that are no longer required
  ****************************************************/
+
+drop index pv_id_idx on collection_event;
+drop index pv_id_idx on processing_event;
+drop index pv_id_idx on specimen;
+
 
 ALTER TABLE origin_info DROP COLUMN ASHIP_ID;
 
