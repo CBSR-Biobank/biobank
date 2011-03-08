@@ -146,10 +146,10 @@ activity_status_id,source_collection_event_id,pv_id)
         JOIN sample_type ON sample_type.id=aliquot.sample_type_id
         JOIN specimen_type ON specimen_type.name=sample_type.name;
 
-INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id
+INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id,
 source_collection_event_id,specimen_type_id,pv_id,sv_id)
        SELECT concat("sw upgrade ",pvsv.id),volume,time_drawn,
-       (select id from activity_status where name='Active'),0,0,patient_visit_id,source_vessel_id
+       (select id from activity_status where name='Active'),0,0,0,patient_visit_id,source_vessel_id
        FROM pv_source_vessel as pvsv
        JOIN source_vessel as sv on sv.id=pvsv.source_vessel_id;
 
@@ -401,22 +401,21 @@ CREATE TABLE processing_event (
     UNIQUE KEY `WORKSHEET` (`WORKSHEET`)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-insert into processing_event (created_at,worksheet,comment,center_id)
-       select pv.date_processed
-       from patient_visit as pv
-       join pv_
-
 /*
 
--- select count(*)
-select pv.date_processed,event_attr.value as worksheet,pv.comment,aship.clinic_id
-from patient_visit as pv
-join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
-join abstract_shipment as aship on aship.id=csp.CLINIC_SHIPMENT_ID
-join event_attr on event_attr.collection_event_id=pv.id
-join study_event_attr on study_event_attr.id=event_attr.study_event_attr_id
-join event_attr_type on event_attr_type.id=study_event_attr.EVENT_ATTR_TYPE_ID
-where label='Worksheet';
+-- multiple patient visits with worksheet BB01AE12DM
+
+insert into processing_event (created_at,worksheet,comment,center_id)
+       select pv.date_processed,event_attr.value as worksheet,pv.comment,center.id
+       from patient_visit as pv
+       join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
+       join abstract_shipment as aship on aship.id=csp.CLINIC_SHIPMENT_ID
+       join clinic on clinic.id=aship.clinic_id
+       join center on center.name=clinic.name
+       join event_attr on event_attr.collection_event_id=pv.id
+       join study_event_attr on study_event_attr.id=event_attr.study_event_attr_id
+       join event_attr_type on event_attr_type.id=study_event_attr.EVENT_ATTR_TYPE_ID
+       where label='Worksheet';
 
 */
 
