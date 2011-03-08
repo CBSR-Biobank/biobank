@@ -42,8 +42,12 @@ public class DispatchAdapter extends AdapterBase {
         boolean editable = super.isEditable();
         if (getWrapper() != null) {
             return editable
-                && (getWrapper().isNew() || getWrapper().isInCreationState() || getWrapper()
-                    .isInTransitState());
+                && ((getWrapper().getSenderCenter().equals(
+                    SessionManager.getUser().getCurrentWorkingCentre()) && (getWrapper()
+                    .isNew() || getWrapper().isInCreationState() || getWrapper()
+                    .isInTransitState())) || (getWrapper().getReceiverCenter()
+                    .equals(SessionManager.getUser().getCurrentWorkingCentre()) && (getWrapper()
+                    .isInReceivedState() || getWrapper().isInTransitState())));
         }
         return editable;
     }
@@ -124,9 +128,8 @@ public class DispatchAdapter extends AdapterBase {
                         doReceiveAndProcess();
                     }
                 });
-            } else if (getWrapper().canUpdate(SessionManager.getUser())) {
-                addEditMenu(menu, "Dispatch");
             }
+            addEditMenu(menu, "Dispatch");
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Error checking permissions", e);
         }

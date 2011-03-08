@@ -157,7 +157,6 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     public void formClosed() {
         try {
             dispatch.reload();
-            dispatch.resetMap();
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Error", "Unable to reload dispatch");
         }
@@ -284,6 +283,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
+        dispatch.resetMap();
         dispatch.setSenderCenter(SessionManager.getUser()
             .getCurrentWorkingCentre());
         if (destSiteComboViewer != null) {
