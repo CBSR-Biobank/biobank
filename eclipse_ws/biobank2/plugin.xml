@@ -1885,6 +1885,19 @@
       id="edu.ualberta.med.biobank.forms.RequestEntryFormBase"
       name="Request Receiving Form">
 </editor>
+<editor
+      default="false"
+      icon="icons/processingEvent.png"
+      id="edu.ualberta.med.biobank.forms.ProcessingEventEntryForm"
+      name="Processing Event Entry">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.ProcessingEventViewForm"
+      default="false"
+      icon="icons/processingEvent.png"
+      id="edu.ualberta.med.biobank.forms.ProcessingEventViewForm"
+      name="Processing Event View">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
