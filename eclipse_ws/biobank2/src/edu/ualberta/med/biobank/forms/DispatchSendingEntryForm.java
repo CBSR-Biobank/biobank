@@ -24,7 +24,6 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.util.DispatchState;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -83,8 +82,6 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         if (dispatch.isNew()) {
             dispatch.setSenderCenter(SessionManager.getUser()
                 .getCurrentWorkingCentre());
-            dispatch.setActivityStatus(ActivityStatusWrapper
-                .getActiveActivityStatus(appService));
             dispatch.setState(DispatchState.CREATION);
         }
 
