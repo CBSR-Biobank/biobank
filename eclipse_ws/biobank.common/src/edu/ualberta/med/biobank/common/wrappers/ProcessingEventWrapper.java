@@ -252,10 +252,4 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return getCenter();
     }
 
-    public static Collection<? extends ModelWrapper<?>> getAllProcessingEvents(
-        BiobankApplicationService appService) throws ApplicationException {
-        return ModelWrapper.wrapModelCollection(appService,
-            appService.search(ProcessingEvent.class, new ProcessingEvent()),
-            ProcessingEventWrapper.class);
-    }
 }

@@ -137,7 +137,8 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
             }
             return new AliquotInfo(aliquot, ResType.NOT_IN_SHIPMENT);
         }
-        if (DispatchSpecimenState.RECEIVED.isEquals(dsa.getState())) {
+        if (DispatchSpecimenState.RECEIVED.equals(dsa
+            .getDispatchSpecimenState())) {
             return new AliquotInfo(dsa.getSpecimen(), ResType.RECEIVED);
         }
         if (DispatchSpecimenState.EXTRA.isEquals(dsa.getState())) {
@@ -170,7 +171,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
             break;
         case NOT_IN_DB:
             BiobankPlugin.openError("Aliquot not found",
-                "This aliquot does not exists in the database.");
+                "This aliquot does not exist in the database.");
             break;
         case DUPLICATE:
             BiobankPlugin.openError("Duplicate aliquot !",
@@ -181,6 +182,16 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
                 "Aliquot with inventory id " + inventoryId
                     + " is already in extra list.");
             break;
+        }
+    }
+
+    @Override
+    public void formClosed() {
+        try {
+            dispatch.reload();
+            dispatch.resetMap();
+        } catch (Exception e) {
+            BiobankPlugin.openAsyncError("Error", "Unable to reload dispatch");
         }
     }
 
