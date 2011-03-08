@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public abstract class AbstractTodaySearchAdministrationView extends
     AbstractAdministrationView {
 
-    protected AbstractTodayNode todayNode;
+    protected AbstractTodayNode<?> todayNode;
 
     protected AbstractSearchedNode searchedNode;
 
@@ -32,11 +32,11 @@ public abstract class AbstractTodaySearchAdministrationView extends
         rootNode.addChild(searchedNode);
     }
 
-    protected abstract AbstractTodayNode createTodayNode();
+    protected abstract AbstractTodayNode<?> createTodayNode();
 
     protected abstract AbstractSearchedNode createSearchedNode();
 
-    public AbstractTodayNode getTodayNode() {
+    public AbstractTodayNode<?> getTodayNode() {
         return todayNode;
     }
 
@@ -52,6 +52,7 @@ public abstract class AbstractTodaySearchAdministrationView extends
             if (searchedObject == null || searchedObject.size() == 0) {
                 notFound(text);
             } else {
+                System.out.println("internalSearch");
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
