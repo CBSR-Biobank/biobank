@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview;
+package edu.ualberta.med.biobank.treeview.patient;
 
 import java.util.Collection;
 
@@ -7,11 +7,13 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.forms.ProcessingEventEntryForm;
 import edu.ualberta.med.biobank.forms.ProcessingEventViewForm;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class ProcessingEventAdapter extends AdapterBase {
 
@@ -28,16 +30,22 @@ public class ProcessingEventAdapter extends AdapterBase {
     }
 
     @Override
+    public void executeDoubleClick() {
+        performExpand();
+        openViewForm();
+    }
+
+    @Override
     protected String getLabelInternal() {
         ProcessingEventWrapper pevent = getWrapper();
         Assert.isNotNull(pevent, "processing event is null");
         String worksheet = pevent.getWorksheet();
-        String name = pevent.getFormattedCreatedAt() + worksheet == null ? ""
-            : " - #" + pevent.getWorksheet();
+        String name = pevent.getFormattedCreatedAt()
+            + (worksheet == null ? "" : " - #" + pevent.getWorksheet());
 
         long count = -1;
         try {
-            count = pevent.getChildSpecimenCount(true);
+            count = pevent.getSourceSpecimenCount(true);
         } catch (Exception e) {
             logger.error("Problem counting specimens", e);
         }
@@ -46,13 +54,25 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return null;
+        return Messages.getString("ProvessingEventAdapter.tooltiptext",
+            getWrapper().getFormattedCreatedAt());
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        // TODO Auto-generated method stub
+        addEditMenu(menu, "Processing Event");
+        addViewMenu(menu, "Processing Event");
+        addDeleteMenu(menu, "Processing Event");
+    }
 
+    @Override
+    public boolean isDeletable() {
+        return internalIsDeletable();
+    }
+
+    @Override
+    protected String getConfirmDeleteMessage() {
+        return Messages.getString("ProcessingEventAdapter.deleteMsg");
     }
 
     @Override

@@ -144,7 +144,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient(Messages
             .getString("CollectionEventViewForm.specimens.title"));
         sourceSpecimenTable = new SpecimenInfoTable(client,
-            cevent.getSourceSpecimenCollection(true), ColumnsShown.EVENT_FORM,
+            cevent.getSourceSpecimenCollection(true), ColumnsShown.CEVENT_FORM,
             10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
     }

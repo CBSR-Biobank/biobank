@@ -52,7 +52,6 @@ public abstract class AbstractTodaySearchAdministrationView extends
             if (searchedObject == null || searchedObject.size() == 0) {
                 notFound(text);
             } else {
-                System.out.println("internalSearch");
                 showSearchedObjectsInTree(searchedObject, true);
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }

@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.views;
 import java.util.Arrays;
 import java.util.List;
 
+import org.eclipse.swt.widgets.Composite;
+
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
@@ -13,6 +15,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientSearchedNode;
 import edu.ualberta.med.biobank.treeview.patient.PatientTodayNode;
+import edu.ualberta.med.biobank.treeview.patient.ProcessingEventGroup;
 import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 
 public class PatientAdministrationView extends
@@ -22,10 +25,22 @@ public class PatientAdministrationView extends
 
     private static PatientAdministrationView currentInstance;
 
+    private ProcessingEventGroup processingNode;
+
     public PatientAdministrationView() {
         super();
         currentInstance = this;
         SessionManager.addView(this);
+    }
+
+    @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+
+        processingNode = new ProcessingEventGroup(rootNode, 2,
+            "Processing Events");
+        processingNode.setParent(rootNode);
+        rootNode.addChild(processingNode);
     }
 
     @Override
@@ -35,7 +50,6 @@ public class PatientAdministrationView extends
             SessionManager.getAppService(), text.trim(),
             SessionManager.getUser());
         if (patient != null) {
-            System.out.println(patient);
             return Arrays.asList(patient);
         }
         return null;

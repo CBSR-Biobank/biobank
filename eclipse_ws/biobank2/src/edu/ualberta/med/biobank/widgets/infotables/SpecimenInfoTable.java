@@ -45,7 +45,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 }
             }
         },
-        EVENT_FORM(new String[] { "Inventory ID", "Type", "Creation Date",
+        CEVENT_FORM(new String[] { "Inventory ID", "Type", "Creation Date",
             "Quantity (ml)", "Activity Status" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {

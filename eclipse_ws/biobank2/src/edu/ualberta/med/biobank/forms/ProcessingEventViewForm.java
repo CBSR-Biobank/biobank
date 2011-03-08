@@ -9,15 +9,14 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.ProcessingEventAdapter;
-import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
+import edu.ualberta.med.biobank.treeview.patient.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
 public class ProcessingEventViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ProcessingEventViewForm"; //$NON-NLS-1$
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ProcessingEventViewForm.class.getName());
@@ -35,22 +34,24 @@ public class ProcessingEventViewForm extends BiobankViewForm {
 
     private SpecimenInfoTable sourceSpecimenTable;
 
+    private BiobankText activityLabel;
+
     @Override
     public void init() throws Exception {
-        Assert.isTrue((adapter instanceof CollectionEventAdapter),
-            "Invalid editor input: object of type "
+        Assert.isTrue((adapter instanceof ProcessingEventAdapter),
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
         pEvent = pEventAdapter.getWrapper();
         retrieveProcessingEvent();
-        setPartName(Messages.getString("ProcessingEventViewForm.title",
+        setPartName(Messages.getString("ProcessingEventViewForm.title", //$NON-NLS-1$
             pEvent.getFormattedCreatedAt()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("ProcessingEventViewForm.title",
+        form.setText(Messages.getString("ProcessingEventViewForm.title", //$NON-NLS-1$
             pEvent.getFormattedCreatedAt()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -66,14 +67,17 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        centreLabel = createReadOnlyLabelledField(client, SWT.NONE, "Centre");
+        centreLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("ProcessingEvent.field.centre.label")); //$NON-NLS-1$
         worksheetLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Worksheet");
+            Messages.getString("ProcessingEvent.field.worksheet.label")); //$NON-NLS-1$
         dateCreationLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Creation date");
+            Messages.getString("ProcessingEvent.field.date.label")); //$NON-NLS-1$
+        activityLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("label.activity")); //$NON-NLS-1$
 
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            Messages.getString("label.comments"));
+            Messages.getString("label.comments")); //$NON-NLS-1$
 
         setValues();
     }
@@ -82,24 +86,24 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         setTextValue(centreLabel, pEvent.getCenter().getName());
         setTextValue(worksheetLabel, pEvent.getWorksheet());
         setTextValue(dateCreationLabel, pEvent.getFormattedCreatedAt());
+        setTextValue(activityLabel, pEvent.getActivityStatus().getName());
         setTextValue(commentLabel, pEvent.getComment());
     }
 
     private void createSourceSpecimensSection() {
         Composite client = createSectionWithClient(Messages
-            .getString("CollectionEventViewForm.specimens.title"));
+            .getString("ProcessingEventViewForm.specimens.title")); //$NON-NLS-1$
         sourceSpecimenTable = new SpecimenInfoTable(client,
-            pEvent.getChildSpecimenCollection(true), ColumnsShown.EVENT_FORM,
-            10);
+            pEvent.getSourceSpecimenCollection(true), ColumnsShown.ALL, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
     }
 
     @Override
     public void reload() {
         retrieveProcessingEvent();
-        setPartName(Messages.getString("ProcessingEventViewForm.title",
+        setPartName(Messages.getString("ProcessingEventViewForm.title", //$NON-NLS-1$
             pEvent.getFormattedCreatedAt()));
-        form.setText(Messages.getString("ProcessingEventViewForm.title",
+        form.setText(Messages.getString("ProcessingEventViewForm.title", //$NON-NLS-1$
             pEvent.getFormattedCreatedAt()));
         setValues();
         sourceSpecimenTable.setCollection(pEvent
@@ -111,9 +115,9 @@ public class ProcessingEventViewForm extends BiobankViewForm {
             pEvent.reload();
         } catch (Exception ex) {
             logger.error(
-                "Error while retrieving processing event "
-                    + pEvent.getFormattedCreatedAt() + "/"
-                    + pEvent.getCenter().getNameShort() + "/"
+                "Error while retrieving processing event " //$NON-NLS-1$
+                    + pEvent.getFormattedCreatedAt() + "/" //$NON-NLS-1$
+                    + pEvent.getCenter().getNameShort() + "/" //$NON-NLS-1$
                     + pEvent.getWorksheet(), ex);
         }
     }

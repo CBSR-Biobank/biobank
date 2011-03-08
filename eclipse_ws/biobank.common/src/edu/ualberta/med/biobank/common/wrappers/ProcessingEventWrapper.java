@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
@@ -18,6 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.base.ProcessingEventBaseWrapper;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Specimen;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -81,10 +83,28 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
+        return getChildSpecimenCollection(false).size();
+    }
+
+    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(specimen) from "
+        + Specimen.class.getName()
+        + " as specimen join specimen."
+        + SpecimenPeer.SPECIMEN_LINK_COLLECTION.getName()
+        + " as links where links."
+        + Property.concatNames(SpecimenLinkPeer.PROCESSING_EVENT,
+            ProcessingEventPeer.ID) + "=?";
+
+    public long getSourceSpecimenCount(boolean fast) throws BiobankException,
+        ApplicationException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(SOURCE_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
         return getSourceSpecimenCollection(false).size();
     }
 
-    public void addSpecimens(List<SpecimenWrapper> specimens) {
+    public void addSourceSpecimens(List<SpecimenWrapper> specimens) {
         List<SpecimenLinkWrapper> links = new ArrayList<SpecimenLinkWrapper>();
         for (SpecimenWrapper specimen : specimens) {
             SpecimenLinkWrapper link = new SpecimenLinkWrapper(appService);
@@ -99,19 +119,35 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         propertiesMap.put(SOURCE_SPECIMEN_COLLECTION_PROPERTY_NAME, null);
     }
 
+    public void removeSourceSpecimens(List<SpecimenWrapper> specimens) {
+        List<SpecimenLinkWrapper> linksToRemove = new ArrayList<SpecimenLinkWrapper>();
+        for (SpecimenLinkWrapper link : getSpecimenLinkCollection(false)) {
+            // FIXME check if not children ??
+            if (specimens.contains(link.getParentSpecimen())) {
+                linksToRemove.add(link);
+            }
+        }
+        removeFromSpecimenLinkCollection(linksToRemove);
+        // FIXME might be better to update the list, but for now will do that
+        // way
+        propertiesMap.put(CHILD_SPECIMEN_COLLECTION_PROPERTY_NAME, null);
+        propertiesMap.put(SOURCE_SPECIMEN_COLLECTION_PROPERTY_NAME, null);
+    }
+
     @SuppressWarnings("unchecked")
     public List<SpecimenWrapper> getSourceSpecimenCollection(boolean sort) {
         List<SpecimenWrapper> specimenCollection = (List<SpecimenWrapper>) propertiesMap
             .get(SOURCE_SPECIMEN_COLLECTION_PROPERTY_NAME);
         if (specimenCollection == null) {
-            specimenCollection = new ArrayList<SpecimenWrapper>();
+            Set<SpecimenWrapper> specimenSet = new HashSet<SpecimenWrapper>();
             List<SpecimenLinkWrapper> links = getSpecimenLinkCollection(false);
             for (SpecimenLinkWrapper link : links) {
-                specimenCollection.add(link.getParentSpecimen());
+                specimenSet.add(link.getParentSpecimen());
             }
+            specimenCollection = new ArrayList<SpecimenWrapper>(specimenSet);
             if (sort)
                 Collections.sort(specimenCollection);
-            propertiesMap.put("SOURCE_SPECIMEN_COLLECTIOn_PROPERTY_NAME",
+            propertiesMap.put("SOURCE_SPECIMEN_COLLECTION_PROPERTY_NAME",
                 specimenCollection);
         }
         return specimenCollection;
@@ -155,18 +191,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
 
     @Override
     public String toString() {
-        return "Date Processed:" + getFormattedDateProcessed()
-            + " / Date Drawn: " + getFormattedCreatedAt();
+        return "Date created:" + getFormattedCreatedAt();
     }
 
     public String getFormattedCreatedAt() {
-        return DateFormatter.formatAsDate(getCreatedAt());
-    }
-
-    @Deprecated
-    public String getFormattedDateProcessed() {
-        // use getFormattedCreatedAt()
-        return null;
+        return DateFormatter.formatAsDateTime(getCreatedAt());
     }
 
     @Override
@@ -223,4 +252,10 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return getCenter();
     }
 
+    public static Collection<? extends ModelWrapper<?>> getAllProcessingEvents(
+        BiobankApplicationService appService) throws ApplicationException {
+        return ModelWrapper.wrapModelCollection(appService,
+            appService.search(ProcessingEvent.class, new ProcessingEvent()),
+            ProcessingEventWrapper.class);
+    }
 }
