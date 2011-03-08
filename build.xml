@@ -54,8 +54,11 @@
   <condition property="debugFileExtension" value="-debug" else="">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
-  <condition property="LOG4J_LEVEL" value="info" else="error">
+  <condition property="LOG4J_LEVEL_WARN" value="warn" else="error">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+  </condition>
+  <condition property="LOG4J_LEVEL_DEBUG" value="debug" else="error">
+	<equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="isHostAicmlMed">
     <equals arg1="${host.name}"
@@ -253,7 +256,8 @@
           tofile="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml"
           overwrite="true" />
     <replace file="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml">
-      <replacefilter token="@LOG4J_LEVEL@" value="${LOG4J_LEVEL}" />
+      <replacefilter token="@LOG4J_LEVEL_WARN@" value="${LOG4J_LEVEL_WARN}" />
+      <replacefilter token="@LOG4J_LEVEL_DEBUG@" value="${LOG4J_LEVEL_DEBUG}" />
       <!-- these one are copied from the caCore ant build file. -->
       <replacefilter token="@CLM_DB_DRIVER@" value="${CLM_DB_DRIVER}" />
       <replacefilter token="@CLM_DB_CONNECTION_URL@"

@@ -12,6 +12,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
@@ -172,9 +173,28 @@ public class PatientWrapper extends PatientBaseWrapper {
         return total;
     }
 
-    public int getAliquotedSpecimensCount() {
-        // FIXME do we need that ?
-        return -1;
+    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+        + " as spcs where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=? and spcs."
+        + SpecimenPeer.PARENT_SPECIMEN_LINK.getName()
+        + " is not null";
+
+    public long getAliquotedSpecimensCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(
+                ALIQUOTED_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        long total = 0;
+        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
+            total += cevent.getAliquotedSpecimensCount(false);
+        return total;
     }
 
     @Deprecated
@@ -374,14 +394,25 @@ public class PatientWrapper extends PatientBaseWrapper {
         return new ArrayList<ProcessingEventWrapper>(pes);
     }
 
-    public List<CollectionEventWrapper> getCollectionEventCollection() {
-        return getCollectionEventCollection(false);
-    }
-
     @Deprecated
     public boolean canBeAddedToShipment(CollectionEventWrapper shipment) {
         // TODO Auto-generated method stub
         return false;
+    }
+
+    private static final String CEVENT_COUNT_QRY = "select count(cevent) from "
+        + CollectionEvent.class.getName() + " as cevent where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=?";
+
+    public Long getCollectionEventCount(boolean fast)
+        throws BiobankQueryResultSizeException, ApplicationException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(CEVENT_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        return (long) getCollectionEventCollection(false).size();
     }
 
 }

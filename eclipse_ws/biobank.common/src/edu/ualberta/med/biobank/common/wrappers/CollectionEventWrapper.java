@@ -233,6 +233,35 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return list.size();
     }
 
+    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spc) from "
+        + Specimen.class.getName()
+        + " as spc where spc."
+        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+            CollectionEventPeer.ID)
+        + "=? and spc."
+        + SpecimenPeer.PARENT_SPECIMEN_LINK.getName() + " is not null";
+
+    public long getAliquotedSpecimensCount(boolean fast)
+        throws BiobankException, ApplicationException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(
+                ALIQUOTED_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        List<SpecimenWrapper> aliquotedSpecimens = getAliquotedSpecimenCollection(false);
+        if (aliquotedSpecimens == null)
+            return 0;
+        return aliquotedSpecimens.size();
+    }
+
+    public List<SpecimenWrapper> getAliquotedSpecimenCollection(boolean sort) {
+        List<SpecimenWrapper> aliquotedSpecimens = new ArrayList<SpecimenWrapper>(
+            getAllSpecimenCollection(true));
+        aliquotedSpecimens.removeAll(getSourceSpecimenCollection(false));
+        return aliquotedSpecimens;
+    }
+
     @Deprecated
     public static List<CollectionEventWrapper> getTodayCollectionEvents(
         WritableApplicationService appService) {

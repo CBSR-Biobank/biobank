@@ -20,15 +20,24 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.PatientEntryForm;
 import edu.ualberta.med.biobank.forms.PatientViewForm;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class PatientAdapter extends AdapterBase {
 
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(PatientAdapter.class.getName());
+
     public PatientAdapter(AdapterBase parent, PatientWrapper patientWrapper) {
         super(parent, patientWrapper);
         if (patientWrapper != null) {
-            setHasChildren(patientWrapper.getProcessingEventCollection() != null
-                && patientWrapper.getProcessingEventCollection().size() > 0);
+            boolean hasChildren = false;
+            try {
+                hasChildren = patientWrapper.getCollectionEventCount(true) > 0;
+            } catch (Exception e) {
+                logger.error("error counting events in patient", e);
+            }
+            setHasChildren(hasChildren);
         }
     }
 
@@ -103,7 +112,7 @@ public class PatientAdapter extends AdapterBase {
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         getWrapper().reload();
-        return getWrapper().getCollectionEventCollection();
+        return getWrapper().getCollectionEventCollection(true);
     }
 
     @Override

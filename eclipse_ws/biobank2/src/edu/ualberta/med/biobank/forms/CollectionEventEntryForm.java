@@ -199,7 +199,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         Section section = createSection(Messages
             .getString("CollectionEventEntryForm.specimens.title"));
         specimensTable = new CEventSpecimenEntryInfoTable(section,
-            cevent.getSourceSpecimenCollection(true), ColumnsShown.CEVENT_FORM);
+            cevent.getSourceSpecimenCollection(true), ColumnsShown.EVENT_FORM);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
 

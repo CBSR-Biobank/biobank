@@ -35,6 +35,7 @@ public class PatientAdministrationView extends
             SessionManager.getAppService(), text.trim(),
             SessionManager.getUser());
         if (patient != null) {
+            System.out.println(patient);
             return Arrays.asList(patient);
         }
         return null;
@@ -82,7 +83,7 @@ public class PatientAdministrationView extends
     }
 
     @Override
-    protected AbstractTodayNode createTodayNode() {
+    protected AbstractTodayNode<?> createTodayNode() {
         return new PatientTodayNode(rootNode, 0);
     }
 
