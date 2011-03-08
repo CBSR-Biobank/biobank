@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
@@ -17,6 +19,10 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class OriginInfoWrapper extends OriginInfoBaseWrapper {
+
+    private static final String SHIPMENT_HQL_STRING = "from "
+        + OriginInfo.class.getName() + " as o inner join fetch o."
+        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s where s is not null";
 
     public OriginInfoWrapper(WritableApplicationService appService) {
         super(appService);
@@ -117,12 +123,48 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     public static List<OriginInfoWrapper> getTodayShipments(
         BiobankApplicationService appService) throws ApplicationException {
-        StringBuilder qry = new StringBuilder(
-            "from "
-                + OriginInfo.class.getName()
-                + " as origin inner join fetch origin.shipmentInfo where origin.shipmentInfo is not null");
+        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING);
         HQLCriteria criteria = new HQLCriteria(qry.toString(),
             new ArrayList<Object>());
+
+        List<OriginInfo> origins = appService.query(criteria);
+        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, OriginInfoWrapper.class);
+
+        return shipments;
+    }
+
+    /**
+     * Search for shipments in the site with the given waybill
+     */
+    public static List<OriginInfoWrapper> getShipmentsByWaybill(
+        WritableApplicationService appService, String waybill)
+        throws ApplicationException {
+        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING + " and s."
+            + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { waybill }));
+
+        List<OriginInfo> origins = appService.query(criteria);
+        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, OriginInfoWrapper.class);
+
+        return shipments;
+    }
+
+    /**
+     * Search for shipments in the site with the given date received. Don't use
+     * hour and minute.
+     */
+    public static List<OriginInfoWrapper> getShipmentsByDateReceived(
+        WritableApplicationService appService, Date dateReceived)
+        throws ApplicationException {
+
+        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
+            + " and DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + ") = DATE(?)");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { dateReceived }));
 
         List<OriginInfo> origins = appService.query(criteria);
         List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
