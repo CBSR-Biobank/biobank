@@ -479,8 +479,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             List<ContainerWrapper> cabinetContainers = new ArrayList<ContainerWrapper>();
             for (ContainerWrapper container : foundContainers) {
                 ContainerWrapper cont = container;
-                while (cont.getParent() != null) {
-                    cont = cont.getParent();
+                while (cont.getParentContainer() != null) {
+                    cont = cont.getParentContainer();
                 }
                 if (cabinetContainerTypes.contains(cont.getContainerType())) {
                     cabinetContainers.add(container);
@@ -488,8 +488,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             }
             if (cabinetContainers.size() == 1) {
                 bin = cabinetContainers.get(0);
-                drawer = bin.getParent();
-                cabinet = drawer.getParent();
+                drawer = bin.getParentContainer();
+                cabinet = drawer.getParentContainer();
             } else if (cabinetContainers.size() == 0) {
                 String errorMsg = Messages
                     .getString(
@@ -573,10 +573,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     }
 
     private void createTypeCombo(Composite fieldsComposite) {
-        List<SpecimenWrapper> sourceSpecimens = null;
-        List<SpecimenTypeWrapper> resultTypes = null;
         typeWidget = new AliquotedSpecimenSelectionWidget(fieldsComposite,
-            null, sourceSpecimens, resultTypes, widgetCreator, false);
+            null, widgetCreator, false);
         typeWidget.addBindings();
 
         // for move mode
@@ -602,7 +600,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     }
 
     private void initCabinetContainerTypesList() throws ApplicationException {
-        if (SessionManager.getUser().getCurrentWorkingCentre() == null)
+        if (SessionManager.getUser().getCurrentWorkingCenter() == null)
             cabinetContainerTypes = new ArrayList<ContainerTypeWrapper>();
         else {
             cabinetContainerTypes = ContainerTypeWrapper
@@ -867,11 +865,10 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     protected void doBeforeSave() throws Exception {
         // can't acces the combos in another thread, so do it now
         if (aliquotMode == AliquotMode.NEW_ALIQUOT) {
-            // FIXME
-            // specimen.setParentSpecimenLink((SpecimenLinkWrapper) typeWidget
-            // .getSelection()[0]);
-            // specimen.setSpecimenType((SpecimenTypeWrapper) typeWidget
-            // .getSelection()[1]);
+            specimen.setParentSpecimen((SpecimenWrapper) typeWidget
+                .getSelection()[0]);
+            specimen.setSpecimenType((SpecimenTypeWrapper) typeWidget
+                .getSelection()[1]);
         }
     }
 
@@ -883,12 +880,12 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             specimen.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
             specimen.setCurrentCenter(SessionManager.getUser()
-                .getCurrentWorkingCentre());
+                .getCurrentWorkingCenter());
         }
         OriginInfoWrapper originInfo = new OriginInfoWrapper(
             SessionManager.getAppService());
         originInfo
-            .setCenter(SessionManager.getUser().getCurrentWorkingCentre());
+            .setCenter(SessionManager.getUser().getCurrentWorkingCenter());
         originInfo.persist();
 
         specimen.setOriginInfo(originInfo);
@@ -899,11 +896,11 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         }
         String msgString = "";
         if (aliquotMode == AliquotMode.NEW_ALIQUOT) {
-            // LINKED/ASSIGNED\: position {0} to specimen {1} in centre {2} -
+            // LINKED/ASSIGNED\: position {0} to specimen {1} in center {2} -
             // Type\: {3} - Patient\: {4} - Visit\: {5}
             msgString = "Cabinet.activitylog.aliquot.saveNew"; //$NON-NLS-1$
         } else {
-            // ASSIGNED\: position {0} to specimen {1} in centre {2} - Type\:
+            // ASSIGNED\: position {0} to specimen {1} in center {2} - Type\:
             // {3} - Patient\: {4} - Visit\: {5}
             msgString = "Cabinet.activitylog.aliquot.saveMove"; //$NON-NLS-1$
         }

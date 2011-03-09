@@ -123,8 +123,8 @@ public class SessionManager {
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
         sessionSourceProvider.setWebAdmin(sessionAdapter != null
             && sessionAdapter.getUser().isWebsiteAdministrator());
-        sessionSourceProvider.setHasWorkingCentre(sessionAdapter != null
-            && sessionAdapter.getUser().getCurrentWorkingCentre() != null);
+        sessionSourceProvider.setHasWorkingCenter(sessionAdapter != null
+            && sessionAdapter.getUser().getCurrentWorkingCenter() != null);
 
         // assign debug state
         DebugState debugStateSourceProvider = (DebugState) service

@@ -120,22 +120,22 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     /**
-     * Collection event count for this centre. This count is different for each
-     * centre: the method should be defined in each centre type
+     * Collection event count for this center. This count is different for each
+     * center: the method should be defined in each center type
      */
     public abstract long getCollectionEventCount() throws ApplicationException,
         BiobankException;
 
     /**
-     * Collection event count for this centre. This count is different for each
-     * centre: the method should be defined in each centre type
+     * Collection event count for this center. This count is different for each
+     * center: the method should be defined in each center type
      */
     public abstract long getCollectionEventCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;
 
     /**
-     * Collection event count for this centre. This count is different for each
-     * centre: the method should be defined in each centre type
+     * Collection event count for this center. This count is different for each
+     * center: the method should be defined in each center type
      */
     public abstract long getPatientCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;

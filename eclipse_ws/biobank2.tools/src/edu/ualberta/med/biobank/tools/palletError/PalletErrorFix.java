@@ -81,10 +81,10 @@ public class PalletErrorFix {
 
         for (ContainerWrapper container : ContainerWrapper.getContainersInSite(
             appService, cbsrSite, "SSAD11")) {
-            if ((container.getParent() == null)
+            if ((container.getParentContainer() == null)
                 && (container.getSpecimens().size() > 0)) {
                 sourceContainer = container;
-            } else if (container.getParent() != null) {
+            } else if (container.getParentContainer() != null) {
                 destContainer = container;
             }
         }

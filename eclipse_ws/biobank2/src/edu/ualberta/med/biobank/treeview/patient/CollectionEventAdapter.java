@@ -42,7 +42,7 @@ public class CollectionEventAdapter extends AdapterBase {
         try {
             count = cevent.getSourceSpecimensCount(true);
         } catch (Exception e) {
-            logger.error("Problem counting specimens");
+            logger.error("Problem counting specimens", e);
         }
         return name + " [" + count + "]";
     }

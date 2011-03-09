@@ -69,9 +69,7 @@ public class AliquotedSpecimenSelectionWidget {
     private Label resultLabel;
 
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
-        List<SpecimenWrapper> sourceSpecimens,
-        List<SpecimenTypeWrapper> resultTypes, WidgetCreator widgetCreator,
-        boolean oneRow) {
+        WidgetCreator widgetCreator, boolean oneRow) {
         this.widgetCreator = widgetCreator;
         this.oneRow = oneRow;
         if (letter != null) {
@@ -88,8 +86,7 @@ public class AliquotedSpecimenSelectionWidget {
         }
         cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
-        setComboProperties(cvSource, widgetCreator.getToolkit(),
-            sourceSpecimens, 0);
+        setComboProperties(cvSource, widgetCreator.getToolkit(), 0);
         cvSource.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -115,7 +112,7 @@ public class AliquotedSpecimenSelectionWidget {
         }
         cvResult = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
-        setComboProperties(cvResult, widgetCreator.getToolkit(), resultTypes, 1);
+        setComboProperties(cvResult, widgetCreator.getToolkit(), 1);
         cvResult.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -142,7 +139,7 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     private void setComboProperties(ComboViewer cv, FormToolkit toolkit,
-        List<?> input, final int selectionPosition) {
+        final int selectionPosition) {
         cv.getControl().setLayoutData(
             new GridData(SWT.FILL, SWT.TOP, true, false));
         toolkit.adapt(cv.getControl(), true, true);
@@ -163,7 +160,6 @@ public class AliquotedSpecimenSelectionWidget {
             }
         });
         cv.setComparator(new ViewerComparator());
-        cv.setInput(input);
         if (selectionPosition != 0)
             cv.getControl().addTraverseListener(new TraverseListener() {
                 @Override
@@ -174,7 +170,6 @@ public class AliquotedSpecimenSelectionWidget {
                     }
                 }
             });
-
     }
 
     private boolean setNextFocus() {

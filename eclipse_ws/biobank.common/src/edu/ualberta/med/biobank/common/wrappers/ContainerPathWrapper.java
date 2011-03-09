@@ -29,11 +29,11 @@ public class ContainerPathWrapper extends ContainerPathBaseWrapper {
             return;
 
         String path;
-        ContainerWrapper parent = container.getParent();
+        ContainerWrapper parent = container.getParentContainer();
         if (parent == null) {
             path = "" + container.getId();
         } else {
-            String parentPath = container.getParent().getPath();
+            String parentPath = container.getParentContainer().getPath();
             if (parentPath == null) {
                 throw new Exception("parent container does not have a path");
             }

@@ -24,7 +24,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
     private ProcessingEventAdapter pEventAdapter;
     private ProcessingEventWrapper pEvent;
 
-    private BiobankText centreLabel;
+    private BiobankText centerLabel;
 
     private BiobankText worksheetLabel;
 
@@ -67,8 +67,8 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        centreLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ProcessingEvent.field.centre.label")); //$NON-NLS-1$
+        centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("ProcessingEvent.field.center.label")); //$NON-NLS-1$
         worksheetLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.getString("ProcessingEvent.field.worksheet.label")); //$NON-NLS-1$
         dateCreationLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -83,7 +83,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        setTextValue(centreLabel, pEvent.getCenter().getName());
+        setTextValue(centerLabel, pEvent.getCenter().getName());
         setTextValue(worksheetLabel, pEvent.getWorksheet());
         setTextValue(dateCreationLabel, pEvent.getFormattedCreatedAt());
         setTextValue(activityLabel, pEvent.getActivityStatus().getName());
