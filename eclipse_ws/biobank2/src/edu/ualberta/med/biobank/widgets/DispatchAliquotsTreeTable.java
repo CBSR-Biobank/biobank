@@ -208,21 +208,24 @@ public class DispatchAliquotsTreeTable extends BiobankWidget {
     }
 
     private void modifyCommentAndState(
-        IStructuredSelection iStructuredSelection, DispatchSpecimenState newState) {
+        IStructuredSelection iStructuredSelection,
+        DispatchSpecimenState newState) {
         ModifyStateDispatchDialog dialog = new ModifyStateDispatchDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             newState);
         int res = dialog.open();
         if (res == Dialog.OK) {
             String comment = dialog.getComment();
-            for (@SuppressWarnings("rawtypes")
-            Iterator iter = iStructuredSelection.iterator(); iter.hasNext();) {
+            for (Iterator<?> iter = iStructuredSelection.iterator(); iter
+                .hasNext();) {
                 DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) iter
                     .next();
                 dsa.setComment(comment);
-                if (newState != null)
-                    dsa.setState(newState.ordinal());
+                if (newState != null) {
+                    dsa.setDispatchSpecimenState(newState);
+                }
             }
+            shipment.resetMap();
             tv.refresh();
             notifyListeners();
         }

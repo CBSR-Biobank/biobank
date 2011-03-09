@@ -194,7 +194,7 @@ public class ShipmentEntryForm extends BiobankEntryForm {
     }
 
     private void createPatientsSection() {
-        Composite client = createSectionWithClient("Patients");
+        Composite client = createSectionWithClient("Specimens");
         GridLayout layout = new GridLayout(1, false);
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));

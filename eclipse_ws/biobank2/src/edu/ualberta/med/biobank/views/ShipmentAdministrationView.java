@@ -120,30 +120,31 @@ public class ShipmentAdministrationView extends
     @Override
     protected List<? extends ModelWrapper<?>> search(String text)
         throws Exception {
-        // if (radioWaybill.getSelection()) {
-        // // with waybill, should find only one corresponding shipment, or
-        // // mutliple shipments from different clinics
-        // List<CollectionEventWrapper> shipments = CollectionEventWrapper
-        // .getShipmentsInSites(SessionManager.getAppService(),
-        // text.trim());
-        // if (shipments.size() > 1) {
-        // SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
-        // PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-        // .getShell(), shipments);
-        // if (dlg.open() == Dialog.OK) {
-        // return Arrays.asList(dlg.getSelectedShipment());
-        // }
-        // } else {
-        // return shipments;
-        // }
-        // } else {
-        // // can find more than one shipments
-        // Date date = dateReceivedWidget.getDate();
-        // if (date != null) {
-        // return OriginInfoWrapper.getShipmentsInSites(
-        // SessionManager.getAppService(), date);
-        // }
-        // }
+        if (radioWaybill.getSelection()) {
+            // with waybill, should find only one corresponding shipment, or
+            // mutliple shipments from different clinics
+            List<OriginInfoWrapper> shipments = OriginInfoWrapper
+                .getShipmentsByWaybill(SessionManager.getAppService(),
+                    text.trim());
+            // TODO: allow selection of specific clinic?
+            // if (shipments.size() > 1) {
+            // SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
+            // PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            // .getShell(), shipments);
+            // if (dlg.open() == Dialog.OK) {
+            // return Arrays.asList(dlg.getSelectedShipment());
+            // }
+            // } else {
+            return shipments;
+            // }
+        } else {
+            // can find more than one shipments
+            Date date = dateReceivedWidget.getDate();
+            if (date != null) {
+                return OriginInfoWrapper.getShipmentsByDateReceived(
+                    SessionManager.getAppService(), date);
+            }
+        }
         return null;
     }
 
@@ -225,7 +226,7 @@ public class ShipmentAdministrationView extends
     }
 
     @Override
-    protected AbstractTodayNode createTodayNode() {
+    protected AbstractTodayNode<?> createTodayNode() {
         return new ShipmentTodayNode(rootNode, 0);
     }
 
