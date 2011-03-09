@@ -113,30 +113,38 @@ INSERT INTO specimen_type (name,name_short)
 ALTER TABLE specimen_type MODIFY COLUMN ID INT(11) NOT NULL;
 
 CREATE TABLE specimen (
-    ID INT(11) NOT NULL AUTO_INCREMENT,
-    INVENTORY_ID VARCHAR(100) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL,
-    COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    QUANTITY DOUBLE NULL DEFAULT NULL,
-    CREATED_AT DATETIME NULL DEFAULT NULL,
-    CURRENT_CENTER_ID INT(11) NULL DEFAULT NULL,
-    SPECIMEN_TYPE_ID INT(11) NOT NULL,
-    ORIGIN_INFO_ID INT(11) NULL DEFAULT NULL,
-    SPECIMEN_LINK_ID INT(11) NULL DEFAULT NULL COMMENT '',
-    COLLECTION_EVENT_ID INT(11) NOT NULL,
-    SOURCE_COLLECTION_EVENT_ID INT(11) NULL DEFAULT NULL,
-    ACTIVITY_STATUS_ID INT(11) NOT NULL,
-    PV_ID INT(11),
-    SV_ID INT(11),
-    INDEX FKAF84F30838445996 (SPECIMEN_TYPE_ID),
-    INDEX FKAF84F308C449A4 (ACTIVITY_STATUS_ID),
-    INDEX FKAF84F30812E55F12 (ORIGIN_INFO_ID),
-    CONSTRAINT INVENTORY_ID UNIQUE KEY(INVENTORY_ID),
-    INDEX FKAF84F308FBB79BBF (CURRENT_CENTER_ID),
-    INDEX FKAF84F30875A7A196 (SPECIMEN_LINK_ID),
-    INDEX FKAF84F308280272F2 (COLLECTION_EVENT_ID),
-    INDEX FKAF84F308777F4CCE (SOURCE_COLLECTION_EVENT_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
+  ID int(11) NOT NULL auto_increment,
+  INVENTORY_ID varchar(100) COLLATE latin1_general_cs NOT NULL,
+  COMMENT text COLLATE latin1_general_cs,
+  QUANTITY double DEFAULT NULL,
+  CREATED_AT datetime DEFAULT NULL,
+  ACTIVITY_STATUS_ID int(11) NOT NULL,
+  SOURCE_COLLECTION_EVENT_ID int(11) DEFAULT NULL,
+  PROCESSING_EVENT_ID int(11) DEFAULT NULL,
+  ORIGIN_INFO_ID int(11) NOT NULL,
+  SPECIMEN_TYPE_ID int(11) NOT NULL,
+  COLLECTION_EVENT_ID int(11) NOT NULL,
+  PARENT_SPECIMEN_ID int(11) DEFAULT NULL,
+  CURRENT_CENTER_ID int(11) DEFAULT NULL,
+  PV_ID INT(11),
+  SV_ID INT(11),
+  PRIMARY KEY (ID),
+  UNIQUE KEY INVENTORY_ID (INVENTORY_ID),
+  KEY FKAF84F308FBB79BBF (CURRENT_CENTER_ID),
+  KEY FKAF84F308280272F2 (COLLECTION_EVENT_ID),
+  KEY FKAF84F308C449A4 (ACTIVITY_STATUS_ID),
+  KEY FKAF84F30812E55F12 (ORIGIN_INFO_ID),
+  KEY FKAF84F30861674F50 (PARENT_SPECIMEN_ID),
+  KEY FKAF84F30833126C8 (PROCESSING_EVENT_ID),
+  KEY FKAF84F308777F4CCE (SOURCE_COLLECTION_EVENT_ID),
+  KEY FKAF84F30838445996 (SPECIMEN_TYPE_ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+
+
+create index pv_id_idx on specimen(pv_id);
+create index sv_id_idx on specimen(sv_id);
+
+-- add an aliquoted specimen for each patient visit
 
 INSERT INTO specimen (inventory_id,comment,quantity,created_at,specimen_type_id,
 activity_status_id,source_collection_event_id,pv_id)
@@ -146,12 +154,16 @@ activity_status_id,source_collection_event_id,pv_id)
         JOIN sample_type ON sample_type.id=aliquot.sample_type_id
         JOIN specimen_type ON specimen_type.name=sample_type.name;
 
+-- add a source specimen for each patient visit
+
 INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id,
 source_collection_event_id,specimen_type_id,pv_id,sv_id)
        SELECT concat("sw upgrade ",pvsv.id),volume,time_drawn,
        (select id from activity_status where name='Active'),0,0,0,patient_visit_id,source_vessel_id
        FROM pv_source_vessel as pvsv
        JOIN source_vessel as sv on sv.id=pvsv.source_vessel_id;
+
+-- set the source center
 
 UPDATE specimen,patient_visit as pv, clinic_shipment_patient as csp,abstract_shipment as aship,
 clinic,center,site
@@ -364,7 +376,6 @@ INSERT INTO collection_event (visit_number,comment,patient_id,activity_status_id
        join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID;
 
 create index pv_id_idx on collection_event(pv_id);
-create index pv_id_idx on specimen(pv_id);
 
 -- set specimen.source_collection_event_id, and specimen.collection_event_id for aliquoted
 -- specimens
@@ -398,6 +409,9 @@ CREATE TABLE processing_event (
   KEY FK327B1E4E92FAA705 (CENTER_ID)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
+-- this insert allows the same worksheet number to be used in more than one
+-- processing event
+
 insert into processing_event (created_at,worksheet,comment,center_id,pv_id)
        select pv.date_processed,event_attr.value as worksheet,pv.comment,center.id,pv.id
        from patient_visit as pv
@@ -414,33 +428,17 @@ ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
 
 create index pv_id_idx on processing_event(pv_id);
 
-/*
-CREATE TABLE specimen_link (
-    ID INT(11) NOT NULL auto_increment,
-    PROCESSING_EVENT_ID INT(11) NOT NULL,
-    PARENT_SPECIMEN_ID INT(11) NOT NULL,
-    PV_ID INT(11),
-    INDEX FK1FA012D161674F50 (PARENT_SPECIMEN_ID),
-    INDEX FK1FA012D133126C8 (PROCESSING_EVENT_ID),
-    PRIMARY KEY (ID)
-) ENGINE=MyISAM COLLATE=latin1_general_cs;
+-- set the processing event for all source specimens
 
-insert into specimen_link (processing_event_id,parent_specimen_id,pv_id)
-       select pe.id,spc.id,pe.pv_id
-       from processing_event as pe
-       join specimen as spc on spc.pv_id=pe.pv_id
-       where spc.sv_id is not null;
+update specimen as spc set processing_event_id=(
+       select id from processing_event as pe
+       where pe.pv_id=spc.pv_id and spc.sv_id is not null limit 1);
 
-update specimen as spc,specimen_link as sl
-       set spc.specimen_link_id=sl.id
-       where spc.pv_id=sl.pv_id and spc.sv_id is null;
+-- set the aliquoted specimens to point to their parent specimen
 
-ALTER TABLE specimen_link MODIFY COLUMN ID INT(11) NOT NULL;
-
-ALTER TABLE processing_event DROP COLUMN PV_ID;
-
-ALTER TABLE specimen_link DROP COLUMN PV_ID;
-*/
+update specimen as spc_a, specimen as spc_b
+       set spc_a.parent_specimen_id=spc_b.id
+	where spc_a.pv_id=spc_b.pv_id and spc_b.sv_id is not null and spc_a.sv_id is null;
 
 /*****************************************************
  * container types and containers
@@ -961,9 +959,6 @@ INSERT INTO entity VALUES (1,'edu.ualberta.med.biobank.model.Aliquot','Aliquot')
 /*!40000 ALTER TABLE entity ENABLE KEYS */;
 UNLOCK TABLES;
 
--- update constraints (unique and not-null):
--- also update ContainerType -> ContainerLabelingScheme relation replace 0..1 by 1 (so cannot be null)
-
 /*****************************************************
  * cleantup and drop tables that are no longer required
  ****************************************************/
@@ -977,26 +972,29 @@ ALTER TABLE origin_info DROP COLUMN ASHIP_ID;
 
 ALTER TABLE collection_event DROP COLUMN PV_ID;
 
+ALTER TABLE processing_event DROP COLUMN PV_ID;
+
 ALTER TABLE dispatch DROP COLUMN ASHIP_ID;
 
 ALTER TABLE specimen DROP COLUMN PV_ID, DROP COLUMN SV_ID;
 
-#DROP TABLE abstract_shipment;
-#DROP TABLE aliquot;
-#DROP TABLE clinic;
-#DROP TABLE clinic_shipment_patient;
-#DROP TABLE container_type_sample_type;
-#DROP TABLE dispatch_info;
-#DROP TABLE dispatch_info_site;
-#DROP TABLE dispatch_shipment_aliquot;
-#DROP TABLE patient_visit;
-#DROP TABLE pv_source_vessel;
-#DROP TABLE research_group;
-#DROP TABLE research_group_researcher;
-#DROP TABLE researcher;
-#DROP TABLE sample_storage
-#DROP TABLE sample_type;
-#DROP TABLE site;
-#DROP TABLE source_vessel;
-#DROP TABLE study_source_vessel;
+DROP TABLE abstract_shipment;
+DROP TABLE aliquot;
+DROP TABLE clinic;
+DROP TABLE clinic_shipment_patient;
+DROP TABLE container_type_sample_type;
+DROP TABLE dispatch_info;
+DROP TABLE dispatch_info_site;
+DROP TABLE dispatch_shipment_aliquot;
+DROP TABLE patient_visit;
+DROP TABLE pv_source_vessel;
+DROP TABLE research_group;
+DROP TABLE research_group_researcher;
+DROP TABLE researcher;
+DROP TABLE sample_storage;
+DROP TABLE sample_type;
+DROP TABLE site;
+DROP TABLE source_vessel;
+DROP TABLE study_source_vessel;
+
 
