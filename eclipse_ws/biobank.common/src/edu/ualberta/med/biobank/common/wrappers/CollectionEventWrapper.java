@@ -233,10 +233,52 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return list.size();
     }
 
+    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spc) from "
+        + Specimen.class.getName()
+        + " as spc where spc."
+        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+            CollectionEventPeer.ID)
+        + "=? and spc."
+        + SpecimenPeer.SOURCE_COLLECTION_EVENT.getName() + " is null";
+
+    public long getAliquotedSpecimensCount(boolean fast)
+        throws BiobankException, ApplicationException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(
+                ALIQUOTED_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        List<SpecimenWrapper> aliquotedSpecimens = getAliquotedSpecimenCollection(false);
+        if (aliquotedSpecimens == null)
+            return 0;
+        return aliquotedSpecimens.size();
+    }
+
+    public List<SpecimenWrapper> getAliquotedSpecimenCollection(boolean sort) {
+        List<SpecimenWrapper> aliquotedSpecimens = new ArrayList<SpecimenWrapper>(
+            getAllSpecimenCollection(true));
+        aliquotedSpecimens.removeAll(getSourceSpecimenCollection(false));
+        return aliquotedSpecimens;
+    }
+
     @Deprecated
     public static List<CollectionEventWrapper> getTodayCollectionEvents(
         WritableApplicationService appService) {
         return null;
+    }
+
+    /**
+     * source specimen that are in a process event
+     */
+    public List<SpecimenWrapper> getSourceSpecimenCollectionInProcess(
+        boolean sort) {
+        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
+        for (SpecimenWrapper specimen : getSourceSpecimenCollection(sort)) {
+            if (specimen.getProcessingEvent() != null)
+                specimens.add(specimen);
+        }
+        return specimens;
     }
 
     private Map<String, StudyEventAttrWrapper> getStudyEventAttrMap() {
@@ -461,11 +503,4 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return null;
     }
 
-    public List<SpecimenLinkWrapper> getSourceSpecimenLinkCollection() {
-        List<SpecimenLinkWrapper> links = new ArrayList<SpecimenLinkWrapper>();
-        for (SpecimenWrapper spec : getSourceSpecimenCollection(true)) {
-            links.addAll(spec.getSpecimenLinkCollection(false));
-        }
-        return links;
-    }
 }

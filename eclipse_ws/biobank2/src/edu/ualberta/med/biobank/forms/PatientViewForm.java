@@ -58,7 +58,7 @@ public class PatientViewForm extends BiobankViewForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
         createPatientSection();
-        createPatientVisitSection();
+        createCollectionEventSection();
         setValues();
     }
 
@@ -82,7 +82,7 @@ public class PatientViewForm extends BiobankViewForm {
             Messages.getString("PatientViewForm.label.totalAliquotedSpecimens"));
     }
 
-    private void createPatientVisitSection() {
+    private void createCollectionEventSection() {
         Section section = createSection(Messages
             .getString("PatientViewForm.visits.title"));
 
@@ -95,13 +95,12 @@ public class PatientViewForm extends BiobankViewForm {
 
     private void setValues() throws ApplicationException, BiobankException {
         setTextValue(studyLabel, patient.getStudy().getName());
-        setTextValue(visitCountLabel,
-            (patient.getProcessingEventCollection() == null) ? 0 : patient
-                .getProcessingEventCollection().size());
+        setTextValue(visitCountLabel, patient.getCollectionEventCount(true)
+            .toString());
         setTextValue(sourceSpecimenCountLabel,
             patient.getSourceSpecimensCount(true));
         setTextValue(aliquotedSpecimenCountLabel,
-            patient.getAliquotedSpecimensCount());
+            patient.getAliquotedSpecimensCount(true));
     }
 
     @Override

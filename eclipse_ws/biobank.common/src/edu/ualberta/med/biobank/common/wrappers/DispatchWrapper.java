@@ -3,7 +3,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
@@ -48,6 +47,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         if (state == null)
             return "";
         return state.getLabel();
+    }
+
+    public DispatchState getDispatchState() {
+        return DispatchState.getState(getState());
     }
 
     public String getFormattedDeparted() {
@@ -134,7 +137,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 map.put(state, new ArrayList<DispatchSpecimenWrapper>());
             }
             for (DispatchSpecimenWrapper wrapper : list) {
-                map.get(wrapper.getState()).add(wrapper);
+                map.get(wrapper.getDispatchSpecimenState()).add(wrapper);
             }
         }
 
@@ -147,6 +150,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             }
             return tmp;
         }
+    }
+
+    public void resetMap() {
+        dispatchSpecimenMap.clear();
     }
 
     public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {
@@ -185,7 +192,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                     appService);
                 dsa.setSpecimen(aliquot);
                 dsa.setDispatch(this);
+                dsa.setDispatchSpecimenState(DispatchSpecimenState.NONE);
                 newDispatchSpecimens.add(dsa);
+                dispatchSpecimenMap.get(DispatchSpecimenState.NONE).add(dsa);
             }
         }
 
@@ -304,18 +313,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return new CheckStatus(true, "");
     }
 
-    private List<DispatchSpecimenWrapper> getDispatchSpecimens(
-        Collection<DispatchSpecimenWrapper> allDispatchItems,
-        Collection<SpecimenWrapper> items) {
-        List<DispatchSpecimenWrapper> dispatchItems = new ArrayList<DispatchSpecimenWrapper>();
-        for (DispatchSpecimenWrapper dispatchItem : allDispatchItems) {
-            if (items.contains(dispatchItem.getSpecimen())) {
-                dispatchItems.add(dispatchItem);
-            }
-        }
-        return dispatchItems;
-    }
-
     @Override
     public void removeFromDispatchSpecimenCollection(
         List<DispatchSpecimenWrapper> dasToRemove) {
@@ -347,32 +344,35 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         List<DispatchSpecimenWrapper> nonProcessedAliquots = getDispatchSpecimenCollectionWithState(DispatchSpecimenState.NONE);
         for (DispatchSpecimenWrapper da : nonProcessedAliquots) {
             if (specimensToReceive.contains(da.getSpecimen())) {
-                da.setState(DispatchSpecimenState.RECEIVED.getId());
+                da.setDispatchSpecimenState(DispatchSpecimenState.RECEIVED);
+                da.getDispatchSpecimenState();
             }
         }
-
+        DispatchSpecimenWrapper da = this.getDispatchSpecimenCollection()
+            .get(0);
         dispatchSpecimenMap.clear();
     }
 
     public boolean isInCreationState() {
-        return getState() == null || DispatchState.CREATION.equals(getState());
+        return getDispatchState() == null
+            || DispatchState.CREATION.equals(getDispatchState());
     }
 
     public boolean isInTransitState() {
-        return DispatchState.CREATION.equals(getState());
+        return DispatchState.IN_TRANSIT.equals(getDispatchState());
     }
 
     public boolean isInReceivedState() {
-        return DispatchState.RECEIVED.equals(getState());
+        return DispatchState.RECEIVED.equals(getDispatchState());
     }
 
     public boolean hasBeenReceived() {
         return EnumSet.of(DispatchState.RECEIVED, DispatchState.CLOSED)
-            .contains(getState());
+            .contains(getDispatchState());
     }
 
     public boolean isInClosedState() {
-        return DispatchState.CLOSED.equals(getState());
+        return DispatchState.CLOSED.equals(getDispatchState());
     }
 
     private static final String DISPATCHES_IN_SITE_QRY = "from "
@@ -488,8 +488,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return sb.toString();
     }
 
-    public boolean canBeSentBy(User user, CenterWrapper<?> site) {
-        return canUpdate(user) && getSenderCenter().equals(site)
+    public boolean canBeSentBy(User user) {
+        return canUpdate(user)
+            && getSenderCenter().equals(user.getCurrentWorkingCentre())
             && isInCreationState() && hasDispatchSpecimens();
     }
 
@@ -498,8 +499,9 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             && !getSpecimenCollection().isEmpty();
     }
 
-    public boolean canBeReceivedBy(User user, CenterWrapper<?> site) {
-        return canUpdate(user) && getReceiverCenter().equals(site)
+    public boolean canBeReceivedBy(User user) {
+        return canUpdate(user)
+            && getReceiverCenter().equals(user.getCurrentWorkingCentre())
             && isInTransitState();
     }
 
@@ -516,7 +518,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     public boolean isInLostState() {
-        return DispatchState.LOST.equals(getState());
+        return DispatchState.LOST.equals(getDispatchState());
     }
 
     public List<DispatchSpecimenWrapper> getNonProcessedDispatchSpecimenCollection() {
@@ -546,55 +548,29 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         addToDispatchSpecimenCollection(daws);
     }
 
-    @Deprecated
-    public StudyWrapper getStudy() {
-        // TODO this can be removed once the gui doesn't use it anymore
-        return null;
-    }
-
-    @Deprecated
-    public void addNewAliquots(List<SpecimenWrapper> asList, boolean b) {
-        // TODO this can be removed once the gui doesn't use it anymore
-
-    }
-
-    @Deprecated
-    public void setStudy(StudyWrapper study) {
-        // TODO this can be removed once the gui doesn't use it anymore
-    }
-
-    @Deprecated
-    public void addExtraAliquots(List<SpecimenWrapper> extraAliquots, boolean b)
-        throws BiobankCheckException {
-        // TODO Auto-generated method stub
-
-    }
-
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
         return getDispatchSpecimenCollection(false);
-    }
-
-    @Deprecated
-    public boolean canBeSentBy(User user) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Deprecated
-    public boolean canBeReceivedBy(User user) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Deprecated
-    public boolean canBeClosedBy(User user) {
-        // TODO Auto-generated method stub
-        return false;
     }
 
     @Deprecated
     public void addAliquots(List<SpecimenWrapper> asList) {
         // TODO seems that this method has been removed... ?
 
+    }
+
+    public boolean canBeClosedBy(User user) {
+        return isInReceivedState() && canUpdate(user);
+    }
+
+    @Override
+    public void reload() throws Exception {
+        super.reload();
+        dispatchSpecimenMap.clear();
+    }
+
+    @Override
+    public void reset() throws Exception {
+        super.reset();
+        dispatchSpecimenMap.clear();
     }
 }

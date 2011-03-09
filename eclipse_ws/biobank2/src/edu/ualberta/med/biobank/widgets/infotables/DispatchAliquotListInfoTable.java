@@ -35,7 +35,7 @@ public abstract class DispatchAliquotListInfoTable extends
     }
 
     private static final String[] HEADINGS = new String[] { "Inventory ID",
-        "Type", "Patient Number", "Activity Status", "Dispatch comment" };
+        "Type", "Patient Number", "Activity Status", "Comment" };
 
     private boolean editMode = false;
 

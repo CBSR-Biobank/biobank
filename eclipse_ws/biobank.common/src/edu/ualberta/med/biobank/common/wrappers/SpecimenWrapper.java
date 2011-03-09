@@ -154,17 +154,13 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public String getCenterString() {
-        CenterWrapper<?> center = getLocation();
+        CenterWrapper<?> center = getCurrentCenter();
         if (center != null) {
             return center.getNameShort();
         }
         // FIXME should never see that ? should never retrieve an Specimen which
         // site cannot be displayed ?
         return "CANNOT DISPLAY INFORMATION";
-    }
-
-    private CenterWrapper<?> getLocation() {
-        return getCurrentCenter();
     }
 
     /**
@@ -316,9 +312,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public static SpecimenWrapper getSpecimen(
         WritableApplicationService appService, String inventoryId, User user)
         throws ApplicationException, BiobankCheckException {
-        SpecimenWrapper Specimen = getSpecimen(appService, inventoryId);
-        if (Specimen != null && user != null) {
-            CenterWrapper<?> center = Specimen.getLocation();
+        SpecimenWrapper specimen = getSpecimen(appService, inventoryId);
+        if (specimen != null && user != null) {
+            CenterWrapper<?> center = specimen.getCurrentCenter();
             // site might be null if can't access it !
             if (center == null) {
                 throw new ApplicationException(
@@ -328,7 +324,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                         + " Its current site location should be a site you can access.");
             }
         }
-        return Specimen;
+        return specimen;
     }
 
     private static final String SPECIMENS_NON_ACTIVE_QRY = "from "
@@ -473,28 +469,4 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
     }
 
-    public List<ProcessingEventWrapper> getProcessingEventCollectionAsParent() {
-        List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
-        for (SpecimenLinkWrapper link : getSpecimenLinkCollection(false)) {
-            peList.add(link.getProcessingEvent());
-        }
-        return peList;
-    }
-
-    public ProcessingEventWrapper getProcessingEventAsChild() {
-        return getParentSpecimenLink() == null ? null : getParentSpecimenLink()
-            .getProcessingEvent();
-    }
-
-    // only for parent specimen
-    public List<ProcessingEventWrapper> getProcessingEventCollectionForWorksheet(
-        String worksheet) {
-        List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
-        for (ProcessingEventWrapper pe : getProcessingEventCollectionAsParent()) {
-            String peWorksheet = pe.getWorksheet();
-            if (peWorksheet != null && peWorksheet.equals(worksheet))
-                peList.add(pe);
-        }
-        return peList;
-    }
 }

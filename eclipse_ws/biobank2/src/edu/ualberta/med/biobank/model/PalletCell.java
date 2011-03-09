@@ -8,7 +8,6 @@ import java.util.TreeMap;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenLinkWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
@@ -21,9 +20,9 @@ public class PalletCell extends Cell {
 
     private String information;
 
-    private String title;
+    private String title = "";
 
-    private SpecimenLinkWrapper sourceSpecimenLink;
+    private SpecimenWrapper sourceSpecimen;
 
     private SpecimenWrapper specimen;
 
@@ -130,14 +129,10 @@ public class PalletCell extends Cell {
         this.status = status;
     }
 
+    /**
+     * usually displayed in the middle of the cell
+     */
     public String getTitle() {
-        if (specimen != null && specimen.getSpecimenType() != null) {
-            SpecimenTypeWrapper type = specimen.getSpecimenType();
-            if (type.getNameShort() != null) {
-                return type.getNameShort();
-            }
-            return type.getName();
-        }
         return title;
     }
 
@@ -145,12 +140,28 @@ public class PalletCell extends Cell {
         this.title = title;
     }
 
+    /**
+     * Usually used for the tooltip of the cell
+     * 
+     * @return
+     */
     public String getInformation() {
         return information;
     }
 
     public void setInformation(String information) {
         this.information = information;
+    }
+
+    public String getTypeString() {
+        if (specimen != null && specimen.getSpecimenType() != null) {
+            SpecimenTypeWrapper type = specimen.getSpecimenType();
+            if (type.getNameShort() != null) {
+                return type.getNameShort();
+            }
+            return type.getName();
+        }
+        return "";
     }
 
     public SpecimenTypeWrapper getType() {
@@ -225,12 +236,12 @@ public class PalletCell extends Cell {
         return expectedSpecimen;
     }
 
-    public void setSourceSpecimenLink(SpecimenLinkWrapper sourceSpecimenLink) {
-        this.sourceSpecimenLink = sourceSpecimenLink;
+    public void setSourceSpecimen(SpecimenWrapper sourceSpecimen) {
+        this.sourceSpecimen = sourceSpecimen;
     }
 
-    public SpecimenLinkWrapper getSourceSpecimenLink() {
-        return sourceSpecimenLink;
+    public SpecimenWrapper getSourceSpecimen() {
+        return sourceSpecimen;
     }
 
 }

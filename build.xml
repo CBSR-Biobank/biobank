@@ -54,8 +54,11 @@
   <condition property="debugFileExtension" value="-debug" else="">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
-  <condition property="LOG4J_LEVEL" value="info" else="error">
+  <condition property="LOG4J_LEVEL_WARN" value="warn" else="error">
     <equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
+  </condition>
+  <condition property="LOG4J_LEVEL_DEBUG" value="debug" else="error">
+	<equals arg1="${debug}" arg2="true" casesensitive="false" trim="true" />
   </condition>
   <condition property="isHostAicmlMed">
     <equals arg1="${host.name}"
@@ -253,7 +256,8 @@
           tofile="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml"
           overwrite="true" />
     <replace file="${cacore.sdk.dir}/output/biobank2/conf/system/web/WEB-INF/classes/log4j.xml">
-      <replacefilter token="@LOG4J_LEVEL@" value="${LOG4J_LEVEL}" />
+      <replacefilter token="@LOG4J_LEVEL_WARN@" value="${LOG4J_LEVEL_WARN}" />
+      <replacefilter token="@LOG4J_LEVEL_DEBUG@" value="${LOG4J_LEVEL_DEBUG}" />
       <!-- these one are copied from the caCore ant build file. -->
       <replacefilter token="@CLM_DB_DRIVER@" value="${CLM_DB_DRIVER}" />
       <replacefilter token="@CLM_DB_CONNECTION_URL@"
@@ -347,7 +351,7 @@
       <targetfilelist dir="${eclipse.proj.dir.common}/lib"
                       files="${sdk.jar.files.basename}" />
     </dependset>
-    <copy todir="${eclipse.proj.dir.common}/lib/client">
+    <copy todir="${eclipse.proj.dir.common}/lib/client" overwrite="true">
       <fileset dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib" />
       <fileset dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib" />
       <filelist dir="${cacore.sdk.dir}/system/lib"
@@ -357,26 +361,26 @@
       <fileset file="${cacore.sdk.dir}/system/security/dist/sdk-security.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-client-framework.jar" />
     </copy>
-    <copy todir="${eclipse.proj.dir.common}/lib/server">
+    <copy todir="${eclipse.proj.dir.common}/lib/server" overwrite="true">
       <fileset file="${cacore.sdk.dir}/system/dist/sdk-core.jar" />
       <fileset file="${cacore.sdk.dir}/system/lib/csmapi-4.1.jar" />
       <fileset file="${cacore.sdk.dir}/writable-api/dist/sdk-writable-core.jar" />
     </copy>
-    <copy todir="${eclipse.proj.dir.common}/conf">
+    <copy todir="${eclipse.proj.dir.common}/conf" overwrite="true">
       <filelist dir="${cacore.sdk.dir}/output/biobank2/package/remote-client/conf"
                 files="application-config-client.xml,application-config-client-info.xml" />
     </copy>
-    <copy todir="${eclipse.proj.dir}/lib">
+    <copy todir="${eclipse.proj.dir}/lib" overwrite="true">
       <filelist dir="${req.jars.dir}" files="${biobank2.jar.files}" />
     </copy>
-    <copy todir="${eclipse.proj.dir.tools}/lib">
+    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <filelist dir="${req.jars.dir}" files="${biobank.tools.jar.files}" />
     </copy>
     <!--copy todir="${eclipse.workspace.dir}/biobank2.ws-client/lib">
       <filelist dir="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib"
                 files="biobank2-beans.jar" />
     </copy-->
-    <copy todir="${eclipse.proj.dir.tools}/lib">
+    <copy todir="${eclipse.proj.dir.tools}/lib" overwrite="true">
       <fileset file="${cacore.sdk.dir}/system/lib/log4j-1.2.14.jar" />
     </copy>
   </target>
@@ -755,8 +759,41 @@
     </javac>
   </target>
 
-  <target name="package-codegen-orm"
+  <target name="compile-generated-beans" description="REDO:: Compiles the generated beans">
+    <copy todir="${cacore.sdk.dir}\${output.src.dir}\edu/ualberta/med/biobank/model" overwrite="true">
+      <fileset dir="sdk_conf/specialSrc" />
+    </copy>
+  	<delete>
+	  <fileset dir="${cacore.sdk.dir}\${build.classes.dir}"/>
+    </delete>
+
+	<javac srcdir="${cacore.sdk.dir}\${output.src.dir}" destdir="${cacore.sdk.dir}\${build.classes.dir}" 
+		debug="true" includeantruntime="false" >
+	  <classpath >
+	  	 <fileset dir="${cacore.sdk.dir}\${system.dir}\${system.lib.dir}">
+	  	            <include name="*.jar"/>
+	  	  </fileset>
+	  </classpath>
+	  <include name="**/*.java"/>
+	</javac>
+  </target>	
+	
+  <target name="package-codegen-orm" depends="compile-generated-beans"
           description="REDO:: Packages the generated ORM and bean artifacts">
+	<jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}" basedir="${cacore.sdk.dir}\${build.classes.dir}">
+			<manifest>
+				<attribute name="Generated-By" value="caCORE SDK Code Generator"/>
+				<attribute name="Version" value="${VERSION}"/>
+			</manifest>
+			<fileset dir="${cacore.sdk.dir}\${output.src.dir}" includes="**/*.java" />
+	</jar>
+	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}" 
+		tofile="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib\${bean.file}"/>
+	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}" 
+		tofile="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib\${bean.file}"/>
+	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}" 
+		tofile="${cacore.sdk.dir}/output/biobank2/package/local-client/lib\${bean.file}"/>
+  	
     <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
          basedir="${cacore.sdk.dir}\${output.src.dir}">
       <manifest>

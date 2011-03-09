@@ -59,8 +59,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     private SpecimenEntryWidget specimenEntryWidget;
 
-    private BiobankText waybillText;
-
     private Label waybillLabel;
 
     private NonEmptyStringValidator waybillValidator;
@@ -133,9 +131,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             GridData.VERTICAL_ALIGN_BEGINNING));
         waybillValidator = new NonEmptyStringValidator(
             "A waybill should be set");
-        waybillText = (BiobankText) createBoundWidget(client,
-            BiobankText.class, SWT.NONE, waybillLabel, new String[0], shipment,
-            "shipmentInfo.waybill", waybillValidator, WAYBILL_BINDING);
+        createBoundWidget(client, BiobankText.class, SWT.NONE, waybillLabel,
+            new String[0], shipment, "shipmentInfo.waybill", waybillValidator,
+            WAYBILL_BINDING);
 
         shippingMethodComboViewer = createComboViewer(client,
             "Shipping Method",

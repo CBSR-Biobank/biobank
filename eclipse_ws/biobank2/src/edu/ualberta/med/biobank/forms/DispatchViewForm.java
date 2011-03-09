@@ -337,17 +337,20 @@ public class DispatchViewForm extends BiobankViewForm {
         setTextValue(receiverLabel,
             dispatch.getReceiverCenter() == null ? "ACCESS DENIED" : dispatch
                 .getReceiverCenter().getName());
-        if (departedLabel != null)
-            setTextValue(departedLabel, dispatch.getFormattedDeparted());
-        if (shippingMethodLabel != null)
-            setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
-                .getShippingMethod() == null ? "" : dispatch.getShipmentInfo()
-                .getShippingMethod().getName());
-        if (waybillLabel != null)
-            setTextValue(waybillLabel, dispatch.getShipmentInfo().getWaybill());
-        if (dateReceivedLabel != null)
-            setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
-                .getFormattedDateReceived());
+        if (dispatch.getShipmentInfo() != null) {
+            if (departedLabel != null)
+                setTextValue(departedLabel, dispatch.getFormattedDeparted());
+            if (shippingMethodLabel != null)
+                setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
+                    .getShippingMethod() == null ? "" : dispatch
+                    .getShipmentInfo().getShippingMethod().getName());
+            if (waybillLabel != null)
+                setTextValue(waybillLabel, dispatch.getShipmentInfo()
+                    .getWaybill());
+            if (dateReceivedLabel != null)
+                setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
+                    .getFormattedDateReceived());
+        }
         setTextValue(commentLabel, dispatch.getComment());
     }
 

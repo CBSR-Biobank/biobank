@@ -31,8 +31,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenLinkWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
@@ -43,47 +43,79 @@ import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 public class AliquotedSpecimenSelectionWidget {
     private ComboViewer cvSource;
     private ComboViewer cvResult;
-    private ControlDecoration controlDecoration;
+    private ControlDecoration rowControlDecoration;
+    private ControlDecoration sourceControlDecoration;
+    private ControlDecoration resultControlDecoration;
     private Label textNumber;
     private Integer number;
 
-    private IObservableValue selectionsDone = new WritableValue(Boolean.TRUE,
+    private IObservableValue bothSelected = new WritableValue(Boolean.FALSE,
         Boolean.class);
 
-    // [source|result]
-    private Boolean[] selections = new Boolean[2];
+    private IObservableValue sourceSelected = new WritableValue(Boolean.FALSE,
+        Boolean.class);
 
-    private Binding binding;
+    private IObservableValue resultSelected = new WritableValue(Boolean.FALSE,
+        Boolean.class);
+
+    private Binding oneRowBinding;
+    private Binding sourceBinding;
+    private Binding resultBinding;
+
     private Object nextWidget;
+    private WidgetCreator widgetCreator;
+    private boolean oneRow;
+    private Label sourceLabel;
+    private Label resultLabel;
 
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
-        List<SpecimenLinkWrapper> sourceSpecimensLink,
-        List<SpecimenTypeWrapper> resultTypes, FormToolkit toolkit) {
-
+        List<SpecimenWrapper> sourceSpecimens,
+        List<SpecimenTypeWrapper> resultTypes, WidgetCreator widgetCreator,
+        boolean oneRow) {
+        this.widgetCreator = widgetCreator;
+        this.oneRow = oneRow;
         if (letter != null) {
-            toolkit.createLabel(parent, letter.toString(), SWT.LEFT);
+            widgetCreator.getToolkit().createLabel(parent, letter.toString(),
+                SWT.LEFT);
         }
-
+        if (!oneRow) {
+            sourceLabel = widgetCreator.createLabel(parent, "Source specimen");
+            sourceControlDecoration = BiobankWidget
+                .createDecorator(
+                    sourceLabel,
+                    Messages
+                        .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+        }
         cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
-        setComboProperties(cvSource, toolkit, sourceSpecimensLink, 0);
+        setComboProperties(cvSource, widgetCreator.getToolkit(),
+            sourceSpecimens, 0);
         cvSource.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                SpecimenLinkWrapper link = (SpecimenLinkWrapper) element;
-                return link.getParentSpecimen().getInventoryId()
-                    + " type:"
-                    + link.getParentSpecimen().getSpecimenType().getNameShort()
-                    + " visit#"
-                    + link.getParentSpecimen().getCollectionEvent()
-                        .getVisitNumber() + " worksheet#"
-                    + link.getProcessingEvent().getWorksheet();
+                SpecimenWrapper spc = (SpecimenWrapper) element;
+                return spc.getSpecimenType().getNameShort() + "("
+                    + spc.getInventoryId() + ")";
             }
         });
+        if (oneRow) {
+            GridData gd = new GridData();
+            gd.widthHint = 250;
+            cvSource.getControl().setLayoutData(gd);
+        }
 
+        if (!oneRow) {
+            resultLabel = widgetCreator.createLabel(parent,
+                "Aliquoted specimen type");
+            resultControlDecoration = BiobankWidget
+                .createDecorator(
+                    resultLabel,
+                    Messages
+                        .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+        }
         cvResult = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
-        setComboProperties(cvResult, toolkit, resultTypes, 1);
+        setComboProperties(cvResult, widgetCreator.getToolkit(), resultTypes, 1);
         cvResult.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
@@ -91,19 +123,22 @@ public class AliquotedSpecimenSelectionWidget {
             }
         });
 
-        textNumber = toolkit.createLabel(parent, "", SWT.BORDER);
-        GridData data = new GridData();
-        data.widthHint = 20;
-        data.horizontalAlignment = SWT.LEFT;
-        textNumber.setLayoutData(data);
+        if (oneRow) {
+            textNumber = widgetCreator.getToolkit().createLabel(parent, "",
+                SWT.BORDER);
+            GridData data = new GridData();
+            data.widthHint = 20;
+            data.horizontalAlignment = SWT.LEFT;
+            textNumber.setLayoutData(data);
 
-        setNumber(null);
+            setNumber(null);
 
-        controlDecoration = BiobankWidget
-            .createDecorator(
-                textNumber,
-                Messages
-                    .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+            rowControlDecoration = BiobankWidget
+                .createDecorator(
+                    textNumber,
+                    Messages
+                        .getString("AliquotedSpecimenSelectionWidget.selections.validation.msg"));
+        }
     }
 
     private void setComboProperties(ComboViewer cv, FormToolkit toolkit,
@@ -115,13 +150,16 @@ public class AliquotedSpecimenSelectionWidget {
         cv.addSelectionChangedListener(new ISelectionChangedListener() {
             @Override
             public void selectionChanged(SelectionChangedEvent event) {
+                boolean res = true;
                 if (event.getSelection() == null
                     || ((IStructuredSelection) event.getSelection()).size() == 0) {
-                    selections[selectionPosition] = false;
-                } else {
-                    selections[selectionPosition] = true;
+                    res = false;
                 }
-                selectionsDone.setValue(selections[0] && selections[1]);
+                if (selectionPosition == 0)
+                    sourceSelected.setValue(res);
+                else
+                    resultSelected.setValue(res);
+                updateBothSelectedField();
             }
         });
         cv.setComparator(new ViewerComparator());
@@ -158,21 +196,27 @@ public class AliquotedSpecimenSelectionWidget {
     }
 
     public void setNumber(Integer number) {
-        this.number = number;
-        String text = "";
-        if (number != null) {
-            text = number.toString();
+        if (textNumber != null) {
+            this.number = number;
+            String text = "";
+            if (number != null) {
+                text = number.toString();
+            }
+            if (number == null || number == 0) {
+                cvSource.getControl().setEnabled(false);
+                sourceSelected.setValue(true);
+                cvResult.getControl().setEnabled(false);
+                resultSelected.setValue(true);
+                bothSelected.setValue(true);
+            } else {
+                cvSource.getControl().setEnabled(true);
+                sourceSelected.setValue(getSourceSelection() != null);
+                cvResult.getControl().setEnabled(true);
+                resultSelected.setValue(getResultTypeSelection() != null);
+                updateBothSelectedField();
+            }
+            textNumber.setText(text);
         }
-        if (number == null || number == 0) {
-            cvSource.getControl().setEnabled(false);
-            cvResult.getControl().setEnabled(false);
-            selectionsDone.setValue(true);
-        } else {
-            cvSource.getControl().setEnabled(true);
-            cvResult.getControl().setEnabled(true);
-            selectionsDone.setValue(getResultTypeSelection() != null);
-        }
-        textNumber.setText(text);
     }
 
     public void increaseNumber() {
@@ -180,7 +224,14 @@ public class AliquotedSpecimenSelectionWidget {
             number = 0;
         number++;
         setNumber(number);
-        selectionsDone.setValue(getResultTypeSelection() != null);
+        sourceSelected.setValue(getSourceSelection() != null);
+        resultSelected.setValue(getResultTypeSelection() != null);
+        updateBothSelectedField();
+    }
+
+    private void updateBothSelectedField() {
+        bothSelected.setValue((Boolean) sourceSelected.getValue()
+            && (Boolean) resultSelected.getValue());
     }
 
     public boolean canFocus() {
@@ -203,39 +254,62 @@ public class AliquotedSpecimenSelectionWidget {
             .getSelection()).getFirstElement();
     }
 
-    private SpecimenLinkWrapper getSourceSelection() {
-        return (SpecimenLinkWrapper) ((StructuredSelection) cvSource
-            .getSelection()).getFirstElement();
+    private SpecimenWrapper getSourceSelection() {
+        return (SpecimenWrapper) ((StructuredSelection) cvSource.getSelection())
+            .getFirstElement();
     }
 
-    public void addBinding(WidgetCreator dbc) {
-        if (binding == null) {
-            WritableValue wv = new WritableValue(Boolean.FALSE, Boolean.class);
-            UpdateValueStrategy uvs = new UpdateValueStrategy();
-            uvs.setAfterGetValidator(new IValidator() {
-                @Override
-                public IStatus validate(Object value) {
-                    if (value instanceof Boolean && !(Boolean) value) {
-                        controlDecoration.show();
-                        return ValidationStatus.error(Messages
-                            .getString("AliquotedSpecimenSelectionWidget.selections.status.msg"));
-                    } else {
-                        controlDecoration.hide();
-                        return Status.OK_STATUS;
-                    }
-                }
-
-            });
-            binding = dbc.bindValue(wv, selectionsDone, uvs, uvs);
+    public void addBindings() {
+        if (oneRow) {
+            if (oneRowBinding == null) {
+                UpdateValueStrategy rowUpdateValue = createOneRowUpdateValueStrategy(rowControlDecoration);
+                oneRowBinding = widgetCreator.bindValue(new WritableValue(
+                    Boolean.FALSE, Boolean.class), bothSelected,
+                    rowUpdateValue, rowUpdateValue);
+            } else {
+                widgetCreator.addBinding(oneRowBinding);
+            }
         } else {
-            dbc.addBinding(binding);
+            if (sourceBinding == null || resultBinding == null) {
+                UpdateValueStrategy sourceUpdateValue = createOneRowUpdateValueStrategy(sourceControlDecoration);
+                sourceBinding = widgetCreator.bindValue(new WritableValue(
+                    Boolean.FALSE, Boolean.class), sourceSelected,
+                    sourceUpdateValue, sourceUpdateValue);
+                UpdateValueStrategy resultUpdateValue = createOneRowUpdateValueStrategy(resultControlDecoration);
+                resultBinding = widgetCreator.bindValue(new WritableValue(
+                    Boolean.FALSE, Boolean.class), resultSelected,
+                    resultUpdateValue, resultUpdateValue);
+            } else {
+                widgetCreator.addBinding(sourceBinding);
+                widgetCreator.addBinding(resultBinding);
+            }
         }
     }
 
-    public void removeBinding(WidgetCreator dbc) {
-        if (binding != null) {
-            dbc.removeBinding(binding);
-        }
+    private UpdateValueStrategy createOneRowUpdateValueStrategy(
+        final ControlDecoration decoration) {
+        UpdateValueStrategy uvs = new UpdateValueStrategy();
+        uvs.setAfterGetValidator(new IValidator() {
+            @Override
+            public IStatus validate(Object value) {
+                if (value instanceof Boolean && !(Boolean) value) {
+                    decoration.show();
+                    return ValidationStatus.error(Messages
+                        .getString("AliquotedSpecimenSelectionWidget.selections.status.msg"));
+                } else {
+                    decoration.hide();
+                    return Status.OK_STATUS;
+                }
+            }
+        });
+        return uvs;
+    }
+
+    public void removeBindings() {
+        if (sourceBinding != null)
+            widgetCreator.removeBinding(sourceBinding);
+        if (resultBinding != null)
+            widgetCreator.removeBinding(resultBinding);
     }
 
     public void resetValues(boolean resetSelection, boolean resetNumber) {
@@ -271,8 +345,8 @@ public class AliquotedSpecimenSelectionWidget {
         cvResult.setInput(types);
     }
 
-    public void setSourceSpecimenLinks(List<SpecimenLinkWrapper> sourceLinks) {
-        cvSource.setInput(sourceLinks);
+    public void setSourceSpecimens(List<SpecimenWrapper> sourceSpecimens) {
+        cvSource.setInput(sourceSpecimens);
     }
 
     public void setFocus() {
@@ -288,4 +362,24 @@ public class AliquotedSpecimenSelectionWidget {
                 getResultTypeSelection() };
         return null;
     }
+
+    public void setEnabled(boolean enabled) {
+        cvSource.getControl().setEnabled(enabled);
+        cvResult.getControl().setEnabled(enabled);
+    }
+
+    public void deselectAll() {
+        cvSource.getCombo().deselectAll();
+        cvResult.getCombo().deselectAll();
+    }
+
+    public void showWidget(boolean enabled) {
+        if (sourceLabel != null)
+            widgetCreator.showWidget(sourceLabel, enabled);
+        widgetCreator.showWidget(cvSource.getControl(), enabled);
+        if (resultLabel != null)
+            widgetCreator.showWidget(resultLabel, enabled);
+        widgetCreator.showWidget(cvResult.getControl(), enabled);
+    }
+
 }
