@@ -177,7 +177,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return pvws;
     }
 
-    private static final String PROCESSING_EVENT_BY_WORKSHEET_COUNT_QRY = "select count distinct(pEvent) from "
+    private static final String PROCESSING_EVENT_BY_WORKSHEET_COUNT_QRY = "select count(pEvent) from "
         + ProcessingEvent.class.getName()
         + " pEvent where pEvent."
         + ProcessingEventPeer.WORKSHEET.getName() + "=?";

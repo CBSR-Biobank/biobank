@@ -37,11 +37,13 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BiobankText patientLabel;
 
-    private BiobankText dateProcessedLabel;
+    private BiobankText visitNumberLabel;
 
     private BiobankText commentLabel;
 
     private SpecimenInfoTable sourceSpecimenTable;
+
+    private BiobankText activityStatusLabel;
 
     private class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
@@ -83,13 +85,15 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
-        dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date Processed");
+        visitNumberLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            "Visit#");
+        activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("label.activity"));
 
         createPvDataSection(client);
 
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+            Messages.getString("label.comments"));
 
         setCollectionEventValues();
     }
@@ -132,7 +136,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
     private void setCollectionEventValues() {
         setTextValue(studyLabel, cevent.getPatient().getStudy().getName());
         setTextValue(patientLabel, cevent.getPatient().getPnumber());
-        setTextValue(dateProcessedLabel, cevent.getVisitNumber());
+        setTextValue(visitNumberLabel, cevent.getVisitNumber());
+        setTextValue(activityStatusLabel, cevent.getActivityStatus().getName());
         setTextValue(commentLabel, cevent.getComment());
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
