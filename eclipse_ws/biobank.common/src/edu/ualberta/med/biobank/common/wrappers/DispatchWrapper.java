@@ -53,8 +53,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return DispatchState.getState(getState());
     }
 
-    public String getFormattedDeparted() {
-        return DateFormatter.formatAsDateTime(getDepartedAt());
+    public String getFormattedPackedAt() {
+        return DateFormatter.formatAsDateTime(getPackedAt());
     }
 
     public boolean hasErrors() {
@@ -150,10 +150,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
             }
             return tmp;
         }
-    }
-
-    public void resetMap() {
-        dispatchSpecimenMap.clear();
     }
 
     public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {
@@ -317,7 +313,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public void removeFromDispatchSpecimenCollection(
         List<DispatchSpecimenWrapper> dasToRemove) {
         super.removeFromDispatchSpecimenCollection(dasToRemove);
-        dispatchSpecimenMap.clear();
+        resetMap();
     }
 
     public void removeAliquots(List<SpecimenWrapper> aliquotsToRemove) {
@@ -348,9 +344,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 da.getDispatchSpecimenState();
             }
         }
-        DispatchSpecimenWrapper da = this.getDispatchSpecimenCollection()
-            .get(0);
-        dispatchSpecimenMap.clear();
+        resetMap();
     }
 
     public boolean isInCreationState() {
@@ -376,11 +370,14 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     }
 
     private static final String DISPATCHES_IN_SITE_QRY = "from "
-        + Dispatch.class.getName() + " where ("
+        + Dispatch.class.getName()
+        + " where ("
         + Property.concatNames(DispatchPeer.SENDER_CENTER, SitePeer.ID)
         + "=? or "
         + Property.concatNames(DispatchPeer.RECEIVER_CENTER, SitePeer.ID)
-        + "=?) and " + ShipmentInfoPeer.WAYBILL.getName() + "=?";
+        + "=?) and "
+        + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
+            ShipmentInfoPeer.WAYBILL) + "=?";
 
     /**
      * Search for shipments with the given waybill. Site can be the sender or
@@ -399,19 +396,19 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return wrappers;
     }
 
-    private static final String DISPATCHES_IN_SITE_BY_DATE_SENT_QRY = "from "
+    private static final String DISPATCHES_IN_SITE_BY_DATE_PACKED_AT = "from "
         + Dispatch.class.getName() + " where ("
         + Property.concatNames(DispatchPeer.SENDER_CENTER, SitePeer.ID)
         + "=? or "
         + Property.concatNames(DispatchPeer.RECEIVER_CENTER, SitePeer.ID)
-        + "=?) and " + ShipmentInfoPeer.RECEIVED_AT.getName() + ">=? and "
-        + ShipmentInfoPeer.RECEIVED_AT.getName() + "<=?";
+        + "=?) and " + DispatchPeer.PACKED_AT.getName() + ">=? and "
+        + DispatchPeer.PACKED_AT.getName() + "<=?";
 
     /**
      * Search for shipments with the given date sent. Don't use hour and minute.
      * Site can be the sender or the receiver.
      */
-    public static List<DispatchWrapper> getDispatchesInSiteByDateSent(
+    public static List<DispatchWrapper> getDispatchesInSiteByPackedAt(
         WritableApplicationService appService, Date dateReceived,
         SiteWrapper site) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
@@ -426,7 +423,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         cal.add(Calendar.DATE, 1);
         Date endDate = cal.getTime();
         HQLCriteria criteria = new HQLCriteria(
-            DISPATCHES_IN_SITE_BY_DATE_SENT_QRY, Arrays.asList(new Object[] {
+            DISPATCHES_IN_SITE_BY_DATE_PACKED_AT, Arrays.asList(new Object[] {
                 site.getId(), site.getId(), startDate, endDate }));
         List<Dispatch> shipments = appService.query(criteria);
         List<DispatchWrapper> wrappers = new ArrayList<DispatchWrapper>();
@@ -443,9 +440,11 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         + "=? or "
         + Property.concatNames(DispatchPeer.RECEIVER_CENTER, SitePeer.ID)
         + "=?) and "
-        + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " >=? and "
-        + ShipmentInfoPeer.RECEIVED_AT.getName() + " <= ?";
+        + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
+            ShipmentInfoPeer.RECEIVED_AT)
+        + ">=? and "
+        + Property.concatNames(DispatchPeer.SHIPMENT_INFO,
+            ShipmentInfoPeer.RECEIVED_AT) + "<=?";
 
     /**
      * Search for shipments with the given date received. Don't use hour and
@@ -542,10 +541,12 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (SpecimenWrapper a : extraAliquots) {
             DispatchSpecimenWrapper da = new DispatchSpecimenWrapper(appService);
             da.setSpecimen(a);
+            da.setDispatch(this);
             da.setDispatchSpecimenState(DispatchSpecimenState.EXTRA);
             daws.add(da);
         }
         addToDispatchSpecimenCollection(daws);
+        resetMap();
     }
 
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
@@ -565,12 +566,16 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Override
     public void reload() throws Exception {
         super.reload();
-        dispatchSpecimenMap.clear();
+        resetMap();
     }
 
     @Override
     public void reset() throws Exception {
         super.reset();
+        resetMap();
+    }
+
+    public void resetMap() {
         dispatchSpecimenMap.clear();
     }
 }

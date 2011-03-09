@@ -156,9 +156,10 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void formClosed() {
         try {
-            dispatch.reload();
+            reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", "Unable to reload dispatch");
+            // TODO: how to handle?
+            e.printStackTrace();
         }
     }
 
@@ -283,7 +284,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        dispatch.resetMap();
+        dispatch.reset();
         dispatch.setSenderCenter(SessionManager.getUser()
             .getCurrentWorkingCentre());
         if (destSiteComboViewer != null) {
@@ -322,8 +323,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
             label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
-            if (dispatch.getDepartedAt() != null)
-                label += "[" + dispatch.getFormattedDeparted() + "]";
+            if (dispatch.getPackedAt() != null)
+                label += "[" + dispatch.getFormattedPackedAt() + "]";
             return label;
         }
     }

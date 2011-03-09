@@ -104,7 +104,7 @@ public class DispatchViewForm extends BiobankViewForm {
     protected void createFormContent() throws Exception {
         String dateString = "";
         if (dispatch.getDepartedAt() != null) {
-            dateString = " on " + dispatch.getFormattedDeparted();
+            dateString = " on " + dispatch.getFormattedPackedAt();
         }
         canSeeEverything = true;
         if (dispatch.getSenderCenter() == null) {
@@ -141,7 +141,9 @@ public class DispatchViewForm extends BiobankViewForm {
                 createSendButton();
             else if (dispatch.canBeReceivedBy(user))
                 createReceiveButtons();
-            else if (dispatch.canBeClosedBy(user))
+            else if (dispatch.canBeClosedBy(user)
+                && dispatch.isInReceivedState()
+                && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
                 createCloseButton();
         }
     }
@@ -339,7 +341,7 @@ public class DispatchViewForm extends BiobankViewForm {
                 .getReceiverCenter().getName());
         if (dispatch.getShipmentInfo() != null) {
             if (departedLabel != null)
-                setTextValue(departedLabel, dispatch.getFormattedDeparted());
+                setTextValue(departedLabel, dispatch.getFormattedPackedAt());
             if (shippingMethodLabel != null)
                 setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
                     .getShippingMethod() == null ? "" : dispatch

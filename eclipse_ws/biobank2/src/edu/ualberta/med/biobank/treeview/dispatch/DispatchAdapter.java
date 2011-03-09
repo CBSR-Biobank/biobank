@@ -63,7 +63,7 @@ public class DispatchAdapter extends AdapterBase {
                 + shipment.getReceiverCenter().getNameShort();
 
         if (shipment.getDepartedAt() != null)
-            label += " [" + shipment.getFormattedDeparted() + "]";
+            label += " [" + shipment.getFormattedPackedAt() + "]";
         return label;
 
     }
@@ -126,6 +126,14 @@ public class DispatchAdapter extends AdapterBase {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
                         doReceiveAndProcess();
+                    }
+                });
+                mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText("Mark as Lost");
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        doSetAsLost();
                     }
                 });
             }

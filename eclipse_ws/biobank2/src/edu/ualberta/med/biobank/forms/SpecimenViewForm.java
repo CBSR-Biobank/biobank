@@ -24,11 +24,11 @@ public class SpecimenViewForm extends BiobankViewForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SpecimenViewForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.AliquotViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.SpecimenViewForm";
 
-    private SpecimenAdapter aliquotAdapter;
+    private SpecimenAdapter specimenAdapter;
 
-    private SpecimenWrapper aliquot;
+    private SpecimenWrapper specimen;
 
     private BiobankText siteLabel;
 
@@ -38,15 +38,11 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BiobankText volumeLabel;
 
-    private BiobankText shipmentWaybillLabel;
-
     private BiobankText studyLabel;
 
     private BiobankText patientLabel;
 
     private BiobankText dateProcessedLabel;
-
-    private BiobankText dateDrawnLabel;
 
     private BiobankText activityStatusLabel;
 
@@ -62,28 +58,28 @@ public class SpecimenViewForm extends BiobankViewForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        aliquotAdapter = (SpecimenAdapter) adapter;
-        aliquot = aliquotAdapter.getSpecimen();
-        retrieveAliquot();
+        specimenAdapter = (SpecimenAdapter) adapter;
+        specimen = specimenAdapter.getSpecimen();
+        retrieveSpecimen();
         try {
-            aliquot.logLookup(aliquot.getCenterString());
+            specimen.logLookup(specimen.getCenterString());
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Log lookup failed", e);
         }
-        setPartName("Aliquot: " + aliquot.getInventoryId());
+        setPartName("Specimen: " + specimen.getInventoryId());
     }
 
-    private void retrieveAliquot() {
+    private void retrieveSpecimen() {
         try {
-            aliquot.reload();
+            specimen.reload();
         } catch (Exception e) {
-            logger.error("Can't reload aliquot with id " + aliquot.getId());
+            logger.error("Can't reload specimen with id " + specimen.getId());
         }
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Aliquot " + aliquot.getInventoryId());
+        form.setText("Specimen " + specimen.getInventoryId());
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -102,7 +98,7 @@ public class SpecimenViewForm extends BiobankViewForm {
         layout.horizontalSpacing = 10;
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        dispatchInfoTable = new DispatchInfoTable(client, aliquot);
+        dispatchInfoTable = new DispatchInfoTable(client, specimen);
     }
 
     private void createInformationSection() {
@@ -114,18 +110,13 @@ public class SpecimenViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE, "Site");
         sampleTypeLabel = createReadOnlyLabelledField(client, SWT.NONE, "Type");
-        linkDateLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Link Date");
+        linkDateLabel = createReadOnlyLabelledField(client, SWT.NONE, "Created");
         volumeLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Volume (ml)");
-        shipmentWaybillLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Shipment Waybill");
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date Processed");
-        dateDrawnLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date Drawn");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client,
@@ -135,7 +126,7 @@ public class SpecimenViewForm extends BiobankViewForm {
     }
 
     private void createContainersSection() {
-        if (aliquot.getParent() != null) {
+        if (specimen.getParent() != null) {
             Section section = createSection("Container Visualization");
             Composite containersComposite = toolkit.createComposite(section);
             section.setClient(containersComposite);
@@ -144,7 +135,7 @@ public class SpecimenViewForm extends BiobankViewForm {
             toolkit.paintBordersFor(containersComposite);
 
             Stack<ContainerWrapper> parents = new Stack<ContainerWrapper>();
-            ContainerWrapper container = aliquot.getParent();
+            ContainerWrapper container = specimen.getParent();
             while (container != null) {
                 parents.push(container);
                 container = container.getParent();
@@ -153,7 +144,7 @@ public class SpecimenViewForm extends BiobankViewForm {
                 container = parents.pop();
                 RowColPos position;
                 if (parents.isEmpty()) {
-                    position = aliquot.getPosition();
+                    position = specimen.getPosition();
                 } else {
                     position = parents.peek().getPositionAsRowCol();
                 }
@@ -178,39 +169,35 @@ public class SpecimenViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        setTextValue(siteLabel, aliquot.getCurrentCenter().getNameShort());
-        setTextValue(sampleTypeLabel, aliquot.getSpecimenType().getName());
-        setTextValue(linkDateLabel, aliquot.getFormattedCreatedAt());
-        setTextValue(volumeLabel, aliquot.getQuantity() == null ? null
-            : aliquot.getQuantity().toString());
-        setTextValue(shipmentWaybillLabel, aliquot.getOriginInfo()
-            .getShipmentInfo().getWaybill());
-        setTextValue(studyLabel, aliquot.getCollectionEvent().getPatient()
+        setTextValue(siteLabel, specimen.getCurrentCenter().getNameShort());
+        setTextValue(sampleTypeLabel, specimen.getSpecimenType().getName());
+        setTextValue(linkDateLabel, specimen.getFormattedCreatedAt());
+        setTextValue(volumeLabel, specimen.getQuantity() == null ? null
+            : specimen.getQuantity().toString());
+        setTextValue(studyLabel, specimen.getCollectionEvent().getPatient()
             .getStudy().getNameShort());
-        setTextValue(patientLabel, aliquot.getCollectionEvent().getPatient()
+        setTextValue(patientLabel, specimen.getCollectionEvent().getPatient()
             .getPnumber());
-
-        setTextValue(dateProcessedLabel, aliquot.getFormattedCreatedAt());
-
-        setTextValue(dateDrawnLabel, aliquot.getParentProcessingEvent()
-            .getFormattedCreatedAt());
-        setTextValue(activityStatusLabel, aliquot.getActivityStatus());
-        setTextValue(commentLabel, aliquot.getComment());
-        setTextValue(positionLabel, aliquot.getPositionString(true, false));
+        if (specimen.hasParent())
+            setTextValue(dateProcessedLabel, specimen
+                .getParentProcessingEvent().getFormattedCreatedAt());
+        setTextValue(activityStatusLabel, specimen.getActivityStatus());
+        setTextValue(commentLabel, specimen.getComment());
+        setTextValue(positionLabel, specimen.getPositionString(true, false));
     }
 
     @Override
     public void setFocus() {
-        // aliquots are not present in treeviews, unnecessary reloads can be
+        // specimens are not present in treeviews, unnecessary reloads can be
         // prevented with this method
     }
 
     @Override
     public void reload() {
-        retrieveAliquot();
+        retrieveSpecimen();
         setValues();
-        setPartName("Aliquot: " + aliquot.getInventoryId());
-        form.setText("Aliquot: " + aliquot.getInventoryId());
+        setPartName("Specimen: " + specimen.getInventoryId());
+        form.setText("Specimen: " + specimen.getInventoryId());
         dispatchInfoTable.reloadCollection();
     }
 
