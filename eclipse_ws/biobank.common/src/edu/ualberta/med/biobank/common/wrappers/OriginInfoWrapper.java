@@ -1,24 +1,36 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
-import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.OriginInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.OriginInfoBaseWrapper;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.OriginInfo;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
+    private static final String SHIPMENT_HQL_STRING = "from "
+        + OriginInfo.class.getName() + " as o inner join fetch o."
+        + OriginInfoPeer.SHIPMENT_INFO.getName() + " as s where s is not null";
+
     public OriginInfoWrapper(WritableApplicationService appService) {
         super(appService);
+    }
+
+    public OriginInfoWrapper(WritableApplicationService appService,
+        OriginInfo originInfo) {
+        super(appService, originInfo);
     }
 
     public List<SpecimenWrapper> getSpecimenCollection() {
@@ -26,19 +38,27 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
     }
 
     public List<PatientWrapper> getPatientCollection() {
-        List<SpecimenWrapper> specs = getSpecimenCollection();
+        List<SpecimenWrapper> specimens = getSpecimenCollection();
         List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
-        for (SpecimenWrapper spec : specs)
-            patients.add(spec.getCollectionEvent().getPatient());
+
+        for (SpecimenWrapper specimen : specimens) {
+            PatientWrapper patient = specimen.getCollectionEvent().getPatient();
+
+            if (!patients.contains(patient)) {
+                patients.add(patient);
+            }
+        }
+
         return patients;
     }
 
     public void checkAtLeastOneSpecimen() throws BiobankCheckException {
-        List<SpecimenWrapper> spc = getSpecimenCollection(false);
-        if (spc == null || spc.isEmpty()) {
-            throw new BiobankCheckException(
-                "At least one specimen should be added to this Collection Event.");
-        }
+        // FIXME don't want that when create form collection event
+        // List<SpecimenWrapper> spc = getSpecimenCollection(false);
+        // if (spc == null || spc.isEmpty()) {
+        // throw new BiobankCheckException(
+        // "At least one specimen should be added to this Collection Event.");
+        // }
     }
 
     private static final String WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY = "from "
@@ -50,7 +70,6 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     private boolean checkWaybillUniqueForClinic(ClinicWrapper clinic)
         throws ApplicationException {
-        String isSameShipment = "";
         List<Object> params = new ArrayList<Object>();
         params.add(clinic.getId());
         params.add(getShipmentInfo().getWaybill());
@@ -58,12 +77,11 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         StringBuilder qry = new StringBuilder(
             WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY);
         if (!isNew()) {
-            qry.append(" and ce.").append(CollectionEventPeer.ID.getName())
+            qry.append(" and oi.").append(OriginInfoPeer.ID.getName())
                 .append(" <> ?");
             params.add(getId());
         }
-        HQLCriteria c = new HQLCriteria(WAYBILL_UNIQUE_FOR_CLINIC_BASE_QRY
-            + isSameShipment, params);
+        HQLCriteria c = new HQLCriteria(qry.toString(), params);
 
         List<Object> results = appService.query(c);
         return results.size() == 0;
@@ -101,5 +119,57 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
             }
         }
 
+    }
+
+    public static List<OriginInfoWrapper> getTodayShipments(
+        BiobankApplicationService appService) throws ApplicationException {
+        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING);
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            new ArrayList<Object>());
+
+        List<OriginInfo> origins = appService.query(criteria);
+        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, OriginInfoWrapper.class);
+
+        return shipments;
+    }
+
+    /**
+     * Search for shipments in the site with the given waybill
+     */
+    public static List<OriginInfoWrapper> getShipmentsByWaybill(
+        WritableApplicationService appService, String waybill)
+        throws ApplicationException {
+        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING + " and s."
+            + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { waybill }));
+
+        List<OriginInfo> origins = appService.query(criteria);
+        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, OriginInfoWrapper.class);
+
+        return shipments;
+    }
+
+    /**
+     * Search for shipments in the site with the given date received. Don't use
+     * hour and minute.
+     */
+    public static List<OriginInfoWrapper> getShipmentsByDateReceived(
+        WritableApplicationService appService, Date dateReceived)
+        throws ApplicationException {
+
+        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING
+            + " and DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + ") = DATE(?)");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { dateReceived }));
+
+        List<OriginInfo> origins = appService.query(criteria);
+        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, OriginInfoWrapper.class);
+
+        return shipments;
     }
 }

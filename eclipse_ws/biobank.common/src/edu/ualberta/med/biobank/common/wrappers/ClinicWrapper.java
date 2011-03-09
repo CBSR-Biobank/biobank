@@ -139,6 +139,29 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return getCountResult(appService, criteria);
     }
 
+    public static final String PATIENT_COUNT_FOR_STUDY_QRY = "select count(distinct patients) from "
+        + Clinic.class.getName()
+        + " as clinic join clinic."
+        + ClinicPeer.ORIGIN_INFO_COLLECTION.getName()
+        + " as oi join oi."
+        + OriginInfoPeer.SPECIMEN_COLLECTION.getName()
+        + " as spcs join spcs."
+        + SpecimenPeer.COLLECTION_EVENT.getName()
+        + " as cevents join cevents."
+        + CollectionEventPeer.PATIENT.getName()
+        + " as patients where clinic."
+        + ClinicPeer.ID.getName()
+        + "=? and patients."
+        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
+
+    @Override
+    public long getPatientCountForStudy(StudyWrapper study)
+        throws ApplicationException, BiobankException {
+        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_STUDY_QRY,
+            Arrays.asList(new Object[] { getId(), study.getId() }));
+        return getCountResult(appService, c);
+    }
+
     private static final String ALL_CLINICS_QRY = "from "
         + Clinic.class.getName();
 
@@ -210,8 +233,4 @@ public class ClinicWrapper extends ClinicBaseWrapper {
         return getCountResult(appService, c);
     }
 
-    public List<CollectionEventWrapper> getCollectionEventCollection() {
-        // TODO Auto-generated method stub
-        return null;
-    }
 }

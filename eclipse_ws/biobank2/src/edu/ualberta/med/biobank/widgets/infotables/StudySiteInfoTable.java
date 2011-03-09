@@ -69,7 +69,7 @@ public class StudySiteInfoTable extends InfoTableWidget<SiteWrapper> {
         throws Exception {
         TableRowData info = new TableRowData();
         info.siteNameShort = site.getNameShort();
-        info.patientCount = study.getPatientCountForCenter(site);
+        info.patientCount = site.getPatientCountForStudy(study);
         info.visitCount = site.getCollectionEventCountForStudy(study);
         return info;
     }

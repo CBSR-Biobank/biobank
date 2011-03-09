@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -328,11 +327,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return specimen;
     }
 
-    private static final String SpecimenS_NON_ACTIVE_QRY = "from "
+    private static final String SPECIMENS_NON_ACTIVE_QRY = "from "
         + Specimen.class.getName()
-        + " a where a."
-        + Property.concatNames(SpecimenPeer.PARENT_PROCESSING_EVENT,
-            ProcessingEventPeer.CENTER, CenterPeer.ID)
+        + " spec where spec."
+        + Property.concatNames(SpecimenPeer.CURRENT_CENTER, CenterPeer.ID)
         + " = ? and "
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + " != ?";
@@ -340,7 +338,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public static List<SpecimenWrapper> getSpecimensNonActiveInCentre(
         WritableApplicationService appService, CenterWrapper<?> centre)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(SpecimenS_NON_ACTIVE_QRY,
+        HQLCriteria criteria = new HQLCriteria(SPECIMENS_NON_ACTIVE_QRY,
             Arrays.asList(new Object[] { centre.getId(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Specimen> Specimens = appService.query(criteria);
@@ -471,14 +469,4 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
     }
 
-    public List<ProcessingEventWrapper> getProcessingEventCollectionForWorksheet(
-        String worksheet) {
-        List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
-        for (ProcessingEventWrapper pe : getProcessingEventCollection(false)) {
-            String peWorksheet = pe.getWorksheet();
-            if (peWorksheet != null && peWorksheet.equals(worksheet))
-                peList.add(pe);
-        }
-        return peList;
-    }
 }

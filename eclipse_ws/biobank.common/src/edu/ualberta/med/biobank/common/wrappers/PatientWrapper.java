@@ -6,13 +6,15 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
@@ -20,7 +22,6 @@ import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -112,10 +113,10 @@ public class PatientWrapper extends PatientBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMoreCollectionEvents();
-        if (getSpecimensCount(false) > 0)
+        if (getAllSpecimensCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
-                + " because patient has samples stored in database.");
+                + " because patient has specimens stored in database.");
     }
 
     private void checkNoMoreCollectionEvents() throws BiobankCheckException {
@@ -127,23 +128,69 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
     }
 
-    private static final String SPECIMEN_COUNT_QRY = "select count(spcs) from "
-        + CollectionEvent.class.getName() + " as cevent join cevent."
-        + CollectionEventPeer.SPECIMEN_COLLECTION.getName()
+    private static final String ALL_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
         + " as spcs where cevent."
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
         + "=?";
 
-    public long getSpecimensCount(boolean fast) throws BiobankException,
+    public long getAllSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(SPECIMEN_COUNT_QRY,
+            HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
         long total = 0;
         for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
-            total += cevent.getSpecimensCount(false);
+            total += cevent.getAllSpecimensCount(false);
+        return total;
+    }
+
+    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.SOURCE_SPECIMEN_COLLECTION.getName()
+        + " as spcs where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=?";
+
+    public long getSourceSpecimensCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(SOURCE_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        long total = 0;
+        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
+            total += cevent.getSourceSpecimensCount(false);
+        return total;
+    }
+
+    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+        + " as spcs where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=? and spcs."
+        + SpecimenPeer.SOURCE_COLLECTION_EVENT.getName()
+        + " is null";
+
+    public long getAliquotedSpecimensCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(
+                ALIQUOTED_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        long total = 0;
+        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
+            total += cevent.getAliquotedSpecimensCount(false);
         return total;
     }
 
@@ -206,23 +253,27 @@ public class PatientWrapper extends PatientBaseWrapper {
         return null;
     }
 
-    private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY = "select pEvent from "
-        + Patient.class.getName()
-        + " as p join p."
-        + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
-        + " as ces join ces."
-        + CollectionEventPeer.SPECIMEN_COLLECTION.getName()
-        + " as specimens join specimens."
-        + SpecimenPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pes where p."
-        + PatientPeer.ID.getName()
-        + "=? and pes."
-        + ProcessingEventPeer.CREATED_AT.getName()
-        + ">? and pes."
-        + ProcessingEventPeer.CREATED_AT.getName() + "<?";
+    // private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY =
+    // "select pEvent from "
+    // + Patient.class.getName()
+    // + " as p join p."
+    // + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
+    // + " as ces join ces."
+    // + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+    // + " as specimens join specimens."
+    // + SpecimenPeer.SPECIMEN_LINK_COLLECTION.getName()
+    // + " as spLink join spLink."
+    // + SpecimenLinkPeer.PROCESSING_EVENT
+    // + " as pes where p."
+    // + PatientPeer.ID.getName()
+    // + "=? and pes."
+    // + ProcessingEventPeer.CREATED_AT.getName()
+    // + ">? and pes."
+    // + ProcessingEventPeer.CREATED_AT.getName() + "<?";
 
     @Deprecated
-    // FIXME :in Scan Link, wants the collection event instead. What is a last 7
+    // FIXME :in Scan Link, wants the collection event instead. ? What is a last
+    // 7
     // days collection events if we don't have the date drawn on the collection
     // event itself ?
     public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
@@ -238,12 +289,13 @@ public class PatientWrapper extends PatientBaseWrapper {
         // 7 days ago, at midnight
         cal.add(Calendar.DATE, -8);
         Date startDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria(
-            LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
-                getId(), site.getId(), startDate, endDate }));
-        List<ProcessingEvent> res = appService.query(criteria);
-        return ModelWrapper.wrapModelCollection(appService, res,
-            ProcessingEventWrapper.class);
+        // HQLCriteria criteria = new HQLCriteria(
+        // LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
+        // getId(), site.getId(), startDate, endDate }));
+        // List<ProcessingEvent> res = appService.query(criteria);
+        // return ModelWrapper.wrapModelCollection(appService, res,
+        // ProcessingEventWrapper.class);
+        return new ArrayList<ProcessingEventWrapper>();
     }
 
     @Override
@@ -309,12 +361,6 @@ public class PatientWrapper extends PatientBaseWrapper {
         }
     }
 
-    @Deprecated
-    public boolean canBeAddedToShipment(CollectionEventWrapper shipment) {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
     public List<CollectionEventWrapper> getCollectionEventCollection(
         boolean sort, final boolean ascending) {
         List<CollectionEventWrapper> cEvents = getCollectionEventCollection(false);
@@ -337,28 +383,34 @@ public class PatientWrapper extends PatientBaseWrapper {
     public List<ProcessingEventWrapper> getProcessingEventCollection() {
         List<CollectionEventWrapper> ces = getCollectionEventCollection(false);
         List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
-        List<ProcessingEventWrapper> pes = new ArrayList<ProcessingEventWrapper>();
+        Set<ProcessingEventWrapper> pes = new HashSet<ProcessingEventWrapper>();
         for (CollectionEventWrapper ce : ces)
-            specs.addAll(ce.getSpecimenCollection());
+            specs.addAll(ce.getAllSpecimenCollection(false));
         for (SpecimenWrapper spec : specs) {
-            pes.addAll(spec.getProcessingEventCollection(false));
-            pes.add(spec.getParentProcessingEvent());
+            pes.add(spec.getProcessingEvent());
         }
-        return pes;
+        return new ArrayList<ProcessingEventWrapper>(pes);
     }
 
-    public int getSourceSpecimensCount() {
-        // FIXME Do we want to display that or something else ?
-        return -1;
+    @Deprecated
+    public boolean canBeAddedToShipment(CollectionEventWrapper shipment) {
+        // TODO Auto-generated method stub
+        return false;
     }
 
-    public int getAliquotedSpecimensCount() {
-        // FIXME Do we want to display that or something else ?
-        return -1;
-    }
+    private static final String CEVENT_COUNT_QRY = "select count(cevent) from "
+        + CollectionEvent.class.getName() + " as cevent where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=?";
 
-    public List<CollectionEventWrapper> getCollectionEventCollection() {
-        return getCollectionEventCollection(false);
+    public Long getCollectionEventCount(boolean fast)
+        throws BiobankQueryResultSizeException, ApplicationException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(CEVENT_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        return (long) getCollectionEventCollection(false).size();
     }
 
 }

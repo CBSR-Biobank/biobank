@@ -602,11 +602,13 @@ public class TestSpecimen extends TestDatabase {
         aliquot.persist();
         SpecimenHelper.addSpecimen(sampleType, null, pv, null, null);
 
-        DebugUtil.getRandomLinkedSpecimens(appService, site.getId());
+        // FIXME
+        // DebugUtil.getRandomLinkedSpecimens(appService, site.getId());
         DebugUtil.getRandomAssignedSpecimens(appService, site.getId());
         DebugUtil.getRandomNonAssignedNonDispatchedSpecimens(appService,
             site.getId());
-        DebugUtil.getRandomDispatchedSpecimens(appService, site.getId());
+        // FIXME
+        // DebugUtil.getRandomDispatchedSpecimens(appService, site.getId());
 
         Assert.fail("not real tests here");
     }

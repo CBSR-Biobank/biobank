@@ -21,6 +21,8 @@ import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public abstract class CenterWrapper<E extends Center> extends
     CenterBaseWrapper<E> {
+    private static final String ALL_CENTERS_HQL_STRING = "from "
+        + Center.class.getName();
 
     private Set<CollectionEventWrapper> deletedCollectionEvents = new HashSet<CollectionEventWrapper>();
 
@@ -131,6 +133,13 @@ public abstract class CenterWrapper<E extends Center> extends
     public abstract long getCollectionEventCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;
 
+    /**
+     * Collection event count for this centre. This count is different for each
+     * centre: the method should be defined in each centre type
+     */
+    public abstract long getPatientCountForStudy(StudyWrapper study)
+        throws ApplicationException, BiobankException;
+
     @SuppressWarnings("unused")
     @Deprecated
     public CollectionEventWrapper getCollectionEvent(Date dateReceived) {
@@ -155,6 +164,19 @@ public abstract class CenterWrapper<E extends Center> extends
                 ce.delete();
             }
         }
+    }
+
+    public static List<CenterWrapper<?>> getCenters(
+        WritableApplicationService appService) throws ApplicationException {
+        StringBuilder qry = new StringBuilder(ALL_CENTERS_HQL_STRING);
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            new ArrayList<Object>());
+
+        List<Center> centers = appService.query(criteria);
+        List<CenterWrapper<?>> centerWrappers = ModelWrapper
+            .wrapModelCollection(appService, centers, null);
+
+        return centerWrappers;
     }
 
     public static List<CenterWrapper<?>> getAllCenters(

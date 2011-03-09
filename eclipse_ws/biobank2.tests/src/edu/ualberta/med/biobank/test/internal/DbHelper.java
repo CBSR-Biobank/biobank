@@ -97,11 +97,12 @@ public class DbHelper {
     public static void deleteCollectionEvents(
         List<CollectionEventWrapper> cevents) throws Exception {
 
-        for (CollectionEventWrapper ce : cevents) {
-            deleteFromList(ce.getSpecimenCollection(false));
-            ce.reload();
-            ce.delete();
-        }
+        // FIXME
+        // for (CollectionEventWrapper ce : cevents) {
+        // deleteFromList(ce.getSpecimenCollection(false));
+        // ce.reload();
+        // ce.delete();
+        // }
     }
 
     public static void deleteClinics(List<ClinicWrapper> clinics)

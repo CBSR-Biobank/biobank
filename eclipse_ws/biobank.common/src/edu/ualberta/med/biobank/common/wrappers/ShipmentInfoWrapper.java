@@ -31,6 +31,11 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
         return DateFormatter.formatAsDateTime(getReceivedAt());
     }
 
+    public String getFormattedDateSent() {
+        // date received is not supposed to be null
+        return DateFormatter.formatAsDateTime(getSentAt());
+    }
+
     @Override
     public int compareTo(ModelWrapper<ShipmentInfo> wrapper) {
         if (wrapper instanceof ShipmentInfoWrapper) {

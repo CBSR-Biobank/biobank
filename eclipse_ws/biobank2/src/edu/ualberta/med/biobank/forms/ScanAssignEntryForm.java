@@ -36,6 +36,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.exception.ContainerLabelSearchException;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
@@ -43,7 +44,6 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -279,14 +279,9 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                         Messages.getString("ScanAssign.validation.error.title"), ex); //$NON-NLS-1$
                 appendLogNLS("ScanAssign.activitylog.error", //$NON-NLS-1$
                     ex.getMessage());
-                if (ex.getMessage() != null
-                    && ex.getMessage().startsWith(
-                        "Can't find container with label")) {
-                    // FIXME: find a better way than that ? Add info inside the
-                    // BiobankCheckException ?
+                if (ex instanceof ContainerLabelSearchException) {
                     nextFocusWidget = palletPositionText;
                 }
-
                 setCanLaunchScan(false);
             }
             if (nextFocusWidget != null) {
@@ -546,6 +541,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     @Override
     protected void beforeScanThreadStart() {
         showOnlyPallet(false, false);
+        currentPalletWrapper.setSite(SessionManager.getUser()
+            .getCurrentWorkingSite());
         currentPalletWrapper
             .setContainerType((ContainerTypeWrapper) ((IStructuredSelection) palletTypesViewer
                 .getSelection()).getFirstElement());
@@ -693,7 +690,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         if (value == null) { // no aliquot scanned
             updateCellAsMissing(positionString, scanCell, expectedAliquot);
         } else {
-            // FIXME test what happen if can't read site
+            // FIXME test what happen if don't have read rights on the site
             SpecimenWrapper foundAliquot = SpecimenWrapper.getSpecimen(
                 appService, value, SessionManager.getUser());
             if (foundAliquot == null) {
@@ -882,11 +879,13 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     .getString(
                         "ScanAssign.scanStatus.aliquot.missing", missingAliquot.getInventoryId())); //$NON-NLS-1$
             scanCell.setTitle("?"); //$NON-NLS-1$
+            // MISSING in {0}\: specimen {1} from visit {2} (patient {3})
+            // missing
             appendLogNLS(
                 "ScanAssign.activitylog.aliquot.missing", position, missingAliquot //$NON-NLS-1$
-                    .getInventoryId(), missingAliquot
-                    .getParentProcessingEvent().getFormattedDateProcessed(),
-                missingAliquot.getCollectionEvent().getPatient().getPnumber());
+                    .getInventoryId(), missingAliquot.getCollectionEvent()
+                    .getVisitNumber(), missingAliquot.getCollectionEvent()
+                    .getPatient().getPnumber());
             movedAndMissingAliquotsFromPallet.put(rcp, scanCell);
         } else {
             movedAndMissingAliquotsFromPallet.remove(rcp);
@@ -932,7 +931,7 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                     }
                 }
             } catch (Exception ex) {
-                setScanHasBeenLauched(false);
+                setScanHasBeenLauched(false, true);
                 throw ex;
             }
             appendLog(sb.toString());
@@ -946,12 +945,10 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     private void computeActivityLogMessage(StringBuffer sb, PalletCell cell,
         SpecimenWrapper aliquot, String posStr) {
         CollectionEventWrapper visit = aliquot.getCollectionEvent();
-        sb.append(Messages.getString(
-            "ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
+        sb.append(Messages.getString("ScanAssign.activitylog.aliquot.assigned", //$NON-NLS-1$
             posStr, currentPalletWrapper.getSite().getNameShort(), cell
                 .getValue(), aliquot.getSpecimenType().getName(), visit
-                .getPatient().getPnumber(), visit.getFormattedDateReceived(),
-            visit.getClinic().getName()));
+                .getPatient().getPnumber(), visit.getVisitNumber()));
     }
 
     private boolean saveEvenIfAliquotsMissing() {
@@ -998,13 +995,11 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     public void reset(boolean beforeScan) {
-        SiteWrapper site = null;
         String productBarcode = ""; //$NON-NLS-1$
         String label = ""; //$NON-NLS-1$
         ContainerTypeWrapper type = null;
 
         if (beforeScan) { // keep fields values
-            site = currentPalletWrapper.getSite();
             productBarcode = palletproductBarcodeText.getText();
             label = palletPositionText.getText();
             type = currentPalletWrapper.getContainerType();
@@ -1027,7 +1022,6 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         palletPositionText.setText(label);
         palletLabelValidator.validate(label);
         currentPalletWrapper.setContainerType(type);
-        currentPalletWrapper.setSite(site);
         if (!beforeScan) {
             setDirty(false);
             setFocus();

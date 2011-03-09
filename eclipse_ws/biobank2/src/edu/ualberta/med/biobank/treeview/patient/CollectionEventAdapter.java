@@ -10,18 +10,16 @@ import org.eclipse.swt.widgets.Tree;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.CollectionEventEntryForm;
 import edu.ualberta.med.biobank.forms.CollectionEventViewForm;
+import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class CollectionEventAdapter extends AdapterBase {
 
-    /**
-     * Aliquot selected in this Collection Event
-     */
-    private SpecimenWrapper selectedAliquot;
+    private static BiobankLogger logger = BiobankLogger
+        .getLogger(CollectionEventAdapter.class.getName());
 
     public CollectionEventAdapter(AdapterBase parent,
         CollectionEventWrapper collectionEventWrapper) {
@@ -40,13 +38,13 @@ public class CollectionEventAdapter extends AdapterBase {
         String name = cevent.getPatient().getPnumber() + " - #"
             + cevent.getVisitNumber();
 
-        Collection<SpecimenWrapper> samples = cevent
-            .getSpecimenCollection(true);
-        int total = 0;
-        if (samples != null) {
-            total = samples.size();
+        long count = -1;
+        try {
+            count = cevent.getSourceSpecimensCount(true);
+        } catch (Exception e) {
+            logger.error("Problem counting specimens");
         }
-        return name + " [" + total + "]";
+        return name + " [" + count + "]";
     }
 
     @Override
@@ -75,14 +73,6 @@ public class CollectionEventAdapter extends AdapterBase {
     @Override
     protected String getConfirmDeleteMessage() {
         return "Are you sure you want to delete this collection event?";
-    }
-
-    public void setSelectedAliquot(SpecimenWrapper aliquot) {
-        this.selectedAliquot = aliquot;
-    }
-
-    public SpecimenWrapper getSelectedAliquot() {
-        return selectedAliquot;
     }
 
     @Override

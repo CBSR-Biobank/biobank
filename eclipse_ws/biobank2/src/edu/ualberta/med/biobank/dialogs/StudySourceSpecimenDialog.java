@@ -18,7 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
-public class SourceSpecimenDialog extends BiobankDialog {
+public class StudySourceSpecimenDialog extends BiobankDialog {
 
     private SourceSpecimenWrapper origSourceSpecimen;
 
@@ -30,7 +30,7 @@ public class SourceSpecimenDialog extends BiobankDialog {
 
     private String message;
 
-    public SourceSpecimenDialog(Shell parent,
+    public StudySourceSpecimenDialog(Shell parent,
         SourceSpecimenWrapper origSourceSpecimen,
         List<SpecimenTypeWrapper> allSpecimenTypes) {
         super(parent);

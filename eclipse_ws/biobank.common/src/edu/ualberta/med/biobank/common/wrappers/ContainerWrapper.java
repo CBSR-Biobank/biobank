@@ -14,6 +14,7 @@ import org.apache.commons.lang.StringUtils;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
+import edu.ualberta.med.biobank.common.exception.ContainerLabelSearchException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -388,7 +389,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             }
 
             if (possibleParents.size() == 0) {
-                throw new BiobankCheckException(
+                throw new ContainerLabelSearchException(
                     "Can't find container with label \""
                         + parentContainerLabel
                         + "\" holding containers of types "
@@ -398,7 +399,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
                             .getNameShort()));
             }
             if (possibleParents.size() > 1) {
-                throw new BiobankCheckException(
+                throw new ContainerLabelSearchException(
                     possibleParents.size()
                         + " containers with label "
                         + parentContainerLabel

@@ -14,22 +14,17 @@ import org.apache.commons.lang.StringUtils;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
-import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
-import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Contact;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Study;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -393,70 +388,6 @@ public class StudyWrapper extends StudyBaseWrapper {
             return compare;
         }
         return 0;
-    }
-
-    private static final String PATIENT_COUNT_FOR_CENTER_QRY = "select count(distinct patient) from "
-        + Center.class.getName()
-        + " as center join center."
-        + CenterPeer.SPECIMEN_COLLECTION.getName()
-        + " as specimens join specimens."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.PATIENT)
-        + " as patient where center."
-        + CenterPeer.ID.getName()
-        + "=? and "
-        + "patient."
-        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID) + "=?";
-
-    // FIXME is it correct to go through the specimen collection of the centre.
-    // Counting patients might be different for a site or a clinic, or a
-    // research group !
-    public long getPatientCountForCenter(CenterWrapper<?> center)
-        throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_CENTER_QRY,
-            Arrays.asList(new Object[] { center.getId(), getId() }));
-        return getCountResult(appService, c);
-    }
-
-    private static final String PROCESSING_EVENT_COUNT_FOR_CENTER_QRY = "select count(distinct pes) from "
-        + Center.class.getName()
-        + " as center join center."
-        + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
-        + " as pes join pes."
-        + ProcessingEventPeer.PARENT_SPECIMEN.getName()
-        + " as parent_spcs join parent_spcs."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.PATIENT, PatientPeer.STUDY)
-        + " as study where study."
-        + StudyPeer.ID.getName()
-        + "=? and center."
-        + CenterPeer.ID.getName() + "=?";
-
-    @Deprecated
-    // not sure we need this method yet
-    public long getProcessingEventCountForCenter(CenterWrapper<?> center)
-        throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_COUNT_FOR_CENTER_QRY,
-            Arrays.asList(new Object[] { getId(), center.getId() }));
-        return getCountResult(appService, c);
-    }
-
-    private static final String PROCESSING_EVENT_COUNT_QRY = "select count(distinct pes) from "
-        + ProcessingEvent.class.getName()
-        + " as pes join pes."
-        + ProcessingEventPeer.PARENT_SPECIMEN.getName()
-        + " as parent_spcs join parent_spcs."
-        + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
-            CollectionEventPeer.PATIENT, PatientPeer.STUDY)
-        + " as study where study." + StudyPeer.ID.getName() + "=?";
-
-    @Deprecated
-    // not sure we need this method yet
-    public long getProcessingEventCount() throws ApplicationException,
-        BiobankException {
-        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        return getCountResult(appService, c);
     }
 
     @Override

@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.treeview.shipment;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 
@@ -16,6 +16,6 @@ public class ClinicWithShipmentAdapter extends ClinicAdapter {
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, CollectionEventWrapper.class);
+        return findChildFromClass(searchedObject, OriginInfoWrapper.class);
     }
 }

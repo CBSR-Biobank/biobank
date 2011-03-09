@@ -9,6 +9,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -38,10 +39,9 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BiobankText dateProcessedLabel;
 
-    @SuppressWarnings("unused")
     private BiobankText commentLabel;
 
-    private SpecimenInfoTable table;
+    private SpecimenInfoTable sourceSpecimenTable;
 
     private class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
@@ -59,17 +59,18 @@ public class CollectionEventViewForm extends BiobankViewForm {
         cevent.logLookup(SessionManager.getUser().getCurrentWorkingCentre()
             .getNameShort());
 
-        setPartName("Visit " + cevent.getVisitNumber());
+        setPartName(Messages.getString("CollectionEventViewForm.title",
+            cevent.getVisitNumber()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Patient Visit - Date Processed: "
-            + cevent.getVisitNumber());
+        form.setText(Messages.getString("CollectionEventViewForm.main.title",
+            +cevent.getVisitNumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
-        createSpecimensSection();
+        createSourceSpecimensSection();
     }
 
     private void createMainSection() throws Exception {
@@ -132,31 +133,32 @@ public class CollectionEventViewForm extends BiobankViewForm {
         setTextValue(studyLabel, cevent.getPatient().getStudy().getName());
         setTextValue(patientLabel, cevent.getPatient().getPnumber());
         setTextValue(dateProcessedLabel, cevent.getVisitNumber());
-
+        setTextValue(commentLabel, cevent.getComment());
         // assign PvInfo
         for (FormPvCustomInfo combinedPvInfo : pvCustomInfoList) {
             setTextValue(combinedPvInfo.widget, combinedPvInfo.getValue());
         }
     }
 
-    private void createSpecimensSection() {
-        Composite client = createSectionWithClient("Source Vessels");
-        table = new SpecimenInfoTable(client, cevent.getSpecimenCollection(),
-            ColumnsShown.CEVENT_FORM, 10);
-        table.adaptToToolkit(toolkit, true);
+    private void createSourceSpecimensSection() {
+        Composite client = createSectionWithClient(Messages
+            .getString("CollectionEventViewForm.specimens.title"));
+        sourceSpecimenTable = new SpecimenInfoTable(client,
+            cevent.getSourceSpecimenCollection(true), ColumnsShown.CEVENT_FORM,
+            10);
+        sourceSpecimenTable.adaptToToolkit(toolkit, true);
     }
 
     @Override
     public void reload() {
         retrievePatientVisit();
-        String date = cevent.getVisitNumber().toString();
-        setPartName("Visit " + date);
-        form.setText("Visit Drawn Date: " + date);
+        setPartName(Messages.getString("CollectionEventViewForm.title",
+            cevent.getVisitNumber()));
+        form.setText(Messages.getString("CollectionEventViewForm.main.title",
+            +cevent.getVisitNumber()));
         setCollectionEventValues();
-
-        // FIXME: load tables
-        // table.setCollection(cevent.getPvSourceVesselCollection());
-        // aliquotWidget.setCollection(cevent.getSpecimenCollection());
+        sourceSpecimenTable.setCollection(cevent
+            .getSourceSpecimenCollection(true));
     }
 
     private void retrievePatientVisit() {

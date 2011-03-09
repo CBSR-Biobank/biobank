@@ -60,18 +60,18 @@ public class CeListInfoTable extends InfoTableWidget<CollectionEventWrapper> {
     }
 
     @Override
-    public TableRowData getCollectionModelObject(CollectionEventWrapper pv)
+    public TableRowData getCollectionModelObject(CollectionEventWrapper cEvent)
         throws Exception {
         TableRowData info = new TableRowData();
-        info.pv = pv;
-        info.pnumber = pv.getPatient().getPnumber();
-        StudyWrapper study = pv.getPatient().getStudy();
+        info.pv = cEvent;
+        info.pnumber = cEvent.getPatient().getPnumber();
+        StudyWrapper study = cEvent.getPatient().getStudy();
         if (study != null) {
             info.studyNameShort = study.getNameShort();
         } else {
             info.studyNameShort = new String();
         }
-        info.numSVs = pv.getSpecimenCollection(false).size();
+        info.numSVs = -1; // cEvent.getSpecimenCollection(false).size();
         return info;
     }
 

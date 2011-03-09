@@ -16,14 +16,19 @@ public class CollectionEventInfoTable extends
     class TableRowData {
         CollectionEventWrapper collectionEvent;
         Integer visitNumber;
-        Long specimenCount;
+        Long sourceSpecimenCount;
+        Long aliquotedSpecimenCount;
         String comment;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { visitNumber.toString(),
-                (specimenCount != null) ? specimenCount.toString() : "0",
-                comment }, "\t");
+            return StringUtils.join(
+                new String[] {
+                    visitNumber.toString(),
+                    (sourceSpecimenCount != null) ? sourceSpecimenCount
+                        .toString() : "0",
+                    (aliquotedSpecimenCount != null) ? aliquotedSpecimenCount
+                        .toString() : "0", comment }, "\t");
         }
     }
 
@@ -57,11 +62,14 @@ public class CollectionEventInfoTable extends
                 case 0:
                     return info.visitNumber.toString();
                 case 1:
-                    return "?";
+                    return "date drawn?";
                 case 2:
-                    return (info.specimenCount != null) ? info.specimenCount
+                    return (info.sourceSpecimenCount != null) ? info.sourceSpecimenCount
                         .toString() : "0";
                 case 3:
+                    return (info.aliquotedSpecimenCount != null) ? info.aliquotedSpecimenCount
+                        .toString() : "0";
+                case 4:
                     return info.comment;
 
                 default:
@@ -77,7 +85,10 @@ public class CollectionEventInfoTable extends
         TableRowData info = new TableRowData();
         info.collectionEvent = collectionEvent;
         info.visitNumber = collectionEvent.getVisitNumber();
-        info.specimenCount = collectionEvent.getSpecimensCount(true);
+        info.sourceSpecimenCount = collectionEvent
+            .getSourceSpecimensCount(true);
+        info.aliquotedSpecimenCount = collectionEvent
+            .getAliquotedSpecimensCount(true);
         info.comment = collectionEvent.getComment();
         return info;
     }

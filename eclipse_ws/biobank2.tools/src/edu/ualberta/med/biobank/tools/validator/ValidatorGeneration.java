@@ -89,18 +89,14 @@ public class ValidatorGeneration {
         ValidatorGeneration.getInstance().doWork(parseCommandLine(argv));
     }
 
-    public void doWork(AppArgs appArgs) {
+    public void doWork(AppArgs appArgs) throws Exception {
         LOGGER.info("UML file: " + appArgs.modelFileName);
         LOGGER.info("validator file:  " + appArgs.validatorFileName);
 
-        try {
-            modelClasses = ModelUmlParser.getInstance().geLogicalModel(
-                appArgs.modelFileName);
-            ModelUmlParser.getInstance().geDataModel(appArgs.modelFileName);
-            createValidatorFile(appArgs.validatorFileName);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        modelClasses = ModelUmlParser.getInstance().geLogicalModel(
+            appArgs.modelFileName);
+        ModelUmlParser.getInstance().geDataModel(appArgs.modelFileName);
+        createValidatorFile(appArgs.validatorFileName);
     }
 
     private void createValidatorFile(String validatorFileName) throws Exception {
