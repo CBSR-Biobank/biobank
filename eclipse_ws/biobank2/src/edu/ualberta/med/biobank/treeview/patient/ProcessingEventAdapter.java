@@ -45,7 +45,7 @@ public class ProcessingEventAdapter extends AdapterBase {
 
         long count = -1;
         try {
-            count = pevent.getSourceSpecimenCount(true);
+            count = pevent.getSpecimenCount(true);
         } catch (Exception e) {
             logger.error("Problem counting specimens", e);
         }

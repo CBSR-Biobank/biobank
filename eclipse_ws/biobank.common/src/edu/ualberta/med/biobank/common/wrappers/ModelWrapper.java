@@ -927,7 +927,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             propertyChangeSupport.firePropertyChange(property.getName(),
                 oldValue, newValue);
         } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

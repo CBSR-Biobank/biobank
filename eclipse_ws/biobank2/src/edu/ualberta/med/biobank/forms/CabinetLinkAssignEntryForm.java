@@ -42,7 +42,6 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenLinkWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.PatientTextCallback;
@@ -416,7 +415,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             public void modifyText(ModifyEvent e) {
                 positionTextModified = true;
                 if (radioNew.getSelection()) {
-                    typeWidget.setSourceSpecimenLinks(null);
+                    typeWidget.setSourceSpecimens(null);
                     typeWidget.setResultTypes(null);
                 }
                 resultShownValue.setValue(Boolean.FALSE);
@@ -574,10 +573,10 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     }
 
     private void createTypeCombo(Composite fieldsComposite) {
-        List<SpecimenLinkWrapper> sourceSpecimensLink = null;
+        List<SpecimenWrapper> sourceSpecimens = null;
         List<SpecimenTypeWrapper> resultTypes = null;
         typeWidget = new AliquotedSpecimenSelectionWidget(fieldsComposite,
-            null, sourceSpecimensLink, resultTypes, widgetCreator, false);
+            null, sourceSpecimens, resultTypes, widgetCreator, false);
         typeWidget.addBindings();
 
         // for move mode
@@ -706,12 +705,12 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
 
         typeWidget.setEnabled(true);
 
-        List<SpecimenLinkWrapper> availableSourceSpecimenLinks = new ArrayList<SpecimenLinkWrapper>();
+        List<SpecimenWrapper> availableSourceSpecimenLinks = new ArrayList<SpecimenWrapper>();
         List<SpecimenTypeWrapper> studiesAliquotedTypes = new ArrayList<SpecimenTypeWrapper>();
         if (linkFormPatientManagement.getCurrentPatient() != null
             && bin != null) {
             availableSourceSpecimenLinks = linkFormPatientManagement
-                .getSpecimenLinksInCollectionEvent();
+                .getSpecimenInCollectionEvent();
 
             List<SpecimenTypeWrapper> binTypes = bin.getContainerType()
                 .getSpecimenTypeCollection();
@@ -739,11 +738,11 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 }
             }
         }
-        typeWidget.setSourceSpecimenLinks(availableSourceSpecimenLinks);
+        typeWidget.setSourceSpecimens(availableSourceSpecimenLinks);
         typeWidget.setResultTypes(studiesAliquotedTypes);
         typeWidget.setEnabled(true);
         typeWidget.deselectAll();
-        specimen.setParentSpecimenLink(null);
+        specimen.setParentSpecimen(null);
         specimen.setSpecimenType(null);
         return studiesAliquotedTypes.size();
     }
@@ -808,8 +807,9 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 .getText());
         }
         oldCabinetPositionText.setText(positionString);
-        sourceSpecimenText.setText(specimen.getParentSpecimenLink()
-            .getParentSpecimen().getInventoryId());
+        sourceSpecimenText.setText(specimen.getParentSpecimen()
+            .getSpecimenType().getNameShort()
+            + "(" + specimen.getParentSpecimen().getInventoryId() + ")");
         specimenTypeText.setText(specimen.getSpecimenType().getName());
         page.layout(true, true);
         appendLogNLS(
@@ -867,10 +867,11 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     protected void doBeforeSave() throws Exception {
         // can't acces the combos in another thread, so do it now
         if (aliquotMode == AliquotMode.NEW_ALIQUOT) {
-            specimen.setParentSpecimenLink((SpecimenLinkWrapper) typeWidget
-                .getSelection()[0]);
-            specimen.setSpecimenType((SpecimenTypeWrapper) typeWidget
-                .getSelection()[1]);
+            // FIXME
+            // specimen.setParentSpecimenLink((SpecimenLinkWrapper) typeWidget
+            // .getSelection()[0]);
+            // specimen.setSpecimenType((SpecimenTypeWrapper) typeWidget
+            // .getSelection()[1]);
         }
     }
 

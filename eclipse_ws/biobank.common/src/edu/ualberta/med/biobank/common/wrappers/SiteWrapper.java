@@ -20,7 +20,6 @@ import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenLinkPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.User;
@@ -189,9 +188,7 @@ public class SiteWrapper extends SiteBaseWrapper {
         + " as site join site."
         + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pevent join pevent."
-        + ProcessingEventPeer.SPECIMEN_LINK_COLLECTION.getName()
-        + " as link join link."
-        + SpecimenLinkPeer.PARENT_SPECIMEN.getName()
+        + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
         + " as spcs join spcs."
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
             CollectionEventPeer.PATIENT)
@@ -204,15 +201,15 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getCountResult(appService, criteria);
     }
 
-    private static final String CHILD_SPECIMENS_COUNT_QRY = "select count(spcs) from "
+    private static final String CHILD_SPECIMENS_COUNT_QRY = "select count(childSpcs) from "
         + Site.class.getName()
         + " site left join site."
         + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
         + " as pevent join pevent."
-        + ProcessingEventPeer.SPECIMEN_LINK_COLLECTION.getName()
-        + " as spLink join spLink."
-        + SpecimenLinkPeer.CHILD_SPECIMEN_COLLECTION.getName()
-        + " as spcs where site." + SitePeer.ID.getName() + "=?";
+        + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
+        + " as parentSpc join parentSpc."
+        + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
+        + " as childSpcs where site." + SitePeer.ID.getName() + "=?";
 
     public Long getAliquotedSpecimenCount() throws Exception {
         HQLCriteria criteria = new HQLCriteria(CHILD_SPECIMENS_COUNT_QRY,

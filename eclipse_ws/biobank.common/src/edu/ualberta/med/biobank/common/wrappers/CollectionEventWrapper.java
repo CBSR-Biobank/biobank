@@ -239,7 +239,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
             CollectionEventPeer.ID)
         + "=? and spc."
-        + SpecimenPeer.PARENT_SPECIMEN_LINK.getName() + " is not null";
+        + SpecimenPeer.SOURCE_COLLECTION_EVENT.getName() + " is null";
 
     public long getAliquotedSpecimensCount(boolean fast)
         throws BiobankException, ApplicationException {
@@ -266,6 +266,19 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     public static List<CollectionEventWrapper> getTodayCollectionEvents(
         WritableApplicationService appService) {
         return null;
+    }
+
+    /**
+     * source specimen that are in a process event
+     */
+    public List<SpecimenWrapper> getSourceSpecimenCollectionInProcess(
+        boolean sort) {
+        List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
+        for (SpecimenWrapper specimen : getSourceSpecimenCollection(sort)) {
+            if (specimen.getProcessingEvent() != null)
+                specimens.add(specimen);
+        }
+        return specimens;
     }
 
     private Map<String, StudyEventAttrWrapper> getStudyEventAttrMap() {
@@ -490,11 +503,4 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         return null;
     }
 
-    public List<SpecimenLinkWrapper> getSourceSpecimenLinkCollection() {
-        List<SpecimenLinkWrapper> links = new ArrayList<SpecimenLinkWrapper>();
-        for (SpecimenWrapper spec : getSourceSpecimenCollection(true)) {
-            links.addAll(spec.getSpecimenLinkCollection(false));
-        }
-        return links;
-    }
 }

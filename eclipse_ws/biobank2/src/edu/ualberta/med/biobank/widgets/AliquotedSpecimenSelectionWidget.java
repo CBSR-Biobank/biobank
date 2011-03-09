@@ -31,8 +31,8 @@ import org.eclipse.ui.forms.widgets.FormToolkit;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenLinkWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 /**
@@ -69,7 +69,7 @@ public class AliquotedSpecimenSelectionWidget {
     private Label resultLabel;
 
     public AliquotedSpecimenSelectionWidget(Composite parent, Character letter,
-        List<SpecimenLinkWrapper> sourceSpecimensLink,
+        List<SpecimenWrapper> sourceSpecimens,
         List<SpecimenTypeWrapper> resultTypes, WidgetCreator widgetCreator,
         boolean oneRow) {
         this.widgetCreator = widgetCreator;
@@ -89,15 +89,13 @@ public class AliquotedSpecimenSelectionWidget {
         cvSource = new ComboViewer(parent, SWT.DROP_DOWN | SWT.READ_ONLY
             | SWT.BORDER);
         setComboProperties(cvSource, widgetCreator.getToolkit(),
-            sourceSpecimensLink, 0);
+            sourceSpecimens, 0);
         cvSource.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
-                SpecimenLinkWrapper link = (SpecimenLinkWrapper) element;
-                return link.getParentSpecimen().getInventoryId() + "-"
-                    + link.getParentSpecimen().getSpecimenType().getNameShort()
-                    + " (wsheet#" + link.getProcessingEvent().getWorksheet()
-                    + ")";
+                SpecimenWrapper spc = (SpecimenWrapper) element;
+                return spc.getSpecimenType().getNameShort() + "("
+                    + spc.getInventoryId() + ")";
             }
         });
         if (oneRow) {
@@ -256,9 +254,9 @@ public class AliquotedSpecimenSelectionWidget {
             .getSelection()).getFirstElement();
     }
 
-    private SpecimenLinkWrapper getSourceSelection() {
-        return (SpecimenLinkWrapper) ((StructuredSelection) cvSource
-            .getSelection()).getFirstElement();
+    private SpecimenWrapper getSourceSelection() {
+        return (SpecimenWrapper) ((StructuredSelection) cvSource.getSelection())
+            .getFirstElement();
     }
 
     public void addBindings() {
@@ -347,8 +345,8 @@ public class AliquotedSpecimenSelectionWidget {
         cvResult.setInput(types);
     }
 
-    public void setSourceSpecimenLinks(List<SpecimenLinkWrapper> sourceLinks) {
-        cvSource.setInput(sourceLinks);
+    public void setSourceSpecimens(List<SpecimenWrapper> sourceSpecimens) {
+        cvSource.setInput(sourceSpecimens);
     }
 
     public void setFocus() {

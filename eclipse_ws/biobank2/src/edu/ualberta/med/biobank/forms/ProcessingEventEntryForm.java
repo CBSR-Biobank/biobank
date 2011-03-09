@@ -163,8 +163,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL, GridData.FILL));
         toolkit.paintBordersFor(client);
 
-        List<SpecimenWrapper> specimens = pEvent
-            .getSourceSpecimenCollection(true);
+        List<SpecimenWrapper> specimens = pEvent.getSpecimenCollection(true);
 
         specimenEntryWidget = new SpecimenEntryWidget(client, SWT.NONE,
             toolkit, appService, true);
@@ -187,12 +186,14 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 case PRE_ADD:
                     break;
                 case POST_ADD:
-                    pEvent.addSourceSpecimens(Arrays.asList(specimen));
+                    specimen.setProcessingEvent(pEvent);
+                    pEvent.addToSpecimenCollection(Arrays.asList(specimen));
                     break;
                 case PRE_DELETE:
                     break;
                 case POST_DELETE:
-                    pEvent.removeSourceSpecimens(Arrays.asList(specimen));
+                    pEvent
+                        .removeFromSpecimenCollection(Arrays.asList(specimen));
                     break;
                 }
             }
@@ -231,7 +232,6 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 pEvent.getActivityStatus()));
         }
-        specimenEntryWidget.setSpecimens(pEvent
-            .getSourceSpecimenCollection(true));
+        specimenEntryWidget.setSpecimens(pEvent.getSpecimenCollection(true));
     }
 }

@@ -94,7 +94,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient(Messages
             .getString("ProcessingEventViewForm.specimens.title")); //$NON-NLS-1$
         sourceSpecimenTable = new SpecimenInfoTable(client,
-            pEvent.getSourceSpecimenCollection(true), ColumnsShown.ALL, 10);
+            pEvent.getSpecimenCollection(true), ColumnsShown.ALL, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
     }
 
@@ -106,19 +106,17 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         form.setText(Messages.getString("ProcessingEventViewForm.title", //$NON-NLS-1$
             pEvent.getFormattedCreatedAt()));
         setValues();
-        sourceSpecimenTable.setCollection(pEvent
-            .getChildSpecimenCollection(true));
+        sourceSpecimenTable.setCollection(pEvent.getSpecimenCollection(true));
     }
 
     private void retrieveProcessingEvent() {
         try {
             pEvent.reload();
         } catch (Exception ex) {
-            logger.error(
-                "Error while retrieving processing event " //$NON-NLS-1$
-                    + pEvent.getFormattedCreatedAt() + "/" //$NON-NLS-1$
-                    + pEvent.getCenter().getNameShort() + "/" //$NON-NLS-1$
-                    + pEvent.getWorksheet(), ex);
+            logger.error("Error while retrieving processing event " //$NON-NLS-1$
+                + pEvent.getFormattedCreatedAt() + "/" //$NON-NLS-1$
+                + pEvent.getCenter().getNameShort() + "/" //$NON-NLS-1$
+                + pEvent.getWorksheet(), ex);
         }
     }
 }

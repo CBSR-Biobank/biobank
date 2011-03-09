@@ -15,8 +15,6 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
-import edu.ualberta.med.biobank.common.peer.SpecimenLinkPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
@@ -24,7 +22,6 @@ import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -180,8 +177,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         + " as spcs where cevent."
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
         + "=? and spcs."
-        + SpecimenPeer.PARENT_SPECIMEN_LINK.getName()
-        + " is not null";
+        + SpecimenPeer.SOURCE_COLLECTION_EVENT.getName()
+        + " is null";
 
     public long getAliquotedSpecimensCount(boolean fast)
         throws ApplicationException, BiobankException {
@@ -256,22 +253,23 @@ public class PatientWrapper extends PatientBaseWrapper {
         return null;
     }
 
-    private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY = "select pEvent from "
-        + Patient.class.getName()
-        + " as p join p."
-        + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
-        + " as ces join ces."
-        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
-        + " as specimens join specimens."
-        + SpecimenPeer.SPECIMEN_LINK_COLLECTION.getName()
-        + " as spLink join spLink."
-        + SpecimenLinkPeer.PROCESSING_EVENT
-        + " as pes where p."
-        + PatientPeer.ID.getName()
-        + "=? and pes."
-        + ProcessingEventPeer.CREATED_AT.getName()
-        + ">? and pes."
-        + ProcessingEventPeer.CREATED_AT.getName() + "<?";
+    // private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY =
+    // "select pEvent from "
+    // + Patient.class.getName()
+    // + " as p join p."
+    // + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
+    // + " as ces join ces."
+    // + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+    // + " as specimens join specimens."
+    // + SpecimenPeer.SPECIMEN_LINK_COLLECTION.getName()
+    // + " as spLink join spLink."
+    // + SpecimenLinkPeer.PROCESSING_EVENT
+    // + " as pes where p."
+    // + PatientPeer.ID.getName()
+    // + "=? and pes."
+    // + ProcessingEventPeer.CREATED_AT.getName()
+    // + ">? and pes."
+    // + ProcessingEventPeer.CREATED_AT.getName() + "<?";
 
     @Deprecated
     // FIXME :in Scan Link, wants the collection event instead. ? What is a last
@@ -291,12 +289,13 @@ public class PatientWrapper extends PatientBaseWrapper {
         // 7 days ago, at midnight
         cal.add(Calendar.DATE, -8);
         Date startDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria(
-            LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
-                getId(), site.getId(), startDate, endDate }));
-        List<ProcessingEvent> res = appService.query(criteria);
-        return ModelWrapper.wrapModelCollection(appService, res,
-            ProcessingEventWrapper.class);
+        // HQLCriteria criteria = new HQLCriteria(
+        // LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
+        // getId(), site.getId(), startDate, endDate }));
+        // List<ProcessingEvent> res = appService.query(criteria);
+        // return ModelWrapper.wrapModelCollection(appService, res,
+        // ProcessingEventWrapper.class);
+        return new ArrayList<ProcessingEventWrapper>();
     }
 
     @Override
@@ -388,8 +387,7 @@ public class PatientWrapper extends PatientBaseWrapper {
         for (CollectionEventWrapper ce : ces)
             specs.addAll(ce.getAllSpecimenCollection(false));
         for (SpecimenWrapper spec : specs) {
-            pes.addAll(spec.getProcessingEventCollectionAsParent());
-            pes.add(spec.getProcessingEventAsChild());
+            pes.add(spec.getProcessingEvent());
         }
         return new ArrayList<ProcessingEventWrapper>(pes);
     }

@@ -473,28 +473,4 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         objectWithPositionManagement.resetInternalFields();
     }
 
-    public List<ProcessingEventWrapper> getProcessingEventCollectionAsParent() {
-        List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
-        for (SpecimenLinkWrapper link : getSpecimenLinkCollection(false)) {
-            peList.add(link.getProcessingEvent());
-        }
-        return peList;
-    }
-
-    public ProcessingEventWrapper getProcessingEventAsChild() {
-        return getParentSpecimenLink() == null ? null : getParentSpecimenLink()
-            .getProcessingEvent();
-    }
-
-    // only for parent specimen
-    public List<ProcessingEventWrapper> getProcessingEventCollectionForWorksheet(
-        String worksheet) {
-        List<ProcessingEventWrapper> peList = new ArrayList<ProcessingEventWrapper>();
-        for (ProcessingEventWrapper pe : getProcessingEventCollectionAsParent()) {
-            String peWorksheet = pe.getWorksheet();
-            if (peWorksheet != null && peWorksheet.equals(worksheet))
-                peList.add(pe);
-        }
-        return peList;
-    }
 }

@@ -23,8 +23,8 @@ import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenLinkWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -276,8 +276,9 @@ public class LinkFormPatientManagement {
         return currentWorksheetNumber;
     }
 
-    public List<SpecimenLinkWrapper> getSpecimenLinksInCollectionEvent() {
-        return getSelectedCollectionEvent().getSourceSpecimenLinkCollection();
+    public List<SpecimenWrapper> getSpecimenInCollectionEvent() {
+        return getSelectedCollectionEvent()
+            .getSourceSpecimenCollectionInProcess(true);
     }
 
     /**
