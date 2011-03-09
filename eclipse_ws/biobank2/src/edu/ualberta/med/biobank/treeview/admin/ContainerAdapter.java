@@ -184,7 +184,7 @@ public class ContainerAdapter extends AdapterBase {
                 if (setNewPositionFromLabel(mc.getNewLabel())) {
                     // update new parent
                     ContainerWrapper newParentContainer = getContainer()
-                        .getParent();
+                        .getParentContainer();
                     ContainerAdapter parentAdapter = (ContainerAdapter) SessionManager
                         .searchFirstNode(newParentContainer);
                     if (parentAdapter != null) {
@@ -271,8 +271,8 @@ public class ContainerAdapter extends AdapterBase {
             ContainerWrapper containerWrapper = (ContainerWrapper) searchedObject;
             List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
             ContainerWrapper currentContainer = containerWrapper;
-            while (currentContainer.hasParent()) {
-                currentContainer = currentContainer.getParent();
+            while (currentContainer.hasParentContainer()) {
+                currentContainer = currentContainer.getParentContainer();
                 parents.add(currentContainer);
             }
             res = searchChildContainers(searchedObject, this, parents);

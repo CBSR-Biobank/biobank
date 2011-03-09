@@ -839,27 +839,27 @@ public class TestContainer extends TestDatabase {
     }
 
     @Test
-    public void testGetParent() throws Exception {
+    public void testgetParentContainer() throws Exception {
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
 
-        Assert.assertEquals(null, containerMap.get("Top").getParent());
+        Assert.assertEquals(null, containerMap.get("Top").getParentContainer());
         Assert.assertEquals(containerMap.get("Top"), containerMap
-            .get("ChildL1").getParent());
+            .get("ChildL1").getParentContainer());
         Assert.assertEquals(containerMap.get("ChildL1"),
-            containerMap.get("ChildL2").getParent());
+            containerMap.get("ChildL2").getParentContainer());
         Assert.assertEquals(containerMap.get("ChildL2"),
-            containerMap.get("ChildL3").getParent());
+            containerMap.get("ChildL3").getParentContainer());
     }
 
     @Test
     public void testHasParent() throws Exception {
         ContainerWrapper top = containerMap.get("Top");
         addContainerHierarchy(top);
-        Assert.assertFalse(containerMap.get("Top").hasParent());
-        Assert.assertTrue(containerMap.get("ChildL1").hasParent());
-        Assert.assertTrue(containerMap.get("ChildL2").hasParent());
-        Assert.assertTrue(containerMap.get("ChildL3").hasParent());
+        Assert.assertFalse(containerMap.get("Top").hasParentContainer());
+        Assert.assertTrue(containerMap.get("ChildL1").hasParentContainer());
+        Assert.assertTrue(containerMap.get("ChildL2").hasParentContainer());
+        Assert.assertTrue(containerMap.get("ChildL3").hasParentContainer());
     }
 
     private ProcessingEventWrapper addProcessingEvent() throws Exception {
@@ -1458,7 +1458,7 @@ public class TestContainer extends TestDatabase {
         String label = "01AA01B6";
         newContainer.setPositionAndParentFromLabel(label, Arrays.asList(type));
 
-        Assert.assertEquals(childL2, newContainer.getParent());
+        Assert.assertEquals(childL2, newContainer.getParentContainer());
         Assert.assertEquals(new RowColPos(1, 5),
             newContainer.getPositionAsRowCol());
         newContainer.persist();
@@ -1583,7 +1583,7 @@ public class TestContainer extends TestDatabase {
         newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
         child.persist();
         child.reload();
-        Assert.assertEquals(top2, child.getParent());
+        Assert.assertEquals(top2, child.getParentContainer());
         Assert.assertEquals(newLabel, child.getLabel());
     }
 
@@ -1610,7 +1610,7 @@ public class TestContainer extends TestDatabase {
         newParent.addChild(newLabel.substring(newLabel.length() - 2), child);
         child.persist();
         child.reload();
-        Assert.assertEquals(top, child.getParent());
+        Assert.assertEquals(top, child.getParentContainer());
         Assert.assertEquals(newLabel, child.getLabel());
     }
 
@@ -1842,17 +1842,20 @@ public class TestContainer extends TestDatabase {
         Assert.assertTrue(emptyContainers.contains(child));
         Assert.assertTrue(emptyContainers.contains(child2));
 
-        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
-            appService, site, Arrays.asList(allSampleTypes.get(1)), 2, 2);
+        emptyContainers = ContainerWrapper
+            .getEmptyContainersHoldingSpecimenType(appService, site,
+                Arrays.asList(allSampleTypes.get(1)), 2, 2);
         Assert.assertEquals(1, emptyContainers.size());
         Assert.assertTrue(emptyContainers.contains(child3));
 
-        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
-            appService, site, Arrays.asList(allSampleTypes.get(0)), 5, 2);
+        emptyContainers = ContainerWrapper
+            .getEmptyContainersHoldingSpecimenType(appService, site,
+                Arrays.asList(allSampleTypes.get(0)), 5, 2);
         Assert.assertEquals(0, emptyContainers.size());
 
-        emptyContainers = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
-            appService, site, Arrays.asList(allSampleTypes.get(1)), 2, 10);
+        emptyContainers = ContainerWrapper
+            .getEmptyContainersHoldingSpecimenType(appService, site,
+                Arrays.asList(allSampleTypes.get(1)), 2, 10);
         Assert.assertEquals(0, emptyContainers.size());
     }
 

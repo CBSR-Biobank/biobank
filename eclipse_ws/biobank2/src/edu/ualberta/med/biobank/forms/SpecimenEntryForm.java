@@ -72,7 +72,8 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         List<SpecimenTypeWrapper> containerSampleTypeList = null;
         if (aliquot.hasParent()) {
-            ContainerTypeWrapper ct = aliquot.getParent().getContainerType();
+            ContainerTypeWrapper ct = aliquot.getParentContainer()
+                .getContainerType();
             ct.reload();
             containerSampleTypeList = ct.getSpecimenTypeCollection();
         }

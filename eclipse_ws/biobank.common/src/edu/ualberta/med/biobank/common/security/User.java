@@ -28,7 +28,7 @@ public class User implements Serializable, NotAProxy {
 
     private List<SiteWrapper> workingSites;
 
-    private CenterWrapper<?> currentWorkingCentre;
+    private CenterWrapper<?> currentWorkingCenter;
 
     public boolean isLockedOut() {
         return isLockedOut;
@@ -232,7 +232,7 @@ public class User implements Serializable, NotAProxy {
     }
 
     // FIXME list caching : what if a new site ? user should log off anyway ?
-    // Should return centres when the full security is set
+    // Should return centers when the full security is set
     public List<SiteWrapper> getWorkingCenters(
         WritableApplicationService appService) throws Exception {
         if (workingSites == null) {
@@ -247,24 +247,24 @@ public class User implements Serializable, NotAProxy {
         return workingSites;
     }
 
-    public void setCurrentWorkingCentre(CenterWrapper<?> centre) {
-        this.currentWorkingCentre = centre;
+    public void setCurrentWorkingCenter(CenterWrapper<?> center) {
+        this.currentWorkingCenter = center;
     }
 
-    public CenterWrapper<?> getCurrentWorkingCentre() {
+    public CenterWrapper<?> getCurrentWorkingCenter() {
         try {
-            if (currentWorkingCentre != null)
-                currentWorkingCentre.reload();
+            if (currentWorkingCenter != null)
+                currentWorkingCenter.reload();
         } catch (Exception e) {
             // FIXME: how to handle?
             e.printStackTrace();
         }
-        return currentWorkingCentre;
+        return currentWorkingCenter;
     }
 
     public SiteWrapper getCurrentWorkingSite() {
-        if (currentWorkingCentre instanceof SiteWrapper)
-            return (SiteWrapper) currentWorkingCentre;
+        if (currentWorkingCenter instanceof SiteWrapper)
+            return (SiteWrapper) currentWorkingCenter;
         return null;
     }
 }

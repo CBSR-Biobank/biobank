@@ -31,7 +31,7 @@ public class DispatchHelper extends DbHelper {
             shipInfo.setReceivedAt(dateReceived);
         }
 
-        dispatch.setDepartedAt(Utils.getRandomDate());
+        dispatch.setPackedAt(Utils.getRandomDate());
 
         if (aliquots != null) {
             dispatch.addSpecimens(Arrays.asList(aliquots));

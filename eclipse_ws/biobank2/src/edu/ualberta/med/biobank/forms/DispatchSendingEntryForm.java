@@ -81,7 +81,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
         if (dispatch.isNew()) {
             dispatch.setSenderCenter(SessionManager.getUser()
-                .getCurrentWorkingCentre());
+                .getCurrentWorkingCenter());
             dispatch.setState(DispatchState.CREATION);
         }
 
@@ -220,7 +220,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     protected void openScanDialog() {
         DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, SessionManager.getUser().getCurrentWorkingCentre());
+            dispatch, SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
         setDirty(true); // FIXME need to do this better !
         reloadAliquots();
@@ -282,7 +282,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         super.reset();
         dispatch.resetMap();
         dispatch.setSenderCenter(SessionManager.getUser()
-            .getCurrentWorkingCentre());
+            .getCurrentWorkingCenter());
         if (destSiteComboViewer != null) {
             CenterWrapper<?> destSite = dispatch.getReceiverCenter();
             if (destSite != null) {
@@ -319,8 +319,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
             label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
-            if (dispatch.getDepartedAt() != null)
-                label += "[" + dispatch.getFormattedDeparted() + "]";
+            if (dispatch.getPackedAt() != null)
+                label += "[" + dispatch.getFormattedPackedAt() + "]";
             return label;
         }
     }

@@ -155,7 +155,7 @@ public class SearchView extends ViewPart {
                 try {
                     List<? extends ModelWrapper<?>> res = type.search(
                         searchString, SessionManager.getUser()
-                            .getCurrentWorkingCentre());
+                            .getCurrentWorkingCenter());
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {

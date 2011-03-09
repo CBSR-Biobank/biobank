@@ -19,8 +19,8 @@ public class PatientWBCTest extends AbstractReportTest {
     };
     private static final Predicate<SpecimenWrapper> ALIQUOT_IN_CABINET = new Predicate<SpecimenWrapper>() {
         public boolean evaluate(SpecimenWrapper aliquot) {
-            return (aliquot.getParent() != null)
-                && aliquot.getParent().getLabel().contains("Cabinet");
+            return (aliquot.getParentContainer() != null)
+                && aliquot.getParentContainer().getLabel().contains("Cabinet");
         }
     };
 

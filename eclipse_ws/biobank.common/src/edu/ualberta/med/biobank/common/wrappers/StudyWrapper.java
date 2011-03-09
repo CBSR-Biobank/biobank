@@ -166,8 +166,10 @@ public class StudyWrapper extends StudyBaseWrapper {
         return studyEventAttr;
     }
 
-    public String getStudyEventAttrType(String label) throws Exception {
-        return getStudyEventAttr(label).getEventAttrType().getName();
+    public EventAttrTypeEnum getStudyEventAttrType(String label)
+        throws Exception {
+        return EventAttrTypeEnum.getEventAttrType(getStudyEventAttr(label)
+            .getEventAttrType().getName());
     }
 
     /**
@@ -209,11 +211,12 @@ public class StudyWrapper extends StudyBaseWrapper {
      * 
      * @throws Exception Thrown if the attribute type does not exist.
      */
-    public void setStudyEventAttr(String label, String type,
+    public void setStudyEventAttr(String label, EventAttrTypeEnum type,
         String[] permissibleValues) throws Exception {
         Map<String, EventAttrTypeWrapper> EventAttrTypeMap = EventAttrTypeWrapper
             .getAllEventAttrTypesMap(appService);
-        EventAttrTypeWrapper EventAttrType = EventAttrTypeMap.get(type);
+        EventAttrTypeWrapper EventAttrType = EventAttrTypeMap.get(type
+            .getName());
         if (EventAttrType == null) {
             throw new Exception("the pv attribute type \"" + type
                 + "\" does not exist");
@@ -222,7 +225,7 @@ public class StudyWrapper extends StudyBaseWrapper {
         getStudyEventAttrMap();
         StudyEventAttrWrapper studyEventAttr = studyEventAttrMap.get(label);
 
-        if (type.startsWith("select_")) {
+        if (type.isSelectType()) {
             // type has permissible values
             if ((studyEventAttr == null) && (permissibleValues == null)) {
                 // nothing to do
@@ -259,7 +262,8 @@ public class StudyWrapper extends StudyBaseWrapper {
      * @throws Exception Thrown if there is no possible patient visit with the
      *             label specified.
      */
-    public void setStudyEventAttr(String label, String type) throws Exception {
+    public void setStudyEventAttr(String label, EventAttrTypeEnum type)
+        throws Exception {
         setStudyEventAttr(label, type, null);
     }
 

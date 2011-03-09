@@ -28,7 +28,7 @@ public enum SearchType {
     INVENTORY_ID("Inventory ID") {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
-            CenterWrapper<?> centre) throws Exception {
+            CenterWrapper<?> center) throws Exception {
             List<SpecimenWrapper> res = new ArrayList<SpecimenWrapper>();
             SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
                 SessionManager.getAppService(), searchString,
@@ -44,11 +44,11 @@ public enum SearchType {
     SPECIMEN_POSITION("Specimen position") {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
-            CenterWrapper<?> centre) throws Exception {
+            CenterWrapper<?> center) throws Exception {
             // FIXME only in site (the one with positions ?)
-            if (centre instanceof SiteWrapper)
+            if (center instanceof SiteWrapper)
                 return SpecimenWrapper.getSpecimensInSiteWithPositionLabel(
-                    SessionManager.getAppService(), (SiteWrapper) centre,
+                    SessionManager.getAppService(), (SiteWrapper) center,
                     searchString);
             return Collections.emptyList();
         }
@@ -57,10 +57,10 @@ public enum SearchType {
     SPECIMEN_NON_ACTIVE("Specimens - non active") {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
-            CenterWrapper<?> centre) throws Exception {
+            CenterWrapper<?> center) throws Exception {
             List<SpecimenWrapper> specimens = SpecimenWrapper
-                .getSpecimensNonActiveInCentre(SessionManager.getAppService(),
-                    centre);
+                .getSpecimensNonActiveInCenter(SessionManager.getAppService(),
+                    center);
             return specimens;
         }
 
@@ -86,10 +86,10 @@ public enum SearchType {
     CONTAINER_LABEL("Container label") {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
-            CenterWrapper<?> centre) throws Exception {
-            if (centre instanceof SiteWrapper)
+            CenterWrapper<?> center) throws Exception {
+            if (center instanceof SiteWrapper)
                 return ContainerWrapper.getContainersInSite(
-                    SessionManager.getAppService(), (SiteWrapper) centre,
+                    SessionManager.getAppService(), (SiteWrapper) center,
                     searchString);
             return Collections.emptyList();
         }
@@ -98,11 +98,11 @@ public enum SearchType {
     CONTAINER_PRODUCT_BARCODE("Container product barcode") {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
-            CenterWrapper<?> centre) throws Exception {
-            if (centre instanceof SiteWrapper) {
+            CenterWrapper<?> center) throws Exception {
+            if (center instanceof SiteWrapper) {
                 ContainerWrapper container = ContainerWrapper
                     .getContainerWithProductBarcodeInSite(
-                        SessionManager.getAppService(), (SiteWrapper) centre,
+                        SessionManager.getAppService(), (SiteWrapper) center,
                         searchString);
                 if (container != null) {
                     return Arrays.asList(container);
@@ -115,7 +115,7 @@ public enum SearchType {
     WORKSHEET("Worksheet") {
         @Override
         public List<? extends ModelWrapper<?>> search(String searchString,
-            CenterWrapper<?> centre) throws Exception {
+            CenterWrapper<?> center) throws Exception {
             List<ProcessingEventWrapper> pvs = ProcessingEventWrapper
                 .getProcessingEventsWithWorksheet(
                     SessionManager.getAppService(), searchString);
@@ -156,7 +156,7 @@ public enum SearchType {
     }
 
     public abstract List<? extends ModelWrapper<?>> search(String searchString,
-        CenterWrapper<?> centre) throws Exception;
+        CenterWrapper<?> center) throws Exception;
 
     public void processResults(List<? extends ModelWrapper<?>> res) {
         Assert.isNotNull(res);

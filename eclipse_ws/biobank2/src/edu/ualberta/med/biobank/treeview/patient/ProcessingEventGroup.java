@@ -40,7 +40,7 @@ public class ProcessingEventGroup extends AdapterBase {
                 ProcessingEventWrapper pEvent = new ProcessingEventWrapper(
                     SessionManager.getAppService());
                 pEvent.setCenter(SessionManager.getUser()
-                    .getCurrentWorkingCentre());
+                    .getCurrentWorkingCenter());
                 ProcessingEventAdapter adapter = new ProcessingEventAdapter(
                     ProcessingEventGroup.this, pEvent);
                 adapter.openEntryForm();

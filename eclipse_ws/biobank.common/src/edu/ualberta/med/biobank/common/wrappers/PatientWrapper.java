@@ -152,7 +152,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(spcs) from "
         + CollectionEvent.class.getName()
         + " as cevent join cevent."
-        + CollectionEventPeer.SOURCE_SPECIMEN_COLLECTION.getName()
+        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
         + " as spcs where cevent."
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
         + "=?";
@@ -177,8 +177,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         + " as spcs where cevent."
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
         + "=? and spcs."
-        + SpecimenPeer.SOURCE_COLLECTION_EVENT.getName()
-        + " is null";
+        + SpecimenPeer.PARENT_SPECIMEN.getName()
+        + " is not null";
 
     public long getAliquotedSpecimensCount(boolean fast)
         throws ApplicationException, BiobankException {

@@ -111,7 +111,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ProcessingEvent.field.centre.label"), pEvent //$NON-NLS-1$
+            Messages.getString("ProcessingEvent.field.center.label"), pEvent //$NON-NLS-1$
                 .getCenter().getName());
 
         dateWidget = createDateTimeWidget(

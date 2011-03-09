@@ -42,7 +42,7 @@ public abstract class AbstractReportTest {
 
     public static final Predicate<ContainerWrapper> CONTAINER_IS_TOP_LEVEL = new Predicate<ContainerWrapper>() {
         public boolean evaluate(ContainerWrapper container) {
-            return container.getParent() == null;
+            return container.getParentContainer() == null;
         }
     };
     public static final Predicate<ContainerWrapper> CONTAINER_CAN_STORE_SAMPLES_PREDICATE = new Predicate<ContainerWrapper>() {
@@ -55,13 +55,13 @@ public abstract class AbstractReportTest {
     };
     public static final Predicate<SpecimenWrapper> ALIQUOT_NOT_IN_SENT_SAMPLE_CONTAINER = new Predicate<SpecimenWrapper>() {
         public boolean evaluate(SpecimenWrapper aliquot) {
-            return (aliquot.getParent() == null)
-                || !aliquot.getParent().getLabel().startsWith("SS");
+            return (aliquot.getParentContainer() == null)
+                || !aliquot.getParentContainer().getLabel().startsWith("SS");
         }
     };
     public static final Predicate<SpecimenWrapper> ALIQUOT_HAS_POSITION = new Predicate<SpecimenWrapper>() {
         public boolean evaluate(SpecimenWrapper aliquot) {
-            return aliquot.getParent() != null;
+            return aliquot.getParentContainer() != null;
         }
     };
     public static final Comparator<SpecimenWrapper> ORDER_ALIQUOT_BY_PNUMBER = new Comparator<SpecimenWrapper>() {

@@ -105,8 +105,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         return DateFormatter.formatAsDateTime(getCreatedAt());
     }
 
-    public ContainerWrapper getParent() {
-        return objectWithPositionManagement.getParent();
+    public ContainerWrapper getParentContainer() {
+        return objectWithPositionManagement.getParentContainer();
     }
 
     public void setParent(ContainerWrapper container) {
@@ -114,7 +114,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public boolean hasParent() {
-        return objectWithPositionManagement.hasParent();
+        return objectWithPositionManagement.hasParentContainer();
     }
 
     public RowColPos getPosition() {
@@ -133,9 +133,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     private void checkParentAcceptSampleType() throws BiobankCheckException {
-        ContainerWrapper parent = getParent();
+        ContainerWrapper parent = getParentContainer();
         if (parent != null) {
-            ContainerTypeWrapper parentType = getParent().getContainerType();
+            ContainerTypeWrapper parentType = getParentContainer()
+                .getContainerType();
             try {
                 parentType.reload();
             } catch (Exception e) {
@@ -145,7 +146,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 .getSpecimenTypeCollection(false);
             if (types == null || !types.contains(getSpecimenType())) {
                 throw new BiobankCheckException("Container "
-                    + getParent().getFullInfoLabel()
+                    + getParentContainer().getFullInfoLabel()
                     + " does not allow inserts of sample type "
                     + ((getSpecimenType() == null) ? "null" : getSpecimenType()
                         .getName()) + ".");
@@ -219,9 +220,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
 
         if (!fullString) {
-            return getPositionStringInParent(position, getParent());
+            return getPositionStringInParent(position, getParentContainer());
         }
-        ContainerWrapper directParent = getParent();
+        ContainerWrapper directParent = getParentContainer();
         ContainerPathWrapper path = directParent.getContainerPath();
         ContainerWrapper topContainer;
 
@@ -229,8 +230,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             topContainer = path.getTopContainer();
         } else {
             topContainer = directParent;
-            while (topContainer.hasParent()) {
-                topContainer = topContainer.getParent();
+            while (topContainer.hasParentContainer()) {
+                topContainer = topContainer.getParentContainer();
             }
         }
         String nameShort = topContainer.getContainerType().getNameShort();
@@ -335,11 +336,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + " != ?";
 
-    public static List<SpecimenWrapper> getSpecimensNonActiveInCentre(
-        WritableApplicationService appService, CenterWrapper<?> centre)
+    public static List<SpecimenWrapper> getSpecimensNonActiveInCenter(
+        WritableApplicationService appService, CenterWrapper<?> center)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(SPECIMENS_NON_ACTIVE_QRY,
-            Arrays.asList(new Object[] { centre.getId(),
+            Arrays.asList(new Object[] { center.getId(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Specimen> Specimens = appService.query(criteria);
         List<SpecimenWrapper> list = new ArrayList<SpecimenWrapper>();

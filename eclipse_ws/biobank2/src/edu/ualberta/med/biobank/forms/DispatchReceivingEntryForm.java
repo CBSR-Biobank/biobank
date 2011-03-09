@@ -26,7 +26,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Dispatch sent on " + dispatch.getFormattedDeparted()
+        form.setText("Dispatch sent on " + dispatch.getFormattedPackedAt()
             + " from " + dispatch.getSenderCenter().getNameShort());
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -75,7 +75,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
         setTextValue(receiverLabel, dispatch.getReceiverCenter().getName());
         BiobankText departedLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Departed");
-        setTextValue(departedLabel, dispatch.getFormattedDeparted());
+        setTextValue(departedLabel, dispatch.getFormattedPackedAt());
         BiobankText shippingMethodLabel = createReadOnlyLabelledField(client,
             SWT.NONE, "Shipping Method");
         setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
@@ -197,7 +197,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
 
     @Override
     protected String getTextForPartName() {
-        return "Dispatch sent on " + dispatch.getDepartedAt();
+        return "Dispatch sent on " + dispatch.getPackedAt();
     }
 
     @Override

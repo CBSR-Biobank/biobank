@@ -43,10 +43,10 @@ public class DispatchAdapter extends AdapterBase {
         if (getWrapper() != null) {
             return editable
                 && ((getWrapper().getSenderCenter().equals(
-                    SessionManager.getUser().getCurrentWorkingCentre()) && (getWrapper()
+                    SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
                     .isNew() || getWrapper().isInCreationState() || getWrapper()
                     .isInTransitState())) || (getWrapper().getReceiverCenter()
-                    .equals(SessionManager.getUser().getCurrentWorkingCentre()) && (getWrapper()
+                    .equals(SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
                     .isInReceivedState() || getWrapper().isInTransitState())));
         }
         return editable;
@@ -62,8 +62,8 @@ public class DispatchAdapter extends AdapterBase {
             label += shipment.getSenderCenter().getNameShort() + " -> "
                 + shipment.getReceiverCenter().getNameShort();
 
-        if (shipment.getDepartedAt() != null)
-            label += " [" + shipment.getFormattedDeparted() + "]";
+        if (shipment.getPackedAt() != null)
+            label += " [" + shipment.getFormattedPackedAt() + "]";
         return label;
 
     }
@@ -170,7 +170,7 @@ public class DispatchAdapter extends AdapterBase {
 
     private void setDispatchAsCreation() {
         getWrapper().setState(DispatchState.CREATION);
-        getWrapper().setDepartedAt(null);
+        getWrapper().setPackedAt(null);
         persistDispatch();
     }
 
@@ -219,7 +219,7 @@ public class DispatchAdapter extends AdapterBase {
     public String getEntryFormId() {
         if (getWrapper().isInCreationState()
             || (getWrapper().isInTransitState() && SessionManager.getUser()
-                .getCurrentWorkingCentre()
+                .getCurrentWorkingCenter()
                 .equals(getWrapper().getSenderCenter())))
             return DispatchSendingEntryForm.ID;
         return DispatchReceivingEntryForm.ID;

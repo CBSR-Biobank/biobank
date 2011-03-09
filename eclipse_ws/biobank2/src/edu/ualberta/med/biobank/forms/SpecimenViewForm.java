@@ -135,7 +135,7 @@ public class SpecimenViewForm extends BiobankViewForm {
     }
 
     private void createContainersSection() {
-        if (aliquot.getParent() != null) {
+        if (aliquot.getParentContainer() != null) {
             Section section = createSection("Container Visualization");
             Composite containersComposite = toolkit.createComposite(section);
             section.setClient(containersComposite);
@@ -144,10 +144,10 @@ public class SpecimenViewForm extends BiobankViewForm {
             toolkit.paintBordersFor(containersComposite);
 
             Stack<ContainerWrapper> parents = new Stack<ContainerWrapper>();
-            ContainerWrapper container = aliquot.getParent();
+            ContainerWrapper container = aliquot.getParentContainer();
             while (container != null) {
                 parents.push(container);
-                container = container.getParent();
+                container = container.getParentContainer();
             }
             while (!parents.isEmpty()) {
                 container = parents.pop();

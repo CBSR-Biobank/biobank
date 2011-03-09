@@ -287,11 +287,10 @@ public class LinkFormPatientManagement {
      */
     public List<SpecimenTypeWrapper> getStudyAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer) {
-        // FIXME really need to reload ?
         StudyWrapper study = getCurrentPatient().getStudy();
         try {
             // need to reload study to avoid performance problem when using
-            // the same lots of time (like is try differents positions for
+            // the same lots of time (like is try different positions for
             // same patient)
             study.reload();
         } catch (Exception e) {
@@ -304,7 +303,8 @@ public class LinkFormPatientManagement {
             .getAliquotedSpecimenCollection(true)) {
             if (ss.getActivityStatus().isActive()) {
                 SpecimenTypeWrapper type = ss.getSpecimenType();
-                if (authorizedSpecimenTypesInContainer.contains(type)) {
+                if (authorizedSpecimenTypesInContainer == null
+                    || authorizedSpecimenTypesInContainer.contains(type)) {
                     studiesAliquotedTypes.add(type);
                 }
             }

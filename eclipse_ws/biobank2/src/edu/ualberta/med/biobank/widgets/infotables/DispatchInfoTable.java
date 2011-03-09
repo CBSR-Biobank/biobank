@@ -85,7 +85,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         throws Exception {
         TableRowData info = new TableRowData();
         info.ds = ds;
-        info.dispatchTime = ds.getDepartedAt();
+        info.dispatchTime = ds.getPackedAt();
         info.dateReceived = ds.getShipmentInfo().getReceivedAt();
         info.dstatus = ds.getStateDescription();
         info.astatus = ds.getDispatchSpecimen(a.getInventoryId())

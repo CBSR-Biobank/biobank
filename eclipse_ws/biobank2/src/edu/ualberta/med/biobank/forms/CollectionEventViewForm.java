@@ -56,7 +56,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         patientVisitAdapter = (CollectionEventAdapter) adapter;
         cevent = patientVisitAdapter.getWrapper();
         retrievePatientVisit();
-        cevent.logLookup(SessionManager.getUser().getCurrentWorkingCentre()
+        cevent.logLookup(SessionManager.getUser().getCurrentWorkingCenter()
             .getNameShort());
 
         setPartName(Messages.getString("CollectionEventViewForm.title",
@@ -144,8 +144,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
         Composite client = createSectionWithClient(Messages
             .getString("CollectionEventViewForm.specimens.title"));
         sourceSpecimenTable = new SpecimenInfoTable(client,
-            cevent.getSourceSpecimenCollection(true), ColumnsShown.CEVENT_FORM,
-            10);
+            cevent.getOriginalSpecimenCollection(true),
+            ColumnsShown.CEVENT_FORM, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
     }
 
@@ -158,7 +158,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
             +cevent.getVisitNumber()));
         setCollectionEventValues();
         sourceSpecimenTable.setCollection(cevent
-            .getSourceSpecimenCollection(true));
+            .getOriginalSpecimenCollection(true));
     }
 
     private void retrievePatientVisit() {
