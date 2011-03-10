@@ -128,6 +128,14 @@ public class DispatchAdapter extends AdapterBase {
                         doReceiveAndProcess();
                     }
                 });
+                mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText("Mark as Lost");
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        doSetAsLost();
+                    }
+                });
             }
             addEditMenu(menu, "Dispatch");
         } catch (Exception e) {

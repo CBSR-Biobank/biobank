@@ -52,8 +52,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return patients;
     }
 
-    public void checkAtLeastOneSpecimen() throws BiobankCheckException {
-        // FIXME don't want that when create form collection event
+    public void checkAtLeastOneSpecimen() {
+        // FIXME don't want that when create from collection event
         // List<SpecimenWrapper> spc = getSpecimenCollection(false);
         // if (spc == null || spc.isEmpty()) {
         // throw new BiobankCheckException(
@@ -123,15 +123,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
 
     public static List<OriginInfoWrapper> getTodayShipments(
         BiobankApplicationService appService) throws ApplicationException {
-        StringBuilder qry = new StringBuilder(SHIPMENT_HQL_STRING);
-        HQLCriteria criteria = new HQLCriteria(qry.toString(),
-            new ArrayList<Object>());
-
-        List<OriginInfo> origins = appService.query(criteria);
-        List<OriginInfoWrapper> shipments = ModelWrapper.wrapModelCollection(
-            appService, origins, OriginInfoWrapper.class);
-
-        return shipments;
+        return getShipmentsByDateReceived(appService, new Date());
     }
 
     /**

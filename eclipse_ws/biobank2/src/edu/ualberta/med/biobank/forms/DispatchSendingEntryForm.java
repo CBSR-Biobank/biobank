@@ -152,9 +152,10 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void formClosed() {
         try {
-            dispatch.reload();
+            reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", "Unable to reload dispatch");
+            // TODO: how to handle?
+            e.printStackTrace();
         }
     }
 
@@ -236,11 +237,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                 SpecimenWrapper existingAliquot = SpecimenWrapper.getSpecimen(
                     dispatch.getAppService(), inventoryId,
                     SessionManager.getUser());
-                if (existingAliquot == null)
-                    BiobankPlugin.openError("Aliquot not found",
-                        "Aliquot with inventory id " + inventoryId
-                            + " has not been found.");
-                else
+                if (dispatch.checkCanAddSpecimen(existingAliquot, true).ok)
                     addAliquot(existingAliquot);
 
             } catch (Exception ae) {
@@ -279,7 +276,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        dispatch.resetMap();
+        dispatch.reset();
         dispatch.setSenderCenter(SessionManager.getUser()
             .getCurrentWorkingCenter());
         if (destSiteComboViewer != null) {

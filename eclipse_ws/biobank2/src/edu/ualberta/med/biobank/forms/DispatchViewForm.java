@@ -141,7 +141,9 @@ public class DispatchViewForm extends BiobankViewForm {
                 createSendButton();
             else if (dispatch.canBeReceivedBy(user))
                 createReceiveButtons();
-            else if (dispatch.canBeClosedBy(user))
+            else if (dispatch.canBeClosedBy(user)
+                && dispatch.isInReceivedState()
+                && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
                 createCloseButton();
         }
     }

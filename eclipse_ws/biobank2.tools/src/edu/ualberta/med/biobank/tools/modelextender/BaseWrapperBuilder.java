@@ -23,6 +23,8 @@ public class BaseWrapperBuilder extends BaseBuilder {
     private static final Logger LOGGER = Logger
         .getLogger(BaseWrapperBuilder.class.getName());
 
+    private static final String SUPPRESS_WARNING_UNCHECKED = "@SuppressWarnings(\"unchecked\")";
+
     protected final String peerpackagename;
 
     protected final String wrapperPackageName;
@@ -265,8 +267,14 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        result.append("   public ").append(assocClassName)
-            .append("Wrapper get")
+        String genericString = "";
+        if (modelBaseClasses.containsKey(assocClassName)) {
+            genericString = "<?>";
+            result.append("   ").append(SUPPRESS_WARNING_UNCHECKED)
+                .append("\n");
+        }
+        result.append("   public ").append(assocClassName).append("Wrapper")
+            .append(genericString).append(" get")
             .append(CamelCase.toCamelCase(assocName, true)).append("() {\n")
             .append("      return getWrappedProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(assocName))
@@ -290,13 +298,17 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
+        String genericString = "";
+        if (modelBaseClasses.containsKey(assocClassName))
+            genericString = "<?>";
+
         result.append("   public void set")
             .append(CamelCase.toCamelCase(assocName, true)).append("(")
-            .append(assocClassName).append("Wrapper ").append(assocName)
-            .append(") {\n").append("      setWrappedProperty(")
-            .append(mc.getName()).append("Peer.")
-            .append(CamelCase.toTitleCase(assocName)).append(", ")
-            .append(assocName).append(");\n").append("   }\n\n");
+            .append(assocClassName).append("Wrapper").append(genericString)
+            .append(" ").append(assocName).append(") {\n")
+            .append("      setWrappedProperty(").append(mc.getName())
+            .append("Peer.").append(CamelCase.toTitleCase(assocName))
+            .append(", ").append(assocName).append(");\n").append("   }\n\n");
         return result.toString();
     }
 

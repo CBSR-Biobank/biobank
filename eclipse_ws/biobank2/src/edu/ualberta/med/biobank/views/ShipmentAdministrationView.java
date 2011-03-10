@@ -169,31 +169,31 @@ public class ShipmentAdministrationView extends
                 topNode = dateNode;
             }
 
-            List<AdapterBase> clinicAdapterList = topNode.search(originInfo
+            List<AdapterBase> centerAdapterList = topNode.search(originInfo
                 .getCenter());
-            ClinicWithShipmentAdapter clinicAdapter = null;
-            if (clinicAdapterList.size() > 0)
-                clinicAdapter = (ClinicWithShipmentAdapter) clinicAdapterList
-                    .get(0);
+            AdapterBase centerAdapter = null;
+
+            if (centerAdapterList.size() > 0)
+                centerAdapter = centerAdapterList.get(0);
             else if (originInfo.getCenter() instanceof ClinicWrapper) {
-                clinicAdapter = new ClinicWithShipmentAdapter(topNode,
+                centerAdapter = new ClinicWithShipmentAdapter(topNode,
                     (ClinicWrapper) originInfo.getCenter());
-                clinicAdapter.setEditable(false);
-                clinicAdapter.setLoadChildrenInBackground(false);
-                topNode.addChild(clinicAdapter);
+                centerAdapter.setEditable(false);
+                centerAdapter.setLoadChildrenInBackground(false);
+                topNode.addChild(centerAdapter);
             }
 
-            if (clinicAdapter != null) {
+            if (centerAdapter != null) {
                 ShipmentAdapter shipmentAdapter = null;
-                List<AdapterBase> shipmentAdapterList = clinicAdapter
+                List<AdapterBase> shipmentAdapterList = centerAdapter
                     .search(originInfo);
                 if (shipmentAdapterList.size() > 0)
                     shipmentAdapter = (ShipmentAdapter) shipmentAdapterList
                         .get(0);
                 else {
-                    shipmentAdapter = new ShipmentAdapter(clinicAdapter,
+                    shipmentAdapter = new ShipmentAdapter(centerAdapter,
                         originInfo);
-                    clinicAdapter.addChild(shipmentAdapter);
+                    centerAdapter.addChild(shipmentAdapter);
                 }
                 return shipmentAdapter;
             }

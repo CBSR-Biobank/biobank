@@ -186,10 +186,16 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
     }
 
     @Override
+    public void reset() throws Exception {
+        super.reset();
+        dispatch.reset();
+        aliquotsTree.refresh();
+    }
+
+    @Override
     public void formClosed() {
         try {
             dispatch.reload();
-            dispatch.resetMap();
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Error", "Unable to reload dispatch");
         }

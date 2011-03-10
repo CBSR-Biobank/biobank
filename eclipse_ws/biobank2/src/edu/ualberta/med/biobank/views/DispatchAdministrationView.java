@@ -92,7 +92,7 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
             }
         });
         radioDateSent = new Button(composite, SWT.RADIO);
-        radioDateSent.setText("Departed");
+        radioDateSent.setText("Packed At");
         radioDateSent.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -191,7 +191,7 @@ public class DispatchAdministrationView extends AbstractAdministrationView {
                 Date date = dateWidget.getDate();
                 if (date != null) {
                     if (radioDateSent.getSelection())
-                        return DispatchWrapper.getDispatchesInSiteByDateSent(
+                        return DispatchWrapper.getDispatchesInSiteByPackedAt(
                             SessionManager.getAppService(), date, site);
                     else
                         return DispatchWrapper

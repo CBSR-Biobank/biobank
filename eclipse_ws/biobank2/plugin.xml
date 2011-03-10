@@ -1605,15 +1605,15 @@
             class="edu.ualberta.med.biobank.forms.SpecimenViewForm"
             default="false"
             icon="icons/specimen.png"
-            id="edu.ualberta.med.biobank.forms.AliquotViewForm"
-            name="Aliquot View">
+            id="edu.ualberta.med.biobank.forms.SpecimenViewForm"
+            name="Specimen View">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.SpecimenEntryForm"
             default="false"
             icon="icons/specimen.png"
-            id="edu.ualberta.med.biobank.forms.AliquotEntryForm"
-            name="Aliquot Entry">
+            id="edu.ualberta.med.biobank.forms.SpecimenEntryForm"
+            name="Specimen Entry">
       </editor>
       <editor
             class="edu.ualberta.med.biobank.forms.SpecimenTypesEntryForm"
