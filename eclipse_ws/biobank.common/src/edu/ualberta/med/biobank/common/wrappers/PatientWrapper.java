@@ -387,7 +387,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         for (CollectionEventWrapper ce : ces)
             specs.addAll(ce.getAllSpecimenCollection(false));
         for (SpecimenWrapper spec : specs) {
-            pes.add(spec.getProcessingEvent());
+            if (spec.getProcessingEvent() != null)
+                pes.add(spec.getProcessingEvent());
         }
         return new ArrayList<ProcessingEventWrapper>(pes);
     }

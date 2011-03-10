@@ -28,17 +28,17 @@ public class WorkingCenterSelectDialog extends BiobankDialog {
 
     @Override
     protected String getTitleAreaMessage() {
-        return Messages.getString("WorkingCenterSelectDialog.description");
+        return Messages.getString("WorkingCenterSelectDialog.description"); //$NON-NLS-1$
     }
 
     @Override
     protected String getTitleAreaTitle() {
-        return Messages.getString("WorkingCenterSelectDialog.title");
+        return Messages.getString("WorkingCenterSelectDialog.title"); //$NON-NLS-1$
     }
 
     @Override
     protected String getDialogShellTitle() {
-        return Messages.getString("WorkingCenterSelectDialog.title");
+        return Messages.getString("WorkingCenterSelectDialog.title"); //$NON-NLS-1$
     }
 
     @Override
@@ -47,14 +47,18 @@ public class WorkingCenterSelectDialog extends BiobankDialog {
         GridLayout layout = new GridLayout(2, false);
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
-        widgetCreator.createComboViewer(contents, "Available centers",
-            user.getWorkingCenters(appService), null, null,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    currentCenter = (SiteWrapper) selectedObject;
-                }
-            });
+        widgetCreator
+            .createComboViewer(
+                contents,
+                Messages
+                    .getString("WorkingCenterSelectDialog.available.centers.label"), //$NON-NLS-1$
+                user.getWorkingCenters(appService), null, null,
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        currentCenter = (SiteWrapper) selectedObject;
+                    }
+                });
     }
 
     @Override

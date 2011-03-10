@@ -69,15 +69,17 @@ public class LoginDialog extends TitleAreaDialog {
 
     private Text passwordWidget;
 
-    private static final String LAST_SERVER = "lastServer";
+    private static final String LAST_SERVER = "lastServer"; //$NON-NLS-1$
 
-    private static final String SAVED_USER_NAMES = "savedUserNames";
+    private static final String SAVED_USER_NAMES = "savedUserNames"; //$NON-NLS-1$
 
-    private static final String USER_NAME = "userName";
+    private static final String USER_NAME = "userName"; //$NON-NLS-1$
 
-    private static final String LAST_USER_NAME = "lastUserName";
+    private static final String LAST_USER_NAME = "lastUserName"; //$NON-NLS-1$
 
-    private static final String DEFAULT_SECURE_PORT = "8443";
+    private static final String DEFAULT_SECURE_PORT = "8443"; //$NON-NLS-1$
+
+    private static final String DEFAULT_UNSECURE_PREFIX = "http://"; //$NON-NLS-1$
 
     private static final BiobankLogger logger = BiobankLogger
         .getLogger(LoginDialog.class.getName());
@@ -110,7 +112,7 @@ public class LoginDialog extends TitleAreaDialog {
 
         String serverList = prefsStore
             .getString(PreferenceConstants.SERVER_LIST);
-        StringTokenizer st = new StringTokenizer(serverList, "\n");
+        StringTokenizer st = new StringTokenizer(serverList, "\n"); //$NON-NLS-1$
         while (st.hasMoreTokens()) {
             servers.add(st.nextToken());
         }
@@ -119,26 +121,26 @@ public class LoginDialog extends TitleAreaDialog {
             String[] userNodeNames = prefsUserNames.childrenNames();
             for (String userNodeName : userNodeNames) {
                 Preferences node = prefsUserNames.node(userNodeName);
-                userNames.add(node.get(USER_NAME, ""));
+                userNames.add(node.get(USER_NAME, "")); //$NON-NLS-1$
             }
         } catch (BackingStoreException e) {
-            logger.error("Could not get " + USER_NAME + " preference", e);
+            logger.error("Could not get " + USER_NAME + " preference", e); //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 
     @Override
     protected void configureShell(Shell shell) {
         super.configureShell(shell);
-        shell.setText("BioBank Login");
+        shell.setText(Messages.getString("LoginDialog.main.title")); //$NON-NLS-1$
     }
 
     @Override
     protected Control createContents(Composite parent) {
         Control contents = super.createContents(parent);
-        setTitle(Messages.getString("LoginDialog.title"));
+        setTitle(Messages.getString("LoginDialog.title")); //$NON-NLS-1$
         setTitleImage(BiobankPlugin.getDefault().getImageRegistry()
             .get(BiobankPlugin.IMG_COMPUTER_KEY));
-        setMessage(Messages.getString("LoginDialog.description"));
+        setMessage(Messages.getString("LoginDialog.description")); //$NON-NLS-1$
         return contents;
     }
 
@@ -161,12 +163,14 @@ public class LoginDialog extends TitleAreaDialog {
         contents.setLayout(layout);
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        String lastServer = pluginPrefs.get(LAST_SERVER, "");
+        String lastServer = pluginPrefs.get(LAST_SERVER, ""); //$NON-NLS-1$
         NonEmptyStringValidator validator = new NonEmptyStringValidator(
-            Messages.getString("LoginDialog.field.server.validation.msg"));
-        serverWidget = createWritableCombo(contents,
-            Messages.getString("LoginDialog.field.server.label"),
-            servers.toArray(new String[0]), "server", lastServer, validator);
+            Messages.getString("LoginDialog.field.server.validation.msg")); //$NON-NLS-1$
+        serverWidget = createWritableCombo(
+            contents,
+            Messages.getString("LoginDialog.field.server.label"), //$NON-NLS-1$
+            servers.toArray(new String[0]),
+            Authentication.SERVER_PROPERTY_NAME, lastServer, validator);
 
         NonEmptyStringValidator userNameValidator = null;
         NonEmptyStringValidator passwordValidator = null;
@@ -174,7 +178,7 @@ public class LoginDialog extends TitleAreaDialog {
             new Label(contents, SWT.NONE);
             secureConnectionButton = new Button(contents, SWT.CHECK);
             secureConnectionButton.setText(Messages
-                .getString("LoginDialog.field.secure.connection"));
+                .getString("LoginDialog.field.secure.connection")); //$NON-NLS-1$
             secureConnectionButton.setSelection(lastServer
                 .contains(DEFAULT_SECURE_PORT));
 
@@ -188,19 +192,21 @@ public class LoginDialog extends TitleAreaDialog {
             });
         } else {
             userNameValidator = new NonEmptyStringValidator(
-                Messages.getString("LoginDialog.field.user.validation.msg"));
+                Messages.getString("LoginDialog.field.user.validation.msg")); //$NON-NLS-1$
             passwordValidator = new NonEmptyStringValidator(
-                Messages.getString("LoginDialog.field.password.validaton.msg"));
+                Messages.getString("LoginDialog.field.password.validaton.msg")); //$NON-NLS-1$
         }
 
-        userNameWidget = createWritableCombo(contents,
-            Messages.getString("LoginDialog.field.user.label"),
-            userNames.toArray(new String[0]), "username",
-            pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator);
+        userNameWidget = createWritableCombo(
+            contents,
+            Messages.getString("LoginDialog.field.user.label"), //$NON-NLS-1$
+            userNames.toArray(new String[0]),
+            Authentication.USERNAME_PROPERTY_NAME,
+            pluginPrefs.get(LAST_USER_NAME, ""), userNameValidator); //$NON-NLS-1$
 
         passwordWidget = createPassWordText(contents,
-            Messages.getString("LoginDialog.field.password.label"), "password",
-            passwordValidator);
+            Messages.getString("LoginDialog.field.password.label"), //$NON-NLS-1$
+            Authentication.PASSWORD_PROPERTY_NAME, passwordValidator);
 
         bindChangeListener();
 
@@ -235,7 +241,7 @@ public class LoginDialog extends TitleAreaDialog {
 
     private Label createLabel(Composite parent, String labelText) {
         Label label = new Label(parent, SWT.NONE);
-        label.setText(labelText + ":");
+        label.setText(labelText + ":"); //$NON-NLS-1$
         label.setLayoutData(new GridData(GridData.END, GridData.CENTER, false,
             false));
         return label;
@@ -292,11 +298,11 @@ public class LoginDialog extends TitleAreaDialog {
     @Override
     protected void okPressed() {
         try {
-            new URL("http://" + serverWidget.getText());
+            new URL(DEFAULT_UNSECURE_PREFIX + serverWidget.getText());
         } catch (MalformedURLException e) {
             MessageDialog.openError(getShell(),
-                Messages.getString("LoginDialog.field.server.url.error.title"),
-                Messages.getString("LoginDialog.field.server.url.error.msg"));
+                Messages.getString("LoginDialog.field.server.url.error.title"), //$NON-NLS-1$
+                Messages.getString("LoginDialog.field.server.url.error.msg")); //$NON-NLS-1$
             return;
         }
 
@@ -309,10 +315,10 @@ public class LoginDialog extends TitleAreaDialog {
             // "You are not allowed to specify a port, only a hostname and path.");
             // return;
             // }
-            if (userNameWidget.getText().equals("")) {
+            if (userNameWidget.getText().equals("")) { //$NON-NLS-1$
                 MessageDialog.openError(getShell(),
-                    Messages.getString("LoginDialog.field.user.error.title"),
-                    Messages.getString("LoginDialog.field.user.error.msg"));
+                    Messages.getString("LoginDialog.field.user.error.title"), //$NON-NLS-1$
+                    Messages.getString("LoginDialog.field.user.error.msg")); //$NON-NLS-1$
                 return;
             }
         }
@@ -334,7 +340,7 @@ public class LoginDialog extends TitleAreaDialog {
                     sessionHelper.getAppService());
             } catch (Exception e) {
                 BiobankPlugin.openAsyncError(Messages
-                    .getString("LoginDialog.working.center.error.title"), e);
+                    .getString("LoginDialog.working.center.error.title"), e); //$NON-NLS-1$
             }
             if (workingCenters != null) {
                 if ((workingCenters.size() == 0)
@@ -343,9 +349,9 @@ public class LoginDialog extends TitleAreaDialog {
                     BiobankPlugin
                         .openAsyncError(
                             Messages
-                                .getString("LoginDialog.working.center.error.title"),
+                                .getString("LoginDialog.working.center.error.title"), //$NON-NLS-1$
                             Messages
-                                .getString("LoginDialog.no.working.center.error.msg"));
+                                .getString("LoginDialog.no.working.center.error.msg")); //$NON-NLS-1$
                 else {
                     // login successful
                     pluginPrefs.put(LAST_SERVER, serverWidget.getText());
@@ -359,7 +365,7 @@ public class LoginDialog extends TitleAreaDialog {
                         StringBuilder serverList = new StringBuilder();
                         for (String server : servers) {
                             serverList.append(server);
-                            serverList.append("\n");
+                            serverList.append("\n"); //$NON-NLS-1$
                         }
                         prefsStore.putValue(PreferenceConstants.SERVER_LIST,
                             serverList.append(serverWidget.getText().trim())
@@ -380,7 +386,7 @@ public class LoginDialog extends TitleAreaDialog {
                     try {
                         pluginPrefs.flush();
                     } catch (BackingStoreException e) {
-                        logger.error("Could not save loggin preferences", e);
+                        logger.error("Could not save loggin preferences", e); //$NON-NLS-1$
                     }
 
                     if (workingCenters.size() == 1) {
@@ -397,9 +403,9 @@ public class LoginDialog extends TitleAreaDialog {
                             BiobankPlugin
                                 .openAsyncInformation(
                                     Messages
-                                        .getString("LoginDialog.working.center.admin.title"),
+                                        .getString("LoginDialog.working.center.admin.title"), //$NON-NLS-1$
                                     Messages
-                                        .getString("LoginDialog.no.working.center.admin.msg"));
+                                        .getString("LoginDialog.no.working.center.admin.msg")); //$NON-NLS-1$
                             // open the administration perspective if another
                             // perspective is open
                             IWorkbench workbench = PlatformUI.getWorkbench();
@@ -412,9 +418,11 @@ public class LoginDialog extends TitleAreaDialog {
                                     workbench.showPerspective(
                                         MainPerspective.ID, activeWindow);
                                 } catch (WorkbenchException e) {
-                                    BiobankPlugin.openAsyncError(
-                                        "Error while opening main perpective",
-                                        e);
+                                    BiobankPlugin
+                                        .openAsyncError(
+                                            Messages
+                                                .getString("LoginDialog.perspective.open.error.msg"), //$NON-NLS-1$
+                                            e);
                                 }
                             }
                         } else {
@@ -422,9 +430,9 @@ public class LoginDialog extends TitleAreaDialog {
                             BiobankPlugin
                                 .openAsyncError(
                                     Messages
-                                        .getString("LoginDialog.working.center.selection.error.title"),
+                                        .getString("LoginDialog.working.center.selection.error.title"), //$NON-NLS-1$
                                     Messages
-                                        .getString("LoginDialog.working.center.selection.error.msg"));
+                                        .getString("LoginDialog.working.center.selection.error.msg")); //$NON-NLS-1$
                         }
                     if (canAddSession)
                         // do that last, that way user has his working center
@@ -440,8 +448,10 @@ public class LoginDialog extends TitleAreaDialog {
         super.okPressed();
     }
 
-    @SuppressWarnings("unused")
-    private class Authentication {
+    public class Authentication {
+        public static final String SERVER_PROPERTY_NAME = "server"; //$NON-NLS-1$
+        public static final String USERNAME_PROPERTY_NAME = "username"; //$NON-NLS-1$
+        public static final String PASSWORD_PROPERTY_NAME = "password"; //$NON-NLS-1$
 
         public String server;
         public String username;
@@ -473,7 +483,7 @@ public class LoginDialog extends TitleAreaDialog {
 
         @Override
         public String toString() {
-            return server + "/" + username + "/" + password;
+            return server + "/" + username + "/" + password; //$NON-NLS-1$ //$NON-NLS-2$
         }
     }
 }

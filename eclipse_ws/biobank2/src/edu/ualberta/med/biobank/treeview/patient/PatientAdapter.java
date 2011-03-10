@@ -55,10 +55,10 @@ public class PatientAdapter extends AdapterBase {
     @Override
     public String getTooltipText() {
         PatientWrapper patient = getWrapper();
-        StudyWrapper study = patient.getStudy();
-        if (study != null) {
-            return study.getName() + " - " + getTooltipText("Patient");
-
+        if (patient != null) {
+            StudyWrapper study = patient.getStudy();
+            if (study != null)
+                return study.getName() + " - " + getTooltipText("Patient");
         }
         return getTooltipText("Patient");
     }

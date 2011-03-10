@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.databinding.Binding;
@@ -377,4 +378,11 @@ public class AliquotedSpecimenSelectionWidget {
         widgetCreator.showWidget(cvResult.getControl(), enabled);
     }
 
+    public void setReadOnlySelections(SpecimenWrapper sourceSpecimen,
+        SpecimenTypeWrapper resultType) {
+        cvSource.setInput(Arrays.asList(sourceSpecimen));
+        cvSource.setSelection(new StructuredSelection(sourceSpecimen));
+        cvResult.setInput(Arrays.asList(resultType));
+        cvResult.setSelection(new StructuredSelection(resultType));
+    }
 }
