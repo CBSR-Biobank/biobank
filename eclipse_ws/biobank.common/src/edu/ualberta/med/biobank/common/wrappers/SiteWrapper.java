@@ -432,44 +432,6 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getStudyCollection(false);
     }
 
-    @Deprecated
-    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study) {
-        // TODO this can be removed once the gui doesn't use it anymore
-        return null;
-    }
-
-    @Deprecated
-    public Collection<? extends ModelWrapper<?>> getAcceptedRequestCollection() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public List<StudyWrapper> getDispatchStudiesAsSender() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public void addStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> addedSites) throws BiobankCheckException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public void removeStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> removedSites) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public Collection<? extends ModelWrapper<?>> getFilledRequestCollection() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
         + Site.class.getName()
         + " as site join site."

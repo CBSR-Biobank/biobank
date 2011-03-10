@@ -52,8 +52,8 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         return patients;
     }
 
-    public void checkAtLeastOneSpecimen() throws BiobankCheckException {
-        // FIXME don't want that when create form collection event
+    public void checkAtLeastOneSpecimen() {
+        // FIXME don't want that when create from collection event
         // List<SpecimenWrapper> spc = getSpecimenCollection(false);
         // if (spc == null || spc.isEmpty()) {
         // throw new BiobankCheckException(
