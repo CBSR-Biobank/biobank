@@ -51,12 +51,11 @@ public class ShipmentAdapter extends AdapterBase {
     @Override
     public String getTooltipText() {
         OriginInfoWrapper originInfo = getWrapper();
-        CenterWrapper<?> center = originInfo.getCenter();
-
-        if (center != null) {
-            return center.getName() + " - " + getTooltipText("Shipment");
+        if (originInfo != null) {
+            CenterWrapper<?> center = originInfo.getCenter();
+            if (center != null)
+                return center.getName() + " - " + getTooltipText("Shipment");
         }
-
         return getTooltipText("Shipment");
     }
 
