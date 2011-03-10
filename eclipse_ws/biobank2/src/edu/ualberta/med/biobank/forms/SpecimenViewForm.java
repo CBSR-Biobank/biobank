@@ -46,8 +46,6 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BiobankText dateProcessedLabel;
 
-    private BiobankText dateDrawnLabel;
-
     private BiobankText activityStatusLabel;
 
     private BiobankText commentLabel;
@@ -124,8 +122,6 @@ public class SpecimenViewForm extends BiobankViewForm {
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date Processed");
-        dateDrawnLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date Drawn");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client,
@@ -135,7 +131,7 @@ public class SpecimenViewForm extends BiobankViewForm {
     }
 
     private void createContainersSection() {
-        if (aliquot.getParent() != null) {
+        if (aliquot.getParentContainer() != null) {
             Section section = createSection("Container Visualization");
             Composite containersComposite = toolkit.createComposite(section);
             section.setClient(containersComposite);
@@ -144,10 +140,10 @@ public class SpecimenViewForm extends BiobankViewForm {
             toolkit.paintBordersFor(containersComposite);
 
             Stack<ContainerWrapper> parents = new Stack<ContainerWrapper>();
-            ContainerWrapper container = aliquot.getParent();
+            ContainerWrapper container = aliquot.getParentContainer();
             while (container != null) {
                 parents.push(container);
-                container = container.getParent();
+                container = container.getParentContainer();
             }
             while (!parents.isEmpty()) {
                 container = parents.pop();

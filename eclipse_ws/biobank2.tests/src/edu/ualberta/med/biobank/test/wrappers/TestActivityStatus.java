@@ -18,6 +18,7 @@ import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -91,7 +92,7 @@ public class TestActivityStatus extends TestDatabase {
             .getAllSpecimenTypes(appService, false));
         topContainerType.persist();
 
-        study.setStudyEventAttr("worksheet", "text");
+        study.setStudyEventAttr("worksheet", EventAttrTypeEnum.TEXT);
         study.persist();
 
         StudyEventAttrWrapper spa = StudyEventAttrWrapper

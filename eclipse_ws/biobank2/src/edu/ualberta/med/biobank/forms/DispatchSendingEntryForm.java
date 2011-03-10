@@ -29,7 +29,6 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
@@ -39,8 +38,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(DispatchSendingEntryForm.class.getName());
+    // private static BiobankLogger logger = BiobankLogger
+    // .getLogger(DispatchSendingEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm";
 
@@ -81,7 +80,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
         if (dispatch.isNew()) {
             dispatch.setSenderCenter(SessionManager.getUser()
-                .getCurrentWorkingCentre());
+                .getCurrentWorkingCenter());
             dispatch.setState(DispatchState.CREATION);
         }
 
@@ -220,7 +219,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     protected void openScanDialog() {
         DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, SessionManager.getUser().getCurrentWorkingCentre());
+            dispatch, SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
         setDirty(true); // FIXME need to do this better !
         reloadAliquots();
@@ -282,7 +281,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         super.reset();
         dispatch.resetMap();
         dispatch.setSenderCenter(SessionManager.getUser()
-            .getCurrentWorkingCentre());
+            .getCurrentWorkingCenter());
         if (destSiteComboViewer != null) {
             CenterWrapper<?> destSite = dispatch.getReceiverCenter();
             if (destSite != null) {
@@ -319,8 +318,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
             label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
-            if (dispatch.getDepartedAt() != null)
-                label += "[" + dispatch.getFormattedDeparted() + "]";
+            if (dispatch.getPackedAt() != null)
+                label += "[" + dispatch.getFormattedPackedAt() + "]";
             return label;
         }
     }

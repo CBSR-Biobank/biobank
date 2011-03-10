@@ -70,7 +70,7 @@ public class SendDispatchDialog extends BiobankDialog {
             "Waybill", null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
-        shipment.setDepartedAt(date);
+        shipment.setPackedAt(date);
         createDateTimeWidget(contents, "Departed", date, shipInfo,
             ShipmentInfoPeer.SENT_AT.getName(), new NotNullValidator(
                 "Departed should be set"));

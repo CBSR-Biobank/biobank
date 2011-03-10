@@ -53,8 +53,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return DispatchState.getState(getState());
     }
 
-    public String getFormattedDeparted() {
-        return DateFormatter.formatAsDateTime(getDepartedAt());
+    public String getFormattedPackedAt() {
+        return DateFormatter.formatAsDateTime(getPackedAt());
     }
 
     public boolean hasErrors() {
@@ -295,10 +295,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 + aliquot.getInventoryId()
                 + ": it has no position. A position should be first assigned.");
         }
-        if (!aliquot.getParent().getSite().equals(getSenderCenter())) {
+        if (!aliquot.getParentContainer().getSite().equals(getSenderCenter())) {
             throw new BiobankCheckException("Aliquot "
                 + aliquot.getInventoryId() + " is currently assigned to site "
-                + aliquot.getParent().getSite().getNameShort()
+                + aliquot.getParentContainer().getSite().getNameShort()
                 + ". It should be first assigned to "
                 + getSenderCenter().getNameShort() + " site.");
         }
@@ -490,7 +490,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean canBeSentBy(User user) {
         return canUpdate(user)
-            && getSenderCenter().equals(user.getCurrentWorkingCentre())
+            && getSenderCenter().equals(user.getCurrentWorkingCenter())
             && isInCreationState() && hasDispatchSpecimens();
     }
 
@@ -501,7 +501,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean canBeReceivedBy(User user) {
         return canUpdate(user)
-            && getReceiverCenter().equals(user.getCurrentWorkingCentre())
+            && getReceiverCenter().equals(user.getCurrentWorkingCenter())
             && isInTransitState();
     }
 

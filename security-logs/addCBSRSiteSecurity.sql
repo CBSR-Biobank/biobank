@@ -2,7 +2,7 @@
 /* add protection element for CBSR */
 INSERT INTO csm_protection_element (protection_element_name, protection_element_description, object_id, attribute, attribute_value, application_id, update_date)
 select "edu.ualberta.med.biobank.model.Site/CBSR", 'CBSR', "edu.ualberta.med.biobank.model.Site", "id", id, 2, sysdate() 
-from site where name_short='CBSR';
+from center where name_short='CBSR';
 
 /* add protection group for CBSR with parent "all sites" (id = 11) */
 INSERT INTO csm_protection_group (PROTECTION_GROUP_NAME, PROTECTION_GROUP_DESCRIPTION, APPLICATION_ID, PARENT_PROTECTION_GROUP_ID, UPDATE_DATE)
@@ -17,7 +17,7 @@ select protection_group_id, protection_element_id,  sysdate() from csm_protectio
 /* add protection element for calgary */
 INSERT INTO csm_protection_element (protection_element_name, protection_element_description, object_id, attribute, attribute_value, application_id, update_date)
 select "edu.ualberta.med.biobank.model.Site/Calgary-F", 'Calgary-F', "edu.ualberta.med.biobank.model.Site", "id", id, 2, sysdate() 
-from site where name_short='Calgary-F';
+from center where name_short='Calgary-F';
 
 /* add protection group for Calgary with parent "all sites" (id = 11) */
 INSERT INTO csm_protection_group (protection_group_name, protection_group_description, application_id, parent_protection_group_id, update_date)

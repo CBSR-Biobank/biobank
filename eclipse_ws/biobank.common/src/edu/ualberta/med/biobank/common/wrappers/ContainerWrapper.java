@@ -109,7 +109,8 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     private void checkParentFromSameSite() throws BiobankCheckException {
-        if (getParent() != null && !getParent().getSite().equals(getSite())) {
+        if (getParentContainer() != null
+            && !getParentContainer().getSite().equals(getSite())) {
             throw new BiobankCheckException(
                 "Parent should be part of the same site");
         }
@@ -128,7 +129,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
      * a container can't be a topContainer and have a parent on the same time
      */
     private void checkTopAndParent() throws BiobankCheckException {
-        if ((getParent() != null) && (getContainerType() != null)
+        if ((getParentContainer() != null) && (getContainerType() != null)
             && Boolean.TRUE.equals(getContainerType().getTopLevel())) {
             throw new BiobankCheckException(
                 "A top level container can't have a parent");
@@ -152,7 +153,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
     @Override
     protected void persistDependencies(Container origObject) throws Exception {
-        ContainerWrapper parent = getParent();
+        ContainerWrapper parent = getParentContainer();
         boolean labelChanged = false;
         if (parent == null) {
             if ((origObject != null) && (getLabel() != null)
@@ -200,7 +201,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     public String getPositionString() {
-        ContainerWrapper parent = getParent();
+        ContainerWrapper parent = getParentContainer();
         if (parent != null) {
             RowColPos pos = getPositionAsRowCol();
             if (pos != null) {
@@ -214,16 +215,16 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         objectWithPositionManagement.setPosition(rcp);
     }
 
-    public ContainerWrapper getParent() {
-        return objectWithPositionManagement.getParent();
+    public ContainerWrapper getParentContainer() {
+        return objectWithPositionManagement.getParentContainer();
     }
 
     public void setParent(ContainerWrapper container) {
         objectWithPositionManagement.setParent(container);
     }
 
-    public boolean hasParent() {
-        return objectWithPositionManagement.hasParent();
+    public boolean hasParentContainer() {
+        return objectWithPositionManagement.hasParentContainer();
     }
 
     private void persistAliquots() throws Exception {
@@ -326,7 +327,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
 
             sb.insert(0, container.getId());
             sb.insert(0, "/");
-            container = container.getParent();
+            container = container.getParentContainer();
         }
         sb.deleteCharAt(0);
 
@@ -649,11 +650,12 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         if (Boolean.TRUE.equals(getContainerType().getTopLevel()))
             return;
 
-        ContainerWrapper parent = getParent();
+        ContainerWrapper parent = getParentContainer();
         if (parent == null)
             throw new BiobankCheckException("Container " + this
                 + " does not have a parent container");
-        ContainerTypeWrapper parentType = getParent().getContainerType();
+        ContainerTypeWrapper parentType = getParentContainer()
+            .getContainerType();
         try {
             // need to reload the type to avoid loop problems (?) from the
             // spring server side in specific cases. (on
@@ -667,7 +669,7 @@ public class ContainerWrapper extends ContainerBaseWrapper {
             .getChildContainerTypeCollection();
         if (types == null || !types.contains(getContainerType())) {
             throw new BiobankCheckException("Container "
-                + getParent().getFullInfoLabel()
+                + getParentContainer().getFullInfoLabel()
                 + " does not allow inserts of container type "
                 + getContainerType().getName() + ".");
         }

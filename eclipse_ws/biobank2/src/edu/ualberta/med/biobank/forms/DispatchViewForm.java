@@ -95,7 +95,7 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     public void reload() throws Exception {
         retrieveDispatch();
-        setPartName("Dispatch sent on " + dispatch.getDepartedAt());
+        setPartName("Dispatch sent on " + dispatch.getPackedAt());
         setDispatchValues();
         aliquotsTree.refresh();
     }
@@ -103,8 +103,8 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         String dateString = "";
-        if (dispatch.getDepartedAt() != null) {
-            dateString = " on " + dispatch.getFormattedDeparted();
+        if (dispatch.getPackedAt() != null) {
+            dateString = " on " + dispatch.getFormattedPackedAt();
         }
         canSeeEverything = true;
         if (dispatch.getSenderCenter() == null) {
@@ -339,7 +339,7 @@ public class DispatchViewForm extends BiobankViewForm {
                 .getReceiverCenter().getName());
         if (dispatch.getShipmentInfo() != null) {
             if (departedLabel != null)
-                setTextValue(departedLabel, dispatch.getFormattedDeparted());
+                setTextValue(departedLabel, dispatch.getFormattedPackedAt());
             if (shippingMethodLabel != null)
                 setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
                     .getShippingMethod() == null ? "" : dispatch

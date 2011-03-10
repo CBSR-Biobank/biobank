@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.dialogs;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +29,8 @@ import edu.ualberta.med.biobank.common.wrappers.SourceSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.validators.DoubleNumberValidator;
+import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
+import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -65,10 +68,14 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
 
     private ActivityStatusWrapper activeActivityStatus;
 
+    private Date defaultTimeDrawn;
+
     public CEventSourceSpecimenDialog(Shell parent, SpecimenWrapper specimen,
         List<SourceSpecimenWrapper> studySourceSpecimen,
-        List<SpecimenTypeWrapper> allSpecimenTypes, NewSpecimenListener listener) {
+        List<SpecimenTypeWrapper> allSpecimenTypes,
+        NewSpecimenListener listener, Date defaultTimeDrawn) {
         super(parent);
+        this.defaultTimeDrawn = defaultTimeDrawn;
         try {
             activeActivityStatus = ActivityStatusWrapper
                 .getActiveActivityStatus(SessionManager.getAppService());
@@ -81,6 +88,7 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
         if (specimen == null) {
             addMode = true;
             internalSpecimen.setActivityStatus(activeActivityStatus);
+            internalSpecimen.setCreatedAt(defaultTimeDrawn);
         } else {
             internalSpecimen.setSpecimenType(specimen.getSpecimenType());
             internalSpecimen.setInventoryId(specimen.getInventoryId());
@@ -97,17 +105,18 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
         }
         this.allSpecimenTypes = allSpecimenTypes;
         if (addMode) {
-            currentTitle = Messages.getString("SpecimenDialog.title.add");
+            currentTitle = Messages
+                .getString("CEventSourceSpecimenDialog.title.add"); //$NON-NLS-1$
         } else {
-            currentTitle = Messages.getString("SpecimenDialog.title.edit");
+            currentTitle = Messages
+                .getString("CEventSourceSpecimenDialog.title.edit"); //$NON-NLS-1$
         }
-
         try {
             allActivityStatus = ActivityStatusWrapper
                 .getAllActivityStatuses(SessionManager.getAppService());
         } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Problem retrieving activity status",
-                e);
+            BiobankPlugin.openAsyncError(Messages
+                .getString("CEventSourceSpecimenDialog.activity.error.msg"), e); //$NON-NLS-1$
         }
     }
 
@@ -119,9 +128,9 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
     @Override
     protected String getTitleAreaMessage() {
         if (addMode) {
-            return Messages.getString("SpecimenDialog.msg.add");
+            return Messages.getString("CEventSourceSpecimenDialog.msg.add"); //$NON-NLS-1$
         } else {
-            return Messages.getString("SpecimenDialog.msg.edit");
+            return Messages.getString("CEventSourceSpecimenDialog.msg.edit"); //$NON-NLS-1$
         }
     }
 
@@ -143,40 +152,43 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(3, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        inventoryIdWidget = (BiobankText) createBoundWidgetWithLabel(contents,
-            BiobankText.class, SWT.NONE,
-            Messages.getString("SourceSpecimen.field.inventoryId.label"), null,
-            internalSpecimen, SpecimenPeer.INVENTORY_ID.getName(), null);
+        inventoryIdWidget = (BiobankText) createBoundWidgetWithLabel(
+            contents,
+            BiobankText.class,
+            SWT.NONE,
+            Messages.getString("SourceSpecimen.field.inventoryId.label"), //$NON-NLS-1$
+            null,
+            internalSpecimen,
+            SpecimenPeer.INVENTORY_ID.getName(),
+            new NonEmptyStringValidator(
+                Messages
+                    .getString("CEventSourceSpecimenDialog.field.inventoryID.validator.msg"))); //$NON-NLS-1$
         GridData gd = (GridData) inventoryIdWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
         addSpecimenTypeWidgets(contents);
 
         timeDrawnLabel = widgetCreator.createLabel(contents,
-            Messages.getString("SpecimenDialog.field.time.label"));
-        timeDrawnWidget = createDateTimeWidget(contents, timeDrawnLabel,
-            internalSpecimen.getCreatedAt(), internalSpecimen,
-            SpecimenPeer.CREATED_AT.getName(), null, SWT.TIME, null);
+            Messages.getString("CEventSourceSpecimenDialog.field.time.label")); //$NON-NLS-1$
+        timeDrawnLabel.setToolTipText(Messages
+            .getString("CEventSourceSpecimenDialog.field.time.tooltip")); //$NON-NLS-1$
+        timeDrawnWidget = createDateTimeWidget(
+            contents,
+            timeDrawnLabel,
+            internalSpecimen.getCreatedAt(),
+            internalSpecimen,
+            SpecimenPeer.CREATED_AT.getName(),
+            new NotNullValidator(
+                Messages
+                    .getString("CEventSourceSpecimenDialog.field.time.validation.msg")), //$NON-NLS-1$
+            SWT.DATE | SWT.TIME, null);
         gd = (GridData) timeDrawnWidget.getLayoutData();
         gd.horizontalSpan = 2;
 
-        quantityLabel = widgetCreator.createLabel(contents,
-            Messages.getString("SpecimenDialog.field.quantity.label"));
-        quantityLabel.setLayoutData(new GridData(
-            GridData.VERTICAL_ALIGN_BEGINNING));
-        quantityTextValidator = new DoubleNumberValidator(
-            Messages.getString("SpecimenDialog.field.quantity.validation.msg"));
-        quantityText = (BiobankText) createBoundWidget(contents,
-            BiobankText.class, SWT.BORDER, quantityLabel, new String[0],
-            internalSpecimen, SpecimenPeer.QUANTITY.getName(),
-            quantityTextValidator);
-        gd = (GridData) quantityText.getLayoutData();
-        gd.horizontalSpan = 2;
-
         activityStatusComboViewer = widgetCreator.createComboViewer(contents,
-            Messages.getString("label.activity"), allActivityStatus,
+            Messages.getString("label.activity"), allActivityStatus, //$NON-NLS-1$
             internalSpecimen.getActivityStatus(),
-            "Specimen must have an activity status",
+            Messages.getString("validation.activity"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -189,9 +201,23 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
 
         BiobankText commentWidget = (BiobankText) createBoundWidgetWithLabel(
             contents, BiobankText.class, SWT.NONE,
-            Messages.getString("label.comments"), null, internalSpecimen,
+            Messages.getString("label.comments"), null, internalSpecimen, //$NON-NLS-1$
             SpecimenPeer.COMMENT.getName(), null);
         gd = (GridData) commentWidget.getLayoutData();
+        gd.horizontalSpan = 2;
+
+        quantityLabel = widgetCreator.createLabel(contents, Messages
+            .getString("CEventSourceSpecimenDialog.field.quantity.label")); //$NON-NLS-1$
+        quantityLabel.setLayoutData(new GridData(
+            GridData.VERTICAL_ALIGN_BEGINNING));
+        quantityTextValidator = new DoubleNumberValidator(
+            Messages
+                .getString("CEventSourceSpecimenDialog.field.quantity.validation.msg")); //$NON-NLS-1$
+        quantityText = (BiobankText) createBoundWidget(contents,
+            BiobankText.class, SWT.BORDER, quantityLabel, new String[0],
+            internalSpecimen, SpecimenPeer.QUANTITY.getName(),
+            quantityTextValidator);
+        gd = (GridData) quantityText.getLayoutData();
         gd.horizontalSpan = 2;
 
         dialogCreated = true;
@@ -208,24 +234,29 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
         if (ssw == null && type != null && allSpecimenTypes.contains(type)) {
             useStudyOnlySourceSpecimens = false;
         }
-        specimenTypeComboViewer = getWidgetCreator().createComboViewer(
-            contents, Messages.getString("SpecimenDialog.field.type.label"),
-            mapStudySourceSpecimen.values(), ssw,
-            Messages.getString("SpecimenDialog.field.type.validation.msg"),
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    if (selectedObject instanceof SourceSpecimenWrapper) {
-                        internalSpecimen
-                            .setSpecimenType(((SourceSpecimenWrapper) selectedObject)
-                                .getSpecimenType());
-                    } else {
-                        internalSpecimen
-                            .setSpecimenType((SpecimenTypeWrapper) selectedObject);
+        specimenTypeComboViewer = getWidgetCreator()
+            .createComboViewer(
+                contents,
+                Messages
+                    .getString("CEventSourceSpecimenDialog.field.type.label"), //$NON-NLS-1$
+                mapStudySourceSpecimen.values(),
+                ssw,
+                Messages
+                    .getString("CEventSourceSpecimenDialog.field.type.validation.msg"), //$NON-NLS-1$
+                new ComboSelectionUpdate() {
+                    @Override
+                    public void doSelection(Object selectedObject) {
+                        if (selectedObject instanceof SourceSpecimenWrapper) {
+                            internalSpecimen
+                                .setSpecimenType(((SourceSpecimenWrapper) selectedObject)
+                                    .getSpecimenType());
+                        } else {
+                            internalSpecimen
+                                .setSpecimenType((SpecimenTypeWrapper) selectedObject);
+                        }
+                        updateWidgetVisibilityAndValues();
                     }
-                    updateWidgetVisibilityAndValues();
-                }
-            });
+                });
         if (!useStudyOnlySourceSpecimens) {
             specimenTypeComboViewer.setInput(allSpecimenTypes);
             specimenTypeComboViewer.setSelection(new StructuredSelection(type));
@@ -233,7 +264,7 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
 
         final Button allSpecimenTypesCheckBox = new Button(contents, SWT.CHECK);
         allSpecimenTypesCheckBox.setText(Messages
-            .getString("SpecimenDialog.field.type.checkbox"));
+            .getString("CEventSourceSpecimenDialog.field.type.checkbox")); //$NON-NLS-1$
         allSpecimenTypesCheckBox.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -264,18 +295,15 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
         boolean isVolumeRequired = ssw != null
             && Boolean.TRUE.equals(ssw.getNeedOriginalVolume());
 
-        timeDrawnLabel.setVisible(enableTimeDrawn);
-        timeDrawnWidget.setVisible(enableTimeDrawn);
+        timeDrawnWidget.setEnabled(enableTimeDrawn || defaultTimeDrawn == null);
+        if (!enableTimeDrawn && defaultTimeDrawn != null) {
+            timeDrawnWidget.setDate(defaultTimeDrawn);
+        }
         quantityLabel.setVisible(enableVolume);
         quantityText.setVisible(enableVolume);
-        // FIXME if there is no dateDrawn on the collection event, we might want
-        // to set it all the time on the specimen
-        if (!enableTimeDrawn) {
-            internalSpecimen.setCreatedAt(null);
-        }
         quantityTextValidator.setAllowEmpty(!enableVolume || !isVolumeRequired);
         String originalText = quantityText.getText();
-        quantityText.setText(originalText + "*");
+        quantityText.setText(originalText + "*"); //$NON-NLS-1$
         quantityText.setText(originalText);
         if (!enableVolume) {
             internalSpecimen.setQuantity(null);
@@ -357,10 +385,10 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
 
             // then reset fields
             internalSpecimen.reset();
-            inventoryIdWidget.setText("");
-            quantityText.setText("");
+            inventoryIdWidget.setText(""); //$NON-NLS-1$
+            quantityText.setText(""); //$NON-NLS-1$
             timeDrawnWidget.setDate(null);
-            quantityText.setText("");
+            quantityText.setText(""); //$NON-NLS-1$
             specimenTypeComboViewer.getCombo().deselectAll();
             specimenTypeComboViewer.getCombo().setFocus();
             activityStatusComboViewer.getCombo().deselectAll();
@@ -368,8 +396,11 @@ public class CEventSourceSpecimenDialog extends BiobankDialog {
                 activeActivityStatus));
             updateWidgetVisibilityAndValues();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError(
-                "Error opening dialog for new specimen", e);
+            BiobankPlugin
+                .openAsyncError(
+                    Messages
+                        .getString("CEventSourceSpecimenDialog.specimen.dialog.error.msg"), //$NON-NLS-1$
+                    e);
         }
     }
 

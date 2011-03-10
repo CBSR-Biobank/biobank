@@ -81,8 +81,9 @@ public class ContainerGroup extends AdapterBase {
                 } else {
                     List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
                     ContainerWrapper currentContainer = container;
-                    while (currentContainer.hasParent()) {
-                        currentContainer = currentContainer.getParent();
+                    while (currentContainer.hasParentContainer()) {
+                        currentContainer = currentContainer
+                            .getParentContainer();
                         parents.add(currentContainer);
                     }
                     for (AdapterBase child : getChildren()) {

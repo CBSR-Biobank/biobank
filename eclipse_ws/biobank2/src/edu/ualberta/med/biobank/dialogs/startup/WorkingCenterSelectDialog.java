@@ -13,13 +13,13 @@ import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
-public class WorkingCentreSelectDialog extends BiobankDialog {
+public class WorkingCenterSelectDialog extends BiobankDialog {
 
     private User user;
     private BiobankApplicationService appService;
-    private SiteWrapper currentCentre;
+    private SiteWrapper currentCenter;
 
-    public WorkingCentreSelectDialog(Shell parentShell,
+    public WorkingCenterSelectDialog(Shell parentShell,
         BiobankApplicationService appService, User user) {
         super(parentShell);
         this.appService = appService;
@@ -52,14 +52,14 @@ public class WorkingCentreSelectDialog extends BiobankDialog {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    currentCentre = (SiteWrapper) selectedObject;
+                    currentCenter = (SiteWrapper) selectedObject;
                 }
             });
     }
 
     @Override
     protected void okPressed() {
-        user.setCurrentWorkingCentre(currentCentre);
+        user.setCurrentWorkingCenter(currentCenter);
         super.okPressed();
     }
 }

@@ -1602,14 +1602,14 @@
             name="Cabinet Link/Assign Entry ">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.AliquotViewForm"
+            class="edu.ualberta.med.biobank.forms.SpecimenViewForm"
             default="false"
             icon="icons/specimen.png"
             id="edu.ualberta.med.biobank.forms.AliquotViewForm"
             name="Aliquot View">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.AliquotEntryForm"
+            class="edu.ualberta.med.biobank.forms.SpecimenEntryForm"
             default="false"
             icon="icons/specimen.png"
             id="edu.ualberta.med.biobank.forms.AliquotEntryForm"
@@ -1684,7 +1684,7 @@
             name="Specimen List">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.PvListViewForm"
+            class="edu.ualberta.med.biobank.forms.CeListViewForm"
             default="false"
             icon="icons/collectionEvent.png"
             id="edu.ualberta.med.biobank.forms.PvListViewForm"

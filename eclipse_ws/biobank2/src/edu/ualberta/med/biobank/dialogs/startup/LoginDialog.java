@@ -384,15 +384,15 @@ public class LoginDialog extends TitleAreaDialog {
                     }
 
                     if (workingCenters.size() == 1) {
-                        sessionHelper.getUser().setCurrentWorkingCentre(
+                        sessionHelper.getUser().setCurrentWorkingCenter(
                             workingCenters.get(0));
                     } else if (workingCenters.size() > 1) {
-                        new WorkingCentreSelectDialog(getShell(),
+                        new WorkingCenterSelectDialog(getShell(),
                             sessionHelper.getAppService(),
                             sessionHelper.getUser()).open();
                     }
                     boolean canAddSession = true;
-                    if (sessionHelper.getUser().getCurrentWorkingCentre() == null)
+                    if (sessionHelper.getUser().getCurrentWorkingCenter() == null)
                         if (sessionHelper.getUser().isWebsiteAdministrator()) {
                             BiobankPlugin
                                 .openAsyncInformation(
@@ -427,7 +427,7 @@ public class LoginDialog extends TitleAreaDialog {
                                         .getString("LoginDialog.working.center.selection.error.msg"));
                         }
                     if (canAddSession)
-                        // do that last, that way user has his working centre
+                        // do that last, that way user has his working center
                         // set
                         SessionManager.getInstance().addSession(
                             sessionHelper.getAppService(),

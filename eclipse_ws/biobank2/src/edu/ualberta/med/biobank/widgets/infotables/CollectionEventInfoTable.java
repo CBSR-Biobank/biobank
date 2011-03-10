@@ -16,30 +16,26 @@ public class CollectionEventInfoTable extends
     class TableRowData {
         CollectionEventWrapper collectionEvent;
         Integer visitNumber;
-        Long sourceSpecimenCount;
-        Long aliquotedSpecimenCount;
+        long sourceSpecimenCount;
+        long aliquotedSpecimenCount;
         String comment;
 
         @Override
         public String toString() {
             return StringUtils.join(
-                new String[] {
-                    visitNumber.toString(),
-                    (sourceSpecimenCount != null) ? sourceSpecimenCount
-                        .toString() : "0",
-                    (aliquotedSpecimenCount != null) ? aliquotedSpecimenCount
-                        .toString() : "0", comment }, "\t");
+                new String[] { visitNumber.toString(),
+                    String.valueOf(sourceSpecimenCount),
+                    String.valueOf(aliquotedSpecimenCount), comment }, "\t"); //$NON-NLS-1$
         }
     }
 
     private static final String[] HEADINGS = new String[] {
-        Messages.getString("CollectionEventInfoTable.header.visitNumber"),
-        Messages.getString("CollectionEventInfoTable.header.dateDrawn"),
+        Messages.getString("CollectionEventInfoTable.header.visitNumber"), //$NON-NLS-1$
         Messages
-            .getString("CollectionEventInfoTable.header.numSourceSpecimens"),
+            .getString("CollectionEventInfoTable.header.numSourceSpecimens"), //$NON-NLS-1$
         Messages
-            .getString("CollectionEventInfoTable.header.numAliquotedSpecimens"),
-        Messages.getString("CollectionEventInfoTable.header.comment") };
+            .getString("CollectionEventInfoTable.header.numAliquotedSpecimens"), //$NON-NLS-1$
+        Messages.getString("CollectionEventInfoTable.header.comment") }; //$NON-NLS-1$
 
     public CollectionEventInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
@@ -54,26 +50,22 @@ public class CollectionEventInfoTable extends
                 TableRowData info = (TableRowData) ((BiobankCollectionModel) element).o;
                 if (info == null) {
                     if (columnIndex == 0) {
-                        return "loading...";
+                        return Messages.getString("infotable.loading.msg"); //$NON-NLS-1$
                     }
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
                 switch (columnIndex) {
                 case 0:
                     return info.visitNumber.toString();
                 case 1:
-                    return "date drawn?";
+                    return String.valueOf(info.sourceSpecimenCount);
                 case 2:
-                    return (info.sourceSpecimenCount != null) ? info.sourceSpecimenCount
-                        .toString() : "0";
+                    return String.valueOf(info.aliquotedSpecimenCount);
                 case 3:
-                    return (info.aliquotedSpecimenCount != null) ? info.aliquotedSpecimenCount
-                        .toString() : "0";
-                case 4:
                     return info.comment;
 
                 default:
-                    return "";
+                    return ""; //$NON-NLS-1$
                 }
             }
         };
