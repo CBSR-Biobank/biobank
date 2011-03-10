@@ -13,7 +13,6 @@ import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.OriginInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
@@ -39,11 +38,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private BiobankText patientTotal;
 
-    private BiobankText visitTotal;
-
-    private BiobankText shipmentTotal;
-
-    private OriginInfoTable shipmentsTable;
+    private BiobankText ceventTotal;
 
     @Override
     protected void init() throws Exception {
@@ -70,7 +65,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         createAddressSection(clinic);
         createContactsSection();
         createStudiesSection();
-        createShipmentsSection();
     }
 
     private void createClinicSection() throws Exception {
@@ -90,12 +84,11 @@ public class ClinicViewForm extends AddressViewFormCommon {
             Messages.getString("label.activity"));
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
             Messages.getString("label.comments"));
-        shipmentTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ClinicViewForm.field.label.totalShipments"));
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.getString("ClinicViewForm.field.label.totalPatients"));
-        visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ClinicViewForm.field.label.totalPatientVisits"));
+        ceventTotal = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages
+                .getString("ClinicViewForm.field.label.totalCollectionEvents"));
 
         setClinicValues();
     }
@@ -106,9 +99,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());
-        setTextValue(shipmentTotal, clinic.getOriginInfoCollection(true).size());
         setTextValue(patientTotal, clinic.getPatientCount());
-        setTextValue(visitTotal, clinic.getCollectionEventCount());
+        setTextValue(ceventTotal, clinic.getCollectionEventCount());
     }
 
     private void createContactsSection() {
@@ -132,17 +124,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         studiesTable.addClickListener(collectionDoubleClickListener);
     }
 
-    protected void createShipmentsSection() {
-        Composite client = createSectionWithClient(Messages
-            .getString("ClinicViewForm.shipments.title"));
-
-        shipmentsTable = new OriginInfoTable(client, clinic);
-        shipmentsTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(shipmentsTable);
-
-        shipmentsTable.addClickListener(collectionDoubleClickListener);
-    }
-
     @Override
     public void reload() throws Exception {
         clinic.reload();
@@ -153,7 +134,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setClinicValues();
         setAdressValues(clinic);
         contactsTable.setCollection(clinic.getContactCollection(true));
-        shipmentsTable.setCollection(clinic.getOriginInfoCollection(true));
         studiesTable.setCollection(clinic.getStudyCollection());
     }
 
