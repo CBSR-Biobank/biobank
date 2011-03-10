@@ -45,22 +45,6 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         super(appService, wrappedObject);
     }
 
-    @Deprecated
-    public void addToSourceVesselCollection(
-        List<SourceVesselWrapper> sourceVesselCollection) {
-    }
-
-    @Deprecated
-    public void removeFromSourceVesselCollection(
-        List<SpecimenWrapper> sourceVesselCollection) {
-    }
-
-    @Deprecated
-    public void removeFromSourceVesselCollectionWithCheck(
-        List<SourceVesselWrapper> sourceVesselCollection)
-        throws BiobankCheckException {
-    }
-
     @Override
     public void addToSourceSpecimenCollection(
         List<SpecimenWrapper> specimenCollection) {
@@ -480,27 +464,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Deprecated
-    public void setClinic(ClinicWrapper selectedObject) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public ClinicWrapper getClinic() {
+    public Object getClinic() {
         // TODO Auto-generated method stub
         return null;
     }
-
-    @Deprecated
-    public void checkPatientsStudy() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public String getFormattedDateReceived() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
 }

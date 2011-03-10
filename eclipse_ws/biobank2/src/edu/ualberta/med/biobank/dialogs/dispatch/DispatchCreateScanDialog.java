@@ -213,7 +213,7 @@ public class DispatchCreateScanDialog extends
                         List<SpecimenWrapper> currentAliquots = (currentShipment)
                             .getSpecimenCollection(false);
                         CheckStatus check = (currentShipment)
-                            .checkCanAddAliquot(foundAliquot, false);
+                            .checkCanAddSpecimen(foundAliquot, false);
                         if (check.ok) {
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)

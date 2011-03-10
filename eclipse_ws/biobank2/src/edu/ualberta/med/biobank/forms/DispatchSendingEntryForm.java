@@ -238,11 +238,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
                 SpecimenWrapper existingAliquot = SpecimenWrapper.getSpecimen(
                     dispatch.getAppService(), inventoryId,
                     SessionManager.getUser());
-                if (existingAliquot == null)
-                    BiobankPlugin.openError("Aliquot not found",
-                        "Aliquot with inventory id " + inventoryId
-                            + " has not been found.");
-                else
+                if (dispatch.checkCanAddSpecimen(existingAliquot, true).ok)
                     addAliquot(existingAliquot);
 
             } catch (Exception ae) {
@@ -320,7 +316,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
             label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
-            if (dispatch.getPackedAt() != null)
+            if (dispatch.getFormattedPackedAt() != null)
                 label += "[" + dispatch.getFormattedPackedAt() + "]";
             return label;
         }

@@ -178,9 +178,9 @@ public class SpecimenViewForm extends BiobankViewForm {
             .getStudy().getNameShort());
         setTextValue(patientLabel, specimen.getCollectionEvent().getPatient()
             .getPnumber());
-        if (specimen.hasParent())
-            setTextValue(dateProcessedLabel, specimen
-                .getParentProcessingEvent().getFormattedCreatedAt());
+        if (specimen.getParentSpecimen() != null)
+            setTextValue(dateProcessedLabel, specimen.getParentSpecimen()
+                .getProcessingEvent().getFormattedCreatedAt());
         setTextValue(activityStatusLabel, specimen.getActivityStatus());
         setTextValue(commentLabel, specimen.getComment());
         setTextValue(positionLabel, specimen.getPositionString(true, false));
