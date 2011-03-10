@@ -63,4 +63,4 @@ mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v131_v140.sql
 echo "setting global security..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < $DUMPFILE
 echo "setting CBSR sites security..."
-#mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < security-logs/addCBSRSiteSecurity.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < security-logs/addCBSRSiteSecurity.sql

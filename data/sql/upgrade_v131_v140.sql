@@ -117,9 +117,9 @@ CREATE TABLE specimen (
   INVENTORY_ID varchar(100) COLLATE latin1_general_cs NOT NULL,
   COMMENT text COLLATE latin1_general_cs,
   QUANTITY double DEFAULT NULL,
-  CREATED_AT datetime DEFAULT NULL,
+  CREATED_AT datetime NOT NULL,
   ACTIVITY_STATUS_ID int(11) NOT NULL,
-  SOURCE_COLLECTION_EVENT_ID int(11) DEFAULT NULL,
+  ORIGINAL_COLLECTION_EVENT_ID int(11) DEFAULT NULL,
   PROCESSING_EVENT_ID int(11) DEFAULT NULL,
   ORIGIN_INFO_ID int(11) NOT NULL,
   SPECIMEN_TYPE_ID int(11) NOT NULL,
@@ -130,13 +130,13 @@ CREATE TABLE specimen (
   SV_ID INT(11),
   PRIMARY KEY (ID),
   UNIQUE KEY INVENTORY_ID (INVENTORY_ID),
-  KEY FKAF84F308FBB79BBF (CURRENT_CENTER_ID),
+  KEY FKAF84F30886857784 (ORIGINAL_COLLECTION_EVENT_ID),
   KEY FKAF84F308280272F2 (COLLECTION_EVENT_ID),
   KEY FKAF84F308C449A4 (ACTIVITY_STATUS_ID),
   KEY FKAF84F30812E55F12 (ORIGIN_INFO_ID),
   KEY FKAF84F30861674F50 (PARENT_SPECIMEN_ID),
   KEY FKAF84F30833126C8 (PROCESSING_EVENT_ID),
-  KEY FKAF84F308777F4CCE (SOURCE_COLLECTION_EVENT_ID),
+  KEY FKAF84F308FBB79BBF (CURRENT_CENTER_ID),
   KEY FKAF84F30838445996 (SPECIMEN_TYPE_ID)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
@@ -147,7 +147,7 @@ create index sv_id_idx on specimen(sv_id);
 -- add an aliquoted specimen for each patient visit
 
 INSERT INTO specimen (inventory_id,comment,quantity,created_at,specimen_type_id,
-activity_status_id,source_collection_event_id,pv_id)
+activity_status_id,original_collection_event_id,pv_id)
         SELECT inventory_id,comment,quantity,link_date,specimen_type.id,activity_status_id,0,
         patient_visit_id
         FROM aliquot
@@ -157,7 +157,7 @@ activity_status_id,source_collection_event_id,pv_id)
 -- add a source specimen for each patient visit
 
 INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id,
-source_collection_event_id,specimen_type_id,pv_id,sv_id)
+original_collection_event_id,specimen_type_id,pv_id,sv_id)
        SELECT concat("sw upgrade ",pvsv.id),volume,time_drawn,
        (select id from activity_status where name='Active'),0,0,0,patient_visit_id,source_vessel_id
        FROM pv_source_vessel as pvsv
@@ -244,7 +244,7 @@ CREATE TABLE dispatch (
     ID INT(11) NOT NULL AUTO_INCREMENT,
     STATE INT(11) NULL DEFAULT NULL,
     COMMENT TEXT CHARACTER SET latin1 COLLATE latin1_general_cs NULL DEFAULT NULL,
-    DEPARTED_AT DATETIME NULL DEFAULT NULL,
+    PACKED_AT DATETIME NULL DEFAULT NULL,
     RECEIVER_CENTER_ID INT(11) NULL DEFAULT NULL,
     SHIPMENT_INFO_ID INT(11)  NULL DEFAULT NULL,
     SENDER_CENTER_ID INT(11) NULL DEFAULT NULL,
@@ -377,17 +377,17 @@ INSERT INTO collection_event (visit_number,comment,patient_id,activity_status_id
 
 create index pv_id_idx on collection_event(pv_id);
 
--- set specimen.source_collection_event_id, and specimen.collection_event_id for aliquoted
+-- set specimen.original_collection_event_id, and specimen.collection_event_id for aliquoted
 -- specimens
 
 update specimen,collection_event as ce
-       set specimen.source_collection_event_id=ce.id,specimen.collection_event_id=ce.id
+       set specimen.original_collection_event_id=ce.id,specimen.collection_event_id=ce.id
        where ce.pv_id=specimen.pv_id and specimen.sv_id is null;
 
--- set specimen.source_collection_event_id for source specimens
+-- set specimen.original_collection_event_id for source specimens
 
 update specimen,collection_event as ce
-       set specimen.source_collection_event_id=ce.id
+       set specimen.original_collection_event_id=ce.id
        where ce.pv_id=specimen.pv_id and specimen.sv_id is not null;
 
 ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
