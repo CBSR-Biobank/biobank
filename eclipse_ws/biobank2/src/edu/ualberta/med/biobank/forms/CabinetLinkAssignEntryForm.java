@@ -82,10 +82,11 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     private BiobankText oldCabinetPositionCheckText;
     private Label newCabinetPositionLabel;
     private BiobankText newCabinetPositionText;
-    private Label sourceSpecimenTextLabel;
-    private BiobankText sourceSpecimenText;
-    private Label specimenTypeTextLabel;
-    private BiobankText specimenTypeText;
+    // private Label sourceSpecimenTextLabel;
+    // private BiobankText sourceSpecimenText;
+    // private Label specimenTypeTextLabel;
+    // private BiobankText specimenTypeText;
+
     private Button checkButton;
 
     private CancelConfirmWidget cancelConfirmWidget;
@@ -312,7 +313,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
             Messages.getString("Cabinet.checkButton.text"), //$NON-NLS-1$
             SWT.PUSH);
         gd = new GridData();
-        gd.horizontalSpan = 3;
+        gd.horizontalSpan = 2;
         checkButton.setLayoutData(gd);
         checkButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -559,17 +560,17 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
 
     private void enableAndShowSampleTypeCombo() {
         boolean enabled = (aliquotMode == AliquotMode.NEW_ALIQUOT);
-        if (enabled) {
-            typeWidget.addBindings();
-        } else {
-            typeWidget.removeBindings();
-        }
+        // if (enabled) {
+        // typeWidget.addBindings();
+        // } else {
+        // typeWidget.removeBindings();
+        // }
         typeWidget.setEnabled(enabled);
-        typeWidget.showWidget(enabled);
-        widgetCreator.showWidget(sourceSpecimenTextLabel, !enabled);
-        widgetCreator.showWidget(sourceSpecimenText, !enabled);
-        widgetCreator.showWidget(specimenTypeTextLabel, !enabled);
-        widgetCreator.showWidget(specimenTypeText, !enabled);
+        // typeWidget.showWidget(enabled);
+        // widgetCreator.showWidget(sourceSpecimenTextLabel, !enabled);
+        // widgetCreator.showWidget(sourceSpecimenText, !enabled);
+        // widgetCreator.showWidget(specimenTypeTextLabel, !enabled);
+        // widgetCreator.showWidget(specimenTypeText, !enabled);
     }
 
     private void createTypeCombo(Composite fieldsComposite) {
@@ -578,25 +579,23 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         typeWidget.addBindings();
 
         // for move mode
-        sourceSpecimenTextLabel = widgetCreator.createLabel(fieldsComposite,
-            Messages.getString("Cabinet.sourceSpecimen.label"));
-        sourceSpecimenTextLabel.setLayoutData(new GridData(
-            GridData.VERTICAL_ALIGN_BEGINNING));
-        sourceSpecimenText = (BiobankText) widgetCreator.createBoundWidget(
-            fieldsComposite, BiobankText.class, SWT.NONE,
-            sourceSpecimenTextLabel, new String[0], null, null);
-        ((GridData) sourceSpecimenText.getLayoutData()).horizontalSpan = 2;
-        sourceSpecimenText.setEnabled(false);
-
-        specimenTypeTextLabel = widgetCreator.createLabel(fieldsComposite,
-            Messages.getString("Cabinet.sampleType.label"));
-        specimenTypeTextLabel.setLayoutData(new GridData(
-            GridData.VERTICAL_ALIGN_BEGINNING));
-        specimenTypeText = (BiobankText) widgetCreator.createBoundWidget(
-            fieldsComposite, BiobankText.class, SWT.NONE,
-            specimenTypeTextLabel, new String[0], null, null);
-        ((GridData) specimenTypeText.getLayoutData()).horizontalSpan = 2;
-        specimenTypeText.setEnabled(false);
+        // sourceSpecimenTextLabel = widgetCreator.createLabel(fieldsComposite,
+        // Messages.getString("Cabinet.sourceSpecimen.label"));
+        // sourceSpecimenTextLabel.setLayoutData(new GridData(
+        // GridData.VERTICAL_ALIGN_BEGINNING));
+        // sourceSpecimenText = (BiobankText) widgetCreator.createBoundWidget(
+        // fieldsComposite, BiobankText.class, SWT.NONE,
+        // sourceSpecimenTextLabel, new String[0], null, null);
+        // sourceSpecimenText.setEnabled(false);
+        //
+        // specimenTypeTextLabel = widgetCreator.createLabel(fieldsComposite,
+        // Messages.getString("Cabinet.sampleType.label"));
+        // specimenTypeTextLabel.setLayoutData(new GridData(
+        // GridData.VERTICAL_ALIGN_BEGINNING));
+        // specimenTypeText = (BiobankText) widgetCreator.createBoundWidget(
+        // fieldsComposite, BiobankText.class, SWT.NONE,
+        // specimenTypeTextLabel, new String[0], null, null);
+        // specimenTypeText.setEnabled(false);
     }
 
     private void initCabinetContainerTypesList() throws ApplicationException {
@@ -805,10 +804,12 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 .getText());
         }
         oldCabinetPositionText.setText(positionString);
-        sourceSpecimenText.setText(specimen.getParentSpecimen()
-            .getSpecimenType().getNameShort()
-            + "(" + specimen.getParentSpecimen().getInventoryId() + ")");
-        specimenTypeText.setText(specimen.getSpecimenType().getName());
+        typeWidget.setReadOnlySelections(specimen.getParentSpecimen(),
+            specimen.getSpecimenType());
+        // sourceSpecimenText.setText(specimen.getParentSpecimen()
+        // .getSpecimenType().getNameShort()
+        // + "(" + specimen.getParentSpecimen().getInventoryId() + ")");
+        // specimenTypeText.setText(specimen.getSpecimenType().getName());
         page.layout(true, true);
         appendLogNLS(
             "Cabinet.activitylog.aliquotInfo", specimen.getInventoryId(), //$NON-NLS-1$
@@ -854,8 +855,8 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         oldCabinetPositionText.setText("");
         oldCabinetPositionCheckText.setText(""); //$NON-NLS-1$
         newCabinetPositionText.setText(""); //$NON-NLS-1$
-        sourceSpecimenText.setText("");
-        specimenTypeText.setText("");
+        // sourceSpecimenText.setText("");
+        // specimenTypeText.setText("");
         typeWidget.deselectAll();
         setDirty(false);
         setFocus();
