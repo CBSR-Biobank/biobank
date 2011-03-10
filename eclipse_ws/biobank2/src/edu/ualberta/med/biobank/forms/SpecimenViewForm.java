@@ -46,8 +46,6 @@ public class SpecimenViewForm extends BiobankViewForm {
 
     private BiobankText dateProcessedLabel;
 
-    private BiobankText dateDrawnLabel;
-
     private BiobankText activityStatusLabel;
 
     private BiobankText commentLabel;
@@ -124,8 +122,6 @@ public class SpecimenViewForm extends BiobankViewForm {
         patientLabel = createReadOnlyLabelledField(client, SWT.NONE, "Patient");
         dateProcessedLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Date Processed");
-        dateDrawnLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Date Drawn");
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Activity Status");
         commentLabel = createReadOnlyLabelledField(client,

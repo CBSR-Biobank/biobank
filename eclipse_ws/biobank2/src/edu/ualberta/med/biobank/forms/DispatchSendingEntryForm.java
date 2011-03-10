@@ -29,7 +29,6 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
@@ -39,8 +38,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(DispatchSendingEntryForm.class.getName());
+    // private static BiobankLogger logger = BiobankLogger
+    // .getLogger(DispatchSendingEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm";
 
