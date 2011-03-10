@@ -33,8 +33,8 @@ public class BiobankReport implements QueryCommand {
             e.printStackTrace();
         }
         // load map
-        for (Object prop : props.entrySet()) {
-            String key = (String) prop;
+        for (Map.Entry<Object, Object> prop : props.entrySet()) {
+            String key = (String) prop.getKey();
             String pieces[] = key.split("[.]");
             ReportData r;
             if (REPORTS.get(pieces[0]) == null)
@@ -42,11 +42,11 @@ public class BiobankReport implements QueryCommand {
             else
                 r = REPORTS.get(pieces[0]);
             if (pieces[1].equals("NAME"))
-                r.name = (String) props.get(prop);
+                r.name = (String) prop.getValue();
             else if (pieces[1].equals("DESCRIPTION"))
-                r.description = (String) props.get(prop);
+                r.description = (String) prop.getValue();
             else
-                r.editorId = editorPath + (String) props.get(prop);
+                r.editorId = editorPath + (String) prop.getValue();
             r.className = pieces[0];
             REPORTS.put(pieces[0], r);
         }
