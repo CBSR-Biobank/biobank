@@ -155,13 +155,22 @@ activity_status_id,original_collection_event_id,pv_id)
         JOIN specimen_type ON specimen_type.name=sample_type.name;
 
 -- add a source specimen for each patient visit
+--
+-- if the pvsv.time_drawn is null the specimen created at time is the date from pv.date_drawn,
+-- if the pvsv.time_drawn is not null specimen created at time is the date from pv.date_drawn
+-- plus the time from pvsv.time_drawn
 
 INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id,
 original_collection_event_id,specimen_type_id,pv_id,sv_id)
-       SELECT concat("sw upgrade ",pvsv.id),volume,time_drawn,
-       (select id from activity_status where name='Active'),0,0,0,patient_visit_id,source_vessel_id
+       SELECT concat("sw upgrade ",pvsv.id),volume,
+       if(pvsv.time_drawn is null,pv.date_drawn,
+               addtime(timestamp(date(pv.date_drawn)), time(pvsv.time_drawn))),
+       (select id from activity_status where name='Active'),0,0,specimen_type.id,
+       patient_visit_id,source_vessel_id
        FROM pv_source_vessel as pvsv
-       JOIN source_vessel as sv on sv.id=pvsv.source_vessel_id;
+       join patient_visit as pv on pv.id=pvsv.patient_visit_id
+       JOIN source_vessel as sv on sv.id=pvsv.source_vessel_id
+       join specimen_type on specimen_type.name=sv.name;
 
 -- set the source center
 
@@ -377,11 +386,10 @@ INSERT INTO collection_event (visit_number,comment,patient_id,activity_status_id
 
 create index pv_id_idx on collection_event(pv_id);
 
--- set specimen.original_collection_event_id, and specimen.collection_event_id for aliquoted
--- specimens
+-- set specimen.collection_event_id for aliquoted specimens
 
 update specimen,collection_event as ce
-       set specimen.original_collection_event_id=ce.id,specimen.collection_event_id=ce.id
+       set specimen.collection_event_id=ce.id
        where ce.pv_id=specimen.pv_id and specimen.sv_id is null;
 
 -- set specimen.original_collection_event_id for source specimens
@@ -412,8 +420,9 @@ CREATE TABLE processing_event (
 -- this insert allows the same worksheet number to be used in more than one
 -- processing event
 
-insert into processing_event (created_at,worksheet,comment,center_id,pv_id)
-       select pv.date_processed,event_attr.value as worksheet,pv.comment,center.id,pv.id
+insert into processing_event (created_at,worksheet,comment,activity_status_id,center_id,pv_id)
+       select pv.date_processed,event_attr.value as worksheet,pv.comment,
+       (select id from activity_status where name='Active'),center.id,pv.id
        from patient_visit as pv
        join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
        join abstract_shipment as aship on aship.id=csp.CLINIC_SHIPMENT_ID
