@@ -10,8 +10,8 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 
 public class AliquotsByPalletTest extends AbstractReportTest {
 
@@ -63,8 +63,9 @@ public class AliquotsByPalletTest extends AbstractReportTest {
         final String containerLabel) {
         return new Predicate<SpecimenWrapper>() {
             public boolean evaluate(SpecimenWrapper aliquot) {
-                return (aliquot.getParent() != null)
-                    && aliquot.getParent().getLabel().equals(containerLabel);
+                return (aliquot.getParentContainer() != null)
+                    && aliquot.getParentContainer().getLabel()
+                        .equals(containerLabel);
             }
         };
     }

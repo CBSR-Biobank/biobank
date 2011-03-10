@@ -655,9 +655,11 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     }
 
     protected void displayPalletPositions() {
-        if (currentPalletWrapper.hasParent()) {
-            ContainerWrapper hotelContainer = currentPalletWrapper.getParent();
-            ContainerWrapper freezerContainer = hotelContainer.getParent();
+        if (currentPalletWrapper.hasParentContainer()) {
+            ContainerWrapper hotelContainer = currentPalletWrapper
+                .getParentContainer();
+            ContainerWrapper freezerContainer = hotelContainer
+                .getParentContainer();
 
             if (freezerContainer != null) {
                 freezerLabel.setText(freezerContainer.getFullInfoLabel());
@@ -751,9 +753,9 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
      */
     private void processCellWithPreviousPosition(PalletCell scanCell,
         String positionString, SpecimenWrapper foundAliquot) {
-        if (foundAliquot.getParent().getSite()
+        if (foundAliquot.getParentContainer().getSite()
             .equals(currentPalletWrapper.getSite())) {
-            if (foundAliquot.getParent().equals(currentPalletWrapper)) {
+            if (foundAliquot.getParentContainer().equals(currentPalletWrapper)) {
                 // same pallet
                 RowColPos rcp = new RowColPos(scanCell.getRow(),
                     scanCell.getCol());
@@ -825,7 +827,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         if (currentPosition == null) {
             currentPosition = "none"; //$NON-NLS-1$
         }
-        String siteName = foundAliquot.getParent().getSite().getNameShort();
+        String siteName = foundAliquot.getParentContainer().getSite()
+            .getNameShort();
         scanCell.setStatus(CellStatus.ERROR);
         scanCell.setTitle(foundAliquot.getCollectionEvent().getPatient()
             .getPnumber());
@@ -1173,7 +1176,8 @@ public class ScanAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                 containerToRemove = containerAtPosition;
                 // pallet already exists. Need to remove the initialisation to
                 // replace it.
-                currentPalletWrapper.setParent(containerAtPosition.getParent());
+                currentPalletWrapper.setParent(containerAtPosition
+                    .getParentContainer());
                 currentPalletWrapper.setPosition(containerAtPosition
                     .getPosition());
             } else {

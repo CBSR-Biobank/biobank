@@ -3,10 +3,12 @@ package edu.ualberta.med.biobank.model;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
+
 public class PvAttrCustom {
     private Boolean isDefault;
     private String label;
-    private String type;
+    private EventAttrTypeEnum type;
     private String[] allowedValues;
     private String value;
 
@@ -31,13 +33,17 @@ public class PvAttrCustom {
             this.label = label);
     }
 
-    public String getType() {
+    public EventAttrTypeEnum getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(EventAttrTypeEnum type) {
         propertyChangeSupport.firePropertyChange("type", this.type,
             this.type = type);
+    }
+
+    public void setType(String typeName) {
+        setType(EventAttrTypeEnum.getEventAttrType(typeName));
     }
 
     public String[] getAllowedValues() {

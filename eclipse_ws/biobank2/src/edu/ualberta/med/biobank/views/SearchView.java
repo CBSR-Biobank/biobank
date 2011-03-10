@@ -19,7 +19,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -78,7 +77,7 @@ public class SearchView extends ViewPart {
                 }
             });
 
-        Label label = widgetCreator.createLabel(parent, "Repository Site");
+        widgetCreator.createLabel(parent, "Repository Site");
 
         searchTypeCombo = new ComboViewer(parent);
         searchTypeCombo.setContentProvider(new ArrayContentProvider());
@@ -155,7 +154,7 @@ public class SearchView extends ViewPart {
                 try {
                     List<? extends ModelWrapper<?>> res = type.search(
                         searchString, SessionManager.getUser()
-                            .getCurrentWorkingCentre());
+                            .getCurrentWorkingCenter());
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {

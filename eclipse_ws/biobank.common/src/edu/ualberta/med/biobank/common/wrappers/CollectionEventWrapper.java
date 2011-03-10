@@ -46,26 +46,26 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Override
-    public void addToSourceSpecimenCollection(
+    public void addToOriginalSpecimenCollection(
         List<SpecimenWrapper> specimenCollection) {
-        super.addToSourceSpecimenCollection(specimenCollection);
+        super.addToOriginalSpecimenCollection(specimenCollection);
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
         deletedSourceSpecimens.removeAll(specimenCollection);
     }
 
     @Override
-    public void removeFromSourceSpecimenCollection(
+    public void removeFromOriginalSpecimenCollection(
         List<SpecimenWrapper> specimenCollection) {
         deletedSourceSpecimens.addAll(specimenCollection);
-        super.removeFromSourceSpecimenCollection(specimenCollection);
+        super.removeFromOriginalSpecimenCollection(specimenCollection);
     }
 
     @Override
-    public void removeFromSourceSpecimenCollectionWithCheck(
+    public void removeFromOriginalSpecimenCollectionWithCheck(
         List<SpecimenWrapper> specimenCollection) throws BiobankCheckException {
         deletedSourceSpecimens.addAll(specimenCollection);
-        super.removeFromSourceSpecimenCollectionWithCheck(specimenCollection);
+        super.removeFromOriginalSpecimenCollectionWithCheck(specimenCollection);
     }
 
     private void deleteSourceVessels() throws Exception {
@@ -109,7 +109,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     public void checkAtLeastOneSourceSpecimen() throws BiobankCheckException {
-        List<SpecimenWrapper> spc = getSourceSpecimenCollection(false);
+        List<SpecimenWrapper> spc = getOriginalSpecimenCollection(false);
         if (spc == null || spc.isEmpty()) {
             throw new BiobankCheckException(
                 "At least one specimen should be added to this Collection Event.");
@@ -138,7 +138,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
 
     private static final String COLLECTION_EVENTS_BY_WAYBILL_QRY = "from "
         + CollectionEvent.class.getName() + " ce join ce."
-        + CollectionEventPeer.SOURCE_SPECIMEN_COLLECTION
+        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
         + " as spcs join spcs." + SpecimenPeer.ORIGIN_INFO.getName()
         + " as oi join oi." + OriginInfoPeer.SHIPMENT_INFO.getName()
         + " as shipinfo where shipinfo." + ShipmentInfoPeer.WAYBILL + "=?";
@@ -159,7 +159,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     private static final String COLLECTION_EVENTS_BY_DATE_RECEIVED_QRY = "from "
         + CollectionEvent.class.getName()
         + " ce join ce."
-        + CollectionEventPeer.SOURCE_SPECIMEN_COLLECTION
+        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION
         + " as spcs join spcs."
         + SpecimenPeer.ORIGIN_INFO.getName()
         + " as oi join oi."
@@ -179,11 +179,13 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
             CollectionEventWrapper.class);
     }
 
-    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(spc) from "
-        + Specimen.class.getName()
-        + " as spc where spc."
-        + Property.concatNames(SpecimenPeer.SOURCE_COLLECTION_EVENT,
-            CollectionEventPeer.ID) + "=?";
+    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(specimens) from "
+        + CollectionEvent.class.getName()
+        + " as cEvent join cEvent."
+        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
+        + " as specimens where cEvent."
+        + CollectionEventPeer.ID.getName()
+        + "=?";
 
     public long getSourceSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
@@ -192,7 +194,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
-        List<SpecimenWrapper> list = getSourceSpecimenCollection(false);
+        List<SpecimenWrapper> list = getOriginalSpecimenCollection(false);
         if (list == null)
             return 0;
         return list.size();
@@ -211,7 +213,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                 Arrays.asList(new Object[] { getId() }));
             return getCountResult(appService, criteria);
         }
-        List<SpecimenWrapper> list = getSourceSpecimenCollection(false);
+        List<SpecimenWrapper> list = getOriginalSpecimenCollection(false);
         if (list == null)
             return 0;
         return list.size();
@@ -223,7 +225,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
         + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
             CollectionEventPeer.ID)
         + "=? and spc."
-        + SpecimenPeer.SOURCE_COLLECTION_EVENT.getName() + " is null";
+        + SpecimenPeer.PARENT_SPECIMEN.getName() + " is not null";
 
     public long getAliquotedSpecimensCount(boolean fast)
         throws BiobankException, ApplicationException {
@@ -242,7 +244,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     public List<SpecimenWrapper> getAliquotedSpecimenCollection(boolean sort) {
         List<SpecimenWrapper> aliquotedSpecimens = new ArrayList<SpecimenWrapper>(
             getAllSpecimenCollection(true));
-        aliquotedSpecimens.removeAll(getSourceSpecimenCollection(false));
+        aliquotedSpecimens.removeAll(getOriginalSpecimenCollection(false));
         return aliquotedSpecimens;
     }
 
@@ -258,7 +260,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     public List<SpecimenWrapper> getSourceSpecimenCollectionInProcess(
         boolean sort) {
         List<SpecimenWrapper> specimens = new ArrayList<SpecimenWrapper>();
-        for (SpecimenWrapper specimen : getSourceSpecimenCollection(sort)) {
+        for (SpecimenWrapper specimen : getOriginalSpecimenCollection(sort)) {
             if (specimen.getProcessingEvent() != null)
                 specimens.add(specimen);
         }
@@ -402,8 +404,8 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                 String type = studyEventAttr.getEventAttrType().getName();
                 List<String> permissibleSplit = null;
 
-                if (type.equals("select_single")
-                    || type.equals("select_multiple")) {
+                if (EventAttrTypeEnum.SELECT_SINGLE.isSameType(type)
+                    || EventAttrTypeEnum.SELECT_MULTIPLE.isSameType(type)) {
                     String permissible = studyEventAttr.getPermissible();
                     if (permissible != null) {
                         permissibleSplit = Arrays
@@ -411,12 +413,12 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                     }
                 }
 
-                if (type.equals("select_single")) {
+                if (EventAttrTypeEnum.SELECT_SINGLE.isSameType(type)) {
                     if (!permissibleSplit.contains(value)) {
                         throw new Exception("value " + value
                             + "is invalid for label \"" + label + "\"");
                     }
-                } else if (type.equals("select_multiple")) {
+                } else if (EventAttrTypeEnum.SELECT_MULTIPLE.isSameType(type)) {
                     for (String singleVal : value.split(";")) {
                         if (!permissibleSplit.contains(singleVal)) {
                             throw new Exception("value " + singleVal + " ("
@@ -424,11 +426,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
                                 + "\"");
                         }
                     }
-                } else if (type.equals("number")) {
+                } else if (EventAttrTypeEnum.NUMBER.isSameType(type)) {
                     Double.parseDouble(value);
-                } else if (type.equals("date_time")) {
+                } else if (EventAttrTypeEnum.DATE_TIME.isSameType(type)) {
                     DateFormatter.dateFormatter.parse(value);
-                } else if (type.equals("text")) {
+                } else if (EventAttrTypeEnum.TEXT.isSameType(type)) {
                     // do nothing
                 } else {
                     throw new Exception("type \"" + type + "\" not tested");
@@ -464,7 +466,7 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Deprecated
-    public Object getClinic() {
+    public ClinicWrapper getClinic() {
         // TODO Auto-generated method stub
         return null;
     }

@@ -152,7 +152,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
     public void dragStart(DragSourceEvent event) {
 
         ContainerWrapper container = getSelectedContainer();
-        if (container != null && container.hasParent()) {
+        if (container != null && container.hasParentContainer()) {
             event.doit = true;
             srcContainer = container;
         } else {

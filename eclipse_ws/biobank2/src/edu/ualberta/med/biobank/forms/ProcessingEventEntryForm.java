@@ -111,7 +111,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ProcessingEvent.field.centre.label"), pEvent //$NON-NLS-1$
+            Messages.getString("ProcessingEvent.field.center.label"), pEvent //$NON-NLS-1$
                 .getCenter().getName());
 
         dateWidget = createDateTimeWidget(
@@ -152,10 +152,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, pEvent, //$NON-NLS-1$
             ProcessingEventPeer.COMMENT.getName(), null);
-
     }
 
     private void createSpecimensSection() {
+        // FIXME combo to select study. If Edit and specimens are already added,
+        // set it to one of the specimen study
         Composite client = createSectionWithClient(Messages
             .getString("ProcessingEventEntryForm.specimens.title")); //$NON-NLS-1$
         GridLayout layout = new GridLayout(1, false);

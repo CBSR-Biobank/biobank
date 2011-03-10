@@ -219,7 +219,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public CheckStatus checkCanAddSpecimen(
         List<SpecimenWrapper> currentAliquots, SpecimenWrapper aliquot,
-        boolean checkAlreadyAdded) throws BiobankCheckException {
+        boolean checkAlreadyAdded) {
         if (aliquot.isNew()) {
             return new CheckStatus(false, "Cannot add aliquot "
                 + aliquot.getInventoryId() + ": it has not already been saved");
@@ -229,10 +229,10 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 + aliquot.getInventoryId() + " is not 'Active'."
                 + " Check comments on this aliquot for more information.");
         }
-        if (!aliquot.getParent().getSite().equals(getSenderCenter())) {
+        if (!aliquot.getCurrentCenter().equals(getSenderCenter())) {
             return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
                 + " is currently assigned to site "
-                + aliquot.getParent().getSite().getNameShort()
+                + aliquot.getCurrentCenter().getNameShort()
                 + ". It should be first assigned to "
                 + getSenderCenter().getNameShort() + " site.");
         }
@@ -428,7 +428,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean canBeSentBy(User user) {
         return canUpdate(user)
-            && getSenderCenter().equals(user.getCurrentWorkingCentre())
+            && getSenderCenter().equals(user.getCurrentWorkingCenter())
             && isInCreationState() && hasDispatchSpecimens();
     }
 
@@ -439,7 +439,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean canBeReceivedBy(User user) {
         return canUpdate(user)
-            && getReceiverCenter().equals(user.getCurrentWorkingCentre())
+            && getReceiverCenter().equals(user.getCurrentWorkingCenter())
             && isInTransitState();
     }
 

@@ -71,7 +71,7 @@ public class SiteAdapter extends AdapterBase {
         addEditMenu(menu, "Site");
         addViewMenu(menu, "Site");
         // FIXME should not be able to delete a site if it is currently the
-        // working centre
+        // working center
         addDeleteMenu(menu, "Site");
     }
 

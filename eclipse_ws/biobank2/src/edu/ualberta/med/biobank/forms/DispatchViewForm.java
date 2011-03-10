@@ -95,7 +95,7 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     public void reload() throws Exception {
         retrieveDispatch();
-        setPartName("Dispatch sent on " + dispatch.getDepartedAt());
+        setPartName("Dispatch sent on " + dispatch.getPackedAt());
         setDispatchValues();
         aliquotsTree.refresh();
     }
@@ -103,7 +103,7 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         String dateString = "";
-        if (dispatch.getDepartedAt() != null) {
+        if (dispatch.getPackedAt() != null) {
             dateString = " on " + dispatch.getFormattedPackedAt();
         }
         canSeeEverything = true;

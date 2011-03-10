@@ -203,7 +203,7 @@ public class DispatchReceivingEntryForm extends AbstractShipmentEntryForm {
 
     @Override
     protected String getTextForPartName() {
-        return "Dispatch sent on " + dispatch.getDepartedAt();
+        return "Dispatch sent on " + dispatch.getPackedAt();
     }
 
     @Override
