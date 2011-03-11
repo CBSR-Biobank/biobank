@@ -1231,6 +1231,36 @@
                   style="push"
                   tooltip="Reload Today Node">
             </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
+                  label="Generic Link"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.processingPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+               <parameter
+                     name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
+                     value="edu.ualberta.med.biobank.forms.GenericLinkEntryForm">
+               </parameter>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
+                  label="Generic Assign"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.processingPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+               <parameter
+                     name="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId"
+                     value="edu.ualberta.med.biobank.forms.GenericAssignEntryForm">
+               </parameter>
+            </command>
          </toolbar>
          <toolbar
                id="edu.ualberta.med.biobank.views.ShipmentAdminView">
@@ -1898,6 +1928,18 @@
       icon="icons/processingEvent.png"
       id="edu.ualberta.med.biobank.forms.ProcessingEventViewForm"
       name="Processing Event View">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.GenericLinkEntryForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.GenericLinkEntryForm"
+      name="Generic Link">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.GenericAssignEntryForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.GenericAssignEntryForm"
+      name="Generic Assign">
 </editor>
    </extension>
    <extension
