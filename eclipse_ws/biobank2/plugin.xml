@@ -1899,6 +1899,18 @@
       id="edu.ualberta.med.biobank.forms.ProcessingEventViewForm"
       name="Processing Event View">
 </editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.GenericLinkEntryForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.GenericLinkEntryForm"
+      name="Generic Link">
+</editor>
+<editor
+      class="edu.ualberta.med.biobank.forms.GenericAssignEntryForm"
+      default="false"
+      id="edu.ualberta.med.biobank.forms.GenericAssignEntryForm"
+      name="Generic Assign">
+</editor>
    </extension>
    <extension
          point="org.eclipse.ui.bindings">
