@@ -3,7 +3,7 @@ package edu.ualberta.med.biobank.preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 
 /**
  * Class used to initialise default preference values.
@@ -12,7 +12,7 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer {
 
     @Override
     public void initializeDefaultPreferences() {
-        IPreferenceStore store = BioBankPlugin.getDefault()
+        IPreferenceStore store = BiobankPlugin.getDefault()
             .getPreferenceStore();
         store.setDefault(PreferenceConstants.GENERAL_CONFIRM, "CONFIRM");
         store.setDefault(PreferenceConstants.GENERAL_CANCEL, "CANCEL");

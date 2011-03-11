@@ -29,23 +29,23 @@ public class ContainerPathWrapper extends ContainerPathBaseWrapper {
             return;
 
         String path;
-        ContainerWrapper parent = container.getParent();
+        ContainerWrapper parent = container.getParentContainer();
         if (parent == null) {
             path = "" + container.getId();
         } else {
-            String parentPath = container.getParent().getPath();
+            String parentPath = container.getParentContainer().getPath();
             if (parentPath == null) {
                 throw new Exception("parent container does not have a path");
             }
             path = parentPath + "/" + container.getId();
         }
 
-        setProperty(ContainerPathPeer.PATH, path);
+        setPath(path);
         ContainerWrapper topContainer = container.getTop();
         if (topContainer == null) {
             throw new Exception("no top container");
         }
-        setWrappedProperty(ContainerPathPeer.TOP_CONTAINER, topContainer);
+        setTopContainer(topContainer);
     }
 
     @Override
@@ -69,11 +69,6 @@ public class ContainerPathWrapper extends ContainerPathBaseWrapper {
     public void persist() throws Exception {
         setPath();
         super.persist();
-    }
-
-    @Override
-    public int compareTo(ModelWrapper<ContainerPath> arg0) {
-        return 0;
     }
 
     @Override

@@ -8,13 +8,13 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 
 public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
-    AliquotWrapper a;
+    SpecimenWrapper a;
 
     protected class TableRowData {
 
@@ -39,7 +39,7 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
 
     private boolean editMode = false;
 
-    public DispatchInfoTable(Composite parent, AliquotWrapper a) {
+    public DispatchInfoTable(Composite parent, SpecimenWrapper a) {
         super(parent, null, HEADINGS, 15);
         this.a = a;
         setCollection(a.getDispatchs());
@@ -85,12 +85,12 @@ public class DispatchInfoTable extends InfoTableWidget<DispatchWrapper> {
         throws Exception {
         TableRowData info = new TableRowData();
         info.ds = ds;
-        info.dispatchTime = ds.getDeparted();
-        info.dateReceived = ds.getDateReceived();
+        info.dispatchTime = ds.getPackedAt();
+        info.dateReceived = ds.getShipmentInfo().getReceivedAt();
         info.dstatus = ds.getStateDescription();
-        info.astatus = ds.getDispatchAliquot(a.getInventoryId())
+        info.astatus = ds.getDispatchSpecimen(a.getInventoryId())
             .getStateDescription();
-        info.waybill = ds.getWaybill();
+        info.waybill = ds.getShipmentInfo().getWaybill();
         return info;
     }
 

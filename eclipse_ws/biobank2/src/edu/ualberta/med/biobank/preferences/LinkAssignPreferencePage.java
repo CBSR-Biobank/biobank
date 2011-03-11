@@ -9,7 +9,7 @@ import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.utils.FilePromptUtil;
 
 public class LinkAssignPreferencePage extends FieldEditorPreferencePage
@@ -19,7 +19,7 @@ public class LinkAssignPreferencePage extends FieldEditorPreferencePage
 
     public LinkAssignPreferencePage() {
         super(GRID);
-        setPreferenceStore(BioBankPlugin.getDefault().getPreferenceStore());
+        setPreferenceStore(BiobankPlugin.getDefault().getPreferenceStore());
     }
 
     /**

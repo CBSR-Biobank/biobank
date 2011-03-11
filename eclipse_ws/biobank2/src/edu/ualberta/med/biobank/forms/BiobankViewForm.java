@@ -18,7 +18,7 @@ import org.eclipse.ui.contexts.IContextService;
 import org.eclipse.ui.menus.CommandContributionItem;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedListener;
@@ -118,8 +118,8 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 new CommandContributionItemParameter(PlatformUI.getWorkbench()
                     .getActiveWorkbenchWindow(), "Edit",
                     "edu.ualberta.med.biobank.commands.edit", null,
-                    BioBankPlugin
-                        .getImageDescriptor(BioBankPlugin.IMG_EDIT_FORM), null,
+                    BiobankPlugin
+                        .getImageDescriptor(BiobankPlugin.IMG_EDIT_FORM), null,
                     null, "Edit", "Edit", "Edit", SWT.NONE, "Edit", true));
             form.getToolBarManager().add(edit);
         }
@@ -132,7 +132,7 @@ public abstract class BiobankViewForm extends BiobankFormBase {
                 "Reload",
                 "edu.ualberta.med.biobank.commands.reloadViewForm",
                 null,
-                BioBankPlugin.getImageDescriptor(BioBankPlugin.IMG_RELOAD_FORM),
+                BiobankPlugin.getImageDescriptor(BiobankPlugin.IMG_RELOAD_FORM),
                 null, null, "Reload", "Reload", "Reload", SWT.NONE, "Reload",
                 true));
         form.getToolBarManager().add(reload);

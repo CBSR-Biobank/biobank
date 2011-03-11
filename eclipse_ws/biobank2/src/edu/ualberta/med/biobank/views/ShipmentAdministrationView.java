@@ -4,7 +4,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -12,14 +11,13 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
-import edu.ualberta.med.biobank.dialogs.select.SelectShipmentClinicDialog;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -125,24 +123,25 @@ public class ShipmentAdministrationView extends
         if (radioWaybill.getSelection()) {
             // with waybill, should find only one corresponding shipment, or
             // mutliple shipments from different clinics
-            List<ShipmentWrapper> shipments = ShipmentWrapper
-                .getShipmentsInSites(SessionManager.getAppService(),
+            List<OriginInfoWrapper> shipments = OriginInfoWrapper
+                .getShipmentsByWaybill(SessionManager.getAppService(),
                     text.trim());
-            if (shipments.size() > 1) {
-                SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
-                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-                        .getShell(), shipments);
-                if (dlg.open() == Dialog.OK) {
-                    return Arrays.asList(dlg.getSelectedShipment());
-                }
-            } else {
-                return shipments;
-            }
+            // TODO: allow selection of specific clinic?
+            // if (shipments.size() > 1) {
+            // SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
+            // PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+            // .getShell(), shipments);
+            // if (dlg.open() == Dialog.OK) {
+            // return Arrays.asList(dlg.getSelectedShipment());
+            // }
+            // } else {
+            return shipments;
+            // }
         } else {
             // can find more than one shipments
             Date date = dateReceivedWidget.getDate();
             if (date != null) {
-                return ShipmentWrapper.getShipmentsInSites(
+                return OriginInfoWrapper.getShipmentsByDateReceived(
                     SessionManager.getAppService(), date);
             }
         }
@@ -151,8 +150,8 @@ public class ShipmentAdministrationView extends
 
     public static AdapterBase addToNode(AdapterBase parentNode,
         ModelWrapper<?> wrapper) {
-        if (currentInstance != null && wrapper instanceof ShipmentWrapper) {
-            ShipmentWrapper shipment = (ShipmentWrapper) wrapper;
+        if (currentInstance != null && wrapper instanceof OriginInfoWrapper) {
+            OriginInfoWrapper originInfo = (OriginInfoWrapper) wrapper;
 
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
@@ -169,29 +168,35 @@ public class ShipmentAdministrationView extends
                 }
                 topNode = dateNode;
             }
-            List<AdapterBase> clinicAdapterList = topNode.search(shipment
-                .getClinic());
-            ClinicWithShipmentAdapter clinicAdapter = null;
-            if (clinicAdapterList.size() > 0)
-                clinicAdapter = (ClinicWithShipmentAdapter) clinicAdapterList
-                    .get(0);
-            else {
-                clinicAdapter = new ClinicWithShipmentAdapter(topNode,
-                    shipment.getClinic());
-                clinicAdapter.setEditable(false);
-                clinicAdapter.setLoadChildrenInBackground(false);
-                topNode.addChild(clinicAdapter);
+
+            List<AdapterBase> centerAdapterList = topNode.search(originInfo
+                .getCenter());
+            AdapterBase centerAdapter = null;
+
+            if (centerAdapterList.size() > 0)
+                centerAdapter = centerAdapterList.get(0);
+            else if (originInfo.getCenter() instanceof ClinicWrapper) {
+                centerAdapter = new ClinicWithShipmentAdapter(topNode,
+                    (ClinicWrapper) originInfo.getCenter());
+                centerAdapter.setEditable(false);
+                centerAdapter.setLoadChildrenInBackground(false);
+                topNode.addChild(centerAdapter);
             }
-            ShipmentAdapter shipmentAdapter = null;
-            List<AdapterBase> shipmentAdapterList = clinicAdapter
-                .search(shipment);
-            if (shipmentAdapterList.size() > 0)
-                shipmentAdapter = (ShipmentAdapter) shipmentAdapterList.get(0);
-            else {
-                shipmentAdapter = new ShipmentAdapter(clinicAdapter, shipment);
-                clinicAdapter.addChild(shipmentAdapter);
+
+            if (centerAdapter != null) {
+                ShipmentAdapter shipmentAdapter = null;
+                List<AdapterBase> shipmentAdapterList = centerAdapter
+                    .search(originInfo);
+                if (shipmentAdapterList.size() > 0)
+                    shipmentAdapter = (ShipmentAdapter) shipmentAdapterList
+                        .get(0);
+                else {
+                    shipmentAdapter = new ShipmentAdapter(centerAdapter,
+                        originInfo);
+                    centerAdapter.addChild(shipmentAdapter);
+                }
+                return shipmentAdapter;
             }
-            return shipmentAdapter;
         }
         return null;
     }
@@ -199,20 +204,21 @@ public class ShipmentAdministrationView extends
     @Override
     protected void notFound(String text) {
         if (radioWaybill.getSelection()) {
-            boolean create = BioBankPlugin.openConfirm("Shipment not found",
+            boolean create = BiobankPlugin.openConfirm("Shipment not found",
                 "Do you want to create this shipment ?");
             if (create) {
-                ShipmentWrapper shipment = new ShipmentWrapper(
-                    SessionManager.getAppService());
-                if (radioWaybill.getSelection()) {
-                    shipment.setWaybill(text);
-                }
-                ShipmentAdapter adapter = new ShipmentAdapter(searchedNode,
-                    shipment);
-                adapter.openEntryForm();
+                // FIXME
+                // CollectionEventWrapper shipment = new CollectionEventWrapper(
+                // SessionManager.getAppService());
+                // if (radioWaybill.getSelection()) {
+                // shipment.setWaybill(text);
+                // }
+                // ShipmentAdapter adapter = new ShipmentAdapter(searchedNode,
+                // shipment);
+                // adapter.openEntryForm();
             }
         } else {
-            BioBankPlugin.openMessage(
+            BiobankPlugin.openMessage(
                 "Shipment not found",
                 "No shipment found for date "
                     + DateFormatter.formatAsDate(dateReceivedWidget.getDate()));
@@ -220,7 +226,7 @@ public class ShipmentAdministrationView extends
     }
 
     @Override
-    protected AbstractTodayNode createTodayNode() {
+    protected AbstractTodayNode<?> createTodayNode() {
         return new ShipmentTodayNode(rootNode, 0);
     }
 
@@ -229,7 +235,7 @@ public class ShipmentAdministrationView extends
         return new ShipmentSearchedNode(rootNode, 1);
     }
 
-    public static void showShipment(ShipmentWrapper shipment) {
+    public static void showShipment(OriginInfoWrapper shipment) {
         if (currentInstance != null) {
             currentInstance.showSearchedObjectsInTree(Arrays.asList(shipment),
                 false);

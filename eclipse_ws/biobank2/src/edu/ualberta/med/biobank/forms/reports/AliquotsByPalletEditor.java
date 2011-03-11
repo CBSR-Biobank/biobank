@@ -16,7 +16,7 @@ import org.eclipse.swt.events.TraverseEvent;
 import org.eclipse.swt.events.TraverseListener;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -103,7 +103,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
             List<ContainerWrapper> containers = ContainerWrapper
                 .getContainersByLabel(SessionManager.getAppService(), label);
             for (ContainerWrapper c : containers)
-                if (c.getContainerType().getSampleTypeCollection().size() > 0)
+                if (c.getContainerType().getSpecimenTypeCollection().size() > 0)
                     validContainers.add(c);
             if (label.equals("") || validContainers.size() > 0)
                 filterList(label);
@@ -111,7 +111,7 @@ public class AliquotsByPalletEditor extends ReportsEditor {
                 throw new ApplicationException();
             }
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Invalid label",
+            BiobankPlugin.openAsyncError("Invalid label",
                 "No bottom-level container labelled " + label);
         }
     }

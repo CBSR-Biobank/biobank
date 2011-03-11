@@ -30,7 +30,7 @@ public class DispatchSearchedNode extends AbstractSearchedNode {
     @Override
     protected boolean isParentTo(ModelWrapper<?> parent, ModelWrapper<?> child) {
         if (child instanceof DispatchWrapper) {
-            return parent.equals(((DispatchWrapper) child).getSender());
+            return parent.equals(((DispatchWrapper) child).getSenderCenter());
         }
         return false;
     }

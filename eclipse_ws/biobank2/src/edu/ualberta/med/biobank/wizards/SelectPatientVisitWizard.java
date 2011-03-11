@@ -1,6 +1,6 @@
 package edu.ualberta.med.biobank.wizards;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.wizards.pages.EnterPnumberPage;
 import edu.ualberta.med.biobank.wizards.pages.SelectPatientVisitPage;
@@ -9,17 +9,20 @@ import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 import org.eclipse.jface.wizard.IWizardPage;
 
+@Deprecated
+// FIXME do we still need this functionality with new model ? (see aliquot entry
+// form)
 public class SelectPatientVisitWizard extends BiobankWizard {
     private final WritableApplicationService appService;
     private EnterPnumberPage pnumberPage;
     private SelectPatientVisitPage pvPage;
-    private PatientVisitWrapper visit;
+    private CollectionEventWrapper visit;
 
     public SelectPatientVisitWizard(WritableApplicationService appService) {
         this.appService = appService;
     }
 
-    public PatientVisitWrapper getPatientVisit() {
+    public CollectionEventWrapper getCollectionEvent() {
         return visit;
     }
 
@@ -39,7 +42,7 @@ public class SelectPatientVisitWizard extends BiobankWizard {
 
     @Override
     public boolean performFinish() {
-        visit = pvPage.getPatientVisit();
+        visit = pvPage.getCollectionEvent();
         return visit != null;
     }
 
@@ -57,8 +60,8 @@ public class SelectPatientVisitWizard extends BiobankWizard {
             }
 
             if (patient != null) {
-                pvPage.setPatientVisitList(patient.getPatientVisitCollection(
-                    true, true, null));
+                pvPage.setCollectionEventList(patient
+                    .getCollectionEventCollection(true));
             } else {
                 pnumberPage.setErrorMessage("Patient does not exist.");
                 return false;

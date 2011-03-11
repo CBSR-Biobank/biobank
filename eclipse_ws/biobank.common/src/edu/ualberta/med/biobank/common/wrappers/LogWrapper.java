@@ -57,11 +57,12 @@ public class LogWrapper extends LogBaseWrapper {
         addLocationLabelParam(parametersString, parametersArgs, locationLabel);
         addParam(parametersString, parametersArgs, "details", details, false);
         addParam(parametersString, parametersArgs, "type", type);
-        String criteriaString = "from " + Log.class.getName();
+        StringBuilder qry = new StringBuilder("from ").append(Log.class
+            .getName());
         if (parametersString.length() > 0) {
-            criteriaString += " where" + parametersString.toString();
+            qry.append(" where").append(parametersString.toString());
         }
-        List<Log> logs = appService.query(new HQLCriteria(criteriaString,
+        List<Log> logs = appService.query(new HQLCriteria(qry.toString(),
             parametersArgs));
 
         List<LogWrapper> wrappers = new ArrayList<LogWrapper>();

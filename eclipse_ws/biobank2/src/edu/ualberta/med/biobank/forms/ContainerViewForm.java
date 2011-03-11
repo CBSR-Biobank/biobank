@@ -31,13 +31,13 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
@@ -49,11 +49,12 @@ import edu.ualberta.med.biobank.widgets.grids.ContainerDisplayWidget;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionEvent;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionListener;
 import edu.ualberta.med.biobank.widgets.grids.selection.MultiSelectionSpecificBehaviour;
-import edu.ualberta.med.biobank.widgets.infotables.AliquotListInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
 
 public class ContainerViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerViewForm"; //$NON-NLS-1$
 
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ContainerViewForm.class.getName());
@@ -62,7 +63,7 @@ public class ContainerViewForm extends BiobankViewForm {
 
     private ContainerWrapper container;
 
-    private AliquotListInfoTable aliquotsWidget;
+    private SpecimenInfoTable aliquotsWidget;
 
     private BiobankText siteLabel;
 
@@ -101,14 +102,14 @@ public class ContainerViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof ContainerAdapter,
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         containerAdapter = (ContainerAdapter) adapter;
         container = containerAdapter.getContainer();
         container.reload();
-        setPartName(container.getLabel() + " ("
-            + container.getContainerType().getNameShort() + ")");
+        setPartName(Messages.getString("ContainerViewForm.title", //$NON-NLS-1$
+            container.getLabel(), container.getContainerType().getNameShort()));
         initCells();
         canCreate = SessionManager.canCreate(ContainerWrapper.class,
             container.getSite());
@@ -118,13 +119,13 @@ public class ContainerViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Container " + container.getLabel() + " ("
-            + container.getContainerType().getNameShort() + ")");
+        form.setText(Messages.getString("ContainerViewForm.title", //$NON-NLS-1$
+            container.getLabel(), container.getContainerType().getNameShort()));
         page.setLayout(new GridLayout(1, false));
 
         createContainerSection();
 
-        if (container.getContainerType().getSampleTypeCollection().size() > 0) {
+        if (container.getContainerType().getSpecimenTypeCollection().size() > 0) {
             // only show aliquots section this if this container type does not
             // have child containers
             createAliquotsSection();
@@ -141,19 +142,19 @@ public class ContainerViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         siteLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Repository Site");
+            Messages.getString("container.field.label.site")); //$NON-NLS-1$
         containerLabelLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Label");
+            Messages.getString("container.field.label.label")); //$NON-NLS-1$
         productBarcodeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Product Bar Code");
+            Messages.getString("container.field.label.barcode")); //$NON-NLS-1$
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity Status");
+            Messages.getString("label.activity")); //$NON-NLS-1$
         commentsLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+            Messages.getString("label.comments")); //$NON-NLS-1$
         containerTypeLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Container Type");
+            Messages.getString("container.field.label.type")); //$NON-NLS-1$
         temperatureLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Temperature");
+            Messages.getString("container.field.label.temperature")); //$NON-NLS-1$
 
         setContainerValues();
 
@@ -171,8 +172,8 @@ public class ContainerViewForm extends BiobankViewForm {
 
             Integer rowCap = container.getRowCapacity();
             Integer colCap = container.getColCapacity();
-            Assert.isNotNull(rowCap, "row capacity is null");
-            Assert.isNotNull(colCap, "column capacity is null");
+            Assert.isNotNull(rowCap, "row capacity is null"); //$NON-NLS-1$
+            Assert.isNotNull(colCap, "column capacity is null"); //$NON-NLS-1$
             if (rowCap == 0)
                 rowCap = 1;
             if (colCap == 0)
@@ -196,8 +197,9 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             }
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Positions errors",
-                "Some child container has wrong position number");
+            BiobankPlugin.openAsyncError(
+                Messages.getString("ContainerViewForm.initCell.error.title"), //$NON-NLS-1$
+                Messages.getString("ContainerViewForm.initCell.error.msg")); //$NON-NLS-1$
             childrenOk = false;
         }
     }
@@ -212,7 +214,8 @@ public class ContainerViewForm extends BiobankViewForm {
     }
 
     protected void createVisualizeContainer() {
-        Section s = createSection("Container Visual");
+        Section s = createSection(Messages
+            .getString("ContainerViewForm.visual.title")); //$NON-NLS-1$
         s.setLayout(new GridLayout(1, false));
         Composite containerSection = new Composite(s, SWT.NONE);
         containerSection.setLayout(new FillLayout(SWT.VERTICAL));
@@ -229,8 +232,8 @@ public class ContainerViewForm extends BiobankViewForm {
         s.setClient(containerSection);
         if (!childrenOk) {
             Label label = toolkit
-                .createLabel(client,
-                    "Error in container children : can't display those initialized");
+                .createLabel(client, Messages
+                    .getString("ContainerViewForm.visualization.error.msg")); //$NON-NLS-1$
             label.setForeground(Display.getCurrent().getSystemColor(
                 SWT.COLOR_RED));
         }
@@ -241,7 +244,6 @@ public class ContainerViewForm extends BiobankViewForm {
         toolkit.adapt(containerWidget);
 
         // Set the minimum size
-
         sc.setMinSize(containerWidget.computeSize(SWT.DEFAULT, SWT.DEFAULT));
 
         containerWidget.addMouseListener(new MouseAdapter() {
@@ -286,13 +288,19 @@ public class ContainerViewForm extends BiobankViewForm {
 
             if (canCreate) {
                 // Initialisation action for selection
-                initSelectionCv = createComboViewer(childrenActionSection,
-                    "Initialize selection to", containerTypes,
-                    containerTypes.get(0));
+                initSelectionCv = createComboViewer(
+                    childrenActionSection,
+                    Messages
+                        .getString("ContainerViewForm.visualization.init.selection.label"), //$NON-NLS-1$
+                    containerTypes, containerTypes.get(0));
                 initSelectionCv.getCombo()
                     .setLayoutData(new GridData(SWT.LEFT));
-                Button initializeSelectionButton = toolkit.createButton(
-                    childrenActionSection, "Initialize", SWT.PUSH);
+                Button initializeSelectionButton = toolkit
+                    .createButton(
+                        childrenActionSection,
+                        Messages
+                            .getString("ContainerViewForm.visualization.init.button.text"), //$NON-NLS-1$
+                        SWT.PUSH);
                 initializeSelectionButton
                     .addSelectionListener(new SelectionAdapter() {
                         @Override
@@ -308,23 +316,33 @@ public class ContainerViewForm extends BiobankViewForm {
             if (canDelete) {
                 // Delete action for selection
                 List<Object> deleteComboList = new ArrayList<Object>();
-                deleteComboList.add("All");
+                deleteComboList.add(Messages
+                    .getString("ContainerViewForm.visualization.all.label")); //$NON-NLS-1$
                 deleteComboList.addAll(containerTypes);
-                deleteCv = createComboViewer(childrenActionSection,
-                    "Delete selected containers of type", deleteComboList,
-                    "All");
+                deleteCv = createComboViewer(
+                    childrenActionSection,
+                    Messages
+                        .getString("ContainerViewForm.visualization.delete.select.label"), //$NON-NLS-1$
+                    deleteComboList, Messages
+                        .getString("ContainerViewForm.visualization.all.label")); //$NON-NLS-1$
                 deleteCv.getCombo().setLayoutData(new GridData(SWT.LEFT));
-                Button deleteButton = toolkit.createButton(
-                    childrenActionSection, "Delete", SWT.PUSH);
+                Button deleteButton = toolkit
+                    .createButton(
+                        childrenActionSection,
+                        Messages
+                            .getString("ContainerViewForm.visualization.delete.button.text"), //$NON-NLS-1$
+                        SWT.PUSH);
                 deleteButton.setLayoutData(new GridData(SWT.LEFT));
                 deleteButton.addSelectionListener(new SelectionAdapter() {
                     @Override
                     public void widgetSelected(SelectionEvent e) {
-                        Boolean confirm = MessageDialog
-                            .openConfirm(PlatformUI.getWorkbench()
+                        Boolean confirm = MessageDialog.openConfirm(
+                            PlatformUI.getWorkbench()
                                 .getActiveWorkbenchWindow().getShell(),
-                                "Confirm Delete",
-                                "Are you sure you want to delete these containers?");
+                            Messages
+                                .getString("ContainerViewForm.vizualisation.delete.confirm.title"), //$NON-NLS-1$
+                            Messages
+                                .getString("ContainerViewForm.vizualisation.delete.confirm.msg")); //$NON-NLS-1$
                         if (confirm) {
                             Object selection = ((IStructuredSelection) deleteCv
                                 .getSelection()).getFirstElement();
@@ -356,7 +374,9 @@ public class ContainerViewForm extends BiobankViewForm {
             context.run(true, false, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    monitor.beginTask("Initializing...",
+                    monitor.beginTask(
+                        Messages
+                            .getString("ContainerViewForm.vizualisation.init.monitor.msg"), //$NON-NLS-1$
                         IProgressMonitor.UNKNOWN);
                     boolean initDone = true;
                     try {
@@ -365,8 +385,10 @@ public class ContainerViewForm extends BiobankViewForm {
                         container.initChildrenWithType(type, positions);
                     } catch (Exception e) {
                         initDone = false;
-                        BioBankPlugin.openAsyncError(
-                            "Error while creating children", e);
+                        BiobankPlugin.openAsyncError(
+                            Messages
+                                .getString("ContainerViewForm.visualization.init.error.msg"), //$NON-NLS-1$
+                            e);
                     }
                     refresh(initDone, false);
                     monitor.done();
@@ -381,7 +403,9 @@ public class ContainerViewForm extends BiobankViewForm {
             });
 
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error while creating children", e);
+            BiobankPlugin.openAsyncError(Messages
+                .getString("ContainerViewForm.visualization.init.error.msg"), //$NON-NLS-1$
+                e);
             refresh(false, false);
         }
     }
@@ -393,7 +417,10 @@ public class ContainerViewForm extends BiobankViewForm {
             context.run(true, false, new IRunnableWithProgress() {
                 @Override
                 public void run(final IProgressMonitor monitor) {
-                    monitor.beginTask("Deleting...", IProgressMonitor.UNKNOWN);
+                    monitor.beginTask(
+                        Messages
+                            .getString("ContainerViewForm.visualization.delete.monitor.msg"), //$NON-NLS-1$
+                        IProgressMonitor.UNKNOWN);
                     boolean deleteDones = false;
                     try {
 
@@ -402,7 +429,9 @@ public class ContainerViewForm extends BiobankViewForm {
                         deleteDones = container.deleteChildrenWithType(type,
                             positions);
                     } catch (Exception ex) {
-                        BioBankPlugin.openAsyncError("Can't Delete Containers",
+                        BiobankPlugin.openAsyncError(
+                            Messages
+                                .getString("ContainerViewForm.visualization.delete.error.msg"), //$NON-NLS-1$
                             ex);
                     }
                     refresh(deleteDones, true);
@@ -417,7 +446,9 @@ public class ContainerViewForm extends BiobankViewForm {
                 }
             });
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Can't Delete Containers", e);
+            BiobankPlugin.openAsyncError(Messages
+                .getString("ContainerViewForm.visualization.delete.error.msg"), //$NON-NLS-1$
+                e);
             refresh(false, false);
         }
     }
@@ -430,7 +461,9 @@ public class ContainerViewForm extends BiobankViewForm {
                     try {
                         reload();
                     } catch (Exception e) {
-                        logger.error("Error loading", e);
+                        logger.error(Messages
+                            .getString("ContainerViewForm.refresh.error.msg"), //$NON-NLS-1$
+                            e);
                     }
                     if (rebuild) {
                         containerAdapter.rebuild();
@@ -481,7 +514,7 @@ public class ContainerViewForm extends BiobankViewForm {
         setTextValue(commentsLabel, container.getComment());
         setTextValue(containerTypeLabel, container.getContainerType().getName());
         setTextValue(temperatureLabel, container.getTemperature());
-        if (container.hasParent()) {
+        if (container.hasParentContainer()) {
             if (rowLabel != null) {
                 setTextValue(rowLabel, container.getPositionAsRowCol().row);
             }
@@ -492,11 +525,13 @@ public class ContainerViewForm extends BiobankViewForm {
         }
     }
 
-    private void createAliquotsSection() throws BiobankException {
-        Composite parent = createSectionWithClient("Aliquots");
-        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>(container
-            .getAliquots().values());
-        aliquotsWidget = new AliquotListInfoTable(parent, aliquots);
+    private void createAliquotsSection() {
+        Composite parent = createSectionWithClient(Messages
+            .getString("ContainerViewForm.aliquots.title")); //$NON-NLS-1$
+        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>(
+            container.getSpecimens().values());
+        aliquotsWidget = new SpecimenInfoTable(parent, aliquots,
+            ColumnsShown.ALL, 20);
         aliquotsWidget.adaptToToolkit(toolkit, true);
         aliquotsWidget.addClickListener(collectionDoubleClickListener);
     }
@@ -505,8 +540,9 @@ public class ContainerViewForm extends BiobankViewForm {
     public void reload() throws Exception {
         if (!form.isDisposed()) {
             container.reload();
-            form.setText("Container " + container.getLabel() + " ("
-                + container.getContainerType().getNameShort() + ")");
+            form.setText(Messages.getString("ContainerViewForm.title", //$NON-NLS-1$
+                container.getLabel(), container.getContainerType()
+                    .getNameShort()));
             if (container.getContainerType().getChildContainerTypeCollection()
                 .size() > 0)
                 refreshVis();
@@ -514,7 +550,8 @@ public class ContainerViewForm extends BiobankViewForm {
             List<ContainerTypeWrapper> containerTypes = container
                 .getContainerType().getChildContainerTypeCollection();
             List<Object> deleteComboList = new ArrayList<Object>();
-            deleteComboList.add("All");
+            deleteComboList.add(Messages
+                .getString("ContainerViewForm.visualization.all.label")); //$NON-NLS-1$
             deleteComboList.addAll(containerTypes);
 
             if (initSelectionCv != null) {
@@ -527,10 +564,9 @@ public class ContainerViewForm extends BiobankViewForm {
             }
 
             if (aliquotsWidget != null) {
-                aliquotsWidget.reloadCollection(new ArrayList<AliquotWrapper>(
-                    container.getAliquots().values()));
+                aliquotsWidget.reloadCollection(new ArrayList<SpecimenWrapper>(
+                    container.getSpecimens().values()));
             }
         }
     }
-
 }

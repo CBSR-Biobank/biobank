@@ -23,10 +23,11 @@ import org.eclipse.swt.widgets.Label;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.wrappers.DispatchAliquotWrapper;
+import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -49,8 +50,6 @@ public class DispatchViewForm extends BiobankViewForm {
     private DispatchAdapter dispatchAdapter;
 
     private DispatchWrapper dispatch;
-
-    private BiobankText studyLabel;
 
     private BiobankText senderLabel;
 
@@ -88,15 +87,15 @@ public class DispatchViewForm extends BiobankViewForm {
         try {
             dispatch.reload();
         } catch (Exception ex) {
-            logger.error(
-                "Error while retrieving shipment " + dispatch.getWaybill(), ex);
+            logger.error("Error while retrieving shipment "
+                + dispatch.getShipmentInfo().getWaybill(), ex);
         }
     }
 
     @Override
     public void reload() throws Exception {
         retrieveDispatch();
-        setPartName("Dispatch sent on " + dispatch.getDeparted());
+        setPartName("Dispatch sent on " + dispatch.getPackedAt());
         setDispatchValues();
         aliquotsTree.refresh();
     }
@@ -104,23 +103,23 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         String dateString = "";
-        if (dispatch.getDeparted() != null) {
-            dateString = " on " + dispatch.getFormattedDeparted();
+        if (dispatch.getPackedAt() != null) {
+            dateString = " on " + dispatch.getFormattedPackedAt();
         }
         canSeeEverything = true;
-        if (dispatch.getSender() == null) {
+        if (dispatch.getSenderCenter() == null) {
             canSeeEverything = false;
-            BioBankPlugin
+            BiobankPlugin
                 .openAsyncError(
                     "Access Denied",
                     "It seems you don't have access to the sender site. Please see administrator to resolve this problem.");
         } else {
             form.setText("Dispatch sent" + dateString + " from "
-                + dispatch.getSender().getNameShort());
+                + dispatch.getSenderCenter().getNameShort());
         }
-        if (dispatch.getReceiver() == null) {
+        if (dispatch.getReceiverCenter() == null) {
             canSeeEverything = false;
-            BioBankPlugin
+            BiobankPlugin
                 .openAsyncError(
                     "Access Denied",
                     "It seems you don't have access to the receiver site. Please see administrator to resolve this problem.");
@@ -142,7 +141,9 @@ public class DispatchViewForm extends BiobankViewForm {
                 createSendButton();
             else if (dispatch.canBeReceivedBy(user))
                 createReceiveButtons();
-            else if (dispatch.canBeClosedBy(user))
+            else if (dispatch.canBeClosedBy(user)
+                && dispatch.isInReceivedState()
+                && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
                 createCloseButton();
         }
     }
@@ -160,8 +161,8 @@ public class DispatchViewForm extends BiobankViewForm {
             aliquotsNonProcessedTable = new DispatchAliquotListInfoTable(
                 parent, dispatch, false) {
                 @Override
-                public List<DispatchAliquotWrapper> getInternalDispatchAliquots() {
-                    return dispatch.getNonProcessedDispatchAliquotCollection();
+                public List<DispatchSpecimenWrapper> getInternalDispatchAliquots() {
+                    return dispatch.getNonProcessedDispatchSpecimenCollection();
                 }
 
             };
@@ -173,10 +174,10 @@ public class DispatchViewForm extends BiobankViewForm {
                         Object selection = event.getSelection();
                         if (selection instanceof InfoTableSelection) {
                             InfoTableSelection tableSelection = (InfoTableSelection) selection;
-                            DispatchAliquotWrapper dsa = (DispatchAliquotWrapper) tableSelection
+                            DispatchSpecimenWrapper dsa = (DispatchSpecimenWrapper) tableSelection
                                 .getObject();
                             if (dsa != null) {
-                                SessionManager.openViewForm(dsa.getAliquot());
+                                SessionManager.openViewForm(dsa.getSpecimen());
                             }
                         }
                     }
@@ -252,23 +253,23 @@ public class DispatchViewForm extends BiobankViewForm {
                             public void run(final IProgressMonitor monitor) {
                                 monitor.beginTask("Saving...",
                                     IProgressMonitor.UNKNOWN);
-                                dispatch.setInTransitState();
+                                dispatch.setState(DispatchState.IN_TRANSIT);
                                 try {
                                     dispatch.persist();
                                 } catch (final RemoteConnectFailureException exp) {
-                                    BioBankPlugin
+                                    BiobankPlugin
                                         .openRemoteConnectErrorMessage(exp);
                                     return;
                                 } catch (final RemoteAccessException exp) {
-                                    BioBankPlugin
+                                    BiobankPlugin
                                         .openRemoteAccessErrorMessage(exp);
                                     return;
                                 } catch (final AccessDeniedException ade) {
-                                    BioBankPlugin
+                                    BiobankPlugin
                                         .openAccessDeniedErrorMessage(ade);
                                     return;
                                 } catch (Exception ex) {
-                                    BioBankPlugin.openAsyncError("Save error",
+                                    BiobankPlugin.openAsyncError("Save error",
                                         ex);
                                     return;
                                 }
@@ -276,7 +277,7 @@ public class DispatchViewForm extends BiobankViewForm {
                             }
                         });
                     } catch (Exception e1) {
-                        BioBankPlugin.openAsyncError("Save error", e1);
+                        BiobankPlugin.openAsyncError("Save error", e1);
                     }
                     DispatchAdministrationView.getCurrent().reload();
                     dispatchAdapter.openViewForm();
@@ -312,7 +313,6 @@ public class DispatchViewForm extends BiobankViewForm {
             label.setLayoutData(gd);
         }
 
-        studyLabel = createReadOnlyLabelledField(client, SWT.NONE, "Study");
         senderLabel = createReadOnlyLabelledField(client, SWT.NONE, "Sender");
         receiverLabel = createReadOnlyLabelledField(client, SWT.NONE,
             "Receiver");
@@ -333,23 +333,26 @@ public class DispatchViewForm extends BiobankViewForm {
     }
 
     private void setDispatchValues() {
-        setTextValue(studyLabel, dispatch.getStudy().getName());
         setTextValue(senderLabel,
-            dispatch.getSender() == null ? " ACCESS DENIED" : dispatch
-                .getSender().getName());
+            dispatch.getSenderCenter() == null ? " ACCESS DENIED" : dispatch
+                .getSenderCenter().getName());
         setTextValue(receiverLabel,
-            dispatch.getReceiver() == null ? "ACCESS DENIED" : dispatch
-                .getReceiver().getName());
-        if (departedLabel != null)
-            setTextValue(departedLabel, dispatch.getFormattedDeparted());
-        if (shippingMethodLabel != null)
-            setTextValue(shippingMethodLabel,
-                dispatch.getShippingMethod() == null ? "" : dispatch
-                    .getShippingMethod().getName());
-        if (waybillLabel != null)
-            setTextValue(waybillLabel, dispatch.getWaybill());
-        if (dateReceivedLabel != null)
-            setTextValue(dateReceivedLabel, dispatch.getFormattedDateReceived());
+            dispatch.getReceiverCenter() == null ? "ACCESS DENIED" : dispatch
+                .getReceiverCenter().getName());
+        if (dispatch.getShipmentInfo() != null) {
+            if (departedLabel != null)
+                setTextValue(departedLabel, dispatch.getFormattedPackedAt());
+            if (shippingMethodLabel != null)
+                setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
+                    .getShippingMethod() == null ? "" : dispatch
+                    .getShipmentInfo().getShippingMethod().getName());
+            if (waybillLabel != null)
+                setTextValue(waybillLabel, dispatch.getShipmentInfo()
+                    .getWaybill());
+            if (dateReceivedLabel != null)
+                setTextValue(dateReceivedLabel, dispatch.getShipmentInfo()
+                    .getFormattedDateReceived());
+        }
         setTextValue(commentLabel, dispatch.getComment());
     }
 

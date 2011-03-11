@@ -19,19 +19,17 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.part.ViewPart;
 import org.eclipse.ui.services.ISourceProviderService;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.utils.SearchType;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
@@ -41,7 +39,6 @@ public class SearchView extends ViewPart {
 
     private BiobankText searchText;
     private ComboViewer searchTypeCombo;
-    private BasicSiteCombo siteCombo;
 
     private Button searchButton;
 
@@ -80,15 +77,7 @@ public class SearchView extends ViewPart {
                 }
             });
 
-        Label label = widgetCreator.createLabel(parent, "Repository Site");
-        siteCombo = new BasicSiteCombo(parent, widgetCreator, null, label,
-            false, null);
-        // FIXME arrange site combo
-        // GridData gds = new GridData();
-        // gds.horizontalSpan = 2;
-        // gds.horizontalAlignment = SWT.FILL;
-        // gds.grabExcessHorizontalSpace = true;
-        // siteCombo.getCombo().setLayoutData(gds);
+        widgetCreator.createLabel(parent, "Repository Site");
 
         searchTypeCombo = new ComboViewer(parent);
         searchTypeCombo.setContentProvider(new ArrayContentProvider());
@@ -109,7 +98,7 @@ public class SearchView extends ViewPart {
                     SearchType searchType = (SearchType) selection
                         .getFirstElement();
                     searchText
-                        .setEnabled(searchType != SearchType.ALIQUOT_NON_ACTIVE);
+                        .setEnabled(searchType != SearchType.SPECIMEN_NON_ACTIVE);
                     searchText.setText("");
                 }
             });
@@ -164,15 +153,16 @@ public class SearchView extends ViewPart {
                     .getSelection()).getFirstElement();
                 try {
                     List<? extends ModelWrapper<?>> res = type.search(
-                        searchString, siteCombo.getSelectedSite());
+                        searchString, SessionManager.getUser()
+                            .getCurrentWorkingCenter());
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {
-                        BioBankPlugin.openInformation("Search Result",
+                        BiobankPlugin.openInformation("Search Result",
                             "no result");
                     }
                 } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Search error", ex);
+                    BiobankPlugin.openAsyncError("Search error", ex);
                 }
             }
         });
@@ -182,12 +172,7 @@ public class SearchView extends ViewPart {
         if (!searchText.isDisposed()) {
             searchText.setEnabled(loggedIn);
             searchTypeCombo.getCombo().setEnabled(loggedIn);
-            siteCombo.setEnabled(loggedIn);
             searchButton.setEnabled(loggedIn);
-            if (loggedIn) {
-                siteCombo.init(SessionManager.getAppService());
-                siteCombo.setSelectedSite(siteCombo.getFirstSite(), true);
-            }
         }
     }
 }

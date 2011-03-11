@@ -20,7 +20,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.dialogs.NewServerDialog;
 
 public class ServerPreferencePage extends FieldEditorPreferencePage implements
@@ -155,7 +155,7 @@ public class ServerPreferencePage extends FieldEditorPreferencePage implements
 
     public ServerPreferencePage() {
         super(GRID);
-        setPreferenceStore(BioBankPlugin.getDefault().getPreferenceStore());
+        setPreferenceStore(BiobankPlugin.getDefault().getPreferenceStore());
     }
 
     @Override

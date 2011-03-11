@@ -74,8 +74,8 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
         if (info.studyShortName == null) {
             info.studyShortName = new String();
         }
-        info.patientCount = study.getPatientCountForClinic(clinic);
-        info.visitCount = study.getPatientVisitCountForClinic(clinic);
+        info.patientCount = clinic.getPatientCountForStudy(study);
+        info.visitCount = clinic.getCollectionEventCountForStudy(study);
         return info;
     }
 

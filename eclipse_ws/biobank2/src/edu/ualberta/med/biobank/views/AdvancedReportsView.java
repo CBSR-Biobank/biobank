@@ -55,12 +55,10 @@ public class AdvancedReportsView extends AbstractAdministrationView {
 
     @Override
     protected void internalSearch() {
-        // TODO Auto-generated method stub
     }
 
     @Override
     protected String getTreeTextToolTip() {
-        // TODO Auto-generated method stub
         return null;
     }
 

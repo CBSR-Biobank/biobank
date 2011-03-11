@@ -3,49 +3,58 @@ package edu.ualberta.med.biobank.treeview.shipment;
 import java.util.Collection;
 import java.util.List;
 
-import org.eclipse.core.runtime.Assert;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
-import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.forms.ShipmentEntryForm;
 import edu.ualberta.med.biobank.forms.ShipmentViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.patient.PatientVisitAdapter;
+import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 
 public class ShipmentAdapter extends AdapterBase {
 
-    public ShipmentAdapter(AdapterBase parent, ShipmentWrapper shipment) {
-        super(parent, shipment);
+    public ShipmentAdapter(AdapterBase parent, OriginInfoWrapper originInfo) {
+        super(parent, originInfo);
+
+        if (originInfo.getShipmentInfo() == null) {
+            throw new NullPointerException(
+                "No shipment information is associated with the given origin information.");
+        }
+
         setHasChildren(true);
     }
 
-    public ShipmentWrapper getWrapper() {
-        return (ShipmentWrapper) modelObject;
+    public OriginInfoWrapper getWrapper() {
+        return (OriginInfoWrapper) modelObject;
     }
 
     @Override
     protected String getLabelInternal() {
-        ShipmentWrapper shipment = getWrapper();
-        Assert.isNotNull(shipment, "shipment is null");
-        String label = shipment.getFormattedDateReceived();
-        if (shipment.getWaybill() != null) {
-            label += " (" + shipment.getWaybill() + ")";
-        }
-        return label;
+        OriginInfoWrapper originInfo = getWrapper();
+        ShipmentInfoWrapper shipmentInfo = originInfo.getShipmentInfo();
 
+        String label = shipmentInfo.getFormattedDateReceived();
+        if (shipmentInfo.getWaybill() != null) {
+            label += " (" + shipmentInfo.getWaybill() + ")";
+        }
+
+        return label;
     }
 
     @Override
     public String getTooltipText() {
-        ShipmentWrapper shipment = getWrapper();
-        ClinicWrapper clinic = shipment.getClinic();
-        if (clinic != null) {
-            return clinic.getName() + " - " + getTooltipText("Shipment");
+        OriginInfoWrapper originInfo = getWrapper();
+        if (originInfo != null) {
+            CenterWrapper<?> center = originInfo.getCenter();
+            if (center != null)
+                return center.getName() + " - " + getTooltipText("Shipment");
         }
         return getTooltipText("Shipment");
     }
@@ -64,25 +73,24 @@ public class ShipmentAdapter extends AdapterBase {
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, PatientVisitWrapper.class);
+        return findChildFromClass(searchedObject, ProcessingEventWrapper.class);
     }
 
     @Override
     protected AdapterBase createChildNode() {
-        return new PatientVisitAdapter(this, null);
+        return new PatientAdapter(this, null);
     }
 
     @Override
     protected AdapterBase createChildNode(ModelWrapper<?> child) {
-        Assert.isTrue(child instanceof PatientVisitWrapper);
-        return new PatientVisitAdapter(this, (PatientVisitWrapper) child);
+        return new PatientAdapter(this, (PatientWrapper) child);
     }
 
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
         getWrapper().reload();
-        return getWrapper().getPatientVisitCollection();
+        return getWrapper().getPatientCollection();
     }
 
     @Override
@@ -104,5 +112,4 @@ public class ShipmentAdapter extends AdapterBase {
     public boolean isDeletable() {
         return internalIsDeletable();
     }
-
 }

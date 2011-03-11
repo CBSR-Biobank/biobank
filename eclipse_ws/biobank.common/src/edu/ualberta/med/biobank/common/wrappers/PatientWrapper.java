@@ -3,33 +3,33 @@ package edu.ualberta.med.biobank.common.wrappers;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.DateCompare;
-import edu.ualberta.med.biobank.common.wrappers.internal.ShipmentPatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.ShipmentPatient;
 import edu.ualberta.med.biobank.model.Site;
-import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
-public class PatientWrapper extends ModelWrapper<Patient> {
-    private static final String PROP_KEY_CSP_COLLECTION = "cspCollection";
+@SuppressWarnings("unused")
+public class PatientWrapper extends PatientBaseWrapper {
 
     public PatientWrapper(WritableApplicationService appService, Patient patient) {
         super(appService, patient);
@@ -39,187 +39,24 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         super(appService);
     }
 
-    public String getPnumber() {
-        return wrappedObject.getPnumber();
-    }
-
-    public void setPnumber(String number) {
-        String oldNumber = getPnumber();
-        wrappedObject.setPnumber(number);
-        propertyChangeSupport.firePropertyChange("pnumber", oldNumber, number);
-    }
-
-    public StudyWrapper getStudy() {
-        StudyWrapper study = (StudyWrapper) propertiesMap.get("study");
-        if (study == null) {
-            Study s = wrappedObject.getStudy();
-            if (s == null)
-                return null;
-            study = new StudyWrapper(appService, s);
-            propertiesMap.put("study", study);
-        }
-        return study;
-    }
-
-    public void setStudy(StudyWrapper study) {
-        propertiesMap.put("study", study);
-        Study oldStudyRaw = wrappedObject.getStudy();
-        Study newStudyRaw = null;
-        if (study != null) {
-            newStudyRaw = study.wrappedObject;
-        }
-        wrappedObject.setStudy(newStudyRaw);
-        propertyChangeSupport.firePropertyChange("study", oldStudyRaw,
-            newStudyRaw);
-    }
-
-    /**
-     * When retrieve the values from the database, need to fire the
-     * modifications for the different objects contained in the wrapped object
-     * 
-     * @throws Exception
-     */
-    @Override
-    protected List<String> getPropertyChangeNames() {
-        return PatientPeer.PROP_NAMES;
-    }
-
     @Override
     protected void persistChecks() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Patient.class, PatientPeer.PNUMBER.getName(),
             getPnumber(), "A patient with PNumber");
-        checkVisitsFromLinkedShipment();
-    }
-
-    private void checkVisitsFromLinkedShipment() throws BiobankCheckException {
-        List<ShipmentWrapper> shipments = getShipmentCollection(null);
-        List<PatientVisitWrapper> visits = getPatientVisitCollection();
-        if (visits != null && visits.size() > 0) {
-            if (shipments == null || shipments.size() == 0) {
-                throw new BiobankCheckException(
-                    "This patient should be linked to a shipment if we want to add a visit linked to this same shipment.");
-            }
-            for (PatientVisitWrapper visit : visits) {
-                if (!shipments.contains(visit.getShipment())) {
-                    throw new BiobankCheckException(
-                        "Visits should be linked to shipment in which this patient participate.");
-                }
-            }
-        }
-    }
-
-    public List<PatientVisitWrapper> getPatientVisitCollection() {
-        return getPatientVisitCollection(true, false, null);
-    }
-
-    public List<PatientVisitWrapper> getPatientVisitCollection(boolean sort,
-        final boolean ascending, SiteWrapper site) {
-        // TODO: gee, I hope that when you modify this collection it isn't meant
-        // to modify the internals of the PatientWrapper object. Ask Delphine.
-        List<PatientVisitWrapper> patientVisitCollection = null;
-        Collection<ShipmentPatientWrapper> csps = getShipmentPatientCollection();
-        if (csps != null && csps.size() > 0) {
-            patientVisitCollection = new ArrayList<PatientVisitWrapper>();
-            for (ShipmentPatientWrapper csp : csps) {
-                if (site == null || (csp.getShipment().getSite().equals(site)))
-                    patientVisitCollection.addAll(csp
-                        .getPatientVisitCollection());
-            }
-        }
-        if (sort && patientVisitCollection != null) {
-            Collections.sort(patientVisitCollection,
-                new Comparator<PatientVisitWrapper>() {
-                    @Override
-                    public int compare(PatientVisitWrapper pv1,
-                        PatientVisitWrapper pv2) {
-                        int res = pv1.compareTo(pv2);
-                        if (ascending) {
-                            return res;
-                        }
-                        return -res;
-                    }
-                });
-        }
-        return patientVisitCollection;
-    }
-
-    Collection<ShipmentPatientWrapper> getShipmentPatientCollection() {
-        @SuppressWarnings("unchecked")
-        Collection<ShipmentPatientWrapper> csps = (Collection<ShipmentPatientWrapper>) propertiesMap
-            .get(PROP_KEY_CSP_COLLECTION);
-        if (csps == null) {
-            Collection<ShipmentPatient> rawCsps = wrappedObject
-                .getShipmentPatientCollection();
-            if (rawCsps != null) {
-                csps = ShipmentPatientWrapper.wrapShipmentPatientCollection(
-                    appService, rawCsps);
-            }
-            propertiesMap.put(PROP_KEY_CSP_COLLECTION, csps);
-        }
-        return csps;
-    }
-
-    public void addPatientVisits(
-        Collection<PatientVisitWrapper> newPatientVisits)
-        throws BiobankCheckException {
-        if (newPatientVisits != null && newPatientVisits.size() > 0) {
-            Collection<PatientVisit> allPvObjects = new ArrayList<PatientVisit>();
-            List<PatientVisitWrapper> allPvWrappers = new ArrayList<PatientVisitWrapper>();
-            // already added visits
-            Collection<PatientVisit> oldCollection = new ArrayList<PatientVisit>();
-            List<PatientVisitWrapper> currentList = getPatientVisitCollection();
-            for (PatientVisitWrapper visit : currentList) {
-                oldCollection.add(visit.getWrappedObject());
-                allPvObjects.add(visit.getWrappedObject());
-                allPvWrappers.add(visit);
-            }
-            // new
-            Collection<ShipmentPatientWrapper> csps = getShipmentPatientCollection();
-            Collection<PatientVisitWrapper> pvs;
-            for (PatientVisitWrapper newVisit : newPatientVisits) {
-                boolean isFound = false;
-                for (ShipmentPatientWrapper csp : csps) {
-                    if (csp.isSameShipmentAndPatient(newVisit
-                        .getShipmentPatient())) {
-                        pvs = csp.getPatientVisitCollection();
-                        pvs.add(newVisit);
-                        csp.setPatientVisitCollection(pvs);
-
-                        allPvObjects.add(newVisit.getWrappedObject());
-                        allPvWrappers.add(newVisit);
-                        isFound = true;
-                    }
-                }
-                if (!isFound) {
-                    throw new BiobankCheckException(
-                        "Cannot add this visit until patient "
-                            + newVisit.getPatient().getPnumber()
-                            + " has been linked to shipment "
-                            + newVisit.getShipment().getWaybill() + ".");
-                }
-            }
-            propertyChangeSupport.firePropertyChange("patientVisitCollection",
-                oldCollection, allPvObjects);
-        }
     }
 
     /**
      * Search patient visits with the given date processed.
      */
-    public List<PatientVisitWrapper> getVisits(Date dateProcessed,
+    @Deprecated
+    public List<CollectionEventWrapper> getVisits(Date dateProcessed,
         Date dateDrawn) {
-        List<PatientVisitWrapper> visits = getPatientVisitCollection();
-        List<PatientVisitWrapper> result = new ArrayList<PatientVisitWrapper>();
-        if (visits != null)
-            for (PatientVisitWrapper visit : visits) {
-                if ((DateCompare.compare(visit.getDateDrawn(), dateDrawn) == 0)
-                    && (DateCompare.compare(visit.getDateProcessed(),
-                        dateProcessed) == 0))
-                    result.add(visit);
-            }
-        return result;
+        return null;
     }
+
+    private static final String PATIENT_QRY = "from " + Patient.class.getName()
+        + " where " + PatientPeer.PNUMBER.getName() + "=?";
 
     /**
      * Search a patient in the site with the given number
@@ -227,8 +64,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
     public static PatientWrapper getPatient(
         WritableApplicationService appService, String patientNumber)
         throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Patient.class.getName() + " where pnumber = ?",
+        HQLCriteria criteria = new HQLCriteria(PATIENT_QRY,
             Arrays.asList(new Object[] { patientNumber }));
         List<Patient> patients = appService.query(criteria);
         if (patients.size() == 1) {
@@ -248,7 +84,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         PatientWrapper patient = getPatient(appService, patientNumber);
         if (patient != null) {
             StudyWrapper study = patient.getStudy();
-            List<SiteWrapper> sites = study.getSiteCollection();
+            List<SiteWrapper> sites = study.getSiteCollection(false);
             boolean canRead = false;
             for (SiteWrapper site : sites) {
                 if (user.hasPrivilegeOnObject(Privilege.READ, null, Site.class,
@@ -266,119 +102,109 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return patient;
     }
 
-    /**
-     * Get the shipment collection. To link patients and shipments, use
-     * Shipment.setPatientCollection method If user is not null, will return
-     * only shipments that are linked to a site this user can update, unless
-     * user is null
-     */
-    public List<ShipmentWrapper> getShipmentCollection(boolean sort,
-        final boolean ascending, User user) {
-        List<ShipmentWrapper> shipmentCollection = new ArrayList<ShipmentWrapper>();
-        Collection<ShipmentPatientWrapper> csps = getShipmentPatientCollection();
-        if (csps != null) {
-            for (ShipmentPatientWrapper csp : csps) {
-                ShipmentWrapper ship = csp.getShipment();
-                if (user == null || user.canUpdateSite(ship.getSite())) {
-                    shipmentCollection.add(ship);
-                }
-            }
-        }
-        if (sort && shipmentCollection != null) {
-            Collections.sort(shipmentCollection,
-                new Comparator<ShipmentWrapper>() {
-                    @Override
-                    public int compare(ShipmentWrapper ship1,
-                        ShipmentWrapper ship2) {
-                        int res = ship1.compareTo(ship2);
-                        if (ascending) {
-                            return res;
-                        }
-                        return -res;
-                    }
-                });
-        }
-        return shipmentCollection;
-    }
-
-    /**
-     * if user is no null, will return only shipment this user can update.
-     */
-    public List<ShipmentWrapper> getShipmentCollection(User user) {
-        return getShipmentCollection(false, true, user);
-    }
-
-    @Override
-    public Class<Patient> getWrappedClass() {
-        return Patient.class;
-    }
-
     @Override
     protected void deleteDependencies() throws Exception {
-        List<PatientVisitWrapper> visits = getPatientVisitCollection();
-        if (visits != null) {
-            for (PatientVisitWrapper visit : visits) {
-                visit.delete();
-            }
+        List<CollectionEventWrapper> cevents = getCollectionEventCollection(false);
+        for (CollectionEventWrapper cevent : cevents) {
+            cevent.delete();
         }
     }
 
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
-        checkNoMorePatientVisits();
-        if (getAliquotsCount(false) > 0)
+        checkNoMoreCollectionEvents();
+        if (getAllSpecimensCount(false) > 0)
             throw new BiobankCheckException("Unable to delete patient "
                 + getPnumber()
-                + " because patient has samples stored in database.");
-        if (hasShipments())
-            throw new BiobankCheckException("Unable to delete patient "
-                + getPnumber()
-                + " because patient has shipments recorded in database.");
+                + " because patient has specimens stored in database.");
     }
 
-    private boolean hasShipments() {
-        if (getShipmentCollection(null) != null
-            && getShipmentCollection(null).size() > 0)
-            return true;
-        return false;
-    }
-
-    private void checkNoMorePatientVisits() throws BiobankCheckException {
-        List<PatientVisitWrapper> pvs = getPatientVisitCollection();
-        if (pvs != null && pvs.size() > 0) {
+    private void checkNoMoreCollectionEvents() throws BiobankCheckException {
+        List<CollectionEventWrapper> pvs = getCollectionEventCollection(false);
+        if (pvs != null && !pvs.isEmpty()) {
             throw new BiobankCheckException(
-                "Visits are still linked to this patient."
+                "Processing events are still linked to this patient."
                     + " Delete them before attempting to remove the patient.");
         }
     }
 
-    public long getAliquotsCount(boolean fast) throws BiobankException,
+    private static final String ALL_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+        + " as spcs where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=?";
+
+    public long getAllSpecimensCount(boolean fast) throws BiobankException,
         ApplicationException {
         if (fast) {
-            HQLCriteria criteria = new HQLCriteria(
-                "select count(aliquots) from " + PatientVisit.class.getName()
-                    + " as pv join pv.aliquotCollection as aliquots "
-                    + "join pv.shipmentPatient as csp "
-                    + "where csp.patient.id = ? ",
+            HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            List<Long> results = appService.query(criteria);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            return results.get(0);
+            return getCountResult(appService, criteria);
         }
         long total = 0;
-        List<PatientVisitWrapper> pvs = getPatientVisitCollection();
-        if (pvs != null)
-            for (PatientVisitWrapper pv : pvs)
-                total += pv.getAliquotsCount(false);
+        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
+            total += cevent.getAllSpecimensCount(false);
         return total;
+    }
+
+    private static final String SOURCE_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.ORIGINAL_SPECIMEN_COLLECTION.getName()
+        + " as spcs where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=?";
+
+    public long getSourceSpecimensCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(SOURCE_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        long total = 0;
+        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
+            total += cevent.getSourceSpecimensCount(false);
+        return total;
+    }
+
+    private static final String ALIQUOTED_SPECIMEN_COUNT_QRY = "select count(spcs) from "
+        + CollectionEvent.class.getName()
+        + " as cevent join cevent."
+        + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+        + " as spcs where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=? and spcs."
+        + SpecimenPeer.PARENT_SPECIMEN.getName()
+        + " is not null";
+
+    public long getAliquotedSpecimensCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(
+                ALIQUOTED_SPECIMEN_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        long total = 0;
+        for (CollectionEventWrapper cevent : getCollectionEventCollection(false))
+            total += cevent.getAliquotedSpecimensCount(false);
+        return total;
+    }
+
+    @Deprecated
+    public boolean canBeAddedToCollectionEvent(CollectionEventWrapper cevent)
+        throws ApplicationException, BiobankException {
+        // TODO: does this make sense anymore?
+        return false;
     }
 
     @Override
     public int compareTo(ModelWrapper<Patient> wrapper) {
         if (wrapper instanceof PatientWrapper) {
-            String number1 = wrappedObject.getPnumber();
+            String number1 = getPnumber();
             String number2 = wrapper.wrappedObject.getPnumber();
             return number1.compareTo(number2);
         }
@@ -390,42 +216,68 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         return getPnumber();
     }
 
-    public boolean canBeAddedToShipment(ShipmentWrapper shipment)
-        throws ApplicationException, BiobankException {
-        if (shipment.getClinic() == null) {
-            return true;
-        }
-        return getStudy().isLinkedToClinic(shipment.getClinic());
-    }
+    // private static final String PATIENTS_IN_TODAYS_COLLECTION_EVENTS_QRY =
+    // "select p from "
+    // + Patient.class.getName()
+    // + " as p join p."
+    // + PatientPeer.SOURCE_VESSEL_COLLECTION.getName()
+    // + " as svc join svc."
+    // + SpecimenPeer.COLLECTION_EVENT.getName()
+    // + " as ces where ces."
+    // + CollectionEventPeer.DATE_RECEIVED.getName()
+    // + ">=? and ces."
+    // + CollectionEventPeer.DATE_RECEIVED.getName() + "<=?";
 
-    public static List<PatientWrapper> getPatientsInTodayShipments(
+    @Deprecated
+    public static List<PatientWrapper> getPatientsInTodayCollectionEvents(
         WritableApplicationService appService) throws ApplicationException {
-        Calendar cal = Calendar.getInstance();
-        // yesterday midnight
-        cal.set(Calendar.AM_PM, Calendar.AM);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        Date startDate = cal.getTime();
-        // today midnight
-        cal.add(Calendar.DATE, 1);
-        Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria("select p from "
-            + Patient.class.getName()
-            + " as p join p.shipmentPatientCollection as csps"
-            + " join csps.shipment as ships" + " where ships.site is not null"
-            + " and ships.dateReceived >= ? and ships.dateReceived <= ?",
-            Arrays.asList(new Object[] { startDate, endDate }));
-        List<Patient> res = appService.query(criteria);
-        List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
-        for (Patient p : res) {
-            patients.add(new PatientWrapper(appService, p));
-        }
-        return patients;
+        // Calendar cal = Calendar.getInstance();
+        // // yesterday midnight
+        // cal.set(Calendar.AM_PM, Calendar.AM);
+        // cal.set(Calendar.HOUR, 0);
+        // cal.set(Calendar.MINUTE, 0);
+        // cal.set(Calendar.SECOND, 0);
+        // Date startDate = cal.getTime();
+        // // today midnight
+        // cal.add(Calendar.DATE, 1);
+        // Date endDate = cal.getTime();
+        // HQLCriteria criteria = new HQLCriteria(
+        // PATIENTS_IN_TODAYS_COLLECTION_EVENTS_QRY,
+        // Arrays.asList(new Object[] { startDate, endDate }));
+        // List<Patient> res = appService.query(criteria);
+        // List<PatientWrapper> patients = new ArrayList<PatientWrapper>();
+        // for (Patient p : res) {
+        // patients.add(new PatientWrapper(appService, p));
+        // }
+        // return patients;
+        return null;
     }
 
-    public List<PatientVisitWrapper> getLast7DaysPatientVisits(SiteWrapper site)
-        throws ApplicationException {
+    // private static final String LAST_7_DAYS_PROCESSING_EVENTS_QRY =
+    // "select pEvent from "
+    // + Patient.class.getName()
+    // + " as p join p."
+    // + PatientPeer.COLLECTION_EVENT_COLLECTION.getName()
+    // + " as ces join ces."
+    // + CollectionEventPeer.ALL_SPECIMEN_COLLECTION.getName()
+    // + " as specimens join specimens."
+    // + SpecimenPeer.SPECIMEN_LINK_COLLECTION.getName()
+    // + " as spLink join spLink."
+    // + SpecimenLinkPeer.PROCESSING_EVENT
+    // + " as pes where p."
+    // + PatientPeer.ID.getName()
+    // + "=? and pes."
+    // + ProcessingEventPeer.CREATED_AT.getName()
+    // + ">? and pes."
+    // + ProcessingEventPeer.CREATED_AT.getName() + "<?";
+
+    @Deprecated
+    // FIXME :in Scan Link, wants the collection event instead. ? What is a last
+    // 7
+    // days collection events if we don't have the date drawn on the collection
+    // event itself ?
+    public List<ProcessingEventWrapper> getLast7DaysProcessingEvents(
+        SiteWrapper site) throws ApplicationException {
         Calendar cal = Calendar.getInstance();
         // today midnight
         cal.add(Calendar.DATE, 1);
@@ -437,20 +289,13 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         // 7 days ago, at midnight
         cal.add(Calendar.DATE, -8);
         Date startDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria(
-            "select visits from "
-                + Patient.class.getName()
-                + " as p join p.shipmentPatientCollection as csps"
-                + " join csps.patientVisitCollection as visits"
-                + " where p.id = ? and csps.shipment.site.id = ? and visits.dateProcessed > ? and visits.dateProcessed < ?",
-            Arrays.asList(new Object[] { getId(), site.getId(), startDate,
-                endDate }));
-        List<PatientVisit> res = appService.query(criteria);
-        List<PatientVisitWrapper> visits = new ArrayList<PatientVisitWrapper>();
-        for (PatientVisit v : res) {
-            visits.add(new PatientVisitWrapper(appService, v));
-        }
-        return visits;
+        // HQLCriteria criteria = new HQLCriteria(
+        // LAST_7_DAYS_PROCESSING_EVENTS_QRY, Arrays.asList(new Object[] {
+        // getId(), site.getId(), startDate, endDate }));
+        // List<ProcessingEvent> res = appService.query(criteria);
+        // return ModelWrapper.wrapModelCollection(appService, res,
+        // ProcessingEventWrapper.class);
+        return new ArrayList<ProcessingEventWrapper>();
     }
 
     @Override
@@ -472,7 +317,7 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         // won't use siteId because patient is not site specific (will be null)
         StudyWrapper study = getStudy();
         if (study != null) {
-            List<SiteWrapper> sites = study.getSiteCollection();
+            List<SiteWrapper> sites = study.getSiteCollection(false);
             for (SiteWrapper site : sites) {
                 // if can update at least one site, then can add/update a
                 // patient to the linked study
@@ -491,35 +336,82 @@ public class PatientWrapper extends ModelWrapper<Patient> {
         reload();
         patient2.reload();
         if (getStudy().equals(patient2.getStudy())) {
-            List<PatientVisitWrapper> pvs = patient2
-                .getPatientVisitCollection();
-            if (pvs != null)
-                for (PatientVisitWrapper pv : pvs) {
-                    ShipmentWrapper shipment = pv.getShipment();
-                    shipment.addPatients(Arrays.asList(this));
-                    shipment.persist();
-
-                    pv.setPatient(this);
-                    pv.persist();
-
-                    patient2.reload();
-                    shipment.reload();
-                    shipment.removePatients(Arrays.asList(patient2));
-                    shipment.persist();
+            List<CollectionEventWrapper> cevents = patient2
+                .getCollectionEventCollection(false);
+            if (!cevents.isEmpty()) {
+                patient2.removeFromCollectionEventCollection(cevents);
+                addToCollectionEventCollection(cevents);
+                for (CollectionEventWrapper cevent : cevents) {
+                    cevent.setPatient(this);
+                    cevent.persist();
                 }
+                patient2.delete();
+                persist();
 
-            patient2.reload();
-            patient2.delete();
-
-            ((BiobankApplicationService) appService).logActivity("merge", null,
-                patient2.getPnumber(), null, null, patient2.getPnumber()
-                    + " --> " + getPnumber(), "Patient");
-            ((BiobankApplicationService) appService).logActivity("merge", null,
-                getPnumber(), null, null,
-                getPnumber() + " <-- " + patient2.getPnumber(), "Patient");
-        } else {
-            throw new BiobankCheckException(
-                "Cannot merge patients from different studies.");
+                ((BiobankApplicationService) appService).logActivity("merge",
+                    null, patient2.getPnumber(), null, null,
+                    patient2.getPnumber() + " --> " + getPnumber(), "Patient");
+                ((BiobankApplicationService) appService).logActivity("merge",
+                    null, getPnumber(), null, null, getPnumber() + " <-- "
+                        + patient2.getPnumber(), "Patient");
+            } else {
+                throw new BiobankCheckException(
+                    "Cannot merge patients from different studies.");
+            }
         }
     }
+
+    public List<CollectionEventWrapper> getCollectionEventCollection(
+        boolean sort, final boolean ascending) {
+        List<CollectionEventWrapper> cEvents = getCollectionEventCollection(false);
+        if (sort) {
+            Collections.sort(cEvents, new Comparator<CollectionEventWrapper>() {
+                @Override
+                public int compare(CollectionEventWrapper ce1,
+                    CollectionEventWrapper ce2) {
+                    int res = ce1.compareTo(ce2);
+                    if (ascending) {
+                        return res;
+                    }
+                    return -res;
+                }
+            });
+        }
+        return cEvents;
+    }
+
+    public List<ProcessingEventWrapper> getProcessingEventCollection() {
+        List<CollectionEventWrapper> ces = getCollectionEventCollection(false);
+        List<SpecimenWrapper> specs = new ArrayList<SpecimenWrapper>();
+        Set<ProcessingEventWrapper> pes = new HashSet<ProcessingEventWrapper>();
+        for (CollectionEventWrapper ce : ces)
+            specs.addAll(ce.getAllSpecimenCollection(false));
+        for (SpecimenWrapper spec : specs) {
+            if (spec.getProcessingEvent() != null)
+                pes.add(spec.getProcessingEvent());
+        }
+        return new ArrayList<ProcessingEventWrapper>(pes);
+    }
+
+    @Deprecated
+    public boolean canBeAddedToShipment(CollectionEventWrapper shipment) {
+        // TODO Auto-generated method stub
+        return false;
+    }
+
+    private static final String CEVENT_COUNT_QRY = "select count(cevent) from "
+        + CollectionEvent.class.getName() + " as cevent where cevent."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
+        + "=?";
+
+    public Long getCollectionEventCount(boolean fast)
+        throws BiobankQueryResultSizeException, ApplicationException {
+        if (fast) {
+            HQLCriteria criteria = new HQLCriteria(CEVENT_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, criteria);
+        }
+        return (long) getCollectionEventCollection(false).size();
+    }
+
 }

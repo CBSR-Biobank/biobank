@@ -8,7 +8,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -111,7 +111,7 @@ public class ShippingMethodEntryForm extends BiobankEntryForm {
         if (!SessionManager.canUpdate(ShippingMethodWrapper.class, null)
             && !SessionManager.canCreate(ShippingMethodWrapper.class, null)
             && !SessionManager.canDelete(ShippingMethodWrapper.class, null)) {
-            BioBankPlugin.openAccessDeniedErrorMessage();
+            BiobankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Shipping Method editor. Access Denied.");
         }

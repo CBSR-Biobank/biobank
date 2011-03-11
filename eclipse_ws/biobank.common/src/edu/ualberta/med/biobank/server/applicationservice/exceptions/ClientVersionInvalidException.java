@@ -1,14 +1,8 @@
 package edu.ualberta.med.biobank.server.applicationservice.exceptions;
 
-import gov.nih.nci.system.applicationservice.ApplicationException;
-
-public class ClientVersionInvalidException extends ApplicationException {
+public class ClientVersionInvalidException extends BiobankServerException {
 
     private static final long serialVersionUID = 1L;
-
-    public ClientVersionInvalidException() {
-        super();
-    }
 
     public ClientVersionInvalidException(String message) {
         super(message);

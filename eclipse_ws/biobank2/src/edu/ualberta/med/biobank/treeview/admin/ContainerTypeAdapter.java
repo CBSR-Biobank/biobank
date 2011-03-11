@@ -34,13 +34,16 @@ public class ContainerTypeAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        ContainerTypeWrapper container = getContainerType();
-        SiteWrapper site = container.getSite();
-        if (site != null) {
-            return site.getNameShort() + " - "
-                + getTooltipText("Container Type");
+        ContainerTypeWrapper type = getContainerType();
+        if (type != null) {
+            SiteWrapper site = type.getSite();
+            if (site != null) {
+                return site.getNameShort() + " - "
+                    + getTooltipText("Container Type");
+            }
         }
         return getTooltipText("Container Type");
+
     }
 
     @Override

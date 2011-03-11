@@ -20,10 +20,12 @@ import org.eclipse.ui.application.IWorkbenchWindowConfigurer;
 import org.eclipse.ui.application.WorkbenchWindowAdvisor;
 import org.eclipse.ui.services.ISourceProviderService;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.rcp.perspective.AliquotManagementPerspective;
+import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.MainPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.rcp.perspective.ReportsPerspective;
@@ -41,10 +43,12 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     private String username = null;
 
+    private String currentCenterText = null;
+
     public ApplicationWorkbenchWindowAdvisor(
         IWorkbenchWindowConfigurer configurer) {
         super(configurer);
-        addScannerPreferencesPropertyListener();
+        addBiobankPreferencesPropertyListener();
     }
 
     @Override
@@ -57,7 +61,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         IProduct product = Platform.getProduct();
         String windowTitle = product.getName();
 
-        if (BioBankPlugin.getDefault().windowTitleShowVersionEnabled()) {
+        if (BiobankPlugin.getDefault().windowTitleShowVersionEnabled()) {
             windowTitle += " " + product.getDefiningBundle().getVersion();
         }
         return windowTitle;
@@ -87,24 +91,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         statusline.setMessage(null, "Application ready");
 
         IWorkbench workbench = PlatformUI.getWorkbench();
-        IWorkbenchWindow window = workbench.getActiveWorkbenchWindow();
-        IWorkbenchPage page = window.getActivePage();
-        if (page.getPerspective().getId()
-            .equals(AliquotManagementPerspective.ID)) {
+        IWorkbenchWindow activeWindow = workbench.getActiveWorkbenchWindow();
+        IWorkbenchPage page = activeWindow.getActivePage();
+        if (page.getPerspective().getId().equals(LinkAssignPerspective.ID)) {
             // can't start on this perspective: switch to patient perspective
             try {
                 workbench.showPerspective(ProcessingPerspective.ID,
-                    workbench.getActiveWorkbenchWindow());
+                    activeWindow);
             } catch (WorkbenchException e) {
                 logger.error("Error while opening patients perpective", e);
             }
         }
         page.addPartListener(new BiobankPartListener());
-        window.addPerspectiveListener(new BiobankPerspectiveListener());
+        activeWindow.addPerspectiveListener(new BiobankPerspectiveListener());
 
         // to activate correct key bindings
-        String currentPerspectiveId = window.getActivePage().getPerspective()
-            .getId();
+        String currentPerspectiveId = activeWindow.getActivePage()
+            .getPerspective().getId();
         activateIfNotInPerspective(currentPerspectiveId, MainPerspective.ID);
         activateIfNotInPerspective(currentPerspectiveId,
             ProcessingPerspective.ID);
@@ -112,7 +115,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
         BindingContextHelper.activateContextInWorkbench(currentPerspectiveId);
 
-        ISourceProviderService service = (ISourceProviderService) window
+        ISourceProviderService service = (ISourceProviderService) activeWindow
             .getService(ISourceProviderService.class);
         SessionState sessionSourceProvider = (SessionState) service
             .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
@@ -124,7 +127,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
                     if (sourceValue != null) {
                         if (sourceValue.equals(SessionState.LOGGED_IN))
                             mainWindowUpdateTitle(SessionManager.getServer(),
-                                SessionManager.getUser().getLogin());
+                                SessionManager.getUser());
                         else if (sourceValue.equals(SessionState.LOGGED_OUT))
                             mainWindowResetTitle();
                     }
@@ -150,9 +153,17 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         mainWindowUpdateTitle(null, null);
     }
 
-    private void mainWindowUpdateTitle(String server, String username) {
+    private void mainWindowUpdateTitle(String server, User user) {
         this.server = server;
-        this.username = username;
+        if (user == null) {
+            this.username = null;
+            this.currentCenterText = null;
+        } else {
+            this.username = user.getLogin();
+            CenterWrapper<?> center = user.getCurrentWorkingCenter();
+            this.currentCenterText = center == null ? null : center
+                .getNameShort();
+        }
         mainWindowUpdateTitle();
     }
 
@@ -164,20 +175,23 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         if ((server != null) && (username != null)) {
             newTitle += " - " + server + " [" + username + "]";
         }
+        if (currentCenterText != null) {
+            newTitle += " - Center " + currentCenterText;
+        }
 
         if (!newTitle.equals(oldTitle)) {
             configurer.setTitle(newTitle);
         }
     }
 
-    private void addScannerPreferencesPropertyListener() {
+    private void addBiobankPreferencesPropertyListener() {
         propertyListener = new IPropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent event) {
                 mainWindowUpdateTitle();
             }
         };
-        BioBankPlugin.getDefault().getPreferenceStore()
+        BiobankPlugin.getDefault().getPreferenceStore()
             .addPropertyChangeListener(propertyListener);
 
     }

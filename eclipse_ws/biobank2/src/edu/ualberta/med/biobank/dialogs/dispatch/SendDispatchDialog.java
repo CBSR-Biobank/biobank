@@ -9,7 +9,10 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.peer.DispatchPeer;
+import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
@@ -47,7 +50,11 @@ public class SendDispatchDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        ShippingMethodWrapper selectedShippingMethod = shipment
+        ShipmentInfoWrapper shipInfo = new ShipmentInfoWrapper(
+            SessionManager.getAppService());
+        shipment.setShipmentInfo(shipInfo);
+
+        ShippingMethodWrapper selectedShippingMethod = shipInfo
             .getShippingMethod();
         widgetCreator.createComboViewer(contents, "Shipping Method",
             ShippingMethodWrapper.getShippingMethods(SessionManager
@@ -55,18 +62,19 @@ public class SendDispatchDialog extends BiobankDialog {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    shipment
-                        .setShippingMethod((ShippingMethodWrapper) selectedObject);
+                    shipment.getShipmentInfo().setShippingMethod(
+                        (ShippingMethodWrapper) selectedObject);
                 }
             });
 
         createBoundWidgetWithLabel(contents, BiobankText.class, SWT.NONE,
-            "Waybill", null, shipment, "waybill", null);
+            "Waybill", null, shipInfo, ShipmentInfoPeer.WAYBILL.getName(), null);
 
         Date date = new Date();
-        shipment.setDeparted(date);
-        createDateTimeWidget(contents, "Departed", date, shipment, "departed",
-            new NotNullValidator("Departed should be set"));
+        shipment.setPackedAt(date);
+        createDateTimeWidget(contents, "Packed At", date, shipment,
+            DispatchPeer.PACKED_AT.getName(), new NotNullValidator(
+                "Packed should be set"));
     }
 
 }

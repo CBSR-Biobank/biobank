@@ -13,7 +13,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.dialogs.startup.ActivityLogLocationDialog;
 import edu.ualberta.med.biobank.dialogs.startup.LoginDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -43,7 +43,7 @@ public class BiobankStartup implements IStartup {
             // to retrieve a file, a temporary folder is created to unzip the
             // file. The modification of this file doesn't affect the real file
             // used for the about dialog
-            URL urlAbout = FileLocator.find(BioBankPlugin.getDefault()
+            URL urlAbout = FileLocator.find(BiobankPlugin.getDefault()
                 .getBundle(), new Path(ABOUT_MAPPINGS_FILE), null);
             String fileAbout = FileLocator.toFileURL(urlAbout).getFile();
             // Read properties file.
@@ -64,12 +64,12 @@ public class BiobankStartup implements IStartup {
                         .getActiveWorkbenchWindow();
                     if (window != null) {
 
-                        boolean logSave = BioBankPlugin
+                        boolean logSave = BiobankPlugin
                             .getDefault()
                             .getPreferenceStore()
                             .getBoolean(
                                 PreferenceConstants.LINK_ASSIGN_ACTIVITY_LOG_INTO_FILE);
-                        String logPath = BioBankPlugin
+                        String logPath = BiobankPlugin
                             .getDefault()
                             .getPreferenceStore()
                             .getString(

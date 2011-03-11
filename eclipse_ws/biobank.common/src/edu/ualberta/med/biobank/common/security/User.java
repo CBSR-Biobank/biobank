@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.model.Site;
@@ -24,6 +25,10 @@ public class User implements Serializable, NotAProxy {
     private String password;
     private String email;
     private boolean isLockedOut;
+
+    private List<SiteWrapper> workingSites;
+
+    private CenterWrapper<?> currentWorkingCenter;
 
     public boolean isLockedOut() {
         return isLockedOut;
@@ -226,4 +231,40 @@ public class User implements Serializable, NotAProxy {
         return properties.toString();
     }
 
+    // FIXME list caching : what if a new site ? user should log off anyway ?
+    // Should return centers when the full security is set
+    public List<SiteWrapper> getWorkingCenters(
+        WritableApplicationService appService) throws Exception {
+        if (workingSites == null) {
+            List<SiteWrapper> allSites = SiteWrapper.getSites(appService);
+            workingSites = new ArrayList<SiteWrapper>();
+            for (SiteWrapper site : allSites) {
+                if (canUpdateSite(site.getId())) {
+                    workingSites.add(site);
+                }
+            }
+        }
+        return workingSites;
+    }
+
+    public void setCurrentWorkingCenter(CenterWrapper<?> center) {
+        this.currentWorkingCenter = center;
+    }
+
+    public CenterWrapper<?> getCurrentWorkingCenter() {
+        try {
+            if (currentWorkingCenter != null)
+                currentWorkingCenter.reload();
+        } catch (Exception e) {
+            // FIXME: how to handle?
+            e.printStackTrace();
+        }
+        return currentWorkingCenter;
+    }
+
+    public SiteWrapper getCurrentWorkingSite() {
+        if (currentWorkingCenter instanceof SiteWrapper)
+            return (SiteWrapper) currentWorkingCenter;
+        return null;
+    }
 }

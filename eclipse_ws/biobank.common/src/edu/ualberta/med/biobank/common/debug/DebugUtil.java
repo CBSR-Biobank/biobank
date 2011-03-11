@@ -4,112 +4,137 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
+import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
+import edu.ualberta.med.biobank.common.peer.CenterPeer;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
+import edu.ualberta.med.biobank.common.peer.ContainerPeer;
+import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.peer.SitePeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
+import edu.ualberta.med.biobank.common.peer.StudyPeer;
+import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.Property;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class DebugUtil {
 
-    public static List<AliquotWrapper> getRandomAliquotsAlreadyLinked(
+    private static final String RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY = "select aliquots from "
+        + Center.class.getName()
+        + " as center join center."
+        + CenterPeer.PROCESSING_EVENT_COLLECTION.getName()
+        + " as pevents join pevents."
+        + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
+        + " as srcSpcs join srcSpcs."
+        + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
+        + " as children where center." + CenterPeer.ID.getName() + "=?";
+
+    public static List<SpecimenWrapper> getRandomLinkedAliquotedSpecimens(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Aliquot.class.getName()
-                + " as s where s.patientVisit.shipmentPatient.shipment.site.id = ?",
+            RANDOM_LINKED_ALIQUOTED_SPECIMENS_QRY,
             Arrays.asList(new Object[] { siteId }));
-        List<Aliquot> aliquots = appService.query(criteria);
-        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        int i = 0;
-        for (Aliquot aliquot : aliquots) {
-            // return a list of 10 maximum
-            if (i == 10) {
-                return list;
-            }
-            list.add(new AliquotWrapper(appService, aliquot));
-            i++;
-        }
-        return list;
+        List<Specimen> aliquots = appService.query(criteria);
+
+        int items = aliquots.size();
+        int maxItems = items > 10 ? 10 : items;
+        return ModelWrapper.wrapModelCollection(appService,
+            aliquots.subList(0, maxItems), SpecimenWrapper.class);
     }
 
-    public static List<AliquotWrapper> getRandomAliquotsAlreadyAssigned(
+    public static List<SpecimenWrapper> getRandomAssignedSpecimens(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
-        return getRandomAliquotsAlreadyAssigned(appService, siteId, null);
+        return getRandomAssignedSpecimens(appService, siteId, null);
     }
 
-    public static List<AliquotWrapper> getRandomAliquotsAlreadyAssigned(
+    private static final String RANDOM_ASSIGNED_SPECIMENS_BASE_QRY = "select specimen from "
+        + Site.class.getName()
+        + " as site join site."
+        + SitePeer.CONTAINER_COLLECTION.getName()
+        + " as cont join cont."
+        + ContainerPeer.SPECIMEN_POSITION_COLLECTION.getName()
+        + " as spcpos join spcpos."
+        + SpecimenPositionPeer.SPECIMEN.getName()
+        + " as specimen where site." + SitePeer.ID.getName() + "=?";
+
+    public static List<SpecimenWrapper> getRandomAssignedSpecimens(
         WritableApplicationService appService, Integer siteId, Integer studyId)
         throws ApplicationException {
         List<Object> params = new ArrayList<Object>();
         params.add(siteId);
-        String studyString = "";
-        if (studyString != null) {
-            studyString = " and a.patientVisit.shipmentPatient.patient.study.id = ?";
+
+        StringBuilder qry = new StringBuilder(
+            RANDOM_ASSIGNED_SPECIMENS_BASE_QRY);
+        if (studyId != null) {
+            qry.append(" and a."
+                + Property.concatNames(SpecimenPeer.COLLECTION_EVENT,
+                    CollectionEventPeer.PATIENT, PatientPeer.STUDY,
+                    StudyPeer.ID) + "=?");
             params.add(studyId);
         }
 
-        HQLCriteria criteria = new HQLCriteria("from "
-            + Aliquot.class.getName()
-            + " as a where a in (select sp.aliquot from "
-            + AliquotPosition.class.getName()
-            + " as sp) and a.aliquotPosition.container.site.id = ?"
-            + studyString, params);
-        List<Aliquot> idList = appService.query(criteria);
-        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        int i = 0;
-        for (Aliquot aliquot : idList) {
-            // return a list of 10 maximum
-            if (i == 10) {
-                return list;
-            }
-            list.add(new AliquotWrapper(appService, aliquot));
-            i++;
-        }
-        return list;
+        HQLCriteria criteria = new HQLCriteria(qry.toString(), params);
+        List<Specimen> aliquots = appService.query(criteria);
+
+        int items = aliquots.size();
+        int maxItems = items > 10 ? 10 : items;
+        return ModelWrapper.wrapModelCollection(appService,
+            aliquots.subList(0, maxItems), SpecimenWrapper.class);
     }
 
-    public static List<AliquotWrapper> getRandomAliquotsNotAssignedNoDispatch(
-        WritableApplicationService appService, Integer siteId)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria("select a from "
-            + Aliquot.class.getName()
-            + " as a left join a.aliquotPosition as ap where ap is null"
-            + " and a.patientVisit.shipmentPatient.shipment.site.id = ?"
-            + " and a.activityStatus.name != 'Dispatched'",
-            Arrays.asList(new Object[] { siteId }));
-        List<Aliquot> aliquots = appService.query(criteria);
-        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        for (int i = 0; i < aliquots.size() && i < 100; i++) {
-            Aliquot aliquot = aliquots.get(i);
-            list.add(new AliquotWrapper(appService, aliquot));
-        }
-        return list;
-    }
+    private static final String RANDOM_NON_ASSIGNED_NON_DISPATCHED_SPECIMENS_QRY = "select spec from "
+        + Site.class.getName()
+        + " as site left join site."
+        + SitePeer.PROCESSING_EVENT_COLLECTION.getName()
+        + " as pe left join pe."
+        + ProcessingEventPeer.SPECIMEN_COLLECTION.getName()
+        + " as srcSpcs left join srcSpcs."
+        + SpecimenPeer.CHILD_SPECIMEN_COLLECTION.getName()
+        + " as spec left join spec."
+        + SpecimenPeer.SPECIMEN_POSITION.getName()
+        + " as spcpos where spcpos is null"
+        + " and site."
+        + SitePeer.ID.getName()
+        + "=? and spec."
+        + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
+            ActivityStatusPeer.NAME) + "!='Dispatched'";
 
-    public static List<AliquotWrapper> getRandomAliquotsDispatched(
+    public static List<SpecimenWrapper> getRandomNonAssignedNonDispatchedSpecimens(
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(
-            "from "
-                + Aliquot.class.getName()
-                + " as s where s.patientVisit.shipment.site.id = ? and a.activityStatus.name='Dispatched'",
+            RANDOM_NON_ASSIGNED_NON_DISPATCHED_SPECIMENS_QRY,
             Arrays.asList(new Object[] { siteId }));
-        List<Aliquot> aliquots = appService.query(criteria);
-        List<AliquotWrapper> list = new ArrayList<AliquotWrapper>();
-        int i = 0;
-        for (Aliquot aliquot : aliquots) {
-            // return a list of 10 maximum
-            if (i == 10) {
-                return list;
-            }
-            list.add(new AliquotWrapper(appService, aliquot));
-            i++;
-        }
-        return list;
+        List<Specimen> aliquots = appService.query(criteria);
+        return ModelWrapper.wrapModelCollection(appService, aliquots,
+            SpecimenWrapper.class);
     }
 
+    private static final String RANDOM_DISPATCHED_SPECIMENS_QRY = "select specimens from "
+        + Specimen.class.getName()
+        + "where and aliquots."
+        + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
+            ActivityStatusPeer.NAME) + "='Dispatched'";
+
+    public static List<SpecimenWrapper> getRandomDispatchedSpecimens(
+        WritableApplicationService appService, Integer siteId)
+        throws ApplicationException {
+        HQLCriteria criteria = new HQLCriteria(RANDOM_DISPATCHED_SPECIMENS_QRY,
+            Arrays.asList(new Object[] { siteId }));
+        List<Specimen> aliquots = appService.query(criteria);
+
+        int items = aliquots.size();
+        int maxItems = items > 10 ? 10 : items;
+        return ModelWrapper.wrapModelCollection(appService,
+            aliquots.subList(0, maxItems), SpecimenWrapper.class);
+    }
 }

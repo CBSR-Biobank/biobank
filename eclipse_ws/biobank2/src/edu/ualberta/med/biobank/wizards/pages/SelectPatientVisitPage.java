@@ -13,25 +13,25 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.widgets.infotables.PatientVisitInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
 
 public class SelectPatientVisitPage extends BiobankWizardPage {
     public static final String PAGE_NAME = SelectPatientVisitPage.class
         .getCanonicalName();
     private static final String PATIENT_VISIT_REQUIRED = "Please select a patient visit.";
-    private PatientVisitInfoTable visitsTable;
+    private CollectionEventInfoTable visitsTable;
 
     public SelectPatientVisitPage() {
         super(PAGE_NAME, "Select a patient visit", null);
     }
 
-    public void setPatientVisitList(List<PatientVisitWrapper> visits) {
+    public void setCollectionEventList(List<CollectionEventWrapper> visits) {
         visitsTable.setCollection(visits);
     }
 
-    public PatientVisitWrapper getPatientVisit() {
+    public CollectionEventWrapper getCollectionEvent() {
         return visitsTable.getSelection();
     }
 
@@ -42,8 +42,8 @@ public class SelectPatientVisitPage extends BiobankWizardPage {
         content.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
         final IObservableValue selection = new WritableValue(null, Object.class);
-        visitsTable = new PatientVisitInfoTable(content,
-            new ArrayList<PatientVisitWrapper>()) {
+        visitsTable = new CollectionEventInfoTable(content,
+            new ArrayList<CollectionEventWrapper>()) {
             @Override
             public boolean isEditMode() {
                 return true;
@@ -52,12 +52,12 @@ public class SelectPatientVisitPage extends BiobankWizardPage {
         visitsTable.addSelectionListener(new SelectionListener() {
             @Override
             public void widgetSelected(SelectionEvent e) {
-                selection.setValue(getPatientVisit());
+                selection.setValue(getCollectionEvent());
             }
 
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
-                selection.setValue(getPatientVisit());
+                selection.setValue(getCollectionEvent());
             }
         });
 

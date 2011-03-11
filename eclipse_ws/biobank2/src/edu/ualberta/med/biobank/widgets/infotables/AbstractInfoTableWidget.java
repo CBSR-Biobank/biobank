@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Table;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
 
@@ -105,6 +105,30 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         GridData gd = new GridData(SWT.FILL, SWT.FILL, true, true);
         table.setLayoutData(gd);
 
+        setHeadings(headings, columnWidths);
+        tableViewer.setUseHashlookup(true);
+        tableViewer.setLabelProvider(getLabelProvider());
+        tableViewer.setContentProvider(new ArrayContentProvider());
+
+        addPaginationWidget();
+
+        if (collection != null)
+            setCollection(collection);
+
+        menu = new Menu(parent);
+        tableViewer.getTable().setMenu(menu);
+
+        autoSizeColumns = columnWidths == null ? true : false;
+
+        addClipboardCopySupport();
+
+    }
+
+    public void setHeadings(String[] headings) {
+        setHeadings(headings, null);
+    }
+
+    public void setHeadings(String[] headings, int[] columnWidths) {
         int index = 0;
         if (headings != null) {
             for (String name : headings) {
@@ -128,22 +152,6 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             }
             tableViewer.setColumnProperties(headings);
         }
-        tableViewer.setUseHashlookup(true);
-        tableViewer.setLabelProvider(getLabelProvider());
-        tableViewer.setContentProvider(new ArrayContentProvider());
-
-        addPaginationWidget();
-
-        if (collection != null)
-            setCollection(collection);
-
-        menu = new Menu(parent);
-        tableViewer.getTable().setMenu(menu);
-
-        autoSizeColumns = columnWidths == null ? true : false;
-
-        addClipboardCopySupport();
-
     }
 
     protected abstract boolean isEditMode();
@@ -267,7 +275,7 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
             };
             backgroundThread.start();
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Cannot Load Table Data", e);
+            BiobankPlugin.openAsyncError("Cannot Load Table Data", e);
         }
 
         layout(true, true);
@@ -362,8 +370,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         paginationWidget.setLayout(new GridLayout(5, false));
 
         firstButton = new Button(paginationWidget, SWT.NONE);
-        firstButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_RESULTSET_FIRST));
+        firstButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_RESULTSET_FIRST));
         firstButton.setToolTipText("First page");
         firstButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -373,8 +381,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         });
 
         prevButton = new Button(paginationWidget, SWT.NONE);
-        prevButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_RESULTSET_PREV));
+        prevButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_RESULTSET_PREV));
         prevButton.setToolTipText("Previous page");
         prevButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -386,8 +394,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         pageLabel = new Label(paginationWidget, SWT.NONE);
 
         nextButton = new Button(paginationWidget, SWT.NONE);
-        nextButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_RESULTSET_NEXT));
+        nextButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_RESULTSET_NEXT));
         nextButton.setToolTipText("Next page");
         nextButton.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -397,8 +405,8 @@ public abstract class AbstractInfoTableWidget<T> extends BiobankWidget {
         });
 
         lastButton = new Button(paginationWidget, SWT.NONE);
-        lastButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_RESULTSET_LAST));
+        lastButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_RESULTSET_LAST));
         lastButton.setToolTipText("Last page");
         lastButton.addSelectionListener(new SelectionAdapter() {
             @Override

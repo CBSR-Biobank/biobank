@@ -17,9 +17,9 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -57,7 +57,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private IObservableValue patientNotNullValue;
 
-    private AbstractInfoTableWidget<PatientVisitWrapper> patient1VisitsTable;
+    private AbstractInfoTableWidget<CollectionEventWrapper> patient1VisitsTable;
 
     private boolean canMerge;
 
@@ -80,8 +80,8 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void createFormContent() throws Exception {
         form.setText("Merging into Patient " + patient1.getPnumber());
         page.setLayout(new GridLayout(1, false));
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_PATIENT));
+        form.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_PATIENT));
 
         toolkit.createLabel(
             page,
@@ -108,8 +108,8 @@ public class PatientMergeForm extends BiobankEntryForm {
         patientArea1.setLayoutData(patient1Data);
 
         Label arrow = toolkit.createLabel(client, "Arrow", SWT.IMAGE_BMP);
-        arrow.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_ARROW_LEFT2));
+        arrow.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_ARROW_LEFT2));
 
         Composite patientArea2 = toolkit.createComposite(client);
         GridLayout patient2Layout = new GridLayout(2, false);
@@ -160,8 +160,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             "Study");
 
         patient1VisitsTable = new ClinicVisitInfoTable(patientArea1,
-            patient1Adapter.getWrapper().getPatientVisitCollection(true, true,
-                null));
+            patient1Adapter.getWrapper().getCollectionEventCollection(true));
         GridData gd1 = new GridData();
         gd1.horizontalSpan = 2;
         gd1.grabExcessHorizontalSpace = true;
@@ -170,7 +169,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         patient1VisitsTable.adaptToToolkit(toolkit, true);
 
         patient2VisitsTable = new ClinicVisitInfoTable(patientArea2,
-            new ArrayList<PatientVisitWrapper>());
+            new ArrayList<CollectionEventWrapper>());
         GridData gd2 = new GridData();
         gd2.horizontalSpan = 2;
         gd2.grabExcessHorizontalSpace = true;
@@ -180,18 +179,18 @@ public class PatientMergeForm extends BiobankEntryForm {
     }
 
     protected void populateFields(String pnumber) {
-        List<PatientVisitWrapper> newContents = new ArrayList<PatientVisitWrapper>();
+        List<CollectionEventWrapper> newContents = new ArrayList<CollectionEventWrapper>();
         try {
             patient2 = PatientWrapper.getPatient(
                 SessionManager.getAppService(), pnumber);
         } catch (ApplicationException e) {
-            BioBankPlugin.openAsyncError("Error retrieving patient", e);
+            BiobankPlugin.openAsyncError("Error retrieving patient", e);
             patient2VisitsTable.setCollection(newContents);
             study2Text.setText("");
             return;
         }
         if (patient2 == null) {
-            BioBankPlugin.openAsyncError("Invalid Patient Number",
+            BiobankPlugin.openAsyncError("Invalid Patient Number",
                 "Cannot find a patient with that pnumber");
             patient2VisitsTable.setCollection(newContents);
             study2Text.setText("");
@@ -199,7 +198,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         }
 
         if (patient2.equals(patient1Adapter.getWrapper())) {
-            BioBankPlugin.openAsyncError("Duplicate Patient Number",
+            BiobankPlugin.openAsyncError("Duplicate Patient Number",
                 "Cannot merge a patient with himself");
             patient2VisitsTable.setCollection(newContents);
             return;
@@ -210,11 +209,11 @@ public class PatientMergeForm extends BiobankEntryForm {
         if (!patient2.getStudy()
             .equals(patient1Adapter.getWrapper().getStudy())) {
             patient2VisitsTable.setCollection(newContents);
-            BioBankPlugin.openAsyncError("Invalid Patient Number",
+            BiobankPlugin.openAsyncError("Invalid Patient Number",
                 "Patients from different studies cannot be merged");
         } else {
             patient2VisitsTable.setCollection(patient2
-                .getPatientVisitCollection());
+                .getCollectionEventCollection(true));
             patientNotNullValue.setValue(Boolean.TRUE);
         }
     }
@@ -223,7 +222,7 @@ public class PatientMergeForm extends BiobankEntryForm {
         try {
             patient1.merge(patient2);
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Merge failed.", e);
+            BiobankPlugin.openAsyncError("Merge failed.", e);
         }
 
         Display.getDefault().syncExec(new Runnable() {
@@ -246,7 +245,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         canMerge = false;
         if (patient2 != null) {
-            if (BioBankPlugin.openConfirm(
+            if (BiobankPlugin.openConfirm(
                 "Confirm Merge",
                 "Are you sure you want to merge patient "
                     + patient2.getPnumber() + " into patient "
@@ -271,10 +270,11 @@ public class PatientMergeForm extends BiobankEntryForm {
         study1Text.setText(patient1Adapter.getWrapper().getStudy()
             .getNameShort());
         patient1VisitsTable.setCollection(patient1Adapter.getWrapper()
-            .getPatientVisitCollection(true, true, null));
+            .getCollectionEventCollection(true));
         pnumber2Text.setText("");
         study2Text.setText("");
-        patient2VisitsTable.setCollection(new ArrayList<PatientVisitWrapper>());
+        patient2VisitsTable
+            .setCollection(new ArrayList<CollectionEventWrapper>());
         patient2 = null;
     }
 

@@ -11,7 +11,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
@@ -52,8 +52,8 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
         try {
             dispatch.reload();
         } catch (Exception ex) {
-            logger.error(
-                "Error while retrieving shipment " + dispatch.getWaybill(), ex);
+            logger.error("Error while retrieving shipment "
+                + dispatch.getShipmentInfo().getWaybill(), ex);
         }
     }
 
@@ -78,8 +78,8 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
             setFirstControl(newAliquotText);
         }
         Button addButton = toolkit.createButton(addComposite, "", SWT.PUSH);
-        addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_ADD));
+        addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_ADD));
         addButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
@@ -91,8 +91,8 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
         toolkit.createLabel(addComposite, "or open scan dialog:");
         Button openScanButton = toolkit
             .createButton(addComposite, "", SWT.PUSH);
-        openScanButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
+        openScanButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_DISPATCH_SHIPMENT_ADD_ALIQUOT));
         openScanButton.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetSelected(SelectionEvent e) {
