@@ -48,7 +48,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractSpecimenAdminForm {
 
     private BiobankText plateToScanText;
-    private Button scanButton;
+    protected Button scanButton;
     private String scanButtonTitle;
 
     protected CancelConfirmWidget cancelConfirmWidget;

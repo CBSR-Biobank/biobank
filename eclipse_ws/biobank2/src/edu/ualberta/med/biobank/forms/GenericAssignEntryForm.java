@@ -3,8 +3,8 @@ package edu.ualberta.med.biobank.forms;
 import java.util.Map;
 
 import org.eclipse.core.databinding.beans.BeansObservables;
+import org.eclipse.core.databinding.observable.value.WritableValue;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.ScrolledComposite;
 import org.eclipse.swt.custom.StackLayout;
@@ -21,6 +21,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
@@ -39,7 +40,6 @@ import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.CancelConfirmWidget;
 import edu.ualberta.med.biobank.widgets.grids.ScanPalletWidget;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 
 public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
@@ -151,7 +151,7 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
         return layout;
     }
 
-    private void createLeftSection() throws Exception {
+    private void createLeftSection() {
         Composite leftComposite = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -236,14 +236,28 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
             inventoryIDValidator);
         inventoryIdText.addKeyListener(textFieldKeyListener);
 
-        BiobankText positionText = (BiobankText) createBoundWidgetWithLabel(
-            singleAssignComposite, BiobankText.class, SWT.NONE,
-            "Position", new String[0], //$NON-NLS-1$
-            singleSpecimen, "inventoryId", //$NON-NLS-1$
-            inventoryIDValidator);
+        Label newCabinetPositionLabel = widgetCreator
+            .createLabel(singleAssignComposite,
+                Messages.getString("Cabinet.position.label"));
+        widgetCreator.createBoundWidget(singleAssignComposite,
+            BiobankText.class, SWT.NONE, newCabinetPositionLabel,
+            new String[0], new WritableValue("", String.class), null); //$NON-NLS-1$
+
+        Button checkButton = toolkit.createButton(singleAssignComposite,
+            Messages.getString("Cabinet.checkButton.text"), //$NON-NLS-1$
+            SWT.PUSH);
+        gd = new GridData();
+        gd.horizontalSpan = 2;
+        checkButton.setLayoutData(gd);
+        checkButton.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                // checkPositionAndAliquot();
+            }
+        });
     }
 
-    private void createMultipleLink(Composite parent) throws Exception {
+    private void createMultipleLink(Composite parent) {
         multipleAssignComposite = toolkit.createComposite(parent);
         GridLayout layout = new GridLayout(2, false);
         layout.horizontalSpacing = 10;
@@ -329,28 +343,29 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
 
     }
 
-    private void createPalletTypesViewer(Composite parent) throws Exception {
-        ComboViewer palletTypesViewer = createComboViewer(
-            parent,
-            Messages.getString("ScanAssign.palletType.label"), //$NON-NLS-1$
-            null, null,
-            Messages.getString("ScanAssign.palletType.validationMsg"),
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    // if (!modificationMode) {
-                    // ContainerTypeWrapper oldContainerType =
-                    // currentPalletWrapper
-                    // .getContainerType();
-                    // currentPalletWrapper
-                    // .setContainerType((ContainerTypeWrapper) selectedObject);
-                    // if (oldContainerType != null) {
-                    // validateValues();
-                    // }
-                    // palletTypesViewer.getCombo().setFocus();
-                    // }
-                }
-            }); //$NON-NLS-1$
+    private void createPalletTypesViewer(
+        @SuppressWarnings("unused") Composite parent) {
+        // ComboViewer palletTypesViewer = createComboViewer(
+        // parent,
+        //            Messages.getString("ScanAssign.palletType.label"), //$NON-NLS-1$
+        // null, null,
+        // Messages.getString("ScanAssign.palletType.validationMsg"),
+        // new ComboSelectionUpdate() {
+        // @Override
+        // public void doSelection(Object selectedObject) {
+        // if (!modificationMode) {
+        // ContainerTypeWrapper oldContainerType =
+        // currentPalletWrapper
+        // .getContainerType();
+        // currentPalletWrapper
+        // .setContainerType((ContainerTypeWrapper) selectedObject);
+        // if (oldContainerType != null) {
+        // validateValues();
+        // }
+        // palletTypesViewer.getCombo().setFocus();
+        // }
+        // }
+        //            }); //$NON-NLS-1$
         // if (palletContainerTypes.size() == 1) {
         // currentPalletWrapper.setContainerType(palletContainerTypes.get(0));
         // palletTypesViewer.setSelection(new StructuredSelection(
@@ -407,10 +422,10 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
                         processCellStatus(cell);
                     }
                 }
-                CellStatus newStatus = CellStatus.EMPTY;
-                if (cell != null) {
-                    newStatus = cell.getStatus();
-                }
+                // CellStatus newStatus = CellStatus.EMPTY;
+                // if (cell != null) {
+                // newStatus = cell.getStatus();
+                // }
                 // currentScanState = currentScanState.mergeWith(newStatus);
             }
         }
@@ -420,9 +435,9 @@ public class GenericAssignEntryForm extends AbstractPalletSpecimenAdminForm {
     protected void processCellStatus(PalletCell scanCell) throws Exception {
         SpecimenWrapper expectedAliquot = scanCell.getExpectedSpecimen();
         String value = scanCell.getValue();
-        String positionString = currentParentContainer.getLabel()
-            + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
-                .getRow(), scanCell.getCol()));
+        // String positionString = currentParentContainer.getLabel()
+        // + ContainerLabelingSchemeWrapper.rowColToSbs(new RowColPos(scanCell
+        // .getRow(), scanCell.getCol()));
         if (value == null) { // no aliquot scanned
             // updateCellAsMissing(positionString, scanCell, expectedAliquot);
         } else {

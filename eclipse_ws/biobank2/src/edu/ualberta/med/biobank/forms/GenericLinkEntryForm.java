@@ -264,7 +264,14 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 precedent.setNextWidget(typeWidget);
             }
             precedent = typeWidget;
+            typeWidget.setEnabled(true);
         }
+    }
+
+    @Override
+    protected void createScanButton(Composite parent) {
+        super.createScanButton(parent);
+        scanButton.setEnabled(true);
     }
 
     /**
@@ -346,7 +353,11 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
         singleTypesWidget = new AliquotedSpecimenSelectionWidget(
             singleLinkComposite, null, widgetCreator, false);
-        // singleTypesWidget.addBindings();
+        singleTypesWidget.addBindings();
+
+        widgetCreator.createLabel(singleLinkComposite,
+            "Go to assign after linking");
+        toolkit.createButton(singleLinkComposite, "", SWT.CHECK);
     }
 
     /**
@@ -361,10 +372,10 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
         for (int row = 0; row < specimenTypesWidgets.size(); row++) {
             AliquotedSpecimenSelectionWidget widget = specimenTypesWidgets
                 .get(row);
-            if (isFirstSuccessfulScan()) {
-                widget.setSourceSpecimens(availableSourceSpecimens);
-                widget.setResultTypes(studiesAliquotedTypes);
-            }
+            // if (isFirstSuccessfulScan()) {
+            widget.setSourceSpecimens(availableSourceSpecimens);
+            widget.setResultTypes(studiesAliquotedTypes);
+            // }
         }
         singleTypesWidget.setSourceSpecimens(availableSourceSpecimens);
         singleTypesWidget.setResultTypes(studiesAliquotedTypes);
@@ -433,13 +444,11 @@ public class GenericLinkEntryForm extends AbstractPalletSpecimenAdminForm {
 
     @Override
     protected void disableFields() {
-        // TODO Auto-generated method stub
 
     }
 
     @Override
     protected boolean fieldsValid() {
-        // FIXME
         return true;
     }
 
