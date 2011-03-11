@@ -431,7 +431,7 @@ public class AliquotWrapper extends ModelWrapper<Aliquot> {
                 .getSampleStorageCollection();
             if (sampleStorageCollection != null) {
                 for (SampleStorageWrapper ss : sampleStorageCollection) {
-                    if (getSampleType().equals(getSampleType())) {
+                    if (getSampleType().equals(ss.getSampleType())) {
                         volume = ss.getVolume();
                     }
                 }
