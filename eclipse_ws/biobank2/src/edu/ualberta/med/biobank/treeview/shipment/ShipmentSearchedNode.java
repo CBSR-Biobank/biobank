@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public class ShipmentSearchedNode extends AbstractSearchedNode {
 
@@ -46,6 +46,6 @@ public class ShipmentSearchedNode extends AbstractSearchedNode {
 
     @Override
     protected void addNode(ModelWrapper<?> wrapper) {
-        ShipmentAdministrationView.addToNode(this, wrapper);
+        SpecimenTransitView.addToNode(this, wrapper);
     }
 }

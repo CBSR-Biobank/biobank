@@ -20,7 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
+import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
@@ -136,9 +136,8 @@ public class PatientEntryForm extends BiobankEntryForm {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                PatientAdministrationView.reloadCurrent();
-                PatientAdministrationView.showPatient(patientAdapter
-                    .getWrapper());
+                CollectionView.reloadCurrent();
+                CollectionView.showPatient(patientAdapter.getWrapper());
             }
         });
     }

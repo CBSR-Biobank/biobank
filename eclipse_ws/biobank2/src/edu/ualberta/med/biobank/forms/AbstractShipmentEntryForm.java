@@ -15,7 +15,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
-import edu.ualberta.med.biobank.views.DispatchAdministrationView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.listeners.BiobankEntryFormWidgetListener;
 import edu.ualberta.med.biobank.widgets.listeners.MultiSelectEvent;
@@ -112,7 +112,7 @@ public abstract class AbstractShipmentEntryForm extends BiobankEntryForm {
         Display.getDefault().asyncExec(new Runnable() {
             @Override
             public void run() {
-                DispatchAdministrationView.getCurrent().reload();
+                SpecimenTransitView.getCurrent().reload();
             }
         });
     }

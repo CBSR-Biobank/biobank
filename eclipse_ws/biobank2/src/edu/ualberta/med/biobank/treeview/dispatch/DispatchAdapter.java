@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.views.DispatchAdministrationView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public class DispatchAdapter extends AdapterBase {
 
@@ -194,7 +194,7 @@ public class DispatchAdapter extends AdapterBase {
         } catch (Exception ex) {
             BiobankPlugin.openAsyncError("Save error", ex);
         }
-        DispatchAdministrationView.getCurrent().reload();
+        SpecimenTransitView.getCurrent().reload();
     }
 
     @Override
