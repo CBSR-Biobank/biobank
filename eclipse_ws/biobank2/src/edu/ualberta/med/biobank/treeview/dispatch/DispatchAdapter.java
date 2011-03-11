@@ -15,12 +15,12 @@ import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.util.DispatchState;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
@@ -42,7 +42,12 @@ public class DispatchAdapter extends AdapterBase {
         boolean editable = super.isEditable();
         if (getWrapper() != null) {
             return editable
-                && (getWrapper().isNew() || !getWrapper().isInTransitState());
+                && ((getWrapper().getSenderCenter().equals(
+                    SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
+                    .isNew() || getWrapper().isInCreationState() || getWrapper()
+                    .isInTransitState())) || (getWrapper().getReceiverCenter()
+                    .equals(SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
+                    .isInReceivedState() || getWrapper().isInTransitState())));
         }
         return editable;
     }
@@ -52,13 +57,13 @@ public class DispatchAdapter extends AdapterBase {
         DispatchWrapper shipment = getWrapper();
         Assert.isNotNull(shipment, "Dispatch is null");
         String label = new String();
-        StudyWrapper study = shipment.getStudy();
+        if (shipment.getSenderCenter() != null
+            && shipment.getReceiverCenter() != null)
+            label += shipment.getSenderCenter().getNameShort() + " -> "
+                + shipment.getReceiverCenter().getNameShort();
 
-        if (study != null) {
-            label += study.getNameShort() + " - ";
-        }
-
-        label += shipment.getFormattedDeparted();
+        if (shipment.getPackedAt() != null)
+            label += " [" + shipment.getFormattedPackedAt() + "]";
         return label;
 
     }
@@ -70,30 +75,30 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        if (getSiteParent() != null)
-            return getSiteParent().equals(getWrapper().getSender())
+        if (getCenterParent() != null)
+            return getCenterParent().equals(getWrapper().getSenderCenter())
                 && getWrapper().canDelete(SessionManager.getUser())
                 && getWrapper().isInCreationState();
         else
             return false;
     }
 
-    private SiteWrapper getSiteParent() {
+    private CenterWrapper<?> getCenterParent() {
         if (getParent().getParent().getParent() != null)
-            return (SiteWrapper) getParent().getParent().getParent()
+            return (CenterWrapper<?>) getParent().getParent().getParent()
                 .getModelObject();
         return null;
     }
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        SiteWrapper siteParent = getSiteParent();
+        CenterWrapper<?> siteParent = getCenterParent();
         addViewMenu(menu, "Dispatch");
         try {
             if (isDeletable()) {
                 addDeleteMenu(menu, "Dispatch");
             }
-            if (siteParent.equals(getWrapper().getSender())
+            if (siteParent.equals(getWrapper().getSenderCenter())
                 && getWrapper().canUpdate(SessionManager.getUser())
                 && getWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
@@ -105,9 +110,8 @@ public class DispatchAdapter extends AdapterBase {
                     }
                 });
             }
-            if (siteParent.equals(getWrapper().getReceiver())
-                && getWrapper().isInTransitState()
-                && getWrapper().canBeReceivedBy(SessionManager.getUser())) {
+            if (siteParent.equals(getWrapper().getReceiverCenter())
+                && getWrapper().isInTransitState()) {
                 MenuItem mi = new MenuItem(menu, SWT.PUSH);
                 mi.setText("Receive");
                 mi.addSelectionListener(new SelectionAdapter() {
@@ -124,11 +128,18 @@ public class DispatchAdapter extends AdapterBase {
                         doReceiveAndProcess();
                     }
                 });
-            } else if (getWrapper().canUpdate(SessionManager.getUser())) {
-                addEditMenu(menu, "Dispatch");
+                mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText("Mark as Lost");
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        doSetAsLost();
+                    }
+                });
             }
+            addEditMenu(menu, "Dispatch");
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Error checking permissions", e);
+            BiobankPlugin.openAsyncError("Error checking permissions", e);
         }
     }
 
@@ -148,26 +159,26 @@ public class DispatchAdapter extends AdapterBase {
     }
 
     public void doClose() {
-        getWrapper().setInCloseState();
+        getWrapper().setState(DispatchState.CLOSED);
         persistDispatch();
         openViewForm();
     }
 
     public void doSetAsLost() {
-        getWrapper().setInLostState();
+        getWrapper().setState(DispatchState.LOST);
         persistDispatch();
         openViewForm();
     }
 
     private void setDispatchAsReceived() {
-        getWrapper().setDateReceived(new Date());
-        getWrapper().setInReceivedState();
+        getWrapper().getShipmentInfo().setReceivedAt(new Date());
+        getWrapper().setState(DispatchState.RECEIVED);
         persistDispatch();
     }
 
     private void setDispatchAsCreation() {
-        getWrapper().setInCreationState();
-        getWrapper().setDeparted(null);
+        getWrapper().setState(DispatchState.CREATION);
+        getWrapper().setPackedAt(null);
         persistDispatch();
     }
 
@@ -175,13 +186,13 @@ public class DispatchAdapter extends AdapterBase {
         try {
             getWrapper().persist();
         } catch (final RemoteConnectFailureException exp) {
-            BioBankPlugin.openRemoteConnectErrorMessage(exp);
+            BiobankPlugin.openRemoteConnectErrorMessage(exp);
         } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (final AccessDeniedException ade) {
-            BioBankPlugin.openAccessDeniedErrorMessage(ade);
+            BiobankPlugin.openAccessDeniedErrorMessage(ade);
         } catch (Exception ex) {
-            BioBankPlugin.openAsyncError("Save error", ex);
+            BiobankPlugin.openAsyncError("Save error", ex);
         }
         DispatchAdministrationView.getCurrent().reload();
     }
@@ -214,9 +225,11 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public String getEntryFormId() {
-        if (getWrapper().isInCreationState())
+        if (getWrapper().isInCreationState()
+            || (getWrapper().isInTransitState() && SessionManager.getUser()
+                .getCurrentWorkingCenter()
+                .equals(getWrapper().getSenderCenter())))
             return DispatchSendingEntryForm.ID;
         return DispatchReceivingEntryForm.ID;
     }
-
 }

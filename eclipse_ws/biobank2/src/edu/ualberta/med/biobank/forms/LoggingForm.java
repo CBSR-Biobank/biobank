@@ -6,7 +6,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.PlatformUI;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.logs.LogQuery;
 import edu.ualberta.med.biobank.views.LoggingView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -45,9 +45,8 @@ public class LoggingForm extends BiobankViewForm {
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
-        // FIXME study icon is not correct for the log form
-        form.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_STUDY));
+        form.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_LOGGING));
 
         Composite client = toolkit.createComposite(page);
         client.setLayout(new GridLayout(2, false));

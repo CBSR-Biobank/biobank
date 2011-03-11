@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.FileDialog;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 
 public class FileBrowser extends BiobankWidget {
     private BiobankText textfield;
@@ -59,7 +59,7 @@ public class FileBrowser extends BiobankWidget {
                 while (br.ready())
                     contents += br.readLine() + "\n";
             } catch (Exception e1) {
-                BioBankPlugin.openError("IO Error", "Unable to read file.");
+                BiobankPlugin.openError("IO Error", "Unable to read file.");
             }
             setText(contents);
         }

@@ -24,16 +24,14 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.widgets.BasicSiteCombo;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.BiobankWidget;
-import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 /**
@@ -44,8 +42,6 @@ public class MoveAliquotsToDialog extends BiobankDialog {
     private ContainerWrapper oldContainer;
 
     private HashMap<String, ContainerWrapper> map = new HashMap<String, ContainerWrapper>();
-
-    private BasicSiteCombo siteCombo;
 
     private ListViewer lv;
 
@@ -88,17 +84,8 @@ public class MoveAliquotsToDialog extends BiobankDialog {
         Label siteLabel = widgetCreator
             .createLabel(contents, "Repository Site");
         siteLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_CENTER));
-        siteCombo = new BasicSiteCombo(contents, widgetCreator,
-            SessionManager.getAppService(), siteLabel, true,
-            new ComboSelectionUpdate() {
-                @Override
-                public void doSelection(Object selectedObject) {
-                    buildContainersMap();
-                }
-            });
-        siteCombo.setSelectedSite(oldContainer.getSite(), false);
+        buildContainersMap();
         if (!SessionManager.getUser().isWebsiteAdministrator()) {
-            siteCombo.setEnabled(false);
             siteLabel
                 .setToolTipText("Only Website administrator can move aliquot to another site");
         }
@@ -163,19 +150,18 @@ public class MoveAliquotsToDialog extends BiobankDialog {
 
     protected void buildContainersMap() {
         map.clear();
-        List<SampleTypeWrapper> typesFromOlContainer = oldContainer
-            .getContainerType().getSampleTypeCollection();
+        List<SpecimenTypeWrapper> typesFromOlContainer = oldContainer
+            .getContainerType().getSpecimenTypeCollection();
         List<ContainerWrapper> conts = new ArrayList<ContainerWrapper>();
-        if (siteCombo.getSelectedSite() != null)
-            try {
-                conts = ContainerWrapper.getEmptyContainersHoldingSampleType(
-                    SessionManager.getAppService(),
-                    siteCombo.getSelectedSite(), typesFromOlContainer,
-                    oldContainer.getRowCapacity(),
-                    oldContainer.getColCapacity());
-            } catch (ApplicationException ae) {
-                BioBankPlugin.openAsyncError("Error retrieving containers", ae);
-            }
+        try {
+            conts = ContainerWrapper.getEmptyContainersHoldingSpecimenType(
+                SessionManager.getAppService(), SessionManager.getUser()
+                    .getCurrentWorkingSite(), typesFromOlContainer,
+                oldContainer.getRowCapacity(), oldContainer.getColCapacity());
+        } catch (ApplicationException e) {
+            BiobankPlugin.openAsyncError("Error",
+                "Failed to retrieve empty containers.");
+        }
         for (ContainerWrapper cont : conts) {
             map.put(cont.getLabel(), cont);
         }
@@ -190,7 +176,7 @@ public class MoveAliquotsToDialog extends BiobankDialog {
 
     @Override
     public void okPressed() {
-        boolean sure = BioBankPlugin.openConfirm("Other site",
+        boolean sure = BiobankPlugin.openConfirm("Other site",
             "You are about to move these aliquots into a container that belongs "
                 + "to another site. Are you sure ?");
         if (sure)

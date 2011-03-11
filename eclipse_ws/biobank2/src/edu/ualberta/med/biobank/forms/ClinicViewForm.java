@@ -7,16 +7,16 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicStudyInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.ContactInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.ShipmentInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ClinicViewForm extends AddressViewFormCommon {
-    public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ClinicViewForm"; //$NON-NLS-1$
 
     private ClinicAdapter clinicAdapter;
 
@@ -38,27 +38,25 @@ public class ClinicViewForm extends AddressViewFormCommon {
 
     private BiobankText patientTotal;
 
-    private BiobankText visitTotal;
-
-    private BiobankText shipmentTotal;
-
-    private ShipmentInfoTable shipmentsTable;
+    private BiobankText ceventTotal;
 
     @Override
     protected void init() throws Exception {
         Assert.isTrue(adapter instanceof ClinicAdapter,
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         clinicAdapter = (ClinicAdapter) adapter;
         clinic = clinicAdapter.getWrapper();
         clinic.reload();
-        setPartName("Clinic: " + clinic.getNameShort());
+        setPartName(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
+            clinic.getNameShort()));
     }
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText("Clinic: " + clinic.getName());
+        form.setText(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
+            clinic.getName()));
 
         GridLayout layout = new GridLayout(1, false);
         page.setLayout(layout);
@@ -67,7 +65,6 @@ public class ClinicViewForm extends AddressViewFormCommon {
         createAddressSection(clinic);
         createContactsSection();
         createStudiesSection();
-        createShipmentsSection();
     }
 
     private void createClinicSection() throws Exception {
@@ -76,21 +73,21 @@ public class ClinicViewForm extends AddressViewFormCommon {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("label.name")); //$NON-NLS-1$
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Short Name");
+            Messages.getString("label.nameShort")); //$NON-NLS-1$
         hasShipmentsButton = (Button) createLabelledWidget(client,
-            Button.class, SWT.NONE, "Sends Shipments");
+            Button.class, SWT.NONE,
+            Messages.getString("clinic.field.label.sendsShipments")); //$NON-NLS-1$
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity Status");
+            Messages.getString("label.activity")); //$NON-NLS-1$
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
-        shipmentTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Shipments");
+            Messages.getString("label.comments")); //$NON-NLS-1$
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Patients");
-        visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Patient Visits");
+            Messages.getString("ClinicViewForm.field.label.totalPatients")); //$NON-NLS-1$
+        ceventTotal = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("ClinicViewForm.field.label.totalPatientVisits")); //$NON-NLS-1$
 
         setClinicValues();
     }
@@ -101,13 +98,13 @@ public class ClinicViewForm extends AddressViewFormCommon {
         setCheckBoxValue(hasShipmentsButton, clinic.getSendsShipments());
         setTextValue(activityStatusLabel, clinic.getActivityStatus());
         setTextValue(commentLabel, clinic.getComment());
-        setTextValue(shipmentTotal, clinic.getShipmentCount(true));
-        setTextValue(patientTotal, clinic.getPatientCount(true));
-        setTextValue(visitTotal, clinic.getPatientVisitCount());
+        setTextValue(patientTotal, clinic.getPatientCount());
+        setTextValue(ceventTotal, clinic.getCollectionEventCount());
     }
 
     private void createContactsSection() {
-        Composite client = createSectionWithClient("Contacts");
+        Composite client = createSectionWithClient(Messages
+            .getString("clinic.contact.title")); //$NON-NLS-1$
 
         contactsTable = new ContactInfoTable(client,
             clinic.getContactCollection());
@@ -116,7 +113,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
     }
 
     protected void createStudiesSection() throws ApplicationException {
-        Composite client = createSectionWithClient("Studies");
+        Composite client = createSectionWithClient(Messages
+            .getString("ClinicViewForm.studies.title")); //$NON-NLS-1$
 
         studiesTable = new ClinicStudyInfoTable(client, clinic);
         studiesTable.adaptToToolkit(toolkit, true);
@@ -125,25 +123,16 @@ public class ClinicViewForm extends AddressViewFormCommon {
         studiesTable.addClickListener(collectionDoubleClickListener);
     }
 
-    protected void createShipmentsSection() {
-        Composite client = createSectionWithClient("Shipments");
-
-        shipmentsTable = new ShipmentInfoTable(client, clinic);
-        shipmentsTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(shipmentsTable);
-
-        shipmentsTable.addClickListener(collectionDoubleClickListener);
-    }
-
     @Override
     public void reload() throws Exception {
         clinic.reload();
-        setPartName("Clinic: " + clinic.getName());
-        form.setText("Clinic: " + clinic.getName());
+        setPartName(Messages
+            .getString("ClinicViewForm.title", clinic.getName())); //$NON-NLS-1$
+        form.setText(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
+            clinic.getName()));
         setClinicValues();
         setAdressValues(clinic);
         contactsTable.setCollection(clinic.getContactCollection(true));
-        shipmentsTable.setCollection(clinic.getShipmentCollection());
         studiesTable.setCollection(clinic.getStudyCollection());
     }
 

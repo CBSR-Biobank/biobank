@@ -13,7 +13,7 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 import org.springframework.remoting.RemoteAccessException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperEvent;
 import edu.ualberta.med.biobank.common.wrappers.listener.WrapperListenerAdapter;
@@ -88,7 +88,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                 }
             }
         } catch (final RemoteAccessException exp) {
-            BioBankPlugin.openRemoteAccessErrorMessage(exp);
+            BiobankPlugin.openRemoteAccessErrorMessage(exp);
         } catch (Exception e) {
             logger.error("Error while refreshing searched elements", e);
         }

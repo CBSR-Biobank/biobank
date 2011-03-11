@@ -3,77 +3,81 @@ package edu.ualberta.med.biobank.test.internal;
 import java.util.Arrays;
 import java.util.Date;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.wrappers.TestCommon;
 
 public class DispatchHelper extends DbHelper {
 
-    public static DispatchWrapper newDispatch(SiteWrapper sender,
-        SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method,
-        String waybill, Date dateReceived, AliquotWrapper... aliquots)
+    public static DispatchWrapper newDispatch(CenterWrapper<?> sender,
+        CenterWrapper<?> receiver, ShippingMethodWrapper method,
+        String waybill, Date dateReceived, SpecimenWrapper... aliquots)
         throws Exception {
-        DispatchWrapper shipment = new DispatchWrapper(appService);
-        shipment.setSender(sender);
-        shipment.setReceiver(receiver);
-        shipment.setStudy(study);
-        shipment.setShippingMethod(method);
-        shipment.setWaybill(waybill);
+        DispatchWrapper dispatch = new DispatchWrapper(appService);
+        dispatch.setSenderCenter(sender);
+        dispatch.setReceiverCenter(receiver);
+
+        ShipmentInfoWrapper shipInfo = new ShipmentInfoWrapper(appService);
+        dispatch.setShipmentInfo(shipInfo);
+
+        shipInfo.setShippingMethod(method);
+        shipInfo.setWaybill(waybill);
+
         if (dateReceived != null) {
-            shipment.setDateReceived(dateReceived);
+            shipInfo.setReceivedAt(dateReceived);
         }
 
-        shipment.setDeparted(Utils.getRandomDate());
+        dispatch.setPackedAt(Utils.getRandomDate());
 
         if (aliquots != null) {
-            shipment.addNewAliquots(Arrays.asList(aliquots), true);
+            dispatch.addSpecimens(Arrays.asList(aliquots));
         }
 
-        return shipment;
+        return dispatch;
     }
 
-    public static DispatchWrapper newDispatch(SiteWrapper sender,
-        SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method,
+    public static DispatchWrapper newDispatch(CenterWrapper<?> sender,
+        CenterWrapper<?> receiver, ShippingMethodWrapper method,
         String waybill, Date dateReceived) throws Exception {
-        return newDispatch(sender, receiver, study, method, waybill,
-            dateReceived, (AliquotWrapper[]) null);
+        return newDispatch(sender, receiver, method, waybill, dateReceived,
+            (SpecimenWrapper[]) null);
     }
 
-    public static DispatchWrapper newDispatch(SiteWrapper sender,
-        SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method)
+    public static DispatchWrapper newDispatch(CenterWrapper<?> sender,
+        CenterWrapper<?> receiver, ShippingMethodWrapper method)
         throws Exception {
-        return newDispatch(sender, receiver, study, method,
+        return newDispatch(sender, receiver, method,
             TestCommon.getNewWaybill(r), Utils.getRandomDate());
     }
 
-    public static DispatchWrapper addDispatch(SiteWrapper sender,
-        SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method,
-        String waybill, Date dateReceived, AliquotWrapper... containers)
+    public static DispatchWrapper addDispatch(CenterWrapper<?> sender,
+        CenterWrapper<?> receiver, ShippingMethodWrapper method,
+        String waybill, Date dateReceived, SpecimenWrapper... containers)
         throws Exception {
-        DispatchWrapper shipment = newDispatch(sender, receiver, study, method,
+        DispatchWrapper dispatch = newDispatch(sender, receiver, method,
             waybill, dateReceived, containers);
-        shipment.persist();
-        return shipment;
+        dispatch.persist();
+        return dispatch;
     }
 
-    public static DispatchWrapper addDispatch(SiteWrapper sender,
-        SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method,
+    public static DispatchWrapper addDispatch(CenterWrapper<?> sender,
+        CenterWrapper<?> receiver, ShippingMethodWrapper method,
         String waybill, Date dateReceived) throws Exception {
-        DispatchWrapper shipment = newDispatch(sender, receiver, study, method,
+        DispatchWrapper dispatch = newDispatch(sender, receiver, method,
             waybill, dateReceived);
-        shipment.persist();
-        return shipment;
+        dispatch.persist();
+        return dispatch;
     }
 
-    public static DispatchWrapper addDispatch(SiteWrapper sender,
-        SiteWrapper receiver, StudyWrapper study, ShippingMethodWrapper method)
+    public static DispatchWrapper addDispatch(CenterWrapper<?> sender,
+        CenterWrapper<?> receiver, ShippingMethodWrapper method)
         throws Exception {
-        DispatchWrapper shipment = newDispatch(sender, receiver, study, method);
-        shipment.persist();
-        return shipment;
+        DispatchWrapper dispatch = newDispatch(sender, receiver, method);
+        dispatch.persist();
+        return dispatch;
     }
 }

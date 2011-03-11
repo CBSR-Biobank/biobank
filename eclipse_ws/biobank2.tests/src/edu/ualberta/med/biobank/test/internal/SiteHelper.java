@@ -62,18 +62,20 @@ public class SiteHelper extends DbHelper {
 
     private static void deleteSiteInternal(SiteWrapper site) throws Exception {
         site.reload();
-        deleteContainers(site.getTopContainerCollection());
+        deleteContainers(site.getTopContainerCollection(false));
         // in case containers with no top level type has been created without a
         // parent :
         // TODO check if still need this with last modifications
         site.reload();
-        deleteContainers(site.getContainerCollection());
-        deleteFromList(site.getContainerTypeCollection());
-        deleteFromList(site.getShipmentCollection());
+        deleteContainers(site.getContainerCollection(false));
+        deleteFromList(site.getContainerTypeCollection(false));
         site.reload();
-        deleteDispatchs(site.getSentDispatchCollection());
-        deleteDispatchs(site.getReceivedDispatchCollection());
+        deleteFromList(site.getProcessingEventCollection(false));
         site.reload();
+        deleteDispatchs(site.getSrcDispatchCollection(false));
+        deleteDispatchs(site.getDstDispatchCollection(false));
+        site.reload();
+
         site.delete();
     }
 

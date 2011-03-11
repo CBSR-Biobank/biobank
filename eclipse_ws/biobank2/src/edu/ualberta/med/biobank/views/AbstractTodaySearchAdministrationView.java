@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.eclipse.swt.widgets.Composite;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
 public abstract class AbstractTodaySearchAdministrationView extends
     AbstractAdministrationView {
 
-    protected AbstractTodayNode todayNode;
+    protected AbstractTodayNode<?> todayNode;
 
     protected AbstractSearchedNode searchedNode;
 
@@ -32,11 +32,11 @@ public abstract class AbstractTodaySearchAdministrationView extends
         rootNode.addChild(searchedNode);
     }
 
-    protected abstract AbstractTodayNode createTodayNode();
+    protected abstract AbstractTodayNode<?> createTodayNode();
 
     protected abstract AbstractSearchedNode createSearchedNode();
 
-    public AbstractTodayNode getTodayNode() {
+    public AbstractTodayNode<?> getTodayNode() {
         return todayNode;
     }
 
@@ -56,7 +56,7 @@ public abstract class AbstractTodaySearchAdministrationView extends
                 getTreeViewer().expandToLevel(searchedNode, 3);
             }
         } catch (Exception e) {
-            BioBankPlugin.openAsyncError("Search error", e);
+            BiobankPlugin.openAsyncError("Search error", e);
         }
     }
 
@@ -89,7 +89,8 @@ public abstract class AbstractTodaySearchAdministrationView extends
     @Override
     public void reload() {
         todayNode.performExpand();
-        searchedNode.removeObjects(todayNode.getCurrentTodayElements());
+        // FIXME
+        // searchedNode.removeObjects(todayNode.getCurrentTodayElements());
         searchedNode.performExpand();
         super.reload();
     }

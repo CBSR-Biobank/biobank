@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
@@ -287,8 +287,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         private void createEditModeButton() {
             editModeButton = new Button(this, SWT.NONE);
-            editModeButton.setImage(BioBankPlugin.getDefault()
-                .getImageRegistry().get(BioBankPlugin.IMG_DOWN));
+            editModeButton.setImage(BiobankPlugin.getDefault()
+                .getImageRegistry().get(BiobankPlugin.IMG_DOWN));
             editModeButton.setToolTipText("Expand to add values");
             editModeButton.addListener(SWT.Selection, new Listener() {
                 @Override
@@ -331,8 +331,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         private void createAddButton() {
             addButton = new Button(this, SWT.NONE);
-            addButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-                .get(BioBankPlugin.IMG_ADD));
+            addButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+                .get(BiobankPlugin.IMG_ADD));
             addButton.setToolTipText("Add value to list");
             addButton.addListener(SWT.Selection, new Listener() {
                 @Override
@@ -398,8 +398,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         private void createRemoveButton() {
             removeButton = new Button(this, SWT.NONE);
-            removeButton.setImage(BioBankPlugin.getDefault().getImageRegistry()
-                .get(BioBankPlugin.IMG_REMOVE));
+            removeButton.setImage(BiobankPlugin.getDefault().getImageRegistry()
+                .get(BiobankPlugin.IMG_REMOVE));
             removeButton.setToolTipText("Remove selected value(s) from list");
             removeButton.addListener(SWT.Selection, new Listener() {
                 @Override
@@ -416,8 +416,8 @@ public class SetFilterValueWidget implements FilterValueWidget {
 
         private void createViewModeButton() {
             viewModeButton = new Button(this, SWT.NONE);
-            viewModeButton.setImage(BioBankPlugin.getDefault()
-                .getImageRegistry().get(BioBankPlugin.IMG_UP));
+            viewModeButton.setImage(BiobankPlugin.getDefault()
+                .getImageRegistry().get(BiobankPlugin.IMG_UP));
             viewModeButton.setToolTipText("Collapse");
             viewModeButton.addListener(SWT.Selection, new Listener() {
                 @Override

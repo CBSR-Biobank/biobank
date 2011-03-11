@@ -8,34 +8,27 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
-import edu.ualberta.med.biobank.common.formatters.DateFormatter;
-import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShipmentWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.Dispatch;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
-import edu.ualberta.med.biobank.test.internal.AliquotHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
 import edu.ualberta.med.biobank.test.internal.DispatchHelper;
-import edu.ualberta.med.biobank.test.internal.DispatchInfoHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
-import edu.ualberta.med.biobank.test.internal.PatientVisitHelper;
-import edu.ualberta.med.biobank.test.internal.ShipmentHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -46,30 +39,25 @@ public class TestDispatch extends TestDatabase {
         String name = "testGettersAndSetters" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        StudyWrapper study = StudyHelper.addStudy(name);
 
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
-        List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
 
-        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
-
-        DispatchWrapper shipment = DispatchHelper.addDispatch(senderSite,
-            receiverSite, study,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        testGettersAndSetters(shipment);
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0));
+        testGettersAndSetters(dispatch);
     }
 
     @Test
     public void testConstructor() throws Exception {
-        Dispatch shipmentRaw = new Dispatch();
-        DispatchWrapper shipment = new DispatchWrapper(appService, shipmentRaw);
-        Assert.assertNotNull(shipment);
+        Dispatch rawDispatch = new Dispatch();
+        DispatchWrapper dispatch = new DispatchWrapper(appService, rawDispatch);
+        Assert.assertNotNull(dispatch);
     }
 
     @Test
@@ -77,34 +65,28 @@ public class TestDispatch extends TestDatabase {
         String name = "testGetSetSender" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        StudyWrapper study = StudyHelper.addStudy(name);
 
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
-        List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
 
-        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        DispatchWrapper dispatch = DispatchHelper.newDispatch(null,
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0));
+        Assert.assertNull(dispatch.getSenderCenter());
 
-        DispatchWrapper shipment = DispatchHelper.newDispatch(null,
-            receiverSite, study,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        Assert.assertNull(shipment.getSender());
+        dispatch.setSenderCenter(senderSite);
+        dispatch.persist();
 
-        shipment.setSender(senderSite);
-        shipment.persist();
+        Assert.assertEquals(senderSite, dispatch.getSenderCenter());
 
-        Assert.assertEquals(senderSite, shipment.getSender());
+        DispatchWrapper dispatch2 = new DispatchWrapper(appService,
+            dispatch.getWrappedObject());
 
-        DispatchWrapper shipment2 = new DispatchWrapper(appService,
-            shipment.getWrappedObject());
-
-        Assert.assertEquals(senderSite, shipment2.getSender());
-
+        Assert.assertEquals(senderSite, dispatch2.getSenderCenter());
     }
 
     @Test
@@ -112,32 +94,27 @@ public class TestDispatch extends TestDatabase {
         String name = "testGetSetReceiver" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        StudyWrapper study = StudyHelper.addStudy(name);
 
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
-        List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
 
-        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
+        DispatchWrapper dispatch = DispatchHelper.newDispatch(senderSite, null,
+            ShippingMethodWrapper.getShippingMethods(appService).get(0));
+        Assert.assertNull(dispatch.getReceiverCenter());
 
-        DispatchWrapper shipment = DispatchHelper.newDispatch(senderSite, null,
-            study, ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        Assert.assertNull(shipment.getReceiver());
+        dispatch.setReceiverCenter(receiverSite);
+        dispatch.persist();
 
-        shipment.setReceiver(receiverSite);
-        shipment.persist();
+        Assert.assertEquals(receiverSite, dispatch.getReceiverCenter());
 
-        Assert.assertEquals(receiverSite, shipment.getReceiver());
+        DispatchWrapper dispatch2 = new DispatchWrapper(appService,
+            dispatch.getWrappedObject());
 
-        DispatchWrapper shipment2 = new DispatchWrapper(appService,
-            shipment.getWrappedObject());
-
-        Assert.assertEquals(receiverSite, shipment2.getReceiver());
+        Assert.assertEquals(receiverSite, dispatch2.getReceiverCenter());
     }
 
     @Test
@@ -148,96 +125,38 @@ public class TestDispatch extends TestDatabase {
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
         SiteWrapper receiverSite2 = SiteHelper.addSite(name + "_receiver2");
 
-        StudyWrapper study = StudyHelper.addStudy(name);
-        StudyWrapper study2 = StudyHelper.addStudy(name + "_study2");
-        List<StudyWrapper> allStudies = Arrays.asList(study, study2);
-
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, senderSite2,
             receiverSite, receiverSite2 };
 
         for (SiteWrapper site : allSites) {
-            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
 
-        DispatchInfoHelper.addInfo(study, senderSite, receiverSite,
-            receiverSite2);
-        DispatchInfoHelper.addInfo(study2, senderSite2, receiverSite2);
-
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
-        DispatchHelper.addDispatch(senderSite, receiverSite, study, method,
-            name, Utils.getRandomDate());
-
-        // set waybill not unique for a shipment not yet database
-        DispatchWrapper shipment2 = DispatchHelper.newDispatch(senderSite,
-            receiverSite, study, method, name, Utils.getRandomDate());
-
-        try {
-            shipment2.persist();
-            Assert
-                .fail("should not be allowed to persist a dispatch shipment without a unique waybill: "
-                    + shipment2.getWaybill());
-        } catch (BiobankCheckException e) {
-            Assert.assertTrue(true);
-        }
-
-        shipment2.setWaybill(name + "2");
-        shipment2.persist();
-
-        // set waybill not unique for a shipment retrieved from database
-        shipment2.setWaybill(name);
-        try {
-            shipment2.persist();
-            Assert
-                .fail("should not be allowed to persist a dispatch shipment without a unique waybill: "
-                    + shipment2.getWaybill());
-        } catch (BiobankCheckException e) {
-            Assert.assertTrue(true);
-        }
-
-        // set waybill to same for 2 different sending sites
-        shipment2 = DispatchHelper.newDispatch(senderSite2, receiverSite2,
-            study2, method, name, Utils.getRandomDate());
-        try {
-            shipment2.persist();
-            Assert.assertTrue(true);
-        } catch (BiobankCheckException e) {
-            Assert
-                .fail("should be allowed to persist a dispatch shipment with a unique waybill");
-        }
+        DispatchHelper.addDispatch(senderSite, receiverSite, method, name,
+            Utils.getRandomDate());
 
         // test no sender
-        DispatchWrapper shipment = DispatchHelper.newDispatch(null,
-            receiverSite, study, method, TestCommon.getNewWaybill(r),
+        DispatchWrapper dispatch = DispatchHelper.newDispatch(null,
+            receiverSite, method, TestCommon.getNewWaybill(r),
             Utils.getRandomDate());
         try {
-            shipment.persist();
+            dispatch.persist();
             Assert
-                .fail("should be allowed to persist a dispatch shipment without a sender");
+                .fail("should not be allowed to persist a dispatch shipment without a sender");
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
 
         // test no receiver
-        shipment = DispatchHelper.newDispatch(senderSite, null, study, method,
+        dispatch = DispatchHelper.newDispatch(senderSite, null, method,
             TestCommon.getNewWaybill(r), Utils.getRandomDate());
         try {
-            shipment.persist();
+            dispatch.persist();
             Assert
                 .fail("should not be allowed to persist a dispatch shipment without a receiver");
-        } catch (BiobankCheckException e) {
-            Assert.assertTrue(true);
-        }
-
-        // test sender can send to receiver
-        shipment = DispatchHelper.newDispatch(senderSite2, receiverSite, study,
-            method, TestCommon.getNewWaybill(r), Utils.getRandomDate());
-        try {
-            shipment.persist();
-            Assert
-                .fail("should not be allowed to persist a dispatch shipment where sender and receiver are not associated");
         } catch (BiobankCheckException e) {
             Assert.assertTrue(true);
         }
@@ -248,37 +167,34 @@ public class TestDispatch extends TestDatabase {
         String name = "testCompareTo" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        StudyWrapper study = StudyHelper.addStudy(name);
 
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
-        List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
 
-        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
-
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
 
-        DispatchWrapper shipment1 = DispatchHelper.addDispatch(senderSite,
-            receiverSite, study, method);
-        shipment1.setDateReceived(DateFormatter.dateFormatter
-            .parse("2010-02-01 23:00"));
+        DispatchWrapper dispatch1 = DispatchHelper.addDispatch(senderSite,
+            receiverSite, method);
+        // FIXME
+        // dispatch1.setDateReceived(DateFormatter.dateFormatter
+        // .parse("2010-02-01 23:00"));
 
-        DispatchWrapper shipment2 = DispatchHelper.addDispatch(senderSite,
-            receiverSite, study, method);
-        shipment2.setDateReceived(DateFormatter.dateFormatter
-            .parse("2009-12-01 23:00"));
+        DispatchWrapper dispatch2 = DispatchHelper.addDispatch(senderSite,
+            receiverSite, method);
+        // FIXME
+        // dispatch2.setDateReceived(DateFormatter.dateFormatter
+        // .parse("2009-12-01 23:00"));
 
-        Assert.assertTrue(shipment1.compareTo(shipment2) > 0);
-        Assert.assertTrue(shipment2.compareTo(shipment1) < 0);
+        Assert.assertTrue(dispatch1.compareTo(dispatch2) > 0);
+        Assert.assertTrue(dispatch2.compareTo(dispatch1) < 0);
 
-        Assert.assertTrue(shipment1.compareTo(null) == 0);
-        Assert.assertTrue(shipment2.compareTo(null) == 0);
+        Assert.assertTrue(dispatch1.compareTo(null) == 0);
+        Assert.assertTrue(dispatch2.compareTo(null) == 0);
     }
 
     @Test
@@ -286,35 +202,32 @@ public class TestDispatch extends TestDatabase {
         String name = "testReset" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        StudyWrapper study = StudyHelper.addStudy(name);
 
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
-        List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
-
-        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
 
         ShippingMethodWrapper method = ShippingMethodWrapper
             .getShippingMethods(appService).get(0);
 
         // test reset for a new object
-        DispatchWrapper shipment = DispatchHelper.newDispatch(senderSite,
-            receiverSite, study, method, name, Utils.getRandomDate());
+        DispatchWrapper dispatch = DispatchHelper.newDispatch(senderSite,
+            receiverSite, method, name, Utils.getRandomDate());
 
-        shipment.reset();
-        Assert.assertEquals(null, shipment.getWaybill());
+        dispatch.reset();
+        // FIXME
+        // Assert.assertEquals(null, dispatch.getWaybill());
 
         // test reset for an object already in database
-        shipment = DispatchHelper.addDispatch(senderSite, receiverSite, study,
-            method, name, Utils.getRandomDate());
-        shipment.setWaybill("QQQQ");
-        shipment.reset();
-        Assert.assertEquals(name, shipment.getWaybill());
+        dispatch = DispatchHelper.addDispatch(senderSite, receiverSite, method,
+            name, Utils.getRandomDate());
+        // FIXME
+        // dispatch.setWaybill("QQQQ");
+        // dispatch.reset();
+        // Assert.assertEquals(name, dispatch.getWaybill());
     }
 
     @Test
@@ -322,22 +235,17 @@ public class TestDispatch extends TestDatabase {
         String name = "testReload" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        StudyWrapper study = StudyHelper.addStudy(name);
 
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
-        List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
 
-        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
         DispatchWrapper shipment = DispatchHelper.addDispatch(senderSite,
-            receiverSite, study,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
-            Utils.getRandomDate());
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0), name, Utils.getRandomDate());
 
         try {
             shipment.reload();
@@ -349,9 +257,9 @@ public class TestDispatch extends TestDatabase {
 
     @Test
     public void testGetWrappedClass() throws Exception {
-        DispatchWrapper shipment = DispatchHelper.newDispatch(null, null, null,
+        DispatchWrapper dispatch = DispatchHelper.newDispatch(null, null,
             ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        Assert.assertEquals(Dispatch.class, shipment.getWrappedClass());
+        Assert.assertEquals(Dispatch.class, dispatch.getWrappedClass());
     }
 
     @Test
@@ -359,27 +267,22 @@ public class TestDispatch extends TestDatabase {
         String name = "testDelete" + r.nextInt();
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        StudyWrapper study = StudyHelper.addStudy(name);
 
         SiteWrapper[] allSites = new SiteWrapper[] { senderSite, receiverSite };
-        List<StudyWrapper> allStudies = Arrays.asList(study);
 
         for (SiteWrapper site : allSites) {
-            site.addToStudyCollection(allStudies);
             site.persist();
             site.reload();
         }
 
-        DispatchInfoHelper.addInfo(study, senderSite, receiverSite);
-        DispatchWrapper shipment = DispatchHelper.addDispatch(senderSite,
-            receiverSite, study,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0), name,
-            Utils.getRandomDate());
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0), name, Utils.getRandomDate());
 
         int countBefore = appService.search(Dispatch.class, new Dispatch())
             .size();
 
-        shipment.delete();
+        dispatch.delete();
 
         int countAfter = appService.search(Dispatch.class, new Dispatch())
             .size();
@@ -387,17 +290,18 @@ public class TestDispatch extends TestDatabase {
         Assert.assertEquals(countBefore - 1, countAfter);
     }
 
-    private List<AliquotWrapper> addAliquotsToContainerRow(
-        PatientVisitWrapper visit, ContainerWrapper container, int row,
-        List<SampleTypeWrapper> sampleTypes) throws Exception {
+    private List<SpecimenWrapper> addAliquotsToContainerRow(
+        ProcessingEventWrapper visit, ContainerWrapper container, int row,
+        List<SpecimenTypeWrapper> sampleTypes) throws Exception {
         int numSampletypes = sampleTypes.size();
         int colCapacity = container.getColCapacity();
-        List<AliquotWrapper> aliquots = new ArrayList<AliquotWrapper>();
+        List<SpecimenWrapper> aliquots = new ArrayList<SpecimenWrapper>();
         for (int i = 0; i < colCapacity; ++i) {
-            aliquots.add(AliquotHelper.addAliquot(
-                sampleTypes.get(r.nextInt(numSampletypes)),
-                ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, visit,
-                row, i));
+            // FIXME
+            // aliquots.add(SpecimenHelper.addAliquot(
+            // sampleTypes.get(r.nextInt(numSampletypes)),
+            // ActivityStatusWrapper.ACTIVE_STATUS_STRING, container, visit,
+            // row, i));
         }
         container.reload();
         visit.reload();
@@ -405,32 +309,30 @@ public class TestDispatch extends TestDatabase {
     }
 
     @Test
-    public void testGetSetAliqutotCollection() throws Exception {
-        String name = "testGetSetAliquotCollection" + r.nextInt();
+    public void testGetSetSpecimenCollection() throws Exception {
+        String name = "testGetSetSpecimenCollection" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
         SiteWrapper senderSite = SiteHelper.addSite(name + "_sender");
-        senderSite.addToStudyCollection(Arrays.asList(study));
         senderSite.persist();
         SiteWrapper receiverSite = SiteHelper.addSite(name + "_receiver");
-        receiverSite.addToStudyCollection(Arrays.asList(study));
         receiverSite.persist();
 
-        senderSite.addStudyDispatchSites(study, Arrays.asList(receiverSite));
         senderSite.persist();
         senderSite.reload();
-        DispatchWrapper shipment = DispatchHelper.addDispatch(senderSite,
-            receiverSite, study,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0));
-        List<SampleTypeWrapper> sampleTypes = SampleTypeWrapper
-            .getAllSampleTypes(appService, false);
+        DispatchWrapper dispatch = DispatchHelper.addDispatch(senderSite,
+            receiverSite, ShippingMethodWrapper.getShippingMethods(appService)
+                .get(0));
+        List<SpecimenTypeWrapper> sampleTypes = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
         ContainerTypeWrapper containerType = ContainerTypeHelper
             .addContainerType(senderSite, name, name, 1, 8, 12, false);
-        containerType.addToSampleTypeCollection(sampleTypes);
+        containerType.addToSpecimenTypeCollection(sampleTypes);
         containerType.persist();
         containerType.reload();
         ContainerTypeWrapper topContainerType = ContainerTypeHelper
             .addContainerTypeRandom(senderSite, name + "top", true);
-        topContainerType.addToChildContainerTypeCollection(Arrays.asList(containerType));
+        topContainerType.addToChildContainerTypeCollection(Arrays
+            .asList(containerType));
         topContainerType.persist();
         topContainerType.reload();
         ContainerWrapper topContainer = ContainerHelper.addContainer(
@@ -444,41 +346,40 @@ public class TestDispatch extends TestDatabase {
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
         study.reload();
-        ShipmentWrapper clinicShipment = ShipmentHelper.addShipment(senderSite,
-            clinic,
-            ShippingMethodWrapper.getShippingMethods(appService).get(0),
-            patient);
-        PatientVisitWrapper visit = PatientVisitHelper.addPatientVisit(patient,
-            clinicShipment, Utils.getRandomDate(), Utils.getRandomDate());
-
-        List<AliquotWrapper> aliquotSet1 = addAliquotsToContainerRow(visit,
-            container, 0, sampleTypes);
-        List<AliquotWrapper> aliquotSet2 = addAliquotsToContainerRow(visit,
-            container, 1, sampleTypes);
-
-        shipment.addNewAliquots(aliquotSet1, true);
-        shipment.persist();
-        shipment.reload();
-
-        List<AliquotWrapper> shipmentAliquots = shipment.getAliquotCollection();
-        Assert.assertEquals(aliquotSet1.size(), shipmentAliquots.size());
-
-        // add more aliquots to row 2
-
-        shipment.addNewAliquots(aliquotSet2, true);
-        shipment.persist();
-        shipment.reload();
-
-        shipmentAliquots = shipment.getAliquotCollection();
-        Assert.assertEquals(aliquotSet1.size() + aliquotSet2.size(),
-            shipmentAliquots.size());
-
-        shipment.removeAliquots(aliquotSet1);
-        shipment.persist();
-        shipment.reload();
-
-        shipmentAliquots = shipment.getAliquotCollection();
-        Assert.assertEquals(aliquotSet2.size(), shipmentAliquots.size());
+        // FIXME
+        // ProcessingEventWrapper visit = ProcessingEventHelper
+        // .addProcessingEvent(clinic, patient, Utils.getRandomDate(),
+        // Utils.getRandomDate());
+        //
+        // List<SpecimenWrapper> aliquotSet1 = addAliquotsToContainerRow(visit,
+        // container, 0, sampleTypes);
+        // List<SpecimenWrapper> aliquotSet2 = addAliquotsToContainerRow(visit,
+        // container, 1, sampleTypes);
+        //
+        // dispatch.addSpecimens(aliquotSet1);
+        // dispatch.persist();
+        // dispatch.reload();
+        //
+        // List<SpecimenWrapper> shipmentAliquots = dispatch
+        // .getSpecimenCollection();
+        // Assert.assertEquals(aliquotSet1.size(), shipmentAliquots.size());
+        //
+        // // add more aliquots to row 2
+        //
+        // dispatch.addSpecimens(aliquotSet2);
+        // dispatch.persist();
+        // dispatch.reload();
+        //
+        // shipmentAliquots = dispatch.getSpecimenCollection();
+        // Assert.assertEquals(aliquotSet1.size() + aliquotSet2.size(),
+        // shipmentAliquots.size());
+        //
+        // dispatch.removeAliquots(aliquotSet1);
+        // dispatch.persist();
+        // dispatch.reload();
+        //
+        // shipmentAliquots = dispatch.getSpecimenCollection();
+        // Assert.assertEquals(aliquotSet2.size(), shipmentAliquots.size());
     }
 
     @Test

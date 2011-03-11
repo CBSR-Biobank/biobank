@@ -8,13 +8,13 @@ import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.HandlerUtil;
 
-import edu.ualberta.med.biobank.forms.AbstractAliquotAdminForm;
+import edu.ualberta.med.biobank.forms.AbstractSpecimenAdminForm;
 
 public class PrintHandler extends AbstractHandler implements IHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
-        AbstractAliquotAdminForm form = (AbstractAliquotAdminForm) HandlerUtil
+        AbstractSpecimenAdminForm form = (AbstractSpecimenAdminForm) HandlerUtil
             .getActiveEditor(event);
         boolean doPrint = MessageDialog.openQuestion(PlatformUI.getWorkbench()
             .getActiveWorkbenchWindow().getShell(), "Print",

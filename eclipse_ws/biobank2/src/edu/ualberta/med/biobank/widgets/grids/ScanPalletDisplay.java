@@ -13,7 +13,6 @@ import org.eclipse.swt.graphics.FontData;
 import org.eclipse.swt.graphics.Rectangle;
 
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
 import edu.ualberta.med.biobank.model.Cell;
 import edu.ualberta.med.biobank.model.CellStatus;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -43,8 +42,8 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         widget.addMouseTrackListener(new MouseTrackAdapter() {
             @Override
             public void mouseHover(MouseEvent e) {
-                PalletCell cell =
-                    (PalletCell) getObjectAtCoordinates(widget, e.x, e.y);
+                PalletCell cell = (PalletCell) getObjectAtCoordinates(widget,
+                    e.x, e.y);
                 if (cell != null) {
                     String msg = cell.getValue();
                     if (cell.getInformation() != null) {
@@ -108,14 +107,10 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     protected String getMiddleTextForBox(Map<RowColPos, ? extends Cell> cells,
         int indexRow, int indexCol) {
         if (cells != null) {
-            PalletCell cell =
-                (PalletCell) cells.get(new RowColPos(indexRow, indexCol));
-            if (cell != null) {
-                String title = cell.getTitle();
-                if (title != null) {
-                    return title;
-                }
-            }
+            PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
+                indexCol));
+            if (cell != null)
+                return cell.getTitle();
         }
         return "";
     }
@@ -132,14 +127,10 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
     protected String getBottomTextForBox(Map<RowColPos, ? extends Cell> cells,
         int indexRow, int indexCol) {
         if (cells != null) {
-            PalletCell cell =
-                (PalletCell) cells.get(new RowColPos(indexRow, indexCol));
-            if (cell != null) {
-                AliquotWrapper aliquot = cell.getAliquot();
-                if (aliquot != null) {
-                    return aliquot.getSampleType().getNameShort();
-                }
-            }
+            PalletCell cell = (PalletCell) cells.get(new RowColPos(indexRow,
+                indexCol));
+            if (cell != null)
+                return cell.getTypeString();
         }
         return "";
     }
@@ -150,9 +141,8 @@ public class ScanPalletDisplay extends AbstractGridDisplay {
         int indexRow, int indexCol, Color defaultBackgroundColor) {
         Color backgroundColor = defaultBackgroundColor;
         if (displayWidget.getCells() != null) {
-            PalletCell cell =
-                (PalletCell) displayWidget.getCells().get(
-                    new RowColPos(indexRow, indexCol));
+            PalletCell cell = (PalletCell) displayWidget.getCells().get(
+                new RowColPos(indexRow, indexCol));
             if (cell != null && cell.getStatus() != null) {
                 backgroundColor = cell.getStatus().getColor();
             }

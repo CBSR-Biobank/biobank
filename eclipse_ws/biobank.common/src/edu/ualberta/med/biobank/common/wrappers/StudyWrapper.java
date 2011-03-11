@@ -15,36 +15,30 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
+import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.ContactPeer;
-import edu.ualberta.med.biobank.common.peer.DispatchInfoPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentPatientPeer;
-import edu.ualberta.med.biobank.common.peer.ShipmentPeer;
-import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.StudyBaseWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.DispatchInfoWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.PvAttrTypeWrapper;
-import edu.ualberta.med.biobank.common.wrappers.internal.StudyPvAttrWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.EventAttrTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Contact;
-import edu.ualberta.med.biobank.model.DispatchInfo;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Study;
-import edu.ualberta.med.biobank.model.StudyPvAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class StudyWrapper extends StudyBaseWrapper {
 
-    private Map<String, StudyPvAttrWrapper> studyPvAttrMap;
+    private Map<String, StudyEventAttrWrapper> studyEventAttrMap;
 
-    private Set<SampleStorageWrapper> deletedSampleStorages = new HashSet<SampleStorageWrapper>();
+    private Set<AliquotedSpecimenWrapper> deletedAliquotedSpecimens = new HashSet<AliquotedSpecimenWrapper>();
 
-    private Set<StudySourceVesselWrapper> deletedStudySourceVessels = new HashSet<StudySourceVesselWrapper>();
+    private Set<SourceSpecimenWrapper> deletedSourceSpecimens = new HashSet<SourceSpecimenWrapper>();
 
-    private Set<StudyPvAttrWrapper> deletedStudyPvAttr = new HashSet<StudyPvAttrWrapper>();
+    private Set<StudyEventAttrWrapper> deletedStudyEventAttr = new HashSet<StudyEventAttrWrapper>();
 
     public StudyWrapper(WritableApplicationService appService,
         Study wrappedObject) {
@@ -53,10 +47,6 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public StudyWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    public List<SiteWrapper> getSiteCollection() {
-        return getSiteCollection(true);
     }
 
     @Override
@@ -68,40 +58,28 @@ public class StudyWrapper extends StudyBaseWrapper {
     }
 
     @Override
-    protected List<String> getPropertyChangeNames() {
-        return StudyPeer.PROP_NAMES;
-    }
-
-    public List<ContactWrapper> getContactCollection() {
-        return getContactCollection(true);
-    }
-
-    public List<SampleStorageWrapper> getSampleStorageCollection() {
-        return getSampleStorageCollection(true);
-    }
-
-    @Override
-    public void addToSampleStorageCollection(
-        List<SampleStorageWrapper> sampleStorageCollection) {
-        super.addToSampleStorageCollection(sampleStorageCollection);
+    public void addToAliquotedSpecimenCollection(
+        List<AliquotedSpecimenWrapper> AliquotedSpecimenCollection) {
+        super.addToAliquotedSpecimenCollection(AliquotedSpecimenCollection);
 
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
-        deletedSampleStorages.removeAll(sampleStorageCollection);
+        deletedAliquotedSpecimens.removeAll(AliquotedSpecimenCollection);
     }
 
     @Override
-    public void removeFromSampleStorageCollection(
-        List<SampleStorageWrapper> sampleStoragesToRemove) {
-        deletedSampleStorages.addAll(sampleStoragesToRemove);
-        super.removeFromSampleStorageCollection(sampleStoragesToRemove);
+    public void removeFromAliquotedSpecimenCollection(
+        List<AliquotedSpecimenWrapper> AliquotedSpecimensToRemove) {
+        deletedAliquotedSpecimens.addAll(AliquotedSpecimensToRemove);
+        super.removeFromAliquotedSpecimenCollection(AliquotedSpecimensToRemove);
     }
 
     /*
-     * Removes the StudyPvAttr objects that are not contained in the collection.
+     * Removes the StudyEventAttr objects that are not contained in the
+     * collection.
      */
-    private void deleteStudyPvAttrs() throws Exception {
-        for (StudyPvAttrWrapper st : deletedStudyPvAttr) {
+    private void deleteStudyEventAttrs() throws Exception {
+        for (StudyEventAttrWrapper st : deletedStudyEventAttr) {
             if (!st.isNew()) {
                 st.delete();
             }
@@ -112,8 +90,8 @@ public class StudyWrapper extends StudyBaseWrapper {
      * Removes the sample storage objects that are not contained in the
      * collection.
      */
-    private void deleteSampleStorages() throws Exception {
-        for (SampleStorageWrapper st : deletedSampleStorages) {
+    private void deleteAliquotedSpecimens() throws Exception {
+        for (AliquotedSpecimenWrapper st : deletedAliquotedSpecimens) {
             if (!st.isNew()) {
                 st.delete();
             }
@@ -124,75 +102,74 @@ public class StudyWrapper extends StudyBaseWrapper {
      * Removes the study source vessel objects that are not contained in the
      * collection.
      */
-    private void deleteStudySourceVessels() throws Exception {
-        for (StudySourceVesselWrapper st : deletedStudySourceVessels) {
+    private void deleteSourceSpecimens() throws Exception {
+        for (SourceSpecimenWrapper st : deletedSourceSpecimens) {
             if (!st.isNew()) {
                 st.delete();
             }
         }
     }
 
-    public List<StudySourceVesselWrapper> getStudySourceVesselCollection() {
-        return getStudySourceVesselCollection(false);
-    }
-
     @Override
-    public void addToStudySourceVesselCollection(
-        List<StudySourceVesselWrapper> newStudySourceVessels) {
-        super.addToStudySourceVesselCollection(newStudySourceVessels);
+    public void addToSourceSpecimenCollection(
+        List<SourceSpecimenWrapper> newSourceSpecimens) {
+        super.addToSourceSpecimenCollection(newSourceSpecimens);
 
         // make sure previously deleted ones, that have been re-added, are
         // no longer deleted
-        deletedStudySourceVessels.removeAll(newStudySourceVessels);
+        deletedSourceSpecimens.removeAll(newSourceSpecimens);
     }
 
     @Override
-    public void removeFromStudySourceVesselCollection(
-        List<StudySourceVesselWrapper> studySourceVesselsToDelete) {
-        deletedStudySourceVessels.addAll(studySourceVesselsToDelete);
-        super.removeFromStudySourceVesselCollection(studySourceVesselsToDelete);
+    public void removeFromSourceSpecimenCollection(
+        List<SourceSpecimenWrapper> SourceSpecimensToDelete) {
+        deletedSourceSpecimens.addAll(SourceSpecimensToDelete);
+        super.removeFromSourceSpecimenCollection(SourceSpecimensToDelete);
     }
 
-    protected Collection<StudyPvAttrWrapper> getStudyPvAttrCollection() {
-        Map<String, StudyPvAttrWrapper> map = getStudyPvAttrMap();
+    protected Collection<StudyEventAttrWrapper> getStudyEventAttrCollection() {
+        Map<String, StudyEventAttrWrapper> map = getStudyEventAttrMap();
         if (map == null) {
             return null;
         }
         return map.values();
     }
 
-    private Map<String, StudyPvAttrWrapper> getStudyPvAttrMap() {
-        if (studyPvAttrMap != null)
-            return studyPvAttrMap;
+    private Map<String, StudyEventAttrWrapper> getStudyEventAttrMap() {
+        if (studyEventAttrMap != null)
+            return studyEventAttrMap;
 
-        studyPvAttrMap = new HashMap<String, StudyPvAttrWrapper>();
+        studyEventAttrMap = new HashMap<String, StudyEventAttrWrapper>();
 
-        List<StudyPvAttrWrapper> pvAttrList = StudyPvAttrWrapper
-            .getStudyPvAttrCollection(this);
+        List<StudyEventAttrWrapper> EventAttrList = StudyEventAttrWrapper
+            .getStudyEventAttrCollection(this);
 
-        for (StudyPvAttrWrapper studyPvAttr : pvAttrList) {
-            studyPvAttrMap.put(studyPvAttr.getLabel(), studyPvAttr);
+        for (StudyEventAttrWrapper studyEventAttr : EventAttrList) {
+            studyEventAttrMap.put(studyEventAttr.getLabel(), studyEventAttr);
         }
-        return studyPvAttrMap;
+        return studyEventAttrMap;
     }
 
-    public String[] getStudyPvAttrLabels() {
-        getStudyPvAttrMap();
-        return studyPvAttrMap.keySet().toArray(new String[] {});
+    public String[] getStudyEventAttrLabels() {
+        getStudyEventAttrMap();
+        return studyEventAttrMap.keySet().toArray(new String[] {});
     }
 
-    protected StudyPvAttrWrapper getStudyPvAttr(String label) throws Exception {
-        getStudyPvAttrMap();
-        StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
-        if (studyPvAttr == null) {
-            throw new Exception("StudyPvAttr with label \"" + label
+    protected StudyEventAttrWrapper getStudyEventAttr(String label)
+        throws Exception {
+        getStudyEventAttrMap();
+        StudyEventAttrWrapper studyEventAttr = studyEventAttrMap.get(label);
+        if (studyEventAttr == null) {
+            throw new Exception("StudyEventAttr with label \"" + label
                 + "\" is invalid");
         }
-        return studyPvAttr;
+        return studyEventAttr;
     }
 
-    public String getStudyPvAttrType(String label) throws Exception {
-        return getStudyPvAttr(label).getPvAttrType().getName();
+    public EventAttrTypeEnum getStudyEventAttrType(String label)
+        throws Exception {
+        return EventAttrTypeEnum.getEventAttrType(getStudyEventAttr(label)
+            .getEventAttrType().getName());
     }
 
     /**
@@ -203,8 +180,8 @@ public class StudyWrapper extends StudyBaseWrapper {
      * @throws Exception hrown if there is no patient visit information item
      *             with the label specified.
      */
-    public String[] getStudyPvAttrPermissible(String label) throws Exception {
-        String joinedPossibleValues = getStudyPvAttr(label).getPermissible();
+    public String[] getStudyEventAttrPermissible(String label) throws Exception {
+        String joinedPossibleValues = getStudyEventAttr(label).getPermissible();
         if (joinedPossibleValues == null)
             return null;
         return joinedPossibleValues.split(";");
@@ -218,9 +195,9 @@ public class StudyWrapper extends StudyBaseWrapper {
      * @return True if the attribute is locked. False otherwise.
      * @throws Exception
      */
-    public ActivityStatusWrapper getStudyPvAttrActivityStatus(String label)
+    public ActivityStatusWrapper getStudyEventAttrActivityStatus(String label)
         throws Exception {
-        return getStudyPvAttr(label).getActivityStatus();
+        return getStudyEventAttr(label).getActivityStatus();
     }
 
     /**
@@ -234,45 +211,46 @@ public class StudyWrapper extends StudyBaseWrapper {
      * 
      * @throws Exception Thrown if the attribute type does not exist.
      */
-    public void setStudyPvAttr(String label, String type,
+    public void setStudyEventAttr(String label, EventAttrTypeEnum type,
         String[] permissibleValues) throws Exception {
-        Map<String, PvAttrTypeWrapper> pvAttrTypeMap = PvAttrTypeWrapper
-            .getAllPvAttrTypesMap(appService);
-        PvAttrTypeWrapper pvAttrType = pvAttrTypeMap.get(type);
-        if (pvAttrType == null) {
+        Map<String, EventAttrTypeWrapper> EventAttrTypeMap = EventAttrTypeWrapper
+            .getAllEventAttrTypesMap(appService);
+        EventAttrTypeWrapper EventAttrType = EventAttrTypeMap.get(type
+            .getName());
+        if (EventAttrType == null) {
             throw new Exception("the pv attribute type \"" + type
                 + "\" does not exist");
         }
 
-        getStudyPvAttrMap();
-        StudyPvAttrWrapper studyPvAttr = studyPvAttrMap.get(label);
+        getStudyEventAttrMap();
+        StudyEventAttrWrapper studyEventAttr = studyEventAttrMap.get(label);
 
-        if (type.startsWith("select_")) {
+        if (type.isSelectType()) {
             // type has permissible values
-            if ((studyPvAttr == null) && (permissibleValues == null)) {
+            if ((studyEventAttr == null) && (permissibleValues == null)) {
                 // nothing to do
                 return;
             }
 
-            if ((studyPvAttr != null) && (permissibleValues == null)) {
-                deleteStudyPvAttr(label);
+            if ((studyEventAttr != null) && (permissibleValues == null)) {
+                deleteStudyEventAttr(label);
                 return;
             }
         }
 
-        if (studyPvAttr == null) {
+        if (studyEventAttr == null) {
             // does not yet exist
-            studyPvAttr = new StudyPvAttrWrapper(appService);
-            studyPvAttr.setLabel(label);
-            studyPvAttr.setPvAttrType(pvAttrType);
-            studyPvAttr.setStudy(this);
+            studyEventAttr = new StudyEventAttrWrapper(appService);
+            studyEventAttr.setLabel(label);
+            studyEventAttr.setEventAttrType(EventAttrType);
+            studyEventAttr.setStudy(this);
         }
 
-        deletedStudyPvAttr.remove(studyPvAttr);
-        studyPvAttr.setActivityStatus(ActivityStatusWrapper
+        deletedStudyEventAttr.remove(studyEventAttr);
+        studyEventAttr.setActivityStatus(ActivityStatusWrapper
             .getActiveActivityStatus(appService));
-        studyPvAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
-        studyPvAttrMap.put(label, studyPvAttr);
+        studyEventAttr.setPermissible(StringUtils.join(permissibleValues, ';'));
+        studyEventAttrMap.put(label, studyEventAttr);
     }
 
     /**
@@ -284,8 +262,9 @@ public class StudyWrapper extends StudyBaseWrapper {
      * @throws Exception Thrown if there is no possible patient visit with the
      *             label specified.
      */
-    public void setStudyPvAttr(String label, String type) throws Exception {
-        setStudyPvAttr(label, type, null);
+    public void setStudyEventAttr(String label, EventAttrTypeEnum type)
+        throws Exception {
+        setStudyEventAttr(label, type, null);
     }
 
     /**
@@ -299,11 +278,11 @@ public class StudyWrapper extends StudyBaseWrapper {
      * 
      * @throws Exception if attribute with label does not exist.
      */
-    public void setStudyPvAttrActivityStatus(String label,
+    public void setStudyEventAttrActivityStatus(String label,
         ActivityStatusWrapper activityStatus) throws Exception {
-        getStudyPvAttrMap();
-        StudyPvAttrWrapper studyPvAttr = getStudyPvAttr(label);
-        studyPvAttr.setActivityStatus(activityStatus);
+        getStudyEventAttrMap();
+        StudyEventAttrWrapper studyEventAttr = getStudyEventAttr(label);
+        studyEventAttr.setActivityStatus(activityStatus);
     }
 
     /**
@@ -312,39 +291,30 @@ public class StudyWrapper extends StudyBaseWrapper {
      * @param label The label used for the attribute.
      * @throws Exception if attribute with label does not exist.
      */
-    public void deleteStudyPvAttr(String label) throws Exception {
-        getStudyPvAttrMap();
-        StudyPvAttrWrapper studyPvAttr = getStudyPvAttr(label);
-        if (studyPvAttr.isUsedByPatientVisits()) {
-            throw new BiobankCheckException("StudyPvAttr with label \"" + label
-                + "\" is in use by patient visits");
+    public void deleteStudyEventAttr(String label) throws Exception {
+        getStudyEventAttrMap();
+        StudyEventAttrWrapper studyEventAttr = getStudyEventAttr(label);
+        if (studyEventAttr.isUsedByProcessingEvents()) {
+            throw new BiobankCheckException("StudyEventAttr with label \""
+                + label + "\" is in use by patient visits");
         }
-        studyPvAttrMap.remove(label);
-        deletedStudyPvAttr.add(studyPvAttr);
+        studyEventAttrMap.remove(label);
+        deletedStudyEventAttr.add(studyEventAttr);
     }
 
     public List<ClinicWrapper> getClinicCollection() {
         // FIXME: is it faster to do an HQL query here?
-        List<ContactWrapper> contacts = getContactCollection();
+        // FIXME answer: might be faster but need to check when this is needed
+        // (what if
+        // want to show the current modification in the studyEntryform, before
+        // it is saved in the DB)
+        List<ContactWrapper> contacts = getContactCollection(false);
         List<ClinicWrapper> clinicWrappers = new ArrayList<ClinicWrapper>();
         if (contacts != null)
             for (ContactWrapper contact : contacts) {
                 clinicWrappers.add(contact.getClinic());
             }
         return clinicWrappers;
-    }
-
-    public boolean hasClinic(String clinicNameShort) {
-        List<ClinicWrapper> clinics = getClinicCollection();
-        if (clinics != null)
-            for (ClinicWrapper c : clinics)
-                if (c.getNameShort().equals(clinicNameShort))
-                    return true;
-        return false;
-    }
-
-    public List<PatientWrapper> getPatientCollection() {
-        return getPatientCollection(false);
     }
 
     private static final String PATIENT_QRY = "select patients from "
@@ -358,7 +328,7 @@ public class StudyWrapper extends StudyBaseWrapper {
             Arrays.asList(new Object[] { patientNumber, getId() }));
         List<Patient> result = appService.query(criteria);
         if (result.size() > 1) {
-            throw new BiobankCheckException("Invalid size for HQL query result");
+            throw new BiobankQueryResultSizeException();
         } else if (result.size() == 1) {
             return new PatientWrapper(appService, result.get(0));
         }
@@ -375,15 +345,7 @@ public class StudyWrapper extends StudyBaseWrapper {
     public boolean hasPatients() throws ApplicationException, BiobankException {
         HQLCriteria criteria = new HQLCriteria(HAS_PATIENTS_QRY,
             Arrays.asList(new Object[] { getId() }));
-        List<Long> result = appService.query(criteria);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0) > 0;
-    }
-
-    public long getPatientCount() throws ApplicationException, BiobankException {
-        return getPatientCount(false);
+        return getCountResult(appService, criteria) > 0;
     }
 
     public static final String PATIENT_COUNT_QRY = "select count(patients) from "
@@ -402,27 +364,19 @@ public class StudyWrapper extends StudyBaseWrapper {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(PATIENT_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));
-            List<Long> results = appService.query(criteria);
-            if (results.size() != 1) {
-                throw new BiobankQueryResultSizeException();
-            }
-            return results.get(0);
+            return getCountResult(appService, criteria);
         }
-        List<PatientWrapper> list = getPatientCollection();
+        List<PatientWrapper> list = getPatientCollection(false);
         if (list == null) {
             return 0;
         }
         return list.size();
     }
 
-    public List<DispatchInfoWrapper> getDispatchInfoCollection() {
-        return getDispatchInfoCollection(true);
-    }
-
     @Override
     public int compareTo(ModelWrapper<Study> wrapper) {
         if (wrapper instanceof StudyWrapper) {
-            String nameShort1 = wrappedObject.getNameShort();
+            String nameShort1 = getNameShort();
             String nameShort2 = wrapper.wrappedObject.getNameShort();
 
             int compare = 0;
@@ -430,7 +384,7 @@ public class StudyWrapper extends StudyBaseWrapper {
                 compare = nameShort1.compareTo(nameShort2);
             }
             if (compare == 0) {
-                String name1 = wrappedObject.getName();
+                String name1 = getName();
                 String name2 = wrapper.wrappedObject.getName();
 
                 return name1.compareTo(name2);
@@ -438,133 +392,6 @@ public class StudyWrapper extends StudyBaseWrapper {
             return compare;
         }
         return 0;
-    }
-
-    private static final String PATIENT_COUNT_FOR_SITE_QRY = "select count(distinct patients) from "
-        + Site.class.getName()
-        + " as site join site."
-        + SitePeer.SHIPMENT_COLLECTION.getName()
-        + " as shipments join shipments."
-        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps join sps."
-        + ShipmentPatientPeer.PATIENT.getName()
-        + " as patients where site."
-        + SitePeer.ID.getName()
-        + "=? and "
-        + "patients."
-        + Property.concatNames(PatientPeer.STUDY, StudyPeer.ID)
-        + "=?";
-
-    public long getPatientCountForSite(SiteWrapper site)
-        throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_SITE_QRY,
-            Arrays.asList(new Object[] { site.getId(), getId() }));
-        List<Long> result = appService.query(c);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
-    }
-
-    private static final String VISIT_COUNT_FOR_SITE_QRY = "select count(distinct visits) from "
-        + Site.class.getName()
-        + " as site join site."
-        + SitePeer.SHIPMENT_COLLECTION.getName()
-        + " as shipments join shipments."
-        + ShipmentPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps join sps."
-        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
-        + " as visits where site."
-        + SitePeer.ID.getName()
-        + "=? and sps."
-        + Property.concatNames(ShipmentPatientPeer.PATIENT, PatientPeer.STUDY,
-            StudyPeer.ID) + "=?";
-
-    public long getPatientVisitCountForSite(SiteWrapper site)
-        throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_SITE_QRY,
-            Arrays.asList(new Object[] { site.getId(), getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
-    }
-
-    public static final String PATIENT_COUNT_FOR_CLINIC_QRY = "select count(distinct patients) from "
-        + Study.class.getName()
-        + " as study join study."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patients join patients."
-        + PatientPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps join sps."
-        + Property.concatNames(ShipmentPatientPeer.SHIPMENT,
-            ShipmentPeer.CLINIC)
-        + " as clinic where study."
-        + StudyPeer.ID.getName()
-        + "=? and clinic."
-        + ClinicPeer.ID.getName()
-        + "=?";
-
-    public long getPatientCountForClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(PATIENT_COUNT_FOR_CLINIC_QRY,
-            Arrays.asList(new Object[] { getId(), clinic.getId() }));
-        List<Long> result = appService.query(c);
-        if (result.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return result.get(0);
-    }
-
-    public static final String VISIT_COUNT_FOR_CLINIC_QRY = "select count(distinct visits) from "
-        + Study.class.getName()
-        + " as study join study."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patients join patients."
-        + PatientPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps join sps."
-        + Property.concatNames(ShipmentPatientPeer.SHIPMENT,
-            ShipmentPeer.CLINIC)
-        + " as clinic join sps."
-        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
-        + " as visits where study."
-        + StudyPeer.ID.getName()
-        + "=? and clinic."
-        + ClinicPeer.ID.getName()
-        + "=? and sps."
-        + Property.concatNames(ShipmentPatientPeer.PATIENT, PatientPeer.STUDY)
-        + "=study";
-
-    public long getPatientVisitCountForClinic(ClinicWrapper clinic)
-        throws ApplicationException, BiobankException {
-        HQLCriteria c = new HQLCriteria(VISIT_COUNT_FOR_CLINIC_QRY,
-            Arrays.asList(new Object[] { getId(), clinic.getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
-    }
-
-    public static final String VISIT_COUNT_QRY = "select count(visits) from "
-        + Study.class.getName() + " as study inner join study."
-        + StudyPeer.PATIENT_COLLECTION.getName()
-        + " as patients inner join patients."
-        + PatientPeer.SHIPMENT_PATIENT_COLLECTION.getName()
-        + " as sps inner join sps."
-        + ShipmentPatientPeer.PATIENT_VISIT_COLLECTION.getName()
-        + " as visits where study." + StudyPeer.ID.getName() + "=? ";
-
-    public long getPatientVisitCount() throws ApplicationException,
-        BiobankException {
-        HQLCriteria c = new HQLCriteria(VISIT_COUNT_QRY,
-            Arrays.asList(new Object[] { getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
     }
 
     @Override
@@ -578,23 +405,17 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     @Override
     protected void persistDependencies(Study origObject) throws Exception {
-        if (studyPvAttrMap != null) {
-            Collection<StudyPvAttr> allStudyPvAttrObjects = new HashSet<StudyPvAttr>();
-            List<StudyPvAttrWrapper> allStudyPvAttrWrappers = new ArrayList<StudyPvAttrWrapper>();
-            for (StudyPvAttrWrapper ss : studyPvAttrMap.values()) {
-                allStudyPvAttrObjects.add(ss.getWrappedObject());
-                allStudyPvAttrWrappers.add(ss);
+        if (studyEventAttrMap != null) {
+            List<StudyEventAttrWrapper> allStudyEventAttrWrappers = new ArrayList<StudyEventAttrWrapper>();
+            for (StudyEventAttrWrapper ss : studyEventAttrMap.values()) {
+                allStudyEventAttrWrappers.add(ss);
             }
-            Collection<StudyPvAttr> oldStudyPvAttrs = wrappedObject
-                .getStudyPvAttrCollection();
-            wrappedObject.setStudyPvAttrCollection(allStudyPvAttrObjects);
-            propertyChangeSupport.firePropertyChange("studyPvAttrCollection",
-                oldStudyPvAttrs, allStudyPvAttrObjects);
-            propertiesMap.put("studyPvAttrCollection", allStudyPvAttrWrappers);
+            setWrapperCollection(StudyPeer.STUDY_EVENT_ATTR_COLLECTION,
+                allStudyEventAttrWrappers);
         }
-        deleteSampleStorages();
-        deleteStudySourceVessels();
-        deleteStudyPvAttrs();
+        deleteAliquotedSpecimens();
+        deleteSourceSpecimens();
+        deleteStudyEventAttrs();
     }
 
     public static final String IS_LINKED_TO_CLINIC_QRY = "select count(clinics) from "
@@ -613,19 +434,15 @@ public class StudyWrapper extends StudyBaseWrapper {
         throws ApplicationException, BiobankException {
         HQLCriteria c = new HQLCriteria(IS_LINKED_TO_CLINIC_QRY,
             Arrays.asList(new Object[] { getId(), clinic.getId() }));
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0) != 0;
+        return getCountResult(appService, c) != 0;
     }
 
     @Override
     public void resetInternalFields() {
-        studyPvAttrMap = null;
-        deletedSampleStorages.clear();
-        deletedStudySourceVessels.clear();
-        deletedStudyPvAttr.clear();
+        studyEventAttrMap = null;
+        deletedAliquotedSpecimens.clear();
+        deletedSourceSpecimens.clear();
+        deletedStudyEventAttr.clear();
     }
 
     public static final String ALL_STUDIES_QRY = "from "
@@ -633,12 +450,9 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public static List<StudyWrapper> getAllStudies(
         WritableApplicationService appService) throws ApplicationException {
-        List<StudyWrapper> wrappers = new ArrayList<StudyWrapper>();
         HQLCriteria c = new HQLCriteria(ALL_STUDIES_QRY);
-        List<Study> studies = appService.query(c);
-        for (Study study : studies)
-            wrappers.add(new StudyWrapper(appService, study));
-        return wrappers;
+        return ModelWrapper.wrapModelCollection(appService,
+            appService.query(c), StudyWrapper.class);
     }
 
     public static final String COUNT_QRY = "select count (*) from "
@@ -646,12 +460,7 @@ public class StudyWrapper extends StudyBaseWrapper {
 
     public static long getCount(WritableApplicationService appService)
         throws BiobankException, ApplicationException {
-        HQLCriteria c = new HQLCriteria(COUNT_QRY);
-        List<Long> results = appService.query(c);
-        if (results.size() != 1) {
-            throw new BiobankQueryResultSizeException();
-        }
-        return results.get(0);
+        return getCountResult(appService, new HQLCriteria(COUNT_QRY));
     }
 
     @Override
@@ -659,36 +468,28 @@ public class StudyWrapper extends StudyBaseWrapper {
         return getName();
     }
 
-    public static final String DISP_DEST_SITE_COLL_QRY = "select info.destSiteCollection from "
-        + DispatchInfo.class.getName()
-        + " as info where info."
-        + Property.concatNames(DispatchInfoPeer.STUDY, StudyPeer.ID)
-        + " = ? and info"
-        + Property.concatNames(DispatchInfoPeer.SRC_SITE, SitePeer.ID) + "=?";
+    private static final String COLLECTION_EVENT_COUNT_QRY = "select count(distinct ce) from "
+        + CollectionEvent.class.getName()
+        + " as ce where ce."
+        + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.STUDY,
+            StudyPeer.ID) + "=?";
 
-    public List<SiteWrapper> getDispatchDestSiteCollection(SiteWrapper site)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(DISP_DEST_SITE_COLL_QRY,
-            Arrays.asList(new Object[] { getId(), site.getId() }));
-        List<Site> results = appService.query(criteria);
-        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
-        for (Site res : results) {
-            wrappers.add(new SiteWrapper(appService, res));
+    public long getCollectionEventCount(boolean fast)
+        throws ApplicationException, BiobankException {
+        if (fast) {
+            HQLCriteria c = new HQLCriteria(COLLECTION_EVENT_COUNT_QRY,
+                Arrays.asList(new Object[] { getId() }));
+            return getCountResult(appService, c);
         }
-        return wrappers;
+        return getCollectionEventWrapper().size();
     }
 
-    public List<SiteWrapper> getDispatchAllSrcSites()
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(
-            "select info.srcSite from " + DispatchInfo.class.getName()
-                + " as info where info.study.id = ?",
-            Arrays.asList(new Object[] { getId() }));
-        List<Site> results = appService.query(criteria);
-        List<SiteWrapper> wrappers = new ArrayList<SiteWrapper>();
-        for (Site res : results) {
-            wrappers.add(new SiteWrapper(appService, res));
+    public List<CollectionEventWrapper> getCollectionEventWrapper() {
+        List<CollectionEventWrapper> cEvents = new ArrayList<CollectionEventWrapper>();
+        for (PatientWrapper p : getPatientCollection(false)) {
+            cEvents.addAll(p.getCollectionEventCollection(false));
         }
-        return wrappers;
+        return cEvents;
     }
+
 }

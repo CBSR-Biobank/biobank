@@ -22,7 +22,7 @@ import org.eclipse.ui.forms.events.ExpansionAdapter;
 import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.widgets.Section;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
@@ -158,7 +158,7 @@ public class UserManagementDialog extends BiobankDialog {
                 currentGroupList = SessionManager.getAppService()
                     .getSecurityGroups();
             } catch (ApplicationException e) {
-                BioBankPlugin.openAsyncError("Unable to load groups.", e);
+                BiobankPlugin.openAsyncError("Unable to load groups.", e);
             }
         }
         return currentGroupList;
@@ -170,7 +170,7 @@ public class UserManagementDialog extends BiobankDialog {
                 currentUserList = SessionManager.getAppService()
                     .getSecurityUsers();
             } catch (ApplicationException e) {
-                BioBankPlugin.openAsyncError("Unable to load users.", e);
+                BiobankPlugin.openAsyncError("Unable to load users.", e);
             }
         }
         return currentUserList;
@@ -182,7 +182,7 @@ public class UserManagementDialog extends BiobankDialog {
             .getActiveWorkbenchWindow().getShell(), user, getGroups(), true);
         int res = dlg.open();
         if (res == Status.OK) {
-            BioBankPlugin.openAsyncInformation(USER_ADDED_TITLE,
+            BiobankPlugin.openAsyncInformation(USER_ADDED_TITLE,
                 MessageFormat.format(USER_ADDED_MESSAGE, user.getLogin()));
             getUsers().add(user);
             userInfoTable.reloadCollection(getUsers(), user);
@@ -195,7 +195,7 @@ public class UserManagementDialog extends BiobankDialog {
             .getActiveWorkbenchWindow().getShell(), group, true);
         int res = dlg.open();
         if (res == Status.OK) {
-            BioBankPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
+            BiobankPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
                 MessageFormat.format(GROUP_ADDED_MESSAGE, group.getName()));
             getGroups().add(group);
             groupInfoTable.reloadCollection(getGroups(), group);
@@ -238,8 +238,8 @@ public class UserManagementDialog extends BiobankDialog {
         }
 
         ToolItem titem = new ToolItem(tbar, SWT.NULL);
-        titem.setImage(BioBankPlugin.getDefault().getImageRegistry()
-            .get(BioBankPlugin.IMG_ADD));
+        titem.setImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_ADD));
         titem.setToolTipText(addTooltip);
         titem.addSelectionListener(addListener);
         return section;

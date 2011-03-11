@@ -57,7 +57,7 @@ public class HbmStrings {
         return instance;
     }
 
-    public void doWork(AppArgs appArgs) {
+    public void doWork(AppArgs appArgs) throws Exception {
         this.appArgs = appArgs;
 
         if (appArgs.verbose) {
@@ -66,35 +66,30 @@ public class HbmStrings {
             LOGGER.info("  Template: " + appArgs.template);
         }
 
-        try {
-            ModelUmlParser.getInstance().geDataModel(appArgs.modelFileName);
+        ModelUmlParser.getInstance().geDataModel(appArgs.modelFileName);
 
-            if (appArgs.verbose) {
-                for (String className : ModelUmlParser.getInstance()
-                    .getDmTableSet()) {
-                    Map<String, Attribute> attrMap = ModelUmlParser
-                        .getInstance().getDmTableAttrMap(className);
-                    for (String attrName : attrMap.keySet()) {
-                        String type = attrMap.get(attrName).getType();
-                        if (!type.startsWith("VARCHAR")
-                            && !type.startsWith("TEXT"))
-                            continue;
+        if (appArgs.verbose) {
+            for (String className : ModelUmlParser.getInstance()
+                .getDmTableSet()) {
+                Map<String, Attribute> attrMap = ModelUmlParser.getInstance()
+                    .getDmTableAttrMap(className);
+                for (String attrName : attrMap.keySet()) {
+                    String type = attrMap.get(attrName).getType();
+                    if (!type.startsWith("VARCHAR") && !type.startsWith("TEXT"))
+                        continue;
 
-                        LOGGER.info("  " + className + "." + attrName + ": "
-                            + type);
-                    }
+                    LOGGER
+                        .info("  " + className + "." + attrName + ": " + type);
                 }
             }
-
-            for (String file : getHbmFiles(appArgs.hbmDir)) {
-                updateHbmFile(file);
-            }
-
-            createVarCharLengthsSourceCode();
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
+
+        for (String file : getHbmFiles(appArgs.hbmDir)) {
+            updateHbmFile(file);
+        }
+
+        createVarCharLengthsSourceCode();
+
     }
 
     public boolean getVerbose() throws Exception {
@@ -213,12 +208,8 @@ public class HbmStrings {
         reader.close();
     }
 
-    public static void main(String argv[]) {
-        try {
-            HbmStrings.getInstance().doWork(parseCommandLine(argv));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    public static void main(String argv[]) throws Exception {
+        HbmStrings.getInstance().doWork(parseCommandLine(argv));
     }
 
     /*

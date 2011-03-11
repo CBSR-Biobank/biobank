@@ -1,19 +1,18 @@
 package edu.ualberta.med.biobank.test.reports;
 
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
+import edu.ualberta.med.biobank.model.AliquotedSpecimen;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.PatientVisit;
-import edu.ualberta.med.biobank.model.SampleStorage;
+import edu.ualberta.med.biobank.model.Specimen;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
@@ -24,12 +23,11 @@ import java.util.List;
 public class CachedReportDataSource implements ReportDataSource {
     private WritableApplicationService appService;
     private List<SiteWrapper> sites;
-    private List<SampleTypeWrapper> sampleTypes;
-    private List<SampleStorageWrapper> sampleStorages;
-    private List<AliquotWrapper> aliquots;
+    private List<SpecimenTypeWrapper> sampleTypes;
+    private List<AliquotedSpecimenWrapper> sampleStorages;
+    private List<SpecimenWrapper> aliquots;
     private List<ContainerWrapper> containers;
     private List<StudyWrapper> studies;
-    private List<PatientVisitWrapper> patientVisits;
     private List<PatientWrapper> patients;
 
     public CachedReportDataSource(WritableApplicationService appService) {
@@ -43,39 +41,41 @@ public class CachedReportDataSource implements ReportDataSource {
         return sites;
     }
 
-    public List<SampleTypeWrapper> getSampleTypes() throws ApplicationException {
+    public List<SpecimenTypeWrapper> getSpecimenTypes()
+        throws ApplicationException {
         if (sampleTypes == null) {
-            sampleTypes = SampleTypeWrapper
-                .getAllSampleTypes(appService, false);
+            sampleTypes = SpecimenTypeWrapper.getAllSpecimenTypes(appService,
+                false);
         }
         return sampleTypes;
     }
 
-    public List<SampleStorageWrapper> getSampleStorages()
+    public List<AliquotedSpecimenWrapper> getAliquotedSpecimens()
         throws ApplicationException {
         if (sampleStorages == null) {
             HQLCriteria criteria = new HQLCriteria("from "
-                + SampleStorage.class.getName());
-            List<SampleStorage> rawSampleStorage = appService.query(criteria);
+                + AliquotedSpecimen.class.getName());
+            List<AliquotedSpecimen> rawAliquotedSpecimen = appService
+                .query(criteria);
 
-            sampleStorages = new ArrayList<SampleStorageWrapper>();
-            for (SampleStorage sampleStorage : rawSampleStorage) {
-                sampleStorages.add(new SampleStorageWrapper(appService,
+            sampleStorages = new ArrayList<AliquotedSpecimenWrapper>();
+            for (AliquotedSpecimen sampleStorage : rawAliquotedSpecimen) {
+                sampleStorages.add(new AliquotedSpecimenWrapper(appService,
                     sampleStorage));
             }
         }
         return sampleStorages;
     }
 
-    public List<AliquotWrapper> getAliquots() throws ApplicationException {
+    public List<SpecimenWrapper> getSpecimens() throws ApplicationException {
         if (aliquots == null) {
             HQLCriteria criteria = new HQLCriteria("from "
-                + Aliquot.class.getName());
-            List<Aliquot> rawAliquots = appService.query(criteria);
+                + Specimen.class.getName());
+            List<Specimen> rawSpecimens = appService.query(criteria);
 
-            aliquots = new ArrayList<AliquotWrapper>();
-            for (Aliquot aliquot : rawAliquots) {
-                aliquots.add(new AliquotWrapper(appService, aliquot));
+            aliquots = new ArrayList<SpecimenWrapper>();
+            for (Specimen aliquot : rawSpecimens) {
+                aliquots.add(new SpecimenWrapper(appService, aliquot));
             }
         }
         return aliquots;
@@ -99,19 +99,21 @@ public class CachedReportDataSource implements ReportDataSource {
         return studies;
     }
 
-    public List<PatientVisitWrapper> getPatientVisits()
+    public List<ProcessingEventWrapper> getPatientVisits()
         throws ApplicationException {
-        if (patientVisits == null) {
-            HQLCriteria criteria = new HQLCriteria("from "
-                + PatientVisit.class.getName());
-            List<PatientVisit> rawVisits = appService.query(criteria);
-
-            patientVisits = new ArrayList<PatientVisitWrapper>();
-            for (PatientVisit visit : rawVisits) {
-                patientVisits.add(new PatientVisitWrapper(appService, visit));
-            }
-        }
-        return patientVisits;
+        return null;
+        // FIXME: patient visits need to be converted
+        // if (patientVisits == null) {
+        // HQLCriteria criteria = new HQLCriteria("from "
+        // + ProcessingEvent.class.getName());
+        // List<PatientVisit> rawVisits = appService.query(criteria);
+        //
+        // patientVisits = new ArrayList<ProcessingEventWrapper>();
+        // for (PatientVisit visit : rawVisits) {
+        // patientVisits.add(new ProcessingEventWrapper(appService, visit));
+        // }
+        // }
+        // return patientVisits;
     }
 
     public List<PatientWrapper> getPatients() throws ApplicationException {

@@ -9,14 +9,17 @@ import org.eclipse.ui.ISources;
 public class SessionState extends AbstractSourceProvider {
     public final static String LOGIN_STATE_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.loginState";
     public final static String IS_WEB_ADMIN_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.isWebAdmin";
+    public final static String HAS_WORKING_CENTER_SOURCE_NAME = "edu.ualberta.med.biobank.sourceprovider.hasWorkingCenter";
     public final static String LOGGED_IN = "loggedIn";
     public final static String LOGGED_OUT = "loggedOut";
     boolean loggedIn;
     boolean isWebAdmin;
+    private boolean hasWorkingCenter;
 
     @Override
     public String[] getProvidedSourceNames() {
-        return new String[] { LOGIN_STATE_SOURCE_NAME, IS_WEB_ADMIN_SOURCE_NAME };
+        return new String[] { LOGIN_STATE_SOURCE_NAME,
+            IS_WEB_ADMIN_SOURCE_NAME, HAS_WORKING_CENTER_SOURCE_NAME };
     }
 
     @Override
@@ -26,6 +29,8 @@ public class SessionState extends AbstractSourceProvider {
         currentStateMap.put(LOGIN_STATE_SOURCE_NAME, currentState);
         currentStateMap.put(IS_WEB_ADMIN_SOURCE_NAME,
             Boolean.toString((isWebAdmin)));
+        currentStateMap.put(HAS_WORKING_CENTER_SOURCE_NAME,
+            Boolean.toString(hasWorkingCenter));
         return currentStateMap;
     }
 
@@ -38,7 +43,8 @@ public class SessionState extends AbstractSourceProvider {
             return; // no change
         this.loggedIn = loggedIn;
         String currentState = loggedIn ? LOGGED_IN : LOGGED_OUT;
-        fireSourceChanged(ISources.WORKBENCH, LOGIN_STATE_SOURCE_NAME, currentState);
+        fireSourceChanged(ISources.WORKBENCH, LOGIN_STATE_SOURCE_NAME,
+            currentState);
     }
 
     public void setWebAdmin(boolean isWebAdmin) {
@@ -52,4 +58,13 @@ public class SessionState extends AbstractSourceProvider {
         fireSourceChanged(ISources.WORKBENCH, IS_WEB_ADMIN_SOURCE_NAME,
             isWebAdmin);
     }
+
+    public void setHasWorkingCenter(boolean hasWorkingCenter) {
+        if (this.hasWorkingCenter == hasWorkingCenter)
+            return; // no change
+        this.hasWorkingCenter = hasWorkingCenter;
+        fireSourceChanged(ISources.WORKBENCH, HAS_WORKING_CENTER_SOURCE_NAME,
+            isWebAdmin);
+    }
+
 }

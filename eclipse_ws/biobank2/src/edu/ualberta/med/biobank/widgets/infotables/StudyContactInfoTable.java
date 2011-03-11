@@ -41,7 +41,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
     public StudyContactInfoTable(Composite parent, StudyWrapper study) {
         super(parent, null, HEADINGS, 10);
         this.study = study;
-        this.setCollection(study.getContactCollection());
+        this.setCollection(study.getContactCollection(true));
     }
 
     @Override
@@ -94,8 +94,8 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         ClinicWrapper clinic = contact.getClinic();
         if (clinic != null) {
             info.clinicNameShort = clinic.getNameShort();
-            info.patientCount = study.getPatientCountForClinic(clinic);
-            info.visitCount = study.getPatientVisitCountForClinic(clinic);
+            info.patientCount = clinic.getPatientCountForStudy(study);
+            info.visitCount = clinic.getCollectionEventCountForStudy(study);
         }
         info.contactName = contact.getName();
         info.contactTitle = contact.getTitle();

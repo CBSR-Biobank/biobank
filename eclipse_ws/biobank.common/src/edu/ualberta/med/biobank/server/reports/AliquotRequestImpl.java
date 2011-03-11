@@ -7,25 +7,25 @@ import java.util.List;
 
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.reports.BiobankReport;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.model.Aliquot;
-import edu.ualberta.med.biobank.model.AliquotPosition;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
 
 public class AliquotRequestImpl extends AbstractReport {
 
-    private static final String QUERY = "select p.aliquot from "
-        + AliquotPosition.class.getName()
-        + " p where p.container.label not like '"
-        + SENT_SAMPLES_FREEZER_NAME
-        + "' and p.aliquot.patientVisit.shipmentPatient.patient.pnumber like ? and"
-        + " datediff(p.aliquot.patientVisit.dateDrawn, ?) = 0  and"
-        + " p.aliquot.sampleType.nameShort like ? and p.aliquot.activityStatus.name != 'Closed' ORDER BY p.aliquot.activityStatus.name, RAND()";
+    // private static final String QUERY = "select p.aliquot from "
+    // + AliquotPosition.class.getName()
+    // + " p where p.container.label not like '"
+    // + SENT_SAMPLES_FREEZER_NAME
+    // +
+    // "' and p.aliquot.patientVisit.shipmentPatient.patient.pnumber like ? and"
+    // + " datediff(p.aliquot.patientVisit.dateDrawn, ?) = 0  and"
+    // +
+    // " p.aliquot.sampleType.nameShort like ? and p.aliquot.activityStatus.name != 'Closed' ORDER BY p.aliquot.activityStatus.name, RAND()";
 
     public AliquotRequestImpl(BiobankReport report) {
-        super(QUERY, report);
+        // super(QUERY, report);
+        super("", report);
     }
 
     @Override
@@ -39,7 +39,7 @@ public class AliquotRequestImpl extends AbstractReport {
 
             c = new HQLCriteria(queryString);
             c.setParameters(Arrays.asList(new Object[] { request.getPnumber(),
-                request.getDateDrawn(), request.getSampleTypeNameShort() }));
+                request.getDateDrawn(), request.getSpecimenTypeNameShort() }));
             // need to limit query size but not possible in hql
             List<Object> queried = appService.query(c);
 
@@ -50,7 +50,7 @@ public class AliquotRequestImpl extends AbstractReport {
             }
             if (queried.size() < maxResults)
                 results.add(getNotFoundRow(request.getPnumber(),
-                    request.getDateDrawn(), request.getSampleTypeNameShort(),
+                    request.getDateDrawn(), request.getSpecimenTypeNameShort(),
                     maxResults, queried.size()));
         }
         return results;
@@ -72,20 +72,21 @@ public class AliquotRequestImpl extends AbstractReport {
             if (ob instanceof Object[]) {
                 modifiedResults.add(ob);
             } else {
-                Aliquot aliquot = (Aliquot) ob;
-                String pnumber = aliquot.getPatientVisit().getShipmentPatient()
-                    .getPatient().getPnumber();
-                String inventoryId = aliquot.getInventoryId();
-                Date dateDrawn = aliquot.getPatientVisit().getDateDrawn();
-                String stName = aliquot.getSampleType().getNameShort();
-                String aliquotLabel = new AliquotWrapper(appService, aliquot)
-                    .getPositionString(true, false);
-                String activityStatus = aliquot.getActivityStatus().getName();
-                modifiedResults.add(new Object[] { pnumber, inventoryId,
-                    dateDrawn, stName, aliquotLabel, activityStatus });
+                // Aliquot aliquot = (Aliquot) ob;
+                // String pnumber = aliquot.getProcessingEvent().getPatient()
+                // .getPnumber();
+                // String inventoryId = aliquot.getInventoryId();
+                // Date dateDrawn = aliquot.getProcessingEvent().getDateDrawn();
+                // String stName = aliquot.getSpecimenType().getNameShort();
+                // String aliquotLabel = new SpecimenWrapper(appService,
+                // aliquot)
+                // .getPositionString(true, false);
+                // String activityStatus =
+                // aliquot.getActivityStatus().getName();
+                // modifiedResults.add(new Object[] { pnumber, inventoryId,
+                // dateDrawn, stName, aliquotLabel, activityStatus });
             }
         }
         return modifiedResults;
     }
-
 }

@@ -11,7 +11,7 @@ import org.hibernate.criterion.Subqueries;
 
 import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.reports.filters.FilterType;
-import edu.ualberta.med.biobank.model.PatientVisit;
+import edu.ualberta.med.biobank.model.ProcessingEvent;
 import edu.ualberta.med.biobank.model.ReportFilterValue;
 import edu.ualberta.med.biobank.server.reports.ReportRunner;
 
@@ -39,7 +39,7 @@ public class FirstVisitFilterType implements FilterType {
         String aliasedPatientId = ReportRunner.getAliasedProperty(patientId);
 
         DetachedCriteria minDateProcessed = DetachedCriteria
-            .forClass(PatientVisit.class, "pv")
+            .forClass(ProcessingEvent.class, "pv")
             .createAlias("pv.shipmentPatient", "sp")
             .createAlias("sp.patient", "p")
             .add(Property.forName("p.id").eqProperty(aliasedPatientId));

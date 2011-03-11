@@ -39,7 +39,7 @@ public class ContactWrapper extends ContactBaseWrapper {
     }
 
     public boolean deleteAllowed() {
-        List<StudyWrapper> studies = getStudyCollection();
+        List<StudyWrapper> studies = getStudyCollection(false);
         return ((studies == null) || (studies.size() == 0));
     }
 

@@ -3,6 +3,7 @@ package edu.ualberta.med.biobank.tools.modelextender;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FilenameFilter;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +22,8 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
     private static final Logger LOGGER = Logger
         .getLogger(BaseWrapperBuilder.class.getName());
+
+    private static final String SUPPRESS_WARNING_UNCHECKED = "@SuppressWarnings(\"unchecked\")";
 
     protected final String peerpackagename;
 
@@ -71,6 +74,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
         }
 
         FilenameFilter filter = new FilenameFilter() {
+            @Override
             public boolean accept(File dir, String name) {
                 return name.contains("Wrapper.java");
             }
@@ -83,13 +87,17 @@ public class BaseWrapperBuilder extends BaseBuilder {
         return wrapperMap;
     }
 
+    @Override
     protected void generateClassFile(ModelClass mc) throws Exception {
         String className = mc.getName();
         String wrapperName = new StringBuilder(className).append("Wrapper")
             .toString();
 
-        if (!wrapperMap.containsKey(wrapperName))
+        if (!wrapperMap.containsKey(wrapperName)) {
+            LOGGER.info("skipping generation of wrapper for " + className
+                + ": no wrapper found with name " + wrapperName);
             return;
+        }
 
         LOGGER.info("generating wrapper base class for " + mc.getName());
 
@@ -112,11 +120,13 @@ public class BaseWrapperBuilder extends BaseBuilder {
             .append("import ").append(mc.getPkg()).append(".")
             .append(mc.getName()).append(";\n");
 
-        if (mc.getExtendsClass() == null) {
+        if (mc.getExtendsClass() == null)
             contents.append("import ").append(wrapperPackageName)
                 .append(".ModelWrapper;\n");
-
-        }
+        else
+            // need this for the getPropertyChangeNames method
+            contents.append("import ").append(ArrayList.class.getName())
+                .append(";\n");
 
         // import the peer class
         contents.append("import ").append(peerpackagename).append(".")
@@ -151,6 +161,7 @@ public class BaseWrapperBuilder extends BaseBuilder {
 
         for (ClassAssociation assoc : mc.getAssocMap().values()) {
             ClassAssociationType assocType = assoc.getAssociationType();
+
             if ((assocType == ClassAssociationType.ZERO_OR_ONE_TO_ONE)
                 || (assocType == ClassAssociationType.ONE_TO_ONE)) {
                 contents.append(createWrappedPropertyGetter(mc, assoc));
@@ -198,10 +209,20 @@ public class BaseWrapperBuilder extends BaseBuilder {
                 .append(".class;\n").append("    }\n\n");
         }
 
-        result.append("    @Override\n")
-            .append("   protected List<String> getPropertyChangeNames() {\n")
-            .append("        return ").append(mc.getName())
-            .append("Peer.PROP_NAMES;\n").append("    }\n\n");
+        result.append("    @Override\n").append(
+            "   protected List<String> getPropertyChangeNames() {\n");
+        if (mc.getExtendsClass() == null)
+            result.append("        return ").append(mc.getName())
+                .append("Peer.PROP_NAMES;\n");
+        else
+            result
+                .append(
+                    "        List<String> superNames = super.getPropertyChangeNames();\n")
+                .append("        List<String> all = new ArrayList<String>();\n")
+                .append("        all.addAll(superNames);\n")
+                .append("        all.addAll(").append(mc.getName())
+                .append("Peer.PROP_NAMES);\n").append("        return all;\n");
+        result.append("    }\n\n");
         return result.toString();
 
     }
@@ -246,8 +267,14 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
-        result.append("   public ").append(assocClassName)
-            .append("Wrapper get")
+        String genericString = "";
+        if (modelBaseClasses.containsKey(assocClassName)) {
+            genericString = "<?>";
+            result.append("   ").append(SUPPRESS_WARNING_UNCHECKED)
+                .append("\n");
+        }
+        result.append("   public ").append(assocClassName).append("Wrapper")
+            .append(genericString).append(" get")
             .append(CamelCase.toCamelCase(assocName, true)).append("() {\n")
             .append("      return getWrappedProperty(").append(mc.getName())
             .append("Peer.").append(CamelCase.toTitleCase(assocName))
@@ -271,13 +298,17 @@ public class BaseWrapperBuilder extends BaseBuilder {
         String assocName = assoc.getAssocName();
         StringBuilder result = new StringBuilder();
 
+        String genericString = "";
+        if (modelBaseClasses.containsKey(assocClassName))
+            genericString = "<?>";
+
         result.append("   public void set")
             .append(CamelCase.toCamelCase(assocName, true)).append("(")
-            .append(assocClassName).append("Wrapper ").append(assocName)
-            .append(") {\n").append("      setWrappedProperty(")
-            .append(mc.getName()).append("Peer.")
-            .append(CamelCase.toTitleCase(assocName)).append(", ")
-            .append(assocName).append(");\n").append("   }\n\n");
+            .append(assocClassName).append("Wrapper").append(genericString)
+            .append(" ").append(assocName).append(") {\n")
+            .append("      setWrappedProperty(").append(mc.getName())
+            .append("Peer.").append(CamelCase.toTitleCase(assocName))
+            .append(", ").append(assocName).append(");\n").append("   }\n\n");
         return result.toString();
     }
 
@@ -467,10 +498,6 @@ public class BaseWrapperBuilder extends BaseBuilder {
         Map<String, ClassAssociation> assocMap = mc.getAssocMap();
         for (ClassAssociation assoc : assocMap.values()) {
             ModelClass toClass = assoc.getToClass();
-
-            if (mc.getName().equals("Report")) {
-                LOGGER.info(mc.getName());
-            }
 
             // check if need to import BioBankCheckException
             ClassAssociationType assocType = assoc.getAssociationType();

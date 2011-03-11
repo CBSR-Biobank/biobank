@@ -9,7 +9,7 @@ import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.model.PalletCell;
@@ -39,10 +39,10 @@ public class PalletScanManagement {
                     processScanResult(monitor);
                     afterScanAndProcess();
                 } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                    BiobankPlugin.openRemoteConnectErrorMessage(exp);
                     scanAndProcessError(null);
                 } catch (Exception e) {
-                    BioBankPlugin
+                    BiobankPlugin
                         .openAsyncError(Messages
                             .getString("linkAssign.dialog.scanError.title"), //$NON-NLS-1$
                             e);
@@ -69,12 +69,12 @@ public class PalletScanManagement {
         monitor.subTask("Launching scan");
         beforeScan();
         Map<RowColPos, PalletCell> oldCells = cells;
-        if (BioBankPlugin.isRealScanEnabled()) {
-            int plateNum = BioBankPlugin.getDefault().getPlateNumber(
+        if (BiobankPlugin.isRealScanEnabled()) {
+            int plateNum = BiobankPlugin.getDefault().getPlateNumber(
                 plateToScan);
             if (plateNum == -1) {
                 plateError();
-                BioBankPlugin.openAsyncError("Scan error",
+                BiobankPlugin.openAsyncError("Scan error",
                     "Plate with barcode " + plateToScan + " is not enabled");
                 return;
             } else {
@@ -84,7 +84,7 @@ public class PalletScanManagement {
                     cells = PalletCell.convertArray(scanCells);
                     successfulScansCount++;
                 } catch (Exception ex) {
-                    BioBankPlugin
+                    BiobankPlugin
                         .openAsyncError(
                             "Scan error", //$NON-NLS-1$
                             ex,

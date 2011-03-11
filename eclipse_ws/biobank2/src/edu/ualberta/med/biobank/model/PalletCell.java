@@ -5,10 +5,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.debug.DebugUtil;
 import edu.ualberta.med.biobank.common.util.RowColPos;
-import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.scannerconfig.dmscanlib.ScanCell;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -19,15 +20,15 @@ public class PalletCell extends Cell {
 
     private String information;
 
-    private String title;
+    private String title = "";
 
-    private SampleTypeWrapper type;
+    private SpecimenWrapper sourceSpecimen;
 
-    private AliquotWrapper aliquot;
+    private SpecimenWrapper specimen;
 
     private ScanCell scanCell;
 
-    private AliquotWrapper expectedAliquot;
+    private SpecimenWrapper expectedSpecimen;
 
     public PalletCell(ScanCell scanCell) {
         this.scanCell = scanCell;
@@ -54,8 +55,8 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        List<AliquotWrapper> aliquots = DebugUtil
-            .getRandomAliquotsAlreadyLinked(appService, siteId);
+        List<SpecimenWrapper> aliquots = DebugUtil
+            .getRandomLinkedAliquotedSpecimens(appService, siteId);
         if (aliquots.size() > 1) {
             int row = 2;
             int col = 3;
@@ -79,8 +80,8 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId, Integer studyId)
         throws Exception {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
-        List<AliquotWrapper> randomAliquots = DebugUtil
-            .getRandomAliquotsAlreadyAssigned(appService, siteId, studyId);
+        List<SpecimenWrapper> randomAliquots = DebugUtil
+            .getRandomAssignedSpecimens(appService, siteId, studyId);
         if (randomAliquots.size() > 0) {
             palletScanned.put(new RowColPos(0, 0), new PalletCell(new ScanCell(
                 0, 0, randomAliquots.get(0).getInventoryId())));
@@ -96,8 +97,8 @@ public class PalletCell extends Cell {
         WritableApplicationService appService, Integer siteId)
         throws ApplicationException {
         Map<RowColPos, PalletCell> palletScanned = new HashMap<RowColPos, PalletCell>();
-        List<AliquotWrapper> randomAliquots = DebugUtil
-            .getRandomAliquotsNotAssignedNoDispatch(appService, siteId);
+        List<SpecimenWrapper> randomAliquots = DebugUtil
+            .getRandomNonAssignedNonDispatchedSpecimens(appService, siteId);
         int i = 0;
         while (i < randomAliquots.size() && i < 30) {
             int row = i / 12;
@@ -127,13 +128,10 @@ public class PalletCell extends Cell {
         this.status = status;
     }
 
+    /**
+     * usually displayed in the middle of the cell
+     */
     public String getTitle() {
-        if (type != null) {
-            if (type.getNameShort() != null) {
-                return type.getNameShort();
-            }
-            return type.getName();
-        }
         return title;
     }
 
@@ -141,6 +139,11 @@ public class PalletCell extends Cell {
         this.title = title;
     }
 
+    /**
+     * Usually used for the tooltip of the cell
+     * 
+     * @return
+     */
     public String getInformation() {
         return information;
     }
@@ -149,20 +152,36 @@ public class PalletCell extends Cell {
         this.information = information;
     }
 
-    public SampleTypeWrapper getType() {
-        return type;
+    public String getTypeString() {
+        if (specimen != null && specimen.getSpecimenType() != null) {
+            SpecimenTypeWrapper type = specimen.getSpecimenType();
+            if (type.getNameShort() != null) {
+                return type.getNameShort();
+            }
+            return type.getName();
+        }
+        return "";
     }
 
-    public void setType(SampleTypeWrapper type) {
-        this.type = type;
+    public SpecimenTypeWrapper getType() {
+        if (specimen == null)
+            return null;
+        return specimen.getSpecimenType();
     }
 
-    public void setAliquot(AliquotWrapper aliquot) {
-        this.aliquot = aliquot;
+    public void setSpecimenType(SpecimenTypeWrapper type) {
+        if (specimen == null) {
+            specimen = new SpecimenWrapper(SessionManager.getAppService());
+        }
+        specimen.setSpecimenType(type);
     }
 
-    public AliquotWrapper getAliquot() {
-        return aliquot;
+    public void setSpecimen(SpecimenWrapper aliquot) {
+        this.specimen = aliquot;
+    }
+
+    public SpecimenWrapper getSpecimen() {
+        return specimen;
     }
 
     public String getValue() {
@@ -208,12 +227,20 @@ public class PalletCell extends Cell {
         return cell != null && cell.getValue() != null;
     }
 
-    public void setExpectedAliquot(AliquotWrapper expectedAliquot) {
-        this.expectedAliquot = expectedAliquot;
+    public void setExpectedSpecimen(SpecimenWrapper expectedSpecimen) {
+        this.expectedSpecimen = expectedSpecimen;
     }
 
-    public AliquotWrapper getExpectedAliquot() {
-        return expectedAliquot;
+    public SpecimenWrapper getExpectedSpecimen() {
+        return expectedSpecimen;
+    }
+
+    public void setSourceSpecimen(SpecimenWrapper sourceSpecimen) {
+        this.sourceSpecimen = sourceSpecimen;
+    }
+
+    public SpecimenWrapper getSourceSpecimen() {
+        return sourceSpecimen;
     }
 
 }

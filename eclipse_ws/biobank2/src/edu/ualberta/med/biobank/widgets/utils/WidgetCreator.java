@@ -88,6 +88,10 @@ public class WidgetCreator {
         this.toolkit = toolkit;
     }
 
+    public FormToolkit getToolkit() {
+        return toolkit;
+    }
+
     public void createBoundWidgetsFromMap(Map<String, FieldInfo> fieldsMap,
         Object bean, Composite client) {
         FieldInfo fi;

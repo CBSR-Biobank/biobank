@@ -34,11 +34,11 @@ public class AliquotRequest implements Serializable {
         this.dateDrawn = dateDrawn;
     }
 
-    public String getSampleTypeNameShort() {
+    public String getSpecimenTypeNameShort() {
         return sampleTypeNameShort;
     }
 
-    public void setSampleTypeNameShort(String sampleType) {
+    public void setSpecimenTypeNameShort(String sampleType) {
         this.sampleTypeNameShort = sampleType;
     }
 

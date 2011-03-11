@@ -11,14 +11,14 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
-import edu.ualberta.med.biobank.common.wrappers.SampleStorageWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SampleTypeWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 
 public class SampleTypeSUsageTest extends AbstractReportTest {
-    private static final Comparator<SampleStorageWrapper> ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<SampleStorageWrapper>() {
-        public int compare(SampleStorageWrapper lhs, SampleStorageWrapper rhs) {
-            int cmp = compareStrings(lhs.getSampleType().getNameShort(), rhs
-                .getSampleType().getNameShort());
+    private static final Comparator<AliquotedSpecimenWrapper> ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<AliquotedSpecimenWrapper>() {
+        public int compare(AliquotedSpecimenWrapper lhs, AliquotedSpecimenWrapper rhs) {
+            int cmp = compareStrings(lhs.getSpecimenType().getNameShort(), rhs
+                .getSpecimenType().getNameShort());
 
             if (cmp != 0) {
                 return cmp;
@@ -28,8 +28,8 @@ public class SampleTypeSUsageTest extends AbstractReportTest {
                 .getNameShort());
         }
     };
-    private static final Comparator<SampleTypeWrapper> ORDER_ST_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<SampleTypeWrapper>() {
-        public int compare(SampleTypeWrapper lhs, SampleTypeWrapper rhs) {
+    private static final Comparator<SpecimenTypeWrapper> ORDER_ST_BY_SAMPLE_TYPE_NAME_SHORT = new Comparator<SpecimenTypeWrapper>() {
+        public int compare(SpecimenTypeWrapper lhs, SpecimenTypeWrapper rhs) {
             return compareStrings(lhs.getNameShort(), rhs.getNameShort());
         }
     };
@@ -41,34 +41,34 @@ public class SampleTypeSUsageTest extends AbstractReportTest {
 
     @Override
     protected Collection<Object> getExpectedResults() throws Exception {
-        List<SampleStorageWrapper> allSampleStorages = new ArrayList<SampleStorageWrapper>(
-            getSampleStorages());
+        List<AliquotedSpecimenWrapper> allSampleStorages = new ArrayList<AliquotedSpecimenWrapper>(
+            getAliquotedSpecimens());
         Collections.sort(allSampleStorages, ORDER_SS_BY_SAMPLE_TYPE_NAME_SHORT);
 
         List<Object> expectedResults = new ArrayList<Object>();
 
         final List<Integer> sampleTypeIdsInSs = new ArrayList<Integer>();
 
-        for (SampleStorageWrapper ss : allSampleStorages) {
-            sampleTypeIdsInSs.add(ss.getSampleType().getId());
+        for (AliquotedSpecimenWrapper ss : allSampleStorages) {
+            sampleTypeIdsInSs.add(ss.getSpecimenType().getId());
             expectedResults
-                .add(new Object[] { ss.getSampleType().getNameShort(),
+                .add(new Object[] { ss.getSpecimenType().getNameShort(),
                     ss.getStudy().getNameShort() });
         }
 
         // add sample types not in any study
-        Collection<SampleTypeWrapper> sampleTypesNotInSs = PredicateUtil
-            .filter(getSampleTypes(), new Predicate<SampleTypeWrapper>() {
-                public boolean evaluate(SampleTypeWrapper type) {
+        Collection<SpecimenTypeWrapper> sampleTypesNotInSs = PredicateUtil
+            .filter(getSpecimenTypes(), new Predicate<SpecimenTypeWrapper>() {
+                public boolean evaluate(SpecimenTypeWrapper type) {
                     return !sampleTypeIdsInSs.contains(type.getId());
                 }
             });
-        List<SampleTypeWrapper> sampleTypesNotInSsOrdered = new ArrayList<SampleTypeWrapper>(
+        List<SpecimenTypeWrapper> sampleTypesNotInSsOrdered = new ArrayList<SpecimenTypeWrapper>(
             sampleTypesNotInSs);
         Collections.sort(sampleTypesNotInSsOrdered,
             ORDER_ST_BY_SAMPLE_TYPE_NAME_SHORT);
 
-        for (SampleTypeWrapper sampleType : sampleTypesNotInSsOrdered) {
+        for (SpecimenTypeWrapper sampleType : sampleTypesNotInSsOrdered) {
             expectedResults.add(new Object[] { sampleType.getNameShort(),
                 "Unused" });
         }

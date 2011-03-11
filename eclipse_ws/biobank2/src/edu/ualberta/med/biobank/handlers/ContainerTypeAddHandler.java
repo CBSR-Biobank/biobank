@@ -15,6 +15,8 @@ public class ContainerTypeAddHandler extends AbstractHandler {
     public Object execute(ExecutionEvent event) throws ExecutionException {
         ContainerTypeAdapter containerTypeAdapter = new ContainerTypeAdapter(
             null, new ContainerTypeWrapper(SessionManager.getAppService()));
+        containerTypeAdapter.getContainerType().setSite(
+            SessionManager.getUser().getCurrentWorkingSite());
         containerTypeAdapter.openEntryForm(false);
         return null;
     }

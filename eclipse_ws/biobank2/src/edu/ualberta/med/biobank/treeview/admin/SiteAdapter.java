@@ -70,6 +70,8 @@ public class SiteAdapter extends AdapterBase {
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
         addEditMenu(menu, "Site");
         addViewMenu(menu, "Site");
+        // FIXME should not be able to delete a site if it is currently the
+        // working center
         addDeleteMenu(menu, "Site");
     }
 

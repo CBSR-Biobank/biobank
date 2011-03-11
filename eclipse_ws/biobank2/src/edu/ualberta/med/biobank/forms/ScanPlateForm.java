@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.PlatformUI;
 import org.springframework.remoting.RemoteConnectFailureException;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.widgets.PlateSelectionWidget;
 import edu.ualberta.med.scannerconfig.ScannerConfigPlugin;
@@ -141,7 +141,7 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
         plateToScan = plateSelectionWidget.getSelectedPlate();
 
         if (plateToScan == null) {
-            BioBankPlugin.openAsyncError("Decode Plate Error",
+            BiobankPlugin.openAsyncError("Decode Plate Error",
                 "No plate selected");
             return;
         }
@@ -153,9 +153,9 @@ public class ScanPlateForm extends PlateForm implements PaintListener {
                 try {
                     launchScan(monitor);
                 } catch (RemoteConnectFailureException exp) {
-                    BioBankPlugin.openRemoteConnectErrorMessage(exp);
+                    BiobankPlugin.openRemoteConnectErrorMessage(exp);
                 } catch (Exception e) {
-                    BioBankPlugin.openAsyncError(
+                    BiobankPlugin.openAsyncError(
                         Messages.getString("ScanPlate.dialog.scanError.title"), //$NON-NLS-1$
                         e);
                 }

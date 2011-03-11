@@ -14,19 +14,24 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.forms.widgets.Section;
 
+import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
+import edu.ualberta.med.biobank.widgets.infotables.AliquotedSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.InfoTableSelection;
-import edu.ualberta.med.biobank.widgets.infotables.SampleStorageInfoTable;
+import edu.ualberta.med.biobank.widgets.infotables.SourceSpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.StudyContactInfoTable;
-import edu.ualberta.med.biobank.widgets.infotables.StudySourceVesselInfoTable;
 
 public class StudyViewForm extends BiobankViewForm {
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.StudyViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.StudyViewForm"; //$NON-NLS-1$
+
+    private static final String DATE_PROCESSED_INFO_FIELD_NAME = Messages
+        .getString("study.visit.info.dateProcessed"); //$NON-NLS-1$
 
     private StudyAdapter studyAdapter;
     private StudyWrapper study;
@@ -39,8 +44,8 @@ public class StudyViewForm extends BiobankViewForm {
     private BiobankText visitTotal;
 
     private StudyContactInfoTable contactsTable;
-    private SampleStorageInfoTable sampleStorageTable;
-    private StudySourceVesselInfoTable studySourceVesselsTable;
+    private AliquotedSpecimenInfoTable aliquotedSpecimenTable;
+    private SourceSpecimenInfoTable sourceSpecimenTable;
 
     private class StudyPvCustomInfo extends PvAttrCustom {
         public BiobankText wiget;
@@ -51,7 +56,7 @@ public class StudyViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof StudyAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
@@ -59,14 +64,16 @@ public class StudyViewForm extends BiobankViewForm {
         // retrieve info from database because study could have been modified
         // after first opening
         study.reload();
-        setPartName("Study " + study.getNameShort());
+        setPartName(Messages.getString(
+            "StudyViewForm.title", study.getNameShort())); //$NON-NLS-1$
         pvCustomInfoList = new ArrayList<StudyPvCustomInfo>();
     }
 
     @Override
     protected void createFormContent() throws Exception {
         if (study.getName() != null) {
-            form.setText("Study: " + study.getName());
+            form.setText(Messages.getString(
+                "StudyViewForm.title", study.getName())); //$NON-NLS-1$
         }
 
         GridLayout layout = new GridLayout(1, false);
@@ -78,28 +85,30 @@ public class StudyViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        nameLabel = createReadOnlyLabelledField(client, SWT.NONE, "Name");
+        nameLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("label.name")); //$NON-NLS-1$
         nameShortLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Short Name");
+            Messages.getString("label.nameShort")); //$NON-NLS-1$
         activityStatusLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            "Activity Status");
+            Messages.getString("label.activity")); //$NON-NLS-1$
         commentLabel = createReadOnlyLabelledField(client, SWT.MULTI,
-            "Comments");
+            Messages.getString("label.comments")); //$NON-NLS-1$
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Patients");
+            Messages.getString("StudyViewForm.field.label.total.patients")); //$NON-NLS-1$
         visitTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            "Total Patient Visits");
+            Messages.getString("StudyViewForm.field.label.total.patientVisits")); //$NON-NLS-1$
 
         createClinicSection();
-        createSampleStorageSection();
-        createSourceVesselSection();
+        createSourceSpecimenSection();
+        createAliquotedSpecimenSection();
         createPvCustomInfoSection();
         setStudySectionValues();
         setPvDataSectionValues();
     }
 
     private void createClinicSection() {
-        Composite client = createSectionWithClient("Clinic Information");
+        Composite client = createSectionWithClient(Messages
+            .getString("StudyViewForm.clinic.title")); //$NON-NLS-1$
 
         contactsTable = new StudyContactInfoTable(client, study);
         contactsTable.addClickListener(collectionDoubleClickListener);
@@ -120,11 +129,11 @@ public class StudyViewForm extends BiobankViewForm {
                         collectionDoubleClickListener.doubleClick(newEvent);
                     } else {
                         Assert.isTrue(false,
-                            "invalid InfoTableSelection class:"
+                            "invalid InfoTableSelection class:" //$NON-NLS-1$
                                 + obj.getClass().getName());
                     }
                 } else {
-                    Assert.isTrue(false, "invalid class for event selection:"
+                    Assert.isTrue(false, "invalid class for event selection:" //$NON-NLS-1$
                         + event.getClass().getName());
                 }
             }
@@ -137,52 +146,55 @@ public class StudyViewForm extends BiobankViewForm {
         setTextValue(activityStatusLabel, study.getActivityStatus());
         setTextValue(commentLabel, study.getComment());
         setTextValue(patientTotal, study.getPatientCount(true));
-        setTextValue(visitTotal, study.getPatientVisitCount());
+        setTextValue(visitTotal, study.getCollectionEventCount(true));
     }
 
-    private void createSampleStorageSection() {
-        Section section = createSection("Sample Storage");
+    private void createAliquotedSpecimenSection() {
+        Section section = createSection(Messages
+            .getString("StudyViewForm.aliquoted.specimen.title")); //$NON-NLS-1$
 
-        sampleStorageTable = new SampleStorageInfoTable(section,
-            study.getSampleStorageCollection(true));
-        section.setClient(sampleStorageTable);
-        sampleStorageTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(sampleStorageTable);
+        aliquotedSpecimenTable = new AliquotedSpecimenInfoTable(section,
+            study.getAliquotedSpecimenCollection(true));
+        section.setClient(aliquotedSpecimenTable);
+        aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(aliquotedSpecimenTable);
     }
 
-    private void createSourceVesselSection() {
-        Section section = createSection("Source Vessels");
+    private void createSourceSpecimenSection() {
+        Section section = createSection(Messages
+            .getString("StudyViewForm.source.specimen.title")); //$NON-NLS-1$
 
-        studySourceVesselsTable = new StudySourceVesselInfoTable(section,
-            study.getStudySourceVesselCollection(true));
-        section.setClient(studySourceVesselsTable);
-        studySourceVesselsTable.adaptToToolkit(toolkit, true);
-        toolkit.paintBordersFor(studySourceVesselsTable);
+        sourceSpecimenTable = new SourceSpecimenInfoTable(section,
+            study.getSourceSpecimenCollection(true));
+        section.setClient(sourceSpecimenTable);
+        sourceSpecimenTable.adaptToToolkit(toolkit, true);
+        toolkit.paintBordersFor(sourceSpecimenTable);
     }
 
     private void createPvCustomInfoSection() throws Exception {
-        Composite client = createSectionWithClient("Patient Visit Information Collected");
+        Composite client = createSectionWithClient(Messages
+            .getString("StudyViewForm.visit.info.attributes.title")); //$NON-NLS-1$
         client.setLayout(new GridLayout(1, false));
 
         StudyPvCustomInfo combinedPvInfo;
 
         combinedPvInfo = new StudyPvCustomInfo();
-        combinedPvInfo.setLabel("Date Processed");
-        combinedPvInfo.setType("date");
+        combinedPvInfo.setLabel(DATE_PROCESSED_INFO_FIELD_NAME); //$NON-NLS-1$
+        combinedPvInfo.setType(EventAttrTypeEnum.DATE_TIME); //$NON-NLS-1$
         pvCustomInfoList.add(combinedPvInfo);
 
-        for (String label : study.getStudyPvAttrLabels()) {
+        for (String label : study.getStudyEventAttrLabels()) {
             combinedPvInfo = new StudyPvCustomInfo();
             combinedPvInfo.setLabel(label);
-            combinedPvInfo.setType(study.getStudyPvAttrType(label));
+            combinedPvInfo.setType(study.getStudyEventAttrType(label));
             combinedPvInfo.setAllowedValues(study
-                .getStudyPvAttrPermissible(label));
+                .getStudyEventAttrPermissible(label));
             pvCustomInfoList.add(combinedPvInfo);
         }
 
         if (pvCustomInfoList.size() == 0) {
             toolkit.createLabel(client,
-                "Study does not collect additional patient visit information");
+                Messages.getString("StudyViewForm.visit.info.msg")); //$NON-NLS-1$
             return;
         }
 
@@ -206,27 +218,28 @@ public class StudyViewForm extends BiobankViewForm {
     private void setPvDataSectionValues() throws Exception {
         for (StudyPvCustomInfo pvCustomInfo : pvCustomInfoList) {
             String label = pvCustomInfo.getLabel();
-            if (label.equals("Date Processed")) {
+            if (label.equals(DATE_PROCESSED_INFO_FIELD_NAME)) { //$NON-NLS-1$
                 // skip this attribute since its already part of PatientVisit
                 continue;
             }
-            setTextValue(pvCustomInfo.wiget,
-                StringUtils.join(study.getStudyPvAttrPermissible(label), "; "));
+            setTextValue(pvCustomInfo.wiget, StringUtils.join(
+                study.getStudyEventAttrPermissible(label), ";")); //$NON-NLS-1$
         }
     }
 
     @Override
     public void reload() throws Exception {
         study.reload();
-        setPartName("Study " + study.getNameShort());
-        form.setText("Study: " + study.getName());
+        setPartName(Messages.getString(
+            "StudyViewForm.title", study.getNameShort())); //$NON-NLS-1$
+        form.setText(Messages.getString(
+            Messages.getString("StudyViewForm.title"), study.getName())); //$NON-NLS-1$
         setStudySectionValues();
         setPvDataSectionValues();
-        sampleStorageTable
-            .setCollection(study.getSampleStorageCollection(true));
-        studySourceVesselsTable.setCollection(study
-            .getStudySourceVesselCollection(true));
+        aliquotedSpecimenTable.setCollection(study
+            .getAliquotedSpecimenCollection(true));
+        sourceSpecimenTable.setCollection(study
+            .getSourceSpecimenCollection(true));
         contactsTable.setCollection(study.getContactCollection(true));
     }
-
 }

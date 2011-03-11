@@ -9,7 +9,7 @@ import org.eclipse.swt.dnd.DropTargetEvent;
 import org.eclipse.swt.dnd.DropTargetListener;
 import org.eclipse.swt.widgets.TreeItem;
 
-import edu.ualberta.med.biobank.BioBankPlugin;
+import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -37,7 +37,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
 
         if (ts.getFirstElement() instanceof ContainerAdapter) {
             if (ts.size() != 1)
-                BioBankPlugin
+                BiobankPlugin
                     .openError("Cannot move multiple container",
                         "You cannot move multiple containers, please drag them one at a time.");
 
@@ -82,7 +82,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                         }
                     }
                 } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Error in drag", ex);
+                    BiobankPlugin.openAsyncError("Error in drag", ex);
                 }
             }
         }
@@ -130,14 +130,14 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
                         srcContainerAdapter.moveContainer(dstContainer);
                         return;
                     } else {
-                        BioBankPlugin
+                        BiobankPlugin
                             .openError(
                                 "Invalid state",
                                 "ERROR: an unexpected state occured in TreeDragDropListener. Please report this.");
 
                     }
                 } catch (Exception ex) {
-                    BioBankPlugin.openAsyncError("Drop error", ex);
+                    BiobankPlugin.openAsyncError("Drop error", ex);
                 }
             }
         }
@@ -152,7 +152,7 @@ public class AdapterTreeDragDropListener implements DropTargetListener,
     public void dragStart(DragSourceEvent event) {
 
         ContainerWrapper container = getSelectedContainer();
-        if (container != null && container.hasParent()) {
+        if (container != null && container.hasParentContainer()) {
             event.doit = true;
             srcContainer = container;
         } else {
