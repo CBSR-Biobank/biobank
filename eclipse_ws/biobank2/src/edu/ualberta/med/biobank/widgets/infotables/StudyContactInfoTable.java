@@ -19,7 +19,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         ContactWrapper contact;
         String clinicNameShort;
         Long patientCount;
-        Long visitCount;
+        Long ceventCount;
         String contactName;
         String contactTitle;
 
@@ -27,14 +27,14 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         public String toString() {
             return StringUtils.join(new String[] { clinicNameShort,
                 (patientCount != null) ? patientCount.toString() : "",
-                (visitCount != null) ? visitCount.toString() : "", contactName,
+                (ceventCount != null) ? ceventCount.toString() : "", contactName,
                 contactTitle }, "\t");
 
         }
     }
 
     private static final String[] HEADINGS = new String[] { "Clinic",
-        "#Patients", "#Patient Visits", "Contact Name", "Title" };
+        "#Patients", "#Collection Events", "Contact Name", "Title" };
 
     private StudyWrapper study;
 
@@ -73,7 +73,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
                     return (item.patientCount != null) ? item.patientCount
                         .toString() : "";
                 case 2:
-                    return (item.visitCount != null) ? item.visitCount
+                    return (item.ceventCount != null) ? item.ceventCount
                         .toString() : "";
                 case 3:
                     return item.contactName;
@@ -95,7 +95,7 @@ public class StudyContactInfoTable extends InfoTableWidget<ContactWrapper> {
         if (clinic != null) {
             info.clinicNameShort = clinic.getNameShort();
             info.patientCount = clinic.getPatientCountForStudy(study);
-            info.visitCount = clinic.getCollectionEventCountForStudy(study);
+            info.ceventCount = clinic.getCollectionEventCountForStudy(study);
         }
         info.contactName = contact.getName();
         info.contactTitle = contact.getTitle();
