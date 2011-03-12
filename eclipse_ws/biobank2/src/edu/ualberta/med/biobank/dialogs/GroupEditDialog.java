@@ -35,8 +35,7 @@ public class GroupEditDialog extends BiobankDialog {
         .getString("GroupEditDialog.msg.persit.error"); //$NON-NLS-1$
 
     private Group originalGroup, modifiedGroup;
-    private MultiSelectWidget readOnlySitesWidget;
-    private MultiSelectWidget canUpdateSitesWidget;
+    private MultiSelectWidget workingCentersWidget;
     private List<SiteWrapper> allSites;
     private MultiSelectWidget featuresWidget;
 
@@ -108,17 +107,12 @@ public class GroupEditDialog extends BiobankDialog {
                 siteNames.add(siteName);
                 siteMap.put(siteId, siteName);
             }
-        readOnlySitesWidget = new MultiSelectWidget(parent, SWT.NONE,
-            Messages.getString("GroupEditDialog.site.list.readonly"), //$NON-NLS-1$
-            Messages.getString("GroupEditDialog.site.list.available"), 75); //$NON-NLS-1$ 
-        readOnlySitesWidget.setSelections(siteMap,
-            modifiedGroup.getReadOnlySites());
 
-        canUpdateSitesWidget = new MultiSelectWidget(parent, SWT.NONE,
+        workingCentersWidget = new MultiSelectWidget(parent, SWT.NONE,
             Messages.getString("GroupEditDialog.site.list.canUpdate"), //$NON-NLS-1$ 
             Messages.getString("GroupEditDialog.site.list.available"), 75); //$NON-NLS-1$
-        canUpdateSitesWidget.setSelections(siteMap,
-            modifiedGroup.getCanUpdateSites());
+        workingCentersWidget.setSelections(siteMap,
+            modifiedGroup.getWorkingCenterIds());
 
         List<ProtectionGroupPrivilege> features = SessionManager
             .getAppService().getSecurityFeatures();
@@ -150,8 +144,8 @@ public class GroupEditDialog extends BiobankDialog {
         // try saving or updating the group inside this dialog so that if there
         // is an error the entered information is not lost
         try {
-            modifiedGroup.setCanUpdateSites(canUpdateSitesWidget.getSelected());
-            modifiedGroup.setReadOnlySites(readOnlySitesWidget.getSelected());
+            modifiedGroup.setWorkingCenterIds(workingCentersWidget
+                .getSelected());
             modifiedGroup.setFeaturesEnabled(featuresWidget.getSelected());
             Group groupeResult = SessionManager.getAppService().persistGroup(
                 modifiedGroup);

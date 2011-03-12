@@ -9,24 +9,24 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
-import edu.ualberta.med.biobank.model.Site;
+import edu.ualberta.med.biobank.model.Center;
 
 public class Group implements Serializable, NotAProxy {
 
     private static final long serialVersionUID = 1L;
 
     // FIXME just remember the ID that should never change ?
-    public static final String GROUP_WEBSITE_ADMINISTRATOR = "Website Administrator";
+    public static final String GROUP_SUPER_ADMIN = "Super Administrator";
     // need the id if is trying to rename it. What is the best ? Are we sure
     // this will be always initialized that way ?
-    public static final Long GROUP_WEBSITE_ADMINISTRATOR_ID = 5L;
+    public static final Long GROUP_SUPER_AMDIN_ID = 5L;
 
     // FIXME just remember the ID that should never change ?
-    public static final String PG_SITE_ADMINISTRATION = "Site Administration Features";
+    public static final String PG_CENTER_ADMINISTRATOR = "Internal: Center Administrator";
     // same as above
-    public static final Long PG_SITE_ADMINISTRATION_ID = 45L;
+    public static final Long PG_CENTER_ADMINISTRATOR_ID = 45L;
 
-    public static final String SITE_FULL_ACCESS = "Site Full Access";
+    public static final String CENTER_FULL_ACCESS = "Center Full Access";
     public static final String READ_ONLY = "Read Only";
     public static final String OBJECT_FULL_ACCESS = "Object Full Access";
 
@@ -44,18 +44,16 @@ public class Group implements Serializable, NotAProxy {
      */
     private Map<String, ProtectionGroupPrivilege> pgMap;
 
-    private List<Integer> readOnlySitesId;
-    private List<Integer> canUpdateSitesId;
+    private List<Integer> workingCenterIds;
     private List<Integer> featuresEnabledId;
-    private Boolean isSiteAdministrator;
+    private Boolean isCenterAdministrator;
 
     public Group() {
         pePrivilegeMap = new HashMap<ProtectionElement, Set<Privilege>>();
         pgMap = new HashMap<String, ProtectionGroupPrivilege>();
-        readOnlySitesId = new ArrayList<Integer>();
-        canUpdateSitesId = new ArrayList<Integer>();
+        workingCenterIds = new ArrayList<Integer>();
         featuresEnabledId = new ArrayList<Integer>();
-        isSiteAdministrator = false;
+        isCenterAdministrator = false;
     }
 
     public Group(Long id, String name) {
@@ -80,8 +78,8 @@ public class Group implements Serializable, NotAProxy {
         return name;
     }
 
-    public boolean isWebsiteAdministrator() {
-        return name != null && name.equals(GROUP_WEBSITE_ADMINISTRATOR);
+    public boolean isSuperAdministrator() {
+        return name != null && name.equals(GROUP_SUPER_ADMIN);
     }
 
     public void addProtectionElementPrivilege(String type, String id,
@@ -143,72 +141,68 @@ public class Group implements Serializable, NotAProxy {
     }
 
     /**
-     * @return true if this group is administrator of the site with id siteId
+     * @return true if this group is administrator of the center with id
+     *         centerId
      */
-    public boolean isSiteAdministrator(Integer siteId) {
+    public boolean isAdministratorForCenter(Integer centerId,
+        Class<? extends Center> centerClass) {
         return hasPrivilegeOnProtectionGroup(Privilege.UPDATE,
-            PG_SITE_ADMINISTRATION, siteId);
+            PG_CENTER_ADMINISTRATOR, centerId, centerClass);
     }
 
     /**
-     * @return true is is site administrator of sites the group can update.
+     * @return true is is center administrator of centers the group can update.
      */
-    public boolean getIsSiteAdministrator() {
-        return isSiteAdministrator;
+    public boolean getIsCenterAdministrator() {
+        return isCenterAdministrator;
     }
 
     /**
-     * set if the group is site administrator of sites the group can update.
+     * set if the group is center administrator of centers the group can update.
      */
-    public void setIsSiteAdministrator(boolean admin) {
-        isSiteAdministrator = admin;
+    public void setIsCenterAdministrator(boolean admin) {
+        isCenterAdministrator = admin;
     }
 
     public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
-        String protectionGroupName, Integer siteId) {
+        String protectionGroupName, Integer centerId,
+        Class<? extends Center> centerClass) {
         ProtectionGroupPrivilege pgv = pgMap.get(protectionGroupName);
         if (pgv == null) {
             return false;
         }
         return pgv.getPrivileges().contains(privilege)
-            && (siteId == null || hasPrivilegeOnObject(privilege,
-                Site.class.getName(), siteId));
+            && (centerId == null || hasPrivilegeOnObject(
+                privilege,
+                centerClass == null ? Center.class.getName() : centerClass
+                    .getName(), centerId));
     }
 
     public void copy(Group group) {
         id = group.getId();
         name = group.getName();
-        isSiteAdministrator = group.isSiteAdministrator;
+        isCenterAdministrator = group.isCenterAdministrator;
         pePrivilegeMap = new HashMap<ProtectionElement, Set<Privilege>>(
             group.pePrivilegeMap);
         pgMap = new HashMap<String, ProtectionGroupPrivilege>(group.pgMap);
-        readOnlySitesId = new ArrayList<Integer>(group.readOnlySitesId);
-        canUpdateSitesId = new ArrayList<Integer>(group.canUpdateSitesId);
+        workingCenterIds = new ArrayList<Integer>(group.workingCenterIds);
     }
 
     public boolean canBeDeleted() {
-        return !GROUP_WEBSITE_ADMINISTRATOR.equals(name);
+        return !GROUP_SUPER_ADMIN.equals(name);
     }
 
     public boolean canBeEdited() {
-        return !GROUP_WEBSITE_ADMINISTRATOR.equals(name)
-            && !GROUP_WEBSITE_ADMINISTRATOR_ID.equals(id);
+        return !GROUP_SUPER_ADMIN.equals(name)
+            && !GROUP_SUPER_AMDIN_ID.equals(id);
     }
 
-    public List<Integer> getReadOnlySites() {
-        return readOnlySitesId;
+    public void setWorkingCenterIds(List<Integer> workingCenterIds) {
+        this.workingCenterIds = workingCenterIds;
     }
 
-    public void setReadOnlySites(List<Integer> readOnlySitesId) {
-        this.readOnlySitesId = readOnlySitesId;
-    }
-
-    public List<Integer> getCanUpdateSites() {
-        return canUpdateSitesId;
-    }
-
-    public void setCanUpdateSites(List<Integer> readOnlySitesId) {
-        this.canUpdateSitesId = readOnlySitesId;
+    public List<Integer> getWorkingCenterIds() {
+        return workingCenterIds;
     }
 
     public List<Integer> getFeaturesEnabled() {
@@ -218,4 +212,5 @@ public class Group implements Serializable, NotAProxy {
     public void setFeaturesEnabled(List<Integer> featuresEnabledId) {
         this.featuresEnabledId = featuresEnabledId;
     }
+
 }

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.server.applicationservice;
 
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
+import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.ResearchGroup;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.security.SecurityServiceProvider;
 import gov.nih.nci.security.UserProvisioningManager;
@@ -104,8 +106,7 @@ public class BiobankSecurityUtil {
         throws CSObjectNotFoundException {
         edu.ualberta.med.biobank.common.security.Group biobankGroup = new edu.ualberta.med.biobank.common.security.Group(
             group.getGroupId(), group.getGroupName());
-        biobankGroup.setReadOnlySites(new ArrayList<Integer>());
-        biobankGroup.setCanUpdateSites(new ArrayList<Integer>());
+        biobankGroup.setWorkingCenterIds(new ArrayList<Integer>());
         Set<?> pepcList = upm
             .getProtectionElementPrivilegeContextForGroup(group.getGroupId()
                 .toString());
@@ -125,13 +126,12 @@ public class BiobankSecurityUtil {
                 id = pe.getValue();
             }
             biobankGroup.addProtectionElementPrivilege(type, id, privileges);
-            if (type.equals(Site.class.getName()) && id != null) {
+            if ((type.equals(Site.class.getName())
+                || type.equals(Clinic.class.getName()) || type
+                .equals(ResearchGroup.class.getName())) && id != null) {
                 if (privileges
                     .contains(edu.ualberta.med.biobank.common.security.Privilege.UPDATE)) {
-                    biobankGroup.getCanUpdateSites().add(new Integer(id));
-                } else if (privileges
-                    .contains(edu.ualberta.med.biobank.common.security.Privilege.READ)) {
-                    biobankGroup.getReadOnlySites().add(new Integer(id));
+                    biobankGroup.getWorkingCenterIds().add(new Integer(id));
                 }
             }
         }
@@ -159,9 +159,9 @@ public class BiobankSecurityUtil {
             }
             biobankGroup.addProtectionGroupPrivilege(
                 pg.getProtectionGroupName(), privileges);
-            if (edu.ualberta.med.biobank.common.security.Group.PG_SITE_ADMINISTRATION_ID
+            if (edu.ualberta.med.biobank.common.security.Group.PG_CENTER_ADMINISTRATOR_ID
                 .equals(pg.getProtectionGroupId()) && containsFullAccessObject)
-                biobankGroup.setIsSiteAdministrator(true);
+                biobankGroup.setIsCenterAdministrator(true);
         }
         return biobankGroup;
     }
@@ -376,27 +376,19 @@ public class BiobankSecurityUtil {
                 // Default is Read Only
                 addPGRoleAssociationToGroup(upm, serverGroup, 1L,
                     edu.ualberta.med.biobank.common.security.Group.READ_ONLY);
-                if (group.getIsSiteAdministrator()) {
+                if (group.getIsCenterAdministrator()) {
                     addPGRoleAssociationToGroup(
                         upm,
                         serverGroup,
-                        edu.ualberta.med.biobank.common.security.Group.PG_SITE_ADMINISTRATION_ID,
+                        edu.ualberta.med.biobank.common.security.Group.PG_CENTER_ADMINISTRATOR_ID,
                         edu.ualberta.med.biobank.common.security.Group.OBJECT_FULL_ACCESS);
                 }
-                for (Integer siteId : group.getCanUpdateSites()) {
+                for (Integer siteId : group.getWorkingCenterIds()) {
                     setSiteSecurityForGroup(
                         upm,
                         serverGroup,
                         siteId,
-                        edu.ualberta.med.biobank.common.security.Group.SITE_FULL_ACCESS);
-                }
-                for (Integer siteId : group.getReadOnlySites()) {
-                    if (!group.getCanUpdateSites().contains(siteId))
-                        setSiteSecurityForGroup(
-                            upm,
-                            serverGroup,
-                            siteId,
-                            edu.ualberta.med.biobank.common.security.Group.READ_ONLY);
+                        edu.ualberta.med.biobank.common.security.Group.CENTER_FULL_ACCESS);
                 }
                 for (Integer pgId : group.getFeaturesEnabled()) {
                     addPGRoleAssociationToGroup(
@@ -534,7 +526,7 @@ public class BiobankSecurityUtil {
                 if (group
                     .getGroupName()
                     .equals(
-                        edu.ualberta.med.biobank.common.security.Group.GROUP_WEBSITE_ADMINISTRATOR)) {
+                        edu.ualberta.med.biobank.common.security.Group.GROUP_SUPER_ADMIN)) {
                     return true;
                 }
             }

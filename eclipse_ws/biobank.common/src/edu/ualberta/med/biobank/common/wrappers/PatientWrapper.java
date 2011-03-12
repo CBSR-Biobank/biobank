@@ -310,7 +310,7 @@ public class PatientWrapper extends PatientBaseWrapper {
     }
 
     @Override
-    public boolean checkSpecificAccess(User user, Integer siteId) {
+    public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
         if (isNew()) {
             return true;
         }
@@ -318,10 +318,10 @@ public class PatientWrapper extends PatientBaseWrapper {
         StudyWrapper study = getStudy();
         if (study != null) {
             List<SiteWrapper> sites = study.getSiteCollection(false);
-            for (SiteWrapper site : sites) {
+            for (SiteWrapper studySite : sites) {
                 // if can update at least one site, then can add/update a
                 // patient to the linked study
-                if (user.canUpdateSite(site.getId())) {
+                if (user.canUpdateCenter(studySite)) {
                     return true;
                 }
             }

@@ -46,7 +46,7 @@ import org.osgi.service.prefs.Preferences;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.helpers.SessionHelper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.preferences.PreferenceConstants;
@@ -93,6 +93,10 @@ public class LoginDialog extends TitleAreaDialog {
     private Boolean okButtonEnabled;
 
     private boolean setupFinished = false;
+
+    private Button superAdminWidget;
+
+    private boolean superAdminMode = false;
 
     public LoginDialog(Shell parentShell) {
         super(parentShell);
@@ -207,6 +211,11 @@ public class LoginDialog extends TitleAreaDialog {
         passwordWidget = createPassWordText(contents,
             Messages.getString("LoginDialog.field.password.label"), //$NON-NLS-1$
             Authentication.PASSWORD_PROPERTY_NAME, passwordValidator);
+
+        new Label(contents, SWT.NONE);
+        superAdminWidget = new Button(contents, SWT.CHECK);
+        superAdminWidget.setText(Messages
+            .getString("LoginDialog.field.superAdmin")); //$NON-NLS-1$
 
         bindChangeListener();
 
@@ -334,118 +343,124 @@ public class LoginDialog extends TitleAreaDialog {
             .getActiveWorkbenchWindow().getShell().getDisplay(), sessionHelper);
 
         if (sessionHelper.getUser() != null) {
-            List<SiteWrapper> workingCenters = null;
-            try {
-                workingCenters = sessionHelper.getUser().getWorkingCenters(
-                    sessionHelper.getAppService());
-            } catch (Exception e) {
-                BiobankPlugin.openAsyncError(Messages
-                    .getString("LoginDialog.working.center.error.title"), e); //$NON-NLS-1$
-            }
-            if (workingCenters != null) {
-                if ((workingCenters.size() == 0)
-                    && !sessionHelper.getUser().isWebsiteAdministrator())
-                    // cannot access the application.
+            if (superAdminWidget.getSelection()) {
+                // super admin mode
+                superAdminMode = sessionHelper.getUser().isSuperAdministrator();
+                if (!superAdminMode)
                     BiobankPlugin
-                        .openAsyncError(
-                            Messages
-                                .getString("LoginDialog.working.center.error.title"), //$NON-NLS-1$
-                            Messages
-                                .getString("LoginDialog.no.working.center.error.msg")); //$NON-NLS-1$
-                else {
-                    // login successful
-                    pluginPrefs.put(LAST_SERVER, serverWidget.getText());
-                    pluginPrefs.put(LAST_USER_NAME, userNameWidget.getText());
-
-                    if ((serverWidget.getText().length() > 0)
-                        && (serverWidget.getSelectionIndex() == -1)
-                        && !servers.contains(serverWidget.getText())) {
-                        IPreferenceStore prefsStore = BiobankPlugin
-                            .getDefault().getPreferenceStore();
-                        StringBuilder serverList = new StringBuilder();
-                        for (String server : servers) {
-                            serverList.append(server);
-                            serverList.append("\n"); //$NON-NLS-1$
-                        }
-                        prefsStore.putValue(PreferenceConstants.SERVER_LIST,
-                            serverList.append(serverWidget.getText().trim())
-                                .toString());
-                    }
-
-                    if ((userNameWidget.getText().length() > 0)
-                        && (userNameWidget.getSelectionIndex() == -1)
-                        && !userNames.contains(userNameWidget.getText())) {
-                        Preferences prefsUserNames = pluginPrefs
-                            .node(SAVED_USER_NAMES);
-                        Preferences prefsUserName = prefsUserNames.node(Integer
-                            .toString(userNames.size()));
-                        prefsUserName.put(USER_NAME, userNameWidget.getText()
-                            .trim());
-                    }
-
-                    try {
-                        pluginPrefs.flush();
-                    } catch (BackingStoreException e) {
-                        logger.error("Could not save loggin preferences", e); //$NON-NLS-1$
-                    }
-
-                    if (workingCenters.size() == 1) {
-                        sessionHelper.getUser().setCurrentWorkingCenter(
-                            workingCenters.get(0));
-                    } else if (workingCenters.size() > 1) {
-                        new WorkingCenterSelectDialog(getShell(),
-                            sessionHelper.getAppService(),
-                            sessionHelper.getUser()).open();
-                    }
-                    boolean canAddSession = true;
-                    if (sessionHelper.getUser().getCurrentWorkingCenter() == null)
-                        if (sessionHelper.getUser().isWebsiteAdministrator()) {
-                            BiobankPlugin
-                                .openAsyncInformation(
-                                    Messages
-                                        .getString("LoginDialog.working.center.admin.title"), //$NON-NLS-1$
-                                    Messages
-                                        .getString("LoginDialog.no.working.center.admin.msg")); //$NON-NLS-1$
-                            // open the administration perspective if another
-                            // perspective is open
-                            IWorkbench workbench = PlatformUI.getWorkbench();
-                            IWorkbenchWindow activeWindow = workbench
-                                .getActiveWorkbenchWindow();
-                            IWorkbenchPage page = activeWindow.getActivePage();
-                            if (!page.getPerspective().getId()
-                                .equals(MainPerspective.ID)) {
-                                try {
-                                    workbench.showPerspective(
-                                        MainPerspective.ID, activeWindow);
-                                } catch (WorkbenchException e) {
-                                    BiobankPlugin
-                                        .openAsyncError(
-                                            Messages
-                                                .getString("LoginDialog.perspective.open.error.msg"), //$NON-NLS-1$
-                                            e);
-                                }
-                            }
-                        } else {
-                            canAddSession = false;
-                            BiobankPlugin
-                                .openAsyncError(
-                                    Messages
-                                        .getString("LoginDialog.working.center.selection.error.title"), //$NON-NLS-1$
-                                    Messages
-                                        .getString("LoginDialog.working.center.selection.error.msg")); //$NON-NLS-1$
-                        }
-                    if (canAddSession)
-                        // do that last, that way user has his working center
-                        // set
-                        SessionManager.getInstance().addSession(
-                            sessionHelper.getAppService(),
-                            serverWidget.getText(), sessionHelper.getUser());
-
-                }
-
+                        .openAsyncError("Super administrator",
+                            "You don't have rights to connect as super administrator");
             }
+            if (!superAdminMode) {
+                selectWorkingCenter(sessionHelper);
+            }
+            if (superAdminMode
+                || sessionHelper.getUser().getCurrentWorkingCenter() != null) {
+                // login successful
+                savePreferences();
+                SessionManager.getInstance().addSession(
+                    sessionHelper.getAppService(), serverWidget.getText(),
+                    sessionHelper.getUser(), superAdminMode);
+            }
+
         }
         super.okPressed();
+    }
+
+    private void savePreferences() {
+        pluginPrefs.put(LAST_SERVER, serverWidget.getText());
+        pluginPrefs.put(LAST_USER_NAME, userNameWidget.getText());
+
+        if ((serverWidget.getText().length() > 0)
+            && (serverWidget.getSelectionIndex() == -1)
+            && !servers.contains(serverWidget.getText())) {
+            IPreferenceStore prefsStore = BiobankPlugin.getDefault()
+                .getPreferenceStore();
+            StringBuilder serverList = new StringBuilder();
+            for (String server : servers) {
+                serverList.append(server);
+                serverList.append("\n"); //$NON-NLS-1$
+            }
+            prefsStore.putValue(PreferenceConstants.SERVER_LIST, serverList
+                .append(serverWidget.getText().trim()).toString());
+        }
+
+        if ((userNameWidget.getText().length() > 0)
+            && (userNameWidget.getSelectionIndex() == -1)
+            && !userNames.contains(userNameWidget.getText())) {
+            Preferences prefsUserNames = pluginPrefs.node(SAVED_USER_NAMES);
+            Preferences prefsUserName = prefsUserNames.node(Integer
+                .toString(userNames.size()));
+            prefsUserName.put(USER_NAME, userNameWidget.getText().trim());
+        }
+
+        try {
+            pluginPrefs.flush();
+        } catch (BackingStoreException e) {
+            logger.error("Could not save loggin preferences", e); //$NON-NLS-1$
+        }
+    }
+
+    private void selectWorkingCenter(SessionHelper sessionHelper) {
+        List<CenterWrapper<?>> workingCenters = null;
+        try {
+            workingCenters = sessionHelper.getUser().getWorkingCenters(
+                sessionHelper.getAppService());
+        } catch (Exception e) {
+            BiobankPlugin
+                .openAsyncError(Messages
+                    .getString("LoginDialog.working.center.error.title"), e); //$NON-NLS-1$
+        }
+        if (workingCenters != null) {
+            if ((workingCenters.size() == 0)
+                && !sessionHelper.getUser().isSuperAdministrator())
+                // cannot access the application.
+                BiobankPlugin.openAsyncError(Messages
+                    .getString("LoginDialog.working.center.error.title"), //$NON-NLS-1$
+                    Messages
+                        .getString("LoginDialog.no.working.center.error.msg")); //$NON-NLS-1$
+            else if (workingCenters.size() == 1) {
+                sessionHelper.getUser().setCurrentWorkingCenter(
+                    workingCenters.get(0));
+            } else if (workingCenters.size() > 1) {
+                new WorkingCenterSelectDialog(getShell(),
+                    sessionHelper.getAppService(), sessionHelper.getUser())
+                    .open();
+            }
+        }
+        if (sessionHelper.getUser().getCurrentWorkingCenter() == null)
+            if (sessionHelper.getUser().isSuperAdministrator()) {
+                // connect in admin mode
+                BiobankPlugin.openAsyncInformation(Messages
+                    .getString("LoginDialog.working.center.admin.title"), //$NON-NLS-1$
+                    Messages
+                        .getString("LoginDialog.no.working.center.admin.msg")); //$NON-NLS-1$
+                // open the administration perspective if another
+                // perspective is open
+                IWorkbench workbench = PlatformUI.getWorkbench();
+                IWorkbenchWindow activeWindow = workbench
+                    .getActiveWorkbenchWindow();
+                IWorkbenchPage page = activeWindow.getActivePage();
+                if (!page.getPerspective().getId().equals(MainPerspective.ID)) {
+                    try {
+                        workbench.showPerspective(MainPerspective.ID,
+                            activeWindow);
+                    } catch (WorkbenchException e) {
+                        BiobankPlugin
+                            .openAsyncError(
+                                Messages
+                                    .getString("LoginDialog.perspective.open.error.msg"), //$NON-NLS-1$
+                                e);
+                    }
+                }
+            } else {
+                BiobankPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("LoginDialog.working.center.selection.error.title"), //$NON-NLS-1$
+                        Messages
+                            .getString("LoginDialog.working.center.selection.error.msg")); //$NON-NLS-1$
+            }
     }
 
     public class Authentication {
@@ -483,7 +498,7 @@ public class LoginDialog extends TitleAreaDialog {
 
         @Override
         public String toString() {
-            return server + "/" + username + "/" + password; //$NON-NLS-1$ //$NON-NLS-2$
+            return server + "/" + username + "/" + password; //$NON-NLS-1$ //$NON-NLS-2$ 
         }
     }
 }

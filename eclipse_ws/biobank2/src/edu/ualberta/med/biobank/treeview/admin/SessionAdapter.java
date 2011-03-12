@@ -56,7 +56,7 @@ public class SessionAdapter extends AdapterBase {
     }
 
     private void addGroupNodes() {
-        if (user.isWebsiteAdministrator()) {
+        if (user.isSuperAdministrator()) {
             addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
             addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
         }

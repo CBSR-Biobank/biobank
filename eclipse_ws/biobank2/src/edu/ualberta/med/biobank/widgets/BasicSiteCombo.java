@@ -59,7 +59,7 @@ public class BasicSiteCombo extends BiobankWidget {
             if (canUpdateOnly) {
                 List<SiteWrapper> updateSites = new ArrayList<SiteWrapper>();
                 for (SiteWrapper site : allSites)
-                    if (SessionManager.getUser().canUpdateSite(site))
+                    if (SessionManager.getUser().canUpdateCenter(site))
                         updateSites.add(site);
                 comboViewer.setInput(updateSites);
             } else {

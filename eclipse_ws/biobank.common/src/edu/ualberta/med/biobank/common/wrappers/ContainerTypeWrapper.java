@@ -523,7 +523,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     }
 
     @Override
-    public boolean checkSpecificAccess(User user, Integer siteId) {
-        return user.isSiteAdministrator(siteId);
+    public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
+        return user.isCenterAdministrator(center);
     }
 }
