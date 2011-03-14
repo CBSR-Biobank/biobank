@@ -181,6 +181,12 @@ public class ReportWrapper extends ReportBaseWrapper {
     }
 
     @Override
+    public Boolean getIsCount() {
+        Boolean isCount = super.getIsCount();
+        return isCount == null || !isCount ? Boolean.FALSE : Boolean.TRUE;
+    }
+
+    @Override
     public int compareTo(ModelWrapper<Report> o) {
         if (o instanceof ReportWrapper) {
             return getName().compareTo(((ReportWrapper) o).getName());
