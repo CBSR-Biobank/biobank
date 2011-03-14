@@ -99,7 +99,7 @@ public class LinkFormPatientManagement {
 
     protected void createCollectionEventWidgets(Composite compositeFields) {
         cEventComboLabel = widgetCreator.createLabel(compositeFields,
-            Messages.getString("ScanLink.visit.label.drawn")); //$NON-NLS-1$
+            Messages.getString("ScanLink.visit.number")); //$NON-NLS-1$
         viewerCollectionEvents = widgetCreator.createComboViewer(
             compositeFields, cEventComboLabel, null, null,
             Messages.getString("ScanLink.visit.validationMsg"), false, null, //$NON-NLS-1$

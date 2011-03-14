@@ -35,6 +35,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
@@ -153,17 +154,6 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         createFieldsSection();
         createLocationSection();
 
-        // FIXME
-        // if (viewerSpecimenTypes != null) {
-        // viewerSpecimenTypes.setInput(null);
-        // specimen.setSpecimenType(null);
-        // if (newCabinetPositionValidator.validate(
-        // newCabinetPositionText.getText()).equals(Status.OK_STATUS)) {
-        // initContainersFromPosition();
-        // setTypeCombosLists();
-        // }
-        // }
-
         cancelConfirmWidget = new CancelConfirmWidget(page, this, true);
 
         addBooleanBinding(new WritableValue(Boolean.FALSE, Boolean.class),
@@ -262,7 +252,6 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
 
                 @Override
                 public void textModified() {
-                    // viewerSpecimenTypes.setInput(null);
                     positionTextModified = true;
                     resultShownValue.setValue(Boolean.FALSE);
                     displayPositions(false);
@@ -276,7 +265,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         inventoryIdText = (BiobankText) createBoundWidgetWithLabel(
             fieldsComposite, BiobankText.class, SWT.NONE,
             Messages.getString("Cabinet.inventoryId.label"), new String[0], //$NON-NLS-1$
-            specimen, "inventoryId", //$NON-NLS-1$
+            specimen, SpecimenPeer.INVENTORY_ID.getName(), //$NON-NLS-1$
             inventoryIDValidator);
         inventoryIdText.addKeyListener(textFieldKeyListener);
         inventoryIdText.addFocusListener(new FocusAdapter() {

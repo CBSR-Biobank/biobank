@@ -260,7 +260,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             .getAliquotedSpecimenCollection(false);
         if (aliquotedSpecimenCollection != null) {
             for (AliquotedSpecimenWrapper ss : aliquotedSpecimenCollection) {
-                if (getSpecimenType().equals(getSpecimenType())) {
+                if (getSpecimenType().equals(ss.getSpecimenType())) {
                     setQuantity(ss.getVolume());
                     return;
                 }
