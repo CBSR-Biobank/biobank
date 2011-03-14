@@ -488,8 +488,8 @@
       <transaction src="${data.sql.dir}/createIndices.sql" />
       <transaction src="${data.sql.dir}/uniqueConstraints.sql" />
       <transaction src="${data.sql.dir}/activityStatus.sql" />
-      <transaction src="${data.sql.dir}/globalEventAttr.sql" />
       <transaction src="${data.sql.dir}/eventAttrType.sql" />
+      <transaction src="${data.sql.dir}/globalEventAttr.sql" />
       <transaction src="${data.sql.dir}/specimenTypes.sql" />
       <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
@@ -792,7 +792,7 @@
 	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}"
 		tofile="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib\${bean.file}"/>
 	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}"
-		tofile="${cacore.sdk.dir}/output/biobank2/package/local-client/lib\${bean.file}"/>  	
+		tofile="${cacore.sdk.dir}/output/biobank2/package/local-client/lib\${bean.file}"/>
     <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
          basedir="${cacore.sdk.dir}\${output.src.dir}">
       <manifest>

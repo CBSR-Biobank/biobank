@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
  *
  *  BioBank2 MySQL upgrade script for model version 1.3.1 to 1.4.0
- *
+ *FK28D36ACF2A2464F
  *----------------------------------------------------------------------------*/
 
 
@@ -209,7 +209,7 @@ abstract_shipment as aship, origin_info as oi
        and aship.id=csp.CLINIC_SHIPMENT_ID
        and oi.aship_id=aship.id
        and aship.discriminator='ClinicShipment'
-       and specimen.pv_id=pv.id and specimen.sv_id is null;
+       and specimen.pv_id=pv.id;
 
 drop index aship_id_idx on origin_info;
 
@@ -297,11 +297,17 @@ CREATE TABLE aliquoted_specimen (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
+-- fix database errors so that foreign key constraints do not fail
+
 INSERT INTO aliquoted_specimen (quantity,volume,activity_status_id,study_id,specimen_type_id)
-       SELECT quantity,volume,activity_status_id,study_id,specimen_type.id
+       SELECT quantity,volume,sample_storage.activity_status_id,study_id,specimen_type.id
        FROM sample_storage
        JOIN sample_type ON sample_type.id=sample_storage.sample_type_id
        JOIN specimen_type ON specimen_type.name=sample_type.name;
+
+delete aspc from aliquoted_specimen as aspc
+       left join study on study.id=aspc.study_id
+       where study.id is null;
 
 ALTER TABLE aliquoted_specimen MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -318,11 +324,15 @@ CREATE TABLE source_specimen (
 
 INSERT INTO source_specimen (need_time_drawn,need_original_volume,study_id,specimen_type_id)
        SELECT need_time_drawn,need_original_volume,study_id,specimen_type.id
-       FROM study_source_vessel
-       JOIN source_vessel on source_vessel.id=study_source_vessel.source_vessel_id
+       FROM study_source_vessel as ssv
+       JOIN source_vessel on source_vessel.id=ssv.source_vessel_id
        JOIN specimen_type ON specimen_type.name=source_vessel.name;
 
 ALTER TABLE source_specimen MODIFY COLUMN ID INT(11) NOT NULL;
+
+delete ss from source_specimen as ss
+       left join study on study.id=ss.study_id
+       where study.id is null;
 
 ALTER TABLE STUDY
       CHANGE COLUMN NAME NAME VARCHAR(255) NOT NULL UNIQUE,
@@ -352,17 +362,17 @@ INSERT INTO collection_event (visit_number,comment,patient_id,activity_status_id
 
 create index pv_id_idx on collection_event(pv_id);
 
--- set specimen.collection_event_id for aliquoted specimens
-
-update specimen,collection_event as ce
-       set specimen.collection_event_id=ce.id
-       where ce.pv_id=specimen.pv_id and specimen.sv_id is null;
-
 -- set specimen.original_collection_event_id for source specimens
 
 update specimen,collection_event as ce
-       set specimen.original_collection_event_id=ce.id
+       set specimen.original_collection_event_id=ce.id,specimen.collection_event_id=ce.id
        where ce.pv_id=specimen.pv_id and specimen.sv_id is not null;
+
+-- set specimen.collection_event_id for aliquoted specimens
+
+update specimen,collection_event as ce
+       set specimen.collection_event_id=ce.id,specimen.original_collection_event_id=null
+       where ce.pv_id=specimen.pv_id and specimen.sv_id is null;
 
 ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -391,15 +401,18 @@ ALTER TABLE study_event_attr
       ADD INDEX FK3EACD8ECC449A4 (ACTIVITY_STATUS_ID),
       ADD INDEX FK3EACD8EC5B770B31 (EVENT_ATTR_TYPE_ID);
 
-
-
 ALTER TABLE event_attr
       CHANGE COLUMN STUDY_PV_ATTR_ID STUDY_EVENT_ATTR_ID INT(11) NOT NULL,
-      CHANGE COLUMN PATIENT_VISIT_ID COLLECTION_EVENT_ID INT(11) NOT NULL COMMENT '',
+      ADD COLUMN COLLECTION_EVENT_ID int(11) COMMENT '' NOT NULL,
       DROP INDEX FK200CD48ABFED96DB,
       DROP INDEX FK200CD48AE5099AFA,
       ADD INDEX FK59508C96280272F2 (COLLECTION_EVENT_ID),
       ADD INDEX FK59508C96A9CFCFDB (STUDY_EVENT_ATTR_ID);
+
+update event_attr as ea set collection_event_id=(select id
+from collection_event as ce where ce.pv_id=ea.patient_visit_id);
+
+alter table event_attr drop column patient_visit_id;
 
 /*****************************************************
  * processing events
@@ -1076,13 +1089,39 @@ alter table study engine=InnoDB;
 alter table study_contact engine=InnoDB;
 alter table study_event_attr engine=InnoDB;
 
--- fix database errors so that foreign key constraints do not fail
-
-delete aspc from aliquoted_specimen as aspc
-       left join study on study.id=aspc.study_id
-       where study.id is null;
-
 -- mysql-diff changes to fully convert to InnoDB
+
+ALTER TABLE abstract_position
+      ADD CONSTRAINT FKBC4AE0A69BFD88CF FOREIGN KEY FKBC4AE0A69BFD88CF (CONTAINER_ID) REFERENCES container (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FKBC4AE0A67366CE44 FOREIGN KEY FKBC4AE0A67366CE44 (PARENT_CONTAINER_ID) REFERENCES container (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FKBC4AE0A6EF199765 FOREIGN KEY FKBC4AE0A6EF199765 (SPECIMEN_ID) REFERENCES specimen (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE aliquoted_specimen
+      ADD CONSTRAINT FK75EACAC138445996 FOREIGN KEY FK75EACAC138445996 (SPECIMEN_TYPE_ID) REFERENCES specimen_type (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK75EACAC1C449A4 FOREIGN KEY FK75EACAC1C449A4 (ACTIVITY_STATUS_ID) REFERENCES activity_status (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK75EACAC1F2A2464F FOREIGN KEY FK75EACAC1F2A2464F (STUDY_ID) REFERENCES study (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE center
+      ADD CONSTRAINT FK7645C0556AF2992F FOREIGN KEY FK7645C0556AF2992F (ADDRESS_ID) REFERENCES address (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK7645C055C449A4 FOREIGN KEY FK7645C055C449A4 (ACTIVITY_STATUS_ID) REFERENCES activity_status (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK7645C055F2A2464F FOREIGN KEY FK7645C055F2A2464F (STUDY_ID) REFERENCES study (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE collection_event
+      ADD CONSTRAINT FKEDAD8999B563F38F FOREIGN KEY FKEDAD8999B563F38F (PATIENT_ID) REFERENCES patient (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FKEDAD8999C449A4 FOREIGN KEY FKEDAD8999C449A4 (ACTIVITY_STATUS_ID) REFERENCES activity_status (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE contact
+      ADD CONSTRAINT FK6382B00057F87A25 FOREIGN KEY FK6382B00057F87A25 (CLINIC_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE container
+      ADD CONSTRAINT FK8D995C613F52C885 FOREIGN KEY FK8D995C613F52C885 (SITE_ID) REFERENCES center (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK8D995C61AC528270 FOREIGN KEY FK8D995C61AC528270 (POSITION_ID) REFERENCES abstract_position (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK8D995C61B3E77A12 FOREIGN KEY FK8D995C61B3E77A12 (CONTAINER_TYPE_ID) REFERENCES container_type (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FK8D995C61C449A4 FOREIGN KEY FK8D995C61C449A4 (ACTIVITY_STATUS_ID) REFERENCES activity_status (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
+
+ALTER TABLE container_path
+      ADD CONSTRAINT FKB2C64D431BE0C379 FOREIGN KEY FKB2C64D431BE0C379 (TOP_CONTAINER_ID) REFERENCES container (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
+      ADD CONSTRAINT FKB2C64D439BFD88CF FOREIGN KEY FKB2C64D439BFD88CF (CONTAINER_ID) REFERENCES container (ID) ON UPDATE NO ACTION ON DELETE NO ACTION;
 
 ALTER TABLE container_type
       ADD CONSTRAINT FKB2C878581764E225 FOREIGN KEY FKB2C878581764E225 (CAPACITY_ID) REFERENCES capacity (ID) ON UPDATE NO ACTION ON DELETE NO ACTION,
