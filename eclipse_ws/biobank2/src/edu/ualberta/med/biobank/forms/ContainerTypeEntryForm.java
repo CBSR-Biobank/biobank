@@ -214,7 +214,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             .getAllLabelingSchemesMap(appService).values()) {
             labelingSchemeMap.put(scheme.getId(), scheme.getName());
         }
-        labelingSchemeComboViewer = createComboViewer(client,
+        labelingSchemeComboViewer = createComboViewer(
+            client,
             Messages.getString("containerType.field.label.scheme"), //$NON-NLS-1$
             labelingSchemeMap.values(), currentScheme,
             Messages.getString("ContainerTypeEntryForm.scheme.validation.msg"), //$NON-NLS-1$
@@ -233,7 +234,8 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                 }
             });
 
-        activityStatusComboViewer = createComboViewer(client,
+        activityStatusComboViewer = createComboViewer(
+            client,
             Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             containerType.getActivityStatus(),
@@ -302,9 +304,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             parent,
             SWT.NONE,
             Messages
-                .getString("ContainerTypeEntryForm.contents.specimen.selected"), //$NON-NLS-1$
-            Messages
                 .getString("ContainerTypeEntryForm.contents.specimen.available"), //$NON-NLS-1$
+            Messages
+                .getString("ContainerTypeEntryForm.contents.specimen.selected"), //$NON-NLS-1$
             100);
         specimensMultiSelect.adaptToToolkit(toolkit, true);
         specimensMultiSelect.addSelectionChangedListener(multiSelectListener);
@@ -339,9 +341,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             parent,
             SWT.NONE,
             Messages
-                .getString("ContainerTypeEntryForm.contents.subcontainer.selected"), //$NON-NLS-1$
-            Messages
                 .getString("ContainerTypeEntryForm.contents.subcontainer.available"), //$NON-NLS-1$
+            Messages
+                .getString("ContainerTypeEntryForm.contents.subcontainer.selected"), //$NON-NLS-1$
             100);
         childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);

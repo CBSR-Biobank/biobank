@@ -437,6 +437,7 @@ public class LoginDialog extends TitleAreaDialog {
                         .getString("LoginDialog.no.working.center.admin.msg")); //$NON-NLS-1$
                 // open the administration perspective if another
                 // perspective is open
+                superAdminMode = true;
                 IWorkbench workbench = PlatformUI.getWorkbench();
                 IWorkbenchWindow activeWindow = workbench
                     .getActiveWorkbenchWindow();

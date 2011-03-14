@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public class LocalInfo implements Serializable {
     private String userName;
-    private Map<Integer, SiteInfo> sitesInfos;
+    private Map<Integer, CenterInfo> centerInfos;
 
     public String getUsername() {
         return userName;
@@ -23,41 +23,46 @@ public class LocalInfo implements Serializable {
 
     private static final long serialVersionUID = 7526471155622776147L;
 
-    public void addNewSiteInfo(Integer siteId, String nameShort, Type type) {
-        if (sitesInfos == null)
-            sitesInfos = new HashMap<Integer, SiteInfo>();
-        sitesInfos.put(siteId, new SiteInfo(siteId, nameShort, type));
+    public void addNewCenterInfo(Integer centerId, String nameShort,
+        Class<?> centerClass, ActionType type) {
+        if (centerInfos == null)
+            centerInfos = new HashMap<Integer, CenterInfo>();
+        centerInfos.put(centerId, new CenterInfo(centerId, nameShort,
+            centerClass, type));
     }
 
-    public boolean hasSiteInfos() {
-        return (sitesInfos != null && sitesInfos.size() > 0);
+    public boolean hasCenterInfos() {
+        return (centerInfos != null && centerInfos.size() > 0);
     }
 
-    public void clearSiteInfos() {
-        if (sitesInfos != null)
-            sitesInfos.clear();
+    public void clearCenterInfos() {
+        if (centerInfos != null)
+            centerInfos.clear();
     }
 
-    public Set<Entry<Integer, SiteInfo>> getSitesInfosEntrySet() {
-        if (sitesInfos == null)
+    public Set<Entry<Integer, CenterInfo>> getCenterInfosEntrySet() {
+        if (centerInfos == null)
             return null;
-        return sitesInfos.entrySet();
+        return centerInfos.entrySet();
     }
 
-    public static class SiteInfo {
+    public static class CenterInfo {
         public Integer id;
         public String nameShort;
-        public Type type;
+        public Class<?> centerClass;
+        public ActionType type;
 
-        public SiteInfo(Integer id, String nameShort, Type type) {
+        public CenterInfo(Integer id, String nameShort, Class<?> centerClass,
+            ActionType type) {
             super();
             this.id = id;
             this.nameShort = nameShort;
+            this.centerClass = centerClass;
             this.type = type;
         }
     }
 
-    public enum Type {
+    public enum ActionType {
         INSERT, DELETE
     };
 

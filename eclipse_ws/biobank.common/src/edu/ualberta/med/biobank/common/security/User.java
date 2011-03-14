@@ -121,7 +121,7 @@ public class User implements Serializable, NotAProxy {
 
     public boolean isSuperAdministrator() {
         for (Group group : groups) {
-            if (group.isSuperAdministrator()) {
+            if (group.isSuperAdministratorGroup()) {
                 return true;
             }
         }

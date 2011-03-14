@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.user;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -19,7 +19,9 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.ProtectionGroupPrivilege;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.dialogs.BiobankDialog;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.multiselect.MultiSelectWidget;
@@ -36,8 +38,9 @@ public class GroupEditDialog extends BiobankDialog {
 
     private Group originalGroup, modifiedGroup;
     private MultiSelectWidget workingCentersWidget;
-    private List<SiteWrapper> allSites;
-    private MultiSelectWidget featuresWidget;
+    private List<CenterWrapper<?>> allCenters;
+    private MultiSelectWidget globalFeaturesWidget;
+    private MultiSelectWidget centerFeaturesWidget;
 
     public GroupEditDialog(Shell parent, Group originalGroup, boolean isNewGroup) {
         super(parent);
@@ -85,58 +88,84 @@ public class GroupEditDialog extends BiobankDialog {
 
         final Button isSiteAdministratorCheckBox = (Button) createBoundWidgetWithLabel(
             contents, Button.class, SWT.CHECK,
-            Messages.getString("GroupEditDialog.site.administrator.title"),
-            null, modifiedGroup, "isSiteAdministrator", null);
+            Messages.getString("GroupEditDialog.center.administrator.title"),
+            null, modifiedGroup, "isWorkingCentersAdministrator", null);
         isSiteAdministratorCheckBox
             .addSelectionListener(new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {
-                    widgetCreator.showWidget(featuresWidget,
+                    widgetCreator.showWidget(centerFeaturesWidget,
                         !isSiteAdministratorCheckBox.getSelection());
                 }
             });
-        isSiteAdministratorCheckBox
-            .setToolTipText("All features are enabled when a group is site administrator");
+        isSiteAdministratorCheckBox.setToolTipText(Messages
+            .getString("GroupEditDialog.center.administrator.tooltip"));
 
-        List<String> siteNames = new ArrayList<String>();
-        final LinkedHashMap<Integer, String> siteMap = new LinkedHashMap<Integer, String>();
-        if (getAllSites() != null)
-            for (SiteWrapper site : getAllSites()) {
-                Integer siteId = site.getId();
-                String siteName = site.getNameShort();
-                siteNames.add(siteName);
-                siteMap.put(siteId, siteName);
+        List<String> centerNames = new ArrayList<String>();
+        final LinkedHashMap<Integer, String> centerMap = new LinkedHashMap<Integer, String>();
+        if (getAllCenters() != null)
+            for (CenterWrapper<?> center : getAllCenters()) {
+                Integer centerId = center.getId();
+                String centerName = center.getNameShort();
+                centerNames.add(centerName);
+                centerMap.put(centerId, centerName);
             }
 
         workingCentersWidget = new MultiSelectWidget(parent, SWT.NONE,
-            Messages.getString("GroupEditDialog.site.list.canUpdate"), //$NON-NLS-1$ 
-            Messages.getString("GroupEditDialog.site.list.available"), 75); //$NON-NLS-1$
-        workingCentersWidget.setSelections(siteMap,
+            Messages.getString("GroupEditDialog.center.list.available"), //$NON-NLS-1$ 
+            Messages.getString("GroupEditDialog.center.list.working"), 75); //$NON-NLS-1$
+        workingCentersWidget.setSelections(centerMap,
             modifiedGroup.getWorkingCenterIds());
 
-        List<ProtectionGroupPrivilege> features = SessionManager
-            .getAppService().getSecurityFeatures();
-        final LinkedHashMap<Integer, String> featuresMap = new LinkedHashMap<Integer, String>();
-        for (ProtectionGroupPrivilege pgp : features) {
-            featuresMap.put(pgp.getId().intValue(), pgp.getName());
-        }
-        featuresWidget = new MultiSelectWidget(parent, SWT.NONE,
-            Messages.getString("GroupEditDialog.feature.list.selected"), //$NON-NLS-1$
-            Messages.getString("GroupEditDialog.feature.list.available"), 75); //$NON-NLS-1$ 
-        featuresWidget.setSelections(featuresMap,
-            modifiedGroup.getFeaturesEnabled());
+        globalFeaturesWidget = createFeaturesSelectionWidget(
+            parent,
+            SessionManager.getAppService().getSecurityGlobalFeatures(),
+            modifiedGroup.getGlobalFeaturesEnabled(),
+            BiobankSecurityUtil.GLOBAL_FEATURE_START_NAME,
+            Messages.getString("GroupEditDialog.feature.global.list.available"), //$NON-NLS-1$
+            Messages.getString("GroupEditDialog.feature.global.list.selected")); //$NON-NLS-1$
+
+        centerFeaturesWidget = createFeaturesSelectionWidget(
+            parent,
+            SessionManager.getAppService().getSecurityCenterFeatures(),
+            modifiedGroup.getCenterFeaturesEnabled(),
+            BiobankSecurityUtil.CENTER_FEATURE_START_NAME,
+            Messages.getString("GroupEditDialog.feature.center.list.available"), //$NON-NLS-1$
+            Messages.getString("GroupEditDialog.feature.center.list.selected")); //$NON-NLS-1$
+        // FIXME display not refresh properly
+        widgetCreator.showWidget(centerFeaturesWidget,
+            !modifiedGroup.getIsWorkingCentersAdministrator());
     }
 
-    private List<SiteWrapper> getAllSites() {
-        if (allSites == null) {
+    private MultiSelectWidget createFeaturesSelectionWidget(Composite parent,
+        List<ProtectionGroupPrivilege> availableFeatures,
+        List<Integer> selectedFeatures, String replaceString,
+        String availableString, String enabledString) {
+        final LinkedHashMap<Integer, String> featuresMap = new LinkedHashMap<Integer, String>();
+        for (ProtectionGroupPrivilege pgp : availableFeatures) {
+            featuresMap.put(pgp.getId().intValue(),
+                pgp.getName().replace(replaceString, ""));
+        }
+        MultiSelectWidget featuresWidget = new MultiSelectWidget(parent,
+            SWT.NONE, availableString, enabledString, 75); //$NON-NLS-1$
+        featuresWidget.setSelections(featuresMap, selectedFeatures);
+        return featuresWidget;
+    }
+
+    private List<CenterWrapper<?>> getAllCenters() {
+        if (allCenters == null) {
             try {
-                allSites = SiteWrapper.getSites(SessionManager.getAppService());
+                // FIXME can retrive everything ?
+                allCenters = CenterWrapper.getAllCenters(SessionManager
+                    .getAppService());
             } catch (Exception e) {
-                BiobankPlugin.openAsyncError(Messages
-                    .getString("GroupEditDialog.msg.error.retrieve.sites"), e); //$NON-NLS-1$
+                BiobankPlugin
+                    .openAsyncError(
+                        Messages
+                            .getString("GroupEditDialog.msg.error.retrieve.centers"), e); //$NON-NLS-1$
             }
         }
-        return allSites;
+        return allCenters;
     }
 
     @Override
@@ -146,7 +175,10 @@ public class GroupEditDialog extends BiobankDialog {
         try {
             modifiedGroup.setWorkingCenterIds(workingCentersWidget
                 .getSelected());
-            modifiedGroup.setFeaturesEnabled(featuresWidget.getSelected());
+            modifiedGroup.setGlobalFeaturesEnabled(globalFeaturesWidget
+                .getSelected());
+            modifiedGroup.setCenterFeaturesEnabled(centerFeaturesWidget
+                .getSelected());
             Group groupeResult = SessionManager.getAppService().persistGroup(
                 modifiedGroup);
             originalGroup.copy(groupeResult);

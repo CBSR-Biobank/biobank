@@ -54,7 +54,7 @@ public class MultiSelectWidget extends BiobankWidget {
         setLayout(new GridLayout(3, false));
         setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
 
-        availTree = createLabelledTree(this, rightLabel);
+        availTree = createLabelledTree(this, leftLabel);
         availTree.setInput(availTreeRootNode);
         availTree.setComparator(new ViewerComparator());
 
@@ -71,7 +71,7 @@ public class MultiSelectWidget extends BiobankWidget {
             .get(BiobankPlugin.IMG_ARROW_LEFT));
         moveLeftButton.setToolTipText("Remove from selected");
 
-        selTree = createLabelledTree(this, leftLabel);
+        selTree = createLabelledTree(this, rightLabel);
         selTree.setInput(selTreeRootNode);
         selTree.setComparator(new ViewerComparator());
 

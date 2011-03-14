@@ -167,9 +167,15 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<ProtectionGroupPrivilege> getSecurityFeatures()
+    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures()
         throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityFeatures();
+        return BiobankSecurityUtil.getSecurityGlobalFeatures();
+    }
+
+    @Override
+    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures()
+        throws ApplicationException {
+        return BiobankSecurityUtil.getSecurityCenterFeatures();
     }
 
     @Override

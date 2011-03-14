@@ -10,6 +10,7 @@ import java.util.Set;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
 
 public class Group implements Serializable, NotAProxy {
 
@@ -19,7 +20,7 @@ public class Group implements Serializable, NotAProxy {
     public static final String GROUP_SUPER_ADMIN = "Super Administrator";
     // need the id if is trying to rename it. What is the best ? Are we sure
     // this will be always initialized that way ?
-    public static final Long GROUP_SUPER_AMDIN_ID = 5L;
+    public static final Long GROUP_SUPER_ADMIN_ID = 5L;
 
     // FIXME just remember the ID that should never change ?
     public static final String PG_CENTER_ADMINISTRATOR = "Internal: Center Administrator";
@@ -45,15 +46,17 @@ public class Group implements Serializable, NotAProxy {
     private Map<String, ProtectionGroupPrivilege> pgMap;
 
     private List<Integer> workingCenterIds;
-    private List<Integer> featuresEnabledId;
-    private Boolean isCenterAdministrator;
+    private List<Integer> globalFeaturesEnabledId;
+    private List<Integer> centerFeaturesEnabledId;
+    private Boolean isWorkingCentersAdministrator;
 
     public Group() {
         pePrivilegeMap = new HashMap<ProtectionElement, Set<Privilege>>();
         pgMap = new HashMap<String, ProtectionGroupPrivilege>();
         workingCenterIds = new ArrayList<Integer>();
-        featuresEnabledId = new ArrayList<Integer>();
-        isCenterAdministrator = false;
+        globalFeaturesEnabledId = new ArrayList<Integer>();
+        centerFeaturesEnabledId = new ArrayList<Integer>();
+        isWorkingCentersAdministrator = false;
     }
 
     public Group(Long id, String name) {
@@ -78,7 +81,7 @@ public class Group implements Serializable, NotAProxy {
         return name;
     }
 
-    public boolean isSuperAdministrator() {
+    public boolean isSuperAdministratorGroup() {
         return name != null && name.equals(GROUP_SUPER_ADMIN);
     }
 
@@ -93,12 +96,19 @@ public class Group implements Serializable, NotAProxy {
         privileges.addAll(newPrivileges);
     }
 
-    public void addProtectionGroupPrivilege(String name,
-        Set<Privilege> newPrivileges) {
+    public void addProtectionGroupPrivilege(Long id, String name,
+        String description, Set<Privilege> newPrivileges) {
         ProtectionGroupPrivilege pgp = pgMap.get(name);
         if (pgp == null) {
-            pgp = new ProtectionGroupPrivilege(name);
+            pgp = new ProtectionGroupPrivilege(id, name, description);
             pgMap.put(name, pgp);
+            if (pgp.getName().startsWith(
+                BiobankSecurityUtil.CENTER_FEATURE_START_NAME)) {
+                centerFeaturesEnabledId.add((int) pgp.getId().longValue());
+            } else if (pgp.getName().startsWith(
+                BiobankSecurityUtil.GLOBAL_FEATURE_START_NAME)) {
+                globalFeaturesEnabledId.add((int) pgp.getId().longValue());
+            }
         }
         pgp.addPrivileges(newPrivileges);
     }
@@ -151,17 +161,17 @@ public class Group implements Serializable, NotAProxy {
     }
 
     /**
-     * @return true is is center administrator of centers the group can update.
+     * @return true is is administrator of working centers of this group.
      */
-    public boolean getIsCenterAdministrator() {
-        return isCenterAdministrator;
+    public boolean getIsWorkingCentersAdministrator() {
+        return isWorkingCentersAdministrator;
     }
 
     /**
-     * set if the group is center administrator of centers the group can update.
+     * set if the group is administrator of working centers of this group.
      */
-    public void setIsCenterAdministrator(boolean admin) {
-        isCenterAdministrator = admin;
+    public void setIsWorkingCentersAdministrator(boolean admin) {
+        isWorkingCentersAdministrator = admin;
     }
 
     public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
@@ -181,11 +191,15 @@ public class Group implements Serializable, NotAProxy {
     public void copy(Group group) {
         id = group.getId();
         name = group.getName();
-        isCenterAdministrator = group.isCenterAdministrator;
+        isWorkingCentersAdministrator = group.isWorkingCentersAdministrator;
         pePrivilegeMap = new HashMap<ProtectionElement, Set<Privilege>>(
             group.pePrivilegeMap);
         pgMap = new HashMap<String, ProtectionGroupPrivilege>(group.pgMap);
         workingCenterIds = new ArrayList<Integer>(group.workingCenterIds);
+        globalFeaturesEnabledId = new ArrayList<Integer>(
+            group.globalFeaturesEnabledId);
+        centerFeaturesEnabledId = new ArrayList<Integer>(
+            group.centerFeaturesEnabledId);
     }
 
     public boolean canBeDeleted() {
@@ -194,7 +208,7 @@ public class Group implements Serializable, NotAProxy {
 
     public boolean canBeEdited() {
         return !GROUP_SUPER_ADMIN.equals(name)
-            && !GROUP_SUPER_AMDIN_ID.equals(id);
+            && !GROUP_SUPER_ADMIN_ID.equals(id);
     }
 
     public void setWorkingCenterIds(List<Integer> workingCenterIds) {
@@ -205,12 +219,19 @@ public class Group implements Serializable, NotAProxy {
         return workingCenterIds;
     }
 
-    public List<Integer> getFeaturesEnabled() {
-        return featuresEnabledId;
+    public List<Integer> getGlobalFeaturesEnabled() {
+        return globalFeaturesEnabledId;
     }
 
-    public void setFeaturesEnabled(List<Integer> featuresEnabledId) {
-        this.featuresEnabledId = featuresEnabledId;
+    public void setGlobalFeaturesEnabled(List<Integer> globalFeaturesEnabledId) {
+        this.globalFeaturesEnabledId = globalFeaturesEnabledId;
     }
 
+    public List<Integer> getCenterFeaturesEnabled() {
+        return centerFeaturesEnabledId;
+    }
+
+    public void setCenterFeaturesEnabled(List<Integer> centerFeaturesEnabledId) {
+        this.centerFeaturesEnabledId = centerFeaturesEnabledId;
+    }
 }
