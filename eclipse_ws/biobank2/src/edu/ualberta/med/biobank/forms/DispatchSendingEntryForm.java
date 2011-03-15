@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
@@ -129,7 +130,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
         } else {
             try {
                 destSiteComboViewer = createComboViewer(client,
-                    "Receiver Site", CenterWrapper.getAllCenters(appService),
+                    "Receiver Site", CenterWrapper.getOtherCenters(appService,
+                        SessionManager.getUser().getCurrentWorkingCenter()),
                     null, "Dispatch must have an associated study",
                     new ComboSelectionUpdate() {
                         @Override
@@ -233,16 +235,20 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
     protected void addAliquot(String inventoryId) {
         if (!inventoryId.isEmpty()) {
+            SpecimenWrapper existingAliquot;
             try {
-                SpecimenWrapper existingAliquot = SpecimenWrapper.getSpecimen(
+                existingAliquot = SpecimenWrapper.getSpecimen(
                     dispatch.getAppService(), inventoryId,
                     SessionManager.getUser());
-                if (dispatch.checkCanAddSpecimen(existingAliquot, true).ok)
+                CheckStatus status = dispatch.checkCanAddSpecimen(
+                    existingAliquot, true);
+                if (status.ok)
                     addAliquot(existingAliquot);
-
-            } catch (Exception ae) {
-                BiobankPlugin.openAsyncError("Error while looking up patient",
-                    ae);
+                else
+                    BiobankPlugin.openAsyncError("Error", status.message);
+            } catch (Exception e) {
+                BiobankPlugin.openAsyncError("Error",
+                    "Unable to retrieve specimen info");
             }
         }
     }

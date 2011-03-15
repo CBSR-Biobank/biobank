@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.ClinicAdapter;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
@@ -54,6 +54,6 @@ public class ShipmentTodayNode extends AbstractTodayNode<OriginInfoWrapper> {
 
     @Override
     protected void addChild(OriginInfoWrapper child) {
-        ShipmentAdministrationView.addToNode(this, child);
+        SpecimenTransitView.addToNode(this, child);
     }
 }

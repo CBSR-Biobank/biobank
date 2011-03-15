@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -140,19 +139,6 @@ public abstract class CenterWrapper<E extends Center> extends
     public abstract long getPatientCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;
 
-    @SuppressWarnings("unused")
-    @Deprecated
-    public CollectionEventWrapper getCollectionEvent(Date dateReceived) {
-        return null;
-    }
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    public CollectionEventWrapper getCollectionEvent(Date dateReceived,
-        String patientNumber) {
-        return null;
-    }
-
     @Override
     protected void persistDependencies(Center origObject) throws Exception {
         deleteCollectionEvents();
@@ -179,12 +165,11 @@ public abstract class CenterWrapper<E extends Center> extends
         return centerWrappers;
     }
 
-    public static List<CenterWrapper<?>> getAllCenters(
-        WritableApplicationService appService) throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + Center.class.getName());
-        List<Center> centers = appService.query(c);
-        List<CenterWrapper<?>> wrappedCenters = ModelWrapper
-            .wrapModelCollection(appService, centers, null);
-        return wrappedCenters;
+    public static List<CenterWrapper<?>> getOtherCenters(
+        WritableApplicationService appService, CenterWrapper<?> center)
+        throws ApplicationException {
+        List<CenterWrapper<?>> centers = getCenters(appService);
+        centers.remove(center);
+        return centers;
     }
 }

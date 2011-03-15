@@ -16,50 +16,74 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchSearchedNode;
 import edu.ualberta.med.biobank.treeview.shipment.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
-public class ShipmentAdministrationView extends
-    AbstractTodaySearchAdministrationView {
+public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
-    public static final String ID = "edu.ualberta.med.biobank.views.ShipmentAdminView";
-
-    private static ShipmentAdministrationView currentInstance;
+    public static final String ID = "edu.ualberta.med.biobank.views.SpecimenTransitView";
 
     private Button radioWaybill;
 
-    private Button radioDateReceived;
-
-    private DateTimeWidget dateReceivedWidget;
+    private Button radioDateSent;
 
     private Composite dateComposite;
 
-    private Composite searchFieldComposite;
+    private DateTimeWidget dateWidget;
 
-    public ShipmentAdministrationView() {
+    private DispatchSearchedNode searchedNode;
+
+    private Button radioDateReceived;
+
+    private static SpecimenTransitView currentInstance;
+
+    public SpecimenTransitView() {
         currentInstance = this;
         SessionManager.addView(this);
     }
 
     @Override
+    public void createPartControl(Composite parent) {
+        super.createPartControl(parent);
+    }
+
+    public void createNodes() {
+        DispatchSiteAdapter siteAdapter = new DispatchSiteAdapter(rootNode,
+            SessionManager.getUser().getCurrentWorkingSite());
+        siteAdapter.setParent(rootNode);
+        rootNode.addChild(siteAdapter);
+
+        todayNode = createTodayNode();
+        todayNode.setParent(rootNode);
+        rootNode.addChild(todayNode);
+
+        searchedNode = new DispatchSearchedNode(rootNode, 2);
+        searchedNode.setParent(rootNode);
+        rootNode.addChild(searchedNode);
+
+    }
+
+    @Override
     protected void createTreeTextOptions(Composite parent) {
-        searchFieldComposite = new Composite(parent, SWT.NONE);
-        GridLayout layout = new GridLayout(2, false);
+        Composite composite = new Composite(parent, SWT.NONE);
+        GridLayout layout = new GridLayout(3, false);
         layout.horizontalSpacing = 0;
         layout.marginHeight = 0;
         layout.verticalSpacing = 0;
-        searchFieldComposite.setLayout(layout);
+        composite.setLayout(layout);
 
-        radioWaybill = new Button(searchFieldComposite, SWT.RADIO);
+        radioWaybill = new Button(composite, SWT.RADIO);
         radioWaybill.setText("Waybill");
         radioWaybill.setSelection(true);
         radioWaybill.addSelectionListener(new SelectionAdapter() {
@@ -70,7 +94,18 @@ public class ShipmentAdministrationView extends
                 }
             }
         });
-        radioDateReceived = new Button(searchFieldComposite, SWT.RADIO);
+        radioDateSent = new Button(composite, SWT.RADIO);
+        radioDateSent.setText("Packed At");
+        radioDateSent.addSelectionListener(new SelectionAdapter() {
+            @Override
+            public void widgetSelected(SelectionEvent e) {
+                if (radioDateSent.getSelection()) {
+                    showTextOnly(false);
+                }
+            }
+        });
+
+        radioDateReceived = new Button(composite, SWT.RADIO);
         radioDateReceived.setText("Date Received");
         radioDateReceived.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -91,9 +126,8 @@ public class ShipmentAdministrationView extends
         gd.exclude = true;
         dateComposite.setLayoutData(gd);
 
-        dateReceivedWidget = new DateTimeWidget(dateComposite, SWT.DATE,
-            new Date());
-        dateReceivedWidget.addSelectionListener(new SelectionAdapter() {
+        dateWidget = new DateTimeWidget(dateComposite, SWT.DATE, new Date());
+        dateWidget.addSelectionListener(new SelectionAdapter() {
             @Override
             public void widgetDefaultSelected(SelectionEvent e) {
                 internalSearch();
@@ -118,34 +152,76 @@ public class ShipmentAdministrationView extends
     }
 
     @Override
-    protected List<? extends ModelWrapper<?>> search(String text)
-        throws Exception {
+    public void reload() {
+        rootNode.removeAll();
+        createNodes();
+        for (AdapterBase adaper : rootNode.getChildren()) {
+            if (!adaper.equals(searchedNode))
+                adaper.rebuild();
+        }
+        super.reload();
+    }
+
+    @Override
+    protected void internalSearch() {
+        try {
+            List<? extends ModelWrapper<?>> searchedObject = search();
+            if (searchedObject == null || searchedObject.size() == 0) {
+                String msg = "No Dispatch found";
+                if (radioWaybill.getSelection()) {
+                    msg += " for waybill " + treeText.getText();
+                } else {
+                    msg += " for date "
+                        + DateFormatter.formatAsDate(dateWidget.getDate());
+                }
+                BiobankPlugin.openMessage("Dispatch not found", msg);
+            } else {
+                showSearchedObjectsInTree(searchedObject, true);
+                getTreeViewer().expandToLevel(searchedNode, 3);
+            }
+        } catch (Exception e) {
+            BiobankPlugin.openError("Search error", e);
+        }
+    }
+
+    protected List<DispatchWrapper> search() throws Exception {
         if (radioWaybill.getSelection()) {
-            // with waybill, should find only one corresponding shipment, or
-            // mutliple shipments from different clinics
-            List<OriginInfoWrapper> shipments = OriginInfoWrapper
-                .getShipmentsByWaybill(SessionManager.getAppService(),
-                    text.trim());
-            // TODO: allow selection of specific clinic?
-            // if (shipments.size() > 1) {
-            // SelectShipmentClinicDialog dlg = new SelectShipmentClinicDialog(
-            // PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-            // .getShell(), shipments);
-            // if (dlg.open() == Dialog.OK) {
-            // return Arrays.asList(dlg.getSelectedShipment());
-            // }
-            // } else {
-            return shipments;
-            // }
+            return DispatchWrapper.getDispatchesInSite(
+                SessionManager.getAppService(), treeText.getText().trim(),
+                SessionManager.getUser().getCurrentWorkingSite());
         } else {
-            // can find more than one shipments
-            Date date = dateReceivedWidget.getDate();
+            Date date = dateWidget.getDate();
             if (date != null) {
-                return OriginInfoWrapper.getShipmentsByDateReceived(
-                    SessionManager.getAppService(), date);
+                if (radioDateSent.getSelection())
+                    return DispatchWrapper.getDispatchesInSiteByPackedAt(
+                        SessionManager.getAppService(), date, SessionManager
+                            .getUser().getCurrentWorkingSite());
+                else
+                    return DispatchWrapper.getDispatchesInSiteByDateReceived(
+                        SessionManager.getAppService(), date, SessionManager
+                            .getUser().getCurrentWorkingSite());
             }
         }
         return null;
+    }
+
+    @Override
+    protected void showSearchedObjectsInTree(
+        List<? extends ModelWrapper<?>> searchedObjects, boolean doubleClick) {
+        for (ModelWrapper<?> searchedObject : searchedObjects) {
+            List<AdapterBase> nodeRes = rootNode.search(searchedObject);
+            if (nodeRes.size() == 0) {
+                searchedNode.addSearchObject(searchedObject);
+                searchedNode.performExpand();
+                nodeRes = searchedNode.search(searchedObject);
+            }
+            if (nodeRes.size() > 0) {
+                setSelectedNode(nodeRes.get(0));
+                if (doubleClick) {
+                    nodeRes.get(0).performDoubleClick();
+                }
+            }
+        }
     }
 
     public static AdapterBase addToNode(AdapterBase parentNode,
@@ -156,14 +232,14 @@ public class ShipmentAdministrationView extends
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
                 && !currentInstance.radioWaybill.getSelection()) {
-                Date date = currentInstance.dateReceivedWidget.getDate();
+                Date date = currentInstance.dateWidget.getDate();
                 List<AdapterBase> dateNodeRes = parentNode.search(date);
                 AdapterBase dateNode = null;
                 if (dateNodeRes.size() > 0)
                     dateNode = dateNodeRes.get(0);
                 else {
                     dateNode = new DateNode(parentNode,
-                        currentInstance.dateReceivedWidget.getDate());
+                        currentInstance.dateWidget.getDate());
                     parentNode.addChild(dateNode);
                 }
                 topNode = dateNode;
@@ -201,28 +277,18 @@ public class ShipmentAdministrationView extends
         return null;
     }
 
+    public static SpecimenTransitView getCurrent() {
+        return currentInstance;
+    }
+
     @Override
-    protected void notFound(String text) {
-        if (radioWaybill.getSelection()) {
-            boolean create = BiobankPlugin.openConfirm("Shipment not found",
-                "Do you want to create this shipment ?");
-            if (create) {
-                // FIXME
-                // CollectionEventWrapper shipment = new CollectionEventWrapper(
-                // SessionManager.getAppService());
-                // if (radioWaybill.getSelection()) {
-                // shipment.setWaybill(text);
-                // }
-                // ShipmentAdapter adapter = new ShipmentAdapter(searchedNode,
-                // shipment);
-                // adapter.openEntryForm();
-            }
-        } else {
-            BiobankPlugin.openMessage(
-                "Shipment not found",
-                "No shipment found for date "
-                    + DateFormatter.formatAsDate(dateReceivedWidget.getDate()));
-        }
+    protected String getTreeTextToolTip() {
+        return "Enter a dispatch/shipment waybill and hit enter";
+    }
+
+    @Override
+    public String getId() {
+        return ID;
     }
 
     @Override
@@ -235,6 +301,18 @@ public class ShipmentAdministrationView extends
         return new ShipmentSearchedNode(rootNode, 1);
     }
 
+    @Override
+    protected List<? extends ModelWrapper<?>> search(String text)
+        throws Exception {
+        return search();
+    }
+
+    @Override
+    protected void notFound(String text) {
+        // TODO Auto-generated method stub
+
+    }
+
     public static void showShipment(OriginInfoWrapper shipment) {
         if (currentInstance != null) {
             currentInstance.showSearchedObjectsInTree(Arrays.asList(shipment),
@@ -242,13 +320,14 @@ public class ShipmentAdministrationView extends
         }
     }
 
-    public static ShipmentAdministrationView getCurrent() {
-        return currentInstance;
-    }
-
     public static void reloadCurrent() {
         if (currentInstance != null)
             currentInstance.reload();
+    }
+
+    @Override
+    protected String getString() {
+        return toString();
     }
 
     public static ShipmentAdapter getCurrentShipment() {
@@ -257,21 +336,6 @@ public class ShipmentAdministrationView extends
             return (ShipmentAdapter) selectedNode;
         }
         return null;
-    }
-
-    @Override
-    public String getId() {
-        return ID;
-    }
-
-    @Override
-    protected String getTreeTextToolTip() {
-        return "Enter a shipment waybill and hit enter";
-    }
-
-    @Override
-    protected String getString() {
-        return toString();
     }
 
 }

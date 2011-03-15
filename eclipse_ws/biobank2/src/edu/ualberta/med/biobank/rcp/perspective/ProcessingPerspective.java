@@ -8,9 +8,9 @@ import org.eclipse.ui.PartInitException;
 
 import edu.ualberta.med.biobank.common.security.Feature;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.views.DispatchAdministrationView;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.views.CollectionView;
+import edu.ualberta.med.biobank.views.ProcessingView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public class ProcessingPerspective implements IPerspectiveFactory {
 
@@ -23,17 +23,15 @@ public class ProcessingPerspective implements IPerspectiveFactory {
     public static void updateVisibility(User user, IWorkbenchPage page)
         throws PartInitException {
         if (page.getPerspective().getId().equals(ID)) {
-            updateVisibility(PatientAdministrationView.ID,
-                user.canPerformActions(Feature.COLLECTION_EVENT,
-                    Feature.ASSIGN, Feature.LINK, Feature.PROCESSING_EVENT),
-                page);
-            updateVisibility(ShipmentAdministrationView.ID,
-                user.canPerformActions(Feature.CLINIC_SHIPMENT), page);
-            updateVisibility(DispatchAdministrationView.ID,
-                user.canPerformActions(Feature.DISPATCH_REQUEST), page);
+            updateVisibility(CollectionView.ID,
+                user.canPerformActions(Feature.COLLECTION_EVENT), page);
+            updateVisibility(ProcessingView.ID, user.canPerformActions(
+                Feature.PROCESSING_EVENT, Feature.LINK, Feature.ASSIGN), page);
+            updateVisibility(SpecimenTransitView.ID, user.canPerformActions(
+                Feature.DISPATCH_REQUEST, Feature.CLINIC_SHIPMENT), page);
             // want to display patient view on top
             for (IViewReference ref : page.getViewReferences()) {
-                if (ref.getId().equals(PatientAdministrationView.ID)) {
+                if (ref.getId().equals(CollectionView.ID)) {
                     page.bringToTop(ref.getView(false));
                 }
             }

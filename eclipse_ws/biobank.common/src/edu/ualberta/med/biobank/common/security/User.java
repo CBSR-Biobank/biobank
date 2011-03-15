@@ -199,7 +199,7 @@ public class User implements Serializable, NotAProxy {
         WritableApplicationService appService) throws Exception {
         if (workingCenters == null) {
             List<CenterWrapper<?>> allCenters = CenterWrapper
-                .getAllCenters(appService);
+                .getCenters(appService);
             workingCenters = new ArrayList<CenterWrapper<?>>();
             for (CenterWrapper<?> center : allCenters) {
                 if (getWorkingCenterIds().contains(center.getId())) {

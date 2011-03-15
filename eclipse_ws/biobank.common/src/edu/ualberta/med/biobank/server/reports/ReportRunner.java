@@ -37,7 +37,7 @@ import edu.ualberta.med.biobank.server.applicationservice.ReportData;
 public class ReportRunner {
     private static final String ID_COLUMN_NAME = "id";
     private static final String PROPERTY_DELIMITER = ".";
-    private static final String ALIAS_DELIMITER = "-";
+    private static final String ALIAS_DELIMITER = "__";
     private static final String PROPERTY_VALUE_TOKEN = "{value}";
     private static final String MODIFIED_PROPERTY_ALIAS = "_modifiedPropertyAlias";
     private static final Comparator<ReportColumn> COMPARE_REPORT_COLUMN_POSITION = new Comparator<ReportColumn>() {
@@ -301,11 +301,11 @@ public class ReportRunner {
             if (!createdProperties.contains(parentProperty)) {
                 int joinType = Criteria.INNER_JOIN;
 
-                // TODO: do not hardcode "aliquotPosition.", read a list or
+                // TODO: do not hardcode "specimenPosition.", read a list or
                 // config from somewhere. This is necessary because some
                 // aliquots legitimately do not have a position in a container
-                if (parentProperty.equals("aliquotPosition")
-                    || parentProperty.startsWith("aliquotPosition.")) {
+                if (parentProperty.equals("specimenPosition")
+                    || parentProperty.startsWith("specimenPosition.")) {
                     joinType = Criteria.LEFT_JOIN;
                 }
 
@@ -318,6 +318,8 @@ public class ReportRunner {
     }
 
     private static String getPropertyAlias(String property) {
+        // TODO: do we need to swap delimiters? Can the alias name just include
+        // the period?
         return property == null ? null : property.replace(PROPERTY_DELIMITER,
             ALIAS_DELIMITER);
     }
