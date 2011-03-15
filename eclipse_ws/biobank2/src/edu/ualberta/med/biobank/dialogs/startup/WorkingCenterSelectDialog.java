@@ -8,7 +8,7 @@ import org.eclipse.swt.widgets.Shell;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
@@ -17,7 +17,7 @@ public class WorkingCenterSelectDialog extends BiobankDialog {
 
     private User user;
     private BiobankApplicationService appService;
-    private SiteWrapper currentCenter;
+    private CenterWrapper<?> currentCenter;
 
     public WorkingCenterSelectDialog(Shell parentShell,
         BiobankApplicationService appService, User user) {
@@ -56,7 +56,7 @@ public class WorkingCenterSelectDialog extends BiobankDialog {
                 new ComboSelectionUpdate() {
                     @Override
                     public void doSelection(Object selectedObject) {
-                        currentCenter = (SiteWrapper) selectedObject;
+                        currentCenter = (CenterWrapper<?>) selectedObject;
                     }
                 });
     }
