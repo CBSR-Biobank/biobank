@@ -88,7 +88,7 @@ INSERT INTO specimen_type (name,name_short)
        SELECT name,name_short FROM sample_type;
 
 INSERT INTO specimen_type (name,name_short)
-       SELECT name,name FROM source_vessel WHERE name!='N/A';
+        SELECT name,name FROM source_vessel;
 
 ALTER TABLE specimen_type MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -107,7 +107,7 @@ CREATE TABLE specimen (
   PARENT_SPECIMEN_ID int(11) DEFAULT NULL,
   CURRENT_CENTER_ID int(11) DEFAULT NULL,
   PV_ID INT(11),
-  SV_ID INT(11),
+  PV_SV_ID INT(11),
   PRIMARY KEY (ID),
   UNIQUE KEY INVENTORY_ID (INVENTORY_ID),
   KEY FKAF84F30886857784 (ORIGINAL_COLLECTION_EVENT_ID),
@@ -122,7 +122,7 @@ CREATE TABLE specimen (
 
 
 create index pv_id_idx on specimen(pv_id);
-create index sv_id_idx on specimen(sv_id);
+create index pv_sv_id_idx on specimen(pv_sv_id);
 
 -- add an aliquoted specimen for each patient visit
 
@@ -141,12 +141,12 @@ activity_status_id,original_collection_event_id,pv_id)
 -- plus the time from pvsv.time_drawn
 
 INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id,
-original_collection_event_id,specimen_type_id,pv_id,sv_id)
+original_collection_event_id,specimen_type_id,parent_specimen_id,origin_info_id,pv_id,pv_sv_id)
        SELECT concat("sw upgrade ",pvsv.id),volume,
        if(pvsv.time_drawn is null,pv.date_drawn,
                addtime(timestamp(date(pv.date_drawn)), time(pvsv.time_drawn))),
        (select id from activity_status where name='Active'),0,0,specimen_type.id,
-       patient_visit_id,source_vessel_id
+       null,0,pv.id,pvsv.id
        FROM pv_source_vessel as pvsv
        join patient_visit as pv on pv.id=pvsv.patient_visit_id
        JOIN source_vessel as sv on sv.id=pvsv.source_vessel_id
@@ -380,13 +380,13 @@ create index pv_id_idx on collection_event(pv_id);
 
 update specimen,collection_event as ce
        set specimen.original_collection_event_id=ce.id,specimen.collection_event_id=ce.id
-       where ce.pv_id=specimen.pv_id and specimen.sv_id is not null;
+       where ce.pv_id=specimen.pv_id and specimen.pv_sv_id is not null;
 
 -- set specimen.collection_event_id for aliquoted specimens
 
 update specimen,collection_event as ce
        set specimen.collection_event_id=ce.id,specimen.original_collection_event_id=null
-       where ce.pv_id=specimen.pv_id and specimen.sv_id is null;
+       where ce.pv_id=specimen.pv_id and specimen.pv_sv_id is null;
 
 ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -469,13 +469,13 @@ create index pv_id_idx on processing_event(pv_id);
 
 update specimen as spc set processing_event_id=(
        select id from processing_event as pe
-       where pe.pv_id=spc.pv_id and spc.sv_id is not null limit 1);
+       where pe.pv_id=spc.pv_id and spc.pv_sv_id is not null limit 1);
 
 -- set the aliquoted specimens to point to their parent specimen
 
 update specimen as spc_a, specimen as spc_b
        set spc_a.parent_specimen_id=spc_b.id
-	where spc_a.pv_id=spc_b.pv_id and spc_b.sv_id is not null and spc_a.sv_id is null;
+	where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
 
 /*****************************************************
  * container types and containers
@@ -1234,7 +1234,7 @@ ALTER TABLE processing_event DROP COLUMN PV_ID;
 
 ALTER TABLE dispatch DROP COLUMN ASHIP_ID;
 
-ALTER TABLE specimen DROP COLUMN PV_ID, DROP COLUMN SV_ID;
+ALTER TABLE specimen DROP COLUMN PV_ID, DROP COLUMN PV_SV_ID;
 
 DROP TABLE abstract_shipment;
 DROP TABLE aliquot;
