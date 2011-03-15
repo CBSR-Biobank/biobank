@@ -890,7 +890,64 @@ CREATE TABLE entity_filter (
 
 LOCK TABLES entity_filter WRITE;
 /*!40000 ALTER TABLE entity_filter DISABLE KEYS */;
-INSERT INTO entity_filter VALUES (1,1,'Inventory Id',1),(2,3,'Link Date',2),(3,1,'Comment',3),(4,2,'Quantity',4),(5,1,'Activity Status',5),(6,1,'Container Product Barcode',7),(7,1,'Container Label',8),(8,1,'Sample Type',9),(9,3,'Date Processed',10),(10,3,'Date Drawn',11),(11,1,'Patient Number',12),(12,4,'Top Container',6),(13,1,'Site',15),(14,1,'Study',16),(15,3,'Date Received',17),(16,1,'Waybill',18),(17,3,'Shipment Departure Date',19),(18,1,'Shipment Box Number',20),(19,1,'Clinic',21),(20,6,'First Patient Visit',10),(101,1,'Product Barcode',101),(102,1,'Comment',102),(103,1,'Label',103),(104,2,'Temperature',104),(105,4,'Top Container',105),(106,3,'Aliquot Link Date',106),(107,1,'Container Type',107),(108,5,'Is Top Level',108),(109,1,'Site',109),(201,1,'Patient Number',201),(202,1,'Study',202),(203,3,'Patient Visit Date Processed',203),(204,3,'Patient Visit Date Drawn',204),(205,1,'Clinic',205),(206,6,'First Patient Visit',203),(301,3,'Date Processed',301),(302,3,'Date Drawn',302),(303,1,'Comment',303),(304,1,'Patient Number',304),(305,3,'Shipment Date Received',305),(306,1,'Shipment Waybill',306),(307,3,'Shipment Date Departed',307),(308,1,'Shipment Box Number',308),(309,1,'Clinic',309),(310,1,'Study',310),(311,6,'First Patient Visit',301);
+INSERT INTO entity_filter VALUES (1,1,'Inventory Id',1),
+(2,3,'Creation Time',2),
+(3,1,'Comment',3),
+(4,2,'Quantity',4),
+(5,1,'Activity Status',5),
+(6,1,'Container Product Barcode',7),
+(7,1,'Container Label',8),
+(8,1,'Specimen Type',9),
+(9,3,'Time Processed',10),
+(11,1,'Patient Number',12),
+(12,4,'Top Container',6),
+(13,1,'Current Center',15),
+(14,1,'Study',16),
+(15,3,'Shipment Time Received',17),
+(16,1,'Shipment Waybill',18),
+(17,3,'Shipment Time Sent',19),
+(18,1,'Shipment Box Number',20),
+(19,1,'Source Center',21),
+(21,1,'Dispatch Sender',22),
+(22,1,'Dispatch Receiver',23),
+(23,3,'Dispatch Time Received',24),
+(24,3,'Dispatch Time Sent',25),
+(25,1,'Dispatch Waybill',26),
+(26,1,'Dispatch Box Number',27),
+
+(101,1,'Product Box Number',101),
+(102,1,'Comment',102),
+(103,1,'Label',103),
+(104,2,'Temperature',104),
+(105,4,'Top Container',105),
+(106,3,'Specimen Creation Time',106),
+(107,1,'Container Type',107),
+(108,5,'Is Top Level',108),
+(109,1,'Site',109),
+
+(201,1,'Patient Number',201),
+(202,1,'Study',202),
+(203,3,'Specimen Time Processed',203),
+(204,3,'Specimen Creation Time',204),
+(205,1,'Source Center',205),
+(206,6,'First Time Processed',204),
+(207,1,'Inventory Id',206),
+
+(301,3,'Specimen Time Processed',301),
+(302,3,'Specimen Creation Time',302),
+(303,1,'Comment',303),
+(304,1,'Patient Number',304),
+(305,1,'Specimen Source Center',305),
+(306,1,'Study',306),
+(307,6,'First Time Processed',301),
+
+(401,1,'Worksheet',401),
+(402,3,'Creation Time',402),
+(403,1,'Comment',403),
+(404,1,'Center',404),
+(405,1,'Activity Status',405),
+(406,1,'Specimen Inventory Id',406),
+(407,3,'Specimen Creation Time',407);
 /*!40000 ALTER TABLE entity_filter ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -916,7 +973,61 @@ CREATE TABLE entity_column (
 
 LOCK TABLES entity_column WRITE;
 /*!40000 ALTER TABLE entity_column DISABLE KEYS */;
-INSERT INTO entity_column VALUES (1,'Inventory Id',1),(2,'Link Date',2),(3,'Comment',3),(4,'Quantity',4),(5,'Activity Status',5),(6,'Container Product Barcode',7),(7,'Container Label',8),(8,'Sample Type',9),(9,'Date Processed',10),(10,'Date Drawn',11),(11,'Patient Number',12),(12,'Top Container Type',13),(13,'Aliquot Position',14),(14,'Site',15),(15,'Study',16),(16,'Date Received',17),(17,'Waybill',18),(18,'Shipment Departure Date',19),(19,'Shipment Box Number',20),(20,'Clinic',21),(101,'Product Barcode',101),(102,'Comment',102),(103,'Label',103),(104,'Temperature',104),(105,'Top Container Type',110),(106,'Aliquot Link Date',106),(107,'Container Type',107),(108,'Site',109),(201,'Patient Number',201),(202,'Study',202),(203,'Patient Visit Date Processed',203),(204,'Patient Visit Date Drawn',204),(205,'Clinic',205),(301,'Date Processed',301),(302,'Date Drawn',302),(303,'Comment',303),(304,'Patient Number',304),(305,'Shipment Date Received',305),(306,'Shipment Waybill',306),(307,'Shipment Date Departed',307),(308,'Shipment Box Number',308),(309,'Clinic',309),(310,'Study',310);
+INSERT INTO entity_column VALUES (1,'Inventory Id',1),
+(2,'Creation Time',2),
+(3,'Comment',3),
+(4,'Quantity',4),
+(5,'Activity Status',5),
+(6,'Container Product Barcode',7),
+(7,'Container Label',8),
+(8,'Specimen Type',9),
+(9,'Time Processed',10),
+(11,'Patient Number',12),
+(12,'Top Container Type',13),
+(13,'Aliquot Position',14),
+(14,'Current Center',15),
+(15,'Study',16),
+(16,'Shipment Time Received',17),
+(17,'Shipment Waybill',18),
+(18,'Shipment Time Sent',19),
+(19,'Shipment Box Number',20),
+(20,'Source Center',21),
+(21,'Dispatch Sender',22),
+(22,'Dispatch Receiver',23),
+(23,'Dispatch Time Received',24),
+(24,'Dispatch Time Sent',25),
+(25,'Dispatch Waybill',26),
+(26,'Dispatch Box Number',27),
+
+(101,'Product Barcode',101),
+(102,'Comment',102),
+(103,'Label',103),
+(104,'Temperature',104),
+(105,'Top Container Type',110),
+(106,'Specimen Creation Time',106),
+(107,'Container Type',107),
+(108,'Site',109),
+
+(201,'Patient Number',201),
+(202,'Study',202),
+(203,'Specimen Time Processed',203),
+(204,'Specimen Creation Time',204),
+(205,'Source Center',205),
+
+(301,'Specimen Time Processed',301),
+(302,'Specimen Creation Time',302),
+(303,'Comment',303),
+(304,'Patient Number',304),
+(305,'Specimen Source Center',305),
+(306,'Study',306),
+
+(401,'Worksheet',401),
+(402,'Creation Time',402),
+(403,'Comment',403),
+(404,'Center',404),
+(405,'Activity Status',405),
+(406,'Specimen Inventory Id',406),
+(407,'Specimen Creation Time',407);
 /*!40000 ALTER TABLE entity_column ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -944,7 +1055,65 @@ CREATE TABLE entity_property (
 
 LOCK TABLES entity_property WRITE;
 /*!40000 ALTER TABLE entity_property DISABLE KEYS */;
-INSERT INTO entity_property VALUES (1,'inventoryId',1,1),(2,'linkDate',3,1),(3,'comment',1,1),(4,'quantity',2,1),(5,'activityStatus.name',1,1),(6,'aliquotPosition.container.containerPath.topContainer.id',2,1),(7,'aliquotPosition.container.productBarcode',1,1),(8,'aliquotPosition.container.label',1,1),(9,'sampleType.nameShort',1,1),(10,'patientVisit.dateProcessed',3,1),(11,'patientVisit.dateDrawn',3,1),(12,'patientVisit.shipmentPatient.patient.pnumber',1,1),(13,'aliquotPosition.container.containerPath.topContainer.containerType.nameShort',1,1),(14,'aliquotPosition.positionString',1,1),(15,'aliquotPosition.container.site.nameShort',1,1),(16,'patientVisit.shipmentPatient.patient.study.nameShort',1,1),(17,'patientVisit.shipmentPatient.shipment.dateReceived',3,1),(18,'patientVisit.shipmentPatient.shipment.waybill',1,1),(19,'patientVisit.shipmentPatient.shipment.departed',3,1),(20,'patientVisit.shipmentPatient.shipment.boxNumber',1,1),(21,'patientVisit.shipmentPatient.shipment.clinic.nameShort',1,1),(101,'productBarcode',1,2),(102,'comment',1,2),(103,'label',1,2),(104,'temperature',2,2),(105,'containerPath.topContainer.id',2,2),(106,'aliquotPositionCollection.aliquot.linkDate',3,2),(107,'containerType.nameShort',1,2),(108,'containerType.topLevel',4,2),(109,'site.nameShort',1,2),(110,'containerPath.topContainer.containerType.nameShort',1,2),(201,'pnumber',1,3),(202,'study.nameShort',1,3),(203,'shipmentPatientCollection.patientVisitCollection.dateProcessed',3,3),(204,'shipmentPatientCollection.patientVisitCollection.dateDrawn',3,3),(205,'shipmentPatientCollection.shipment.clinic.nameShort',1,3),(301,'dateProcessed',3,4),(302,'dateDrawn',3,4),(303,'comment',1,4),(304,'shipmentPatient.patient.pnumber',1,4),(305,'shipmentPatient.shipment.dateReceived',3,4),(306,'shipmentPatient.shipment.waybill',1,4),(307,'shipmentPatient.shipment.departed',3,4),(308,'shipmentPatient.shipment.boxNumber',1,4),(309,'shipmentPatient.shipment.clinic.nameShort',1,4),(310,'shipmentPatient.patient.study.nameShort',1,4);
+INSERT INTO entity_property VALUES (1,'inventoryId',1,1),
+(2,'createdAt',3,1),
+(3,'comment',1,1),
+(4,'quantity',2,1),
+(5,'activityStatus.name',1,1),
+(6,'specimenPosition.container.containerPath.topContainer.id',2,1),
+(7,'specimenPosition.container.productBarcode',1,1),
+(8,'specimenPosition.container.label',1,1),
+(9,'specimenType.nameShort',1,1),
+(10,'parentSpecimen.processingEvent.createdAt',3,1),
+(12,'collectionEvent.patient.pnumber',1,1),
+(13,'specimenPosition.container.containerPath.topContainer.containerType.nameShort',1,1),
+(14,'specimenPosition.positionString',1,1),
+(15,'currentCenter.nameShort',1,1),
+(16,'collectionEvent.patient.study.nameShort',1,1),
+(17,'originInfo.shipmentInfo.receivedAt',3,1),
+(18,'originInfo.shipmentInfo.waybill',1,1),
+(19,'originInfo.shipmentInfo.sentAt',3,1),
+(20,'originInfo.shipmentInfo.boxNumber',1,1),
+(21,'originInfo.center.nameShort',1,1),
+(22,'dispatchSpecimenCollection.dispatch.senderCenter.nameShort',1,1),
+(23,'dispatchSpecimenCollection.dispatch.receiverCenter.nameShort',1,1),
+(24,'dispatchSpecimenCollection.dispatch.shipmentInfo.receivedAt',3,1),
+(25,'dispatchSpecimenCollection.dispatch.shipmentInfo.sentAt',3,1),
+(26,'dispatchSpecimenCollection.dispatch.shipmentInfo.waybill',1,1),
+(27,'dispatchSpecimenCollection.dispatch.shipmentInfo.boxNumber',1,1),
+
+(101,'productBarcode',1,2),
+(102,'comment',1,2),
+(103,'label',1,2),
+(104,'temperature',2,2),
+(105,'containerPath.topContainer.id',2,2),
+(106,'specimenPositionCollection.specimen.createdAt',3,2),
+(107,'containerType.nameShort',1,2),
+(108,'containerType.topLevel',4,2),
+(109,'site.nameShort',1,2),
+(110,'containerPath.topContainer.containerType.nameShort',1,2),
+
+(201,'pnumber',1,3),
+(202,'study.nameShort',1,3),
+(203,'collectionEventCollection.allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,3),
+(204,'collectionEventCollection.allSpecimenCollection.createdAt',3,3),
+(205,'collectionEventCollection.allSpecimenCollection.originInfo.center.nameShort',1,3),
+(206,'collectionEventCollection.allSpecimenCollection.inventoryId',1,3),
+
+(301,'allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,4),
+(302,'allSpecimenCollection.createdAt',3,4),
+(303,'comment',1,4),
+(304,'patient.pnumber',1,4),
+(305,'allSpecimenCollection.originInfo.center.nameShort',1,4),
+(306,'patient.study.nameShort',1,4),
+
+(401,'worksheet',1,5),
+(402,'createdAt',3,5),
+(403,'comment',1,5),
+(404,'center.nameShort',1,5),
+(405,'activityStatus.name',1,5),
+(406,'specimenCollection.inventoryId',1,5),
+(407,'specimenCollection.createdAt',3,5);
 /*!40000 ALTER TABLE entity_property ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1020,7 +1189,11 @@ CREATE TABLE entity (
 
 LOCK TABLES entity WRITE;
 /*!40000 ALTER TABLE entity DISABLE KEYS */;
-INSERT INTO entity VALUES (1,'edu.ualberta.med.biobank.model.Aliquot','Aliquot'),(2,'edu.ualberta.med.biobank.model.Container','Container'),(3,'edu.ualberta.med.biobank.model.Patient','Patient'),(4,'edu.ualberta.med.biobank.model.PatientVisit','PatientVisit');
+INSERT INTO entity VALUES (1,'edu.ualberta.med.biobank.model.Specimen','Specimen'),
+(2,'edu.ualberta.med.biobank.model.Container','Container'),
+(3,'edu.ualberta.med.biobank.model.Patient','Patient'),
+(4,'edu.ualberta.med.biobank.model.CollectionEvent','Collection Event'),
+(5,'edu.ualberta.med.biobank.model.ProcessingEvent','Processing Event');
 /*!40000 ALTER TABLE entity ENABLE KEYS */;
 UNLOCK TABLES;
 

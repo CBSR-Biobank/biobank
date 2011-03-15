@@ -156,7 +156,7 @@ public class GroupEditDialog extends BiobankDialog {
         if (allCenters == null) {
             try {
                 // FIXME can retrive everything ?
-                allCenters = CenterWrapper.getAllCenters(SessionManager
+                allCenters = CenterWrapper.getCenters(SessionManager
                     .getAppService());
             } catch (Exception e) {
                 BiobankPlugin

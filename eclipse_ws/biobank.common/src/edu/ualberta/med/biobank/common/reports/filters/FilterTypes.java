@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.reports.filters;
 
 import edu.ualberta.med.biobank.common.reports.filters.types.BooleanFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.DateFilterType;
-import edu.ualberta.med.biobank.common.reports.filters.types.FirstVisitFilterType;
+import edu.ualberta.med.biobank.common.reports.filters.types.FirstTimeProcessedFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.NumberFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.StringFilterType;
 import edu.ualberta.med.biobank.common.reports.filters.types.TopContainerFilterType;
@@ -23,7 +23,7 @@ public enum FilterTypes {
     DATE(3, new DateFilterType()),
     TOP_CONTAINER(4, new TopContainerFilterType()),
     BOOLEAN(5, new BooleanFilterType()),
-    FIRST_VISIT(6, new FirstVisitFilterType());
+    FIRST_TIME_PROCESSED(6, new FirstTimeProcessedFilterType());
 
     private final int id;
     private final FilterType filterType;

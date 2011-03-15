@@ -77,8 +77,6 @@ public class SearchView extends ViewPart {
                 }
             });
 
-        widgetCreator.createLabel(parent, "Repository Site");
-
         searchTypeCombo = new ComboViewer(parent);
         searchTypeCombo.setContentProvider(new ArrayContentProvider());
         searchTypeCombo.setInput(SearchType.values());

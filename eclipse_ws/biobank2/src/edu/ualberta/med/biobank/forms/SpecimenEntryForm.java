@@ -142,7 +142,7 @@ public class SpecimenEntryForm extends BiobankEntryForm {
 
         Control w = widgetCreator.createBoundWidget(c, BiobankText.class,
             SWT.READ_ONLY, null, BeansObservables.observeValue(aliquot,
-                "patientVisit.patient.pnumber"), null);
+                "collectionEvent.patient.pnumber"), null);
         w.setBackground(WidgetCreator.READ_ONLY_TEXT_BGR);
 
         Button editPatientButton = new Button(c, SWT.NONE);
