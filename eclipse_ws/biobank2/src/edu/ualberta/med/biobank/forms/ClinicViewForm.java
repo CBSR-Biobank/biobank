@@ -87,7 +87,8 @@ public class ClinicViewForm extends AddressViewFormCommon {
         patientTotal = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.getString("ClinicViewForm.field.label.totalPatients")); //$NON-NLS-1$
         ceventTotal = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ClinicViewForm.field.label.totalPatientVisits")); //$NON-NLS-1$
+            Messages
+                .getString("ClinicViewForm.field.label.totalCollectionEvents")); //$NON-NLS-1$
 
         setClinicValues();
     }

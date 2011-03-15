@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
@@ -147,19 +148,13 @@ public class RequestWrapper extends RequestBaseWrapper {
         + Property.concatNames(RequestSpecimenPeer.REQUEST, RequestPeer.ID)
         + "=?";
 
-    public boolean isAllProcessed() {
+    public boolean isAllProcessed() throws BiobankQueryResultSizeException,
+        ApplicationException {
         // using the collection was too slow
-        List<Object> results = null;
         HQLCriteria c = new HQLCriteria(IS_ALL_PROCESSED_QRY,
             Arrays.asList(new Object[] {
                 RequestSpecimenState.NONPROCESSED_STATE.getId(), getId() }));
-        try {
-            results = appService.query(c);
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return 0 == (Long) results.get(0);
+        return 0 == getCountResult(appService, c);
     }
 
     public void setState(RequestState state) {

@@ -14,8 +14,8 @@ import org.eclipse.ui.services.ISourceProviderService;
 import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
@@ -53,6 +53,9 @@ public class SessionManager {
 
     private String currentAdministrationViewId;
 
+    // FIXME Should be able to set to true at login
+    private boolean superAdminMode = false;
+
     private SessionManager() {
         super();
         rootNode = new RootNode();
@@ -72,10 +75,11 @@ public class SessionManager {
     }
 
     public void addSession(final BiobankApplicationService appService,
-        String serverName, User user) {
+        String serverName, User user, boolean superAdminMode) {
         logger.debug("addSession: " + serverName + ", user/" + user.getLogin());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
+        this.superAdminMode = superAdminMode;
         rootNode.addChild(sessionAdapter);
 
         updateMenus();
@@ -122,7 +126,7 @@ public class SessionManager {
             .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
         sessionSourceProvider.setWebAdmin(sessionAdapter != null
-            && sessionAdapter.getUser().isWebsiteAdministrator());
+            && sessionAdapter.getUser().isSuperAdministrator());
         sessionSourceProvider.setHasWorkingCenter(sessionAdapter != null
             && sessionAdapter.getUser().getCurrentWorkingCenter() != null);
 
@@ -225,20 +229,16 @@ public class SessionManager {
         return getInstance().getSession().getServerName();
     }
 
-    /**
-     * Site specific only if currentSite != null
-     */
-    public static boolean canCreate(Class<?> clazz, SiteWrapper currentSite) {
-        return getUser().hasPrivilegeOnObject(Privilege.CREATE,
-            currentSite == null ? null : currentSite.getId(), clazz, null);
+    public static boolean canCreate(Class<?> clazz,
+        CenterWrapper<?> currentCenter) {
+        return getUser().hasPrivilegeOnObject(Privilege.CREATE, currentCenter,
+            clazz, null);
     }
 
-    /**
-     * Site specific only if currentSite != null
-     */
-    public static boolean canDelete(Class<?> clazz, SiteWrapper currentSite) {
-        return getUser().hasPrivilegeOnObject(Privilege.DELETE,
-            currentSite == null ? null : currentSite.getId(), clazz, null);
+    public static boolean canDelete(Class<?> clazz,
+        CenterWrapper<?> currentCenter) {
+        return getUser().hasPrivilegeOnObject(Privilege.DELETE, currentCenter,
+            clazz, null);
     }
 
     public static boolean canDelete(ModelWrapper<?> wrapper) {
@@ -250,12 +250,11 @@ public class SessionManager {
             .hasPrivilegeOnObject(Privilege.READ, null, clazz, null);
     }
 
-    /**
-     * Site specific only if currentSite != null
-     */
-    public static boolean canUpdate(Class<?> clazz, SiteWrapper currentSite) {
-        return getUser().hasPrivilegeOnObject(Privilege.UPDATE,
-            currentSite == null ? null : currentSite.getId(), clazz, null);
+    // FIXME need the currentCenter parameter ?
+    public static boolean canUpdate(Class<?> clazz,
+        CenterWrapper<?> currentCenter) {
+        return getUser().hasPrivilegeOnObject(Privilege.UPDATE, currentCenter,
+            clazz, null);
     }
 
     public boolean isConnected() {
@@ -311,5 +310,9 @@ public class SessionManager {
 
     public static void setCurrentAdministrationViewId(String id) {
         getInstance().currentAdministrationViewId = id;
+    }
+
+    public static boolean isSuperAdminMode() {
+        return getInstance().superAdminMode;
     }
 }

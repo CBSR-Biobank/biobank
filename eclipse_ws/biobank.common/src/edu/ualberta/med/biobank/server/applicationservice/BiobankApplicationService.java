@@ -63,7 +63,10 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public String getServerVersion();
 
-    public List<ProtectionGroupPrivilege> getSecurityFeatures()
+    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures()
+        throws ApplicationException;
+
+    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures()
         throws ApplicationException;
 
     public QueryHandle createQuery(QueryCommand qc) throws Exception;

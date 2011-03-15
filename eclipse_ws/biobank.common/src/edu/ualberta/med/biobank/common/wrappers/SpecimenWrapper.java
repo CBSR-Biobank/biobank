@@ -454,7 +454,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 if (!dispatch.equals(excludedShipment)
                     && (EnumSet.of(DispatchState.CREATION,
                         DispatchState.IN_TRANSIT).contains(dispatch.getState()))) {
-                    if (DispatchSpecimenState.MISSING.equals(dsa.getState())) {
+                    if (DispatchSpecimenState.MISSING == DispatchSpecimenState
+                        .getState(dsa.getState())) {
                         return false;
                     }
                     return true;

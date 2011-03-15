@@ -504,8 +504,8 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canRead(User user, Integer siteId) {
-        return user.hasPrivilegeOnObject(Privilege.READ, siteId, this);
+    public boolean canRead(User user, CenterWrapper<?> center) {
+        return user.hasPrivilegeOnObject(Privilege.READ, center, this);
     }
 
     /**
@@ -513,17 +513,15 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
      */
     public boolean canUpdate(User user) {
         CenterWrapper<?> site = getCenterLinkedToObject();
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, site == null ? null
-            : site.getId(), this);
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, site, this);
     }
 
     /**
      * return true if the user can delete this object
      */
     public boolean canDelete(User user) {
-        CenterWrapper<?> site = getCenterLinkedToObject();
-        return user.hasPrivilegeOnObject(Privilege.DELETE, site == null ? null
-            : site.getId(), this);
+        return user.hasPrivilegeOnObject(Privilege.DELETE,
+            getCenterLinkedToObject(), this);
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -591,8 +589,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if access is authorized
      */
+    // FIXME needed ?
     public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
-        @SuppressWarnings("unused") Integer siteId) {
+        @SuppressWarnings("unused") CenterWrapper<?> center) {
         return true;
     }
 
@@ -664,10 +663,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             return (one == null) ? -1 : 1;
         }
 
-        if (one == null && two == null) {
+        if (one == null || two == null) {
             return 0;
         }
-
         return one.compareTo(two);
     }
 

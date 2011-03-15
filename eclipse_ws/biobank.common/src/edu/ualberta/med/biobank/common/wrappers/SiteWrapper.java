@@ -400,7 +400,7 @@ public class SiteWrapper extends SiteBaseWrapper {
      */
     @Override
     public boolean canUpdate(User user) {
-        return user.isWebsiteAdministrator();
+        return user.isSuperAdministrator();
     }
 
     public static Collection<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
@@ -499,4 +499,5 @@ public class SiteWrapper extends SiteBaseWrapper {
             Arrays.asList(new Object[] { getId(), study.getId() }));
         return getCountResult(appService, c);
     }
+
 }
