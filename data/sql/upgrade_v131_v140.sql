@@ -53,6 +53,20 @@ ALTER TABLE site_study
       ADD INDEX FK7A197EB13F52C885 (SITE_ID),
       ADD PRIMARY KEY (SITE_ID,STUDY_ID);
 
+ALTER TABLE contact
+      ADD COLUMN CENTER_ID int(11) COMMENT '' NOT NULL;
+
+update contact set contact.center_id=(select center.id
+       from clinic
+       join center on center.name=clinic.name
+       where clinic.id=contact.clinic_id);
+
+alter table contact
+      drop index FK6382B00057F87A25,
+      drop column clinic_id,
+      change column CENTER_ID CLINIC_ID int(11) COMMENT '' NOT NULL,
+      add index FK6382B00057F87A25 (CLINIC_ID);
+
 ALTER TABLE center MODIFY COLUMN ID INT(11) NOT NULL;
 
 /*****************************************************
@@ -469,23 +483,41 @@ update specimen as spc_a, specimen as spc_b
 
 ALTER TABLE container
       CHANGE COLUMN label LABEL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT '',
-      ADD COLUMN CENTER_ID int(11) COMMENT '' NOT NULL;
-      ADD CONSTRAINT uc_label UNIQUE KEY(LABEL, CONTAINER_TYPE_ID),
-      ADD CONSTRAINT uc_productbarcode UNIQUE KEY(PRODUCT_BARCODE, SITE_ID);
+      ADD COLUMN CENTER_ID int(11) COMMENT '' NOT NULL,
+      ADD CONSTRAINT uc_label UNIQUE KEY(LABEL, CONTAINER_TYPE_ID);
 
-update container set center_id=(select center.id
-       from center
-       join site on site.id=container.site_id
-       where center.name=site.name);
+update container set container.center_id=(select center.id
+       from site
+       join center on center.name=site.name
+       where site.id=container.site_id);
 
 alter table container
+      drop index FK8D995C613F52C885,
       drop column site_id,
-      alter column center_id site_id int(11) COMMENT '' NOT NULL;
+      change column CENTER_ID SITE_ID int(11) COMMENT '' NOT NULL,
+      add index FK8D995C613F52C885 (SITE_ID),
+      ADD CONSTRAINT uc_productbarcode UNIQUE KEY(PRODUCT_BARCODE, SITE_ID);
 
 ALTER TABLE container_type
       CHANGE COLUMN name NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT '',
       CHANGE COLUMN name_short NAME_SHORT VARCHAR(50) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT '',
       CHANGE COLUMN child_labeling_scheme_id CHILD_LABELING_SCHEME_ID INT(11) NOT NULL COMMENT '',
+      ADD COLUMN CENTER_ID int(11) COMMENT '' NOT NULL,
+      ADD CONSTRAINT uc_name UNIQUE KEY(NAME, SITE_ID),
+      ADD CONSTRAINT uc_nameshort UNIQUE KEY(NAME_SHORT, SITE_ID);
+
+update container_type set container_type.center_id=(select center.id
+       from site
+       join center on center.name=site.name
+       where site.id=container_type.site_id);
+
+alter table container_type
+      drop key uc_name,
+      drop key uc_nameshort,
+      drop index FKB2C878583F52C885,
+      drop column site_id,
+      change column CENTER_ID SITE_ID int(11) COMMENT '' NOT NULL,
+      ADD INDEX FKB2C878583F52C885 (SITE_ID),
       ADD CONSTRAINT uc_name UNIQUE KEY(NAME, SITE_ID),
       ADD CONSTRAINT uc_nameshort UNIQUE KEY(NAME_SHORT, SITE_ID);
 
