@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
-import edu.ualberta.med.biobank.views.DispatchAdministrationView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
@@ -279,7 +279,7 @@ public class DispatchViewForm extends BiobankViewForm {
                     } catch (Exception e1) {
                         BiobankPlugin.openAsyncError("Save error", e1);
                     }
-                    DispatchAdministrationView.getCurrent().reload();
+                    SpecimenTransitView.getCurrent().reload();
                     dispatchAdapter.openViewForm();
                 }
             }
