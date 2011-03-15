@@ -35,8 +35,10 @@ import org.springframework.remoting.RemoteConnectFailureException;
 import edu.ualberta.med.biobank.BioBankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientVisitWrapper;
@@ -462,11 +464,13 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
         try {
             String fullLabel = newCabinetPositionText.getText();
             List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
-            int removeSize = 2;
+            int removeSize = 2; // FIXME we are assuming that the aliquot
+                                // position will be only of size 2 !
             List<String> labelsTested = new ArrayList<String>();
-            while (removeSize < 5) {
-                String binLabel = fullLabel.substring(0, fullLabel.length()
-                    - removeSize);
+            while (removeSize < 5) { // we are assuming that the bin
+                                     // position won't be bigger than 3 !
+                int cutIndex = fullLabel.length() - removeSize;
+                String binLabel = fullLabel.substring(0, cutIndex);
                 labelsTested.add(binLabel);
                 for (ContainerWrapper cont : ContainerWrapper
                     .getContainersInSite(appService,
@@ -476,7 +480,21 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                         && cont.getContainerType().getSampleTypeCollection()
                             .size() > 0;
                     if (canContainSamples) {
-                        foundContainers.add(cont);
+                        RowColPos rcp = null;
+                        try {
+                            rcp = ContainerLabelingSchemeWrapper
+                                .getRowColFromPositionString(appService,
+                                    fullLabel.substring(cutIndex), cont
+                                        .getContainerType()
+                                        .getChildLabelingScheme(), cont
+                                        .getContainerType().getRowCapacity(),
+                                    cont.getContainerType().getColCapacity());
+                        } catch (Exception ex) {
+                            // the test failed
+                            break;
+                        }
+                        if (rcp != null) // the full position string is valid:
+                            foundContainers.add(cont);
                     }
                 }
                 removeSize++;
@@ -487,11 +505,13 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 while (cont.getParent() != null) {
                     cont = cont.getParent();
                 }
+                // Checking this is actually inside a cabinet
                 if (cabinetContainerTypes.contains(cont.getContainerType())) {
                     cabinetContainers.add(container);
                 }
             }
             if (cabinetContainers.size() == 1) {
+                // only one cabinet container has been found
                 bin = cabinetContainers.get(0);
                 drawer = bin.getParent();
                 cabinet = drawer.getParent();
@@ -505,6 +525,7 @@ public class CabinetLinkAssignEntryForm extends AbstractAliquotAdminForm {
                 focusControlInError(newCabinetPositionText);
                 return;
             } else {
+                // FIXME should we display a dialog to select the correct one ?
                 BioBankPlugin
                     .openError(
                         "Container problem",
