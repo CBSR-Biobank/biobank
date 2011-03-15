@@ -24,8 +24,8 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.views.ProcessingView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
@@ -269,10 +269,10 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                ShipmentAdministrationView.reloadCurrent();
-                PatientAdministrationView.reloadCurrent();
+                SpecimenTransitView.reloadCurrent();
+                ProcessingView.reloadCurrent();
                 if (!shipment.getShipmentInfo().isReceivedToday())
-                    ShipmentAdministrationView.showShipment(shipment);
+                    SpecimenTransitView.showShipment(shipment);
             }
         });
     }

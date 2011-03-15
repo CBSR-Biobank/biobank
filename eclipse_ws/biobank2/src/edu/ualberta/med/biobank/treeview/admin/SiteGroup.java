@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -77,7 +78,7 @@ public class SiteGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return SiteWrapper.getSites(getAppService());
+        return Arrays.asList(SessionManager.getUser().getCurrentWorkingSite());
     }
 
     @Override

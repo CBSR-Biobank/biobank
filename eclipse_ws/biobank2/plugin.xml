@@ -888,16 +888,6 @@
                id="edu.ualberta.med.biobank.menu.processing"
                label="Processing">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
-                  icon="icons/shipment_add.png"
-                  label="Add Shipment"
-                  style="push">
-            </command>
-            <separator
-                  name="biobank2.separator1"
-                  visible="true">
-            </separator>
-            <command
                   commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
                   icon="icons/patient_add.png"
                   label="Add Patient"
@@ -957,6 +947,12 @@
                   commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
                   icon="icons/dispatch_add.png"
                   label="Add Dispatch"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
+                  icon="icons/shipment_add.png"
+                  label="Add Shipment"
                   style="push">
             </command>
             <separator
@@ -1143,32 +1139,7 @@
             </command>
          </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.views.PatientsAdminView">
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
-                  icon="icons/patient_add.png"
-                  label="Add Patient"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
-                  icon="icons/patient_merge.png"
-                  label="Merge Patients"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd"
-                  icon="icons/collectionEvent_add.png"
-                  label="Add Collection Event"
-                  style="push">
-            </command>
-            <command
-                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
-                  icon="icons/delete.png"
-                  label="Delete Selected Item"
-                  style="push"
-                  tooltip="Delete Selected Item">
-            </command>
+               id="edu.ualberta.med.biobank.views.ProcessingView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.openSampleProcessForm"
                   icon="icons/scanLink.png"
@@ -1218,6 +1189,13 @@
                </parameter>
             </command>
             <command
+                  commandId="edu.ualberta.med.biobank.commands.deleteSelection"
+                  icon="icons/delete.png"
+                  label="Delete Selected Item"
+                  style="push"
+                  tooltip="Delete Selected Item">
+            </command>
+            <command
                   commandId="edu.ualberta.med.biobank.commands.search"
                   icon="icons/search.png"
                   label="Search"
@@ -1233,18 +1211,24 @@
             </command>
          </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.views.ShipmentAdminView">
+               id="edu.ualberta.med.biobank.views.CollectionView">
             <command
-                  commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
-                  icon="icons/shipment_add.png"
-                  label="Add Shipment"
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientAdd"
+                  icon="icons/patient_add.png"
+                  label="Add Patient"
                   style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                  <reference
-                        definitionId="biobank2.processingPerspectiveSelected">
-                  </reference>
-               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.collectionEventAdd"
+                  icon="icons/collectionEvent_add.png"
+                  label="Add Collection Event"
+                  style="push">
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.patients.patientMerge"
+                  icon="icons/patient_merge.png"
+                  label="Merge Patients"
+                  style="push">
             </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.deleteSelection"
@@ -1269,11 +1253,23 @@
             </command>
          </toolbar>
          <toolbar
-               id="edu.ualberta.med.biobank.views.DispatchAdministrationView">
+               id="edu.ualberta.med.biobank.views.SpecimenTransitView">
             <command
                   commandId="edu.ualberta.med.biobank.commands.dispatch.dispatchAdd"
                   icon="icons/dispatch_add.png"
                   label="Add Dispatch"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.processingPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.shipments.shipmentAdd"
+                  icon="icons/shipment_add.png"
+                  label="Add Shipment"
                   style="push">
                <visibleWhen
                      checkEnabled="false">
@@ -1399,12 +1395,36 @@
          </view>
          <view
                closeable="false"
-               id="edu.ualberta.med.biobank.views.PatientsAdminView"
+               id="edu.ualberta.med.biobank.views.CollectionView"
                minimized="false"
                moveable="false"
-               ratio="0.40"
+               ratio="0.20"
                relationship="left"
                relative="org.eclipse.ui.editorss"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.ProcessingView"
+               minimized="false"
+               moveable="false"
+               ratio="0.20"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.CollectionView"
+               showTitle="false"
+               standalone="false"
+               visible="true">
+         </view>
+         <view
+               closeable="false"
+               id="edu.ualberta.med.biobank.views.SpecimenTransitView"
+               minimized="false"
+               moveable="false"
+               ratio="0.20"
+               relationship="stack"
+               relative="edu.ualberta.med.biobank.views.CollectionView"
                showTitle="false"
                standalone="false"
                visible="true">
@@ -1414,36 +1434,12 @@
                id="edu.ualberta.med.biobank.views.SearchView"
                minimized="false"
                moveable="true"
-               ratio="0.85"
+               ratio="0.8"
                relationship="bottom"
-               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
+               relative="edu.ualberta.med.biobank.views.CollectionView"
                showTitle="true"
                standalone="false"
                visible="false">
-         </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.ShipmentAdminView"
-               minimized="false"
-               moveable="false"
-               ratio="0.20"
-               relationship="stack"
-               relative="edu.ualberta.med.biobank.views.PatientsAdminView"
-               showTitle="false"
-               standalone="false"
-               visible="true">
-         </view>
-         <view
-               closeable="false"
-               id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
-               minimized="false"
-               moveable="false"
-               ratio="0.20"
-               relationship="stack"
-               relative="edu.ualberta.med.biobank.views.ShipmentAdminView"
-               showTitle="false"
-               standalone="false"
-               visible="true">
          </view>
       </perspectiveExtension>
       <perspectiveExtension
@@ -2224,33 +2220,26 @@
       </view>
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.PatientAdministrationView"
+            class="edu.ualberta.med.biobank.views.ProcessingView"
             icon="icons/patientView.png"
-            id="edu.ualberta.med.biobank.views.PatientsAdminView"
-            name="Patients"
+            id="edu.ualberta.med.biobank.views.ProcessingView"
+            name="Processing"
             restorable="true">
       </view>
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.ShipmentAdministrationView"
+            class="edu.ualberta.med.biobank.views.CollectionView"
             icon="icons/shipment.png"
-            id="edu.ualberta.med.biobank.views.ShipmentAdminView"
-            name="Shipments"
+            id="edu.ualberta.med.biobank.views.CollectionView"
+            name="Collection"
             restorable="true">
       </view>
       <view
             allowMultiple="false"
-            class="edu.ualberta.med.biobank.views.DispatchAdministrationView"
+            class="edu.ualberta.med.biobank.views.SpecimenTransitView"
             icon="icons/dispatch.png"
-            id="edu.ualberta.med.biobank.views.DispatchAdministrationView"
-            name="Dispatches"
-            restorable="true">
-      </view>
-      <view
-            class="edu.ualberta.med.biobank.views.AdvancedReportsView"
-            icon="icons/reportsPerspective.png"
-            id="edu.ualberta.med.biobank.views.ReportAdministrationView"
-            name="Advanced Reports"
+            id="edu.ualberta.med.biobank.views.SpecimenTransitView"
+            name="Specimen Transit"
             restorable="true">
       </view>
       <view
