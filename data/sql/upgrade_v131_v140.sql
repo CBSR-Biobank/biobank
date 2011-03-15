@@ -469,8 +469,18 @@ update specimen as spc_a, specimen as spc_b
 
 ALTER TABLE container
       CHANGE COLUMN label LABEL VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT '',
+      ADD COLUMN CENTER_ID int(11) COMMENT '' NOT NULL;
       ADD CONSTRAINT uc_label UNIQUE KEY(LABEL, CONTAINER_TYPE_ID),
       ADD CONSTRAINT uc_productbarcode UNIQUE KEY(PRODUCT_BARCODE, SITE_ID);
+
+update container set center_id=(select center.id
+       from center
+       join site on site.id=container.site_id
+       where center.name=site.name);
+
+alter table container
+      drop column site_id,
+      alter column center_id site_id int(11) COMMENT '' NOT NULL;
 
 ALTER TABLE container_type
       CHANGE COLUMN name NAME VARCHAR(255) CHARACTER SET latin1 COLLATE latin1_general_cs NOT NULL COMMENT '',
