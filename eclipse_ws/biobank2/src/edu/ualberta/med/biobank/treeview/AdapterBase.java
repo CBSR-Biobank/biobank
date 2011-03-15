@@ -610,7 +610,8 @@ public abstract class AdapterBase {
     }
 
     public void openViewForm() {
-        if (getViewFormId() != null) {
+        if (getViewFormId() != null && modelObject != null
+            && modelObject.getWrappedObject() != null) {
             openForm(new FormInput(this), getViewFormId());
         }
     }

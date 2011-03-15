@@ -22,7 +22,6 @@ import edu.ualberta.med.biobank.common.peer.ContainerPositionPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerTypePeer;
 import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.util.TypeReference;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerBaseWrapper;
@@ -1165,14 +1164,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
         return objectWithPositionManagement.getTop();
     }
 
-    @Override
-    public SiteWrapper getCenterLinkedToObject() {
-        return getSite();
-    }
+    // @Override
+    // public SiteWrapper getCenterLinkedToObjectForSecu() {
+    // return getSite();
+    // }
 
-    @Override
-    public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
-        return user.isCenterAdministrator(center);
-    }
+    // @Override
+    // public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
+    // return user.isCenterAdministrator(center);
+    // }
 
 }

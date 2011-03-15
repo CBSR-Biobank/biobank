@@ -37,6 +37,6 @@ public class CollectionEventAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ProcessingEventWrapper.class, null);
+        return SessionManager.canCreate(ProcessingEventWrapper.class);
     }
 }

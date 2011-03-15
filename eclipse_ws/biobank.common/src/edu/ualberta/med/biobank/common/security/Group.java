@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.util.NotAProxy;
-import edu.ualberta.med.biobank.model.Center;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankSecurityUtil;
 
 public class Group implements Serializable, NotAProxy {
@@ -114,25 +114,16 @@ public class Group implements Serializable, NotAProxy {
     }
 
     /**
-     * When no id is specified, type=name
+     * will check the privilege on the protection element with no id specified
+     * on it.
      */
-    public boolean hasPrivilegeOnObject(Privilege privilege, String type) {
-        return hasPrivilegeOnObject(privilege, type, null);
-    }
-
-    /**
-     * When no id is specified, type=name; otherwise, need to check the
-     * protection element privilege type
-     */
-    public boolean hasPrivilegeOnObject(Privilege privilege, String type,
-        Integer id) {
-        ProtectionElement pep = new ProtectionElement(type, id);
+    public boolean hasPrivilegeOnObject(Privilege privilege,
+        String objectClassName) {
+        ProtectionElement pep = new ProtectionElement(objectClassName,
+            (Integer) null);
         Set<Privilege> privileges = pePrivilegeMap.get(pep);
         if (privileges == null) {
-            if (id == null) {
-                return false;
-            }
-            return hasPrivilegeOnObject(privilege, type, null);
+            return false;
         }
         return privileges.contains(privilege);
     }
@@ -154,10 +145,9 @@ public class Group implements Serializable, NotAProxy {
      * @return true if this group is administrator of the center with id
      *         centerId
      */
-    public boolean isAdministratorForCenter(Integer centerId,
-        Class<? extends Center> centerClass) {
+    public boolean isAdministratorForCenter(CenterWrapper<?> center) {
         return hasPrivilegeOnProtectionGroup(Privilege.UPDATE,
-            PG_CENTER_ADMINISTRATOR, centerId, centerClass);
+            PG_CENTER_ADMINISTRATOR, center);
     }
 
     /**
@@ -174,18 +164,20 @@ public class Group implements Serializable, NotAProxy {
         isWorkingCentersAdministrator = admin;
     }
 
+    /**
+     * Check privilege on a protection group for a specific center, if this
+     * center is a working center for this group
+     */
     public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
-        String protectionGroupName, Integer centerId,
-        Class<? extends Center> centerClass) {
-        ProtectionGroupPrivilege pgv = pgMap.get(protectionGroupName);
-        if (pgv == null) {
-            return false;
+        String protectionGroupName, CenterWrapper<?> center) {
+        if (center != null && getWorkingCenterIds().contains(center.getId())) {
+            ProtectionGroupPrivilege pgv = pgMap.get(protectionGroupName);
+            if (pgv == null) {
+                return false;
+            }
+            return pgv.getPrivileges().contains(privilege);
         }
-        return pgv.getPrivileges().contains(privilege)
-            && (centerId == null || hasPrivilegeOnObject(
-                privilege,
-                centerClass == null ? Center.class.getName() : centerClass
-                    .getName(), centerId));
+        return false;
     }
 
     public void copy(Group group) {

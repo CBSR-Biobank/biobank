@@ -1,9 +1,6 @@
 package edu.ualberta.med.biobank.handlers;
 
-import java.util.Map;
-
 import org.eclipse.core.commands.AbstractHandler;
-import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;
 import org.eclipse.jface.action.IContributionItem;
@@ -18,6 +15,7 @@ import org.eclipse.ui.console.IConsoleConstants;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.forms.input.FormInput;
 import edu.ualberta.med.biobank.rcp.perspective.LinkAssignPerspective;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
@@ -26,15 +24,11 @@ import edu.ualberta.med.biobank.treeview.AdapterBase;
  * Open a form in patient administration like scan link, scan assign or cabinet
  * like/assign
  */
-public class OpenSampleProcessFormHandler extends AbstractHandler implements IHandler {
+public abstract class LinkAssignCommonHandler extends AbstractHandler implements
+    IHandler {
 
-    private static final String EDITOR_ID_PARAM = "edu.ualberta.med.biobank.commands.patients.openSampleProcessForm.editorId";
-
-    @Override
-    public Object execute(ExecutionEvent event) throws ExecutionException {
-        @SuppressWarnings({ "rawtypes" })
-        final Map parameters = event.getParameters();
-        final String editorId = (String) parameters.get(EDITOR_ID_PARAM);
+    public Object openLinkAssignPerspective(String editorId)
+        throws ExecutionException {
         IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
         try {
             if (workbench.getActiveWorkbenchWindow().getActivePage()
@@ -54,6 +48,13 @@ public class OpenSampleProcessFormHandler extends AbstractHandler implements IHa
         }
         return null;
     }
+
+    @Override
+    public boolean isEnabled() {
+        return canUserPerformAction(SessionManager.getUser());
+    }
+
+    protected abstract boolean canUserPerformAction(User user);
 
     private void hideConsoleViewIcons(IWorkbenchPage activePage) {
         // Remove buttons in the console view toolbar

@@ -273,4 +273,5 @@ public class ShipmentAdministrationView extends
     protected String getString() {
         return toString();
     }
+
 }

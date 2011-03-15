@@ -96,7 +96,7 @@ public class OriginInfoWrapper extends OriginInfoBaseWrapper {
         }
         checkAtLeastOneSpecimen();
 
-        if (center instanceof ClinicWrapper) {
+        if (center instanceof ClinicWrapper && getShipmentInfo() != null) {
             ClinicWrapper clinic = (ClinicWrapper) center;
             String waybill = getShipmentInfo().getWaybill();
 

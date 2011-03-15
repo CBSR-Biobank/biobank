@@ -504,24 +504,22 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canRead(User user, CenterWrapper<?> center) {
-        return user.hasPrivilegeOnObject(Privilege.READ, center, this);
+    public boolean canRead(User user) {
+        return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass());
     }
 
     /**
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        CenterWrapper<?> site = getCenterLinkedToObject();
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, site, this);
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass());
     }
 
     /**
      * return true if the user can delete this object
      */
     public boolean canDelete(User user) {
-        return user.hasPrivilegeOnObject(Privilege.DELETE,
-            getCenterLinkedToObject(), this);
+        return user.hasPrivilegeOnObject(Privilege.DELETE, getWrappedClass());
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -582,18 +580,18 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return this.getId().compareTo(arg0.getId());
     }
 
-    public CenterWrapper<?> getCenterLinkedToObject() {
-        return null;
-    }
+    // public CenterWrapper<?> getCenterLinkedToObjectForSecu() {
+    // return null;
+    // }
 
     /**
      * return true if access is authorized
      */
     // FIXME needed ?
-    public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
-        @SuppressWarnings("unused") CenterWrapper<?> center) {
-        return true;
-    }
+    // public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
+    // @SuppressWarnings("unused") CenterWrapper<?> center) {
+    // return true;
+    // }
 
     public static <W extends ModelWrapper<? extends M>, M> W wrapModel(
         WritableApplicationService appService, M model, Class<W> wrapperKlazz)
@@ -897,8 +895,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             T tmp = (T) getter.invoke(model);
             value = tmp;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
 
         return value;

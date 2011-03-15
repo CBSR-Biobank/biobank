@@ -23,8 +23,7 @@ public class ContainerTypeAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        boolean can = SessionManager
-            .canCreate(ContainerTypeWrapper.class, null);
+        boolean can = SessionManager.canCreate(ContainerTypeWrapper.class);
         return can;
     }
 }

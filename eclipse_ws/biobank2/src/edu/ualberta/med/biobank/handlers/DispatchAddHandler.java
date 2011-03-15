@@ -26,7 +26,7 @@ public class DispatchAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(DispatchWrapper.class, null);
+        return SessionManager.canCreate(DispatchWrapper.class);
     }
 
 }

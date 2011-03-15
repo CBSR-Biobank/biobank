@@ -85,14 +85,21 @@ public class PatientAdministrationView extends
 
     @Override
     protected void notFound(String text) {
-        boolean create = BiobankPlugin.openConfirm("Patient not found",
-            "Do you want to create this patient ?");
-        if (create) {
-            PatientWrapper patient = new PatientWrapper(
-                SessionManager.getAppService());
-            patient.setPnumber(text);
-            PatientAdapter adapter = new PatientAdapter(searchedNode, patient);
-            adapter.openEntryForm();
+        boolean canCreate = SessionManager.canCreate(PatientWrapper.class);
+        if (canCreate) {
+            boolean create = BiobankPlugin.openConfirm("Patient not found",
+                "Do you want to create this patient ?");
+            if (create) {
+                PatientWrapper patient = new PatientWrapper(
+                    SessionManager.getAppService());
+                patient.setPnumber(text);
+                PatientAdapter adapter = new PatientAdapter(searchedNode,
+                    patient);
+                adapter.openEntryForm();
+            }
+        } else {
+            BiobankPlugin.openInformation("Patient not found",
+                "This patient doesn't exist.");
         }
     }
 
