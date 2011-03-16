@@ -364,11 +364,14 @@ public class BiobankSecurityUtil {
                 }
 
                 Group serverGroup = null;
+                edu.ualberta.med.biobank.common.security.Group oldGroup = null;
                 if (group.getId() != null) {
                     serverGroup = upm.getGroupById(group.getId().toString());
+                    oldGroup = createGroup(upm, serverGroup);
                 }
                 if (serverGroup == null) {
                     serverGroup = new Group();
+                    oldGroup = new edu.ualberta.med.biobank.common.security.Group();
                 }
                 serverGroup.setGroupName(group.getName());
                 if (serverGroup.getGroupId() == null) {
@@ -376,9 +379,11 @@ public class BiobankSecurityUtil {
                 } else {
                     upm.modifyGroup(serverGroup);
                 }
-                // Default is Read Only
+                // Default is Read Only for all Objects (protection group with
+                // id=1
                 addPGRoleAssociationToGroup(upm, serverGroup, 1L,
                     edu.ualberta.med.biobank.common.security.Group.READ_ONLY);
+
                 if (group.getIsWorkingCentersAdministrator()) {
                     addPGRoleAssociationToGroup(
                         upm,
@@ -386,27 +391,25 @@ public class BiobankSecurityUtil {
                         edu.ualberta.med.biobank.common.security.Group.PG_CENTER_ADMINISTRATOR_ID,
                         edu.ualberta.med.biobank.common.security.Group.OBJECT_FULL_ACCESS);
                 }
+
+                List<Integer> oldCentersList = oldGroup.getWorkingCenterIds();
                 for (Integer centerId : group.getWorkingCenterIds()) {
+                    oldCentersList.remove(centerId);
                     setCenterSecurityForGroup(
                         upm,
                         serverGroup,
                         centerId,
                         edu.ualberta.med.biobank.common.security.Group.CENTER_FULL_ACCESS);
                 }
-                for (Integer pgId : group.getGlobalFeaturesEnabled()) {
-                    addPGRoleAssociationToGroup(
-                        upm,
-                        serverGroup,
-                        pgId.longValue(),
-                        edu.ualberta.med.biobank.common.security.Group.OBJECT_FULL_ACCESS);
+                for (Integer centerId : oldCentersList) {
+                    removeCenterSecurityForGroup(upm, serverGroup, centerId);
                 }
-                for (Integer pgId : group.getCenterFeaturesEnabled()) {
-                    addPGRoleAssociationToGroup(
-                        upm,
-                        serverGroup,
-                        pgId.longValue(),
-                        edu.ualberta.med.biobank.common.security.Group.OBJECT_FULL_ACCESS);
-                }
+                modifyFeatures(upm, serverGroup,
+                    oldGroup.getGlobalFeaturesEnabled(),
+                    group.getGlobalFeaturesEnabled());
+                modifyFeatures(upm, serverGroup,
+                    oldGroup.getCenterFeaturesEnabled(),
+                    group.getCenterFeaturesEnabled());
                 return createGroup(upm, serverGroup);
             } catch (ApplicationException ae) {
                 log.error("Error persisting security group", ae);
@@ -421,11 +424,48 @@ public class BiobankSecurityUtil {
         }
     }
 
-    @SuppressWarnings("unchecked")
+    private static void modifyFeatures(UserProvisioningManager upm,
+        Group serverGroup, List<Integer> oldFeatures, List<Integer> newFeatures)
+        throws ApplicationException, CSTransactionException {
+        for (Integer pgId : newFeatures) {
+            oldFeatures.remove(pgId);
+            addPGRoleAssociationToGroup(
+                upm,
+                serverGroup,
+                pgId.longValue(),
+                edu.ualberta.med.biobank.common.security.Group.OBJECT_FULL_ACCESS);
+        }
+        if (serverGroup.getGroupId() != null)
+            for (Integer pgId : oldFeatures) {
+                upm.removeGroupFromProtectionGroup(pgId.toString(), serverGroup
+                    .getGroupId().toString());
+            }
+
+    }
+
+    private static void removeCenterSecurityForGroup(
+        UserProvisioningManager upm, Group serverGroup, Integer centerId)
+        throws CSObjectNotFoundException, ApplicationException,
+        CSTransactionException {
+        ProtectionGroup pg = getProtectionGroupForCenter(upm, centerId);
+        upm.removeGroupFromProtectionGroup(
+            pg.getProtectionGroupId().toString(), serverGroup.getGroupId()
+                .toString());
+    }
+
     private static void setCenterSecurityForGroup(UserProvisioningManager upm,
         Group serverGroup, Integer centerId, String roleName)
         throws ApplicationException, CSTransactionException,
         CSObjectNotFoundException {
+        ProtectionGroup pg = getProtectionGroupForCenter(upm, centerId);
+        addPGRoleAssociationToGroup(upm, serverGroup,
+            pg.getProtectionGroupId(), roleName);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static ProtectionGroup getProtectionGroupForCenter(
+        UserProvisioningManager upm, Integer centerId)
+        throws ApplicationException, CSObjectNotFoundException {
         ProtectionElement pe = new ProtectionElement();
         // FIXME would be better to get the exact class name to search
         // pe.setObjectId(Site.class.getName());
@@ -443,8 +483,7 @@ public class BiobankSecurityUtil {
         if (pgs.size() != 1)
             throw new ApplicationException(
                 "Problem with protection group for center with id=" + centerId);
-        addPGRoleAssociationToGroup(upm, serverGroup, pgs.iterator().next()
-            .getProtectionGroupId(), roleName);
+        return pgs.iterator().next();
     }
 
     private static void addPGRoleAssociationToGroup(
@@ -527,7 +566,7 @@ public class BiobankSecurityUtil {
             }
         } else {
             throw new ApplicationException(
-                "Only Website Administrators can retrieve security features");
+                "Only super administrators can retrieve security features");
         }
     }
 

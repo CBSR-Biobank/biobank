@@ -111,10 +111,8 @@ public class ContainerViewForm extends BiobankViewForm {
         setPartName(Messages.getString("ContainerViewForm.title", //$NON-NLS-1$
             container.getLabel(), container.getContainerType().getNameShort()));
         initCells();
-        canCreate = SessionManager.canCreate(ContainerWrapper.class,
-            container.getSite());
-        canDelete = SessionManager.canDelete(ContainerWrapper.class,
-            container.getSite());
+        canCreate = SessionManager.canCreate(ContainerWrapper.class);
+        canDelete = SessionManager.canDelete(ContainerWrapper.class);
     }
 
     @Override

@@ -23,7 +23,7 @@ public class SiteAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(SiteWrapper.class, null)
+        return SessionManager.canCreate(SiteWrapper.class)
             && SessionManager.getInstance().getSession() != null;
     }
 }

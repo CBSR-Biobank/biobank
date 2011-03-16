@@ -75,7 +75,6 @@ public class ProcessingView extends AbstractTodaySearchAdministrationView {
 
     @Override
     protected void notFound(String text) {
-
     }
 
     @Override

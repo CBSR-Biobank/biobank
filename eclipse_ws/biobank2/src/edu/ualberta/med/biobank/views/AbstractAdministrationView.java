@@ -94,11 +94,14 @@ public abstract class AbstractAdministrationView extends
                 public void sourceChanged(int sourcePriority,
                     String sourceName, Object sourceValue) {
                     if (sourceValue != null) {
-                        if (sourceValue instanceof Boolean)
-                            searchComposite.setEnabled((Boolean) sourceValue);
-                        if (sourceValue instanceof String)
-                            searchComposite.setEnabled(new Boolean(
-                                (String) sourceValue));
+                        if (!searchComposite.isDisposed()) {
+                            if (sourceValue instanceof Boolean)
+                                searchComposite
+                                    .setEnabled((Boolean) sourceValue);
+                            if (sourceValue instanceof String)
+                                searchComposite.setEnabled(new Boolean(
+                                    (String) sourceValue));
+                        }
                     }
                 }
 
@@ -120,9 +123,11 @@ public abstract class AbstractAdministrationView extends
 
     @Override
     public void reload() {
-        getTreeViewer().refresh(true);
-        getTreeViewer().expandToLevel(3);
-        setSearchFieldsEnablement(true);
+        if (!getTreeViewer().getControl().isDisposed()) {
+            getTreeViewer().refresh(true);
+            getTreeViewer().expandToLevel(3);
+            setSearchFieldsEnablement(true);
+        }
     }
 
     @Override
@@ -132,9 +137,11 @@ public abstract class AbstractAdministrationView extends
     }
 
     private void setSearchFieldsEnablement(boolean enabled) {
-        searchComposite.setEnabled(enabled);
-        for (Control c : searchComposite.getChildren()) {
-            c.setEnabled(enabled);
+        if (!searchComposite.isDisposed()) {
+            searchComposite.setEnabled(enabled);
+            for (Control c : searchComposite.getChildren()) {
+                c.setEnabled(enabled);
+            }
         }
     }
 

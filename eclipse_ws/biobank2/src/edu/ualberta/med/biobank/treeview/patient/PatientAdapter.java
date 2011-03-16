@@ -76,7 +76,7 @@ public class PatientAdapter extends AdapterBase {
         addDeleteMenu(menu, "Patient");
 
         if (isEditable()
-            && SessionManager.canCreate(ProcessingEventWrapper.class, null)) {
+            && SessionManager.canCreate(CollectionEventWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Collection Event");
             mi.addSelectionListener(new SelectionAdapter() {

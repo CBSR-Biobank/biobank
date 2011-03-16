@@ -23,7 +23,7 @@ public class StudyMasterGroup extends AbstractStudyGroup {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(StudyWrapper.class, null)) {
+        if (SessionManager.canCreate(StudyWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Study");
             mi.addSelectionListener(new SelectionAdapter() {

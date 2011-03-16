@@ -43,7 +43,7 @@ public class SiteGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(SiteWrapper.class, null)) {
+        if (SessionManager.canCreate(SiteWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Site");
             mi.addSelectionListener(new SelectionAdapter() {

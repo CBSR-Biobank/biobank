@@ -36,9 +36,9 @@ public class EditShippingMethodsHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.canCreate(ShippingMethodWrapper.class, null)
-            || SessionManager.canUpdate(ShippingMethodWrapper.class, null) || SessionManager
-            .canDelete(ShippingMethodWrapper.class, null))
+        return (SessionManager.canCreate(ShippingMethodWrapper.class)
+            || SessionManager.canUpdate(ShippingMethodWrapper.class) || SessionManager
+            .canDelete(ShippingMethodWrapper.class))
             && (SessionManager.getInstance().getSession() != null);
     }
 }

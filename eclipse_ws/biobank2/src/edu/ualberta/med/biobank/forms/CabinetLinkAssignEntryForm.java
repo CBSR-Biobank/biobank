@@ -36,8 +36,10 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
+import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ContainerLabelingSchemeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -448,11 +450,13 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 .getCurrentWorkingSite();
             String fullLabel = newCabinetPositionText.getText();
             List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
-            int removeSize = 2;
+            int removeSize = 2;// FIXME we are assuming that the specimen
+                               // position will be only of size 2 !
             List<String> labelsTested = new ArrayList<String>();
-            while (removeSize < 5) {
-                String binLabel = fullLabel.substring(0, fullLabel.length()
-                    - removeSize);
+            while (removeSize < 5) { // we are assuming that the bin position
+                                     // won't be bigger than 3 !
+                int cutIndex = fullLabel.length() - removeSize;
+                String binLabel = fullLabel.substring(0, cutIndex);
                 labelsTested.add(binLabel);
                 for (ContainerWrapper cont : ContainerWrapper
                     .getContainersInSite(appService, currentSite, binLabel)) {
@@ -461,7 +465,21 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                         && cont.getContainerType().getSpecimenTypeCollection()
                             .size() > 0;
                     if (canContainSamples) {
-                        foundContainers.add(cont);
+                        RowColPos rcp = null;
+                        try {
+                            rcp = ContainerLabelingSchemeWrapper
+                                .getRowColFromPositionString(appService,
+                                    fullLabel.substring(cutIndex), cont
+                                        .getContainerType()
+                                        .getChildLabelingSchemeId(), cont
+                                        .getContainerType().getRowCapacity(),
+                                    cont.getContainerType().getColCapacity());
+                        } catch (Exception ex) {
+                            // the test failed
+                            break;
+                        }
+                        if (rcp != null) // the full position string is valid:
+                            foundContainers.add(cont);
                     }
                 }
                 removeSize++;
@@ -472,6 +490,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 while (cont.getParentContainer() != null) {
                     cont = cont.getParentContainer();
                 }
+                // Checking this is actually inside a cabinet
                 if (cabinetContainerTypes.contains(cont.getContainerType())) {
                     cabinetContainers.add(container);
                 }
@@ -481,20 +500,20 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 drawer = bin.getParentContainer();
                 cabinet = drawer.getParentContainer();
             } else if (cabinetContainers.size() == 0) {
-                String errorMsg = Messages
-                    .getString(
-                        "Cabinet.activitylog.checkParent.error.found", getBinLabelMessage(labelsTested), currentSite.getNameShort()); //$NON-NLS-1$
+                String errorMsg = Messages.getString(
+                    "Cabinet.activitylog.checkParent.error.found", //$NON-NLS-1$
+                    getBinLabelMessage(labelsTested),
+                    currentSite.getNameShort());
                 BiobankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
                 typeWidget.setEnabled(false);
                 focusControlInError(newCabinetPositionText);
                 return;
             } else {
-                BiobankPlugin
-                    .openError(
-                        "Container problem",
-                        "More than one container found for " + getBinLabelMessage(labelsTested) //$NON-NLS-1$
-                            + " --- should do something"); //$NON-NLS-1$
+                BiobankPlugin.openError("Container problem",
+                    "More than one container found for "
+                        + getBinLabelMessage(labelsTested)
+                        + " --- should do something");
                 typeWidget.setEnabled(false);
                 focusControlInError(newCabinetPositionText);
                 return;

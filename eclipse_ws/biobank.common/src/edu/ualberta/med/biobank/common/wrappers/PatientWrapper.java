@@ -16,13 +16,11 @@ import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
-import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.base.PatientBaseWrapper;
 import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Log;
 import edu.ualberta.med.biobank.model.Patient;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
@@ -78,21 +76,23 @@ public class PatientWrapper extends PatientBaseWrapper {
      * patient only if the current user has read access on a site that works
      * with this patient study
      */
+    // FIXME not sure the result is still what is explain in the comments
     public static PatientWrapper getPatient(
         WritableApplicationService appService, String patientNumber, User user)
         throws ApplicationException {
         PatientWrapper patient = getPatient(appService, patientNumber);
         if (patient != null) {
-            StudyWrapper study = patient.getStudy();
-            List<SiteWrapper> sites = study.getSiteCollection(false);
-            boolean canRead = false;
-            for (SiteWrapper site : sites) {
-                if (user.hasPrivilegeOnObject(Privilege.READ, null, Site.class,
-                    site.getId())) {
-                    canRead = true;
-                    break;
-                }
-            }
+            boolean canRead = true;
+            // StudyWrapper study = patient.getStudy();
+            // List<SiteWrapper> sites = study.getSiteCollection(false);
+            // boolean canRead = false;
+            // for (SiteWrapper site : sites) {
+            // if (user.hasPrivilegeOnObject(Privilege.READ, null, Site.class,
+            // site.getId())) {
+            // canRead = true;
+            // break;
+            // }
+            // }
             if (!canRead) {
                 throw new ApplicationException("Patient " + patientNumber
                     + " exists but you don't have access to it."
@@ -309,25 +309,26 @@ public class PatientWrapper extends PatientBaseWrapper {
         return log;
     }
 
-    @Override
-    public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
-        if (isNew()) {
-            return true;
-        }
-        // won't use siteId because patient is not site specific (will be null)
-        StudyWrapper study = getStudy();
-        if (study != null) {
-            List<SiteWrapper> sites = study.getSiteCollection(false);
-            for (SiteWrapper studySite : sites) {
-                // if can update at least one site, then can add/update a
-                // patient to the linked study
-                if (user.canUpdateCenter(studySite)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+    // @Override
+    // public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
+    // if (isNew()) {
+    // return true;
+    // }
+    // // won't use siteId because patient is not site specific (will be null)
+    // StudyWrapper study = getStudy();
+    // if (study != null) {
+    // List<CenterWrapper<?>> studyCenters = study
+    // .getSiteCollection(false);
+    // for (SiteWrapper studySite : sites) {
+    // // if can update at least one site, then can add/update a
+    // // patient to the linked study
+    // if (user.canUpdateCenter(studySite)) {
+    // return true;
+    // }
+    // }
+    // }
+    // return false;
+    // }
 
     /**
      * merge patient2 into this patient

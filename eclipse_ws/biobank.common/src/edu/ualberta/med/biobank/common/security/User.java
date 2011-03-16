@@ -11,7 +11,6 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
-import edu.ualberta.med.biobank.model.Center;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class User implements Serializable, NotAProxy {
@@ -128,57 +127,23 @@ public class User implements Serializable, NotAProxy {
         return false;
     }
 
-    public boolean isCenterAdministrator(CenterWrapper<?> center) {
-        Integer id = null;
-        if (center != null)
-            id = center.getId();
-        return isCenterAdministrator(id,
-            center == null ? null : center.getWrappedClass());
-    }
-
-    public boolean isCenterAdministrator(Integer centerId,
-        Class<? extends Center> centerClass) {
-        if (isSuperAdministrator()) {
-            return true;
-        }
+    /**
+     * Return true if this user is administrator for this center.
+     */
+    public boolean isAdministratorForCurrentCenter() {
         for (Group group : groups) {
-            if (group.isAdministratorForCenter(centerId, centerClass)) {
+            if (group.isAdministratorForCenter(currentWorkingCenter)) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * Use to check if a user can modify objects inside a center
-     */
-    public boolean canUpdateCenter(CenterWrapper<?> center) {
-        Integer id = null;
-        if (center != null)
-            id = center.getId();
-        return canUpdateCenter(id,
-            center == null ? null : center.getWrappedClass());
-    }
-
-    /**
-     * Use to check if a user can modify objects inside a center
-     */
-    public boolean canUpdateCenter(Integer centerId,
-        Class<? extends Center> centerClass) {
-        if (centerId == null)
-            return false;
-        return hasPrivilegeOnObject(
-            Privilege.UPDATE,
-            centerClass == null ? Center.class.getName() : centerClass
-                .getName(), centerId);
     }
 
     public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
-        String protectionGroupName, Integer centerId,
-        Class<? extends Center> centerClass) {
+        String protectionGroupName) {
         for (Group group : groups) {
             if (group.hasPrivilegeOnProtectionGroup(privilege,
-                protectionGroupName, centerId, centerClass)) {
+                protectionGroupName, currentWorkingCenter)) {
                 return true;
             }
         }
@@ -186,19 +151,7 @@ public class User implements Serializable, NotAProxy {
     }
 
     public boolean hasPrivilegeOnObject(Privilege privilege,
-        CenterWrapper<?> center, ModelWrapper<?> modelWrapper) {
-        boolean canCreateDeleteUpdate = true;
-        String type = modelWrapper.getWrappedClass().getName();
-        if (privilege != Privilege.READ && center != null)
-            canCreateDeleteUpdate = canUpdateCenter(center);
-        canCreateDeleteUpdate = canCreateDeleteUpdate
-            && modelWrapper.checkSpecificAccess(this, center);
-        return canCreateDeleteUpdate
-            && hasPrivilegeOnObject(privilege, type, modelWrapper.getId());
-    }
-
-    public boolean hasPrivilegeOnObject(Privilege privilege,
-        CenterWrapper<?> center, Class<?> objectClazz, Integer objectId) {
+        Class<?> objectClazz) {
         if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
             ModelWrapper<?> wrapper = null;
             try {
@@ -211,16 +164,16 @@ public class User implements Serializable, NotAProxy {
                 e.printStackTrace();
                 return false;
             }
-            return hasPrivilegeOnObject(privilege, center, wrapper);
+            return hasPrivilegeOnObject(privilege, wrapper.getWrappedClass()
+                .getName());
         }
         String type = objectClazz.getName();
-        return hasPrivilegeOnObject(privilege, type, objectId);
+        return hasPrivilegeOnObject(privilege, type);
     }
 
-    private boolean hasPrivilegeOnObject(Privilege privilege, String type,
-        Integer id) {
+    private boolean hasPrivilegeOnObject(Privilege privilege, String type) {
         for (Group group : groups) {
-            if (group.hasPrivilegeOnObject(privilege, type, id)) {
+            if (group.hasPrivilegeOnObject(privilege, type)) {
                 return true;
             }
         }
@@ -286,5 +239,17 @@ public class User implements Serializable, NotAProxy {
         if (currentWorkingCenter instanceof SiteWrapper)
             return (SiteWrapper) currentWorkingCenter;
         return null;
+    }
+
+    // FIXME for now assume features are center features (so can use
+    // isAdministratorForCurrentCenter)
+    public boolean canPerformActions(Feature... features) {
+        boolean ok = isAdministratorForCurrentCenter();
+        for (Feature feature : features) {
+            ok = ok
+                || hasPrivilegeOnProtectionGroup(Privilege.UPDATE,
+                    feature.getName());
+        }
+        return ok;
     }
 }
