@@ -173,7 +173,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         for (ProcessingEvent pv : pvs)
             pvws.add(new ProcessingEventWrapper(appService, pv));
         if (pvws.size() == 0)
-            return null;
+            return new ArrayList<ProcessingEventWrapper>();
         return pvws;
     }
 
