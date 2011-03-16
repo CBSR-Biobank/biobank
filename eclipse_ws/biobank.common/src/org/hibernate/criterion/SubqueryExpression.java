@@ -1,4 +1,8 @@
 //$Id: SubqueryExpression.java,v 1.8 2005/07/04 02:40:28 oneovthafew Exp $
+// This file is here to override the class in the hibernate*.jar because
+// this class has a bug that does not allow DetachedCriteria to use joins
+// properly. See
+// http://opensource.atlassian.com/projects/hibernate/browse/HHH-952 for the bug.
 package org.hibernate.criterion;
 
 import java.util.HashMap;
