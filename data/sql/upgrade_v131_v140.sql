@@ -801,6 +801,172 @@ LOCK TABLES report_column WRITE;
 UNLOCK TABLES;
 
 --
+-- Table structure for table entity
+--
+
+DROP TABLE IF EXISTS entity;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE entity (
+  ID int(11) NOT NULL,
+  CLASS_NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  PRIMARY KEY (ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table entity
+--
+
+LOCK TABLES entity WRITE;
+/*!40000 ALTER TABLE entity DISABLE KEYS */;
+INSERT INTO entity VALUES (1,'edu.ualberta.med.biobank.model.Specimen','Specimen'),
+(2,'edu.ualberta.med.biobank.model.Container','Container'),
+(3,'edu.ualberta.med.biobank.model.Patient','Patient'),
+(4,'edu.ualberta.med.biobank.model.CollectionEvent','Collection Event'),
+(5,'edu.ualberta.med.biobank.model.ProcessingEvent','Processing Event');
+/*!40000 ALTER TABLE entity ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table property_modifier
+--
+
+DROP TABLE IF EXISTS property_modifier;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE property_modifier (
+  ID int(11) NOT NULL,
+  NAME text COLLATE latin1_general_cs,
+  PROPERTY_MODIFIER text COLLATE latin1_general_cs,
+  PROPERTY_TYPE_ID int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  KEY FK5DF9160157C0C3B0 (PROPERTY_TYPE_ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table property_modifier
+--
+
+LOCK TABLES property_modifier WRITE;
+/*!40000 ALTER TABLE property_modifier DISABLE KEYS */;
+INSERT INTO property_modifier VALUES (1,'Year','YEAR({value})',3),(2,'Year, Quarter','CONCAT(YEAR({value}), CONCAT(\'-\', QUARTER({value})))',3),(3,'Year, Month','CONCAT(YEAR({value}), CONCAT(\'-\', MONTH({value})))',3),(4,'Year, Week','CONCAT(YEAR({value}), CONCAT(\'-\', WEEK({value})))',3);
+/*!40000 ALTER TABLE property_modifier ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table property_type
+--
+
+DROP TABLE IF EXISTS property_type;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE property_type (
+  ID int(11) NOT NULL,
+  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  PRIMARY KEY (ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table property_type
+--
+
+LOCK TABLES property_type WRITE;
+/*!40000 ALTER TABLE property_type DISABLE KEYS */;
+INSERT INTO property_type VALUES (1,'String'),(2,'Number'),(3,'Date'),(4,'Boolean');
+/*!40000 ALTER TABLE property_type ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table entity_property
+--
+
+DROP TABLE IF EXISTS entity_property;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE entity_property (
+  ID int(11) NOT NULL,
+  PROPERTY varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  PROPERTY_TYPE_ID int(11) NOT NULL,
+  ENTITY_ID int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  KEY FK3FC956B191CFD445 (ENTITY_ID),
+  KEY FK3FC956B157C0C3B0 (PROPERTY_TYPE_ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table entity_property
+--
+
+LOCK TABLES entity_property WRITE;
+/*!40000 ALTER TABLE entity_property DISABLE KEYS */;
+INSERT INTO entity_property VALUES (1,'inventoryId',1,1),
+(2,'createdAt',3,1),
+(3,'comment',1,1),
+(4,'quantity',2,1),
+(5,'activityStatus.name',1,1),
+(6,'specimenPosition.container.containerPath.topContainer.id',2,1),
+(7,'specimenPosition.container.productBarcode',1,1),
+(8,'specimenPosition.container.label',1,1),
+(9,'specimenType.nameShort',1,1),
+(10,'parentSpecimen.processingEvent.createdAt',3,1),
+(12,'collectionEvent.patient.pnumber',1,1),
+(13,'specimenPosition.container.containerPath.topContainer.containerType.nameShort',1,1),
+(14,'specimenPosition.positionString',1,1),
+(15,'currentCenter.nameShort',1,1),
+(16,'collectionEvent.patient.study.nameShort',1,1),
+(17,'originInfo.shipmentInfo.receivedAt',3,1),
+(18,'originInfo.shipmentInfo.waybill',1,1),
+(19,'originInfo.shipmentInfo.sentAt',3,1),
+(20,'originInfo.shipmentInfo.boxNumber',1,1),
+(21,'originInfo.center.nameShort',1,1),
+(22,'dispatchSpecimenCollection.dispatch.senderCenter.nameShort',1,1),
+(23,'dispatchSpecimenCollection.dispatch.receiverCenter.nameShort',1,1),
+(24,'dispatchSpecimenCollection.dispatch.shipmentInfo.receivedAt',3,1),
+(25,'dispatchSpecimenCollection.dispatch.shipmentInfo.sentAt',3,1),
+(26,'dispatchSpecimenCollection.dispatch.shipmentInfo.waybill',1,1),
+(27,'dispatchSpecimenCollection.dispatch.shipmentInfo.boxNumber',1,1),
+
+(101,'productBarcode',1,2),
+(102,'comment',1,2),
+(103,'label',1,2),
+(104,'temperature',2,2),
+(105,'containerPath.topContainer.id',2,2),
+(106,'specimenPositionCollection.specimen.createdAt',3,2),
+(107,'containerType.nameShort',1,2),
+(108,'containerType.topLevel',4,2),
+(109,'site.nameShort',1,2),
+(110,'containerPath.topContainer.containerType.nameShort',1,2),
+
+(201,'pnumber',1,3),
+(202,'study.nameShort',1,3),
+(203,'collectionEventCollection.allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,3),
+(204,'collectionEventCollection.allSpecimenCollection.createdAt',3,3),
+(205,'collectionEventCollection.allSpecimenCollection.originInfo.center.nameShort',1,3),
+(206,'collectionEventCollection.allSpecimenCollection.inventoryId',1,3),
+
+(301,'allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,4),
+(302,'allSpecimenCollection.createdAt',3,4),
+(303,'comment',1,4),
+(304,'patient.pnumber',1,4),
+(305,'allSpecimenCollection.originInfo.center.nameShort',1,4),
+(306,'patient.study.nameShort',1,4),
+
+(401,'worksheet',1,5),
+(402,'createdAt',3,5),
+(403,'comment',1,5),
+(404,'center.nameShort',1,5),
+(405,'activityStatus.name',1,5),
+(406,'specimenCollection.inventoryId',1,5),
+(407,'specimenCollection.createdAt',3,5);
+/*!40000 ALTER TABLE entity_property ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table entity_filter
 --
 
@@ -962,172 +1128,6 @@ INSERT INTO entity_column VALUES (1,'Inventory Id',1),
 (406,'Specimen Inventory Id',406),
 (407,'Specimen Creation Time',407);
 /*!40000 ALTER TABLE entity_column ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table entity_property
---
-
-DROP TABLE IF EXISTS entity_property;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE entity_property (
-  ID int(11) NOT NULL,
-  PROPERTY varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  PROPERTY_TYPE_ID int(11) NOT NULL,
-  ENTITY_ID int(11) DEFAULT NULL,
-  PRIMARY KEY (ID),
-  KEY FK3FC956B191CFD445 (ENTITY_ID),
-  KEY FK3FC956B157C0C3B0 (PROPERTY_TYPE_ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table entity_property
---
-
-LOCK TABLES entity_property WRITE;
-/*!40000 ALTER TABLE entity_property DISABLE KEYS */;
-INSERT INTO entity_property VALUES (1,'inventoryId',1,1),
-(2,'createdAt',3,1),
-(3,'comment',1,1),
-(4,'quantity',2,1),
-(5,'activityStatus.name',1,1),
-(6,'specimenPosition.container.containerPath.topContainer.id',2,1),
-(7,'specimenPosition.container.productBarcode',1,1),
-(8,'specimenPosition.container.label',1,1),
-(9,'specimenType.nameShort',1,1),
-(10,'parentSpecimen.processingEvent.createdAt',3,1),
-(12,'collectionEvent.patient.pnumber',1,1),
-(13,'specimenPosition.container.containerPath.topContainer.containerType.nameShort',1,1),
-(14,'specimenPosition.positionString',1,1),
-(15,'currentCenter.nameShort',1,1),
-(16,'collectionEvent.patient.study.nameShort',1,1),
-(17,'originInfo.shipmentInfo.receivedAt',3,1),
-(18,'originInfo.shipmentInfo.waybill',1,1),
-(19,'originInfo.shipmentInfo.sentAt',3,1),
-(20,'originInfo.shipmentInfo.boxNumber',1,1),
-(21,'originInfo.center.nameShort',1,1),
-(22,'dispatchSpecimenCollection.dispatch.senderCenter.nameShort',1,1),
-(23,'dispatchSpecimenCollection.dispatch.receiverCenter.nameShort',1,1),
-(24,'dispatchSpecimenCollection.dispatch.shipmentInfo.receivedAt',3,1),
-(25,'dispatchSpecimenCollection.dispatch.shipmentInfo.sentAt',3,1),
-(26,'dispatchSpecimenCollection.dispatch.shipmentInfo.waybill',1,1),
-(27,'dispatchSpecimenCollection.dispatch.shipmentInfo.boxNumber',1,1),
-
-(101,'productBarcode',1,2),
-(102,'comment',1,2),
-(103,'label',1,2),
-(104,'temperature',2,2),
-(105,'containerPath.topContainer.id',2,2),
-(106,'specimenPositionCollection.specimen.createdAt',3,2),
-(107,'containerType.nameShort',1,2),
-(108,'containerType.topLevel',4,2),
-(109,'site.nameShort',1,2),
-(110,'containerPath.topContainer.containerType.nameShort',1,2),
-
-(201,'pnumber',1,3),
-(202,'study.nameShort',1,3),
-(203,'collectionEventCollection.allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,3),
-(204,'collectionEventCollection.allSpecimenCollection.createdAt',3,3),
-(205,'collectionEventCollection.allSpecimenCollection.originInfo.center.nameShort',1,3),
-(206,'collectionEventCollection.allSpecimenCollection.inventoryId',1,3),
-
-(301,'allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,4),
-(302,'allSpecimenCollection.createdAt',3,4),
-(303,'comment',1,4),
-(304,'patient.pnumber',1,4),
-(305,'allSpecimenCollection.originInfo.center.nameShort',1,4),
-(306,'patient.study.nameShort',1,4),
-
-(401,'worksheet',1,5),
-(402,'createdAt',3,5),
-(403,'comment',1,5),
-(404,'center.nameShort',1,5),
-(405,'activityStatus.name',1,5),
-(406,'specimenCollection.inventoryId',1,5),
-(407,'specimenCollection.createdAt',3,5);
-/*!40000 ALTER TABLE entity_property ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table property_type
---
-
-DROP TABLE IF EXISTS property_type;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE property_type (
-  ID int(11) NOT NULL,
-  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  PRIMARY KEY (ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table property_type
---
-
-LOCK TABLES property_type WRITE;
-/*!40000 ALTER TABLE property_type DISABLE KEYS */;
-INSERT INTO property_type VALUES (1,'String'),(2,'Number'),(3,'Date'),(4,'Boolean');
-/*!40000 ALTER TABLE property_type ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table property_modifier
---
-
-DROP TABLE IF EXISTS property_modifier;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE property_modifier (
-  ID int(11) NOT NULL,
-  NAME text COLLATE latin1_general_cs,
-  PROPERTY_MODIFIER text COLLATE latin1_general_cs,
-  PROPERTY_TYPE_ID int(11) DEFAULT NULL,
-  PRIMARY KEY (ID),
-  KEY FK5DF9160157C0C3B0 (PROPERTY_TYPE_ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table property_modifier
---
-
-LOCK TABLES property_modifier WRITE;
-/*!40000 ALTER TABLE property_modifier DISABLE KEYS */;
-INSERT INTO property_modifier VALUES (1,'Year','YEAR({value})',3),(2,'Year, Quarter','CONCAT(YEAR({value}), CONCAT(\'-\', QUARTER({value})))',3),(3,'Year, Month','CONCAT(YEAR({value}), CONCAT(\'-\', MONTH({value})))',3),(4,'Year, Week','CONCAT(YEAR({value}), CONCAT(\'-\', WEEK({value})))',3);
-/*!40000 ALTER TABLE property_modifier ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table entity
---
-
-DROP TABLE IF EXISTS entity;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE entity (
-  ID int(11) NOT NULL,
-  CLASS_NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  PRIMARY KEY (ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table entity
---
-
-LOCK TABLES entity WRITE;
-/*!40000 ALTER TABLE entity DISABLE KEYS */;
-INSERT INTO entity VALUES (1,'edu.ualberta.med.biobank.model.Specimen','Specimen'),
-(2,'edu.ualberta.med.biobank.model.Container','Container'),
-(3,'edu.ualberta.med.biobank.model.Patient','Patient'),
-(4,'edu.ualberta.med.biobank.model.CollectionEvent','Collection Event'),
-(5,'edu.ualberta.med.biobank.model.ProcessingEvent','Processing Event');
-/*!40000 ALTER TABLE entity ENABLE KEYS */;
 UNLOCK TABLES;
 
 -- update constraints (unique and not-null):
