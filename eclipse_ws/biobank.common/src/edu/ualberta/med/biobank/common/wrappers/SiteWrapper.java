@@ -360,6 +360,16 @@ public class SiteWrapper extends SiteBaseWrapper {
         return shipCollection;
     }
 
+    @Override
+    public void reload() {
+        propertiesMap.clear();
+        try {
+            super.reload();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
     public Set<ClinicWrapper> getWorkingClinicCollection() {
         List<StudyWrapper> studies = getStudyCollection(false);
         Set<ClinicWrapper> clinics = new HashSet<ClinicWrapper>();
@@ -457,7 +467,6 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     }
 
-    @Deprecated
     public void removeStudyDispatchSites(StudyWrapper study,
         List<SiteWrapper> removedSites) {
         // TODO Auto-generated method stub

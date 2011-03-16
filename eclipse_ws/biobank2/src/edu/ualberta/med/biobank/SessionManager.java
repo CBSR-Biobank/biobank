@@ -98,7 +98,6 @@ public class SessionManager {
         sessionAdapter = null;
         updateMenus();
         ServiceConnection.logout(appService);
-
         // for key binding contexts:
         BindingContextHelper
             .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
@@ -134,7 +133,8 @@ public class SessionManager {
     }
 
     public SessionAdapter getSession() {
-        Assert.isNotNull(sessionAdapter, "session adapter is null");
+        Assert.isNotNull(sessionAdapter,
+            "No connection available. Please log in to continue.");
         return sessionAdapter;
     }
 

@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -24,7 +25,6 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.views.ProcessingView;
 import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -116,7 +116,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         senderComboViewer = createComboViewer(client, "Sender",
-            CenterWrapper.getCenters(appService), shipment.getCenter(),
+            ClinicWrapper.getAllClinics(appService),
+            (ClinicWrapper) shipment.getCenter(),
             "A sender should be selected", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -270,7 +271,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
             @Override
             public void run() {
                 SpecimenTransitView.reloadCurrent();
-                ProcessingView.reloadCurrent();
                 if (!shipment.getShipmentInfo().isReceivedToday())
                     SpecimenTransitView.showShipment(shipment);
             }
