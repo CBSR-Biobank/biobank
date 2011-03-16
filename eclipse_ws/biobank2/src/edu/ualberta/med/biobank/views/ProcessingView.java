@@ -6,12 +6,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
-import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingSearchNode;
 import edu.ualberta.med.biobank.treeview.processing.ProcessingTodayNode;
@@ -44,34 +40,6 @@ public class ProcessingView extends AbstractTodaySearchAdministrationView {
     protected List<? extends ModelWrapper<?>> search(String text)
         throws Exception {
         // FIXME: i do nothing
-        return null;
-    }
-
-    public static AdapterBase addToNode(AdapterBase parentNode,
-        ModelWrapper<?> wrapper) {
-        if (wrapper instanceof PatientWrapper) {
-            PatientWrapper patient = (PatientWrapper) wrapper;
-            List<AdapterBase> res = parentNode.search(patient.getStudy());
-            StudyWithPatientAdapter studyAdapter = null;
-            if (res.size() > 0)
-                studyAdapter = (StudyWithPatientAdapter) res.get(0);
-            if (studyAdapter == null) {
-                studyAdapter = new StudyWithPatientAdapter(parentNode,
-                    patient.getStudy());
-                studyAdapter.setEditable(false);
-                studyAdapter.setLoadChildrenInBackground(false);
-                parentNode.addChild(studyAdapter);
-            }
-            List<AdapterBase> patientAdapterList = studyAdapter.search(patient);
-            PatientAdapter patientAdapter = null;
-            if (patientAdapterList.size() > 0)
-                patientAdapter = (PatientAdapter) patientAdapterList.get(0);
-            else {
-                patientAdapter = new PatientAdapter(studyAdapter, patient);
-                studyAdapter.addChild(patientAdapter);
-            }
-            return patientAdapter;
-        }
         return null;
     }
 

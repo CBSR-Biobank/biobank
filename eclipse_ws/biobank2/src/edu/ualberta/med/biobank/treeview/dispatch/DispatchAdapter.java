@@ -75,24 +75,19 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        if (getCenterParent() != null)
-            return getCenterParent().equals(getWrapper().getSenderCenter())
+        if (SessionManager.getUser().getCurrentWorkingCenter() != null)
+            return SessionManager.getUser().getCurrentWorkingCenter()
+                .equals(getWrapper().getSenderCenter())
                 && getWrapper().canDelete(SessionManager.getUser())
                 && getWrapper().isInCreationState();
         else
             return false;
     }
 
-    private CenterWrapper<?> getCenterParent() {
-        if (getParent().getParent().getParent() != null)
-            return (CenterWrapper<?>) getParent().getParent().getParent()
-                .getModelObject();
-        return null;
-    }
-
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        CenterWrapper<?> siteParent = getCenterParent();
+        CenterWrapper<?> siteParent = SessionManager.getUser()
+            .getCurrentWorkingCenter();
         addViewMenu(menu, "Dispatch");
         try {
             if (isDeletable()) {
