@@ -31,7 +31,6 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSet
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
-import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerTypeHelper;
@@ -88,10 +87,12 @@ public class TestSpecimen extends TestDatabase {
         site.persist();
         site.reload();
 
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1);
-        spc = SpecimenHelper.newSpecimen(sampleType, container, cevent, 0, 0);
-        container.reload();
+        // CollectionEventWrapper cevent = CollectionEventHelper
+        // .addCollectionEvent(site, patient, 1);
+        // spc = SpecimenHelper.newSpecimen(sampleType, container, cevent, 0,
+        // 0);
+        // container.reload();
+        Assert.fail("new implemtation needed");
     }
 
     @Test

@@ -2,7 +2,9 @@ package edu.ualberta.med.biobank.test.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -11,10 +13,9 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -303,7 +304,11 @@ public class TestClinic extends TestDatabase {
         SpecimenWrapper sv = SpecimenHelper.newSpecimen(SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false).get(0));
 
-        CollectionEventHelper.addCollectionEvent(clinic, patient, 1, sv);
+        OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
+        originInfo.setCenter(clinic);
+        originInfo.persist();
+        CollectionEventHelper.addCollectionEvent(clinic, patient, 1,
+            originInfo, sv);
 
         clinic.reload();
         try {
@@ -334,118 +339,6 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testAddCollectionEvents() throws Exception {
-        String name = "testAddCollectionEvents" + r.nextInt();
-        ClinicWrapper clinic = ClinicHelper.addClinicWithShipments(name);
-        ContactWrapper contact = ContactHelper.addContact(clinic, name);
-
-        StudyWrapper study = StudyHelper.addStudy(name);
-        study.addToContactCollection(Arrays.asList(contact));
-        study.persist();
-        PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-
-        List<SpecimenTypeWrapper> specimenTypes = SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, false);
-
-        StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
-        study2.addToContactCollection(Arrays.asList(contact));
-        study2.persist();
-        PatientWrapper patient2 = PatientHelper.addPatient(name + "_2", study2);
-        SpecimenWrapper sv1 = SpecimenHelper.newSpecimen(DbHelper
-            .chooseRandomlyInList(specimenTypes));
-        SpecimenWrapper sv2 = SpecimenHelper.newSpecimen(DbHelper
-            .chooseRandomlyInList(specimenTypes));
-
-        ShippingMethodWrapper method = ShippingMethodWrapper
-            .getShippingMethods(appService).get(0);
-
-        CollectionEventHelper.addCollectionEvent(clinic, patient1, 1, sv1);
-        CollectionEventHelper.addCollectionEvent(clinic, patient2, 1, sv2);
-
-        clinic.reload();
-
-        int n = r.nextInt(5) + 1;
-        List<CollectionEventWrapper> ces = new ArrayList<CollectionEventWrapper>();
-        for (int i = 0; i < n; i++) {
-            SpecimenWrapper sv = SpecimenHelper.newSpecimen(DbHelper
-                .chooseRandomlyInList(specimenTypes));
-
-            ces.add(CollectionEventHelper.addCollectionEvent(clinic, patient1,
-                1, sv));
-        }
-
-        clinic.persist();
-        clinic.reload();
-        // Assert.assertEquals(2 + n, clinic.getCollectionEventCollection(false)
-        // .size());
-        //
-        // clinic.removeFromCollectionEventCollectionWithCheck(ces);
-        // Assert.assertEquals(2, clinic.getCollectionEventCollection(false)
-        // .size());
-        // clinic.persist();
-        //
-        // for (CollectionEventWrapper ce : ces) {
-        // DbHelper.deleteFromList(ce.getSourceVesselCollection(false));
-        // ce.delete();
-        // }
-        // clinic.reload();
-        // Assert.assertEquals(2, clinic.getCollectionEventCollection(false)
-        // .size());
-        Assert.fail("test needs new implementation");
-    }
-
-    @Test
-    public void testGetCollectionEventCount() throws Exception {
-        // String name = "testGetCollectionEventCount" + r.nextInt();
-        // ClinicWrapper clinic = ClinicHelper.addClinicWithShipments(name);
-        // ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        //
-        // StudyWrapper study = StudyHelper.addStudy(name);
-        // study.addToContactCollection(Arrays.asList(contact));
-        // study.persist();
-        // PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        // SpecimenWrapper sv1 = SpecimenHelper.newSpecimen(patient1,
-        // Utils.getRandomDate(), 0.1);
-        //
-        // StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
-        // study2.addToContactCollection(Arrays.asList(contact));
-        // study2.persist();
-        // PatientWrapper patient2 = PatientHelper.addPatient(name + "_2",
-        // study2);
-        // SpecimenWrapper sv2 = SpecimenHelper.newSpecimen(patient2,
-        // Utils.getRandomDate(), 0.1);
-        //
-        // Assert.assertEquals(0, clinic.getCollectionEventCount());
-        // Assert.assertEquals(0, clinic.getCollectionEventCount(true));
-        //
-        // ShippingMethodWrapper method = ShippingMethodWrapper
-        // .getShippingMethods(appService).get(0);
-        // CollectionEventWrapper ce1 =
-        // CollectionEventHelper.addCollectionEvent(
-        // clinic, method, sv1);
-        // CollectionEventWrapper ce2 =
-        // CollectionEventHelper.addCollectionEvent(
-        // clinic, method, sv2);
-        //
-        // Assert.assertEquals(2, clinic.getCollectionEventCount());
-        // Assert.assertEquals(2, clinic.getCollectionEventCount(true));
-        //
-        // clinic.reload();
-        //
-        // DbHelper.deleteFromList(ce1.getSourceVesselCollection(false));
-        // ce1.delete();
-        //
-        // DbHelper.deleteFromList(ce2.getSourceVesselCollection(false));
-        // ce2.delete();
-        //
-        // clinic.reload();
-        //
-        // Assert.assertEquals(0, clinic.getCollectionEventCount());
-        // Assert.assertEquals(0, clinic.getCollectionEventCount(true));
-        Assert.fail("test needs new implementation");
-    }
-
-    @Test
     public void testCompareTo() throws Exception {
         String name = "testCompareTo" + r.nextInt();
         ClinicWrapper clinic1 = ClinicHelper.addClinic("QWERTY" + name);
@@ -471,108 +364,60 @@ public class TestClinic extends TestDatabase {
     }
 
     @Test
-    public void testGetCollectionEventWithDate() throws Exception {
-        // String name = "testGetCollectionEventWithDate" + r.nextInt();
-        // ClinicWrapper clinic = ClinicHelper.addClinic(name);
-        // ContactWrapper contact = ContactHelper.addContact(clinic, name);
-        //
-        // StudyWrapper study = StudyHelper.addStudy(name);
-        // study.addToContactCollection(Arrays.asList(contact));
-        // study.persist();
-        // PatientWrapper patient1 = PatientHelper.addPatient(name, study);
-        // SpecimenWrapper sv1 = SpecimenHelper.newSpecimen(patient1,
-        // Utils.getRandomDate(), 0.1);
-        //
-        // StudyWrapper study2 = StudyHelper.addStudy(name + "_2");
-        // study2.addToContactCollection(Arrays.asList(contact));
-        // study2.persist();
-        // PatientWrapper patient2 = PatientHelper.addPatient(name + "_2",
-        // study2);
-        // SpecimenWrapper sv2 = SpecimenHelper.newSpecimen(patient2,
-        // Utils.getRandomDate(), 0.1);
-        //
-        // ShippingMethodWrapper method = ShippingMethodWrapper
-        // .getShippingMethods(appService).get(0);
-        // CollectionEventWrapper shipment1 = CollectionEventHelper
-        // .addCollectionEventNoWaybill(clinic, method, sv1);
-        // Date date1 = shipment1.getDateReceived();
-        // CollectionEventWrapper shipment2 = CollectionEventHelper
-        // .addCollectionEventNoWaybill(clinic, method, sv2);
-        // Date date2 = shipment2.getDateReceived();
-        //
-        // clinic.reload();
-        //
-        // CollectionEventWrapper shipFound = clinic.getCollectionEvent(date1);
-        // Assert.assertEquals(shipment1, shipFound);
-        // Assert.assertFalse(shipment2.equals(shipFound));
-        //
-        // shipFound = clinic.getCollectionEvent(date2);
-        // Assert.assertEquals(shipment2, shipFound);
-        // Assert.assertFalse(shipment1.equals(shipFound));
-        //
-        // shipFound = clinic.getCollectionEvent(new Date());
-        // Assert.assertNull(shipFound);
-        Assert.fail("test needs new implementation");
-    }
-
-    @Test
     public void testGetPatientCount() throws Exception {
-        // String name = "testGetPatientCount" + r.nextInt();
-        // ClinicWrapper clinic1 = ClinicHelper.addClinic(name);
-        // ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
-        // ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
-        // ContactWrapper contact2 = ContactHelper
-        // .addContact(clinic2, name + "_2");
-        //
-        // StudyWrapper study = StudyHelper.addStudy(name);
-        // study.addToContactCollection(Arrays.asList(contact1, contact2));
-        // study.persist();
-        //
-        // PatientWrapper patient;
-        // List<ClinicWrapper> clinics = Arrays.asList(clinic1, clinic2);
-        // Map<ClinicWrapper, List<PatientWrapper>> patientMap = new
-        // HashMap<ClinicWrapper, List<PatientWrapper>>();
-        //
-        // for (ClinicWrapper clinic : clinics) {
-        // patientMap.put(clinic, new ArrayList<PatientWrapper>());
-        // }
-        //
-        // // add patients
-        // for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
-        // patient = PatientHelper.addPatient(name + "_p" + i, study);
-        // ClinicWrapper clinic = clinics.get(i & 1);
-        // patientMap.get(clinic).add(patient);
-        // CollectionEventHelper
-        // .addCollectionEventNoWaybill(clinic, ShippingMethodWrapper
-        // .getShippingMethods(appService).get(0), SpecimenHelper
-        // .newSpecimen(patient, Utils.getRandomDate(), 0.1));
-        // Assert.assertEquals(patientMap.get(clinic).size(),
-        // clinic.getPatientCount(true));
-        // Assert.assertEquals(patientMap.get(clinic).size(),
-        // clinic.getPatientCount(false));
-        // }
-        //
-        // // delete patients
-        // for (ClinicWrapper clinic : clinics) {
-        // while (patientMap.get(clinic).size() > 0) {
-        // patient = patientMap.get(clinic).get(0);
-        // patient.reload();
-        // if (patient.getSourceVesselCollection(false) != null) {
-        // for (SpecimenWrapper s : patient
-        // .getSourceVesselCollection(false)) {
-        // s.delete();
-        // }
-        // patient.reload();
-        // }
-        // patient.delete();
-        // patientMap.get(clinic).remove(0);
-        // clinic.reload();
-        // Assert.assertEquals(patientMap.get(clinic).size(),
-        // clinic.getPatientCount(true));
-        // Assert.assertEquals(patientMap.get(clinic).size(),
-        // clinic.getPatientCount(false));
-        // }
-        // }
-        Assert.fail("test needs new implementation");
+        String name = "testGetPatientCount" + r.nextInt();
+        ClinicWrapper clinic1 = ClinicHelper.addClinic(name);
+        ContactWrapper contact1 = ContactHelper.addContact(clinic1, name);
+        ClinicWrapper clinic2 = ClinicHelper.addClinic(name + "_2");
+        ContactWrapper contact2 = ContactHelper
+            .addContact(clinic2, name + "_2");
+
+        StudyWrapper study = StudyHelper.addStudy(name);
+        study.addToContactCollection(Arrays.asList(contact1, contact2));
+        study.persist();
+
+        PatientWrapper patient;
+        List<ClinicWrapper> clinics = Arrays.asList(clinic1, clinic2);
+        Map<ClinicWrapper, List<PatientWrapper>> patientMap = new HashMap<ClinicWrapper, List<PatientWrapper>>();
+
+        for (ClinicWrapper clinic : clinics) {
+            patientMap.put(clinic, new ArrayList<PatientWrapper>());
+        }
+
+        // add patients
+        for (int i = 0, n = r.nextInt(10) + 1; i < n; ++i) {
+            patient = PatientHelper.addPatient(name + "_p" + i, study);
+            ClinicWrapper clinic = clinics.get(i & 1);
+            patientMap.get(clinic).add(patient);
+            OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
+            originInfo.setCenter(clinic);
+            originInfo.persist();
+            SpecimenWrapper sv = SpecimenHelper.newSpecimen(SpecimenTypeWrapper
+                .getAllSpecimenTypes(appService, false).get(0));
+            CollectionEventHelper.addCollectionEvent(clinic, patient, i,
+                originInfo, sv);
+            Assert.assertEquals(patientMap.get(clinic).size(),
+                clinic.getPatientCount());
+        }
+
+        // delete patients
+        for (ClinicWrapper clinic : clinics) {
+            while (patientMap.get(clinic).size() > 0) {
+                patient = patientMap.get(clinic).get(0);
+                patient.reload();
+                // if (patient.getSourceVesselCollection(false) != null) {
+                // for (SpecimenWrapper s : patient
+                // .getSourceVesselCollection(false)) {
+                // s.delete();
+                // }
+                // patient.reload();
+                // }
+                patient.delete();
+                patientMap.get(clinic).remove(0);
+                clinic.reload();
+                Assert.assertEquals(patientMap.get(clinic).size(),
+                    clinic.getPatientCount());
+            }
+        }
     }
 }
