@@ -776,7 +776,6 @@ CREATE TABLE report (
 
 LOCK TABLES report WRITE;
 /*!40000 ALTER TABLE report DISABLE KEYS */;
-INSERT INTO report VALUES (7,'05 - Aliquots per Study',NULL,15,NULL,'',1),(8,'03 - Aliquots per Study per Clinic',NULL,15,NULL,'',1),(6,'01 - Aliquots',NULL,15,'\0','\0',1),(9,'04A - Aliquots per Study per Clinic by Year',NULL,15,'\0','',1),(16,'11 - New Patient Visits per Study by Date',NULL,15,NULL,'',4),(15,'14 - Patients per Study by Date',NULL,15,NULL,'',3),(14,'12 - New Patients per Study per Clinic by Date',NULL,15,NULL,'',3),(13,'07 - Aliquots by Container',NULL,15,NULL,NULL,1),(17,'13 - Patient Visits per Study by Date',NULL,15,NULL,'',4),(18,'18A - Invoicing Report',NULL,15,NULL,'',1),(19,'18B - Invoicing Report','',15,NULL,'',4),(20,'19 - Sample Type Totals by Patient Visit and Study',NULL,15,NULL,'',1);
 /*!40000 ALTER TABLE report ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -805,7 +804,6 @@ CREATE TABLE report_filter (
 
 LOCK TABLES report_filter WRITE;
 /*!40000 ALTER TABLE report_filter DISABLE KEYS */;
-INSERT INTO report_filter VALUES (184,0,4,12,6),(185,1,1,2,6),(189,0,101,7,13),(190,1,3,12,13),(191,2,101,13,13),(193,0,4,12,8),(194,1,1,2,8),(195,0,4,12,9),(196,1,1,2,9),(197,0,4,12,7),(198,1,1,2,7),(199,0,NULL,206,14),(200,1,1,203,14),(201,0,1,203,15),(203,0,1,301,17),(204,0,4,12,18),(205,1,1,2,18),(208,0,4,12,20),(209,1,101,14,20),(210,0,1,301,16),(211,1,NULL,311,16),(212,0,1,301,19);
 /*!40000 ALTER TABLE report_filter ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -833,7 +831,6 @@ CREATE TABLE report_filter_value (
 
 LOCK TABLES report_filter_value WRITE;
 /*!40000 ALTER TABLE report_filter_value DISABLE KEYS */;
-INSERT INTO report_filter_value VALUES (138,0,'2799',NULL,208),(133,0,'2799',NULL,184),(134,0,'2799',NULL,193),(135,0,'2799',NULL,195),(136,0,'2799',NULL,197),(137,0,'2799',NULL,204),(140,0,'%',NULL,209);
 /*!40000 ALTER TABLE report_filter_value ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -863,7 +860,6 @@ CREATE TABLE report_column (
 
 LOCK TABLES report_column WRITE;
 /*!40000 ALTER TABLE report_column DISABLE KEYS */;
-INSERT INTO report_column VALUES (22,2,11,NULL,6),(21,3,2,NULL,6),(20,4,8,NULL,6),(23,1,20,NULL,6),(24,0,1,NULL,6),(29,1,20,NULL,9),(30,0,15,NULL,9),(27,0,15,NULL,8),(28,2,2,1,9),(25,0,15,NULL,7),(26,1,20,NULL,8),(51,1,309,NULL,16),(53,2,301,3,17),(52,0,310,NULL,16),(50,2,301,3,16),(49,0,202,NULL,15),(48,1,203,3,15),(45,2,203,3,14),(47,0,202,NULL,14),(46,1,205,NULL,14),(40,4,8,NULL,13),(41,3,11,NULL,13),(42,2,1,NULL,13),(43,1,7,NULL,13),(44,0,13,NULL,13),(54,1,309,NULL,17),(55,0,310,NULL,17),(56,2,8,NULL,18),(57,1,20,NULL,18),(58,0,15,NULL,18),(59,1,309,NULL,19),(60,0,310,NULL,19),(63,3,8,NULL,20),(64,0,11,NULL,20),(65,2,10,NULL,20),(66,1,9,NULL,20);
 /*!40000 ALTER TABLE report_column ENABLE KEYS */;
 UNLOCK TABLES;
 
