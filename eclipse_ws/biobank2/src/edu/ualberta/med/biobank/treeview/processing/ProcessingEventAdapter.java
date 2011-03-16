@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview.patient;
+package edu.ualberta.med.biobank.treeview.processing;
 
 import java.util.Collection;
 

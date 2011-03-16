@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.patient.ProcessingEventAdapter;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;

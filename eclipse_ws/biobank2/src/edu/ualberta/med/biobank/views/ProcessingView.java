@@ -11,8 +11,10 @@ import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.treeview.patient.ProcessingEventGroup;
 import edu.ualberta.med.biobank.treeview.patient.StudyWithPatientAdapter;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingSearchNode;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingTodayNode;
 
 public class ProcessingView extends AbstractTodaySearchAdministrationView {
 
@@ -79,14 +81,12 @@ public class ProcessingView extends AbstractTodaySearchAdministrationView {
 
     @Override
     protected AbstractTodayNode<?> createTodayNode() {
-        return null;
-        // FIXME: i do nothing
+        return new ProcessingTodayNode(rootNode, 0);
     }
 
     @Override
     protected AbstractSearchedNode createSearchedNode() {
-        return null;
-        // FIXME: i do nothing
+        return new ProcessingSearchNode(rootNode, 1);
     }
 
     public static ProcessingView getCurrent() {
