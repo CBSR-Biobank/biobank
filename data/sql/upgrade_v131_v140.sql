@@ -477,6 +477,8 @@ update specimen as spc_a, specimen as spc_b
        set spc_a.parent_specimen_id=spc_b.id
 	where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
 
+quit;
+
 /*****************************************************
  * container types and containers
  ****************************************************/
