@@ -39,15 +39,6 @@ public class ProtectionElementPrivilegeContext implements Comparable,
     }
 
     /**
-     * 
-     * @exception Throwable
-     */
-    @Override
-    public void finalize() throws Throwable {
-
-    }
-
-    /**
      * Collection of privileges for this protection element
      */
     public java.util.Set getPrivileges() {
@@ -83,20 +74,25 @@ public class ProtectionElementPrivilegeContext implements Comparable,
 
     @Override
     public boolean equals(Object obj) {
-        ProtectionElementPrivilegeContext other = (ProtectionElementPrivilegeContext) obj;
-        if (null == other || null == this) {
-            return false;
+        if (obj instanceof ProtectionElementPrivilegeContext) {
+            ProtectionElementPrivilegeContext other = (ProtectionElementPrivilegeContext) obj;
+            if (null == other || null == this) {
+                return false;
+            }
+            if (null == other.getProtectionElement()
+                || null == this.getProtectionElement()) {
+                return false;
+            }
+            if (this
+                .getProtectionElement()
+                .getProtectionElementName()
+                .equals(other.getProtectionElement().getProtectionElementName())) {
+                return true;
+            } else {
+                return false;
+            }
         }
-        if (null == other.getProtectionElement()
-            || null == this.getProtectionElement()) {
-            return false;
-        }
-        if (this.getProtectionElement().getProtectionElementName()
-            .equals(other.getProtectionElement().getProtectionElementName())) {
-            return true;
-        } else {
-            return false;
-        }
+        return false;
     }
 
     @Override

@@ -85,8 +85,8 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                 availableSpecimenTypes.remove(ssw.getSpecimenType());
             }
         }
-        StudyAliquotedSpecimenDialog dlg = new StudyAliquotedSpecimenDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+        StudyAliquotedSpecimenDialog dlg = new StudyAliquotedSpecimenDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             aliquotedSpecimen, availableSpecimenTypes);
         if (dlg.open() == Dialog.OK) {
             if (add) {
@@ -100,7 +100,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
     }
 
     private void addEditSupport() {
-        if (SessionManager.canCreate(AliquotedSpecimenWrapper.class, null)) {
+        if (SessionManager.canCreate(AliquotedSpecimenWrapper.class)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
@@ -108,7 +108,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                 }
             });
         }
-        if (SessionManager.canUpdate(AliquotedSpecimenWrapper.class, null)) {
+        if (SessionManager.canUpdate(AliquotedSpecimenWrapper.class)) {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
@@ -118,7 +118,7 @@ public class AliquotedSpecimenEntryInfoTable extends AliquotedSpecimenInfoTable 
                 }
             });
         }
-        if (SessionManager.canDelete(AliquotedSpecimenWrapper.class, null)) {
+        if (SessionManager.canDelete(AliquotedSpecimenWrapper.class)) {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {

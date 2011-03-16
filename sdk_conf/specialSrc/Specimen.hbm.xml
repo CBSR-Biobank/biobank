@@ -18,7 +18,7 @@
 			<one-to-many class="edu.ualberta.med.biobank.model.RequestSpecimen"/>
 		</set>
 			<many-to-one name="activityStatus" class="edu.ualberta.med.biobank.model.ActivityStatus" column="ACTIVITY_STATUS_ID" lazy="proxy" not-null="true" cascade="none"/>
-		<set name="childSpecimenCollection" lazy="true" cascade="none" inverse="true">
+		<set name="childSpecimenCollection" lazy="true" cascade="save-update" inverse="true">
 			<cache usage="read-write" />
 			<key column="PARENT_SPECIMEN_ID" not-null="false" />
 			<one-to-many class="edu.ualberta.med.biobank.model.Specimen"/>

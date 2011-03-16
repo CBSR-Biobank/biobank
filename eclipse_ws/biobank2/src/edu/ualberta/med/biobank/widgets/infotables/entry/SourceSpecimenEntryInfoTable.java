@@ -95,8 +95,8 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
             dialogSpecimenTypes.add(sourceSpecimen.getSpecimenType());
         }
         // FIXME: create new dialog type
-        StudySourceSpecimenDialog dlg = new StudySourceSpecimenDialog(PlatformUI
-            .getWorkbench().getActiveWorkbenchWindow().getShell(),
+        StudySourceSpecimenDialog dlg = new StudySourceSpecimenDialog(
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
             sourceSpecimen, dialogSpecimenTypes);
         if (dlg.open() == Dialog.OK) {
             if (add) {
@@ -111,7 +111,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
     }
 
     private void addEditSupport() {
-        if (SessionManager.canCreate(SourceSpecimenWrapper.class, null)) {
+        if (SessionManager.canCreate(SourceSpecimenWrapper.class)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
@@ -119,7 +119,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                 }
             });
         }
-        if (SessionManager.canUpdate(SourceSpecimenWrapper.class, null)) {
+        if (SessionManager.canUpdate(SourceSpecimenWrapper.class)) {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
@@ -129,7 +129,7 @@ public class SourceSpecimenEntryInfoTable extends SourceSpecimenInfoTable {
                 }
             });
         }
-        if (SessionManager.canDelete(SourceSpecimenWrapper.class, null)) {
+        if (SessionManager.canDelete(SourceSpecimenWrapper.class)) {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {

@@ -45,6 +45,8 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private BiobankText activityStatusLabel;
 
+    private SpecimenInfoTable aliquotedSpecimenTable;
+
     private class FormPvCustomInfo extends PvAttrCustom {
         BiobankText widget;
     }
@@ -73,6 +75,7 @@ public class CollectionEventViewForm extends BiobankViewForm {
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         createMainSection();
         createSourceSpecimensSection();
+        createAliquotedSpecimensSection();
     }
 
     private void createMainSection() throws Exception {
@@ -147,11 +150,21 @@ public class CollectionEventViewForm extends BiobankViewForm {
 
     private void createSourceSpecimensSection() {
         Composite client = createSectionWithClient(Messages
-            .getString("CollectionEventViewForm.specimens.title"));
+            .getString("CollectionEventViewForm.sourcespecimens.title"));
         sourceSpecimenTable = new SpecimenInfoTable(client,
             cevent.getOriginalSpecimenCollection(true),
             ColumnsShown.CEVENT_FORM, 10);
         sourceSpecimenTable.adaptToToolkit(toolkit, true);
+    }
+
+    private void createAliquotedSpecimensSection() {
+        // FIXME should we show that to clinics ?
+        Composite client = createSectionWithClient(Messages
+            .getString("CollectionEventViewForm.aliquotedspecimens.title"));
+        aliquotedSpecimenTable = new SpecimenInfoTable(client,
+            cevent.getAliquotedSpecimenCollection(true),
+            ColumnsShown.CEVENT_FORM, 10);
+        aliquotedSpecimenTable.adaptToToolkit(toolkit, true);
     }
 
     @Override

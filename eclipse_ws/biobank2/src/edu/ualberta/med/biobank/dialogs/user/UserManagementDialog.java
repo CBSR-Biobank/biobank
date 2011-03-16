@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.user;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.widgets.infotables.GroupInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -36,7 +37,7 @@ public class UserManagementDialog extends BiobankDialog {
     private UserInfoTable userInfoTable;
     private List<User> currentUserList;
     private GroupInfoTable groupInfoTable;
-    private List<Group> currentGroupList;
+    private List<Group> groups;
 
     private static final String USER_ADDED_TITLE = "User Added";
     private static final String USER_ADDED_MESSAGE = "Successfully added new user \"{0}\".";
@@ -153,15 +154,14 @@ public class UserManagementDialog extends BiobankDialog {
     }
 
     protected List<Group> getGroups() {
-        if (currentGroupList == null) {
+        if (groups == null) {
             try {
-                currentGroupList = SessionManager.getAppService()
-                    .getSecurityGroups();
+                groups = SessionManager.getAppService().getSecurityGroups();
             } catch (ApplicationException e) {
                 BiobankPlugin.openAsyncError("Unable to load groups.", e);
             }
         }
-        return currentGroupList;
+        return groups;
     }
 
     protected List<User> getUsers() {

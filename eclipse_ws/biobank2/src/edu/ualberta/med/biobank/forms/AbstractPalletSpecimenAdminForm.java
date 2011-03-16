@@ -19,6 +19,7 @@ import org.eclipse.swt.events.MouseEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
@@ -47,7 +48,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
     AbstractSpecimenAdminForm {
 
     private BiobankText plateToScanText;
-    private Button scanButton;
+    protected Button scanButton;
     private String scanButtonTitle;
 
     protected CancelConfirmWidget cancelConfirmWidget;
@@ -215,7 +216,7 @@ public abstract class AbstractPalletSpecimenAdminForm extends
         }
         scanButton = toolkit.createButton(parent, scanButtonTitle, SWT.PUSH);
         GridData gd = new GridData();
-        gd.horizontalSpan = 3;
+        gd.horizontalSpan = ((GridLayout) parent.getLayout()).numColumns;
         gd.widthHint = 100;
         scanButton.setLayoutData(gd);
         scanButton.addSelectionListener(new SelectionAdapter() {

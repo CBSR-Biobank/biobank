@@ -54,8 +54,11 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return Messages.getString("ProvessingEventAdapter.tooltiptext",
-            getWrapper().getFormattedCreatedAt());
+        if (getWrapper() == null)
+            return Messages.getString("ProvessingEventAdapter.tooltiptext");
+        return Messages.getString(
+            "ProvessingEventAdapter.tooltiptext.withdate", getWrapper()
+                .getFormattedCreatedAt());
     }
 
     @Override

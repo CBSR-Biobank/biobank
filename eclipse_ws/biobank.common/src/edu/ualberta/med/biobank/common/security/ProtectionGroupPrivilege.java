@@ -24,10 +24,6 @@ public class ProtectionGroupPrivilege implements Serializable, NotAProxy {
      */
     private Set<Privilege> privileges;
 
-    public ProtectionGroupPrivilege(String name) {
-        this(null, name, null);
-    }
-
     public ProtectionGroupPrivilege(Long id, String name, String description) {
         this.id = id;
         this.name = name;

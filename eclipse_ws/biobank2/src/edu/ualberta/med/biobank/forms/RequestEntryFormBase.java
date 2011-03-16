@@ -112,7 +112,11 @@ public class RequestEntryFormBase extends BiobankFormBase {
                 newAliquotText.setFocus();
                 newAliquotText.setText("");
                 aliquotsTree.refresh();
-                button.setEnabled(request.isAllProcessed());
+                try {
+                    button.setEnabled(request.isAllProcessed());
+                } catch (Exception ex) {
+                    BiobankPlugin.openAsyncError("Query error", ex);
+                }
             }
         });
         toolkit.createLabel(addComposite, "or open scan dialog:");
@@ -137,7 +141,11 @@ public class RequestEntryFormBase extends BiobankFormBase {
             // setDirty(true);
         }
         aliquotsTree.refresh();
-        button.setEnabled(request.isAllProcessed());
+        try {
+            button.setEnabled(request.isAllProcessed());
+        } catch (Exception e) {
+            BiobankPlugin.openAsyncError("Query error", e);
+        }
     }
 
     @Override

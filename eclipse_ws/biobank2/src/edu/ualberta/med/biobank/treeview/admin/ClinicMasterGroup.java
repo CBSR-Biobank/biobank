@@ -23,7 +23,7 @@ public class ClinicMasterGroup extends AbstractClinicGroup {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(ClinicWrapper.class, null)) {
+        if (SessionManager.canCreate(ClinicWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Clinic");
             mi.addSelectionListener(new SelectionAdapter() {

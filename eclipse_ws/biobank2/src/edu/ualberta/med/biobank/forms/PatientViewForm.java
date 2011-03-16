@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.widgets.infotables.CollectionEventInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientViewForm extends BiobankViewForm {
-    public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.PatientViewForm"; //$NON-NLS-1$
 
     private PatientAdapter patientAdapter;
 
@@ -35,14 +35,14 @@ public class PatientViewForm extends BiobankViewForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof PatientAdapter,
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         patientAdapter = (PatientAdapter) adapter;
         patient = patientAdapter.getWrapper();
         retrievePatient();
         patient.logLookup(null);
-        setPartName(Messages.getString("PatientViewForm.title",
+        setPartName(Messages.getString("PatientViewForm.title", //$NON-NLS-1$
             patient.getPnumber()));
     }
 
@@ -52,7 +52,7 @@ public class PatientViewForm extends BiobankViewForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("PatientViewForm.title",
+        form.setText(Messages.getString("PatientViewForm.title", //$NON-NLS-1$
             patient.getPnumber()));
         page.setLayout(new GridLayout(1, false));
         page.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
@@ -71,20 +71,20 @@ public class PatientViewForm extends BiobankViewForm {
         toolkit.paintBordersFor(client);
 
         studyLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("patient.field.label.study"));
+            Messages.getString("patient.field.label.study")); //$NON-NLS-1$
         visitCountLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("PatientViewForm.label.totalVisits"));
+            Messages.getString("PatientViewForm.label.totalVisits")); //$NON-NLS-1$
         sourceSpecimenCountLabel = createReadOnlyLabelledField(client,
             SWT.NONE,
-            Messages.getString("PatientViewForm.label.totalSourceSpecimens"));
+            Messages.getString("PatientViewForm.label.totalSourceSpecimens")); //$NON-NLS-1$
         aliquotedSpecimenCountLabel = createReadOnlyLabelledField(client,
             SWT.NONE,
-            Messages.getString("PatientViewForm.label.totalAliquotedSpecimens"));
+            Messages.getString("PatientViewForm.label.totalAliquotedSpecimens")); //$NON-NLS-1$
     }
 
     private void createCollectionEventSection() {
         Section section = createSection(Messages
-            .getString("PatientViewForm.visits.title"));
+            .getString("PatientViewForm.visits.title")); //$NON-NLS-1$
 
         collectionEventTable = new CollectionEventInfoTable(section,
             patient.getCollectionEventCollection(true));
@@ -107,8 +107,10 @@ public class PatientViewForm extends BiobankViewForm {
     public void reload() throws Exception {
         setValues();
         retrievePatient();
-        setPartName("Patient " + patient.getPnumber());
-        form.setText("Patient: " + patient.getPnumber());
+        setPartName(Messages.getString("PatientViewForm.title", //$NON-NLS-1$
+            patient.getPnumber()));
+        form.setText(Messages.getString("PatientViewForm.title", //$NON-NLS-1$
+            patient.getPnumber()));
         collectionEventTable.setCollection(patient
             .getCollectionEventCollection(true));
     }

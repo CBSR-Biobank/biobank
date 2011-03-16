@@ -36,9 +36,9 @@ public class EditSpecimenTypesHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.canCreate(SpecimenTypeWrapper.class, null)
-            || SessionManager.canUpdate(SpecimenTypeWrapper.class, null) || SessionManager
-            .canDelete(SpecimenTypeWrapper.class, null))
+        return (SessionManager.canCreate(SpecimenTypeWrapper.class)
+            || SessionManager.canUpdate(SpecimenTypeWrapper.class) || SessionManager
+            .canDelete(SpecimenTypeWrapper.class))
             && SessionManager.getInstance().getSession() != null;
     }
 }

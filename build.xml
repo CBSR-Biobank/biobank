@@ -68,7 +68,7 @@
   </condition>
   <condition property="isHostAicml5">
     <equals arg1="${host.name}"
-            arg2="aicml5"
+            arg2="aicml5.cs.ualberta.ca"
             casesensitive="true"
             trim="true" />
   </condition>
@@ -396,7 +396,7 @@
           overwrite="true" />
   </target>
   <target name="hostAicml5" if="isHostAicml5">
-    <copy file="${secu-log.dir}/jboss/${host.name}.cs.ualberta.ca.keystore"
+    <copy file="${secu-log.dir}/jboss/${host.name}.keystore"
           tofile="${env.JBOSS_HOME}/server/default/conf/biobank.keystore"
           overwrite="true" />
   </target>
@@ -435,7 +435,7 @@
           message="JBOSS_HOME environment variable not defined" />
   </target>
   <target name="deploy-jboss"
-          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
+          depends="jboss.home.env,sdk-files,package-webapp-orm,check-jboss-uptodate,hostAicmlMed,hostAicml5,hostCbsr,hostCbsrTraining,hostLocal,server-manifest"
           description="deploys the caCORE SDK webapp to JBoss"
           unless="jboss.uptodate">
     <copy file="${secu-log.dir}/jboss/login-config.xml"
@@ -488,8 +488,8 @@
       <transaction src="${data.sql.dir}/createIndices.sql" />
       <transaction src="${data.sql.dir}/uniqueConstraints.sql" />
       <transaction src="${data.sql.dir}/activityStatus.sql" />
-      <transaction src="${data.sql.dir}/globalEventAttr.sql" />
       <transaction src="${data.sql.dir}/eventAttrType.sql" />
+      <transaction src="${data.sql.dir}/globalEventAttr.sql" />
       <transaction src="${data.sql.dir}/specimenTypes.sql" />
       <transaction src="${data.sql.dir}/containerLabelingScheme.sql" />
       <transaction src="${data.sql.dir}/shippingMethod.sql" />
@@ -767,7 +767,7 @@
 	  <fileset dir="${cacore.sdk.dir}\${build.classes.dir}"/>
     </delete>
 
-	<javac srcdir="${cacore.sdk.dir}\${output.src.dir}" destdir="${cacore.sdk.dir}\${build.classes.dir}" 
+	<javac srcdir="${cacore.sdk.dir}\${output.src.dir}" destdir="${cacore.sdk.dir}\${build.classes.dir}"
 		debug="true" includeantruntime="false" >
 	  <classpath >
 	  	 <fileset dir="${cacore.sdk.dir}\${system.dir}\${system.lib.dir}">
@@ -776,8 +776,8 @@
 	  </classpath>
 	  <include name="**/*.java"/>
 	</javac>
-  </target>	
-	
+  </target>
+
   <target name="package-codegen-orm" depends="compile-generated-beans"
           description="REDO:: Packages the generated ORM and bean artifacts">
 	<jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}" basedir="${cacore.sdk.dir}\${build.classes.dir}">
@@ -787,13 +787,12 @@
 			</manifest>
 			<fileset dir="${cacore.sdk.dir}\${output.src.dir}" includes="**/*.java" />
 	</jar>
-	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}" 
+	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}"
 		tofile="${cacore.sdk.dir}/output/biobank2/package/remote-client/lib\${bean.file}"/>
-	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}" 
+	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}"
 		tofile="${cacore.sdk.dir}/output/biobank2/package/ws-client/lib\${bean.file}"/>
-	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}" 
+	<copy file="${cacore.sdk.dir}\${build.jar.dir}\${bean.file}"
 		tofile="${cacore.sdk.dir}/output/biobank2/package/local-client/lib\${bean.file}"/>
-  	
     <jar destfile="${cacore.sdk.dir}\${build.jar.dir}\${orm.file}"
          basedir="${cacore.sdk.dir}\${output.src.dir}">
       <manifest>

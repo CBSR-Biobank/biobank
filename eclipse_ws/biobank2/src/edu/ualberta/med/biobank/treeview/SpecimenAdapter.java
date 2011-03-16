@@ -31,13 +31,13 @@ public class SpecimenAdapter extends AdapterBase {
     @Override
     protected String getLabelInternal() {
         SpecimenWrapper aliquot = getSpecimen();
-        Assert.isNotNull(aliquot, "sample is null");
+        Assert.isNotNull(aliquot, "specimen is null");
         return aliquot.getInventoryId();
     }
 
     @Override
     public String getTooltipText() {
-        return getTooltipText("Aliquot");
+        return getTooltipText("Specimen");
     }
 
     @Override
@@ -47,7 +47,7 @@ public class SpecimenAdapter extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        addViewMenu(menu, "Aliquot");
+        addViewMenu(menu, "Specimen");
     }
 
     @Override
