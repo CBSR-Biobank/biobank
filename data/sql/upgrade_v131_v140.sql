@@ -164,6 +164,12 @@ clinic,center,site
        and pv.id=specimen.pv_id
        and aship.discriminator='ClinicShipment';
 
+-- set the aliquoted specimens to point to their parent specimen
+
+update specimen as spc_a, specimen as spc_b
+       set spc_a.parent_specimen_id=spc_b.id
+	where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
+
 ALTER TABLE specimen MODIFY COLUMN ID INT(11) NOT NULL;
 
 CREATE TABLE specimen_type_specimen_type (
@@ -471,13 +477,6 @@ update specimen as spc set processing_event_id=(
        select id from processing_event as pe
        where pe.pv_id=spc.pv_id and spc.pv_sv_id is not null limit 1);
 
--- set the aliquoted specimens to point to their parent specimen
-
-update specimen as spc_a, specimen as spc_b
-       set spc_a.parent_specimen_id=spc_b.id
-	where spc_a.pv_id=spc_b.pv_id and spc_b.pv_sv_id is not null and spc_a.pv_sv_id is null;
-
-quit;
 
 /*****************************************************
  * container types and containers
