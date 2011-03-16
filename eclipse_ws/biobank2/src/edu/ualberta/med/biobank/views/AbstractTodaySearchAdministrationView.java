@@ -23,10 +23,6 @@ public abstract class AbstractTodaySearchAdministrationView extends
     public void createPartControl(Composite parent) {
         super.createPartControl(parent);
 
-        todayNode = createTodayNode();
-        todayNode.setParent(rootNode);
-        rootNode.addChild(todayNode);
-
         searchedNode = createSearchedNode();
         searchedNode.setParent(rootNode);
         rootNode.addChild(searchedNode);
@@ -88,10 +84,10 @@ public abstract class AbstractTodaySearchAdministrationView extends
 
     @Override
     public void reload() {
-        todayNode.performExpand();
-        // FIXME
-        // searchedNode.removeObjects(todayNode.getCurrentTodayElements());
-        searchedNode.performExpand();
+        if (todayNode != null)
+            todayNode.performExpand();
+        if (searchedNode != null)
+            searchedNode.performExpand();
         super.reload();
     }
 

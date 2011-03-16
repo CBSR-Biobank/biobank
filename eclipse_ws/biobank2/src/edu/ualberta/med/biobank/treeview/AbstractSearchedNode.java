@@ -63,6 +63,7 @@ public abstract class AbstractSearchedNode extends AdapterBase {
                         || !isParentTo(childWrapper, subChildWrapper)) {
                         subChild.getParent().removeChild(subChild);
                     }
+                    subChild.rebuild();
                 }
             }
 

@@ -1,6 +1,8 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -23,10 +25,10 @@ import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.DateNode;
-import edu.ualberta.med.biobank.treeview.dispatch.DispatchSearchedNode;
+import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
+import edu.ualberta.med.biobank.treeview.dispatch.OriginInfoSearchedNode;
 import edu.ualberta.med.biobank.treeview.shipment.ClinicWithShipmentAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
-import edu.ualberta.med.biobank.treeview.shipment.ShipmentSearchedNode;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentTodayNode;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
@@ -42,7 +44,9 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     private DateTimeWidget dateWidget;
 
-    private DispatchSearchedNode searchedNode;
+    DispatchSiteAdapter centerNode;
+
+    private AbstractSearchedNode searchedNode;
 
     private Button radioDateReceived;
 
@@ -59,19 +63,19 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     }
 
     public void createNodes() {
-        DispatchSiteAdapter siteAdapter = new DispatchSiteAdapter(rootNode,
-            SessionManager.getUser().getCurrentWorkingSite());
-        siteAdapter.setParent(rootNode);
-        rootNode.addChild(siteAdapter);
+        SessionManager.getUser().getCurrentWorkingSite().reload();
+        centerNode = new DispatchSiteAdapter(rootNode, SessionManager.getUser()
+            .getCurrentWorkingSite());
+        centerNode.setParent(rootNode);
+        rootNode.addChild(centerNode);
 
         todayNode = createTodayNode();
         todayNode.setParent(rootNode);
         rootNode.addChild(todayNode);
 
-        searchedNode = new DispatchSearchedNode(rootNode, 2);
+        searchedNode = createSearchedNode();
         searchedNode.setParent(rootNode);
         rootNode.addChild(searchedNode);
-
     }
 
     @Override
@@ -94,16 +98,16 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 }
             }
         });
-        radioDateSent = new Button(composite, SWT.RADIO);
-        radioDateSent.setText("Packed At");
-        radioDateSent.addSelectionListener(new SelectionAdapter() {
-            @Override
-            public void widgetSelected(SelectionEvent e) {
-                if (radioDateSent.getSelection()) {
-                    showTextOnly(false);
-                }
-            }
-        });
+        // radioDateSent = new Button(composite, SWT.RADIO);
+        // radioDateSent.setText("Packed At");
+        // radioDateSent.addSelectionListener(new SelectionAdapter() {
+        // @Override
+        // public void widgetSelected(SelectionEvent e) {
+        // if (radioDateSent.getSelection()) {
+        // showTextOnly(false);
+        // }
+        // }
+        // });
 
         radioDateReceived = new Button(composite, SWT.RADIO);
         radioDateReceived.setText("Date Received");
@@ -156,8 +160,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         rootNode.removeAll();
         createNodes();
         for (AdapterBase adaper : rootNode.getChildren()) {
-            if (!adaper.equals(searchedNode))
-                adaper.rebuild();
+            adaper.rebuild();
         }
         super.reload();
     }
@@ -167,7 +170,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         try {
             List<? extends ModelWrapper<?>> searchedObject = search();
             if (searchedObject == null || searchedObject.size() == 0) {
-                String msg = "No Dispatch found";
+                String msg = "No Dispatches/Shipments found";
                 if (radioWaybill.getSelection()) {
                     msg += " for waybill " + treeText.getText();
                 } else {
@@ -184,22 +187,32 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         }
     }
 
-    protected List<DispatchWrapper> search() throws Exception {
+    protected List<ModelWrapper<?>> search() throws Exception {
+        List<ModelWrapper<?>> wrappers = new ArrayList<ModelWrapper<?>>();
         if (radioWaybill.getSelection()) {
-            return DispatchWrapper.getDispatchesInSite(
-                SessionManager.getAppService(), treeText.getText().trim(),
-                SessionManager.getUser().getCurrentWorkingSite());
+            wrappers.addAll(OriginInfoWrapper.getShipmentsByWaybill(
+                SessionManager.getAppService(), treeText.getText().trim()));
+            wrappers.addAll(DispatchWrapper.getDispatchesByWaybill(
+                SessionManager.getAppService(), treeText.getText().trim()));
+            return wrappers;
+
         } else {
             Date date = dateWidget.getDate();
             if (date != null) {
-                if (radioDateSent.getSelection())
-                    return DispatchWrapper.getDispatchesInSiteByPackedAt(
-                        SessionManager.getAppService(), date, SessionManager
-                            .getUser().getCurrentWorkingSite());
-                else
-                    return DispatchWrapper.getDispatchesInSiteByDateReceived(
-                        SessionManager.getAppService(), date, SessionManager
-                            .getUser().getCurrentWorkingSite());
+                // if (radioDateSent.getSelection())
+                // ;
+                /*
+                 * return ShipmentInfoWrapper.getShipsInSiteByPackedAt(
+                 * SessionManager.getAppService(), date, SessionManager
+                 * .getUser().getCurrentWorkingSite());
+                 */
+                // else {
+                wrappers.addAll(OriginInfoWrapper.getShipmentsByDateReceived(
+                    SessionManager.getAppService(), date));
+                wrappers.addAll(DispatchWrapper.getDispatchesByDateReceived(
+                    SessionManager.getAppService(), date));
+                return wrappers;
+                // }
             }
         }
         return null;
@@ -232,14 +245,20 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             AdapterBase topNode = parentNode;
             if (parentNode.equals(currentInstance.searchedNode)
                 && !currentInstance.radioWaybill.getSelection()) {
-                Date date = currentInstance.dateWidget.getDate();
+                Date date = (Date) originInfo.getShipmentInfo().getReceivedAt()
+                    .clone();
+                Calendar c = Calendar.getInstance();
+                c.setTime(date);
+                c.clear(Calendar.SECOND);
+                c.clear(Calendar.MINUTE);
+                c.clear(Calendar.HOUR_OF_DAY);
+                date = c.getTime();
                 List<AdapterBase> dateNodeRes = parentNode.search(date);
                 AdapterBase dateNode = null;
                 if (dateNodeRes.size() > 0)
                     dateNode = dateNodeRes.get(0);
                 else {
-                    dateNode = new DateNode(parentNode,
-                        currentInstance.dateWidget.getDate());
+                    dateNode = new DateNode(parentNode, date);
                     parentNode.addChild(dateNode);
                 }
                 topNode = dateNode;
@@ -273,7 +292,16 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                 }
                 return shipmentAdapter;
             }
+        } else if (currentInstance != null
+            && wrapper instanceof DispatchWrapper) {
+            List<AdapterBase> res = parentNode.search(wrapper);
+            if (res.size() == 0) {
+                DispatchAdapter dispatch = new DispatchAdapter(parentNode,
+                    (DispatchWrapper) wrapper);
+                parentNode.addChild(dispatch);
+            }
         }
+
         return null;
     }
 
@@ -293,18 +321,21 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     @Override
     protected AbstractTodayNode<?> createTodayNode() {
-        return new ShipmentTodayNode(rootNode, 0);
+        return new ShipmentTodayNode(rootNode, 1);
     }
 
     @Override
     protected AbstractSearchedNode createSearchedNode() {
-        return new ShipmentSearchedNode(rootNode, 1);
+        if (searchedNode == null)
+            return new OriginInfoSearchedNode(rootNode, 2);
+        else
+            return searchedNode;
     }
 
     @Override
     protected List<? extends ModelWrapper<?>> search(String text)
         throws Exception {
-        return search();
+        return null;
     }
 
     @Override
@@ -336,6 +367,12 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
             return (ShipmentAdapter) selectedNode;
         }
         return null;
+    }
+
+    @Override
+    public void clear() {
+        rootNode.removeChild(centerNode);
+        super.clear();
     }
 
 }

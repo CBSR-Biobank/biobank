@@ -13,7 +13,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractTodayNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
-import edu.ualberta.med.biobank.views.ProcessingView;
+import edu.ualberta.med.biobank.views.CollectionView;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class PatientTodayNode extends AbstractTodayNode<PatientWrapper> {
@@ -69,6 +69,6 @@ public class PatientTodayNode extends AbstractTodayNode<PatientWrapper> {
 
     @Override
     protected void addChild(PatientWrapper child) {
-        ProcessingView.addToNode(this, child);
+        CollectionView.addToNode(this, child);
     }
 }

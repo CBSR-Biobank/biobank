@@ -700,9 +700,9 @@ public abstract class AdapterBase {
                 public void run() {
                     try {
                         if (modelObject != null) {
-                            modelObject.delete();
                             getParent().removeChild(AdapterBase.this);
                             getParent().notifyListeners();
+                            modelObject.delete();
                             notifyListeners();
                         }
                     } catch (BiobankCheckException bce) {
