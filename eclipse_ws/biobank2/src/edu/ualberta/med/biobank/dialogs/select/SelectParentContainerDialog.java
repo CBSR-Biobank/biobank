@@ -63,15 +63,28 @@ public class SelectParentContainerDialog extends BiobankDialog {
         contents.setLayout(new GridLayout(2, false));
         contents.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true, true));
 
-        comboViewer =
-            getWidgetCreator().createComboViewer(contents, "Select parent",
-                containers, null, "A source vessel should be selected", null);
+        comboViewer = getWidgetCreator().createComboViewer(contents,
+            "Select parent", containers, null,
+            "A container should be selected", null);
         comboViewer.setLabelProvider(new LabelProvider() {
             @Override
             public String getText(Object element) {
                 ContainerWrapper container = (ContainerWrapper) element;
-                return container.getLabel() + " ("
-                    + container.getContainerType().getNameShort() + ")";
+                StringBuffer text = new StringBuffer();
+                text.append(container.getFullInfoLabel());
+                ContainerWrapper parent = container.getParent();
+                boolean hasParents = parent != null;
+                if (hasParents)
+                    text.append(" (Parents: ");
+                while (parent != null) {
+                    text.append(parent.getFullInfoLabel());
+                    parent = parent.getParent();
+                    if (parent != null)
+                        text.append("; ");
+                }
+                if (hasParents)
+                    text.append(")");
+                return text.toString();
             }
         });
         comboViewer
@@ -84,9 +97,8 @@ public class SelectParentContainerDialog extends BiobankDialog {
     }
 
     private void saveSelectedContainer() {
-        selectedContainer =
-            (ContainerWrapper) ((IStructuredSelection) comboViewer
-                .getSelection()).getFirstElement();
+        selectedContainer = (ContainerWrapper) ((IStructuredSelection) comboViewer
+            .getSelection()).getFirstElement();
     }
 
     public ContainerWrapper getSelectedContainer() {
