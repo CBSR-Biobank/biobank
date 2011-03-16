@@ -16,7 +16,7 @@ public class SiteAddHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        sessionAdapter.getSitesGroupNode().addSite();
+        sessionAdapter.addSite();
         return null;
 
     }
