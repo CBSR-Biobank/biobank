@@ -120,9 +120,9 @@ public class BiobankApplicationServiceImpl extends
     }
 
     @Override
-    public List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups()
-        throws ApplicationException {
-        return BiobankSecurityUtil.getSecurityGroups();
+    public List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups(
+        boolean includeSuperAdmin) throws ApplicationException {
+        return BiobankSecurityUtil.getSecurityGroups(includeSuperAdmin);
     }
 
     @Override

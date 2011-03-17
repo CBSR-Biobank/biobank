@@ -36,7 +36,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void modifyPassword(String oldPassword, String newPassword)
         throws ApplicationException;
 
-    public List<Group> getSecurityGroups() throws ApplicationException;
+    public List<Group> getSecurityGroups(boolean includeSuperAdmin)
+        throws ApplicationException;
 
     public List<User> getSecurityUsers() throws ApplicationException;
 

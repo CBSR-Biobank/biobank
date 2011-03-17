@@ -157,9 +157,8 @@ public class UserInfoTable extends InfoTableWidget<User> {
      */
     protected int editUser(User user) {
         List<Group> groups = null;
-
         try {
-            groups = SessionManager.getAppService().getSecurityGroups();
+            groups = SessionManager.getAppService().getSecurityGroups(true);
         } catch (ApplicationException e) {
             BiobankPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
             return Dialog.CANCEL;

@@ -4,7 +4,7 @@ WHERE group_name='Website Administrator';
 
 UPDATE csm_group
 SET group_desc='Super administrator of the application'
-WHERE group_name='Super Administrator'
+WHERE group_name='Super Administrator';
 
 
 -- all webadministrators are now Super Administrator (renaming of web admin) and CBST Tech Level 1
