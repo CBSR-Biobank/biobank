@@ -42,6 +42,7 @@ public class ReportWrapper extends ReportBaseWrapper {
         setIsCount(report.getIsCount());
         setIsPublic(report.getIsPublic());
 
+        wrappedObject.setId(null);
         wrappedObject.setEntity(report.getWrappedObject().getEntity());
         wrappedObject.setUserId(report.getWrappedObject().getUserId());
 

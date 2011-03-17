@@ -13,10 +13,12 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.action.Action;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.dialogs.ProgressMonitorDialog;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ComboViewer;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -37,6 +39,7 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
 import org.supercsv.io.CsvListWriter;
@@ -69,7 +72,9 @@ import edu.ualberta.med.biobank.widgets.report.FilterChangeEvent;
 import edu.ualberta.med.biobank.widgets.report.FilterSelectWidget;
 
 public class ReportEntryForm extends BiobankEntryForm {
-    // TODO: put this somewhere so it can be shared
+    private static ImageDescriptor SAVE_AS_NEW_ACTION_IMAGE = ImageDescriptor
+        .createFromImage(BiobankPlugin.getDefault().getImageRegistry()
+            .get(BiobankPlugin.IMG_SAVE_AS_NEW));
 
     public static final String ID = "edu.ualberta.med.biobank.forms.ReportEntryForm";
 
@@ -142,6 +147,10 @@ public class ReportEntryForm extends BiobankEntryForm {
         report = reportAdapter.getWrapper();
         report.reload();
 
+        updatePartName();
+    }
+
+    private void updatePartName() {
         String entityName = report.getEntity().getName();
 
         String tabName;
@@ -157,8 +166,6 @@ public class ReportEntryForm extends BiobankEntryForm {
         }
 
         setPartName(tabName);
-
-        // TODO: add "Save As" toolbar icon?
     }
 
     @Override
@@ -288,6 +295,8 @@ public class ReportEntryForm extends BiobankEntryForm {
                         public void run() {
                             resultsTable = new ReportResultsTableWidget<Object>(
                                 resultsContainer, null, getHeaders());
+
+                            toolkit.adapt(resultsTable);
 
                             resultsTable.setCollection(results);
 
@@ -552,6 +561,45 @@ public class ReportEntryForm extends BiobankEntryForm {
         if (generateButton != null && !generateButton.isDisposed()) {
             generateButton.setEnabled(hasColumnsSelected);
         }
+    }
+
+    @Override
+    protected void addToolbarButtons() {
+        super.addToolbarButtons();
+
+        Action saveAsNewAction = new Action() {
+            @Override
+            public void run() {
+                closeEntryOpenView(false, false);
+
+                ReportWrapper report = new ReportWrapper(
+                    ReportEntryForm.this.report);
+
+                int userId = SessionManager.getUser().getId().intValue();
+                report.setUserId(userId);
+
+                ReportAdapter reportAdapter = new ReportAdapter(getAdapter()
+                    .getParent(), report);
+                IEditorPart part = reportAdapter.openEntryForm();
+
+                if (part instanceof ReportEntryForm) {
+                    ReportEntryForm form = (ReportEntryForm) part;
+                    form.setDirty(true);
+                    form.confirm();
+                }
+            }
+        };
+
+        // TODO: Need to add a command (and handler) for a shortcut to work, but
+        // it won't be able to invoke the Action's run method.
+        saveAsNewAction
+            .setActionDefinitionId("edu.ualberta.med.biobank.commands.saveAsNew");
+
+        saveAsNewAction.setImageDescriptor(SAVE_AS_NEW_ACTION_IMAGE);
+        saveAsNewAction.setToolTipText("Save As New Report");
+
+        form.getToolBarManager().add(saveAsNewAction);
+        form.updateToolBar();
     }
 
     // TODO: extract printing/ exporting methods into some interfaces and

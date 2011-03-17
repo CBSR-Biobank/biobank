@@ -20,6 +20,11 @@ public class StringFilterType implements FilterType {
         FilterOperator op, List<ReportFilterValue> values) {
 
         switch (op) {
+        case IS_SET: {
+            FilterTypeUtil.checkValues(values, 0, 0);
+            criteria.add(Restrictions.isNotNull(aliasedProperty));
+        }
+            break;
         case IS_NOT_SET: {
             FilterTypeUtil.checkValues(values, 0, 0);
             criteria.add(ReportsUtil.isNotSet(aliasedProperty));
@@ -76,7 +81,7 @@ public class StringFilterType implements FilterType {
     public Collection<FilterOperator> getOperators() {
         return Arrays.asList(FilterOperator.MATCHES,
             FilterOperator.MATCHES_ANY, FilterOperator.MATCHES_ALL,
-            FilterOperator.IS_NOT_SET, FilterOperator.DOES_NOT_MATCH,
-            FilterOperator.DOES_NOT_MATCH_ANY);
+            FilterOperator.IS_SET, FilterOperator.IS_NOT_SET,
+            FilterOperator.DOES_NOT_MATCH, FilterOperator.DOES_NOT_MATCH_ANY);
     }
 }
