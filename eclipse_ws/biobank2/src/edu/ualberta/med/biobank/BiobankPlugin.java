@@ -52,6 +52,8 @@ import edu.ualberta.med.biobank.treeview.dispatch.ReceivingWithErrorsDispatchGro
 import edu.ualberta.med.biobank.treeview.dispatch.SentInTransitDispatchGroup;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
+import edu.ualberta.med.biobank.treeview.patient.ProcessingEventAdapter;
+import edu.ualberta.med.biobank.treeview.patient.ProcessingEventGroup;
 import edu.ualberta.med.biobank.treeview.request.ApprovedRequestNode;
 import edu.ualberta.med.biobank.treeview.request.RequestAdapter;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
@@ -143,6 +145,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_WAND = "wand";
     public static final String IMG_HOURGLASS = "hourglass";
     public static final String IMG_LOGGING = "logging";
+    public static final String IMG_PROCESSING = "processingEvent";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -205,6 +208,10 @@ public class BiobankPlugin extends AbstractUIPlugin {
             BiobankPlugin.IMG_REQUEST);
         classToImageKey.put(SpecimenAdapter.class.getName(),
             BiobankPlugin.IMG_ALIQUOT);
+        classToImageKey.put(ProcessingEventAdapter.class.getName(),
+            BiobankPlugin.IMG_PROCESSING);
+        classToImageKey.put(ProcessingEventGroup.class.getName(),
+            BiobankPlugin.IMG_PROCESSING);
     };
 
     private static final String[] CONTAINER_TYPE_IMAGE_KEYS = new String[] {
@@ -326,6 +333,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_WAND, "wand.png");
         registerImage(registry, IMG_HOURGLASS, "hourglass.png");
         registerImage(registry, IMG_LOGGING, "table_row_delete.png");
+        registerImage(registry, IMG_PROCESSING, "processingEvent.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
