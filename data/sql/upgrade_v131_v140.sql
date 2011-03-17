@@ -402,7 +402,6 @@ ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
 
 RENAME TABLE global_pv_attr TO global_event_attr;
 RENAME TABLE study_pv_attr TO study_event_attr;
-RENAME TABLE pv_attr TO event_attr;
 RENAME TABLE pv_attr_type TO event_attr_type;
 
 ALTER TABLE global_event_attr
@@ -421,18 +420,30 @@ ALTER TABLE study_event_attr
       ADD INDEX FK3EACD8ECC449A4 (ACTIVITY_STATUS_ID),
       ADD INDEX FK3EACD8EC5B770B31 (EVENT_ATTR_TYPE_ID);
 
-ALTER TABLE event_attr
-      CHANGE COLUMN STUDY_PV_ATTR_ID STUDY_EVENT_ATTR_ID INT(11) NOT NULL,
-      ADD COLUMN COLLECTION_EVENT_ID int(11) COMMENT '' NOT NULL,
-      DROP INDEX FK200CD48ABFED96DB,
-      DROP INDEX FK200CD48AE5099AFA,
-      ADD INDEX FK59508C96280272F2 (COLLECTION_EVENT_ID),
-      ADD INDEX FK59508C96A9CFCFDB (STUDY_EVENT_ATTR_ID);
+-- need to remove duplicate rows in pv_attr
 
-update event_attr as ea set collection_event_id=(select id
-from collection_event as ce where ce.pv_id=ea.patient_visit_id);
+CREATE TABLE event_attr (
+  ID int(11) NOT NULL auto_increment,
+  VALUE varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  COLLECTION_EVENT_ID int(11) NOT NULL,
+  STUDY_EVENT_ATTR_ID int(11) NOT NULL,
+  PRIMARY KEY (ID),
+  KEY FK59508C96280272F2 (COLLECTION_EVENT_ID),
+  KEY FK59508C96A9CFCFDB (STUDY_EVENT_ATTR_ID),
+  CONSTRAINT FK59508C96A9CFCFDB FOREIGN KEY (STUDY_EVENT_ATTR_ID) REFERENCES study_event_attr (ID),
+  CONSTRAINT FK59508C96280272F2 FOREIGN KEY (COLLECTION_EVENT_ID) REFERENCES collection_event (ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-alter table event_attr drop column patient_visit_id;
+insert into event_attr (value,collection_event_id,study_event_attr_id)
+       select pa.value,ce.id,sea.id
+       from pv_attr pa
+       join (select patient_visit_id,max(id) max_id
+            from pv_attr
+            group by patient_visit_id,study_pv_attr_id) a on a.max_id=pa.id
+       join collection_event ce on ce.pv_id=pa.patient_visit_id
+       join study_event_attr sea on sea.id=pa.study_pv_attr_id;
+
+ALTER TABLE event_attr MODIFY COLUMN ID INT(11) NOT NULL;
 
 /*****************************************************
  * processing events
@@ -451,21 +462,24 @@ CREATE TABLE processing_event (
   KEY FK327B1E4E92FAA705 (CENTER_ID)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
--- this insert allows the same worksheet number to be used in more than one
--- processing event
+-- add a processing event for each patient visit
 
-insert into processing_event (created_at,worksheet,comment,activity_status_id,center_id,pv_id)
-       select pv.date_processed,event_attr.value as worksheet,pv.comment,
+insert into processing_event (created_at,comment,activity_status_id,center_id,pv_id)
+       select pv.date_processed,pv.comment,
        (select id from activity_status where name='Active'),center.id,pv.id
        from patient_visit as pv
        join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
        join abstract_shipment as aship on aship.id=csp.CLINIC_SHIPMENT_ID
        join clinic on clinic.id=aship.clinic_id
-       join center on center.name=clinic.name
-       join event_attr on event_attr.collection_event_id=pv.id
-       join study_event_attr on study_event_attr.id=event_attr.study_event_attr_id
-       join event_attr_type on event_attr_type.id=study_event_attr.EVENT_ATTR_TYPE_ID
-       where label='Worksheet';
+       join center on center.name=clinic.name;
+
+update processing_event pe,collection_event ce,patient_visit pv,event_attr,study_event_attr
+       set worksheet=event_attr.value
+       where pe.pv_id=pv.id
+       and event_attr.collection_event_id=ce.id
+       and ce.pv_id=pv.id
+       and study_event_attr.id=event_attr.study_event_attr_id
+       and label='Worksheet';
 
 ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
 
