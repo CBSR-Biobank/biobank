@@ -487,9 +487,10 @@ create index pv_id_idx on processing_event(pv_id);
 
 -- set the processing event for all source specimens
 
-update specimen as spc set processing_event_id=(
-       select id from processing_event as pe
-       where pe.pv_id=spc.pv_id and spc.pv_sv_id is not null limit 1);
+update specimen as spc,processing_event as pe
+       set processing_event_id=pe.id
+       where pe.pv_id=spc.pv_id
+       and spc.pv_sv_id is not null;
 
 
 /*****************************************************
