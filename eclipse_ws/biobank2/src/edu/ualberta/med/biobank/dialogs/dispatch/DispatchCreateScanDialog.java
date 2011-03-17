@@ -317,9 +317,8 @@ public class DispatchCreateScanDialog extends
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell
-                .getRandomAliquotsAlreadyAssigned(SessionManager
-                    .getAppService(), (currentShipment).getSenderCenter()
-                    .getId());
+                .getRandomAliquotsNotAssigned(SessionManager.getAppService(),
+                    (currentShipment).getSenderCenter().getId());
             return cells;
         } else {
             for (SpecimenWrapper aliquot : currentPallet.getSpecimens()

@@ -250,7 +250,7 @@ public class PatientMergeForm extends BiobankEntryForm {
                 "Are you sure you want to merge patient "
                     + patient2.getPnumber() + " into patient "
                     + patient1Adapter.getWrapper().getPnumber()
-                    + "? All patient visits will be transferred.")) {
+                    + "? All collection events will be transferred.")) {
                 canMerge = true;
             }
         }

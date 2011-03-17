@@ -339,13 +339,41 @@ public class PatientWrapper extends PatientBaseWrapper {
         if (getStudy().equals(patient2.getStudy())) {
             List<CollectionEventWrapper> cevents = patient2
                 .getCollectionEventCollection(false);
+
             if (!cevents.isEmpty()) {
                 patient2.removeFromCollectionEventCollection(cevents);
-                addToCollectionEventCollection(cevents);
-                for (CollectionEventWrapper cevent : cevents) {
-                    cevent.setPatient(this);
-                    cevent.persist();
+                Set<CollectionEventWrapper> toAdd = new HashSet<CollectionEventWrapper>();
+                List<CollectionEventWrapper> toDelete = new ArrayList<CollectionEventWrapper>();
+                boolean merged = false;
+                for (CollectionEventWrapper p2event : cevents) {
+                    for (CollectionEventWrapper p1event : getCollectionEventCollection(false))
+                        if (p1event.getVisitNumber().equals(
+                            p2event.getVisitNumber())) {
+                            p1event.addToOriginalSpecimenCollection(p2event
+                                .getOriginalSpecimenCollection(false));
+                            p1event.addToAllSpecimenCollection(p2event
+                                .getAllSpecimenCollection(false));
+                            p2event
+                                .removeFromOriginalSpecimenCollection(p2event
+                                    .getOriginalSpecimenCollection(false));
+                            p2event.removeFromAllSpecimenCollection(p2event
+                                .getAllSpecimenCollection(false));
+                            toDelete.add(p2event);
+                            p1event.persist();
+                            merged = true;
+                        }
+                    if (!merged)
+                        toAdd.add(p2event);
+                    merged = false;
                 }
+
+                for (CollectionEventWrapper addMe : toAdd) {
+                    addMe.setPatient(this);
+                    addMe.persist();
+                }
+                for (CollectionEventWrapper deleteMe : toDelete)
+                    deleteMe.delete();
+
                 patient2.delete();
                 persist();
 

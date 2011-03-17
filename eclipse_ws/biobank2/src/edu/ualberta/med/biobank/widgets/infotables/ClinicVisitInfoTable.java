@@ -12,17 +12,18 @@ public class ClinicVisitInfoTable extends
     InfoTableWidget<CollectionEventWrapper> {
 
     class TableRowData {
-        public String clinicName;
-        public String visit;
+        public Integer visit;
+        public Long numSamples;
 
         @Override
         public String toString() {
-            return StringUtils.join(new String[] { clinicName, visit });
+            return StringUtils.join(new String[] { visit.toString(),
+                numSamples.toString() });
         }
     }
 
-    private static final String[] HEADINGS = new String[] { "Clinic",
-        "Patient Visits (Date Processed)" };
+    private static final String[] HEADINGS = new String[] { "Visit #",
+        "Specimens" };
 
     public ClinicVisitInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
@@ -43,9 +44,9 @@ public class ClinicVisitInfoTable extends
                 }
                 switch (columnIndex) {
                 case 0:
-                    return item.clinicName;
+                    return item.visit.toString();
                 case 1:
-                    return item.visit;
+                    return item.numSamples.toString();
                 default:
                     return "";
                 }
@@ -57,9 +58,8 @@ public class ClinicVisitInfoTable extends
     public Object getCollectionModelObject(CollectionEventWrapper p)
         throws Exception {
         TableRowData info = new TableRowData();
-        // FIXME: what should be displayed?
-        // info.clinicName = p.getCenter().getNameShort();
-        // info.visit = p.getFormattedDateProcessed();
+        info.visit = p.getVisitNumber();
+        info.numSamples = p.getSourceSpecimensCount(true);
         return info;
     }
 
