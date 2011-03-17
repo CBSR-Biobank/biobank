@@ -570,10 +570,12 @@ public class ReportEntryForm extends BiobankEntryForm {
         Action saveAsNewAction = new Action() {
             @Override
             public void run() {
-                closeEntryOpenView(false, false);
+                updateReportModel();
 
                 ReportWrapper report = new ReportWrapper(
                     ReportEntryForm.this.report);
+
+                closeEntryOpenView(false, false);
 
                 int userId = SessionManager.getUser().getId().intValue();
                 report.setUserId(userId);
