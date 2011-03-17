@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.common.security;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,9 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
+import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class User implements Serializable, NotAProxy {
@@ -28,6 +33,56 @@ public class User implements Serializable, NotAProxy {
     private List<CenterWrapper<?>> workingCenters;
 
     private transient CenterWrapper<?> currentWorkingCenter;
+
+    /**
+     * [object type | privilege] = list of center class names
+     */
+    private static transient Map<TypePrivilegeKey, List<String>> specificRightsMapping;
+
+    private static class TypePrivilegeKey {
+        public String type;
+        public Privilege privilege;
+
+        public TypePrivilegeKey(String type, Privilege privilege) {
+            this.type = type;
+            this.privilege = privilege;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (object instanceof TypePrivilegeKey) {
+                TypePrivilegeKey tpk = (TypePrivilegeKey) object;
+                return type.equals(tpk.type) && privilege.equals(tpk.privilege);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return type.hashCode() + privilege.hashCode();
+        }
+    }
+
+    static {
+        specificRightsMapping = new HashMap<TypePrivilegeKey, List<String>>();
+
+        addSpecificMappings(
+            Container.class.getName(),
+            Arrays.asList(Privilege.CREATE, Privilege.UPDATE, Privilege.DELETE),
+            Arrays.asList(Site.class.getName()));
+        addSpecificMappings(
+            ContainerType.class.getName(),
+            Arrays.asList(Privilege.CREATE, Privilege.UPDATE, Privilege.DELETE),
+            Arrays.asList(Site.class.getName()));
+    }
+
+    private static void addSpecificMappings(String objectType,
+        List<Privilege> privileges, List<String> centerClassNames) {
+        for (Privilege privilege : privileges) {
+            specificRightsMapping.put(new TypePrivilegeKey(objectType,
+                privilege), centerClassNames);
+        }
+    }
 
     public boolean isLockedOut() {
         return isLockedOut;
@@ -152,6 +207,7 @@ public class User implements Serializable, NotAProxy {
 
     public boolean hasPrivilegeOnObject(Privilege privilege,
         Class<?> objectClazz) {
+        String type = objectClazz.getName();
         if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
             ModelWrapper<?> wrapper = null;
             try {
@@ -164,11 +220,19 @@ public class User implements Serializable, NotAProxy {
                 e.printStackTrace();
                 return false;
             }
-            return hasPrivilegeOnObject(privilege, wrapper.getWrappedClass()
-                .getName());
+            type = wrapper.getWrappedClass().getName();
         }
-        String type = objectClazz.getName();
-        return hasPrivilegeOnObject(privilege, type);
+        boolean currentCenterRights = true;
+        CenterWrapper<?> currentCenter = getCurrentWorkingCenter();
+        if (currentCenter != null) {
+            List<String> centerSpecificRights = specificRightsMapping
+                .get(new TypePrivilegeKey(type, privilege));
+            if (centerSpecificRights != null) {
+                currentCenterRights = centerSpecificRights
+                    .contains(currentCenter.getWrappedClass().getName());
+            }
+        }
+        return currentCenterRights && hasPrivilegeOnObject(privilege, type);
     }
 
     private boolean hasPrivilegeOnObject(Privilege privilege, String type) {

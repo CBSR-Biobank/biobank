@@ -137,7 +137,7 @@ CREATE TABLE `csm_pg_pe` (
   KEY `idx_PROTECTION_GROUP_ID` (`PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PROTECTION_ELEMENT_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_GROUP_PROTECTION_ELEMENT` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1414 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1418 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -230,6 +230,10 @@ INSERT INTO `csm_pg_pe` VALUES (1410,47,8,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (1411,47,24,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (1412,47,185,'0000-00-00');
 INSERT INTO `csm_pg_pe` VALUES (1413,47,11,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1414,45,19,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1415,45,7,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1416,45,34,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1417,45,20,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -378,18 +382,17 @@ LOCK TABLES `csm_protection_group` WRITE;
 /*!40000 ALTER TABLE `csm_protection_group` DISABLE KEYS */;
 INSERT INTO `csm_protection_group` VALUES (1,'Internal: All Objects','Contains Protection Element of each model object',2,0,'2011-03-11',NULL);
 INSERT INTO `csm_protection_group` VALUES (45,'Internal: Center Administrator','** DO NOT RENAME **\r\nAct like a flag to tell if will be administrator of the working centers - Also contains all center specific features',2,0,'2011-03-14',NULL);
-INSERT INTO `csm_protection_group` VALUES (46,'Center Feature: Clinic Shipments','Represents the ability to create/delete/update shipments (needed when clinics doesn\'t use the software)',2,0,'2011-03-11',72);
-INSERT INTO `csm_protection_group` VALUES (47,'Center Feature: Collection Event','Represents the ability to create/update/delete patients and collection events',2,0,'2011-03-11',72);
-INSERT INTO `csm_protection_group` VALUES (48,'Center Feature: Assign positions','Represents the ability to assign a position to a specimen',2,0,'2011-03-11',72);
+INSERT INTO `csm_protection_group` VALUES (46,'Center Feature: Clinic Shipments','Represents the ability to create/delete/update shipments (needed when clinics doesn\'t use the software)',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (47,'Center Feature: Collection Event','Represents the ability to create/update/delete patients and collection events',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (48,'Center Feature: Assign positions','Represents the ability to assign a position to a specimen',2,0,'2011-03-11',45);
 INSERT INTO `csm_protection_group` VALUES (49,'Global Feature: Specimen Type','Represents the ability to create/edit/delete specimen types',2,0,'2011-03-11',73);
-INSERT INTO `csm_protection_group` VALUES (50,'Center Feature: Dispatch/Request','Represent the dispatch and request features + contains protection elements needed to manage dispatches',2,0,'2011-03-11',72);
-INSERT INTO `csm_protection_group` VALUES (65,'Center Feature: Reports','Represents the reports feature',2,0,'2011-03-11',72);
-INSERT INTO `csm_protection_group` VALUES (66,'Center Feature: Processing Event','Represents the ability to create/delete/update processing events',2,0,'2011-03-11',72);
-INSERT INTO `csm_protection_group` VALUES (67,'Center Feature: Link specimens','Represents the ability to link specimens to their source specimens',2,0,'2011-03-11',72);
+INSERT INTO `csm_protection_group` VALUES (50,'Center Feature: Dispatch/Request','Represent the dispatch and request features + contains protection elements needed to manage dispatches',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (65,'Center Feature: Reports','Represents the reports feature',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (66,'Center Feature: Processing Event','Represents the ability to create/delete/update processing events',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (67,'Center Feature: Link specimens','Represents the ability to link specimens to their source specimens',2,0,'2011-03-11',45);
 INSERT INTO `csm_protection_group` VALUES (68,'Global Feature: Activity Status','Represents the ability to create/edit/delete activity statuses',2,0,'2011-03-11',73);
 INSERT INTO `csm_protection_group` VALUES (69,'Global Feature: Shipping Method','Represents the ability to create/edit/delete shipping methodes',2,0,'2011-03-11',73);
 INSERT INTO `csm_protection_group` VALUES (70,'Global Feature: Collection Event Attributes Types','Represents the ability to create/edit/delete collection Event Attributes Types',2,0,'2011-03-11',73);
-INSERT INTO `csm_protection_group` VALUES (72,'Internal: All Center Features','contains all center specific features',2,0,'2011-03-14',45);
 INSERT INTO `csm_protection_group` VALUES (73,'Internal: All Global Features','contains all non center specific features',2,0,'2011-03-14',NULL);
 /*!40000 ALTER TABLE `csm_protection_group` ENABLE KEYS */;
 UNLOCK TABLES;
@@ -647,4 +650,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-03-15 10:29:10
+-- Dump completed on 2011-03-17 11:30:26
