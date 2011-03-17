@@ -464,8 +464,6 @@ CREATE TABLE processing_event (
 
 -- add a processing event for each patient visit
 
-quit;
-
 insert into processing_event (created_at,comment,activity_status_id,center_id,pv_id)
        select pv.date_processed,pv.comment,
        (select id from activity_status where name='Active'),center.id,pv.id
@@ -1209,9 +1207,6 @@ INSERT INTO entity_column VALUES (1,'Inventory Id',1),
 (407,'Specimen Creation Time',407);
 /*!40000 ALTER TABLE entity_column ENABLE KEYS */;
 UNLOCK TABLES;
-
--- update constraints (unique and not-null):
--- also update ContainerType -> ContainerLabelingScheme relation replace 0..1 by 1 (so cannot be null)
 
 /*****************************************************
  * cleantup and drop tables that are no longer required

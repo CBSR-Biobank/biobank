@@ -20,6 +20,7 @@ import edu.ualberta.med.biobank.common.wrappers.ContainerTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContainerWrapper;
 import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -33,6 +34,7 @@ import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
+import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
@@ -110,11 +112,15 @@ public class TestActivityStatus extends TestDatabase {
         SpecimenWrapper spc = SpecimenHelper.newSpecimen(SpecimenTypeHelper
             .newSpecimenType(name));
 
+        OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
+        originInfo.setCenter(site);
+        originInfo.persist();
+
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1, spc);
+            .addCollectionEvent(site, patient, 1, originInfo, spc);
 
         CollectionEventWrapper visit = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1);
+            .addCollectionEvent(site, patient, 1, originInfo);
 
         SpecimenWrapper aliquot = SpecimenHelper.addSpecimen(sampleType,
             topContainer, visit, 0, 0);
@@ -172,10 +178,9 @@ public class TestActivityStatus extends TestDatabase {
         if (deleteWrappers != null) {
             for (ModelWrapper<?> delWrapper : deleteWrappers) {
                 if (delWrapper instanceof CollectionEventWrapper) {
-                    // FIXME
-                    // DbHelper
-                    // .deleteFromList(((CollectionEventWrapper) delWrapper)
-                    // .getSpecimenCollection(false));
+                    DbHelper
+                        .deleteFromList(((CollectionEventWrapper) delWrapper)
+                            .getAllSpecimenCollection(false));
                 }
                 delWrapper.delete();
             }

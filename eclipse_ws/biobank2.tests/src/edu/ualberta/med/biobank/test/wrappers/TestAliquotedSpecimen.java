@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -16,6 +17,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSet
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
+import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -196,39 +198,37 @@ public class TestAliquotedSpecimen extends TestDatabase {
         Assert.assertTrue(sampleStorage2.compareTo(sampleStorage1) < 0);
     }
 
-    // @Test
-    // public void testStudyDeleteRemoveAliquotedSpecimens() throws Exception {
-    // String name = "testStudyDeleteRemoveAliquotedSpecimens" + r.nextInt();
-    // int nbAliquotedSpecimen = appService.search(AliquotedSpecimen.class,
-    // new AliquotedSpecimen()).size();
-    // SiteWrapper site = SiteHelper.addSite(name);
-    //
-    // StudyWrapper study1 = StudyHelper.addStudy(name);
-    // List<SpecimenTypeWrapper> types =
-    // SpecimenTypeWrapper.getGlobalSpecimenTypes(
-    // appService, false);
-    // AliquotedSpecimenHelper.addAliquotedSpecimen(study1, DbHelper
-    // .chooseRandomlyInList(types));
-    // study1.delete();
-    // Assert.assertEquals(nbAliquotedSpecimen, appService.search(
-    // AliquotedSpecimen.class, new AliquotedSpecimen()).size());
-    //
-    // StudyWrapper study = StudyHelper.addStudy("studyname"
-    // + r.nextInt());
-    // PatientWrapper patient = PatientHelper.addPatient("5684", study);
-    // study.persist();
-    // AliquotedSpecimenHelper.addAliquotedSpecimen(study, DbHelper
-    // .chooseRandomlyInList(types));
-    // study.reload();
-    // patient.delete();
-    // study.reload();
-    // study.delete();
-    // // FIXME this test is failing when the study has a patient. Should find
-    // // why !
-    // //
-    // // it seems like hibernate forgets about the cascade setting for
-    // // this association . NL
-    // Assert.assertEquals(nbAliquotedSpecimen, appService.search(
-    // AliquotedSpecimen.class, new AliquotedSpecimen()).size());
-    // }
+    @Test
+    public void testStudyDeleteRemoveAliquotedSpecimens() throws Exception {
+        String name = "testStudyDeleteRemoveAliquotedSpecimens" + r.nextInt();
+        int nbAliquotedSpecimen = appService.search(AliquotedSpecimen.class,
+            new AliquotedSpecimen()).size();
+        StudyWrapper study1 = StudyHelper.addStudy(name);
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
+        AliquotedSpecimenHelper.addAliquotedSpecimen(study1,
+            DbHelper.chooseRandomlyInList(types));
+        study1.delete();
+        Assert.assertEquals(nbAliquotedSpecimen,
+            appService.search(AliquotedSpecimen.class, new AliquotedSpecimen())
+                .size());
+
+        StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt());
+        PatientWrapper patient = PatientHelper.addPatient("5684", study);
+        study.persist();
+        AliquotedSpecimenHelper.addAliquotedSpecimen(study,
+            DbHelper.chooseRandomlyInList(types));
+        study.reload();
+        patient.delete();
+        study.reload();
+        study.delete();
+        // FIXME this test is failing when the study has a patient. Should find
+        // why !
+        //
+        // it seems like hibernate forgets about the cascade setting for
+        // this association . NL
+        Assert.assertEquals(nbAliquotedSpecimen,
+            appService.search(AliquotedSpecimen.class, new AliquotedSpecimen())
+                .size());
+    }
 }
