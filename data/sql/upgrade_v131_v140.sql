@@ -154,12 +154,14 @@ original_collection_event_id,specimen_type_id,parent_specimen_id,origin_info_id,
 
 -- set the source center
 
-UPDATE specimen,patient_visit as pv, clinic_shipment_patient as csp,abstract_shipment as aship,
-clinic,center,site
+UPDATE specimen,patient_visit
+       as pv, clinic_shipment_patient as csp,abstract_shipment as aship,
+       clinic,center,site
        SET current_center_id=center.id
        where csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
        and aship.id=csp.CLINIC_SHIPMENT_ID
        and clinic.id=aship.clinic_id
+       and site.id=aship.site_id
        and center.name=site.name
        and pv.id=specimen.pv_id
        and aship.discriminator='ClinicShipment';

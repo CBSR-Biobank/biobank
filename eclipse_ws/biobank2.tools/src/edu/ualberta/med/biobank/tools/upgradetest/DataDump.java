@@ -39,6 +39,8 @@ public class DataDump {
     }
 
     public static Date getDateFromStr(String str) throws ParseException {
+        if (str == null)
+            return null;
         Date date = DateFormatter.parseToDateTime(str);
         if (date == null) {
             date = DateFormatter.parseToDate(str);
