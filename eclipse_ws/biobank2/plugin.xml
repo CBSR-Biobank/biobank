@@ -294,6 +294,11 @@
              id="edu.ualberta.med.biobank.commands.patients.cabinetLinkAssign"
              name="Cabinet Link Assign">
        </command>
+       <command
+             categoryId="org.eclipse.ui.category.edit"
+             id="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
+             name="Add Processing Event">
+       </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -824,6 +829,25 @@
               </reference>
          </enabledWhen>
       </handler>
+      <handler
+            class="edu.ualberta.med.biobank.handlers.ProcessingEventAddHandler"
+            commandId="edu.ualberta.med.biobank.commands.ProcessingEventAdd">
+         <activeWhen>
+            <and>
+               <reference
+                     definitionId="biobank2.processingPerspectiveSelected">
+               </reference>
+               <reference
+                     definitionId="biobank2.loggedIn">
+               </reference>
+            </and>
+         </activeWhen>
+         <enabledWhen>
+            <reference
+                  definitionId="biobank2.processingPerspectiveSelected">
+            </reference>
+         </enabledWhen>
+      </handler>
    </extension>
    <extension
          point="org.eclipse.ui.menus">
@@ -1170,6 +1194,18 @@
          </toolbar>
          <toolbar
                id="edu.ualberta.med.biobank.views.ProcessingView">
+            <command
+                  commandId="edu.ualberta.med.biobank.commands.ProcessingEventAdd"
+                  icon="icons/processingEvent.png"
+                  label="Add Processing Event"
+                  style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                  <reference
+                        definitionId="biobank2.processingPerspectiveSelected">
+                  </reference>
+               </visibleWhen>
+            </command>
             <command
                   commandId="edu.ualberta.med.biobank.commands.patients.scanLink"
                   icon="icons/scanLink.png"
@@ -2239,7 +2275,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.ProcessingView"
-            icon="icons/patientView.png"
+            icon="icons/processingPerspective.png"
             id="edu.ualberta.med.biobank.views.ProcessingView"
             name="Processing"
             restorable="true">
@@ -2247,7 +2283,7 @@
       <view
             allowMultiple="false"
             class="edu.ualberta.med.biobank.views.CollectionView"
-            icon="icons/shipment.png"
+            icon="icons/patientView.png"
             id="edu.ualberta.med.biobank.views.CollectionView"
             name="Collection"
             restorable="true">
