@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -23,7 +22,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class SiteGroup extends AdapterBase {
 
     public SiteGroup(SessionAdapter parent, int id) {
-        super(parent, id, "Sites", true, false);
+        super(parent, id, "All Sites", true, false);
     }
 
     @Override
@@ -82,10 +81,7 @@ public class SiteGroup extends AdapterBase {
         if (SessionManager.isSuperAdminMode()) {
             return SiteWrapper.getSites(SessionManager.getAppService());
         }
-        SiteWrapper current = SessionManager.getUser().getCurrentWorkingSite();
-        if (current == null)
-            return Collections.emptyList();
-        return Arrays.asList(current);
+        return Collections.emptyList();
     }
 
     @Override

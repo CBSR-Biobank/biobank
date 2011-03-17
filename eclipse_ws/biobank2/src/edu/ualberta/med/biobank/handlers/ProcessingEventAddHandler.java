@@ -8,7 +8,7 @@ import org.eclipse.core.runtime.Assert;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
-import edu.ualberta.med.biobank.treeview.patient.ProcessingEventAdapter;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 
 public class ProcessingEventAddHandler extends AbstractHandler {
 

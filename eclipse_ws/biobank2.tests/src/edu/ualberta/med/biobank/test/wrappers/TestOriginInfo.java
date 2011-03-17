@@ -3,14 +3,12 @@ package edu.ualberta.med.biobank.test.wrappers;
 import org.junit.Assert;
 import org.junit.Test;
 
-import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.test.TestDatabase;
-import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.ShippingMethodHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
@@ -30,11 +28,11 @@ public class TestOriginInfo extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         SpecimenWrapper spc = SpecimenHelper.newSpecimen(name);
 
-        CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1, spc);
+        // CollectionEventWrapper cevent = CollectionEventHelper
+        // .addCollectionEvent(site, patient, 1, spc);
 
-        cevent.persist();
-        cevent.reload();
+        // cevent.persist();
+        // cevent.reload();
 
         // Assert.assertEquals(company, cevent.getShippingMethod());
         Assert.fail("test needs implementation");

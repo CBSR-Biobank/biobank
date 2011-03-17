@@ -616,12 +616,12 @@ public abstract class AdapterBase {
         }
     }
 
-    public void openEntryForm() {
-        openEntryForm(false);
+    public IEditorPart openEntryForm() {
+        return openEntryForm(false);
     }
 
-    public void openEntryForm(boolean hasPreviousForm) {
-        openForm(new FormInput(this, hasPreviousForm), getEntryFormId());
+    public IEditorPart openEntryForm(boolean hasPreviousForm) {
+        return openForm(new FormInput(this, hasPreviousForm), getEntryFormId());
     }
 
     public abstract String getViewFormId();

@@ -34,19 +34,28 @@ public class ReportWrapper extends ReportBaseWrapper {
         super(appService);
     }
 
+    private static <E> Collection<E> notNull(Collection<E> collection) {
+        if (collection == null) {
+            return new ArrayList<E>();
+        }
+        return collection;
+    }
+
     public ReportWrapper(ReportWrapper report) {
         super(report.getAppService());
 
-        setName(report.getName());
-        setDescription(report.getDescription());
-        setIsCount(report.getIsCount());
-        setIsPublic(report.getIsPublic());
+        setName(report.wrappedObject.getName());
+        setDescription(report.wrappedObject.getDescription());
+        setIsCount(report.wrappedObject.getIsCount());
+        setIsPublic(report.wrappedObject.getIsPublic());
 
-        wrappedObject.setEntity(report.getWrappedObject().getEntity());
-        wrappedObject.setUserId(report.getWrappedObject().getUserId());
+        wrappedObject.setId(null);
+        wrappedObject.setEntity(report.wrappedObject.getEntity());
+        wrappedObject.setUserId(report.wrappedObject.getUserId());
 
         Collection<ReportColumn> reportColumns = new ArrayList<ReportColumn>();
-        for (ReportColumn column : report.getReportColumnCollection()) {
+        for (ReportColumn column : notNull(report.wrappedObject
+            .getReportColumnCollection())) {
             ReportColumn columnCopy = new ReportColumn();
             columnCopy.setEntityColumn(column.getEntityColumn());
             columnCopy.setPosition(column.getPosition());
@@ -57,15 +66,16 @@ public class ReportWrapper extends ReportBaseWrapper {
         setReportColumnCollection(reportColumns);
 
         Collection<ReportFilter> reportFilters = new ArrayList<ReportFilter>();
-        for (ReportFilter filter : report.getReportFilterCollection()) {
+        for (ReportFilter filter : notNull(report.wrappedObject
+            .getReportFilterCollection())) {
             ReportFilter filterCopy = new ReportFilter();
             filterCopy.setEntityFilter(filter.getEntityFilter());
             filterCopy.setOperator(filter.getOperator());
             filterCopy.setPosition(filter.getPosition());
 
             Collection<ReportFilterValue> values = new ArrayList<ReportFilterValue>();
-            for (ReportFilterValue value : filter
-                .getReportFilterValueCollection()) {
+            for (ReportFilterValue value : notNull(filter
+                .getReportFilterValueCollection())) {
                 ReportFilterValue valueCopy = new ReportFilterValue();
                 valueCopy.setPosition(value.getPosition());
                 valueCopy.setValue(value.getValue());
@@ -75,6 +85,7 @@ public class ReportWrapper extends ReportBaseWrapper {
 
             reportFilters.add(filterCopy);
         }
+        setReportFilterCollection(reportFilters);
     }
 
     public List<ReportColumn> getReportColumnCollection() {

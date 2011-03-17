@@ -10,6 +10,7 @@ import org.junit.Test;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -35,8 +36,11 @@ public class TestCollectionEvent extends TestDatabase {
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         SpecimenWrapper spc = SpecimenHelper.newSpecimen(name);
 
+        OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
+        originInfo.setCenter(site);
+        originInfo.persist();
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1, spc);
+            .addCollectionEvent(site, patient, 1, originInfo, spc);
 
         testGettersAndSetters(cevent);
     }
@@ -69,8 +73,11 @@ public class TestCollectionEvent extends TestDatabase {
             patient2, patient3 }) {
             SpecimenWrapper spc = SpecimenHelper.newSpecimen(patient
                 .getPnumber());
+            OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
+            originInfo.setCenter(site);
+            originInfo.persist();
             CollectionEventWrapper cevent = CollectionEventHelper
-                .addCollectionEvent(site, patient, 1, spc);
+                .addCollectionEvent(site, patient, 1, originInfo, spc);
             cevent.reload();
             Assert.assertEquals(patient, cevent.getPatient());
         }

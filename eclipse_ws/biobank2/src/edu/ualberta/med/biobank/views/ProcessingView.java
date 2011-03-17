@@ -17,8 +17,8 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.treeview.patient.ProcessingEventAdapter;
-import edu.ualberta.med.biobank.treeview.patient.ProcessingEventGroup;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingEventGroup;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 
 public class ProcessingView extends AbstractAdministrationView {
