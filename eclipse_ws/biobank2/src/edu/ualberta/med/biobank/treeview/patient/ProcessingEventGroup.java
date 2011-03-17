@@ -92,13 +92,12 @@ public class ProcessingEventGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return ProcessingEventWrapper.getAllProcessingEvents(SessionManager
-            .getAppService());
+        return null;
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+        return 0;
     }
 
 }

@@ -85,7 +85,7 @@ public class MoveAliquotsToDialog extends BiobankDialog {
             .createLabel(contents, "Repository Site");
         siteLabel.setLayoutData(new GridData(GridData.VERTICAL_ALIGN_CENTER));
         buildContainersMap();
-        if (!SessionManager.getUser().isWebsiteAdministrator()) {
+        if (!SessionManager.getUser().isSuperAdministrator()) {
             siteLabel
                 .setToolTipText("Only Website administrator can move aliquot to another site");
         }

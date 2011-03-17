@@ -27,6 +27,6 @@ public class ShipmentAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(OriginInfoWrapper.class, null);
+        return SessionManager.canCreate(OriginInfoWrapper.class);
     }
 }

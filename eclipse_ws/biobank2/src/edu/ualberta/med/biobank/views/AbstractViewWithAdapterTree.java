@@ -104,4 +104,5 @@ public abstract class AbstractViewWithAdapterTree extends
         if (rootNode != null)
             rootNode.removeAll();
     }
+
 }

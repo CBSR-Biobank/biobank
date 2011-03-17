@@ -31,7 +31,7 @@ public class StudyViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.StudyViewForm"; //$NON-NLS-1$
 
     private static final String DATE_PROCESSED_INFO_FIELD_NAME = Messages
-        .getString("study.visit.info.dateProcessed");
+        .getString("study.visit.info.dateProcessed"); //$NON-NLS-1$
 
     private StudyAdapter studyAdapter;
     private StudyWrapper study;

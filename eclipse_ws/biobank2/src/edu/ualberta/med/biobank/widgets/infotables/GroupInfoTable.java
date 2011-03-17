@@ -14,7 +14,7 @@ import org.eclipse.ui.PlatformUI;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
-import edu.ualberta.med.biobank.dialogs.GroupEditDialog;
+import edu.ualberta.med.biobank.dialogs.user.GroupEditDialog;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 

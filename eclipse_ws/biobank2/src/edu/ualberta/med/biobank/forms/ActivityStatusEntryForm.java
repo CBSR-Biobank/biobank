@@ -90,9 +90,9 @@ public class ActivityStatusEntryForm extends BiobankEntryForm {
 
     @Override
     protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(ActivityStatusWrapper.class, null)
-            && !SessionManager.canCreate(ActivityStatusWrapper.class, null)
-            && !SessionManager.canDelete(ActivityStatusWrapper.class, null)) {
+        if (!SessionManager.canUpdate(ActivityStatusWrapper.class)
+            && !SessionManager.canCreate(ActivityStatusWrapper.class)
+            && !SessionManager.canDelete(ActivityStatusWrapper.class)) {
             BiobankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Activity Status editor. Access Denied.");

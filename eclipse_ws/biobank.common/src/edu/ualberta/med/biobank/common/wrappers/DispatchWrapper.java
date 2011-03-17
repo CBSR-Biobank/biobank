@@ -198,7 +198,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         deletedDispatchedSpecimens.removeAll(newDispatchSpecimens);
     }
 
-    public class CheckStatus {
+    public static class CheckStatus {
         public CheckStatus(boolean b, String string) {
             this.ok = b;
             this.message = string;

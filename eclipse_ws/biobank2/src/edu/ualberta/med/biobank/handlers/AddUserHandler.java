@@ -16,7 +16,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.dialogs.UserEditDialog;
+import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class AddUserHandler extends AbstractHandler implements IHandler {

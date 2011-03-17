@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.handlers;
+package edu.ualberta.med.biobank.expressions;
 
 import org.eclipse.core.expressions.PropertyTester;
 
@@ -15,8 +15,7 @@ public class AdapterBasePropertyTester extends PropertyTester {
         if (receiver instanceof AdapterBase) {
             AdapterBase adapter = (AdapterBase) receiver;
             if (property.equals("canDelete")) {
-                boolean can = adapter.isDeletable();
-                return can;
+                return adapter.isDeletable();
             }
         }
         return false;

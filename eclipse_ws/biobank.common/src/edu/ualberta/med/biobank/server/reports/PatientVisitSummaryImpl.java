@@ -57,7 +57,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
         int numSums = 7;
         Long[] sums = new Long[numSums];
         for (int i = 0; i < numSums; i++)
-            sums[i] = new Long(0);
+            sums[i] = 0L;
         for (Object obj : results) {
             Object[] castObj = (Object[]) obj;
             if (lastStudy.compareTo((String) castObj[0]) != 0) {
@@ -67,7 +67,7 @@ public class PatientVisitSummaryImpl extends AbstractReport {
                 totalledResults.add(new Object[] { "", "", "", "", "", "", "",
                     "", "" });
                 for (int i = 0; i < numSums; i++)
-                    sums[i] = new Long(0);
+                    sums[i] = 0L;
             }
             for (int i = 0; i < numSums; i++)
                 if (castObj[i + 2] instanceof BigInteger)

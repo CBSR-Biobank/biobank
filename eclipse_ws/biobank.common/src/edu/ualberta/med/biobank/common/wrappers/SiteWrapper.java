@@ -410,7 +410,7 @@ public class SiteWrapper extends SiteBaseWrapper {
      */
     @Override
     public boolean canUpdate(User user) {
-        return user.isWebsiteAdministrator();
+        return user.isSuperAdministrator();
     }
 
     public static Collection<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
@@ -440,43 +440,6 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(false);
-    }
-
-    @Deprecated
-    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study) {
-        // TODO this can be removed once the gui doesn't use it anymore
-        return null;
-    }
-
-    @Deprecated
-    public Collection<? extends ModelWrapper<?>> getAcceptedRequestCollection() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public List<StudyWrapper> getDispatchStudiesAsSender() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public void addStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> addedSites) throws BiobankCheckException {
-        // TODO Auto-generated method stub
-
-    }
-
-    public void removeStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> removedSites) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public Collection<? extends ModelWrapper<?>> getFilledRequestCollection() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
@@ -546,4 +509,5 @@ public class SiteWrapper extends SiteBaseWrapper {
             Arrays.asList(new Object[] { getId(), study.getId() }));
         return getCountResult(appService, c);
     }
+
 }

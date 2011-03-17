@@ -54,7 +54,7 @@ fi
 DUMPFILE="/tmp/$SCRIPT.$RANDOM.sql"
 
 ant dbcreate
-scripts/dump_csm_schema.sh -ecsm_user -ecsm_user_group -H$DBHOST -u$DBUSER -p$DBPWD -o$DUMPFILE
+scripts/dump_csm_schema.sh -ecsm_user -ecsm_user_group -ecsm_group -H$DBHOST -u$DBUSER -p$DBPWD -o$DUMPFILE
 echo "extracting old database..."
 mysqladmin -f -h$DBHOST -u$DBUSER -p$DBPWD drop biobank2 create biobank2
 gzip -dc $DBDUMP | mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2
@@ -64,3 +64,5 @@ echo "setting global security..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < $DUMPFILE
 echo "setting CBSR sites security..."
 mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < security-logs/addCBSRSiteSecurity.sql
+mysql -h$DBHOST -u$DBUSER -p$DBPWD biobank2 < data/sql/upgrade_v131_v140_security.sql
+

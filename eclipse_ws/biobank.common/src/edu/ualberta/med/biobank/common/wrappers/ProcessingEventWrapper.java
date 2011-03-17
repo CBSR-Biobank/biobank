@@ -173,7 +173,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         for (ProcessingEvent pv : pvs)
             pvws.add(new ProcessingEventWrapper(appService, pv));
         if (pvws.size() == 0)
-            return null;
+            return new ArrayList<ProcessingEventWrapper>();
         return pvws;
     }
 
@@ -191,10 +191,10 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return getCountResult(appService, c);
     }
 
-    @Override
-    public CenterWrapper<?> getCenterLinkedToObject() {
-        return getCenter();
-    }
+    // @Override
+    // public CenterWrapper<?> getCenterLinkedToObjectForSecu() {
+    // return getCenter();
+    // }
 
     public static Collection<? extends ModelWrapper<?>> getAllProcessingEvents(
         BiobankApplicationService appService) throws ApplicationException {

@@ -30,7 +30,7 @@ public class PatientMergeHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(PatientWrapper.class, null);
+        return SessionManager.canCreate(PatientWrapper.class);
     }
 
 }

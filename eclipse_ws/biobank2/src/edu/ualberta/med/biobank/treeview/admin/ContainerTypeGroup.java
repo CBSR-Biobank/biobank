@@ -38,8 +38,7 @@ public class ContainerTypeGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(ContainerTypeWrapper.class,
-            getParentFromClass(SiteAdapter.class).getWrapper())) {
+        if (SessionManager.canCreate(ContainerTypeWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Container Type");
             mi.addSelectionListener(new SelectionAdapter() {

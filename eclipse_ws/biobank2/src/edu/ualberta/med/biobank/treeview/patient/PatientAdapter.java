@@ -55,10 +55,10 @@ public class PatientAdapter extends AdapterBase {
     @Override
     public String getTooltipText() {
         PatientWrapper patient = getWrapper();
-        StudyWrapper study = patient.getStudy();
-        if (study != null) {
-            return study.getName() + " - " + getTooltipText("Patient");
-
+        if (patient != null) {
+            StudyWrapper study = patient.getStudy();
+            if (study != null)
+                return study.getName() + " - " + getTooltipText("Patient");
         }
         return getTooltipText("Patient");
     }
@@ -76,7 +76,7 @@ public class PatientAdapter extends AdapterBase {
         addDeleteMenu(menu, "Patient");
 
         if (isEditable()
-            && SessionManager.canCreate(ProcessingEventWrapper.class, null)) {
+            && SessionManager.canCreate(CollectionEventWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Collection Event");
             mi.addSelectionListener(new SelectionAdapter() {

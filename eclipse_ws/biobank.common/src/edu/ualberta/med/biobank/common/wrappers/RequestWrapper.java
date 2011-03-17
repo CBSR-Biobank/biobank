@@ -1,13 +1,12 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.RequestPeer;
 import edu.ualberta.med.biobank.common.peer.RequestSpecimenPeer;
 import edu.ualberta.med.biobank.common.util.RequestSpecimenState;
@@ -149,93 +148,17 @@ public class RequestWrapper extends RequestBaseWrapper {
         + Property.concatNames(RequestSpecimenPeer.REQUEST, RequestPeer.ID)
         + "=?";
 
-    public boolean isAllProcessed() {
+    public boolean isAllProcessed() throws BiobankQueryResultSizeException,
+        ApplicationException {
         // using the collection was too slow
-        List<Object> results = null;
         HQLCriteria c = new HQLCriteria(IS_ALL_PROCESSED_QRY,
             Arrays.asList(new Object[] {
                 RequestSpecimenState.NONPROCESSED_STATE.getId(), getId() }));
-        try {
-            results = appService.query(c);
-        } catch (ApplicationException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        return 0 == (Long) results.get(0);
+        return 0 == getCountResult(appService, c);
     }
 
     public void setState(RequestState state) {
         setState(state.getId());
     }
 
-    @Deprecated
-    public void setInAcceptedState() {
-        // TODO replace by appropriate method
-    }
-
-    @Deprecated
-    public Date getDateCreated() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public void setInFilledState() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public void setInShippedState() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public void setInCloseState() {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public Date getAccepted() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public Timestamp getShipped() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public String getWaybill() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public boolean isInAcceptedState() {
-        // TODO Auto-generated method stub
-        return false;
-    }
-
-    @Deprecated
-    public SiteWrapper getSite() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public void setShipped(Date date) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public void setWaybill(String text) {
-        // TODO Auto-generated method stub
-
-    }
 }

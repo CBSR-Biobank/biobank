@@ -27,15 +27,16 @@ public class ExceptionInterceptor implements ThrowsAdvice {
      */
     public void afterThrowing(InvalidStateException ise)
         throws ValidationException {
-        String message = "";
+        StringBuffer message = new StringBuffer();
         for (int i = 0; i < ise.getInvalidValues().length; i++) {
             InvalidValue iv = ise.getInvalidValues()[i];
-            message += iv.getBeanClass().getSimpleName() + ": "
-                + iv.getPropertyName() + " " + iv.getMessage();
+            message.append(iv.getBeanClass().getSimpleName()).append(": ")
+                .append(iv.getPropertyName()).append(" ")
+                .append(iv.getMessage());
             if (i != ise.getInvalidValues().length - 1)
-                message += ". ";
+                message.append(". ");
         }
-        throw new ValidationException(message, ise);
+        throw new ValidationException(message.toString(), ise);
     }
 
     public void afterThrowing(ApplicationException ae)

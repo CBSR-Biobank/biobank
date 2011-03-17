@@ -55,20 +55,19 @@ public class PalletCell extends Cell {
     public static Map<RowColPos, PalletCell> getRandomScanLinkWithAliquotsAlreadyLinked(
         WritableApplicationService appService, Integer siteId) throws Exception {
         Map<RowColPos, PalletCell> cells = convertArray(ScanCell.getRandom());
-        // FIXME
-        // List<SpecimenWrapper> aliquots = DebugUtil.getRandomLinkedSpecimens(
-        // appService, siteId);
-        // if (aliquots.size() > 1) {
-        // int row = 2;
-        // int col = 3;
-        // ScanCell scanCell = new ScanCell(row, col, aliquots.get(0)
-        // .getInventoryId());
-        // cells.put(new RowColPos(row, col), new PalletCell(scanCell));
-        // row = 3;
-        // col = 1;
-        // scanCell = new ScanCell(row, col, aliquots.get(1).getInventoryId());
-        // cells.put(new RowColPos(row, col), new PalletCell(scanCell));
-        // }
+        List<SpecimenWrapper> aliquots = DebugUtil
+            .getRandomLinkedAliquotedSpecimens(appService, siteId);
+        if (aliquots.size() > 1) {
+            int row = 2;
+            int col = 3;
+            ScanCell scanCell = new ScanCell(row, col, aliquots.get(0)
+                .getInventoryId());
+            cells.put(new RowColPos(row, col), new PalletCell(scanCell));
+            row = 3;
+            col = 1;
+            scanCell = new ScanCell(row, col, aliquots.get(1).getInventoryId());
+            cells.put(new RowColPos(row, col), new PalletCell(scanCell));
+        }
         return cells;
     }
 

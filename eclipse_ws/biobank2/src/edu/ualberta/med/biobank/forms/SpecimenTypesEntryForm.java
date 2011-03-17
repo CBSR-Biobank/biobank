@@ -107,9 +107,9 @@ public class SpecimenTypesEntryForm extends BiobankEntryForm {
 
     @Override
     protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(SpecimenTypeWrapper.class, null)
-            && !SessionManager.canCreate(SpecimenTypeWrapper.class, null)
-            && !SessionManager.canDelete(SpecimenTypeWrapper.class, null)) {
+        if (!SessionManager.canUpdate(SpecimenTypeWrapper.class)
+            && !SessionManager.canCreate(SpecimenTypeWrapper.class)
+            && !SessionManager.canDelete(SpecimenTypeWrapper.class)) {
             BiobankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Specimen Type editor. Access Denied.");

@@ -48,8 +48,8 @@ public class TopContainerFilterType implements FilterType, SelectableFilterType 
                     intValues.toArray()));
                 break;
             case IS_NOT_IN:
-                // TODO: use left join because not in includes Aliquot-s without
-                // any container.
+                // TODO: use left join because not in includes Specimen-s
+                // without any container.
                 Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);
                 or.add(Restrictions.not(Restrictions.in(aliasedProperty,
                     intValues.toArray())));

@@ -48,13 +48,13 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(ContainerTypeEntryForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.ContainerTypeEntryForm"; //$NON-NLS-1$
 
     private static final String MSG_NEW_STORAGE_TYPE_OK = Messages
-        .getString("ContainerTypeEntryForm.creation.msg");
+        .getString("ContainerTypeEntryForm.creation.msg"); //$NON-NLS-1$
 
     private static final String MSG_STORAGE_TYPE_OK = Messages
-        .getString("ContainerTypeEntryForm.edition.msg");
+        .getString("ContainerTypeEntryForm.edition.msg"); //$NON-NLS-1$
 
     private ContainerTypeAdapter containerTypeAdapter;
 
@@ -95,18 +95,18 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof ContainerTypeAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         containerTypeAdapter = (ContainerTypeAdapter) adapter;
         containerType = containerTypeAdapter.getContainerType();
         String tabName;
         if (containerType.isNew()) {
-            tabName = Messages.getString("ContainerTypeEntryForm.new.title");
+            tabName = Messages.getString("ContainerTypeEntryForm.new.title"); //$NON-NLS-1$
             containerType.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            tabName = Messages.getString("ContainerTypeEntryForm.edit.title",
+            tabName = Messages.getString("ContainerTypeEntryForm.edit.title", //$NON-NLS-1$
                 containerType.getName());
         }
         setPartName(tabName);
@@ -114,7 +114,7 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
 
     @Override
     protected void createFormContent() throws Exception {
-        form.setText(Messages.getString("ContainerTypeEntryForm.main.title"));
+        form.setText(Messages.getString("ContainerTypeEntryForm.main.title")); //$NON-NLS-1$
         form.setMessage(getOkMessage(), IMessageProvider.NONE);
         page.setLayout(new GridLayout(1, false));
 
@@ -147,12 +147,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("label.name"),
+            Messages.getString("label.name"), //$NON-NLS-1$
             null,
             containerType,
             ContainerTypePeer.NAME.getName(),
             new NonEmptyStringValidator(Messages
-                .getString("ContainerTypeEntryForm.name.validation.msg")));
+                .getString("ContainerTypeEntryForm.name.validation.msg"))); //$NON-NLS-1$
 
         setFirstControl(name);
 
@@ -160,18 +160,18 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("label.nameShort"),
+            Messages.getString("label.nameShort"), //$NON-NLS-1$
             null,
             containerType,
             ContainerTypePeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(Messages
-                .getString("ContainerTypeEntryForm.nameShort.validation.msg")));
+                .getString("ContainerTypeEntryForm.nameShort.validation.msg"))); //$NON-NLS-1$
 
         if (containerType.getTopLevel() == null) {
             containerType.setTopLevel(false);
         }
         createBoundWidgetWithLabel(client, Button.class, SWT.CHECK,
-            Messages.getString("containerType.field.label.topLevel"), null,
+            Messages.getString("containerType.field.label.topLevel"), null, //$NON-NLS-1$
             containerType, ContainerTypePeer.TOP_LEVEL.getName(), null);
         toolkit.paintBordersFor(client);
 
@@ -179,34 +179,34 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             client,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("containerType.field.label.rows"),
+            Messages.getString("containerType.field.label.rows"), //$NON-NLS-1$
             null,
             containerType,
             CapacityPeer.ROW_CAPACITY.getName(),
             new IntegerNumberValidator(Messages
-                .getString("ContainerTypeEntryForm.rows.validation.msg"), false));
+                .getString("ContainerTypeEntryForm.rows.validation.msg"), false)); //$NON-NLS-1$
 
         createBoundWidgetWithLabel(
             client,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("containerType.field.label.cols"),
+            Messages.getString("containerType.field.label.cols"), //$NON-NLS-1$
             null,
             containerType,
             CapacityPeer.COL_CAPACITY.getName(),
             new IntegerNumberValidator(Messages
-                .getString("ContainerTypeEntryForm.cols.validation.msg"), false));
+                .getString("ContainerTypeEntryForm.cols.validation.msg"), false)); //$NON-NLS-1$
 
         createBoundWidgetWithLabel(
             client,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("containerType.field.label.temperature"),
+            Messages.getString("containerType.field.label.temperature"), //$NON-NLS-1$
             null,
             containerType,
             ContainerTypePeer.DEFAULT_TEMPERATURE.getName(),
             new DoubleNumberValidator(Messages
-                .getString("ContainerTypeEntryForm.temperature.validation.msg")));
+                .getString("ContainerTypeEntryForm.temperature.validation.msg"))); //$NON-NLS-1$
 
         String currentScheme = containerType.getChildLabelingSchemeName();
         labelingSchemeMap = new HashMap<Integer, String>();
@@ -214,10 +214,11 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             .getAllLabelingSchemesMap(appService).values()) {
             labelingSchemeMap.put(scheme.getId(), scheme.getName());
         }
-        labelingSchemeComboViewer = createComboViewer(client,
-            Messages.getString("containerType.field.label.scheme"),
+        labelingSchemeComboViewer = createComboViewer(
+            client,
+            Messages.getString("containerType.field.label.scheme"), //$NON-NLS-1$
             labelingSchemeMap.values(), currentScheme,
-            Messages.getString("ContainerTypeEntryForm.scheme.validation.msg"),
+            Messages.getString("ContainerTypeEntryForm.scheme.validation.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -227,18 +228,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
                     } catch (Exception e) {
                         BiobankPlugin.openAsyncError(
                             Messages
-                                .getString("ContainerTypeEntryForm.scheme.error.msg"),
+                                .getString("ContainerTypeEntryForm.scheme.error.msg"), //$NON-NLS-1$
                             e);
                     }
                 }
             });
 
-        activityStatusComboViewer = createComboViewer(client,
-            Messages.getString("label.activity"),
+        activityStatusComboViewer = createComboViewer(
+            client,
+            Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             containerType.getActivityStatus(),
             Messages
-                .getString("ContainerTypeEntryForm.activity.validation.msg"),
+                .getString("ContainerTypeEntryForm.activity.validation.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -248,19 +250,19 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, containerType,
+            Messages.getString("label.comments"), null, containerType, //$NON-NLS-1$
             ContainerTypePeer.COMMENT.getName(), null);
 
     }
 
     private void createContainsSection() throws Exception {
         Composite client = createSectionWithClient(Messages
-            .getString("ContainerTypeEntryForm.contents.title"));
+            .getString("ContainerTypeEntryForm.contents.title")); //$NON-NLS-1$
         hasContainersRadio = toolkit.createButton(client, Messages
-            .getString("ContainerTypeEntryForm.contents.button.container"),
+            .getString("ContainerTypeEntryForm.contents.button.container"), //$NON-NLS-1$
             SWT.RADIO);
         hasSpecimensRadio = toolkit.createButton(client, Messages
-            .getString("ContainerTypeEntryForm.contents.button.specimen"),
+            .getString("ContainerTypeEntryForm.contents.button.specimen"), //$NON-NLS-1$
             SWT.RADIO);
         hasContainersRadio.addSelectionListener(new SelectionAdapter() {
             @Override
@@ -302,9 +304,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             parent,
             SWT.NONE,
             Messages
-                .getString("ContainerTypeEntryForm.contents.specimen.selected"),
+                .getString("ContainerTypeEntryForm.contents.specimen.available"), //$NON-NLS-1$
             Messages
-                .getString("ContainerTypeEntryForm.contents.specimen.available"),
+                .getString("ContainerTypeEntryForm.contents.specimen.selected"), //$NON-NLS-1$
             100);
         specimensMultiSelect.adaptToToolkit(toolkit, true);
         specimensMultiSelect.addSelectionChangedListener(multiSelectListener);
@@ -339,9 +341,9 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             parent,
             SWT.NONE,
             Messages
-                .getString("ContainerTypeEntryForm.contents.subcontainer.selected"),
+                .getString("ContainerTypeEntryForm.contents.subcontainer.available"), //$NON-NLS-1$
             Messages
-                .getString("ContainerTypeEntryForm.contents.subcontainer.available"),
+                .getString("ContainerTypeEntryForm.contents.subcontainer.selected"), //$NON-NLS-1$
             100);
         childContainerTypesMultiSelect.adaptToToolkit(toolkit, true);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL);
@@ -414,12 +416,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             if (addedIds.size() != addedSpecimenTypes.size()) {
                 throw new BiobankCheckException(
                     Messages
-                        .getString("ContainerTypeEntryForm.save.error.msg.specimen.added"));
+                        .getString("ContainerTypeEntryForm.save.error.msg.specimen.added")); //$NON-NLS-1$
             }
             if (removedIds.size() != removedSpecimenTypes.size()) {
                 throw new BiobankCheckException(
                     Messages
-                        .getString("ContainerTypeEntryForm.save.error.msg.specimen.removed"));
+                        .getString("ContainerTypeEntryForm.save.error.msg.specimen.removed")); //$NON-NLS-1$
             }
             containerType.addToSpecimenTypeCollection(addedSpecimenTypes);
             containerType
@@ -453,12 +455,12 @@ public class ContainerTypeEntryForm extends BiobankEntryForm {
             if (addedTypesIds.size() != addedContainerTypes.size()) {
                 throw new BiobankCheckException(
                     Messages
-                        .getString("ContainerTypeEntryForm.save.error.msg.subcontainer.added"));
+                        .getString("ContainerTypeEntryForm.save.error.msg.subcontainer.added")); //$NON-NLS-1$
             }
             if (removedTypesIds.size() != removedContainerTypes.size()) {
                 throw new BiobankCheckException(
                     Messages
-                        .getString("ContainerTypeEntryForm.save.error.msg.subcontainer.removed"));
+                        .getString("ContainerTypeEntryForm.save.error.msg.subcontainer.removed")); //$NON-NLS-1$
             }
             containerType
                 .addToChildContainerTypeCollection(addedContainerTypes);

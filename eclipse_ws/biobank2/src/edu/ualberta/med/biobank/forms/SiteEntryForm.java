@@ -32,12 +32,12 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SiteEntryForm.class.getName());
 
-    public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm";
+    public static final String ID = "edu.ualberta.med.biobank.forms.SiteEntryForm"; //$NON-NLS-1$
 
     private static final String MSG_NEW_SITE_OK = Messages
-        .getString("SiteEntryForm.creation.msg");
+        .getString("SiteEntryForm.creation.msg"); //$NON-NLS-1$
     private static final String MSG_SITE_OK = Messages
-        .getString("SiteEntryForm.edition.msg");
+        .getString("SiteEntryForm.edition.msg"); //$NON-NLS-1$
 
     private SiteAdapter siteAdapter;
 
@@ -59,7 +59,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
     @Override
     public void init() throws Exception {
         Assert.isTrue((adapter instanceof SiteAdapter),
-            "Invalid editor input: object of type "
+            "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
@@ -67,16 +67,16 @@ public class SiteEntryForm extends AddressEntryFormCommon {
         try {
             site.reload();
         } catch (Exception e) {
-            logger.error("Can't reload site", e);
+            logger.error("Can't reload site", e); //$NON-NLS-1$
         }
 
         String tabName;
         if (site.isNew()) {
-            tabName = Messages.getString("SiteEntryForm.title.new");
+            tabName = Messages.getString("SiteEntryForm.title.new"); //$NON-NLS-1$
             site.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
         } else {
-            tabName = Messages.getString("SiteEntryForm.title.edit",
+            tabName = Messages.getString("SiteEntryForm.title.edit", //$NON-NLS-1$
                 site.getNameShort());
         }
         setPartName(tabName);
@@ -84,7 +84,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     @Override
     protected void createFormContent() throws ApplicationException {
-        form.setText(Messages.getString("SiteEntryForm.main.title"));
+        form.setText(Messages.getString("SiteEntryForm.main.title")); //$NON-NLS-1$
         page.setLayout(new GridLayout(1, false));
         createSiteSection();
         createAddressArea(site);
@@ -97,7 +97,7 @@ public class SiteEntryForm extends AddressEntryFormCommon {
 
     private void createSiteSection() throws ApplicationException {
         toolkit.createLabel(page,
-            Messages.getString("SiteEntryForm.main.description"), SWT.LEFT);
+            Messages.getString("SiteEntryForm.main.description"), SWT.LEFT); //$NON-NLS-1$
 
         Composite client = toolkit.createComposite(page);
         GridLayout layout = new GridLayout(2, false);
@@ -110,29 +110,29 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             client,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("label.name"),
+            Messages.getString("label.name"), //$NON-NLS-1$
             null,
             site,
             SitePeer.NAME.getName(),
             new NonEmptyStringValidator(Messages
-                .getString("SiteEntryForm.field.name.validation.msg"))));
+                .getString("SiteEntryForm.field.name.validation.msg")))); //$NON-NLS-1$
 
         createBoundWidgetWithLabel(
             client,
             BiobankText.class,
             SWT.NONE,
-            Messages.getString("label.nameShort"),
+            Messages.getString("label.nameShort"), //$NON-NLS-1$
             null,
             site,
             SitePeer.NAME_SHORT.getName(),
             new NonEmptyStringValidator(Messages
-                .getString("SiteEntryForm.field.nameShort.validation.msg")));
+                .getString("SiteEntryForm.field.nameShort.validation.msg"))); //$NON-NLS-1$
 
         activityStatusComboViewer = createComboViewer(client,
-            Messages.getString("label.activity"),
+            Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             site.getActivityStatus(),
-            Messages.getString("SiteEntryForm.field.activity.validation.msg"),
+            Messages.getString("SiteEntryForm.field.activity.validation.msg"), //$NON-NLS-1$
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -141,15 +141,15 @@ public class SiteEntryForm extends AddressEntryFormCommon {
             });
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
-            Messages.getString("label.comments"), null, site,
+            Messages.getString("label.comments"), null, site, //$NON-NLS-1$
             SitePeer.COMMENT.getName(), null);
     }
 
     private void createStudySection() {
         Section section = createSection(Messages
-            .getString("SiteEntryForm.studies.title"));
+            .getString("SiteEntryForm.studies.title")); //$NON-NLS-1$
         addSectionToolbar(section,
-            Messages.getString("SiteEntryForm.studies.add"),
+            Messages.getString("SiteEntryForm.studies.add"), //$NON-NLS-1$
             new SelectionAdapter() {
                 @Override
                 public void widgetSelected(SelectionEvent e) {

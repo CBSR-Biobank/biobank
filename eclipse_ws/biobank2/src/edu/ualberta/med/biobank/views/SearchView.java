@@ -31,7 +31,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.utils.SearchType;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 public class SearchView extends ViewPart {
 
@@ -42,13 +41,10 @@ public class SearchView extends ViewPart {
 
     private Button searchButton;
 
-    private WidgetCreator widgetCreator;
-
     protected static boolean loggedIn;
 
     @Override
     public void createPartControl(Composite parent) {
-        widgetCreator = new WidgetCreator(null);
         parent.setLayout(new GridLayout(2, false));
 
         IWorkbenchWindow window = PlatformUI.getWorkbench()

@@ -611,6 +611,7 @@ public class ScanLinkEntryForm extends AbstractPalletSpecimenAdminForm {
                 aliquotedSpecimen.setParentSpecimen(sourceSpecimen);
                 aliquotedSpecimen.setCollectionEvent(sourceSpecimen
                     .getCollectionEvent());
+                aliquotedSpecimen.setQuantityFromType();
                 sourceSpecimen.addToChildSpecimenCollection(Arrays
                     .asList(aliquotedSpecimen));
                 modifiedSources.add(sourceSpecimen);

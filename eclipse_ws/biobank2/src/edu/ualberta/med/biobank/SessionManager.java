@@ -7,7 +7,10 @@ import java.util.Map;
 
 import org.eclipse.core.runtime.Assert;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.services.ISourceProviderService;
 
@@ -15,9 +18,9 @@ import edu.ualberta.med.biobank.client.util.ServiceConnection;
 import edu.ualberta.med.biobank.common.security.Privilege;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.dialogs.ChangePasswordDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
+import edu.ualberta.med.biobank.rcp.perspective.ProcessingPerspective;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.sourceproviders.DebugState;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
@@ -53,10 +56,15 @@ public class SessionManager {
 
     private String currentAdministrationViewId;
 
+    private boolean superAdminMode = false;
+
+    private Map<String, Boolean> perspectivesUpdateDone;
+
     private SessionManager() {
         super();
         rootNode = new RootNode();
         possibleViewMap = new HashMap<String, AbstractViewWithAdapterTree>();
+        initPerspectivesUpdateDone();
     }
 
     public static SessionManager getInstance() {
@@ -72,10 +80,11 @@ public class SessionManager {
     }
 
     public void addSession(final BiobankApplicationService appService,
-        String serverName, User user) {
+        String serverName, User user, boolean superAdminMode) {
         logger.debug("addSession: " + serverName + ", user/" + user.getLogin());
         sessionAdapter = new SessionAdapter(rootNode, appService, 0,
             serverName, user);
+        this.superAdminMode = superAdminMode;
         rootNode.addChild(sessionAdapter);
 
         updateMenus();
@@ -91,6 +100,11 @@ public class SessionManager {
             .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
         BindingContextHelper
             .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
+
+        IWorkbench workbench = BiobankPlugin.getDefault().getWorkbench();
+        IWorkbenchPage page = workbench.getActiveWorkbenchWindow()
+            .getActivePage();
+        updateVisibility(page);
     }
 
     public void deleteSession() throws Exception {
@@ -103,6 +117,15 @@ public class SessionManager {
             .activateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_OUT);
         BindingContextHelper
             .deactivateContextInWorkbench(BIOBANK2_CONTEXT_LOGGED_IN);
+
+        initPerspectivesUpdateDone();
+    }
+
+    private void initPerspectivesUpdateDone() {
+        if (perspectivesUpdateDone == null)
+            perspectivesUpdateDone = new HashMap<String, Boolean>();
+        perspectivesUpdateDone.clear();
+        perspectivesUpdateDone.put(ProcessingPerspective.ID, false);
     }
 
     public void updateSession() {
@@ -121,7 +144,7 @@ public class SessionManager {
             .getSourceProvider(SessionState.LOGIN_STATE_SOURCE_NAME);
         sessionSourceProvider.setLoggedInState(sessionAdapter != null);
         sessionSourceProvider.setWebAdmin(sessionAdapter != null
-            && sessionAdapter.getUser().isWebsiteAdministrator());
+            && sessionAdapter.getUser().isSuperAdministrator());
         sessionSourceProvider.setHasWorkingCenter(sessionAdapter != null
             && sessionAdapter.getUser().getCurrentWorkingCenter() != null);
 
@@ -151,7 +174,7 @@ public class SessionManager {
 
     public static void refreshTreeNode(final AdapterBase node) {
         final AbstractViewWithAdapterTree view = getCurrentAdapterViewWithTree();
-        if (view != null) {
+        if (view != null && !view.getTreeViewer().getControl().isDisposed()) {
             view.getTreeViewer().refresh(node, true);
         }
     }
@@ -225,20 +248,12 @@ public class SessionManager {
         return getInstance().getSession().getServerName();
     }
 
-    /**
-     * Site specific only if currentSite != null
-     */
-    public static boolean canCreate(Class<?> clazz, SiteWrapper currentSite) {
-        return getUser().hasPrivilegeOnObject(Privilege.CREATE,
-            currentSite == null ? null : currentSite.getId(), clazz, null);
+    public static boolean canCreate(Class<?> clazz) {
+        return getUser().hasPrivilegeOnObject(Privilege.CREATE, clazz);
     }
 
-    /**
-     * Site specific only if currentSite != null
-     */
-    public static boolean canDelete(Class<?> clazz, SiteWrapper currentSite) {
-        return getUser().hasPrivilegeOnObject(Privilege.DELETE,
-            currentSite == null ? null : currentSite.getId(), clazz, null);
+    public static boolean canDelete(Class<?> clazz) {
+        return getUser().hasPrivilegeOnObject(Privilege.DELETE, clazz);
     }
 
     public static boolean canDelete(ModelWrapper<?> wrapper) {
@@ -246,16 +261,11 @@ public class SessionManager {
     }
 
     public static boolean canView(Class<?> clazz) {
-        return getUser()
-            .hasPrivilegeOnObject(Privilege.READ, null, clazz, null);
+        return getUser().hasPrivilegeOnObject(Privilege.READ, clazz);
     }
 
-    /**
-     * Site specific only if currentSite != null
-     */
-    public static boolean canUpdate(Class<?> clazz, SiteWrapper currentSite) {
-        return getUser().hasPrivilegeOnObject(Privilege.UPDATE,
-            currentSite == null ? null : currentSite.getId(), clazz, null);
+    public static boolean canUpdate(Class<?> clazz) {
+        return getUser().hasPrivilegeOnObject(Privilege.UPDATE, clazz);
     }
 
     public boolean isConnected() {
@@ -311,5 +321,27 @@ public class SessionManager {
 
     public static void setCurrentAdministrationViewId(String id) {
         getInstance().currentAdministrationViewId = id;
+    }
+
+    public static boolean isSuperAdminMode() {
+        return getInstance().superAdminMode;
+    }
+
+    public static void updateVisibility(IWorkbenchPage page) {
+        try {
+            SessionManager sm = getInstance();
+            if (sm.isConnected()) {
+                String perspectiveId = page.getPerspective().getId();
+                Boolean done = sm.perspectivesUpdateDone.get(perspectiveId);
+                if (done != null && !done) {
+                    // will check if this is the right perspective
+                    ProcessingPerspective.updateVisibility(getUser(), page);
+                    sm.perspectivesUpdateDone.put(perspectiveId, true);
+                }
+            }
+        } catch (PartInitException e) {
+            BiobankPlugin.openAsyncError("Error displaying available actions",
+                e);
+        }
     }
 }
