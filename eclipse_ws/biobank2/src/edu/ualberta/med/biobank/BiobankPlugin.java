@@ -146,6 +146,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
     public static final String IMG_HOURGLASS = "hourglass";
     public static final String IMG_LOGGING = "logging";
     public static final String IMG_PROCESSING = "processingEvent";
+    public static final String IMG_SAVE_AS_NEW = "saveAsNew";
 
     //
     // ContainerTypeAdapter and Container missing on purpose.
@@ -334,6 +335,7 @@ public class BiobankPlugin extends AbstractUIPlugin {
         registerImage(registry, IMG_HOURGLASS, "hourglass.png");
         registerImage(registry, IMG_LOGGING, "table_row_delete.png");
         registerImage(registry, IMG_PROCESSING, "processingEvent.png");
+        registerImage(registry, IMG_SAVE_AS_NEW, "application_form_add.png");
     }
 
     private void registerImage(ImageRegistry registry, String key,
