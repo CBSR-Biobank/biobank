@@ -79,8 +79,8 @@ public class BiobankSecurityUtil {
         }
     }
 
-    public static List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups()
-        throws ApplicationException {
+    public static List<edu.ualberta.med.biobank.common.security.Group> getSecurityGroups(
+        boolean includeSuperAdmin) throws ApplicationException {
         if (isSuperAdministrator()) {
             try {
                 UserProvisioningManager upm = SecurityServiceProvider
@@ -89,8 +89,9 @@ public class BiobankSecurityUtil {
                 for (Object object : upm.getObjects(new GroupSearchCriteria(
                     new Group()))) {
                     Group g = (Group) object;
-                    if (!edu.ualberta.med.biobank.common.security.Group.GROUP_SUPER_ADMIN_ID
-                        .equals(g.getGroupId()))
+                    if (includeSuperAdmin
+                        || !edu.ualberta.med.biobank.common.security.Group.GROUP_SUPER_ADMIN_ID
+                            .equals(g.getGroupId()))
                         list.add(createGroup(upm, (Group) object));
                 }
                 return list;

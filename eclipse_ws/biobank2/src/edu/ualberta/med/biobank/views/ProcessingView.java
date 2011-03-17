@@ -144,9 +144,8 @@ public class ProcessingView extends AbstractAdministrationView {
 
     @Override
     protected void internalSearch() {
-        String text = treeText.getText().trim();
         try {
-            List<? extends ModelWrapper<?>> searchedObject = search(text);
+            List<? extends ModelWrapper<?>> searchedObject = search();
             if (searchedObject.size() == 0) {
                 String msg = "No Processing Events found";
                 if (radioWorksheet.getSelection()) {
@@ -165,11 +164,16 @@ public class ProcessingView extends AbstractAdministrationView {
         }
     }
 
-    protected List<? extends ModelWrapper<?>> search(String text)
-        throws Exception {
-        List<ProcessingEventWrapper> processingEvents = ProcessingEventWrapper
-            .getProcessingEventsWithWorksheet(SessionManager.getAppService(),
-                text);
+    protected List<? extends ModelWrapper<?>> search() throws Exception {
+        List<ProcessingEventWrapper> processingEvents;
+        if (radioWorksheet.getSelection()) {
+            processingEvents = ProcessingEventWrapper
+                .getProcessingEventsWithWorksheet(
+                    SessionManager.getAppService(), treeText.getText().trim());
+        } else
+            processingEvents = ProcessingEventWrapper
+                .getProcessingEventsWithDate(SessionManager.getAppService(),
+                    dateWidget.getDate());
         return processingEvents;
     }
 

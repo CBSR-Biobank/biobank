@@ -129,6 +129,7 @@ public class ShipmentAdapter extends AdapterBase {
                 @Override
                 public void run() {
                     try {
+                        getParent().removeChild(ShipmentAdapter.this);
                         if (modelObject != null) {
                             modelObject.delete();
                             notifyListeners();

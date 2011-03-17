@@ -43,7 +43,7 @@ public class OriginInfoSearchedNode extends AbstractSearchedNode {
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
-        return findChildFromClass(searchedObject, searchedObject.getClass());
+        return searchChildren(searchedObject);
     }
 
     @Override
