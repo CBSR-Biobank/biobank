@@ -70,8 +70,8 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsedBySamples()) {
-            throw new BiobankCheckException("Unable to delete sample type "
-                + getName() + ". Aliquots of this type exists in storage."
+            throw new BiobankCheckException("Unable to delete specimen type "
+                + getName() + ". Specimens of this type exists in storage."
                 + " Remove all instances before deleting this type.");
         }
     }

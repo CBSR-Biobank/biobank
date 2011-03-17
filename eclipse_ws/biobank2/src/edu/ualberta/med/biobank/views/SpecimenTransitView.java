@@ -38,8 +38,6 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     private Button radioWaybill;
 
-    private Button radioDateSent;
-
     private Composite dateComposite;
 
     private DateTimeWidget dateWidget;
