@@ -402,7 +402,6 @@ ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
 
 RENAME TABLE global_pv_attr TO global_event_attr;
 RENAME TABLE study_pv_attr TO study_event_attr;
-RENAME TABLE pv_attr TO event_attr;
 RENAME TABLE pv_attr_type TO event_attr_type;
 
 ALTER TABLE global_event_attr
@@ -421,18 +420,30 @@ ALTER TABLE study_event_attr
       ADD INDEX FK3EACD8ECC449A4 (ACTIVITY_STATUS_ID),
       ADD INDEX FK3EACD8EC5B770B31 (EVENT_ATTR_TYPE_ID);
 
-ALTER TABLE event_attr
-      CHANGE COLUMN STUDY_PV_ATTR_ID STUDY_EVENT_ATTR_ID INT(11) NOT NULL,
-      ADD COLUMN COLLECTION_EVENT_ID int(11) COMMENT '' NOT NULL,
-      DROP INDEX FK200CD48ABFED96DB,
-      DROP INDEX FK200CD48AE5099AFA,
-      ADD INDEX FK59508C96280272F2 (COLLECTION_EVENT_ID),
-      ADD INDEX FK59508C96A9CFCFDB (STUDY_EVENT_ATTR_ID);
+-- need to remove duplicate rows in pv_attr
 
-update event_attr as ea set collection_event_id=(select id
-from collection_event as ce where ce.pv_id=ea.patient_visit_id);
+CREATE TABLE event_attr (
+  ID int(11) NOT NULL auto_increment,
+  VALUE varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  COLLECTION_EVENT_ID int(11) NOT NULL,
+  STUDY_EVENT_ATTR_ID int(11) NOT NULL,
+  PRIMARY KEY (ID),
+  KEY FK59508C96280272F2 (COLLECTION_EVENT_ID),
+  KEY FK59508C96A9CFCFDB (STUDY_EVENT_ATTR_ID),
+  CONSTRAINT FK59508C96A9CFCFDB FOREIGN KEY (STUDY_EVENT_ATTR_ID) REFERENCES study_event_attr (ID),
+  CONSTRAINT FK59508C96280272F2 FOREIGN KEY (COLLECTION_EVENT_ID) REFERENCES collection_event (ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
-alter table event_attr drop column patient_visit_id;
+insert into event_attr (value,collection_event_id,study_event_attr_id)
+       select pa.value,ce.id,sea.id
+       from pv_attr pa
+       join (select patient_visit_id,max(id) max_id
+            from pv_attr
+            group by patient_visit_id,study_pv_attr_id) a on a.max_id=pa.id
+       join collection_event ce on ce.pv_id=pa.patient_visit_id
+       join study_event_attr sea on sea.id=pa.study_pv_attr_id;
+
+ALTER TABLE event_attr MODIFY COLUMN ID INT(11) NOT NULL;
 
 /*****************************************************
  * processing events
@@ -451,21 +462,26 @@ CREATE TABLE processing_event (
   KEY FK327B1E4E92FAA705 (CENTER_ID)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
 
--- this insert allows the same worksheet number to be used in more than one
--- processing event
+-- add a processing event for each patient visit
 
-insert into processing_event (created_at,worksheet,comment,activity_status_id,center_id,pv_id)
-       select pv.date_processed,event_attr.value as worksheet,pv.comment,
+quit;
+
+insert into processing_event (created_at,comment,activity_status_id,center_id,pv_id)
+       select pv.date_processed,pv.comment,
        (select id from activity_status where name='Active'),center.id,pv.id
        from patient_visit as pv
        join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
        join abstract_shipment as aship on aship.id=csp.CLINIC_SHIPMENT_ID
        join clinic on clinic.id=aship.clinic_id
-       join center on center.name=clinic.name
-       join event_attr on event_attr.collection_event_id=pv.id
-       join study_event_attr on study_event_attr.id=event_attr.study_event_attr_id
-       join event_attr_type on event_attr_type.id=study_event_attr.EVENT_ATTR_TYPE_ID
-       where label='Worksheet';
+       join center on center.name=clinic.name;
+
+update processing_event pe,collection_event ce,patient_visit pv,event_attr,study_event_attr
+       set worksheet=event_attr.value
+       where pe.pv_id=pv.id
+       and event_attr.collection_event_id=ce.id
+       and ce.pv_id=pv.id
+       and study_event_attr.id=event_attr.study_event_attr_id
+       and label='Worksheet';
 
 ALTER TABLE processing_event MODIFY COLUMN ID INT(11) NOT NULL;
 
@@ -777,7 +793,6 @@ CREATE TABLE report (
 
 LOCK TABLES report WRITE;
 /*!40000 ALTER TABLE report DISABLE KEYS */;
-INSERT INTO report VALUES (7,'05 - Aliquots per Study',NULL,15,NULL,'',1),(8,'03 - Aliquots per Study per Clinic',NULL,15,NULL,'',1),(6,'01 - Aliquots',NULL,15,'\0','\0',1),(9,'04A - Aliquots per Study per Clinic by Year',NULL,15,'\0','',1),(16,'11 - New Patient Visits per Study by Date',NULL,15,NULL,'',4),(15,'14 - Patients per Study by Date',NULL,15,NULL,'',3),(14,'12 - New Patients per Study per Clinic by Date',NULL,15,NULL,'',3),(13,'07 - Aliquots by Container',NULL,15,NULL,NULL,1),(17,'13 - Patient Visits per Study by Date',NULL,15,NULL,'',4),(18,'18A - Invoicing Report',NULL,15,NULL,'',1),(19,'18B - Invoicing Report','',15,NULL,'',4),(20,'19 - Sample Type Totals by Patient Visit and Study',NULL,15,NULL,'',1);
 /*!40000 ALTER TABLE report ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -806,7 +821,6 @@ CREATE TABLE report_filter (
 
 LOCK TABLES report_filter WRITE;
 /*!40000 ALTER TABLE report_filter DISABLE KEYS */;
-INSERT INTO report_filter VALUES (184,0,4,12,6),(185,1,1,2,6),(189,0,101,7,13),(190,1,3,12,13),(191,2,101,13,13),(193,0,4,12,8),(194,1,1,2,8),(195,0,4,12,9),(196,1,1,2,9),(197,0,4,12,7),(198,1,1,2,7),(199,0,NULL,206,14),(200,1,1,203,14),(201,0,1,203,15),(203,0,1,301,17),(204,0,4,12,18),(205,1,1,2,18),(208,0,4,12,20),(209,1,101,14,20),(210,0,1,301,16),(211,1,NULL,311,16),(212,0,1,301,19);
 /*!40000 ALTER TABLE report_filter ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -834,7 +848,6 @@ CREATE TABLE report_filter_value (
 
 LOCK TABLES report_filter_value WRITE;
 /*!40000 ALTER TABLE report_filter_value DISABLE KEYS */;
-INSERT INTO report_filter_value VALUES (138,0,'2799',NULL,208),(133,0,'2799',NULL,184),(134,0,'2799',NULL,193),(135,0,'2799',NULL,195),(136,0,'2799',NULL,197),(137,0,'2799',NULL,204),(140,0,'%',NULL,209);
 /*!40000 ALTER TABLE report_filter_value ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -864,8 +877,173 @@ CREATE TABLE report_column (
 
 LOCK TABLES report_column WRITE;
 /*!40000 ALTER TABLE report_column DISABLE KEYS */;
-INSERT INTO report_column VALUES (22,2,11,NULL,6),(21,3,2,NULL,6),(20,4,8,NULL,6),(23,1,20,NULL,6),(24,0,1,NULL,6),(29,1,20,NULL,9),(30,0,15,NULL,9),(27,0,15,NULL,8),(28,2,2,1,9),(25,0,15,NULL,7),(26,1,20,NULL,8),(51,1,309,NULL,16),(53,2,301,3,17),(52,0,310,NULL,16),(50,2,301,3,16),(49,0,202,NULL,15),(48,1,203,3,15),(45,2,203,3,14),(47,0,202,NULL,14),(46,1,205,NULL,14),(40,4,8,NULL,13),(41,3,11,NULL,13),(42,2,1,NULL,13),(43,1,7,NULL,13),(44,0,13,NULL,13),(54,1,309,NULL,17),(55,0,310,NULL,17),(56,2,8,NULL,18),(57,1,20,NULL,18),(58,0,15,NULL,18),(59,1,309,NULL,19),(60,0,310,NULL,19),(63,3,8,NULL,20),(64,0,11,NULL,20),(65,2,10,NULL,20),(66,1,9,NULL,20);
 /*!40000 ALTER TABLE report_column ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table entity
+--
+
+DROP TABLE IF EXISTS entity;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE entity (
+  ID int(11) NOT NULL,
+  CLASS_NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  PRIMARY KEY (ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table entity
+--
+
+LOCK TABLES entity WRITE;
+/*!40000 ALTER TABLE entity DISABLE KEYS */;
+INSERT INTO entity VALUES (1,'edu.ualberta.med.biobank.model.Specimen','Specimen'),
+(2,'edu.ualberta.med.biobank.model.Container','Container'),
+(3,'edu.ualberta.med.biobank.model.Patient','Patient'),
+(4,'edu.ualberta.med.biobank.model.CollectionEvent','Collection Event'),
+(5,'edu.ualberta.med.biobank.model.ProcessingEvent','Processing Event');
+/*!40000 ALTER TABLE entity ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table property_modifier
+--
+
+DROP TABLE IF EXISTS property_modifier;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE property_modifier (
+  ID int(11) NOT NULL,
+  NAME text COLLATE latin1_general_cs,
+  PROPERTY_MODIFIER text COLLATE latin1_general_cs,
+  PROPERTY_TYPE_ID int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  KEY FK5DF9160157C0C3B0 (PROPERTY_TYPE_ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table property_modifier
+--
+
+LOCK TABLES property_modifier WRITE;
+/*!40000 ALTER TABLE property_modifier DISABLE KEYS */;
+INSERT INTO property_modifier VALUES (1,'Year','YEAR({value})',3),(2,'Year, Quarter','CONCAT(YEAR({value}), CONCAT(\'-\', QUARTER({value})))',3),(3,'Year, Month','CONCAT(YEAR({value}), CONCAT(\'-\', MONTH({value})))',3),(4,'Year, Week','CONCAT(YEAR({value}), CONCAT(\'-\', WEEK({value})))',3);
+/*!40000 ALTER TABLE property_modifier ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table property_type
+--
+
+DROP TABLE IF EXISTS property_type;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE property_type (
+  ID int(11) NOT NULL,
+  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  PRIMARY KEY (ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table property_type
+--
+
+LOCK TABLES property_type WRITE;
+/*!40000 ALTER TABLE property_type DISABLE KEYS */;
+INSERT INTO property_type VALUES (1,'String'),(2,'Number'),(3,'Date'),(4,'Boolean');
+/*!40000 ALTER TABLE property_type ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table entity_property
+--
+
+DROP TABLE IF EXISTS entity_property;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE entity_property (
+  ID int(11) NOT NULL,
+  PROPERTY varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
+  PROPERTY_TYPE_ID int(11) NOT NULL,
+  ENTITY_ID int(11) DEFAULT NULL,
+  PRIMARY KEY (ID),
+  KEY FK3FC956B191CFD445 (ENTITY_ID),
+  KEY FK3FC956B157C0C3B0 (PROPERTY_TYPE_ID)
+) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table entity_property
+--
+
+LOCK TABLES entity_property WRITE;
+/*!40000 ALTER TABLE entity_property DISABLE KEYS */;
+INSERT INTO entity_property VALUES (1,'inventoryId',1,1),
+(2,'createdAt',3,1),
+(3,'comment',1,1),
+(4,'quantity',2,1),
+(5,'activityStatus.name',1,1),
+(6,'specimenPosition.container.containerPath.topContainer.id',2,1),
+(7,'specimenPosition.container.productBarcode',1,1),
+(8,'specimenPosition.container.label',1,1),
+(9,'specimenType.nameShort',1,1),
+(10,'parentSpecimen.processingEvent.createdAt',3,1),
+(12,'collectionEvent.patient.pnumber',1,1),
+(13,'specimenPosition.container.containerPath.topContainer.containerType.nameShort',1,1),
+(14,'specimenPosition.positionString',1,1),
+(15,'currentCenter.nameShort',1,1),
+(16,'collectionEvent.patient.study.nameShort',1,1),
+(17,'originInfo.shipmentInfo.receivedAt',3,1),
+(18,'originInfo.shipmentInfo.waybill',1,1),
+(19,'originInfo.shipmentInfo.sentAt',3,1),
+(20,'originInfo.shipmentInfo.boxNumber',1,1),
+(21,'originInfo.center.nameShort',1,1),
+(22,'dispatchSpecimenCollection.dispatch.senderCenter.nameShort',1,1),
+(23,'dispatchSpecimenCollection.dispatch.receiverCenter.nameShort',1,1),
+(24,'dispatchSpecimenCollection.dispatch.shipmentInfo.receivedAt',3,1),
+(25,'dispatchSpecimenCollection.dispatch.shipmentInfo.sentAt',3,1),
+(26,'dispatchSpecimenCollection.dispatch.shipmentInfo.waybill',1,1),
+(27,'dispatchSpecimenCollection.dispatch.shipmentInfo.boxNumber',1,1),
+
+(101,'productBarcode',1,2),
+(102,'comment',1,2),
+(103,'label',1,2),
+(104,'temperature',2,2),
+(105,'containerPath.topContainer.id',2,2),
+(106,'specimenPositionCollection.specimen.createdAt',3,2),
+(107,'containerType.nameShort',1,2),
+(108,'containerType.topLevel',4,2),
+(109,'site.nameShort',1,2),
+(110,'containerPath.topContainer.containerType.nameShort',1,2),
+
+(201,'pnumber',1,3),
+(202,'study.nameShort',1,3),
+(203,'collectionEventCollection.allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,3),
+(204,'collectionEventCollection.allSpecimenCollection.createdAt',3,3),
+(205,'collectionEventCollection.allSpecimenCollection.originInfo.center.nameShort',1,3),
+(206,'collectionEventCollection.allSpecimenCollection.inventoryId',1,3),
+
+(301,'allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,4),
+(302,'allSpecimenCollection.createdAt',3,4),
+(303,'comment',1,4),
+(304,'patient.pnumber',1,4),
+(305,'allSpecimenCollection.originInfo.center.nameShort',1,4),
+(306,'patient.study.nameShort',1,4),
+
+(401,'worksheet',1,5),
+(402,'createdAt',3,5),
+(403,'comment',1,5),
+(404,'center.nameShort',1,5),
+(405,'activityStatus.name',1,5),
+(406,'specimenCollection.inventoryId',1,5),
+(407,'specimenCollection.createdAt',3,5);
+/*!40000 ALTER TABLE entity_property ENABLE KEYS */;
 UNLOCK TABLES;
 
 --
@@ -1032,171 +1210,8 @@ INSERT INTO entity_column VALUES (1,'Inventory Id',1),
 /*!40000 ALTER TABLE entity_column ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table entity_property
---
-
-DROP TABLE IF EXISTS entity_property;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE entity_property (
-  ID int(11) NOT NULL,
-  PROPERTY varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  PROPERTY_TYPE_ID int(11) NOT NULL,
-  ENTITY_ID int(11) DEFAULT NULL,
-  PRIMARY KEY (ID),
-  KEY FK3FC956B191CFD445 (ENTITY_ID),
-  KEY FK3FC956B157C0C3B0 (PROPERTY_TYPE_ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table entity_property
---
-
-LOCK TABLES entity_property WRITE;
-/*!40000 ALTER TABLE entity_property DISABLE KEYS */;
-INSERT INTO entity_property VALUES (1,'inventoryId',1,1),
-(2,'createdAt',3,1),
-(3,'comment',1,1),
-(4,'quantity',2,1),
-(5,'activityStatus.name',1,1),
-(6,'specimenPosition.container.containerPath.topContainer.id',2,1),
-(7,'specimenPosition.container.productBarcode',1,1),
-(8,'specimenPosition.container.label',1,1),
-(9,'specimenType.nameShort',1,1),
-(10,'parentSpecimen.processingEvent.createdAt',3,1),
-(12,'collectionEvent.patient.pnumber',1,1),
-(13,'specimenPosition.container.containerPath.topContainer.containerType.nameShort',1,1),
-(14,'specimenPosition.positionString',1,1),
-(15,'currentCenter.nameShort',1,1),
-(16,'collectionEvent.patient.study.nameShort',1,1),
-(17,'originInfo.shipmentInfo.receivedAt',3,1),
-(18,'originInfo.shipmentInfo.waybill',1,1),
-(19,'originInfo.shipmentInfo.sentAt',3,1),
-(20,'originInfo.shipmentInfo.boxNumber',1,1),
-(21,'originInfo.center.nameShort',1,1),
-(22,'dispatchSpecimenCollection.dispatch.senderCenter.nameShort',1,1),
-(23,'dispatchSpecimenCollection.dispatch.receiverCenter.nameShort',1,1),
-(24,'dispatchSpecimenCollection.dispatch.shipmentInfo.receivedAt',3,1),
-(25,'dispatchSpecimenCollection.dispatch.shipmentInfo.sentAt',3,1),
-(26,'dispatchSpecimenCollection.dispatch.shipmentInfo.waybill',1,1),
-(27,'dispatchSpecimenCollection.dispatch.shipmentInfo.boxNumber',1,1),
-
-(101,'productBarcode',1,2),
-(102,'comment',1,2),
-(103,'label',1,2),
-(104,'temperature',2,2),
-(105,'containerPath.topContainer.id',2,2),
-(106,'specimenPositionCollection.specimen.createdAt',3,2),
-(107,'containerType.nameShort',1,2),
-(108,'containerType.topLevel',4,2),
-(109,'site.nameShort',1,2),
-(110,'containerPath.topContainer.containerType.nameShort',1,2),
-
-(201,'pnumber',1,3),
-(202,'study.nameShort',1,3),
-(203,'collectionEventCollection.allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,3),
-(204,'collectionEventCollection.allSpecimenCollection.createdAt',3,3),
-(205,'collectionEventCollection.allSpecimenCollection.originInfo.center.nameShort',1,3),
-(206,'collectionEventCollection.allSpecimenCollection.inventoryId',1,3),
-
-(301,'allSpecimenCollection.parentSpecimen.processingEvent.createdAt',3,4),
-(302,'allSpecimenCollection.createdAt',3,4),
-(303,'comment',1,4),
-(304,'patient.pnumber',1,4),
-(305,'allSpecimenCollection.originInfo.center.nameShort',1,4),
-(306,'patient.study.nameShort',1,4),
-
-(401,'worksheet',1,5),
-(402,'createdAt',3,5),
-(403,'comment',1,5),
-(404,'center.nameShort',1,5),
-(405,'activityStatus.name',1,5),
-(406,'specimenCollection.inventoryId',1,5),
-(407,'specimenCollection.createdAt',3,5);
-/*!40000 ALTER TABLE entity_property ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table property_type
---
-
-DROP TABLE IF EXISTS property_type;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE property_type (
-  ID int(11) NOT NULL,
-  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  PRIMARY KEY (ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table property_type
---
-
-LOCK TABLES property_type WRITE;
-/*!40000 ALTER TABLE property_type DISABLE KEYS */;
-INSERT INTO property_type VALUES (1,'String'),(2,'Number'),(3,'Date'),(4,'Boolean');
-/*!40000 ALTER TABLE property_type ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table property_modifier
---
-
-DROP TABLE IF EXISTS property_modifier;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE property_modifier (
-  ID int(11) NOT NULL,
-  NAME text COLLATE latin1_general_cs,
-  PROPERTY_MODIFIER text COLLATE latin1_general_cs,
-  PROPERTY_TYPE_ID int(11) DEFAULT NULL,
-  PRIMARY KEY (ID),
-  KEY FK5DF9160157C0C3B0 (PROPERTY_TYPE_ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table property_modifier
---
-
-LOCK TABLES property_modifier WRITE;
-/*!40000 ALTER TABLE property_modifier DISABLE KEYS */;
-INSERT INTO property_modifier VALUES (1,'Year','YEAR({value})',3),(2,'Year, Quarter','CONCAT(YEAR({value}), CONCAT(\'-\', QUARTER({value})))',3),(3,'Year, Month','CONCAT(YEAR({value}), CONCAT(\'-\', MONTH({value})))',3),(4,'Year, Week','CONCAT(YEAR({value}), CONCAT(\'-\', WEEK({value})))',3);
-/*!40000 ALTER TABLE property_modifier ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table entity
---
-
-DROP TABLE IF EXISTS entity;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!40101 SET character_set_client = utf8 */;
-CREATE TABLE entity (
-  ID int(11) NOT NULL,
-  CLASS_NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  NAME varchar(255) COLLATE latin1_general_cs DEFAULT NULL,
-  PRIMARY KEY (ID)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1 COLLATE=latin1_general_cs;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table entity
---
-
-LOCK TABLES entity WRITE;
-/*!40000 ALTER TABLE entity DISABLE KEYS */;
-INSERT INTO entity VALUES (1,'edu.ualberta.med.biobank.model.Specimen','Specimen'),
-(2,'edu.ualberta.med.biobank.model.Container','Container'),
-(3,'edu.ualberta.med.biobank.model.Patient','Patient'),
-(4,'edu.ualberta.med.biobank.model.CollectionEvent','Collection Event'),
-(5,'edu.ualberta.med.biobank.model.ProcessingEvent','Processing Event');
-/*!40000 ALTER TABLE entity ENABLE KEYS */;
-UNLOCK TABLES;
+-- update constraints (unique and not-null):
+-- also update ContainerType -> ContainerLabelingScheme relation replace 0..1 by 1 (so cannot be null)
 
 /*****************************************************
  * cleantup and drop tables that are no longer required
