@@ -63,11 +63,16 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
     }
 
     public void createNodes() {
-        SessionManager.getUser().getCurrentWorkingSite().reload();
-        centerNode = new DispatchSiteAdapter(rootNode, SessionManager.getUser()
-            .getCurrentWorkingSite());
-        centerNode.setParent(rootNode);
-        rootNode.addChild(centerNode);
+        // FIXME DD: I think this should be center based instead of site based.
+        // getCurrentWorkingSite() will return null if the current center is a
+        // clinic
+        if (SessionManager.getUser().getCurrentWorkingSite() != null) {
+            SessionManager.getUser().getCurrentWorkingSite().reload();
+            centerNode = new DispatchSiteAdapter(rootNode, SessionManager
+                .getUser().getCurrentWorkingSite());
+            centerNode.setParent(rootNode);
+            rootNode.addChild(centerNode);
+        }
 
         todayNode = createTodayNode();
         todayNode.setParent(rootNode);
@@ -157,10 +162,12 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     @Override
     public void reload() {
-        rootNode.removeAll();
-        createNodes();
-        for (AdapterBase adaper : rootNode.getChildren()) {
-            adaper.rebuild();
+        if (rootNode != null) {
+            rootNode.removeAll();
+            createNodes();
+            for (AdapterBase adaper : rootNode.getChildren()) {
+                adaper.rebuild();
+            }
         }
         super.reload();
     }
