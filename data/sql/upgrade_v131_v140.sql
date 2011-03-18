@@ -152,7 +152,8 @@ original_collection_event_id,specimen_type_id,parent_specimen_id,origin_info_id,
        JOIN source_vessel as sv on sv.id=pvsv.source_vessel_id
        join specimen_type on specimen_type.name=sv.name;
 
--- set the source center
+-- initialize the current center to be where they were created, dispatches are handled
+-- in the next step
 
 UPDATE specimen,patient_visit
        as pv, clinic_shipment_patient as csp,abstract_shipment as aship,
@@ -165,6 +166,18 @@ UPDATE specimen,patient_visit
        and center.name=site.name
        and pv.id=specimen.pv_id
        and aship.discriminator='ClinicShipment';
+
+-- set the current center for aliquots that have been disptached
+
+update specimen spc, aliquot aq,dispatch_shipment_aliquot dsa,abstract_shipment aship,
+       site,center
+       set current_center_id=center.id
+       where spc.inventory_id=aq.inventory_id
+       and dsa.aliquot_id=aq.id
+       and aship.id=dsa.dispatch_shipment_id
+       and site.id=aship.dispatch_receiver_id
+       and center.name=site.name
+       and aship.discriminator='DispatchShipment';
 
 -- set the aliquoted specimens to point to their parent specimen
 
@@ -569,10 +582,18 @@ ALTER TABLE abstract_position
       DROP KEY ALIQUOT_ID,
       CHANGE COLUMN row ROW INT(11) NOT NULL COMMENT '',
       CHANGE COLUMN col COL INT(11) NOT NULL COMMENT '',
-      CHANGE COLUMN ALIQUOT_ID SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
       ADD COLUMN POSITION_STRING VARCHAR(50) NULL DEFAULT NULL COMMENT '',
       ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
       ADD CONSTRAINT SPECIMEN_ID UNIQUE KEY(SPECIMEN_ID);
+
+update abstract_position ap ,aliquot aq,specimen spc
+       set ap.specimen_id=spc.id
+       where ap.aliquot_id=aq.id
+       and aq.inventory_id=spc.inventory_id;
+
+alter table abstract_position
+      drop column ALIQUOT_ID;
 
 -- update position_string values
 -- SBS Standard
@@ -1259,6 +1280,7 @@ DROP TABLE dispatch_info;
 DROP TABLE dispatch_info_site;
 DROP TABLE dispatch_shipment_aliquot;
 DROP TABLE patient_visit;
+DROP TABLE pv_attr;
 DROP TABLE pv_source_vessel;
 DROP TABLE research_group;
 DROP TABLE research_group_researcher;
