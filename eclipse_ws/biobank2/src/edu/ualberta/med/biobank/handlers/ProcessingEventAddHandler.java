@@ -6,24 +6,29 @@ import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.Assert;
 
 import edu.ualberta.med.biobank.SessionManager;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.treeview.admin.SessionAdapter;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 
-public class SiteAddHandler extends AbstractHandler {
+public class ProcessingEventAddHandler extends AbstractHandler {
 
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        sessionAdapter.addSite();
+        ProcessingEventWrapper pe = new ProcessingEventWrapper(
+            SessionManager.getAppService());
+        pe.setCenter(SessionManager.getUser().getCurrentWorkingCenter());
+        ProcessingEventAdapter node = new ProcessingEventAdapter(
+            sessionAdapter, pe);
+        node.openEntryForm();
         return null;
-
     }
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(SiteWrapper.class)
-            && SessionManager.getInstance().getSession() != null;
+        return SessionManager.canCreate(ProcessingEventWrapper.class);
     }
+
 }

@@ -31,6 +31,7 @@ public class PeerBuilder extends BaseBuilder {
     private static final Logger LOGGER = Logger.getLogger(PeerBuilder.class
         .getName());
 
+    @Override
     protected void generateClassFile(ModelClass mc) throws IOException {
 
         LOGGER.info("generating peer class for " + mc.getName());

@@ -11,7 +11,7 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.treeview.AbstractSearchedNode;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.admin.SiteAdapter;
-import edu.ualberta.med.biobank.views.ProcessingView;
+import edu.ualberta.med.biobank.views.CollectionView;
 
 public class PatientSearchedNode extends AbstractSearchedNode {
 
@@ -45,6 +45,12 @@ public class PatientSearchedNode extends AbstractSearchedNode {
 
     @Override
     protected void addNode(ModelWrapper<?> wrapper) {
-        ProcessingView.addToNode(this, wrapper);
+        CollectionView.addToNode(this, wrapper);
     }
+
+    @Override
+    public void rebuild() {
+        performExpand();
+    }
+
 }

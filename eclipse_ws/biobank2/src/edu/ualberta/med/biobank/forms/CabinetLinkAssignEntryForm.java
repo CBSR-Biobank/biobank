@@ -47,6 +47,7 @@ import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
+import edu.ualberta.med.biobank.dialogs.select.SelectParentContainerDialog;
 import edu.ualberta.med.biobank.forms.LinkFormPatientManagement.PatientTextCallback;
 import edu.ualberta.med.biobank.forms.listener.EnterKeyToNextFieldListener;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
@@ -442,6 +443,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     }
 
     protected void initContainersFromPosition() {
+        resetParentContainers();
         try {
             bin = null;
             drawer = null;
@@ -450,11 +452,11 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 .getCurrentWorkingSite();
             String fullLabel = newCabinetPositionText.getText();
             List<ContainerWrapper> foundContainers = new ArrayList<ContainerWrapper>();
-            int removeSize = 2;// FIXME we are assuming that the specimen
-                               // position will be only of size 2 !
+            int removeSize = 2; // FIXME we are assuming that the aliquot
+                                // position will be only of size 2 !
             List<String> labelsTested = new ArrayList<String>();
-            while (removeSize < 5) { // we are assuming that the bin position
-                                     // won't be bigger than 3 !
+            while (removeSize < 5) { // we are assuming that the bin
+                                     // position won't be bigger than 3 !
                 int cutIndex = fullLabel.length() - removeSize;
                 String binLabel = fullLabel.substring(0, cutIndex);
                 labelsTested.add(binLabel);
@@ -496,27 +498,33 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
                 }
             }
             if (cabinetContainers.size() == 1) {
-                bin = cabinetContainers.get(0);
-                drawer = bin.getParentContainer();
-                cabinet = drawer.getParentContainer();
+                initContainersParents(cabinetContainers.get(0));
             } else if (cabinetContainers.size() == 0) {
                 String errorMsg = Messages.getString(
                     "Cabinet.activitylog.checkParent.error.found", //$NON-NLS-1$
-                    getBinLabelMessage(labelsTested),
-                    currentSite.getNameShort());
+                    getBinLabelMessage(fullLabel, labelsTested));
                 BiobankPlugin.openError("Check position and aliquot", errorMsg); //$NON-NLS-1$
                 appendLogNLS("Cabinet.activitylog.checkParent.error", errorMsg); //$NON-NLS-1$
                 typeWidget.setEnabled(false);
                 focusControlInError(newCabinetPositionText);
                 return;
             } else {
-                BiobankPlugin.openError("Container problem",
-                    "More than one container found for "
-                        + getBinLabelMessage(labelsTested)
-                        + " --- should do something");
-                typeWidget.setEnabled(false);
-                focusControlInError(newCabinetPositionText);
-                return;
+                SelectParentContainerDialog dlg = new SelectParentContainerDialog(
+                    PlatformUI.getWorkbench().getActiveWorkbenchWindow()
+                        .getShell(), cabinetContainers);
+                dlg.open();
+                if (dlg.getSelectedContainer() == null) {
+                    StringBuffer sb = new StringBuffer();
+                    for (ContainerWrapper cont : cabinetContainers) {
+                        sb.append(cont.getFullInfoLabel());
+                    }
+                    BiobankPlugin.openError("Container problem",
+                        "More than one container found mathing the position label: "
+                            + sb.toString() + " --- should do something");
+                    typeWidget.setEnabled(false);
+                    focusControlInError(newCabinetPositionText);
+                } else
+                    initContainersParents(dlg.getSelectedContainer());
             }
         } catch (Exception ex) {
             BiobankPlugin.openError("Init container from position", ex);
@@ -524,15 +532,29 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         }
     }
 
-    private String getBinLabelMessage(List<String> labelsTested) {
-        String res = "";
+    private void initContainersParents(ContainerWrapper cabinetContainer) {
+        // only one cabinet container has been found
+        bin = cabinetContainer;
+        drawer = bin.getParentContainer();
+        cabinet = drawer.getParentContainer();
+        appendLogNLS(
+            "Cabinet.activitylog.containers.init", //$NON-NLS-1$
+            cabinet.getFullInfoLabel(), drawer.getFullInfoLabel(),
+            bin.getFullInfoLabel());
+    }
+
+    private String getBinLabelMessage(String fullLabel,
+        List<String> labelsTested) {
+        StringBuffer res = new StringBuffer();
         for (int i = 0; i < labelsTested.size(); i++) {
             if (i != 0) {
-                res += " or ";
+                res.append(", ");
             }
-            res += labelsTested.get(i);
+            String binLabel = labelsTested.get(i);
+            res.append(binLabel).append("(")
+                .append(fullLabel.replace(binLabel, "")).append(")");
         }
-        return res;
+        return res.toString();
     }
 
     protected void setSpecimenMode(AliquotMode mode) {
@@ -849,11 +871,7 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
     @Override
     public void reset() throws Exception {
         specimen.reset(); // reset internal values
-        cabinet = null;
-        drawer = null;
-        bin = null;
-        cabinetWidget.setSelection(null);
-        drawerWidget.setSelection(null);
+        resetParentContainers();
         resultShownValue.setValue(Boolean.FALSE);
         linkFormPatientManagement.reset(true);
         // the 2 following lines are needed. The validator won't update if don't
@@ -868,6 +886,14 @@ public class CabinetLinkAssignEntryForm extends AbstractSpecimenAdminForm {
         typeWidget.deselectAll();
         setDirty(false);
         setFocus();
+    }
+
+    private void resetParentContainers() {
+        cabinet = null;
+        drawer = null;
+        bin = null;
+        cabinetWidget.setSelection(null);
+        drawerWidget.setSelection(null);
     }
 
     @Override

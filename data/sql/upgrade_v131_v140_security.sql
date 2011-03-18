@@ -1,3 +1,12 @@
+UPDATE csm_group
+SET group_name='Super Administrator'
+WHERE group_name='Website Administrator';
+
+UPDATE csm_group
+SET group_desc='Super administrator of the application'
+WHERE group_name='Super Administrator';
+
+
 -- all webadministrators are now Super Administrator (renaming of web admin) and CBST Tech Level 1
 INSERT INTO csm_user_group (USER_ID, GROUP_ID) 
 select cuser.USER_ID , cgroup.GROUP_ID 

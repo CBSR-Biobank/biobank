@@ -136,7 +136,7 @@ public abstract class AbstractAdministrationView extends
         setSearchFieldsEnablement(false);
     }
 
-    private void setSearchFieldsEnablement(boolean enabled) {
+    protected void setSearchFieldsEnablement(boolean enabled) {
         if (!searchComposite.isDisposed()) {
             searchComposite.setEnabled(enabled);
             for (Control c : searchComposite.getChildren()) {

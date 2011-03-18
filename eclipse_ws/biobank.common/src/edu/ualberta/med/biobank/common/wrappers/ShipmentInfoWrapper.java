@@ -73,4 +73,5 @@ public class ShipmentInfoWrapper extends ShipmentInfoBaseWrapper {
         return dateReveived.compareTo(startDate) >= 0
             && dateReveived.compareTo(endDate) <= 0;
     }
+
 }

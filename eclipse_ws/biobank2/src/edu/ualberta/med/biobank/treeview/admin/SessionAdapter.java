@@ -16,11 +16,14 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.handlers.IHandlerService;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class SessionAdapter extends AdapterBase {
@@ -56,11 +59,26 @@ public class SessionAdapter extends AdapterBase {
     }
 
     private void addGroupNodes() {
-        if (user.isSuperAdministrator()) {
+        if (SessionManager.isSuperAdminMode()) {
             addChild(new StudyMasterGroup(this, STUDIES_NODE_ID));
             addChild(new ClinicMasterGroup(this, CLINICS_BASE_NODE_ID));
+            addChild(new SiteGroup(this, SITES_NODE_ID));
+        } else
+            addCurrentCenter();
+    }
+
+    private AdapterBase addCurrentCenter() {
+        if (SessionManager.getInstance().isConnected()) {
+            CenterWrapper<?> currentCenter = SessionManager.getUser()
+                .getCurrentWorkingCenter();
+            if (currentCenter != null) {
+                AdapterBase child = AdapterFactory.getAdapter(currentCenter);
+                child.setParent(this);
+                addChild(child);
+                return child;
+            }
         }
-        addChild(new SiteGroup(this, SITES_NODE_ID));
+        return null;
     }
 
     @Override
@@ -92,7 +110,7 @@ public class SessionAdapter extends AdapterBase {
         return "";
     }
 
-    public SiteGroup getSitesGroupNode() {
+    private SiteGroup getSitesGroupNode() {
         AdapterBase adapter = getChild(SITES_NODE_ID);
         Assert.isNotNull(adapter);
         return (SiteGroup) adapter;
@@ -194,6 +212,23 @@ public class SessionAdapter extends AdapterBase {
         ClinicMasterGroup g = getClinicGroupNode();
         if (g != null) {
             g.addClinic();
+        }
+    }
+
+    public void addSite() {
+        SiteGroup s = getSitesGroupNode();
+        if (s != null)
+            s.addSite();
+    }
+
+    public void displayMainInformation() {
+        AdapterBase adapter = getChild(SITES_NODE_ID);
+        if (adapter != null)
+            adapter.performExpand();
+        else {
+            AdapterBase res = addCurrentCenter();
+            if (res != null)
+                res.performExpand();
         }
     }
 

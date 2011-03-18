@@ -158,6 +158,24 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return log;
     }
 
+    private static final String PROCESSING_EVENT_BY_DATE_QRY = "select pEvent from "
+        + ProcessingEvent.class.getName()
+        + " pEvent where DATE(pEvent."
+        + ProcessingEventPeer.CREATED_AT.getName() + ")=DATE(?)";
+
+    public static List<ProcessingEventWrapper> getProcessingEventsWithDate(
+        WritableApplicationService appService, Date date) throws Exception {
+        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_DATE_QRY,
+            Arrays.asList(new Object[] { date }));
+        List<ProcessingEvent> pvs = appService.query(c);
+        List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
+        for (ProcessingEvent pv : pvs)
+            pvws.add(new ProcessingEventWrapper(appService, pv));
+        if (pvws.size() == 0)
+            return new ArrayList<ProcessingEventWrapper>();
+        return pvws;
+    }
+
     private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pEvent from "
         + ProcessingEvent.class.getName()
         + " pEvent where pEvent."
@@ -173,7 +191,7 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         for (ProcessingEvent pv : pvs)
             pvws.add(new ProcessingEventWrapper(appService, pv));
         if (pvws.size() == 0)
-            return null;
+            return new ArrayList<ProcessingEventWrapper>();
         return pvws;
     }
 
