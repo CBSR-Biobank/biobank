@@ -119,10 +119,10 @@ public class DataDumpV140 extends DataDump {
         bw.flush();
     }
 
-    public void ClinicShipments() throws SQLException, IOException,
+    public void getClinicShipments() throws SQLException, IOException,
         ParseException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps
-            .getProperty("v140.ClinicShipments"));
+            .getProperty("v140.getClinicShipments"));
 
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
@@ -132,6 +132,26 @@ public class DataDumpV140 extends DataDump {
                 .append(getDateFromStr(rs.getString(4))).append(",")
                 .append(getDateFromStr(rs.getString(5))).append(",")
                 .append(rs.getString(6)).append(",").append(rs.getString(7));
+            bw.write(row.toString());
+            bw.newLine();
+        }
+        bw.newLine();
+        bw.flush();
+    }
+
+    public void getDispatchSpecimens() throws SQLException, IOException,
+        ParseException {
+        PreparedStatement ps = dbconnection.prepareStatement(queryProps
+            .getProperty("v140.getDispatchSpecimens"));
+
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            StringBuilder row = new StringBuilder();
+            row.append(rs.getString(1)).append(",").append(rs.getString(2))
+                .append(",").append(rs.getString(3))
+                .append(getDateFromStr(rs.getString(4))).append(",")
+                .append(getDateFromStr(rs.getString(5)))
+                .append(rs.getString(6));
             bw.write(row.toString());
             bw.newLine();
         }

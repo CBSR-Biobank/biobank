@@ -40,19 +40,21 @@ public class TestUpgradeV131V140 {
 
             // dataDumpV131.getAliquots();
             // dataDumpV131.getPvSourceVessels();
-            dataDumpV131.getAliquotStorageSite();
+            // dataDumpV131.getAliquotStorageSite();
             // dataDumpV131.getSiteStudies();
             // dataDumpV131.getStudyContacts();
             // dataDumpV131.getSiteContainers();
-            // dataDumpV131.ClinicShipments();
+            // dataDumpV131.getClinicShipments();
+            dataDumpV131.getDispatchAliquots();
 
             // dataDumpV140.getAliquotedSpecimens();
             // dataDumpV140.getSourceSpecimens();
-            dataDumpV140.getSpecimenStorageSite();
+            // dataDumpV140.getSpecimenStorageSite();
             // dataDumpV140.getSiteStudies();
             // dataDumpV140.getStudyContacts();
             // dataDumpV140.getSiteContainers();
             // dataDumpV140.ClinicShipments();
+            dataDumpV140.getDispatchSpecimens();
 
             dataDumpV131.dispose();
             dataDumpV140.dispose();
