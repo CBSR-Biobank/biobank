@@ -206,20 +206,11 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         } else {
             Date date = dateWidget.getDate();
             if (date != null) {
-                // if (radioDateSent.getSelection())
-                // ;
-                /*
-                 * return ShipmentInfoWrapper.getShipsInSiteByPackedAt(
-                 * SessionManager.getAppService(), date, SessionManager
-                 * .getUser().getCurrentWorkingSite());
-                 */
-                // else {
                 wrappers.addAll(OriginInfoWrapper.getShipmentsByDateReceived(
                     SessionManager.getAppService(), date));
                 wrappers.addAll(DispatchWrapper.getDispatchesByDateReceived(
                     SessionManager.getAppService(), date));
                 return wrappers;
-                // }
             }
         }
         return null;
@@ -256,9 +247,9 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
                     .clone();
                 Calendar c = Calendar.getInstance();
                 c.setTime(date);
-                c.clear(Calendar.SECOND);
-                c.clear(Calendar.MINUTE);
-                c.clear(Calendar.HOUR_OF_DAY);
+                c.set(Calendar.SECOND, 0);
+                c.set(Calendar.MINUTE, 0);
+                c.set(Calendar.HOUR_OF_DAY, 0);
                 date = c.getTime();
                 List<AdapterBase> dateNodeRes = parentNode.search(date);
                 AdapterBase dateNode = null;

@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -57,7 +56,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private IObservableValue patientNotNullValue;
 
-    private AbstractInfoTableWidget<CollectionEventWrapper> patient1VisitsTable;
+    private ClinicVisitInfoTable patient1VisitsTable;
 
     private boolean canMerge;
 
@@ -245,12 +244,14 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         canMerge = false;
         if (patient2 != null) {
-            if (BiobankPlugin.openConfirm(
-                "Confirm Merge",
-                "Are you sure you want to merge patient "
-                    + patient2.getPnumber() + " into patient "
-                    + patient1Adapter.getWrapper().getPnumber()
-                    + "? All collection events will be transferred.")) {
+            if (BiobankPlugin
+                .openConfirm(
+                    "Confirm Merge",
+                    "Are you sure you want to merge patient "
+                        + patient2.getPnumber()
+                        + " into patient "
+                        + patient1Adapter.getWrapper().getPnumber()
+                        + "? All collection events, source specimens, and aliquoted specimens will be transferred.")) {
                 canMerge = true;
             }
         }

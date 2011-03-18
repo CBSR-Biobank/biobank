@@ -353,11 +353,9 @@ public class PatientWrapper extends PatientBaseWrapper {
                                 .getOriginalSpecimenCollection(false));
                             p1event.addToAllSpecimenCollection(p2event
                                 .getAllSpecimenCollection(false));
-                            p2event
-                                .removeFromOriginalSpecimenCollection(p2event
-                                    .getOriginalSpecimenCollection(false));
-                            p2event.removeFromAllSpecimenCollection(p2event
-                                .getAllSpecimenCollection(false));
+                            for (SpecimenWrapper spec : p2event
+                                .getAllSpecimenCollection(false))
+                                spec.setCollectionEvent(p1event);
                             toDelete.add(p2event);
                             p1event.persist();
                             merged = true;
@@ -371,9 +369,10 @@ public class PatientWrapper extends PatientBaseWrapper {
                     addMe.setPatient(this);
                     addMe.persist();
                 }
-                for (CollectionEventWrapper deleteMe : toDelete)
+                for (CollectionEventWrapper deleteMe : toDelete) {
+                    deleteMe.persist();
                     deleteMe.delete();
-
+                }
                 patient2.delete();
                 persist();
 

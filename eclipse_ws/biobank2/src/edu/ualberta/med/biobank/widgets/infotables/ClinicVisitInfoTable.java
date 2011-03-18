@@ -13,17 +13,18 @@ public class ClinicVisitInfoTable extends
 
     class TableRowData {
         public Integer visit;
-        public Long numSamples;
+        public Long numSource;
+        public Long numAliquots;
 
         @Override
         public String toString() {
             return StringUtils.join(new String[] { visit.toString(),
-                numSamples.toString() });
+                numSource.toString(), numAliquots.toString() });
         }
     }
 
     private static final String[] HEADINGS = new String[] { "Visit #",
-        "Specimens" };
+        "Source Specimens", "Aliquoted Specimens" };
 
     public ClinicVisitInfoTable(Composite parent,
         List<CollectionEventWrapper> collection) {
@@ -46,7 +47,9 @@ public class ClinicVisitInfoTable extends
                 case 0:
                     return item.visit.toString();
                 case 1:
-                    return item.numSamples.toString();
+                    return item.numSource.toString();
+                case 2:
+                    return item.numAliquots.toString();
                 default:
                     return "";
                 }
@@ -59,7 +62,8 @@ public class ClinicVisitInfoTable extends
         throws Exception {
         TableRowData info = new TableRowData();
         info.visit = p.getVisitNumber();
-        info.numSamples = p.getSourceSpecimensCount(true);
+        info.numSource = p.getSourceSpecimensCount(true);
+        info.numAliquots = p.getAliquotedSpecimensCount(true);
         return info;
     }
 
