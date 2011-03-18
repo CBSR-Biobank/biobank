@@ -54,6 +54,22 @@ public class DataDumpV131 extends DataDump {
         bw.flush();
     }
 
+    public void getAliquotStorageSite() throws SQLException, IOException,
+        ParseException {
+        PreparedStatement ps = dbconnection.prepareStatement(queryProps
+            .getProperty("v131.getAliquotStorageSite"));
+
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            StringBuilder row = new StringBuilder();
+            row.append(rs.getString(1)).append(",").append(rs.getString(2));
+            bw.write(row.toString());
+            bw.newLine();
+        }
+        bw.newLine();
+        bw.flush();
+    }
+
     public void getSiteStudies() throws SQLException, IOException,
         ParseException {
         PreparedStatement ps = dbconnection.prepareStatement(queryProps

@@ -582,10 +582,18 @@ ALTER TABLE abstract_position
       DROP KEY ALIQUOT_ID,
       CHANGE COLUMN row ROW INT(11) NOT NULL COMMENT '',
       CHANGE COLUMN col COL INT(11) NOT NULL COMMENT '',
-      CHANGE COLUMN ALIQUOT_ID SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
       ADD COLUMN POSITION_STRING VARCHAR(50) NULL DEFAULT NULL COMMENT '',
       ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
       ADD CONSTRAINT SPECIMEN_ID UNIQUE KEY(SPECIMEN_ID);
+
+update abstract_position ap ,aliquot aq,specimen spc
+       set ap.specimen_id=spc.id
+       where ap.aliquot_id=aq.id
+       and aq.inventory_id=spc.inventory_id;
+
+alter table abstract_position
+      drop column ALIQUOT_ID;
 
 -- update position_string values
 -- SBS Standard
@@ -1272,6 +1280,7 @@ DROP TABLE dispatch_info;
 DROP TABLE dispatch_info_site;
 DROP TABLE dispatch_shipment_aliquot;
 DROP TABLE patient_visit;
+DROP TABLE pv_attr;
 DROP TABLE pv_source_vessel;
 DROP TABLE research_group;
 DROP TABLE research_group_researcher;
