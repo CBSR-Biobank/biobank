@@ -44,7 +44,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
 
     private DateTimeWidget dateWidget;
 
-    DispatchSiteAdapter centerNode;
+    DispatchCenterAdapter centerNode;
 
     private AbstractSearchedNode searchedNode;
 
@@ -68,7 +68,7 @@ public class SpecimenTransitView extends AbstractTodaySearchAdministrationView {
         // clinic
         if (SessionManager.getUser().getCurrentWorkingSite() != null) {
             SessionManager.getUser().getCurrentWorkingSite().reload();
-            centerNode = new DispatchSiteAdapter(rootNode, SessionManager
+            centerNode = new DispatchCenterAdapter(rootNode, SessionManager
                 .getUser().getCurrentWorkingSite());
             centerNode.setParent(rootNode);
             rootNode.addChild(centerNode);
