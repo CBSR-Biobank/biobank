@@ -167,17 +167,15 @@ clinic,center,site
 
 -- set the current center for aliquots that have been disptached
 
-quit;
-
 update specimen spc, aliquot aq,dispatch_shipment_aliquot dsa,abstract_shipment aship,
-site,center
-        set current_center_id=center.id
-        where specimen.inventory_id=aq.inventory_id
-	and dsa.aliquot_id=aliquot.id
-        and aship.id=dsa.dispatch_shipment_id
-        and site.id=aship.dispatch_receiver_id
-        and center.name=site.name
-        and aship.discriminator='DispatchShipment';
+       site,center
+       set current_center_id=center.id
+       where spc.inventory_id=aq.inventory_id
+       and dsa.aliquot_id=aq.id
+       and aship.id=dsa.dispatch_shipment_id
+       and site.id=aship.dispatch_receiver_id
+       and center.name=site.name
+       and aship.discriminator='DispatchShipment';
 
 -- set the aliquoted specimens to point to their parent specimen
 
