@@ -159,4 +159,22 @@ public class DataDumpV140 extends DataDump {
         bw.flush();
     }
 
+    public void getCollectionEvents() throws SQLException, IOException,
+        ParseException {
+        PreparedStatement ps = dbconnection.prepareStatement(queryProps
+            .getProperty("v140.getCollectionEvents"));
+
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            StringBuilder row = new StringBuilder();
+            row.append(rs.getString(1)).append(",").append(rs.getString(2))
+                .append(",").append(getDateFromStr(rs.getString(3)))
+                .append(",").append(rs.getInt(4));
+            bw.write(row.toString());
+            bw.newLine();
+        }
+        bw.newLine();
+        bw.flush();
+    }
+
 }

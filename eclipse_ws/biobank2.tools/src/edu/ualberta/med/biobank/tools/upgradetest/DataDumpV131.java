@@ -148,10 +148,28 @@ public class DataDumpV131 extends DataDump {
         while (rs.next()) {
             StringBuilder row = new StringBuilder();
             row.append(rs.getString(1)).append(",").append(rs.getString(2))
-                .append(",").append(rs.getString(3))
+                .append(",").append(rs.getString(3)).append(",")
                 .append(getDateFromStr(rs.getString(4))).append(",")
                 .append(getDateFromStr(rs.getString(5)))
                 .append(rs.getString(6));
+            bw.write(row.toString());
+            bw.newLine();
+        }
+        bw.newLine();
+        bw.flush();
+    }
+
+    public void getPatientVisits() throws SQLException, IOException,
+        ParseException {
+        PreparedStatement ps = dbconnection.prepareStatement(queryProps
+            .getProperty("v131.getPatientVisits"));
+
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            StringBuilder row = new StringBuilder();
+            row.append(rs.getString(1)).append(",").append(rs.getString(2))
+                .append(",").append(getDateFromStr(rs.getString(3)))
+                .append(",").append(rs.getInt(4));
             bw.write(row.toString());
             bw.newLine();
         }
