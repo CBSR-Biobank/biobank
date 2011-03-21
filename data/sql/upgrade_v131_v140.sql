@@ -428,7 +428,9 @@ update specimen,collection_event as ce
        set specimen.collection_event_id=ce.id,specimen.original_collection_event_id=null
        where ce.pv_id=specimen.pv_id and specimen.pv_sv_id is null;
 
-ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
+ALTER TABLE collection_event
+      MODIFY COLUMN ID INT(11) NOT NULL,
+      drop column PV_DATE_DRAWN;
 
 /*****************************************************
  *  EVENT ATTRIBUTES
