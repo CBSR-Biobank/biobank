@@ -2,6 +2,7 @@ package edu.ualberta.med.biobank.test.internal;
 
 import java.util.Arrays;
 
+import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
@@ -18,7 +19,8 @@ public class CollectionEventHelper extends DbHelper {
         CollectionEventWrapper cevent = new CollectionEventWrapper(appService);
         cevent.setPatient(patient);
         cevent.setVisitNumber(visitNumber);
-
+        cevent.setActivityStatus(ActivityStatusWrapper
+            .getActiveActivityStatus(appService));
         if ((spcs != null) && (spcs.length != 0)) {
             cevent.addToOriginalSpecimenCollection(Arrays.asList(spcs));
             for (SpecimenWrapper spc : spcs) {

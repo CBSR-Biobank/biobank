@@ -1,7 +1,7 @@
 /*------------------------------------------------------------------------------
  *
  *  BioBank2 MySQL upgrade script for model version 1.3.1 to 1.4.0
- *FK28D36ACF2A2464F
+ *
  *----------------------------------------------------------------------------*/
 
 
@@ -136,12 +136,15 @@ activity_status_id,original_collection_event_id,pv_id)
 
 -- add a source specimen for each patient visit
 --
--- if the pvsv.time_drawn is null the specimen created at time is the date from pv.date_drawn,
--- if the pvsv.time_drawn is not null specimen created at time is the date from pv.date_drawn
--- plus the time from pvsv.time_drawn
+-- if the pvsv.time_drawn is null the specimen created at time is the date from
+-- pv.date_drawn,
+--
+-- if the pvsv.time_drawn is not null specimen created at time is the date from
+-- pv.date_drawn plus the time from pvsv.time_drawn
 
-INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,collection_event_id,
-original_collection_event_id,specimen_type_id,parent_specimen_id,origin_info_id,pv_id,pv_sv_id)
+INSERT INTO specimen (inventory_id,quantity,created_at,activity_status_id,
+       collection_event_id,original_collection_event_id,specimen_type_id,
+       parent_specimen_id,origin_info_id,pv_id,pv_sv_id)
        SELECT concat("sw upgrade ",pvsv.id),volume,
        if(pvsv.time_drawn is null,pv.date_drawn,
                addtime(timestamp(date(pv.date_drawn)), time(pvsv.time_drawn))),
@@ -152,17 +155,32 @@ original_collection_event_id,specimen_type_id,parent_specimen_id,origin_info_id,
        JOIN source_vessel as sv on sv.id=pvsv.source_vessel_id
        join specimen_type on specimen_type.name=sv.name;
 
--- set the source center
+-- initialize the current center to be where they were created, dispatches are handled
+-- in the next step
 
-UPDATE specimen,patient_visit as pv, clinic_shipment_patient as csp,abstract_shipment as aship,
-clinic,center,site
+UPDATE specimen,patient_visit
+       as pv, clinic_shipment_patient as csp,abstract_shipment as aship,
+       clinic,center,site
        SET current_center_id=center.id
        where csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID
        and aship.id=csp.CLINIC_SHIPMENT_ID
        and clinic.id=aship.clinic_id
+       and site.id=aship.site_id
        and center.name=site.name
        and pv.id=specimen.pv_id
        and aship.discriminator='ClinicShipment';
+
+-- set the current center for aliquots that have been disptached
+
+update specimen spc, aliquot aq,dispatch_shipment_aliquot dsa,abstract_shipment aship,
+       site,center
+       set current_center_id=center.id
+       where spc.inventory_id=aq.inventory_id
+       and dsa.aliquot_id=aq.id
+       and aship.id=dsa.dispatch_shipment_id
+       and site.id=aship.dispatch_receiver_id
+       and center.name=site.name
+       and aship.discriminator='DispatchShipment';
 
 -- set the aliquoted specimens to point to their parent specimen
 
@@ -253,20 +271,23 @@ CREATE TABLE dispatch (
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,shipping_method_id)
-SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id FROM abstract_shipment
-WHERE discriminator='DispatchShipment';
+INSERT INTO shipment_info (aship_id,received_at,sent_at,waybill,box_number,
+       shipping_method_id)
+       SELECT id,date_received,date_shipped,waybill,box_number,shipping_method_id
+       FROM abstract_shipment
+       WHERE discriminator='DispatchShipment';
 
-INSERT INTO dispatch (sender_center_id,receiver_center_id,state,comment,shipment_info_id,aship_id)
-SELECT sender_center.id,receiver_center.id,state,abstract_shipment.comment,
-shipment_info.id,abstract_shipment.id
-	FROM abstract_shipment
-        JOIN site as sender_site on sender_site.id=abstract_shipment.dispatch_sender_id
-        JOIN center as sender_center on sender_center.name=sender_site.name
-        JOIN site as receiver_site on receiver_site.id=abstract_shipment.dispatch_receiver_id
-        JOIN center as receiver_center on receiver_center.name=receiver_site.name
-	JOIN shipment_info on shipment_info.aship_id=abstract_shipment.id
-        WHERE abstract_shipment.discriminator='DispatchShipment';
+INSERT INTO dispatch (sender_center_id,receiver_center_id,state,comment,shipment_info_id,
+       aship_id)
+       SELECT sender_center.id,receiver_center.id,state,abstract_shipment.comment,
+       shipment_info.id,abstract_shipment.id
+       FROM abstract_shipment
+       JOIN site as sender_site on sender_site.id=abstract_shipment.dispatch_sender_id
+       JOIN center as sender_center on sender_center.name=sender_site.name
+       JOIN site as receiver_site on receiver_site.id=abstract_shipment.dispatch_receiver_id
+       JOIN center as receiver_center on receiver_center.name=receiver_site.name
+       JOIN shipment_info on shipment_info.aship_id=abstract_shipment.id
+       WHERE abstract_shipment.discriminator='DispatchShipment';
 
 CREATE TABLE dispatch_specimen (
     ID INT(11) NOT NULL auto_increment,
@@ -567,10 +588,18 @@ ALTER TABLE abstract_position
       DROP KEY ALIQUOT_ID,
       CHANGE COLUMN row ROW INT(11) NOT NULL COMMENT '',
       CHANGE COLUMN col COL INT(11) NOT NULL COMMENT '',
-      CHANGE COLUMN ALIQUOT_ID SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
+      ADD COLUMN SPECIMEN_ID INT(11) NULL DEFAULT NULL COMMENT '',
       ADD COLUMN POSITION_STRING VARCHAR(50) NULL DEFAULT NULL COMMENT '',
       ADD INDEX FKBC4AE0A6EF199765 (SPECIMEN_ID),
       ADD CONSTRAINT SPECIMEN_ID UNIQUE KEY(SPECIMEN_ID);
+
+update abstract_position ap ,aliquot aq,specimen spc
+       set ap.specimen_id=spc.id
+       where ap.aliquot_id=aq.id
+       and aq.inventory_id=spc.inventory_id;
+
+alter table abstract_position
+      drop column ALIQUOT_ID;
 
 -- update position_string values
 -- SBS Standard
@@ -1257,6 +1286,7 @@ DROP TABLE dispatch_info;
 DROP TABLE dispatch_info_site;
 DROP TABLE dispatch_shipment_aliquot;
 DROP TABLE patient_visit;
+DROP TABLE pv_attr;
 DROP TABLE pv_source_vessel;
 DROP TABLE research_group;
 DROP TABLE research_group_researcher;

@@ -76,6 +76,7 @@ public class SiteHelper extends DbHelper {
         deleteDispatchs(site.getDstDispatchCollection(false));
         site.reload();
 
+        deleteFromList(site.getOriginInfoCollection(false));
         site.delete();
     }
 

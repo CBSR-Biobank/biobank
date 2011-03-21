@@ -110,7 +110,7 @@ public class TestActivityStatus extends TestDatabase {
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
         SpecimenWrapper spc = SpecimenHelper.newSpecimen(SpecimenTypeHelper
-            .newSpecimenType(name));
+            .addSpecimenType(name));
 
         OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
         originInfo.setCenter(site);
@@ -122,10 +122,13 @@ public class TestActivityStatus extends TestDatabase {
         CollectionEventWrapper visit = CollectionEventHelper
             .addCollectionEvent(site, patient, 1, originInfo);
 
-        SpecimenWrapper aliquot = SpecimenHelper.addSpecimen(sampleType,
-            topContainer, visit, 0, 0);
+        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
+        oi.setCenter(site);
+        oi.persist();
+        SpecimenWrapper specimen = SpecimenHelper.addSpecimen(sampleType,
+            topContainer, visit, 0, 0, oi);
 
-        ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { aliquot, spa,
+        ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { specimen, spa,
             topContainer, topContainerType };
 
         for (ModelWrapper<?> wrapper : wrappers) {
@@ -178,9 +181,11 @@ public class TestActivityStatus extends TestDatabase {
         if (deleteWrappers != null) {
             for (ModelWrapper<?> delWrapper : deleteWrappers) {
                 if (delWrapper instanceof CollectionEventWrapper) {
+                    delWrapper.reload();
                     DbHelper
                         .deleteFromList(((CollectionEventWrapper) delWrapper)
                             .getAllSpecimenCollection(false));
+                    delWrapper.reload();
                 }
                 delWrapper.delete();
             }
