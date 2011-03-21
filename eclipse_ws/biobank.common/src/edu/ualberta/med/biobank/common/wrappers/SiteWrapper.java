@@ -255,7 +255,6 @@ public class SiteWrapper extends SiteBaseWrapper {
 
     @Override
     public void reload() {
-        propertiesMap.clear();
         try {
             super.reload();
         } catch (Exception e) {

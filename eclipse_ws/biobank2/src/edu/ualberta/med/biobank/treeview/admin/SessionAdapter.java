@@ -21,6 +21,8 @@ import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
+import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.util.AdapterFactory;
@@ -71,7 +73,10 @@ public class SessionAdapter extends AdapterBase {
         if (SessionManager.getInstance().isConnected()) {
             CenterWrapper<?> currentCenter = SessionManager.getUser()
                 .getCurrentWorkingCenter();
-            if (currentCenter != null) {
+            SiteWrapper clonedSite = new SiteWrapper(appService, new Site());
+            clonedSite.getWrappedObject().setId(currentCenter.getId());
+            clonedSite.reload();
+            if (clonedSite != null) {
                 AdapterBase child = AdapterFactory.getAdapter(currentCenter);
                 child.setParent(this);
                 addChild(child);

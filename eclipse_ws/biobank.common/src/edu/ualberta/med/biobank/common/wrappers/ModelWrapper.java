@@ -117,6 +117,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return null;
     }
 
+    public void setId(Integer id) {
+        Class<?> wrappedClass = wrappedObject.getClass();
+        try {
+            Method methodSetId = wrappedClass.getMethod("setId", Integer.class);
+            methodSetId.invoke(wrappedObject, id);
+        } catch (Exception e) {
+
+        }
+    }
+
     public WritableApplicationService getAppService() {
         return appService;
     }
@@ -949,5 +959,44 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         return sb.toString();
+    }
+
+    public ModelWrapper<?> getDatabaseClone() {
+        ModelWrapper<?> wrapper = null;
+
+        try {
+            Constructor<?> c = getClass().getDeclaredConstructor(
+                WritableApplicationService.class);
+            Object[] arglist = new Object[] { appService };
+            try {
+                wrapper = (ModelWrapper<?>) c.newInstance(arglist);
+                wrapper.setId(getId());
+                try {
+                    wrapper.reload();
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return wrapper;
     }
 }

@@ -108,6 +108,10 @@ public abstract class AdapterBase {
         return modelObject;
     }
 
+    public ModelWrapper<?> getModelObjectClone() {
+        return modelObject.getDatabaseClone();
+    }
+
     /*
      * Used when updating tree nodes from a background thread.
      */

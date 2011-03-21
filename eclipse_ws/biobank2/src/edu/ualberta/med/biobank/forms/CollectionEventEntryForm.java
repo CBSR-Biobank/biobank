@@ -95,7 +95,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
-        cevent = ceventAdapter.getWrapper();
+        cevent = (CollectionEventWrapper) ceventAdapter.getWrapper()
+            .getDatabaseClone();
         patient = cevent.getPatient();
         retrieve();
         try {

@@ -47,7 +47,7 @@ public class ClinicViewForm extends AddressViewFormCommon {
                 + adapter.getClass().getName());
 
         clinicAdapter = (ClinicAdapter) adapter;
-        clinic = clinicAdapter.getWrapper();
+        clinic = (ClinicWrapper) clinicAdapter.getWrapper().getDatabaseClone();
         clinic.reload();
         setPartName(Messages.getString("ClinicViewForm.title", //$NON-NLS-1$
             clinic.getNameShort()));

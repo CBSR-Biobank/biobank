@@ -135,7 +135,13 @@ public abstract class BiobankEntryForm extends BiobankFormBase {
     }
 
     public void formClosed() {
-        // do nothing by default
+        try {
+            adapter.getModelObject().reload();
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        SessionManager.updateAdapterTreeNode(adapter);
     }
 
     @Override

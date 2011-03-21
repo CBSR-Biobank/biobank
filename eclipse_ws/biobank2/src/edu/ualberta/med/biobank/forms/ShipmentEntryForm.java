@@ -82,7 +82,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         shipmentAdapter = (ShipmentAdapter) adapter;
-        shipment = shipmentAdapter.getWrapper();
+        shipment = (OriginInfoWrapper) shipmentAdapter.getWrapper()
+            .getDatabaseClone();
         try {
             shipment.reload();
         } catch (Exception e) {
