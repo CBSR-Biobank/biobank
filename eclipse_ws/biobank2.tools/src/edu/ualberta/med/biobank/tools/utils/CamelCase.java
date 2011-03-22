@@ -3,6 +3,11 @@ package edu.ualberta.med.biobank.tools.utils;
 public class CamelCase {
 
     public static String toCamelCase(String str, boolean firstCharUpperCase) {
+        return toCamelCase(str, firstCharUpperCase, false);
+    }
+
+    public static String toCamelCase(String str, boolean firstCharUpperCase,
+        boolean lowerOtherChars) {
         StringBuffer sb = new StringBuffer();
         String[] splitStr = str.split("_");
         boolean firstTime = true;
@@ -13,7 +18,10 @@ public class CamelCase {
                 firstTime = false;
             } else {
                 sb.append(Character.toUpperCase(temp.charAt(0)));
-                sb.append(temp.substring(1));
+                String others = temp.substring(1);
+                if (lowerOtherChars)
+                    others = others.toLowerCase();
+                sb.append(others);
             }
         }
         return sb.toString();
@@ -33,5 +41,4 @@ public class CamelCase {
 
         return sb.toString();
     }
-
 }

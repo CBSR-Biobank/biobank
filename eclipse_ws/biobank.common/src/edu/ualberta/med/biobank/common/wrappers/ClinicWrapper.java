@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ClinicPeer;
@@ -98,10 +98,11 @@ public class ClinicWrapper extends ClinicBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
+    protected void deleteChecks() throws BiobankDeleteException,
+        ApplicationException {
         List<StudyWrapper> studies = getStudyCollection();
         if (studies != null && studies.size() > 0) {
-            throw new BiobankCheckException("Unable to delete clinic "
+            throw new BiobankDeleteException("Unable to delete clinic "
                 + getName() + ". No more study reference should exist.");
         }
     }

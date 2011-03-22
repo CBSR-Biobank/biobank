@@ -29,12 +29,6 @@ public class SpecimenPositionWrapper extends SpecimenPositionBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
-
-    }
-
-    @Override
     public void setRow(Integer row) {
         if (row == null || !row.equals(getRow())) {
             updatePositionString();

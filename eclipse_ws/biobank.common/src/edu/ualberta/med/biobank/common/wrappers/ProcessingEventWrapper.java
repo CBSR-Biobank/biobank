@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
@@ -77,7 +78,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
+    protected void deleteChecks() throws BiobankDeleteException,
+        ApplicationException {
         // FIXME
         // if (getChildSpecimenCount(false) > 0) {
         // throw new BiobankCheckException(

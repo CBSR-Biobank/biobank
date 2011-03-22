@@ -1,15 +1,14 @@
 package edu.ualberta.med.biobank.common.wrappers.internal;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.base.EventAttrTypeBaseWrapper;
 import edu.ualberta.med.biobank.model.EventAttrType;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class EventAttrTypeWrapper extends EventAttrTypeBaseWrapper {
 
@@ -20,11 +19,6 @@ public class EventAttrTypeWrapper extends EventAttrTypeBaseWrapper {
 
     public EventAttrTypeWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
     }
 
     @Override
