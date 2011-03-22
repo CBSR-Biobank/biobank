@@ -80,6 +80,8 @@ public class ReportWrapper extends ReportBaseWrapper {
                 valueCopy.setPosition(value.getPosition());
                 valueCopy.setValue(value.getValue());
                 valueCopy.setSecondValue(value.getSecondValue());
+
+                values.add(valueCopy);
             }
             filterCopy.setReportFilterValueCollection(values);
 

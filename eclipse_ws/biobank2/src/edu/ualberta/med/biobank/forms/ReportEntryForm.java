@@ -1,10 +1,10 @@
 package edu.ualberta.med.biobank.forms;
 
-import java.io.FileWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -42,27 +42,29 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.forms.widgets.Section;
-import org.supercsv.io.CsvListWriter;
-import org.supercsv.prefs.CsvPreference;
 
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+import edu.ualberta.med.biobank.common.reports.filters.FilterOperator;
 import edu.ualberta.med.biobank.common.util.AbstractBiobankListProxy;
 import edu.ualberta.med.biobank.common.util.Holder;
 import edu.ualberta.med.biobank.common.util.ReportListProxy;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
+import edu.ualberta.med.biobank.exporters.CsvReportExporter;
+import edu.ualberta.med.biobank.exporters.ReportExporter;
+import edu.ualberta.med.biobank.exporters.ReportExporter.Data;
 import edu.ualberta.med.biobank.forms.listener.ProgressMonitorDialogBusyListener;
 import edu.ualberta.med.biobank.model.EntityFilter;
 import edu.ualberta.med.biobank.model.Report;
 import edu.ualberta.med.biobank.model.ReportColumn;
 import edu.ualberta.med.biobank.model.ReportFilter;
+import edu.ualberta.med.biobank.model.ReportFilterValue;
 import edu.ualberta.med.biobank.server.applicationservice.BiobankApplicationService;
 import edu.ualberta.med.biobank.treeview.report.ReportAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.views.AdvancedReportsView;
-import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.ReportResultsTableWidget;
 import edu.ualberta.med.biobank.widgets.report.ChangeListener;
@@ -94,7 +96,8 @@ public class ReportEntryForm extends BiobankEntryForm {
 
     private Section filtersSection;
 
-    private Button generateButton, exportButton;
+    private Button generateButton;
+    private final Collection<Button> exportButtons = new ArrayList<Button>();
 
     private Composite resultsContainer;
 
@@ -246,7 +249,9 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private void generateReport() {
-        exportButton.setEnabled(false);
+        for (Button button : exportButtons) {
+            button.setEnabled(false);
+        }
 
         updateReportModel();
         emptyResultsContainer();
@@ -290,7 +295,7 @@ public class ReportEntryForm extends BiobankEntryForm {
                         }
                     }
 
-                    exportButton.getDisplay().syncExec(new Runnable() {
+                    generateButton.getDisplay().syncExec(new Runnable() {
                         @Override
                         public void run() {
                             resultsTable = new ReportResultsTableWidget<Object>(
@@ -313,7 +318,9 @@ public class ReportEntryForm extends BiobankEntryForm {
                                     });
                             }
 
-                            exportButton.setEnabled(true);
+                            for (Button button : exportButtons) {
+                                button.setEnabled(true);
+                            }
                         }
                     });
                 } catch (Exception e) {
@@ -335,17 +342,34 @@ public class ReportEntryForm extends BiobankEntryForm {
     }
 
     private Control createExportButtons(Composite parent) {
-        exportButton = new Button(parent, SWT.NONE);
-        exportButton.setText("Export CSV");
-        exportButton.setEnabled(false);
-        exportButton.addListener(SWT.Selection, new Listener() {
+        Composite container = toolkit.createComposite(parent);
+        GridLayout layout = new GridLayout(3, false);
+        layout.horizontalSpacing = 10;
+        container.setLayout(layout);
+        container.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
+        toolkit.paintBordersFor(container);
+
+        // TODO: printPDF and PdfExporter-s
+        createExporterButton(container, new CsvReportExporter());
+        createExporterButton(container, new CsvReportExporter());
+        createExporterButton(container, new CsvReportExporter());
+
+        return container;
+    }
+
+    private void createExporterButton(Composite parent,
+        final ReportExporter exporter) {
+        Button button = new Button(parent, SWT.NONE);
+        button.setText(exporter.getName());
+        button.setEnabled(false);
+        button.addListener(SWT.Selection, new Listener() {
             @Override
             public void handleEvent(Event event) {
-                exportCsv();
+                export(exporter);
             }
         });
 
-        return exportButton;
+        exportButtons.add(button);
     }
 
     private void openViewForm(ISelection selection) {
@@ -604,31 +628,49 @@ public class ReportEntryForm extends BiobankEntryForm {
         form.updateToolBar();
     }
 
-    // TODO: extract printing/ exporting methods into some interfaces and
-    // classes
+    private void export(final ReportExporter exporter) {
+        final Data data = new Data();
+        data.setHeaders(Arrays.asList(getHeaders()));
+        data.setTitle(report.getName());
+        data.setComments(getComments(report));
+        data.setResults(results);
 
-    public void exportCsv() {
-        final Holder<String> path = new Holder<String>(null);
-
-        if (!MessageDialog.openQuestion(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), "Confirm",
-            "Export table contents?")) {
+        // check if the exporter can export this data
+        try {
+            exporter.canExport(data);
+        } catch (Exception e) {
+            MessageDialog.openError(PlatformUI.getWorkbench()
+                .getActiveWorkbenchWindow().getShell(), "Cannot Export",
+                e.getMessage());
             return;
         }
 
-        String defaultFilename = report.getName().replaceAll(" ", "_") + "_"
-            + DateFormatter.formatAsDate(new Date());
-
-        FileDialog fd = new FileDialog(form.getShell(), SWT.SAVE);
-        fd.setOverwrite(true);
-        fd.setText("Export as");
-        fd.setFilterExtensions(new String[] { "*.csv" });
-        fd.setFileName(defaultFilename);
-
-        path.setValue(fd.open());
-
-        if (path.getValue() == null || !path.getValue().endsWith(".csv")) {
+        // confirm exporting
+        if (!MessageDialog.openQuestion(PlatformUI.getWorkbench()
+            .getActiveWorkbenchWindow().getShell(),
+            "Confirm Report Results Export", "Are you sure you want to "
+                + exporter.getName() + "?")) {
             return;
+        }
+
+        // select an output path, if necessary
+        final Holder<String> path = new Holder<String>(null);
+        String[] exts = exporter.getPathFilterExtensions();
+        if (exts != null) {
+            String defaultFilename = report.getName().replaceAll(" ", "_")
+                + "_" + DateFormatter.formatAsDate(new Date());
+
+            FileDialog fd = new FileDialog(form.getShell(), SWT.SAVE);
+            fd.setOverwrite(true);
+            fd.setText("Export as");
+            fd.setFilterExtensions(exts);
+            fd.setFileName(defaultFilename);
+
+            path.setValue(fd.open());
+
+            if (path.getValue() == null) {
+                return;
+            }
         }
 
         IRunnableContext context = new ProgressMonitorDialog(Display
@@ -640,10 +682,11 @@ public class ReportEntryForm extends BiobankEntryForm {
                     monitor.beginTask("Preparing Report...",
                         IProgressMonitor.UNKNOWN);
                     try {
-                        exportCsv(path.getValue(), getHeaders(), monitor);
+                        exporter.export(data, path.getValue(),
+                            resultsTable.getLabelProvider(), monitor);
                     } catch (Exception e) {
-                        BiobankPlugin.openAsyncError("Error exporting results",
-                            e);
+                        BiobankPlugin.openAsyncError(
+                            "Error Exporting Report Results", e);
                         return;
                     }
                 }
@@ -655,33 +698,44 @@ public class ReportEntryForm extends BiobankEntryForm {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+
     }
 
-    private void exportCsv(String path, String[] headers,
-        IProgressMonitor monitor) throws Exception {
+    private List<String> getComments(ReportWrapper report) {
+        List<String> comments = new ArrayList<String>();
 
-        CsvListWriter writer = new CsvListWriter(new FileWriter(path),
-            CsvPreference.EXCEL_PREFERENCE);
+        comments.add(report.getDescription());
 
-        // TODO: write filter, operators, and their values?
+        for (ReportFilter filter : report.getReportFilterCollection()) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(filter.getEntityFilter().getName());
 
-        writer.writeHeader(headers);
-        int numHeaders = headers.length;
-
-        BiobankLabelProvider labelProvider = resultsTable.getLabelProvider();
-        Object[] data = new Object[numHeaders];
-        for (Object row : results) {
-            if (monitor.isCanceled()) {
-                throw new Exception("Exporting canceled.");
+            Integer opId = filter.getOperator();
+            FilterOperator op = FilterOperator.getFilterOperator(opId);
+            if (op != null) {
+                sb.append(" ");
+                sb.append(op.getDisplayString());
             }
 
-            for (int i = 0; i < numHeaders; i++) {
-                data[i] = labelProvider.getColumnText(row, i);
+            Collection<ReportFilterValue> values = filter
+                .getReportFilterValueCollection();
+            if (values != null) {
+                sb.append(": ");
+                for (ReportFilterValue value : values) {
+                    sb.append("'");
+                    sb.append(value.getValue().replace("'", "\'"));
+
+                    if (value.getSecondValue() != null) {
+                        sb.append("' and '");
+                        sb.append(value.getSecondValue().replace("'", "\'"));
+                    }
+                    sb.append("'; ");
+                }
             }
 
-            writer.write(data);
+            comments.add(sb.toString());
         }
 
-        writer.close();
+        return comments;
     }
 }
