@@ -72,14 +72,18 @@ public class DateFilterType implements FilterType {
             break;
         case ON_OR_AFTER: {
             FilterTypeUtil.checkValues(values, 0, 1);
-            Date date = getDate(values.get(0));
-            criteria.add(Restrictions.ge(aliasedProperty, date));
+            for (ReportFilterValue value : values) {
+                Date date = getDate(value);
+                criteria.add(Restrictions.ge(aliasedProperty, date));
+            }
         }
             break;
         case ON_OR_BEFORE: {
             FilterTypeUtil.checkValues(values, 0, 1);
-            Date date = getDate(values.get(0));
-            criteria.add(Restrictions.le(aliasedProperty, date));
+            for (ReportFilterValue value : values) {
+                Date date = getDate(value);
+                criteria.add(Restrictions.le(aliasedProperty, date));
+            }
         }
             break;
         case THIS_DAY:
