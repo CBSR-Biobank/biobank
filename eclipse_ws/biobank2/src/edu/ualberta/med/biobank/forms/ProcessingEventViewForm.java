@@ -43,7 +43,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
-        pEvent = pEventAdapter.getWrapper();
+        pEvent = (ProcessingEventWrapper) pEventAdapter.getWrapper();
         retrieveProcessingEvent();
         setPartName(Messages.getString("ProcessingEventViewForm.title", //$NON-NLS-1$
             pEvent.getFormattedCreatedAt()));

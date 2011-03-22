@@ -63,7 +63,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
-        clinic = clinicAdapter.getWrapper();
+        if (clinicAdapter.getWrapper().isNew())
+            clinic = clinicAdapter.getWrapper();
+        else
+            clinic = (ClinicWrapper) clinicAdapter.getWrapper()
+                .getDatabaseClone();
         clinic.reload();
 
         String tabName;
@@ -119,7 +123,8 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             clinic, ClinicPeer.SENDS_SHIPMENTS.getName(), null);
         toolkit.paintBordersFor(client);
 
-        activityStatusComboViewer = createComboViewer(client,
+        activityStatusComboViewer = createComboViewer(
+            client,
             Messages.getString("label.activity"), //$NON-NLS-1$
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             clinic.getActivityStatus(),

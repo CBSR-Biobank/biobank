@@ -7,20 +7,20 @@ import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.Tree;
 
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 
 public abstract class AbstractDispatchGroup extends AdapterBase {
 
-    SiteWrapper site;
+    CenterWrapper<?> center;
 
     public AbstractDispatchGroup(AdapterBase parent, int id, String name,
-        SiteWrapper site) {
+        CenterWrapper<?> center) {
         super(parent, id, name, true, true);
-        this.site = site;
+        this.center = center;
     }
 
     @Override

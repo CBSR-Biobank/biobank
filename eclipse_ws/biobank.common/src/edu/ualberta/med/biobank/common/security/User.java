@@ -289,13 +289,8 @@ public class User implements Serializable, NotAProxy {
     }
 
     public CenterWrapper<?> getCurrentWorkingCenter() {
-        try {
-            if (currentWorkingCenter != null)
-                currentWorkingCenter.reload();
-        } catch (Exception e) {
-            // FIXME: how to handle?
-            e.printStackTrace();
-        }
+        // TODO: removed reload... called way too often, should manage reloads
+        // in forms
         return currentWorkingCenter;
     }
 

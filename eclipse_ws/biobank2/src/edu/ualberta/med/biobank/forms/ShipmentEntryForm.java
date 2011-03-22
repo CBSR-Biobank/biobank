@@ -82,7 +82,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         shipmentAdapter = (ShipmentAdapter) adapter;
-        shipment = shipmentAdapter.getWrapper();
+        if (!shipmentAdapter.getWrapper().isNew())
+            shipment = (OriginInfoWrapper) shipmentAdapter.getWrapper()
+                .getDatabaseClone();
+        else
+            shipment = shipmentAdapter.getWrapper();
         try {
             shipment.reload();
         } catch (Exception e) {
@@ -114,6 +118,12 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayout(layout);
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
+
+        ShipmentInfoWrapper shipInfo = shipment.getShipmentInfo();
+        if (shipInfo == null) {
+            shipInfo = new ShipmentInfoWrapper(appService);
+            shipment.setShipmentInfo(shipInfo);
+        }
 
         senderComboViewer = createComboViewer(client, "Sender",
             ClinicWrapper.getAllClinics(appService),
@@ -152,7 +162,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 }
             });
 
-        ShipmentInfoWrapper shipInfo = shipment.getShipmentInfo();
         ShippingMethodWrapper shipMethod = shipInfo.getShippingMethod();
         if (shipInfo.getSentAt() == null) {
             shipInfo.setSentAt(new Date());
@@ -261,7 +270,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        if (shipment.getShipmentInfo().getWaybill().isEmpty()) {
+        if (shipment.getShipmentInfo().getWaybill() != null
+            && shipment.getShipmentInfo().getWaybill().isEmpty()) {
             shipment.getShipmentInfo().setWaybill(null);
         }
 
