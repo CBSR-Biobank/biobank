@@ -98,7 +98,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Specimen.class, SpecimenPeer.INVENTORY_ID.getName(),
-            getInventoryId(), "An Specimen with inventoryId");
+            getInventoryId(), "A specimen with inventoryId");
     }
 
     public String getFormattedCreatedAt() {
@@ -273,11 +273,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         super.loadAttributes();
         getPositionString();
         wrappedObject.getSpecimenType().getName();
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
     }
 
     private static final String Specimen_QRY = "from "

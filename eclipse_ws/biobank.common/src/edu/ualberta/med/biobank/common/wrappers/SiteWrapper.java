@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -68,12 +68,12 @@ public class SiteWrapper extends SiteBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
+    protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
         if (!getContainerCollection(false).isEmpty()
             || !getContainerTypeCollection(false).isEmpty()
             || !getProcessingEventCollection(false).isEmpty()) {
-            throw new BiobankCheckException(
+            throw new BiobankDeleteException(
                 "Unable to delete site "
                     + getName()
                     + ". All defined children (processing events, container types, and containers) must be removed first.");

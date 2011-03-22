@@ -45,7 +45,8 @@ public class TestUpgradeV131V140 {
             // dataDumpV131.getStudyContacts();
             // dataDumpV131.getSiteContainers();
             // dataDumpV131.getClinicShipments();
-            dataDumpV131.getDispatchAliquots();
+            // dataDumpV131.getDispatchAliquots();
+            dataDumpV131.getPatientVisits();
 
             // dataDumpV140.getAliquotedSpecimens();
             // dataDumpV140.getSourceSpecimens();
@@ -54,7 +55,8 @@ public class TestUpgradeV131V140 {
             // dataDumpV140.getStudyContacts();
             // dataDumpV140.getSiteContainers();
             // dataDumpV140.ClinicShipments();
-            dataDumpV140.getDispatchSpecimens();
+            // dataDumpV140.getDispatchSpecimens();
+            dataDumpV140.getCollectionEvents();
 
             dataDumpV131.dispose();
             dataDumpV140.dispose();

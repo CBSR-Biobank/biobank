@@ -51,16 +51,8 @@ public class SiteHelper extends DbHelper {
         return sites;
     }
 
-    public static void deleteSite(SiteWrapper site) throws Exception {
-        if (!createdSites.contains(site)) {
-            throw new Exception("Site " + site.getName()
-                + " not created with SiteHelper");
-        }
-        createdSites.remove(site);
-        site.delete();
-    }
-
-    private static void deleteSiteInternal(SiteWrapper site) throws Exception {
+    public static void deleteSiteAndDependencies(SiteWrapper site)
+        throws Exception {
         site.reload();
         deleteContainers(site.getTopContainerCollection(false));
         // in case containers with no top level type has been created without a
@@ -76,13 +68,14 @@ public class SiteHelper extends DbHelper {
         deleteDispatchs(site.getDstDispatchCollection(false));
         site.reload();
 
+        deleteFromList(site.getSpecimenCollection(false));
         deleteFromList(site.getOriginInfoCollection(false));
         site.delete();
     }
 
     public static void deleteCreatedSites() throws Exception {
         for (SiteWrapper site : createdSites) {
-            deleteSiteInternal(site);
+            deleteSiteAndDependencies(site);
         }
         createdSites.clear();
     }

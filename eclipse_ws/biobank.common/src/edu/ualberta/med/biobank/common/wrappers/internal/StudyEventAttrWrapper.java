@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.EventAttrPeer;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -30,7 +30,7 @@ public class StudyEventAttrWrapper extends StudyEventAttrBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsedByProcessingEvents()) {
-            throw new BiobankCheckException(
+            throw new BiobankDeleteException(
                 "Unable to delete EventAttr with id " + getId()
                     + ". A patient visit using it exists in storage."
                     + " Remove all instances before deleting this type.");

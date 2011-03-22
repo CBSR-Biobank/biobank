@@ -27,11 +27,6 @@ public class ContainerPositionWrapper extends ContainerPositionBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
-    }
-
-    @Override
     public int compareTo(ModelWrapper<ContainerPosition> modelWrapper) {
         if (modelWrapper instanceof ContainerPositionWrapper) {
             return getContainer().compareTo(

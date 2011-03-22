@@ -390,18 +390,31 @@ CREATE TABLE collection_event (
     PATIENT_ID INT(11) NOT NULL,
     ACTIVITY_STATUS_ID INT(11) NOT NULL,
     PV_ID INT(11) NOT NULL,
+    PV_DATE_DRAWN datetime NOT NULL,
     INDEX FKEDAD8999C449A4 (ACTIVITY_STATUS_ID),
     INDEX FKEDAD8999B563F38F (PATIENT_ID),
     PRIMARY KEY (ID)
 ) ENGINE=MyISAM COLLATE=latin1_general_cs;
 
-INSERT INTO collection_event (visit_number,comment,patient_id,activity_status_id,pv_id)
+INSERT INTO collection_event (visit_number,comment,patient_id,activity_status_id,pv_id,
+       pv_date_drawn)
        SELECT -1,pv.comment,csp.patient_id,
-       (select id from activity_status where name='Active'),pv.id
+       (select id from activity_status where name='Active'),pv.id,pv.date_drawn
        FROM patient_visit as pv
        join clinic_shipment_patient as csp on csp.id=pv.CLINIC_SHIPMENT_PATIENT_ID;
 
 create index pv_id_idx on collection_event(pv_id);
+
+-- number the collection event 'visit number' according the patient visit 'date drawn'
+-- in chronological order
+
+select @pp = null;
+select @pv = null;
+
+update collection_event ce
+       set ce.visit_number = if(@pp <> ce.patient_id or @pp is null,
+           if(@pp := ce.patient_id, @pv := 1, @pv := 1), @pv := @pv + 1)
+       order by patient_id, pv_date_drawn;
 
 -- set specimen.original_collection_event_id for source specimens
 
@@ -415,7 +428,9 @@ update specimen,collection_event as ce
        set specimen.collection_event_id=ce.id,specimen.original_collection_event_id=null
        where ce.pv_id=specimen.pv_id and specimen.pv_sv_id is null;
 
-ALTER TABLE collection_event MODIFY COLUMN ID INT(11) NOT NULL;
+ALTER TABLE collection_event
+      MODIFY COLUMN ID INT(11) NOT NULL,
+      drop column PV_DATE_DRAWN;
 
 /*****************************************************
  *  EVENT ATTRIBUTES

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -114,15 +115,15 @@ public class PatientWrapper extends PatientBaseWrapper {
     protected void deleteChecks() throws BiobankException, ApplicationException {
         checkNoMoreCollectionEvents();
         if (getAllSpecimensCount(false) > 0)
-            throw new BiobankCheckException("Unable to delete patient "
+            throw new BiobankDeleteException("Unable to delete patient "
                 + getPnumber()
                 + " because patient has specimens stored in database.");
     }
 
-    private void checkNoMoreCollectionEvents() throws BiobankCheckException {
+    private void checkNoMoreCollectionEvents() throws BiobankDeleteException {
         List<CollectionEventWrapper> pvs = getCollectionEventCollection(false);
         if (pvs != null && !pvs.isEmpty()) {
-            throw new BiobankCheckException(
+            throw new BiobankDeleteException(
                 "Processing events are still linked to this patient."
                     + " Delete them before attempting to remove the patient.");
         }
@@ -136,8 +137,8 @@ public class PatientWrapper extends PatientBaseWrapper {
         + Property.concatNames(CollectionEventPeer.PATIENT, PatientPeer.ID)
         + "=?";
 
-    public long getAllSpecimensCount(boolean fast) throws BiobankException,
-        ApplicationException {
+    public long getAllSpecimensCount(boolean fast) throws ApplicationException,
+        BiobankException {
         if (fast) {
             HQLCriteria criteria = new HQLCriteria(ALL_SPECIMEN_COUNT_QRY,
                 Arrays.asList(new Object[] { getId() }));

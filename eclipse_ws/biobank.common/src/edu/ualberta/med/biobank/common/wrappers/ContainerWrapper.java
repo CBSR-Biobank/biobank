@@ -12,6 +12,7 @@ import java.util.TreeMap;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.exception.ContainerLabelSearchException;
@@ -754,14 +755,14 @@ public class ContainerWrapper extends ContainerBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
+    protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
         if (hasSpecimens()) {
-            throw new BiobankCheckException("Unable to delete container "
+            throw new BiobankDeleteException("Unable to delete container "
                 + getLabel() + ". All aliquots must be removed first.");
         }
         if (hasChildren()) {
-            throw new BiobankCheckException("Unable to delete container "
+            throw new BiobankDeleteException("Unable to delete container "
                 + getLabel() + ". All subcontainers must be removed first.");
         }
     }
