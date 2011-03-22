@@ -138,11 +138,7 @@ public class SpecimenEntryWidget extends BiobankWidget {
             try {
                 SpecimenWrapper specimen = SpecimenWrapper.getSpecimen(
                     appService, inventoryId, SessionManager.getUser());
-                if (specimen == null) {
-                    // TODO: create Specimen?
-                } else {
-                    addSpecimen(specimen);
-                }
+                addSpecimen(specimen);
             } catch (Exception e) {
                 BiobankPlugin.openAsyncError("Error while looking up specimen",
                     e);
