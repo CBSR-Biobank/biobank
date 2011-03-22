@@ -1,15 +1,15 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.wrappers.base.GlobalEventAttrBaseWrapper;
 import edu.ualberta.med.biobank.model.GlobalEventAttr;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 import gov.nih.nci.system.query.hibernate.HQLCriteria;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 
 public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
 
@@ -23,7 +23,7 @@ public class GlobalEventAttrWrapper extends GlobalEventAttrBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
+    protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
         // FIXME if used by any study then it cannot be deleted
     }

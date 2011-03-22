@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -78,14 +79,11 @@ public class CollectionEventWrapper extends CollectionEventBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
-        checkNoMoreSpecimens();
-    }
-
-    private void checkNoMoreSpecimens() throws BiobankCheckException {
+    protected void deleteChecks() throws BiobankDeleteException,
+        ApplicationException {
         List<SpecimenWrapper> sourceVessels = getAllSpecimenCollection(false);
         if (sourceVessels != null && !sourceVessels.isEmpty()) {
-            throw new BiobankCheckException(
+            throw new BiobankDeleteException(
                 "Source Vessels are still linked to this Collection Event. "
                     + "Delete them before attempting to remove this Collection Event");
         }

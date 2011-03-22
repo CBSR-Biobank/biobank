@@ -8,7 +8,9 @@ import java.util.List;
 import java.util.Set;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
 import edu.ualberta.med.biobank.common.wrappers.base.SpecimenTypeBaseWrapper;
@@ -70,7 +72,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsedBySamples()) {
-            throw new BiobankCheckException("Unable to delete specimen type "
+            throw new BiobankDeleteException("Unable to delete specimen type "
                 + getName() + ". Specimens of this type exists in storage."
                 + " Remove all instances before deleting this type.");
         }
@@ -141,7 +143,7 @@ public class SpecimenTypeWrapper extends SpecimenTypeBaseWrapper {
         + SpecimenPeer.SPECIMEN_TYPE.getName() + "=?)";
 
     public boolean isUsedBySamples() throws ApplicationException,
-        BiobankException {
+        BiobankQueryResultSizeException {
         HQLCriteria c = new HQLCriteria(IS_USED_BY_SAMPLES_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;

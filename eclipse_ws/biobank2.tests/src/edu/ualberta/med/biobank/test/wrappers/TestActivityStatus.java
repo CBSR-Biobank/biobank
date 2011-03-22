@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.test.wrappers;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -9,10 +10,12 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
 import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.util.ClassUtils;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
+import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
@@ -22,6 +25,7 @@ import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
@@ -30,12 +34,13 @@ import edu.ualberta.med.biobank.common.wrappers.internal.StudyEventAttrWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.Utils;
+import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.ClinicHelper;
 import edu.ualberta.med.biobank.test.internal.CollectionEventHelper;
 import edu.ualberta.med.biobank.test.internal.ContactHelper;
 import edu.ualberta.med.biobank.test.internal.ContainerHelper;
-import edu.ualberta.med.biobank.test.internal.DbHelper;
 import edu.ualberta.med.biobank.test.internal.PatientHelper;
+import edu.ualberta.med.biobank.test.internal.ProcessingEventHelper;
 import edu.ualberta.med.biobank.test.internal.SiteHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
@@ -51,6 +56,16 @@ public class TestActivityStatus extends TestDatabase {
         for (ActivityStatusWrapper a : addedstatus) {
             a.delete();
         }
+    }
+
+    @Test
+    public void testGettersAndSetters() throws BiobankCheckException, Exception {
+        String name = "testGettersAndSetters" + r.nextInt();
+        ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
+        as.setName(name);
+        as.persist();
+        addedstatus.add(as);
+        testGettersAndSetters(as);
     }
 
     @Test
@@ -83,115 +98,90 @@ public class TestActivityStatus extends TestDatabase {
         String name = "testDeleteFail" + r.nextInt();
 
         // should not be allowed to remove an activity status that is used
-        SiteWrapper site = SiteHelper.addSite("site" + name);
-        StudyWrapper study = StudyHelper.addStudy("study" + name, false);
-        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name, false,
-            false);
+
+        // Center
+        SiteWrapper site = SiteHelper.newSite("center" + name);
+        site.persist();
+        // Container
         ContainerWrapper topContainer = ContainerHelper.addTopContainerRandom(
             site, name, 2, 2);
+        // ContainerType
         ContainerTypeWrapper topContainerType = topContainer.getContainerType();
         topContainerType.addToSpecimenTypeCollection(SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false));
         topContainerType.persist();
 
-        study.setStudyEventAttr("worksheet", EventAttrTypeEnum.TEXT);
-        study.persist();
-
-        StudyEventAttrWrapper spa = StudyEventAttrWrapper
-            .getStudyEventAttrCollection(study).get(0);
-
-        SpecimenTypeWrapper sampleType = SpecimenTypeWrapper
-            .getAllSpecimenTypes(appService, false).get(0);
-
+        ClinicWrapper clinic = ClinicHelper.addClinic("clinic" + name, false,
+            false);
         ContactWrapper contact = ContactHelper.addContact(clinic, name);
+
+        // Study
+        StudyWrapper study = StudyHelper.newStudy("study" + name);
+        // StudyEventAttr
+        study.setStudyEventAttr("worksheet", EventAttrTypeEnum.TEXT);
         study.addToContactCollection(Arrays.asList(contact));
         study.persist();
-        study.reload();
+        StudyEventAttrWrapper studyEventAttr = StudyEventAttrWrapper
+            .getStudyEventAttrCollection(study).get(0);
+        // AliquotedSpecimen
+        AliquotedSpecimenWrapper aliquotedSpecimenType = AliquotedSpecimenHelper
+            .addAliquotedSpecimen(study, SpecimenTypeWrapper
+                .getAllSpecimenTypes(appService, false).get(0));
 
         PatientWrapper patient = PatientHelper.addPatient(name, study);
-        SpecimenWrapper spc = SpecimenHelper.newSpecimen(SpecimenTypeHelper
-            .addSpecimenType(name));
+        // Specimen
+        SpecimenWrapper originSpecimen = SpecimenHelper
+            .newSpecimen(SpecimenTypeHelper.addSpecimenType(name));
 
         OriginInfoWrapper originInfo = new OriginInfoWrapper(appService);
         originInfo.setCenter(site);
         originInfo.persist();
 
+        // Collection Event
         CollectionEventWrapper cevent = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1, originInfo, spc);
+            .addCollectionEvent(site, patient, 1, originInfo, originSpecimen);
+        originSpecimen = cevent.getOriginalSpecimenCollection(false).get(0);
 
-        CollectionEventWrapper visit = CollectionEventHelper
-            .addCollectionEvent(site, patient, 1, originInfo);
+        // ProcessingEvent
+        ProcessingEventWrapper pevent = ProcessingEventHelper
+            .addProcessingEvent(site, patient, Utils.getRandomDate());
 
-        OriginInfoWrapper oi = new OriginInfoWrapper(appService);
-        oi.setCenter(site);
-        oi.persist();
-        SpecimenWrapper specimen = SpecimenHelper.addSpecimen(sampleType,
-            topContainer, visit, 0, 0, oi);
-
-        ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { specimen, spa,
-            topContainer, topContainerType };
-
+        ModelWrapper<?>[] wrappers = new ModelWrapper<?>[] { originSpecimen,
+            studyEventAttr, topContainer, topContainerType, cevent,
+            aliquotedSpecimenType, pevent, study, site };
         for (ModelWrapper<?> wrapper : wrappers) {
             testDeleteFail(wrapper,
-                name + ClassUtils.getClassName(wrapper.getClass()), null);
+                name + ClassUtils.getClassName(wrapper.getClass()));
         }
-
-        // clinic, study, site
-        testDeleteFail(clinic,
-            name + ClassUtils.getClassName(clinic.getClass()),
-            new ModelWrapper<?>[] { visit, cevent, patient, study, contact });
     }
 
-    private void testDeleteFail(ModelWrapper<?> wrapper, String asName,
-        ModelWrapper<?>[] deleteWrappers) throws Exception {
+    private void testDeleteFail(ModelWrapper<?> wrapper, String asName)
+        throws Exception {
+        wrapper.reload();
         ActivityStatusWrapper as = new ActivityStatusWrapper(appService);
         as.setName(asName);
         as.persist();
         as.reload();
 
-        if (wrapper instanceof SpecimenWrapper) {
-            ((SpecimenWrapper) wrapper).setActivityStatus(as);
-        } else if (wrapper instanceof StudyEventAttrWrapper) {
-            ((StudyEventAttrWrapper) wrapper).setActivityStatus(as);
-        } else if (wrapper instanceof ContainerWrapper) {
-            ((ContainerWrapper) wrapper).setActivityStatus(as);
-        } else if (wrapper instanceof ContainerTypeWrapper) {
-            ((ContainerTypeWrapper) wrapper).setActivityStatus(as);
-        } else if (wrapper instanceof ClinicWrapper) {
-            ((ClinicWrapper) wrapper).setActivityStatus(as);
-        } else if (wrapper instanceof StudyWrapper) {
-            ((StudyWrapper) wrapper).setActivityStatus(as);
-        } else if (wrapper instanceof SiteWrapper) {
-            ((SiteWrapper) wrapper).setActivityStatus(as);
-        } else {
-            Assert.fail("invalid wrapper class: "
-                + wrapper.getClass().getName());
-        }
-
+        Method setActivityMethod = wrapper.getClass().getMethod(
+            "setActivityStatus", ActivityStatusWrapper.class);
+        setActivityMethod.invoke(wrapper, as);
         wrapper.persist();
         wrapper.reload();
 
         try {
             as.delete();
             Assert.fail("should not be allowed to delete activity status");
-        } catch (BiobankCheckException bce) {
+        } catch (BiobankDeleteException bce) {
             Assert.assertTrue(true);
         }
 
-        if (deleteWrappers != null) {
-            for (ModelWrapper<?> delWrapper : deleteWrappers) {
-                if (delWrapper instanceof CollectionEventWrapper) {
-                    delWrapper.reload();
-                    DbHelper
-                        .deleteFromList(((CollectionEventWrapper) delWrapper)
-                            .getAllSpecimenCollection(false));
-                    delWrapper.reload();
-                }
-                delWrapper.delete();
-            }
-        }
-
-        wrapper.delete();
+        if (wrapper instanceof StudyWrapper)
+            StudyHelper.deleteStudyAndDependencies((StudyWrapper) wrapper);
+        else if (wrapper instanceof SiteWrapper) {
+            SiteHelper.deleteSiteAndDependencies(((SiteWrapper) wrapper));
+        } else
+            wrapper.delete();
 
         try {
             as.delete();
@@ -288,14 +278,6 @@ public class TestActivityStatus extends TestDatabase {
     }
 
     @Test
-    public void testGetName() throws Exception {
-        ActivityStatusWrapper activeAs = ActivityStatusWrapper
-            .getActiveActivityStatus(appService);
-        Assert.assertEquals(ActivityStatusWrapper.ACTIVE_STATUS_STRING,
-            activeAs.getName());
-    }
-
-    @Test
     public void testCompareTo() throws Exception {
         ActivityStatusWrapper activeAs = ActivityStatusWrapper
             .getActiveActivityStatus(appService);
@@ -323,15 +305,14 @@ public class TestActivityStatus extends TestDatabase {
             .contains(ActivityStatusWrapper.CLOSED_STATUS_STRING));
         Assert.assertTrue(names
             .contains(ActivityStatusWrapper.FLAGGED_STATUS_STRING));
-
-        // invoke one more time to make sure a database access is not made
-        list = ActivityStatusWrapper.getAllActivityStatuses(appService);
     }
 
     @Test
     public void testGetActivityStatus() throws Exception {
+        // success
         ActivityStatusWrapper.getActiveActivityStatus(appService);
 
+        // fail
         try {
             ActivityStatusWrapper.getActivityStatus(appService,
                 Utils.getRandomString(15, 20));

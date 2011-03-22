@@ -53,14 +53,18 @@ public class StudyHelper extends DbHelper {
     public static void deleteCreatedStudies() throws Exception {
         Assert.assertNotNull("appService is null", appService);
         for (StudyWrapper study : createdStudies) {
-            study.reload();
-            deletePatients(study.getPatientCollection(false));
-            deleteFromList(study.getAliquotedSpecimenCollection(false));
-            deleteFromList(study.getSourceSpecimenCollection(false));
-            study.reload();
-            study.delete();
+            deleteStudyAndDependencies(study);
         }
         createdStudies.clear();
+    }
+
+    public static void deleteStudyAndDependencies(StudyWrapper study) throws Exception {
+        study.reload();
+        deletePatients(study.getPatientCollection(false));
+        deleteFromList(study.getAliquotedSpecimenCollection(false));
+        deleteFromList(study.getSourceSpecimenCollection(false));
+        study.reload();
+        study.delete();
     }
 
     public static void deleteCreatedStudy(StudyWrapper study) throws Exception {

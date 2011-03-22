@@ -1,9 +1,7 @@
 package edu.ualberta.med.biobank.common.wrappers;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.wrappers.base.AliquotedSpecimenBaseWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
-import gov.nih.nci.system.applicationservice.ApplicationException;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
 public class AliquotedSpecimenWrapper extends AliquotedSpecimenBaseWrapper {
@@ -15,11 +13,6 @@ public class AliquotedSpecimenWrapper extends AliquotedSpecimenBaseWrapper {
 
     public AliquotedSpecimenWrapper(WritableApplicationService appService) {
         super(appService);
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
     }
 
     @Override

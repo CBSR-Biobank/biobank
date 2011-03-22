@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.peer.ShippingMethodPeer;
@@ -30,10 +31,11 @@ public class ShippingMethodWrapper extends ShippingMethodBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
+    protected void deleteChecks() throws BiobankDeleteException,
+        ApplicationException {
         List<CollectionEventWrapper> shipments = getCollectionEventCollection();
         if (shipments != null && shipments.size() > 0) {
-            throw new BiobankCheckException(
+            throw new BiobankDeleteException(
                 "Cannot delete this shipping company: shipments are still using it");
         }
     }
