@@ -47,9 +47,7 @@ public class ShipmentViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         shipmentAdapter = (ShipmentAdapter) adapter;
-        shipment = (OriginInfoWrapper) shipmentAdapter.getWrapper()
-            .getDatabaseClone();
-        retrieveShipment();
+        shipment = shipmentAdapter.getWrapper();
 
         setPartName();
     }

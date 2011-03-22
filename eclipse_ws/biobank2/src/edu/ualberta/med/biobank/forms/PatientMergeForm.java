@@ -67,8 +67,11 @@ public class PatientMergeForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         patient1Adapter = (PatientAdapter) adapter;
-        patient1 = (PatientWrapper) patient1Adapter.getWrapper()
-            .getDatabaseClone();
+        if (patient1Adapter.getWrapper().isNew())
+            patient1 = patient1Adapter.getWrapper();
+        else
+            patient1 = (PatientWrapper) patient1Adapter.getWrapper()
+                .getDatabaseClone();
         String tabName = "Merging Patient " + patient1.getPnumber();
         setPartName(tabName);
         patientNotNullValue = new WritableValue(Boolean.FALSE, Boolean.class);

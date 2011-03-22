@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
@@ -82,6 +83,8 @@ public class SiteAdapter extends AdapterBase {
 
     @Override
     public List<AdapterBase> search(Object searchedObject) {
+        if (searchedObject instanceof SiteWrapper)
+            return Arrays.asList((AdapterBase) this);
         return searchChildren(searchedObject);
     }
 

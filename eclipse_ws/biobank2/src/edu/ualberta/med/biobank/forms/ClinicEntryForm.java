@@ -63,7 +63,11 @@ public class ClinicEntryForm extends AddressEntryFormCommon {
             "Invalid editor input: object of type " //$NON-NLS-1$
                 + adapter.getClass().getName());
         clinicAdapter = (ClinicAdapter) adapter;
-        clinic = (ClinicWrapper) clinicAdapter.getWrapper().getDatabaseClone();
+        if (clinicAdapter.getWrapper().isNew())
+            clinic = clinicAdapter.getWrapper();
+        else
+            clinic = (ClinicWrapper) clinicAdapter.getWrapper()
+                .getDatabaseClone();
         clinic.reload();
 
         String tabName;

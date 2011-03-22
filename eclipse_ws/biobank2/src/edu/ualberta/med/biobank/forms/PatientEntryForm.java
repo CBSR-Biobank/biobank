@@ -51,7 +51,11 @@ public class PatientEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        patient = (PatientWrapper) adapter.getModelObject().getDatabaseClone();
+        if (adapter.getModelObject().isNew())
+            patient = (PatientWrapper) adapter.getModelObject();
+        else
+            patient = (PatientWrapper) adapter.getModelObject()
+                .getDatabaseClone();
         retrievePatient();
         try {
             patient.logEdit(null);

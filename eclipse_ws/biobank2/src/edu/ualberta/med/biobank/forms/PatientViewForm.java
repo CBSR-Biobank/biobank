@@ -39,8 +39,7 @@ public class PatientViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         patientAdapter = (PatientAdapter) adapter;
-        patient = (PatientWrapper) patientAdapter.getWrapper()
-            .getDatabaseClone();
+        patient = patientAdapter.getWrapper();
         retrievePatient();
         patient.logLookup(null);
         setPartName(Messages.getString("PatientViewForm.title", //$NON-NLS-1$

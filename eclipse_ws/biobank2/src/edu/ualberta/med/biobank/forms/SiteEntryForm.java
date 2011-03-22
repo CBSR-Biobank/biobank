@@ -63,7 +63,10 @@ public class SiteEntryForm extends AddressEntryFormCommon {
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
-        site = (SiteWrapper) siteAdapter.getWrapper().getDatabaseClone();
+        if (siteAdapter.getWrapper().isNew())
+            site = siteAdapter.getWrapper();
+        else
+            site = (SiteWrapper) siteAdapter.getWrapper().getDatabaseClone();
 
         String tabName;
         if (site.isNew()) {

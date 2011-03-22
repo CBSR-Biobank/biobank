@@ -58,7 +58,7 @@ public class SiteViewForm extends AddressViewFormCommon {
                 + adapter.getClass().getName());
 
         siteAdapter = (SiteAdapter) adapter;
-        site = (SiteWrapper) siteAdapter.getWrapper().getDatabaseClone();
+        site = siteAdapter.getWrapper();
         retrieveSite();
         setPartName(Messages.getString("SiteViewForm.title", //$NON-NLS-1$
             site.getNameShort()));

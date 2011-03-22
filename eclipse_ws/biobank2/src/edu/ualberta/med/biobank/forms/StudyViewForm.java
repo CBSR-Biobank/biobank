@@ -60,7 +60,7 @@ public class StudyViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        study = (StudyWrapper) studyAdapter.getWrapper().getDatabaseClone();
+        study = studyAdapter.getWrapper();
         // retrieve info from database because study could have been modified
         // after first opening
         study.reload();
