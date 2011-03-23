@@ -11,7 +11,9 @@ import java.util.Set;
 import org.apache.commons.lang.StringUtils;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.CapacityPeer;
 import edu.ualberta.med.biobank.common.peer.ContainerLabelingSchemePeer;
 import edu.ualberta.med.biobank.common.peer.ContainerPeer;
@@ -21,7 +23,6 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPositionPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenTypePeer;
-import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.RowColPos;
 import edu.ualberta.med.biobank.common.wrappers.base.ContainerTypeBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.CapacityWrapper;
@@ -192,7 +193,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
     @Override
     protected void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsedByContainers()) {
-            throw new BiobankCheckException("Unable to delete container type "
+            throw new BiobankDeleteException("Unable to delete container type "
                 + getName() + ". A container of this type exists in storage."
                 + " Remove all instances before deleting this type.");
         }
@@ -204,7 +205,7 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
         + ContainerPeer.CONTAINER_TYPE.getName() + "=?";
 
     public boolean isUsedByContainers() throws ApplicationException,
-        BiobankException {
+        BiobankQueryResultSizeException {
         HQLCriteria c = new HQLCriteria(IS_USED_BY_CONTAINERS_QRY,
             Arrays.asList(new Object[] { wrappedObject }));
         return getCountResult(appService, c) > 0;
@@ -517,13 +518,13 @@ public class ContainerTypeWrapper extends ContainerTypeBaseWrapper {
             getRowCapacity(), getColCapacity());
     }
 
-    @Override
-    public SiteWrapper getCenterLinkedToObject() {
-        return getSite();
-    }
+    // @Override
+    // public SiteWrapper getCenterLinkedToObjectForSecu() {
+    // return getSite();
+    // }
 
-    @Override
-    public boolean checkSpecificAccess(User user, Integer siteId) {
-        return user.isSiteAdministrator(siteId);
-    }
+    // @Override
+    // public boolean checkSpecificAccess(User user, CenterWrapper<?> center) {
+    // return user.isCenterAdministrator(center);
+    // }
 }

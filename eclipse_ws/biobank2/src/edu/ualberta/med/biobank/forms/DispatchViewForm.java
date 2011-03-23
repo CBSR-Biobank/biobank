@@ -32,7 +32,7 @@ import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.SendDispatchDialog;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.dispatch.DispatchAdapter;
-import edu.ualberta.med.biobank.views.DispatchAdministrationView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
@@ -95,7 +95,7 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     public void reload() throws Exception {
         retrieveDispatch();
-        setPartName("Dispatch sent on " + dispatch.getDepartedAt());
+        setPartName("Dispatch sent on " + dispatch.getPackedAt());
         setDispatchValues();
         aliquotsTree.refresh();
     }
@@ -103,8 +103,8 @@ public class DispatchViewForm extends BiobankViewForm {
     @Override
     protected void createFormContent() throws Exception {
         String dateString = "";
-        if (dispatch.getDepartedAt() != null) {
-            dateString = " on " + dispatch.getFormattedDeparted();
+        if (dispatch.getPackedAt() != null) {
+            dateString = " on " + dispatch.getFormattedPackedAt();
         }
         canSeeEverything = true;
         if (dispatch.getSenderCenter() == null) {
@@ -141,7 +141,9 @@ public class DispatchViewForm extends BiobankViewForm {
                 createSendButton();
             else if (dispatch.canBeReceivedBy(user))
                 createReceiveButtons();
-            else if (dispatch.canBeClosedBy(user))
+            else if (dispatch.canBeClosedBy(user)
+                && dispatch.isInReceivedState()
+                && dispatch.getNonProcessedDispatchSpecimenCollection().size() == 0)
                 createCloseButton();
         }
     }
@@ -277,7 +279,7 @@ public class DispatchViewForm extends BiobankViewForm {
                     } catch (Exception e1) {
                         BiobankPlugin.openAsyncError("Save error", e1);
                     }
-                    DispatchAdministrationView.getCurrent().reload();
+                    SpecimenTransitView.getCurrent().reload();
                     dispatchAdapter.openViewForm();
                 }
             }
@@ -339,7 +341,7 @@ public class DispatchViewForm extends BiobankViewForm {
                 .getReceiverCenter().getName());
         if (dispatch.getShipmentInfo() != null) {
             if (departedLabel != null)
-                setTextValue(departedLabel, dispatch.getFormattedDeparted());
+                setTextValue(departedLabel, dispatch.getFormattedPackedAt());
             if (shippingMethodLabel != null)
                 setTextValue(shippingMethodLabel, dispatch.getShipmentInfo()
                     .getShippingMethod() == null ? "" : dispatch

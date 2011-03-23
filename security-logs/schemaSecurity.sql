@@ -82,7 +82,6 @@ CREATE TABLE `csm_filter_clause` (
 
 LOCK TABLES `csm_filter_clause` WRITE;
 /*!40000 ALTER TABLE `csm_filter_clause` DISABLE KEYS */;
-INSERT INTO `csm_filter_clause` VALUES (1,'edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site - self','id','java.lang.Integer','','','id in (select s.ID from site s where s.id in ( select pe.attribute_value from csm_protection_group pg, csm_protection_element pe, csm_pg_pe pgpe, csm_user_group_role_pg ugrpg, csm_user u, csm_role_privilege rp, csm_role r, csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.user_id = u.user_id and ugrpg.protection_group_id = any (select pg1.protection_group_id from csm_protection_group pg1 where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id = (select pg2.parent_protection_group_id from csm_protection_group pg2 where pg2.protection_group_id = pg.protection_group_id)) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= \'edu.ualberta.med.biobank.model.Site\' and pe.attribute=\'id\' and p.privilege_name=\'READ\' and u.login_name=:USER_NAME and pe.application_id=:APPLICATION_ID) or s.id in (select distinct pe.attribute_value from csm_protection_group pg, csm_protection_element pe, csm_pg_pe pgpe, csm_user_group_role_pg ugrpg, csm_group g, csm_role_privilege rp, csm_role r, csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.group_id = g.group_id and ugrpg.protection_group_id = any ( select pg1.protection_group_id from csm_protection_group pg1 where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id =  (select pg2.parent_protection_group_id from csm_protection_group pg2  where pg2.protection_group_id = pg.protection_group_id)) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= \'edu.ualberta.med.biobank.model.Site\' and p.privilege_name=\'READ\' and g.group_name in (select grp.group_name from csm_group grp, csm_user_group userGrp, csm_user u where u.user_id = userGrp.user_id and userGrp.group_id = grp.group_id and u.login_name=:USER_NAME) and pe.application_id=:APPLICATION_ID))','id in (select table_name_csm_.id   from site table_name_csm_ where table_name_csm_.id in \r\n( select distinct pe.attribute_value from csm_protection_group pg, 	csm_protection_element pe, 	csm_pg_pe pgpe,	csm_user_group_role_pg ugrpg, 	csm_group g, 	csm_role_privilege rp, 	csm_role r, 	csm_privilege p where ugrpg.role_id = r.role_id and ugrpg.group_id = g.group_id and ugrpg.protection_group_id = any ( select pg1.protection_group_id from csm_protection_group pg1  where pg1.protection_group_id = pg.protection_group_id or pg1.protection_group_id =  (select pg2.parent_protection_group_id from csm_protection_group pg2 where pg2.protection_group_id = pg.protection_group_id) ) and pg.protection_group_id = pgpe.protection_group_id and pgpe.protection_element_id = pe.protection_element_id and r.role_id = rp.role_id and rp.privilege_id = p.privilege_id and pe.object_id= \'edu.ualberta.med.biobank.model.Site\' and p.privilege_name=\'READ\' and g.group_name in (:GROUP_NAMES ) and pe.application_id=:APPLICATION_ID))',2,'2010-01-27');
 /*!40000 ALTER TABLE `csm_filter_clause` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -112,7 +111,7 @@ CREATE TABLE `csm_group` (
 
 LOCK TABLES `csm_group` WRITE;
 /*!40000 ALTER TABLE `csm_group` DISABLE KEYS */;
-INSERT INTO `csm_group` VALUES (5,'Website Administrator','** DO NOT RENAME **','2010-10-20',2);
+INSERT INTO `csm_group` VALUES (5,'Super Administrator','Super administrator of the application','2011-03-11',2);
 INSERT INTO `csm_group` VALUES (6,'CBSR Technician Level 1','','2010-01-28',2);
 INSERT INTO `csm_group` VALUES (7,'CBSR Technician Level 2','','2010-01-28',2);
 INSERT INTO `csm_group` VALUES (8,'Calgary Technicians','','2010-04-20',2);
@@ -138,7 +137,7 @@ CREATE TABLE `csm_pg_pe` (
   KEY `idx_PROTECTION_GROUP_ID` (`PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PROTECTION_ELEMENT_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_ELEMENT_ID`) REFERENCES `csm_protection_element` (`PROTECTION_ELEMENT_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_GROUP_PROTECTION_ELEMENT` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=1285 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=1418 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -147,81 +146,94 @@ CREATE TABLE `csm_pg_pe` (
 
 LOCK TABLES `csm_pg_pe` WRITE;
 /*!40000 ALTER TABLE `csm_pg_pe` DISABLE KEYS */;
-INSERT INTO `csm_pg_pe` VALUES (826,47,8,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (828,47,11,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (836,48,19,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (837,48,7,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (838,48,14,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (839,48,36,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (840,48,15,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (841,48,34,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (877,50,19,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (878,50,65,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (879,50,7,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (881,50,151,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (882,50,34,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (935,49,24,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (936,49,12,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (937,49,3,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (938,49,16,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (939,49,32,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1011,45,10,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1012,45,35,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1013,45,4,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1014,45,5,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1015,45,13,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1016,45,11,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1017,45,25,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1018,45,30,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1019,45,20,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1043,11,18,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1238,1,186,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1239,1,18,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1240,1,25,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1241,1,7,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1242,1,180,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1243,1,10,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1244,1,21,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1245,1,178,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1246,1,36,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1247,1,6,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1248,1,188,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1249,1,194,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1250,1,170,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1251,1,51,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1252,1,8,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1253,1,24,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1254,1,151,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1255,1,32,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1256,1,65,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1257,1,27,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1258,1,183,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1259,1,13,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1260,1,20,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1261,1,19,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1262,1,179,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1263,1,16,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1264,1,187,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1265,1,5,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1266,1,192,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1267,1,14,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1268,1,30,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1269,1,34,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1270,1,11,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1271,1,193,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1272,1,177,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1273,1,15,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1274,1,181,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1275,1,175,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1276,1,184,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1277,1,171,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1278,1,35,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1279,1,4,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1280,1,176,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1281,1,3,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1282,1,185,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1283,1,12,'0000-00-00');
-INSERT INTO `csm_pg_pe` VALUES (1284,1,182,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1289,1,186,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1290,1,18,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1291,1,25,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1292,1,7,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1293,1,180,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1294,1,10,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1295,1,21,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1296,1,178,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1297,1,36,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1298,1,6,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1299,1,188,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1300,1,170,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1301,1,51,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1302,1,8,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1303,1,24,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1304,1,151,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1305,1,32,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1306,1,65,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1307,1,27,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1308,1,183,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1309,1,13,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1310,1,20,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1311,1,19,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1312,1,179,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1313,1,16,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1314,1,187,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1315,1,5,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1316,1,192,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1318,1,30,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1319,1,34,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1320,1,11,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1321,1,193,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1322,1,177,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1323,1,15,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1324,1,181,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1325,1,175,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1326,1,184,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1327,1,171,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1328,1,35,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1329,1,4,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1330,1,176,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1331,1,3,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1332,1,185,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1333,1,12,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1334,1,182,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1335,46,16,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1336,46,193,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1353,65,175,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1354,65,179,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1355,65,184,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1356,65,180,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1357,65,176,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1358,65,178,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1359,65,183,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1360,65,177,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1361,65,182,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1362,65,181,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1372,66,186,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1373,66,24,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1374,67,24,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1375,48,19,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1376,48,7,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1377,48,24,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1378,48,36,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1379,48,34,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1380,48,15,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1381,50,19,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1382,50,7,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1383,50,171,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1384,50,151,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1385,50,24,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1387,50,192,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1388,50,65,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1389,50,36,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1390,50,34,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1395,49,187,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1396,68,3,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1397,69,32,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1398,70,12,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1409,47,16,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1410,47,8,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1411,47,24,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1412,47,185,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1413,47,11,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1414,45,19,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1415,45,7,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1416,45,34,'0000-00-00');
+INSERT INTO `csm_pg_pe` VALUES (1417,45,20,'0000-00-00');
 /*!40000 ALTER TABLE `csm_pg_pe` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -300,7 +312,6 @@ INSERT INTO `csm_protection_element` VALUES (10,'edu.ualberta.med.biobank.model.
 INSERT INTO `csm_protection_element` VALUES (11,'edu.ualberta.med.biobank.model.EventAttr','edu.ualberta.med.biobank.model.EventAttr','edu.ualberta.med.biobank.model.EventAttr','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (12,'edu.ualberta.med.biobank.model.GlobalEventAttr','edu.ualberta.med.biobank.model.GlobalEventAttr','edu.ualberta.med.biobank.model.GlobalEventAttr','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (13,'edu.ualberta.med.biobank.model.EventAttrType','edu.ualberta.med.biobank.model.EventAttrType','edu.ualberta.med.biobank.model.EventAttrType','','','',2,'2011-02-28');
-INSERT INTO `csm_protection_element` VALUES (14,'edu.ualberta.med.biobank.model.Aliquot','edu.ualberta.med.biobank.model.Aliquot','edu.ualberta.med.biobank.model.Aliquot',NULL,NULL,NULL,2,'2009-07-22');
 INSERT INTO `csm_protection_element` VALUES (15,'edu.ualberta.med.biobank.model.SpecimenPosition','edu.ualberta.med.biobank.model.SpecimenPosition','edu.ualberta.med.biobank.model.SpecimenPosition','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (16,'edu.ualberta.med.biobank.model.OriginInfo','edu.ualberta.med.biobank.model.OriginInfo','edu.ualberta.med.biobank.model.OriginInfo','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (18,'edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site','edu.ualberta.med.biobank.model.Site',NULL,NULL,NULL,2,'2009-07-22');
@@ -336,7 +347,6 @@ INSERT INTO `csm_protection_element` VALUES (187,'edu.ualberta.med.biobank.model
 INSERT INTO `csm_protection_element` VALUES (188,'edu.ualberta.med.biobank.model.Center','','edu.ualberta.med.biobank.model.Center','','','',2,'2011-02-15');
 INSERT INTO `csm_protection_element` VALUES (192,'edu.ualberta.med.biobank.model.RequestSpecimen','','edu.ualberta.med.biobank.model.RequestSpecimen','','','',2,'2011-02-28');
 INSERT INTO `csm_protection_element` VALUES (193,'edu.ualberta.med.biobank.model.ShipmentInfo','edu.ualberta.med.biobank.model.ShipmentInfo','edu.ualberta.med.biobank.model.ShipmentInfo','','','',2,'2011-02-28');
-INSERT INTO `csm_protection_element` VALUES (194,'edu.ualberta.med.biobank.model.SpecimenLink','edu.ualberta.med.biobank.model.SpecimenLink','edu.ualberta.med.biobank.model.SpecimenLink','','','',2,'2011-03-04');
 /*!40000 ALTER TABLE `csm_protection_element` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -361,7 +371,7 @@ CREATE TABLE `csm_protection_group` (
   KEY `idx_PARENT_PROTECTION_GROUP_ID` (`PARENT_PROTECTION_GROUP_ID`),
   CONSTRAINT `FK_PG_APPLICATION` FOREIGN KEY (`APPLICATION_ID`) REFERENCES `csm_application` (`APPLICATION_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_PROTECTION_GROUP` FOREIGN KEY (`PARENT_PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`)
-) ENGINE=InnoDB AUTO_INCREMENT=65 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=74 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -370,14 +380,20 @@ CREATE TABLE `csm_protection_group` (
 
 LOCK TABLES `csm_protection_group` WRITE;
 /*!40000 ALTER TABLE `csm_protection_group` DISABLE KEYS */;
-INSERT INTO `csm_protection_group` VALUES (1,'All Objects','Contains Protection Element of each model object, except Site',2,0,'2010-12-08',NULL);
-INSERT INTO `csm_protection_group` VALUES (11,'All Existing Sites','** DO NOT REMOVE ** Is parent of all sites protection elements + the Site class itself',2,0,'2010-10-20',NULL);
-INSERT INTO `csm_protection_group` VALUES (45,'Site Administration Features','** DO NOT RENAME **\r\nContains protection elements (or protection groups children) that need privileges to manage the internal features of a site - will be available only to sites the user can update',2,0,'2010-10-20',NULL);
-INSERT INTO `csm_protection_group` VALUES (46,'Clinic Shipments Feature','Represents the clinic shipments feature + contains the protection elements that need specific privileges to create/update/delete clinic shipments - will be available only to sites the user can update',2,0,'2010-10-20',45);
-INSERT INTO `csm_protection_group` VALUES (47,'Patient/Patient Visit Feature','Represents the patient/visit feature + contains the protection elements that need specific privileges to create/update/delete patients and visits - will be available only to sites the user can update',2,0,'2010-10-20',45);
-INSERT INTO `csm_protection_group` VALUES (48,'Link/Assign Feature','represents the aliquot link/assign feature  + contains the protection elements that need create/update/delete privileges to manage these aliquots - will be available only to sites the user can update',2,0,'2010-10-20',45);
-INSERT INTO `csm_protection_group` VALUES (49,'Global Objects Administration Features','Objects that are global to all sites',2,0,'2010-10-20',NULL);
-INSERT INTO `csm_protection_group` VALUES (50,'Dispatch Feature','Represent the dispatch feature + contains protection elements needed to manage dispatches - will be available only to sites the user can update',2,0,'2010-10-20',45);
+INSERT INTO `csm_protection_group` VALUES (1,'Internal: All Objects','Contains Protection Element of each model object',2,0,'2011-03-11',NULL);
+INSERT INTO `csm_protection_group` VALUES (45,'Internal: Center Administrator','** DO NOT RENAME **\r\nAct like a flag to tell if will be administrator of the working centers - Also contains all center specific features',2,0,'2011-03-14',NULL);
+INSERT INTO `csm_protection_group` VALUES (46,'Center Feature: Clinic Shipments','Represents the ability to create/delete/update shipments (needed when clinics doesn\'t use the software)',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (47,'Center Feature: Collection Event','Represents the ability to create/update/delete patients and collection events',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (48,'Center Feature: Assign positions','Represents the ability to assign a position to a specimen',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (49,'Global Feature: Specimen Type','Represents the ability to create/edit/delete specimen types',2,0,'2011-03-11',73);
+INSERT INTO `csm_protection_group` VALUES (50,'Center Feature: Dispatch/Request','Represent the dispatch and request features + contains protection elements needed to manage dispatches',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (65,'Center Feature: Reports','Represents the reports feature',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (66,'Center Feature: Processing Event','Represents the ability to create/delete/update processing events',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (67,'Center Feature: Link specimens','Represents the ability to link specimens to their source specimens',2,0,'2011-03-11',45);
+INSERT INTO `csm_protection_group` VALUES (68,'Global Feature: Activity Status','Represents the ability to create/edit/delete activity statuses',2,0,'2011-03-11',73);
+INSERT INTO `csm_protection_group` VALUES (69,'Global Feature: Shipping Method','Represents the ability to create/edit/delete shipping methodes',2,0,'2011-03-11',73);
+INSERT INTO `csm_protection_group` VALUES (70,'Global Feature: Collection Event Attributes Types','Represents the ability to create/edit/delete collection Event Attributes Types',2,0,'2011-03-11',73);
+INSERT INTO `csm_protection_group` VALUES (73,'Internal: All Global Features','contains all non center specific features',2,0,'2011-03-14',NULL);
 /*!40000 ALTER TABLE `csm_protection_group` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -410,7 +426,7 @@ LOCK TABLES `csm_role` WRITE;
 /*!40000 ALTER TABLE `csm_role` DISABLE KEYS */;
 INSERT INTO `csm_role` VALUES (7,'Read Only','has read privilege on objects',2,1,'2010-10-20');
 INSERT INTO `csm_role` VALUES (8,'Object Full Access','has create/read/update/delete privileges on objects',2,1,'2010-10-20');
-INSERT INTO `csm_role` VALUES (9,'Site Full Access','has read and update privilege on site object',2,1,'2010-10-20');
+INSERT INTO `csm_role` VALUES (9,'Center Full Access','has read and update privilege on center object',2,1,'2011-03-11');
 /*!40000 ALTER TABLE `csm_role` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -562,7 +578,7 @@ CREATE TABLE `csm_user_group_role_pg` (
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_PROTECTION_GROUP` FOREIGN KEY (`PROTECTION_GROUP_ID`) REFERENCES `csm_protection_group` (`PROTECTION_GROUP_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_ROLE` FOREIGN KEY (`ROLE_ID`) REFERENCES `csm_role` (`ROLE_ID`) ON DELETE CASCADE,
   CONSTRAINT `FK_USER_GROUP_ROLE_PROTECTION_GROUP_USER` FOREIGN KEY (`USER_ID`) REFERENCES `csm_user` (`USER_ID`) ON DELETE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=193 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB AUTO_INCREMENT=200 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -572,9 +588,7 @@ CREATE TABLE `csm_user_group_role_pg` (
 LOCK TABLES `csm_user_group_role_pg` WRITE;
 /*!40000 ALTER TABLE `csm_user_group_role_pg` DISABLE KEYS */;
 INSERT INTO `csm_user_group_role_pg` VALUES (163,NULL,9,8,45,'2010-10-20');
-INSERT INTO `csm_user_group_role_pg` VALUES (164,NULL,8,8,48,'2010-10-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (165,NULL,8,7,1,'2010-10-20');
-INSERT INTO `csm_user_group_role_pg` VALUES (168,NULL,8,8,46,'2010-10-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (169,NULL,8,8,50,'2010-10-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (170,NULL,8,8,47,'2010-10-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (171,NULL,6,7,1,'2010-10-20');
@@ -585,8 +599,14 @@ INSERT INTO `csm_user_group_role_pg` VALUES (179,NULL,7,8,46,'2010-10-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (180,NULL,7,8,50,'2010-10-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (181,NULL,7,8,47,'2010-10-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (182,NULL,5,8,1,'2010-10-20');
-INSERT INTO `csm_user_group_role_pg` VALUES (183,NULL,5,8,11,'2010-10-20');
 INSERT INTO `csm_user_group_role_pg` VALUES (184,NULL,9,7,1,'2010-10-20');
+INSERT INTO `csm_user_group_role_pg` VALUES (193,NULL,7,8,67,'2011-03-11');
+INSERT INTO `csm_user_group_role_pg` VALUES (194,NULL,7,8,66,'2011-03-11');
+INSERT INTO `csm_user_group_role_pg` VALUES (195,NULL,7,8,65,'2011-03-11');
+INSERT INTO `csm_user_group_role_pg` VALUES (196,NULL,8,8,67,'2011-03-11');
+INSERT INTO `csm_user_group_role_pg` VALUES (197,NULL,8,8,66,'2011-03-11');
+INSERT INTO `csm_user_group_role_pg` VALUES (198,NULL,5,8,45,'2011-03-11');
+INSERT INTO `csm_user_group_role_pg` VALUES (199,NULL,5,8,73,'2011-03-14');
 /*!40000 ALTER TABLE `csm_user_group_role_pg` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -630,4 +650,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2011-03-04 14:26:55
+-- Dump completed on 2011-03-17 11:30:26

@@ -8,7 +8,10 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
@@ -39,6 +42,11 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         ApplicationException {
         // TODO: new checks required
         // TODO at least one specimen added ?
+        if (getWorksheet() != null
+            && getProcessingEventsWithWorksheetCount(appService, getWorksheet()) > 0) {
+            throw new BiobankCheckException("Worksheet " + getWorksheet()
+                + " is already used.");
+        }
     }
 
     @Override
@@ -70,7 +78,8 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankException, ApplicationException {
+    protected void deleteChecks() throws BiobankDeleteException,
+        ApplicationException {
         // FIXME
         // if (getChildSpecimenCount(false) > 0) {
         // throw new BiobankCheckException(
@@ -151,6 +160,24 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         return log;
     }
 
+    private static final String PROCESSING_EVENT_BY_DATE_QRY = "select pEvent from "
+        + ProcessingEvent.class.getName()
+        + " pEvent where DATE(pEvent."
+        + ProcessingEventPeer.CREATED_AT.getName() + ")=DATE(?)";
+
+    public static List<ProcessingEventWrapper> getProcessingEventsWithDate(
+        WritableApplicationService appService, Date date) throws Exception {
+        HQLCriteria c = new HQLCriteria(PROCESSING_EVENT_BY_DATE_QRY,
+            Arrays.asList(new Object[] { date }));
+        List<ProcessingEvent> pvs = appService.query(c);
+        List<ProcessingEventWrapper> pvws = new ArrayList<ProcessingEventWrapper>();
+        for (ProcessingEvent pv : pvs)
+            pvws.add(new ProcessingEventWrapper(appService, pv));
+        if (pvws.size() == 0)
+            return new ArrayList<ProcessingEventWrapper>();
+        return pvws;
+    }
+
     private static final String PROCESSING_EVENT_BY_WORKSHEET_QRY = "select pEvent from "
         + ProcessingEvent.class.getName()
         + " pEvent where pEvent."
@@ -166,14 +193,28 @@ public class ProcessingEventWrapper extends ProcessingEventBaseWrapper {
         for (ProcessingEvent pv : pvs)
             pvws.add(new ProcessingEventWrapper(appService, pv));
         if (pvws.size() == 0)
-            return null;
+            return new ArrayList<ProcessingEventWrapper>();
         return pvws;
     }
 
-    @Override
-    public CenterWrapper<?> getCenterLinkedToObject() {
-        return getCenter();
+    private static final String PROCESSING_EVENT_BY_WORKSHEET_COUNT_QRY = "select count(pEvent) from "
+        + ProcessingEvent.class.getName()
+        + " pEvent where pEvent."
+        + ProcessingEventPeer.WORKSHEET.getName() + "=?";
+
+    public static long getProcessingEventsWithWorksheetCount(
+        WritableApplicationService appService, String worksheetNumber)
+        throws BiobankQueryResultSizeException, ApplicationException {
+        HQLCriteria c = new HQLCriteria(
+            PROCESSING_EVENT_BY_WORKSHEET_COUNT_QRY,
+            Arrays.asList(new Object[] { worksheetNumber }));
+        return getCountResult(appService, c);
     }
+
+    // @Override
+    // public CenterWrapper<?> getCenterLinkedToObjectForSecu() {
+    // return getCenter();
+    // }
 
     public static Collection<? extends ModelWrapper<?>> getAllProcessingEvents(
         BiobankApplicationService appService) throws ApplicationException {

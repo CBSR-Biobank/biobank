@@ -26,7 +26,7 @@ public class ClinicStudyInfoTable extends InfoTableWidget<StudyWrapper> {
     }
 
     private static final String[] HEADINGS = new String[] { "Study",
-        "No. Patients", "No. Patient Visits" };
+        "#Patients", "#Collection Events" };
 
     private ClinicWrapper clinic;
 

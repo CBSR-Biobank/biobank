@@ -2,7 +2,7 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -11,6 +11,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.ProcessingEventPeer;
+import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.base.CenterBaseWrapper;
 import edu.ualberta.med.biobank.common.wrappers.internal.AddressWrapper;
 import edu.ualberta.med.biobank.model.Center;
@@ -120,38 +121,25 @@ public abstract class CenterWrapper<E extends Center> extends
     }
 
     /**
-     * Collection event count for this centre. This count is different for each
-     * centre: the method should be defined in each centre type
+     * Collection event count for this center. This count is different for each
+     * center: the method should be defined in each center type
      */
     public abstract long getCollectionEventCount() throws ApplicationException,
         BiobankException;
 
     /**
-     * Collection event count for this centre. This count is different for each
-     * centre: the method should be defined in each centre type
+     * Collection event count for this center. This count is different for each
+     * center: the method should be defined in each center type
      */
     public abstract long getCollectionEventCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;
 
     /**
-     * Collection event count for this centre. This count is different for each
-     * centre: the method should be defined in each centre type
+     * Collection event count for this center. This count is different for each
+     * center: the method should be defined in each center type
      */
     public abstract long getPatientCountForStudy(StudyWrapper study)
         throws ApplicationException, BiobankException;
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    public CollectionEventWrapper getCollectionEvent(Date dateReceived) {
-        return null;
-    }
-
-    @SuppressWarnings("unused")
-    @Deprecated
-    public CollectionEventWrapper getCollectionEvent(Date dateReceived,
-        String patientNumber) {
-        return null;
-    }
 
     @Override
     protected void persistDependencies(Center origObject) throws Exception {
@@ -179,12 +167,141 @@ public abstract class CenterWrapper<E extends Center> extends
         return centerWrappers;
     }
 
-    public static List<CenterWrapper<?>> getAllCenters(
-        WritableApplicationService appService) throws ApplicationException {
-        HQLCriteria c = new HQLCriteria("from " + Center.class.getName());
-        List<Center> centers = appService.query(c);
-        List<CenterWrapper<?>> wrappedCenters = ModelWrapper
-            .wrapModelCollection(appService, centers, null);
-        return wrappedCenters;
+    public static List<CenterWrapper<?>> getOtherCenters(
+        WritableApplicationService appService, CenterWrapper<?> center)
+        throws ApplicationException {
+        List<CenterWrapper<?>> centers = getCenters(appService);
+        centers.remove(center);
+        return centers;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchWrapper> getInTransitSentDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("inTransitSentDispatchCollection");
+        if (shipCollection == null) {
+            List<DispatchWrapper> children = getSrcDispatchCollection(false);
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.IN_TRANSIT.equals(dispatch
+                        .getDispatchState())) {
+                        shipCollection.add(dispatch);
+                    }
+                }
+                propertiesMap.put("inTransitSentDispatchCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchWrapper> getInTransitReceiveDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("inTransitReceiveDispatchCollection");
+        if (shipCollection == null) {
+            List<DispatchWrapper> children = getDstDispatchCollection(false);
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.IN_TRANSIT.equals(dispatch
+                        .getDispatchState())) {
+                        shipCollection.add(dispatch);
+                    }
+                }
+                propertiesMap.put("inTransitReceiveDispatchCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchWrapper> getReceivingNoErrorsDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("receivingDispatchCollection");
+        if (shipCollection == null) {
+            List<DispatchWrapper> children = getDstDispatchCollection(false);
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.RECEIVED.equals(dispatch
+                        .getDispatchState()) && !dispatch.hasErrors()) {
+                        shipCollection.add(dispatch);
+                    }
+                }
+                propertiesMap
+                    .put("receivingDispatchCollection", shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchWrapper> getReceivingWithErrorsDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("receivingWithErrorsDispatchCollection");
+        if (shipCollection == null) {
+            List<DispatchWrapper> children = getDstDispatchCollection(false);
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.RECEIVED.equals(dispatch
+                        .getDispatchState()) && dispatch.hasErrors()) {
+                        shipCollection.add(dispatch);
+                    }
+                }
+                propertiesMap.put("receivingWithErrorsDispatchCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<DispatchWrapper> getInCreationDispatchCollection() {
+        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
+            .get("inCreationDispatchCollection");
+        if (shipCollection == null) {
+            List<DispatchWrapper> children = getSrcDispatchCollection(false);
+            if (children != null) {
+                shipCollection = new ArrayList<DispatchWrapper>();
+                for (DispatchWrapper dispatch : children) {
+                    if (DispatchState.CREATION.equals(dispatch
+                        .getDispatchState())) {
+                        shipCollection.add(dispatch);
+                    }
+                }
+                propertiesMap.put("inCreationDispatchCollection",
+                    shipCollection);
+            }
+        }
+        return shipCollection;
+    }
+
+    public static Collection<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
+        CenterWrapper<?> center) {
+        return center.getInTransitReceiveDispatchCollection();
+    }
+
+    public static Collection<? extends ModelWrapper<?>> getReceivingNoErrorsDispatchCollection(
+        CenterWrapper<?> center) {
+        return center.getReceivingNoErrorsDispatchCollection();
+    }
+
+    public static Collection<? extends ModelWrapper<?>> getInCreationDispatchCollection(
+        CenterWrapper<?> center) {
+        return center.getInCreationDispatchCollection();
+    }
+
+    public static Collection<? extends ModelWrapper<?>> getReceivingWithErrorsDispatchCollection(
+        CenterWrapper<?> center) {
+        return center.getReceivingWithErrorsDispatchCollection();
+    }
+
+    public static Collection<? extends ModelWrapper<?>> getInTransitSentDispatchCollection(
+        CenterWrapper<?> center) {
+        return center.getInTransitSentDispatchCollection();
     }
 }

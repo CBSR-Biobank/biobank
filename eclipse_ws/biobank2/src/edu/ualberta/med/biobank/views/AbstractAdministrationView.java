@@ -1,5 +1,7 @@
 package edu.ualberta.med.biobank.views;
 
+import java.util.Map;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -7,8 +9,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.ui.ISourceProviderListener;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.services.ISourceProviderService;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.treeview.RootNode;
 import edu.ualberta.med.biobank.widgets.AdapterTreeWidget;
 import edu.ualberta.med.biobank.widgets.BiobankText;
@@ -58,6 +64,8 @@ public abstract class AbstractAdministrationView extends
         gd.grabExcessHorizontalSpace = true;
         treeText.setLayoutData(gd);
         treeText.setToolTipText(getTreeTextToolTip());
+        searchComposite.setEnabled(false);
+        addWorkingCenterListener();
 
         adaptersTree = new AdapterTreeWidget(parent, false);
         getSite().setSelectionProvider(adaptersTree.getTreeViewer());
@@ -74,6 +82,36 @@ public abstract class AbstractAdministrationView extends
         adaptersTree.getTreeViewer().expandAll();
     }
 
+    private void addWorkingCenterListener() {
+        ISourceProviderService service = (ISourceProviderService) PlatformUI
+            .getWorkbench().getActiveWorkbenchWindow()
+            .getService(ISourceProviderService.class);
+        SessionState sessionSourceProvider = (SessionState) service
+            .getSourceProvider(SessionState.HAS_WORKING_CENTER_SOURCE_NAME);
+        sessionSourceProvider
+            .addSourceProviderListener(new ISourceProviderListener() {
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    String sourceName, Object sourceValue) {
+                    if (sourceValue != null) {
+                        if (!searchComposite.isDisposed()) {
+                            if (sourceValue instanceof Boolean)
+                                searchComposite
+                                    .setEnabled((Boolean) sourceValue);
+                            if (sourceValue instanceof String)
+                                searchComposite.setEnabled(new Boolean(
+                                    (String) sourceValue));
+                        }
+                    }
+                }
+
+                @Override
+                public void sourceChanged(int sourcePriority,
+                    @SuppressWarnings("rawtypes") Map sourceValuesByName) {
+                }
+            });
+    }
+
     protected abstract String getTreeTextToolTip();
 
     protected void createTreeTextOptions(
@@ -85,9 +123,11 @@ public abstract class AbstractAdministrationView extends
 
     @Override
     public void reload() {
-        getTreeViewer().refresh(true);
-        getTreeViewer().expandToLevel(3);
-        setSearchFieldsEnablement(true);
+        if (!getTreeViewer().getControl().isDisposed()) {
+            getTreeViewer().refresh(true);
+            getTreeViewer().expandToLevel(3);
+            setSearchFieldsEnablement(true);
+        }
     }
 
     @Override
@@ -96,10 +136,12 @@ public abstract class AbstractAdministrationView extends
         setSearchFieldsEnablement(false);
     }
 
-    private void setSearchFieldsEnablement(boolean enabled) {
-        searchComposite.setEnabled(enabled);
-        for (Control c : searchComposite.getChildren()) {
-            c.setEnabled(enabled);
+    protected void setSearchFieldsEnablement(boolean enabled) {
+        if (!searchComposite.isDisposed()) {
+            searchComposite.setEnabled(enabled);
+            for (Control c : searchComposite.getChildren()) {
+                c.setEnabled(enabled);
+            }
         }
     }
 

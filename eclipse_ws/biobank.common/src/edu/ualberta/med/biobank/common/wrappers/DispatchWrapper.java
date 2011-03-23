@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.EnumSet;
@@ -16,7 +15,6 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CenterPeer;
 import edu.ualberta.med.biobank.common.peer.DispatchPeer;
 import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
-import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.security.User;
 import edu.ualberta.med.biobank.common.util.DispatchSpecimenState;
 import edu.ualberta.med.biobank.common.util.DispatchState;
@@ -53,8 +51,8 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return DispatchState.getState(getState());
     }
 
-    public String getFormattedDeparted() {
-        return DateFormatter.formatAsDateTime(getDepartedAt());
+    public String getFormattedPackedAt() {
+        return DateFormatter.formatAsDateTime(getPackedAt());
     }
 
     public boolean hasErrors() {
@@ -152,12 +150,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         }
     }
 
-    public void resetMap() {
-        dispatchSpecimenMap.clear();
-    }
-
     public List<SpecimenWrapper> getSpecimenCollection(boolean sort) {
-        // TODO: cache?
         List<SpecimenWrapper> list = new ArrayList<SpecimenWrapper>();
         for (DispatchSpecimenWrapper da : getDispatchSpecimenCollection(false)) {
             list.add(da.getSpecimen());
@@ -205,7 +198,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         deletedDispatchedSpecimens.removeAll(newDispatchSpecimens);
     }
 
-    public class CheckStatus {
+    public static class CheckStatus {
         public CheckStatus(boolean b, String string) {
             this.ok = b;
             this.message = string;
@@ -216,98 +209,38 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     }
 
-    @Deprecated
-    public CheckStatus checkCanAddAliquot(SpecimenWrapper spc,
+    public CheckStatus checkCanAddSpecimen(SpecimenWrapper spc,
         boolean checkAlreadyAdded) {
         return checkCanAddSpecimen(getSpecimenCollection(), spc,
             checkAlreadyAdded);
     }
 
-    @Deprecated
-    /**
-     * need to rewrite this. Compare with following method that jon rewrote
-     */
-    protected CheckStatus checkCanAddSpecimen(
+    public CheckStatus checkCanAddSpecimen(
         List<SpecimenWrapper> currentAliquots, SpecimenWrapper aliquot,
         boolean checkAlreadyAdded) {
-        // if (aliquot.isNew()) {
-        // return new CheckStatus(false, "Cannot add aliquot "
-        // + aliquot.getInventoryId() + ": it has not already been saved");
-        // }
-        // if (!aliquot.isActive()) {
-        // return new CheckStatus(false, "Activity status of "
-        // + aliquot.getInventoryId() + " is not 'Active'."
-        // + " Check comments on this aliquot for more information.");
-        // }
-        // if (aliquot.getPosition() == null) {
-        // return new CheckStatus(false, "Cannot add aliquot "
-        // + aliquot.getInventoryIgetExtraDispatchSpecimensd()
-        // + ": it has no position. A position should be first assigned.");
-        // }
-        // if (aliquot.getParent() != null
-        // && !aliquot.getParent().getSite().equals(getSender())) {
-        // return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
-        // + " is currently assigned to site "
-        // + aliquot.getParent().getSite().getNameShort()
-        // + ". It should be first assigned to "
-        // + getSender().getNameShort() + " site.");
-        // }
-        // StudyWrapper aliquotStudy = aliquot.getPatientVisit().getPatient()
-        // .getStudy();
-        // // if (!aliquotStudy.equals(getStudy())) {
-        // // return new CheckStatus(false, "Aliquot " +
-        // aliquot.getInventoryId()
-        // // + " is linked to study " + aliquotStudy.getNameShort()
-        // // + ". The study of this shipment is "
-        // // + ((getStudy() == null) ? "none" : getStudy().getNameShort())
-        // // + ".");
-        // // }
-        // if (checkAlreadyAdded && currentAliquots != null
-        // && currentAliquots.contains(aliquot)) {
-        // return new CheckStatus(false, aliquot.getInventoryId()
-        // + " is already in this shipment.");
-        // }
-        // if (aliquot.isUsedInDispatch()) {
-        // return new CheckStatus(false, aliquot.getInventoryId()
-        // + " is already in another shipment in transit or in creation.");
-        // }
-        return new CheckStatus(true, "");
-    }
-
-    @Deprecated
-    /**
-     * See previous method comment. Return Checkstatus for compiling only
-     */
-    public CheckStatus checkCanAddSpecimen(
-        List<SpecimenWrapper> currentAliquots, SpecimenWrapper aliquot)
-        throws BiobankCheckException {
         if (aliquot.isNew()) {
-            throw new BiobankCheckException("Cannot add aliquot "
+            return new CheckStatus(false, "Cannot add aliquot "
                 + aliquot.getInventoryId() + ": it has not already been saved");
         }
         if (!aliquot.isActive()) {
-            throw new BiobankCheckException("Activity status of "
+            return new CheckStatus(false, "Activity status of "
                 + aliquot.getInventoryId() + " is not 'Active'."
                 + " Check comments on this aliquot for more information.");
         }
-        if (aliquot.getPosition() == null) {
-            throw new BiobankCheckException("Cannot add aliquot "
-                + aliquot.getInventoryId()
-                + ": it has no position. A position should be first assigned.");
-        }
-        if (!aliquot.getParent().getSite().equals(getSenderCenter())) {
-            throw new BiobankCheckException("Aliquot "
-                + aliquot.getInventoryId() + " is currently assigned to site "
-                + aliquot.getParent().getSite().getNameShort()
+        if (!aliquot.getCurrentCenter().equals(getSenderCenter())) {
+            return new CheckStatus(false, "Aliquot " + aliquot.getInventoryId()
+                + " is currently assigned to site "
+                + aliquot.getCurrentCenter().getNameShort()
                 + ". It should be first assigned to "
                 + getSenderCenter().getNameShort() + " site.");
         }
-        if (currentAliquots != null && currentAliquots.contains(aliquot)) {
-            throw new BiobankCheckException(aliquot.getInventoryId()
+        if (checkAlreadyAdded && currentAliquots != null
+            && currentAliquots.contains(aliquot)) {
+            return new CheckStatus(false, aliquot.getInventoryId()
                 + " is already in this Dispatch.");
         }
         if (aliquot.isUsedInDispatch()) {
-            throw new BiobankCheckException(aliquot.getInventoryId()
+            return new CheckStatus(false, aliquot.getInventoryId()
                 + " is already in a Dispatch in-transit or in creation.");
         }
         return new CheckStatus(true, "");
@@ -317,7 +250,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     public void removeFromDispatchSpecimenCollection(
         List<DispatchSpecimenWrapper> dasToRemove) {
         super.removeFromDispatchSpecimenCollection(dasToRemove);
-        dispatchSpecimenMap.clear();
+        resetMap();
     }
 
     public void removeAliquots(List<SpecimenWrapper> aliquotsToRemove) {
@@ -348,9 +281,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
                 da.getDispatchSpecimenState();
             }
         }
-        DispatchSpecimenWrapper da = this.getDispatchSpecimenCollection()
-            .get(0);
-        dispatchSpecimenMap.clear();
+        resetMap();
     }
 
     public boolean isInCreationState() {
@@ -375,108 +306,6 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         return DispatchState.CLOSED.equals(getDispatchState());
     }
 
-    private static final String DISPATCHES_IN_SITE_QRY = "from "
-        + Dispatch.class.getName() + " where ("
-        + Property.concatNames(DispatchPeer.SENDER_CENTER, SitePeer.ID)
-        + "=? or "
-        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, SitePeer.ID)
-        + "=?) and " + ShipmentInfoPeer.WAYBILL.getName() + "=?";
-
-    /**
-     * Search for shipments with the given waybill. Site can be the sender or
-     * the receiver.
-     */
-    public static List<DispatchWrapper> getDispatchesInSite(
-        WritableApplicationService appService, String waybill, SiteWrapper site)
-        throws ApplicationException {
-        HQLCriteria criteria = new HQLCriteria(DISPATCHES_IN_SITE_QRY,
-            Arrays.asList(new Object[] { site.getId(), site.getId(), waybill }));
-        List<Dispatch> shipments = appService.query(criteria);
-        List<DispatchWrapper> wrappers = new ArrayList<DispatchWrapper>();
-        for (Dispatch s : shipments) {
-            wrappers.add(new DispatchWrapper(appService, s));
-        }
-        return wrappers;
-    }
-
-    private static final String DISPATCHES_IN_SITE_BY_DATE_SENT_QRY = "from "
-        + Dispatch.class.getName() + " where ("
-        + Property.concatNames(DispatchPeer.SENDER_CENTER, SitePeer.ID)
-        + "=? or "
-        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, SitePeer.ID)
-        + "=?) and " + ShipmentInfoPeer.RECEIVED_AT.getName() + ">=? and "
-        + ShipmentInfoPeer.RECEIVED_AT.getName() + "<=?";
-
-    /**
-     * Search for shipments with the given date sent. Don't use hour and minute.
-     * Site can be the sender or the receiver.
-     */
-    public static List<DispatchWrapper> getDispatchesInSiteByDateSent(
-        WritableApplicationService appService, Date dateReceived,
-        SiteWrapper site) throws ApplicationException {
-        Calendar cal = Calendar.getInstance();
-        // date at 0:0am
-        cal.setTime(dateReceived);
-        cal.set(Calendar.AM_PM, Calendar.AM);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        Date startDate = cal.getTime();
-        // date at 0:0pm
-        cal.add(Calendar.DATE, 1);
-        Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria(
-            DISPATCHES_IN_SITE_BY_DATE_SENT_QRY, Arrays.asList(new Object[] {
-                site.getId(), site.getId(), startDate, endDate }));
-        List<Dispatch> shipments = appService.query(criteria);
-        List<DispatchWrapper> wrappers = new ArrayList<DispatchWrapper>();
-        for (Dispatch s : shipments) {
-            wrappers.add(new DispatchWrapper(appService, s));
-        }
-        return wrappers;
-    }
-
-    private static final String DISPATCHES_IN_SITE_BY_DATE_RECEIVED_QRY = "from "
-        + Dispatch.class.getName()
-        + " where ("
-        + Property.concatNames(DispatchPeer.SENDER_CENTER, SitePeer.ID)
-        + "=? or "
-        + Property.concatNames(DispatchPeer.RECEIVER_CENTER, SitePeer.ID)
-        + "=?) and "
-        + ShipmentInfoPeer.RECEIVED_AT.getName()
-        + " >=? and "
-        + ShipmentInfoPeer.RECEIVED_AT.getName() + " <= ?";
-
-    /**
-     * Search for shipments with the given date received. Don't use hour and
-     * minute. Site can be the sender or the receiver.
-     */
-    public static List<DispatchWrapper> getDispatchesInSiteByDateReceived(
-        WritableApplicationService appService, Date dateReceived,
-        SiteWrapper site) throws ApplicationException {
-        Calendar cal = Calendar.getInstance();
-        // date at 0:0am
-        cal.setTime(dateReceived);
-        cal.set(Calendar.AM_PM, Calendar.AM);
-        cal.set(Calendar.HOUR, 0);
-        cal.set(Calendar.MINUTE, 0);
-        cal.set(Calendar.SECOND, 0);
-        Date startDate = cal.getTime();
-        // date at 0:0pm
-        cal.add(Calendar.DATE, 1);
-        Date endDate = cal.getTime();
-        HQLCriteria criteria = new HQLCriteria(
-            DISPATCHES_IN_SITE_BY_DATE_RECEIVED_QRY,
-            Arrays.asList(new Object[] { site.getId(), site.getId(), startDate,
-                endDate }));
-        List<Dispatch> shipments = appService.query(criteria);
-        List<DispatchWrapper> wrappers = new ArrayList<DispatchWrapper>();
-        for (Dispatch s : shipments) {
-            wrappers.add(new DispatchWrapper(appService, s));
-        }
-        return wrappers;
-    }
-
     @Override
     public String toString() {
         StringBuffer sb = new StringBuffer();
@@ -490,7 +319,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean canBeSentBy(User user) {
         return canUpdate(user)
-            && getSenderCenter().equals(user.getCurrentWorkingCentre())
+            && getSenderCenter().equals(user.getCurrentWorkingCenter())
             && isInCreationState() && hasDispatchSpecimens();
     }
 
@@ -501,7 +330,7 @@ public class DispatchWrapper extends DispatchBaseWrapper {
 
     public boolean canBeReceivedBy(User user) {
         return canUpdate(user)
-            && getReceiverCenter().equals(user.getCurrentWorkingCentre())
+            && getReceiverCenter().equals(user.getCurrentWorkingCenter())
             && isInTransitState();
     }
 
@@ -542,20 +371,29 @@ public class DispatchWrapper extends DispatchBaseWrapper {
         for (SpecimenWrapper a : extraAliquots) {
             DispatchSpecimenWrapper da = new DispatchSpecimenWrapper(appService);
             da.setSpecimen(a);
+            da.setDispatch(this);
             da.setDispatchSpecimenState(DispatchSpecimenState.EXTRA);
             daws.add(da);
         }
         addToDispatchSpecimenCollection(daws);
+        resetMap();
     }
 
     public List<DispatchSpecimenWrapper> getDispatchSpecimenCollection() {
         return getDispatchSpecimenCollection(false);
     }
 
-    @Deprecated
-    public void addAliquots(List<SpecimenWrapper> asList) {
-        // TODO seems that this method has been removed... ?
-
+    public void addAliquots(List<SpecimenWrapper> aliquots) {
+        List<DispatchSpecimenWrapper> daws = new ArrayList<DispatchSpecimenWrapper>();
+        for (SpecimenWrapper a : aliquots) {
+            DispatchSpecimenWrapper da = new DispatchSpecimenWrapper(appService);
+            da.setSpecimen(a);
+            da.setDispatch(this);
+            da.setDispatchSpecimenState(DispatchSpecimenState.NONE);
+            daws.add(da);
+        }
+        addToDispatchSpecimenCollection(daws);
+        resetMap();
     }
 
     public boolean canBeClosedBy(User user) {
@@ -565,12 +403,60 @@ public class DispatchWrapper extends DispatchBaseWrapper {
     @Override
     public void reload() throws Exception {
         super.reload();
-        dispatchSpecimenMap.clear();
+        resetMap();
     }
 
     @Override
     public void reset() throws Exception {
         super.reset();
+        resetMap();
+    }
+
+    public void resetMap() {
         dispatchSpecimenMap.clear();
     }
+
+    private static final String DISPATCH_HQL_STRING = "from "
+        + Dispatch.class.getName() + " as d inner join fetch d."
+        + DispatchPeer.SHIPMENT_INFO.getName() + " as s where s is not null";
+
+    /**
+     * Search for shipments in the site with the given waybill
+     */
+    public static List<DispatchWrapper> getDispatchesByWaybill(
+        WritableApplicationService appService, String waybill)
+        throws ApplicationException {
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING + " and s."
+            + ShipmentInfoPeer.WAYBILL.getName() + " = ?");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { waybill }));
+
+        List<Dispatch> origins = appService.query(criteria);
+        List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, DispatchWrapper.class);
+
+        return shipments;
+    }
+
+    /**
+     * Search for shipments in the site with the given date received. Don't use
+     * hour and minute.
+     */
+    public static List<DispatchWrapper> getDispatchesByDateReceived(
+        WritableApplicationService appService, Date dateReceived)
+        throws ApplicationException {
+
+        StringBuilder qry = new StringBuilder(DISPATCH_HQL_STRING
+            + " and DATE(s." + ShipmentInfoPeer.RECEIVED_AT.getName()
+            + ") = DATE(?)");
+        HQLCriteria criteria = new HQLCriteria(qry.toString(),
+            Arrays.asList(new Object[] { dateReceived }));
+
+        List<Dispatch> origins = appService.query(criteria);
+        List<DispatchWrapper> shipments = ModelWrapper.wrapModelCollection(
+            appService, origins, DispatchWrapper.class);
+
+        return shipments;
+    }
+
 }

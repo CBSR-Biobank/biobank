@@ -17,7 +17,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
 
     public static enum ColumnsShown {
         ALL(new String[] { "Inventory ID", "Type", "Patient", "Visit#",
-            "Position", "Creation Date", "Quantity (ml)", "Activity Status",
+            "Position", "Time drawn", "Quantity (ml)", "Activity status",
             "Comment" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
@@ -45,8 +45,8 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
                 }
             }
         },
-        CEVENT_FORM(new String[] { "Inventory ID", "Type", "Creation Date",
-            "Quantity (ml)", "Activity Status" }) {
+        CEVENT_FORM(new String[] { "Inventory ID", "Type", "Time drawn",
+            "Quantity (ml)", "Activity status" }) {
             @Override
             public String getColumnValue(TableRowData row, int columnIndex) {
                 switch (columnIndex) {
@@ -133,7 +133,7 @@ public class SpecimenInfoTable extends InfoTableWidget<SpecimenWrapper> {
         info.specimen = specimen;
         info.inventoryId = specimen.getInventoryId();
         SpecimenTypeWrapper type = specimen.getSpecimenType();
-        Assert.isNotNull(type, "aliquot with null for sample type");
+        Assert.isNotNull(type, "aliquot with null for specimen type");
         info.type = type.getName();
         CollectionEventWrapper cEvent = specimen.getCollectionEvent();
         info.patient = cEvent == null ? "" : cEvent.getPatient().getPnumber();

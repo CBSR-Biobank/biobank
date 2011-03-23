@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.user;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.handlers.LogoutHandler;
 import edu.ualberta.med.biobank.validators.AbstractValidator;
 import edu.ualberta.med.biobank.validators.EmptyStringValidator;
@@ -45,7 +46,7 @@ public class UserEditDialog extends BiobankDialog {
     private static final String MSG_PASSWORDS_MUST_MATCH = "The passwords entered do not match.";
     private static final String CONFIRM_DEMOTION_TITLE = "Confirm Demotion";
     private static final String CONFIRM_DEMOTION_MESSAGE = "Are you certain you want to remove yourself as a "
-        + Group.GROUP_WEBSITE_ADMINISTRATOR + "?";
+        + Group.GROUP_SUPER_ADMIN + "?";
     private static final String USER_PERSIST_ERROR_TITLE = "Unable to Save User";
     private static final String MSG_LOGIN_UNIQUE = "Each user login must be unique: \"{0}\" is already taken. Please try a different login name.";
     private static final String USER_PERSIST_TITLE = "User Information Saved";
@@ -182,9 +183,9 @@ public class UserEditDialog extends BiobankDialog {
 
         final boolean warnOfRightsDemotion = SessionManager.getUser().equals(
             originalUser.getLogin())
-            && originalUser.isWebsiteAdministrator();
+            && originalUser.isSuperAdministrator();
         groupsWidget = new MultiSelectWidget(parent, SWT.NONE,
-            "Assigned Groups", "Available Groups", 75);
+            "Available Groups", "Assigned Groups", 75);
         groupsWidget.setSelections(groupMap, userInGroupIds);
         groupsWidget
             .addSelectionChangedListener(new BiobankEntryFormWidgetListener() {
@@ -195,7 +196,7 @@ public class UserEditDialog extends BiobankDialog {
                     if (warnOfRightsDemotion) {
                         for (Integer id : groupsWidget.getRemovedToSelection()) {
                             Group group = allGroupsMap.get(id.longValue());
-                            if (group != null && group.isWebsiteAdministrator()) {
+                            if (group != null && group.isSuperAdministratorGroup()) {
                                 if (!BiobankPlugin.openConfirm(
                                     CONFIRM_DEMOTION_TITLE,
                                     CONFIRM_DEMOTION_MESSAGE)) {

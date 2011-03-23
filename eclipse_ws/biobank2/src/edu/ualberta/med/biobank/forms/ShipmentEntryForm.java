@@ -16,6 +16,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
+import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
@@ -24,8 +25,7 @@ import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
 import edu.ualberta.med.biobank.widgets.SpecimenEntryWidget;
@@ -82,7 +82,11 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         shipmentAdapter = (ShipmentAdapter) adapter;
-        shipment = shipmentAdapter.getWrapper();
+        if (!shipmentAdapter.getWrapper().isNew())
+            shipment = (OriginInfoWrapper) shipmentAdapter.getWrapper()
+                .getDatabaseClone();
+        else
+            shipment = shipmentAdapter.getWrapper();
         try {
             shipment.reload();
         } catch (Exception e) {
@@ -115,8 +119,15 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
+        ShipmentInfoWrapper shipInfo = shipment.getShipmentInfo();
+        if (shipInfo == null) {
+            shipInfo = new ShipmentInfoWrapper(appService);
+            shipment.setShipmentInfo(shipInfo);
+        }
+
         senderComboViewer = createComboViewer(client, "Sender",
-            CenterWrapper.getCenters(appService), shipment.getCenter(),
+            ClinicWrapper.getAllClinics(appService),
+            (ClinicWrapper) shipment.getCenter(),
             "A sender should be selected", new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -151,7 +162,6 @@ public class ShipmentEntryForm extends BiobankEntryForm {
                 }
             });
 
-        ShipmentInfoWrapper shipInfo = shipment.getShipmentInfo();
         ShippingMethodWrapper shipMethod = shipInfo.getShippingMethod();
         if (shipInfo.getSentAt() == null) {
             shipInfo.setSentAt(new Date());
@@ -260,7 +270,8 @@ public class ShipmentEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        if (shipment.getShipmentInfo().getWaybill().isEmpty()) {
+        if (shipment.getShipmentInfo().getWaybill() != null
+            && shipment.getShipmentInfo().getWaybill().isEmpty()) {
             shipment.getShipmentInfo().setWaybill(null);
         }
 
@@ -269,10 +280,9 @@ public class ShipmentEntryForm extends BiobankEntryForm {
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                ShipmentAdministrationView.reloadCurrent();
-                PatientAdministrationView.reloadCurrent();
+                SpecimenTransitView.reloadCurrent();
                 if (!shipment.getShipmentInfo().isReceivedToday())
-                    ShipmentAdministrationView.showShipment(shipment);
+                    SpecimenTransitView.showShipment(shipment);
             }
         });
     }

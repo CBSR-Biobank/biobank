@@ -19,7 +19,7 @@ import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.patient.ProcessingEventAdapter;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.validators.NotNullValidator;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DateTimeWidget;
@@ -61,7 +61,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
-        pEvent = pEventAdapter.getWrapper();
+        if (pEventAdapter.getWrapper().isNew())
+            pEvent = pEventAdapter.getWrapper();
+        else
+            pEvent = (ProcessingEventWrapper) pEventAdapter.getWrapper()
+                .getDatabaseClone();
         retrieve();
         String tabName;
         if (pEvent.isNew()) {
@@ -111,7 +115,7 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         toolkit.paintBordersFor(client);
 
         createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ProcessingEvent.field.centre.label"), pEvent //$NON-NLS-1$
+            Messages.getString("ProcessingEvent.field.center.label"), pEvent //$NON-NLS-1$
                 .getCenter().getName());
 
         dateWidget = createDateTimeWidget(
@@ -152,10 +156,11 @@ public class ProcessingEventEntryForm extends BiobankEntryForm {
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
             Messages.getString("label.comments"), null, pEvent, //$NON-NLS-1$
             ProcessingEventPeer.COMMENT.getName(), null);
-
     }
 
     private void createSpecimensSection() {
+        // FIXME combo to select study. If Edit and specimens are already added,
+        // set it to one of the specimen study
         Composite client = createSectionWithClient(Messages
             .getString("ProcessingEventEntryForm.specimens.title")); //$NON-NLS-1$
         GridLayout layout = new GridLayout(1, false);

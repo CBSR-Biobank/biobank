@@ -2,7 +2,6 @@ package edu.ualberta.med.biobank.common.wrappers;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.peer.AddressPeer;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
@@ -23,7 +22,6 @@ import edu.ualberta.med.biobank.common.peer.SitePeer;
 import edu.ualberta.med.biobank.common.peer.SpecimenPeer;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.util.Predicate;
 import edu.ualberta.med.biobank.common.util.PredicateUtil;
 import edu.ualberta.med.biobank.common.util.RequestState;
@@ -70,12 +68,12 @@ public class SiteWrapper extends SiteBaseWrapper {
     }
 
     @Override
-    protected void deleteChecks() throws BiobankCheckException,
+    protected void deleteChecks() throws BiobankDeleteException,
         ApplicationException {
         if (!getContainerCollection(false).isEmpty()
             || !getContainerTypeCollection(false).isEmpty()
             || !getProcessingEventCollection(false).isEmpty()) {
-            throw new BiobankCheckException(
+            throw new BiobankDeleteException(
                 "Unable to delete site "
                     + getName()
                     + ". All defined children (processing events, container types, and containers) must be removed first.");
@@ -255,109 +253,13 @@ public class SiteWrapper extends SiteBaseWrapper {
         return getName();
     }
 
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getInTransitSentDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("inTransitSentDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getSrcDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.IN_TRANSIT.equals(dispatch
-                        .getDispatchState())) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap.put("inTransitSentDispatchCollection",
-                    shipCollection);
-            }
+    @Override
+    public void reload() {
+        try {
+            super.reload();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-        return shipCollection;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getInTransitReceiveDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("inTransitReceiveDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getDstDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.IN_TRANSIT.equals(dispatch
-                        .getDispatchState())) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap.put("inTransitReceiveDispatchCollection",
-                    shipCollection);
-            }
-        }
-        return shipCollection;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getReceivingNoErrorsDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("receivingDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getDstDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.RECEIVED.equals(dispatch
-                        .getDispatchState()) && !dispatch.hasErrors()) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap
-                    .put("receivingDispatchCollection", shipCollection);
-            }
-        }
-        return shipCollection;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getReceivingWithErrorsDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("receivingWithErrorsDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getDstDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.RECEIVED.equals(dispatch
-                        .getDispatchState()) && dispatch.hasErrors()) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap.put("receivingWithErrorsDispatchCollection",
-                    shipCollection);
-            }
-        }
-        return shipCollection;
-    }
-
-    @SuppressWarnings("unchecked")
-    public List<DispatchWrapper> getInCreationDispatchCollection() {
-        List<DispatchWrapper> shipCollection = (List<DispatchWrapper>) propertiesMap
-            .get("inCreationDispatchCollection");
-        if (shipCollection == null) {
-            List<DispatchWrapper> children = getSrcDispatchCollection(false);
-            if (children != null) {
-                shipCollection = new ArrayList<DispatchWrapper>();
-                for (DispatchWrapper dispatch : children) {
-                    if (DispatchState.CREATION.equals(dispatch
-                        .getDispatchState())) {
-                        shipCollection.add(dispatch);
-                    }
-                }
-                propertiesMap.put("inCreationDispatchCollection",
-                    shipCollection);
-            }
-        }
-        return shipCollection;
     }
 
     public Set<ClinicWrapper> getWorkingClinicCollection() {
@@ -400,74 +302,11 @@ public class SiteWrapper extends SiteBaseWrapper {
      */
     @Override
     public boolean canUpdate(User user) {
-        return user.isWebsiteAdministrator();
-    }
-
-    public static Collection<? extends ModelWrapper<?>> getInTransitReceiveDispatchCollection(
-        SiteWrapper site) {
-        return site.getInTransitReceiveDispatchCollection();
-    }
-
-    public static Collection<? extends ModelWrapper<?>> getReceivingNoErrorsDispatchCollection(
-        SiteWrapper site) {
-        return site.getReceivingNoErrorsDispatchCollection();
-    }
-
-    public static Collection<? extends ModelWrapper<?>> getInCreationDispatchCollection(
-        SiteWrapper site) {
-        return site.getInCreationDispatchCollection();
-    }
-
-    public static Collection<? extends ModelWrapper<?>> getReceivingWithErrorsDispatchCollection(
-        SiteWrapper site) {
-        return site.getReceivingWithErrorsDispatchCollection();
-    }
-
-    public static Collection<? extends ModelWrapper<?>> getInTransitSentDispatchCollection(
-        SiteWrapper site) {
-        return site.getInTransitSentDispatchCollection();
+        return user.isSuperAdministrator();
     }
 
     public List<StudyWrapper> getStudyCollection() {
         return getStudyCollection(false);
-    }
-
-    @Deprecated
-    public List<SiteWrapper> getStudyDispachSites(StudyWrapper study) {
-        // TODO this can be removed once the gui doesn't use it anymore
-        return null;
-    }
-
-    @Deprecated
-    public Collection<? extends ModelWrapper<?>> getAcceptedRequestCollection() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public List<StudyWrapper> getDispatchStudiesAsSender() {
-        // TODO Auto-generated method stub
-        return null;
-    }
-
-    @Deprecated
-    public void addStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> addedSites) throws BiobankCheckException {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public void removeStudyDispatchSites(StudyWrapper study,
-        List<SiteWrapper> removedSites) {
-        // TODO Auto-generated method stub
-
-    }
-
-    @Deprecated
-    public Collection<? extends ModelWrapper<?>> getFilledRequestCollection() {
-        // TODO Auto-generated method stub
-        return null;
     }
 
     public static final String COLLECTION_EVENT_COUNT_QRY = "select count(cevent) from "
@@ -537,4 +376,5 @@ public class SiteWrapper extends SiteBaseWrapper {
             Arrays.asList(new Object[] { getId(), study.getId() }));
         return getCountResult(appService, c);
     }
+
 }

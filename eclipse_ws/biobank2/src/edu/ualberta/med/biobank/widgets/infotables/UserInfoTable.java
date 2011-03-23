@@ -21,7 +21,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
-import edu.ualberta.med.biobank.dialogs.UserEditDialog;
+import edu.ualberta.med.biobank.dialogs.user.UserEditDialog;
 import edu.ualberta.med.biobank.widgets.BiobankLabelProvider;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -157,9 +157,8 @@ public class UserInfoTable extends InfoTableWidget<User> {
      */
     protected int editUser(User user) {
         List<Group> groups = null;
-
         try {
-            groups = SessionManager.getAppService().getSecurityGroups();
+            groups = SessionManager.getAppService().getSecurityGroups(true);
         } catch (ApplicationException e) {
             BiobankPlugin.openAsyncError(GROUPS_LOADING_ERROR, e);
             return Dialog.CANCEL;

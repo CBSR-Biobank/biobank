@@ -12,9 +12,9 @@ import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Tree;
 
 import edu.ualberta.med.biobank.SessionManager;
+import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
-import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
 
 public class OutgoingNode extends AdapterBase {
@@ -22,13 +22,13 @@ public class OutgoingNode extends AdapterBase {
     private InCreationDispatchGroup creationNode;
     private SentInTransitDispatchGroup sentTransitNode;
 
-    public OutgoingNode(AdapterBase parent, int id, SiteWrapper site) {
+    public OutgoingNode(AdapterBase parent, int id, CenterWrapper<?> center) {
         super(parent, id, "Outgoing", true, false);
-        creationNode = new InCreationDispatchGroup(this, 0, site);
+        creationNode = new InCreationDispatchGroup(this, 0, center);
         creationNode.setParent(this);
         addChild(creationNode);
 
-        sentTransitNode = new SentInTransitDispatchGroup(this, 1, site);
+        sentTransitNode = new SentInTransitDispatchGroup(this, 1, center);
         sentTransitNode.setParent(this);
         addChild(sentTransitNode);
     }
@@ -45,7 +45,7 @@ public class OutgoingNode extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(DispatchWrapper.class, null)) {
+        if (SessionManager.canCreate(DispatchWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Dispatch");
             mi.addSelectionListener(new SelectionAdapter() {

@@ -22,6 +22,7 @@ import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
 import edu.ualberta.med.biobank.common.peer.StudyPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.GlobalEventAttrWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.exception.UserUIException;
@@ -87,8 +88,10 @@ public class StudyEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         studyAdapter = (StudyAdapter) adapter;
-        study = studyAdapter.getWrapper();
-        study.reload();
+        if (studyAdapter.getWrapper().isNew())
+            study = studyAdapter.getWrapper();
+        else
+            study = (StudyWrapper) studyAdapter.getWrapper().getDatabaseClone();
 
         String tabName;
         if (study.isNew()) {
@@ -227,7 +230,7 @@ public class StudyEntryForm extends BiobankEntryForm {
         for (String field : defaultFields) {
             studyPvAttrCustom = new StudyPvAttrCustom();
             studyPvAttrCustom.setLabel(field);
-            studyPvAttrCustom.setType("date_time"); //$NON-NLS-1$
+            studyPvAttrCustom.setType(EventAttrTypeEnum.DATE_TIME); //$NON-NLS-1$
             studyPvAttrCustom.setIsDefault(true);
             studyPvAttrCustom.widget = new PvInfoWidget(client, SWT.NONE,
                 studyPvAttrCustom, true);

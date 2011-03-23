@@ -8,7 +8,7 @@ import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ShipmentInfoWrapper;
 import edu.ualberta.med.biobank.treeview.shipment.ShipmentAdapter;
-import edu.ualberta.med.biobank.views.ShipmentAdministrationView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public class ShipmentAddHandler extends AbstractHandler {
 
@@ -19,14 +19,14 @@ public class ShipmentAddHandler extends AbstractHandler {
         ShipmentInfoWrapper shipmentInfo = new ShipmentInfoWrapper(
             SessionManager.getAppService());
         shipment.setShipmentInfo(shipmentInfo);
-        ShipmentAdapter shipNode = new ShipmentAdapter(
-            ShipmentAdministrationView.getCurrent().getSearchedNode(), shipment);
+        ShipmentAdapter shipNode = new ShipmentAdapter(SpecimenTransitView
+            .getCurrent().getSearchedNode(), shipment);
         shipNode.openEntryForm();
         return null;
     }
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(OriginInfoWrapper.class, null);
+        return SessionManager.canCreate(OriginInfoWrapper.class);
     }
 }

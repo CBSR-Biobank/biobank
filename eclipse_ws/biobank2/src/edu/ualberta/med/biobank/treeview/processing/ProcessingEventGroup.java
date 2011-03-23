@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview.patient;
+package edu.ualberta.med.biobank.treeview.processing;
 
 import java.util.Collection;
 import java.util.List;
@@ -40,7 +40,7 @@ public class ProcessingEventGroup extends AdapterBase {
                 ProcessingEventWrapper pEvent = new ProcessingEventWrapper(
                     SessionManager.getAppService());
                 pEvent.setCenter(SessionManager.getUser()
-                    .getCurrentWorkingCentre());
+                    .getCurrentWorkingCenter());
                 ProcessingEventAdapter adapter = new ProcessingEventAdapter(
                     ProcessingEventGroup.this, pEvent);
                 adapter.openEntryForm();
@@ -92,13 +92,12 @@ public class ProcessingEventGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return ProcessingEventWrapper.getAllProcessingEvents(SessionManager
-            .getAppService());
+        return null;
     }
 
     @Override
     protected int getWrapperChildCount() throws Exception {
-        return getWrapperChildren().size();
+        return 0;
     }
 
 }

@@ -108,6 +108,10 @@ public abstract class AdapterBase {
         return modelObject;
     }
 
+    public ModelWrapper<?> getModelObjectClone() {
+        return modelObject.getDatabaseClone();
+    }
+
     /*
      * Used when updating tree nodes from a background thread.
      */
@@ -610,7 +614,8 @@ public abstract class AdapterBase {
     }
 
     public void openViewForm() {
-        if (getViewFormId() != null) {
+        if (getViewFormId() != null && modelObject != null
+            && modelObject.getWrappedObject() != null) {
             openForm(new FormInput(this), getViewFormId());
         }
     }
@@ -700,9 +705,9 @@ public abstract class AdapterBase {
                 public void run() {
                     try {
                         if (modelObject != null) {
-                            modelObject.delete();
                             getParent().removeChild(AdapterBase.this);
                             getParent().notifyListeners();
+                            modelObject.delete();
                             notifyListeners();
                         }
                     } catch (BiobankCheckException bce) {

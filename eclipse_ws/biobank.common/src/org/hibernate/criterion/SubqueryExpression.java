@@ -22,6 +22,7 @@ import org.hibernate.type.Type;
 /**
  * @author Gavin King
  */
+@SuppressWarnings("serial")
 public abstract class SubqueryExpression implements Criterion {
 
     private CriteriaImpl criteriaImpl;
@@ -45,6 +46,7 @@ public abstract class SubqueryExpression implements Criterion {
     protected abstract String toLeftSqlString(Criteria criteria,
         CriteriaQuery outerQuery);
 
+    @Override
     public String toSqlString(Criteria criteria, CriteriaQuery criteriaQuery)
         throws HibernateException {
 
@@ -72,11 +74,13 @@ public abstract class SubqueryExpression implements Criterion {
 
         // patch to generate joins on subqueries
         // stolen from CriteriaLoader
+        @SuppressWarnings("rawtypes")
         CriteriaJoinWalker walker = new CriteriaJoinWalker(persister,
             innerQuery, factory, criteriaImpl,
             criteriaImpl.getEntityOrClassName(), new HashMap()) {
             // need to override default of "this_" to whatever the innerQuery is
             // using
+            @Override
             protected String generateRootAlias(final String description) {
                 return innerQuery.getRootSQLALias();
             }
@@ -94,6 +98,7 @@ public abstract class SubqueryExpression implements Criterion {
         return buf.append('(').append(sql).append(')').toString();
     }
 
+    @Override
     public TypedValue[] getTypedValues(Criteria criteria,
         CriteriaQuery criteriaQuery) throws HibernateException {
         // the following two lines were added to ensure that this.params is not
@@ -160,7 +165,8 @@ public abstract class SubqueryExpression implements Criterion {
      * @return
      */
     private SessionFactoryImplementor extractSessionFactoryImplementor(
-        Criteria criteria, CriteriaQuery criteriaQuery) {
+        @SuppressWarnings("unused") Criteria criteria,
+        CriteriaQuery criteriaQuery) {
         return criteriaQuery.getFactory();
 
         // the following code was originally used to get around one problem with

@@ -89,6 +89,7 @@ public class NumberFilterType implements FilterType {
             }
             criteria.add(or);
         }
+            break;
         case NOT_BETWEEN: {
             FilterTypeUtil.checkValues(values, 0, 1);
             Disjunction or = ReportsUtil.idIsNullOr(aliasedProperty);

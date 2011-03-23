@@ -67,11 +67,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
             tabName = "Container";
             container.setActivityStatus(ActivityStatusWrapper
                 .getActiveActivityStatus(appService));
-            if (container.hasParent()) {
-                container.setLabel(container.getParent().getLabel()
+            if (container.hasParentContainer()) {
+                container.setLabel(container.getParentContainer().getLabel()
                     + container.getPositionString());
-                container
-                    .setTemperature(container.getParent().getTemperature());
+                container.setTemperature(container.getParentContainer()
+                    .getTemperature());
             }
         } else {
             tabName = "Container " + container.getLabel();
@@ -97,11 +97,11 @@ public class ContainerEntryForm extends BiobankEntryForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        if (!container.hasParent()) {
+        if (!container.hasParentContainer()) {
             containerTypes = ContainerTypeWrapper.getTopContainerTypesInSite(
                 appService, container.getSite());
         } else {
-            containerTypes = container.getParent().getContainerType()
+            containerTypes = container.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
         }
         if (container.isNew())
@@ -112,7 +112,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
 
         setFirstControl(client);
 
-        if ((container.isNew() && container.getParent() == null)
+        if ((container.isNew() && container.getParentContainer() == null)
             || (container.getContainerType() != null && Boolean.TRUE
                 .equals(container.getContainerType().getTopLevel()))) {
             // only allow edit to label on top level containers
@@ -154,7 +154,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
     private void createContainerTypesSection(Composite client) throws Exception {
         List<ContainerTypeWrapper> containerTypes;
         ContainerTypeWrapper currentType = container.getContainerType();
-        if (!container.hasParent()) {
+        if (!container.hasParentContainer()) {
             SiteWrapper currentSite = container.getSite();
             if (currentSite == null)
                 containerTypes = new ArrayList<ContainerTypeWrapper>();
@@ -162,7 +162,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
                 containerTypes = ContainerTypeWrapper
                     .getTopContainerTypesInSite(appService, currentSite);
         } else {
-            containerTypes = container.getParent().getContainerType()
+            containerTypes = container.getParentContainer().getContainerType()
                 .getChildContainerTypeCollection();
         }
         if (container.isNew() && containerTypes.size() == 1)
@@ -192,7 +192,7 @@ public class ContainerEntryForm extends BiobankEntryForm {
             BiobankText.class, SWT.NONE, "Temperature (Celcius)", null,
             container, "temperature", new DoubleNumberValidator(
                 "Default temperature is not a valid number"));
-        if (container.hasParent())
+        if (container.hasParentContainer())
             tempWidget.setEnabled(false);
 
         if (container.hasChildren() || container.hasSpecimens()) {

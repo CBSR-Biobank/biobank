@@ -98,15 +98,15 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public void checkInventoryIdUnique() throws BiobankException,
         ApplicationException {
         checkNoDuplicates(Specimen.class, SpecimenPeer.INVENTORY_ID.getName(),
-            getInventoryId(), "An Specimen with inventoryId");
+            getInventoryId(), "A specimen with inventoryId");
     }
 
     public String getFormattedCreatedAt() {
         return DateFormatter.formatAsDateTime(getCreatedAt());
     }
 
-    public ContainerWrapper getParent() {
-        return objectWithPositionManagement.getParent();
+    public ContainerWrapper getParentContainer() {
+        return objectWithPositionManagement.getParentContainer();
     }
 
     public void setParent(ContainerWrapper container) {
@@ -114,7 +114,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     public boolean hasParent() {
-        return objectWithPositionManagement.hasParent();
+        return objectWithPositionManagement.hasParentContainer();
     }
 
     public RowColPos getPosition() {
@@ -133,9 +133,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     }
 
     private void checkParentAcceptSampleType() throws BiobankCheckException {
-        ContainerWrapper parent = getParent();
+        ContainerWrapper parent = getParentContainer();
         if (parent != null) {
-            ContainerTypeWrapper parentType = getParent().getContainerType();
+            ContainerTypeWrapper parentType = getParentContainer()
+                .getContainerType();
             try {
                 parentType.reload();
             } catch (Exception e) {
@@ -145,7 +146,7 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 .getSpecimenTypeCollection(false);
             if (types == null || !types.contains(getSpecimenType())) {
                 throw new BiobankCheckException("Container "
-                    + getParent().getFullInfoLabel()
+                    + getParentContainer().getFullInfoLabel()
                     + " does not allow inserts of sample type "
                     + ((getSpecimenType() == null) ? "null" : getSpecimenType()
                         .getName()) + ".");
@@ -219,9 +220,9 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         }
 
         if (!fullString) {
-            return getPositionStringInParent(position, getParent());
+            return getPositionStringInParent(position, getParentContainer());
         }
-        ContainerWrapper directParent = getParent();
+        ContainerWrapper directParent = getParentContainer();
         ContainerPathWrapper path = directParent.getContainerPath();
         ContainerWrapper topContainer;
 
@@ -229,8 +230,8 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
             topContainer = path.getTopContainer();
         } else {
             topContainer = directParent;
-            while (topContainer.hasParent()) {
-                topContainer = topContainer.getParent();
+            while (topContainer.hasParentContainer()) {
+                topContainer = topContainer.getParentContainer();
             }
         }
         String nameShort = topContainer.getContainerType().getNameShort();
@@ -253,20 +254,18 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
     public void setQuantityFromType() {
         if (getSpecimenType() == null)
             return;
-
         CollectionEventWrapper cevent = getCollectionEvent();
         StudyWrapper study = cevent.getPatient().getStudy();
-        Double volume = null;
-        Collection<AliquotedSpecimenWrapper> sampleStorageCollection = study
+        Collection<AliquotedSpecimenWrapper> aliquotedSpecimenCollection = study
             .getAliquotedSpecimenCollection(false);
-        if (sampleStorageCollection != null) {
-            for (AliquotedSpecimenWrapper ss : sampleStorageCollection) {
-                if (getSpecimenType().equals(getSpecimenType())) {
-                    volume = ss.getVolume();
+        if (aliquotedSpecimenCollection != null) {
+            for (AliquotedSpecimenWrapper ss : aliquotedSpecimenCollection) {
+                if (getSpecimenType().equals(ss.getSpecimenType())) {
+                    setQuantity(ss.getVolume());
+                    return;
                 }
             }
         }
-        setQuantity(volume);
     }
 
     @Override
@@ -274,11 +273,6 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         super.loadAttributes();
         getPositionString();
         wrappedObject.getSpecimenType().getName();
-    }
-
-    @Override
-    protected void deleteChecks() throws BiobankCheckException,
-        ApplicationException {
     }
 
     private static final String Specimen_QRY = "from "
@@ -335,11 +329,11 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
         + Property.concatNames(SpecimenPeer.ACTIVITY_STATUS,
             ActivityStatusPeer.NAME) + " != ?";
 
-    public static List<SpecimenWrapper> getSpecimensNonActiveInCentre(
-        WritableApplicationService appService, CenterWrapper<?> centre)
+    public static List<SpecimenWrapper> getSpecimensNonActiveInCenter(
+        WritableApplicationService appService, CenterWrapper<?> center)
         throws ApplicationException {
         HQLCriteria criteria = new HQLCriteria(SPECIMENS_NON_ACTIVE_QRY,
-            Arrays.asList(new Object[] { centre.getId(),
+            Arrays.asList(new Object[] { center.getId(),
                 ActivityStatusWrapper.ACTIVE_STATUS_STRING }));
         List<Specimen> Specimens = appService.query(criteria);
         List<SpecimenWrapper> list = new ArrayList<SpecimenWrapper>();
@@ -454,8 +448,10 @@ public class SpecimenWrapper extends SpecimenBaseWrapper {
                 DispatchWrapper dispatch = dsa.getDispatch();
                 if (!dispatch.equals(excludedShipment)
                     && (EnumSet.of(DispatchState.CREATION,
-                        DispatchState.IN_TRANSIT).contains(dispatch.getState()))) {
-                    if (DispatchSpecimenState.MISSING.equals(dsa.getState())) {
+                        DispatchState.IN_TRANSIT).contains(dispatch
+                        .getDispatchState()))) {
+                    if (DispatchSpecimenState.MISSING.equals(dsa
+                        .getDispatchSpecimenState())) {
                         return false;
                     }
                     return true;

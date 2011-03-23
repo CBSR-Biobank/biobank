@@ -8,6 +8,7 @@ import org.junit.Test;
 
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
@@ -16,6 +17,7 @@ import edu.ualberta.med.biobank.server.applicationservice.exceptions.ValueNotSet
 import edu.ualberta.med.biobank.test.TestDatabase;
 import edu.ualberta.med.biobank.test.internal.AliquotedSpecimenHelper;
 import edu.ualberta.med.biobank.test.internal.DbHelper;
+import edu.ualberta.med.biobank.test.internal.PatientHelper;
 import edu.ualberta.med.biobank.test.internal.SpecimenTypeHelper;
 import edu.ualberta.med.biobank.test.internal.StudyHelper;
 
@@ -28,9 +30,9 @@ public class TestAliquotedSpecimen extends TestDatabase {
 
         List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false);
-        AliquotedSpecimenWrapper sampleStorage = AliquotedSpecimenHelper
+        AliquotedSpecimenWrapper aliquotedSpec = AliquotedSpecimenHelper
             .addAliquotedSpecimen(study, DbHelper.chooseRandomlyInList(types));
-        testGettersAndSetters(sampleStorage);
+        testGettersAndSetters(aliquotedSpec);
     }
 
     @Test
@@ -40,20 +42,20 @@ public class TestAliquotedSpecimen extends TestDatabase {
 
         List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false);
-        AliquotedSpecimenWrapper sampleStorage = AliquotedSpecimenHelper
+        AliquotedSpecimenWrapper aliquotedSpec = AliquotedSpecimenHelper
             .addAliquotedSpecimen(study, DbHelper.chooseRandomlyInList(types));
 
-        Assert.assertEquals(study, sampleStorage.getStudy());
+        Assert.assertEquals(study, aliquotedSpec.getStudy());
 
         StudyWrapper newStudy = StudyHelper.addStudy(name + "NEW");
-        sampleStorage.setStudy(newStudy);
-        sampleStorage.persist();
+        aliquotedSpec.setStudy(newStudy);
+        aliquotedSpec.persist();
 
-        Assert.assertEquals(newStudy, sampleStorage.getStudy());
-        Assert.assertFalse(study.equals(sampleStorage.getStudy()));
+        Assert.assertEquals(newStudy, aliquotedSpec.getStudy());
+        Assert.assertFalse(study.equals(aliquotedSpec.getStudy()));
 
-        sampleStorage = new AliquotedSpecimenWrapper(appService);
-        Assert.assertNull(sampleStorage.getStudy());
+        aliquotedSpec = new AliquotedSpecimenWrapper(appService);
+        Assert.assertNull(aliquotedSpec.getStudy());
     }
 
     @Test
@@ -64,20 +66,20 @@ public class TestAliquotedSpecimen extends TestDatabase {
         List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false);
         SpecimenTypeWrapper type = DbHelper.chooseRandomlyInList(types);
-        AliquotedSpecimenWrapper sampleStorage = AliquotedSpecimenHelper
+        AliquotedSpecimenWrapper aliquotedSpec = AliquotedSpecimenHelper
             .addAliquotedSpecimen(study, type);
 
-        Assert.assertEquals(type, sampleStorage.getSpecimenType());
+        Assert.assertEquals(type, aliquotedSpec.getSpecimenType());
 
         SpecimenTypeWrapper newType = SpecimenTypeHelper.addSpecimenType(name);
-        sampleStorage.setSpecimenType(newType);
-        sampleStorage.persist();
+        aliquotedSpec.setSpecimenType(newType);
+        aliquotedSpec.persist();
 
-        Assert.assertEquals(newType, sampleStorage.getSpecimenType());
-        Assert.assertFalse(type.equals(sampleStorage.getSpecimenType()));
+        Assert.assertEquals(newType, aliquotedSpec.getSpecimenType());
+        Assert.assertFalse(type.equals(aliquotedSpec.getSpecimenType()));
 
-        sampleStorage = new AliquotedSpecimenWrapper(appService);
-        Assert.assertNull(sampleStorage.getSpecimenType());
+        aliquotedSpec = new AliquotedSpecimenWrapper(appService);
+        Assert.assertNull(aliquotedSpec.getSpecimenType());
     }
 
     @Test
@@ -98,7 +100,7 @@ public class TestAliquotedSpecimen extends TestDatabase {
 
     @Test
     public void testActivityStatus() throws Exception {
-        String name = "testPersist" + r.nextInt();
+        String name = "testActivityStatus" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
         List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
@@ -114,9 +116,18 @@ public class TestAliquotedSpecimen extends TestDatabase {
             Assert.assertTrue(true);
         }
 
-        ss.setActivityStatus(ActivityStatusWrapper
-            .getActiveActivityStatus(appService));
+        ActivityStatusWrapper as = ActivityStatusWrapper
+            .getActiveActivityStatus(appService);
+        ss.setActivityStatus(as);
         ss.persist();
+        Assert.assertTrue(as.equals(ss.getActivityStatus()));
+
+        ActivityStatusWrapper as2 = ActivityStatusWrapper.getActivityStatus(
+            appService, "Flagged");
+        ss.setActivityStatus(as2);
+        ss.persist();
+        Assert.assertTrue(as2.equals(ss.getActivityStatus()));
+        Assert.assertFalse(as.equals(ss.getActivityStatus()));
     }
 
     @Test
@@ -126,18 +137,18 @@ public class TestAliquotedSpecimen extends TestDatabase {
 
         List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false);
-        AliquotedSpecimenWrapper sampleStorage = AliquotedSpecimenHelper
+        AliquotedSpecimenWrapper aliquotedSpec = AliquotedSpecimenHelper
             .addAliquotedSpecimen(study, DbHelper.chooseRandomlyInList(types));
 
         // object is in database
         AliquotedSpecimen ssInDB = ModelUtils.getObjectWithId(appService,
-            AliquotedSpecimen.class, sampleStorage.getId());
+            AliquotedSpecimen.class, aliquotedSpec.getId());
         Assert.assertNotNull(ssInDB);
 
-        sampleStorage.delete();
+        aliquotedSpec.delete();
 
         ssInDB = ModelUtils.getObjectWithId(appService,
-            AliquotedSpecimen.class, sampleStorage.getId());
+            AliquotedSpecimen.class, aliquotedSpec.getId());
         // object is not anymore in database
         Assert.assertNull(ssInDB);
     }
@@ -149,23 +160,23 @@ public class TestAliquotedSpecimen extends TestDatabase {
 
         List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
             .getAllSpecimenTypes(appService, false);
-        AliquotedSpecimenWrapper sampleStorage = AliquotedSpecimenHelper
+        AliquotedSpecimenWrapper aliquotedSpec = AliquotedSpecimenHelper
             .addAliquotedSpecimen(study, DbHelper.chooseRandomlyInList(types));
 
-        sampleStorage.reload();
-        Double oldVolume = sampleStorage.getVolume();
-        sampleStorage.setVolume(6.3);
-        sampleStorage.reset();
-        Assert.assertEquals(oldVolume, sampleStorage.getVolume());
+        aliquotedSpec.reload();
+        Double oldVolume = aliquotedSpec.getVolume();
+        aliquotedSpec.setVolume(6.3);
+        aliquotedSpec.reset();
+        Assert.assertEquals(oldVolume, aliquotedSpec.getVolume());
     }
 
     @Test
     public void testResetNew() throws Exception {
-        AliquotedSpecimenWrapper sampleStorage = new AliquotedSpecimenWrapper(
+        AliquotedSpecimenWrapper aliquotedSpec = new AliquotedSpecimenWrapper(
             appService);
-        sampleStorage.setVolume(5.2);
-        sampleStorage.reset();
-        Assert.assertEquals(null, sampleStorage.getVolume());
+        aliquotedSpec.setVolume(5.2);
+        aliquotedSpec.reset();
+        Assert.assertEquals(null, aliquotedSpec.getVolume());
     }
 
     @Test
@@ -187,48 +198,60 @@ public class TestAliquotedSpecimen extends TestDatabase {
         SpecimenTypeWrapper typeWrapperHair = new SpecimenTypeWrapper(
             appService, type);
 
-        AliquotedSpecimenWrapper sampleStorage1 = AliquotedSpecimenHelper
+        AliquotedSpecimenWrapper aliquotedSpec1 = AliquotedSpecimenHelper
             .addAliquotedSpecimen(study, typeWrapperPlasma);
-        AliquotedSpecimenWrapper sampleStorage2 = AliquotedSpecimenHelper
+        AliquotedSpecimenWrapper aliquotedSpec2 = AliquotedSpecimenHelper
             .addAliquotedSpecimen(study, typeWrapperHair);
 
-        Assert.assertTrue(sampleStorage1.compareTo(sampleStorage2) > 0);
-        Assert.assertTrue(sampleStorage2.compareTo(sampleStorage1) < 0);
+        Assert.assertTrue(aliquotedSpec1.compareTo(aliquotedSpec2) > 0);
+        Assert.assertTrue(aliquotedSpec2.compareTo(aliquotedSpec1) < 0);
     }
 
-    // @Test
-    // public void testStudyDeleteRemoveAliquotedSpecimens() throws Exception {
-    // String name = "testStudyDeleteRemoveAliquotedSpecimens" + r.nextInt();
-    // int nbAliquotedSpecimen = appService.search(AliquotedSpecimen.class,
-    // new AliquotedSpecimen()).size();
-    // SiteWrapper site = SiteHelper.addSite(name);
-    //
-    // StudyWrapper study1 = StudyHelper.addStudy(name);
-    // List<SpecimenTypeWrapper> types =
-    // SpecimenTypeWrapper.getGlobalSpecimenTypes(
-    // appService, false);
-    // AliquotedSpecimenHelper.addAliquotedSpecimen(study1, DbHelper
-    // .chooseRandomlyInList(types));
-    // study1.delete();
-    // Assert.assertEquals(nbAliquotedSpecimen, appService.search(
-    // AliquotedSpecimen.class, new AliquotedSpecimen()).size());
-    //
-    // StudyWrapper study = StudyHelper.addStudy("studyname"
-    // + r.nextInt());
-    // PatientWrapper patient = PatientHelper.addPatient("5684", study);
-    // study.persist();
-    // AliquotedSpecimenHelper.addAliquotedSpecimen(study, DbHelper
-    // .chooseRandomlyInList(types));
-    // study.reload();
-    // patient.delete();
-    // study.reload();
-    // study.delete();
-    // // FIXME this test is failing when the study has a patient. Should find
-    // // why !
-    // //
-    // // it seems like hibernate forgets about the cascade setting for
-    // // this association . NL
-    // Assert.assertEquals(nbAliquotedSpecimen, appService.search(
-    // AliquotedSpecimen.class, new AliquotedSpecimen()).size());
-    // }
+    @Test
+    public void testStudyDeleteRemoveAliquotedSpecimens() throws Exception {
+        String name = "testStudyDeleteRemoveAliquotedSpecimens" + r.nextInt();
+        int nbAliquotedSpecimen = appService.search(AliquotedSpecimen.class,
+            new AliquotedSpecimen()).size();
+        StudyWrapper study1 = StudyHelper.addStudy(name, false);
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
+        AliquotedSpecimenHelper.addAliquotedSpecimen(study1,
+            DbHelper.chooseRandomlyInList(types));
+        study1.delete();
+        Assert.assertEquals(nbAliquotedSpecimen,
+            appService.search(AliquotedSpecimen.class, new AliquotedSpecimen())
+                .size());
+
+        StudyWrapper study = StudyHelper.addStudy("studyname" + r.nextInt(),
+            false);
+        PatientWrapper patient = PatientHelper.addPatient("5684" + r.nextInt(),
+            study);
+        AliquotedSpecimenHelper.addAliquotedSpecimen(study,
+            DbHelper.chooseRandomlyInList(types));
+        study.reload();
+
+        Assert.assertEquals(nbAliquotedSpecimen + 1,
+            appService.search(AliquotedSpecimen.class, new AliquotedSpecimen())
+                .size());
+
+        patient.delete();
+        study.reload();
+        study.delete();
+        Assert.assertEquals(nbAliquotedSpecimen,
+            appService.search(AliquotedSpecimen.class, new AliquotedSpecimen())
+                .size());
+    }
+
+    @Test
+    public void testToString() throws Exception {
+        String name = "testToString" + r.nextInt();
+        StudyWrapper study = StudyHelper.addStudy(name);
+
+        List<SpecimenTypeWrapper> types = SpecimenTypeWrapper
+            .getAllSpecimenTypes(appService, false);
+        AliquotedSpecimenWrapper aliquotedSpec = AliquotedSpecimenHelper
+            .addAliquotedSpecimen(study, DbHelper.chooseRandomlyInList(types));
+        String s = aliquotedSpec.toString();
+        Assert.assertTrue((s != null) && !s.isEmpty());
+    }
 }

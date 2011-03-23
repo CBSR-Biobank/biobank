@@ -179,9 +179,14 @@ public class HbmStrings {
                     if (varcharMatcher.find()) {
                         attrType = varcharMatcher.group(1);
 
-                        sb.append("\t\taMap.put(\"edu.ualberta.med.biobank.model."
-                            + CamelCase.toCamelCase(className + "." + attrName,
-                                true) + "\", " + attrType + ");");
+                        sb.append(
+                            "\t\taMap.put(\"edu.ualberta.med.biobank.model.")
+                            .append(
+                                CamelCase.toCamelCase(className, true, true))
+                            .append(".")
+                            .append(
+                                CamelCase.toCamelCase(attrName, false, true))
+                            .append("\", ").append(attrType).append(");");
                         sb.append(newLine);
                     }
                 }

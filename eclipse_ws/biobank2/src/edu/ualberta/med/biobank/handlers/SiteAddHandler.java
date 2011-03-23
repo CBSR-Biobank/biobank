@@ -16,14 +16,14 @@ public class SiteAddHandler extends AbstractHandler {
         SessionAdapter sessionAdapter = SessionManager.getInstance()
             .getSession();
         Assert.isNotNull(sessionAdapter);
-        sessionAdapter.getSitesGroupNode().addSite();
+        sessionAdapter.addSite();
         return null;
 
     }
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(SiteWrapper.class, null)
+        return SessionManager.canCreate(SiteWrapper.class)
             && SessionManager.getInstance().getSession() != null;
     }
 }

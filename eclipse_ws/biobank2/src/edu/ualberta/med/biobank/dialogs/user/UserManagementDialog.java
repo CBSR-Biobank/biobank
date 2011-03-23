@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.dialogs;
+package edu.ualberta.med.biobank.dialogs.user;
 
 import java.text.MessageFormat;
 import java.util.ArrayList;
@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.SessionManager;
 import edu.ualberta.med.biobank.common.security.Group;
 import edu.ualberta.med.biobank.common.security.User;
+import edu.ualberta.med.biobank.dialogs.BiobankDialog;
 import edu.ualberta.med.biobank.widgets.infotables.GroupInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.UserInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
@@ -36,7 +37,6 @@ public class UserManagementDialog extends BiobankDialog {
     private UserInfoTable userInfoTable;
     private List<User> currentUserList;
     private GroupInfoTable groupInfoTable;
-    private List<Group> currentGroupList;
 
     private static final String USER_ADDED_TITLE = "User Added";
     private static final String USER_ADDED_MESSAGE = "Successfully added new user \"{0}\".";
@@ -110,15 +110,7 @@ public class UserManagementDialog extends BiobankDialog {
                     addGroup();
                 }
             });
-        groupInfoTable = new GroupInfoTable(groupsSection, null) {
-            @Override
-            protected boolean deleteGroup(Group group) {
-                boolean deleted = super.deleteGroup(group);
-                if (deleted)
-                    getGroups().remove(group);
-                return deleted;
-            }
-        };
+        groupInfoTable = new GroupInfoTable(groupsSection, null);
         groupsSection.setClient(groupInfoTable);
         addExpansionListener(contents, groupsSection, groupInfoTable);
         List<Group> tmpGroups = new ArrayList<Group>();
@@ -139,11 +131,10 @@ public class UserManagementDialog extends BiobankDialog {
                         userInfoTable.setCollection(users);
                     }
                 });
-                final List<Group> groups = getGroups();
                 getShell().getDisplay().syncExec(new Runnable() {
                     @Override
                     public void run() {
-                        groupInfoTable.setCollection(groups);
+                        groupInfoTable.setCollection(getGroups(false));
                     }
                 });
             }
@@ -152,16 +143,14 @@ public class UserManagementDialog extends BiobankDialog {
         t.start();
     }
 
-    protected List<Group> getGroups() {
-        if (currentGroupList == null) {
-            try {
-                currentGroupList = SessionManager.getAppService()
-                    .getSecurityGroups();
-            } catch (ApplicationException e) {
-                BiobankPlugin.openAsyncError("Unable to load groups.", e);
-            }
+    protected List<Group> getGroups(boolean includeSuperAdmin) {
+        try {
+            return SessionManager.getAppService().getSecurityGroups(
+                includeSuperAdmin);
+        } catch (ApplicationException e) {
+            BiobankPlugin.openAsyncError("Unable to load groups.", e);
         }
-        return currentGroupList;
+        return null;
     }
 
     protected List<User> getUsers() {
@@ -179,7 +168,7 @@ public class UserManagementDialog extends BiobankDialog {
     protected void addUser() {
         User user = new User();
         UserEditDialog dlg = new UserEditDialog(PlatformUI.getWorkbench()
-            .getActiveWorkbenchWindow().getShell(), user, getGroups(), true);
+            .getActiveWorkbenchWindow().getShell(), user, getGroups(true), true);
         int res = dlg.open();
         if (res == Status.OK) {
             BiobankPlugin.openAsyncInformation(USER_ADDED_TITLE,
@@ -197,8 +186,7 @@ public class UserManagementDialog extends BiobankDialog {
         if (res == Status.OK) {
             BiobankPlugin.openAsyncInformation(GROUP_ADDED_TITLE,
                 MessageFormat.format(GROUP_ADDED_MESSAGE, group.getName()));
-            getGroups().add(group);
-            groupInfoTable.reloadCollection(getGroups(), group);
+            groupInfoTable.reloadCollection(getGroups(false), group);
         }
     }
 

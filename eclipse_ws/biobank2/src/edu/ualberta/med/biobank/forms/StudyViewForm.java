@@ -16,6 +16,7 @@ import org.eclipse.ui.forms.widgets.Section;
 
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.model.PvAttrCustom;
 import edu.ualberta.med.biobank.treeview.admin.StudyAdapter;
@@ -30,7 +31,7 @@ public class StudyViewForm extends BiobankViewForm {
     public static final String ID = "edu.ualberta.med.biobank.forms.StudyViewForm"; //$NON-NLS-1$
 
     private static final String DATE_PROCESSED_INFO_FIELD_NAME = Messages
-        .getString("study.visit.info.dateProcessed");
+        .getString("study.visit.info.dateProcessed"); //$NON-NLS-1$
 
     private StudyAdapter studyAdapter;
     private StudyWrapper study;
@@ -179,7 +180,7 @@ public class StudyViewForm extends BiobankViewForm {
 
         combinedPvInfo = new StudyPvCustomInfo();
         combinedPvInfo.setLabel(DATE_PROCESSED_INFO_FIELD_NAME); //$NON-NLS-1$
-        combinedPvInfo.setType("date"); //$NON-NLS-1$
+        combinedPvInfo.setType(EventAttrTypeEnum.DATE_TIME); //$NON-NLS-1$
         pvCustomInfoList.add(combinedPvInfo);
 
         for (String label : study.getStudyEventAttrLabels()) {

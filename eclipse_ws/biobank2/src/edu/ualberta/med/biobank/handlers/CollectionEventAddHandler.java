@@ -10,7 +10,7 @@ import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.CollectionEventAdapter;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
+import edu.ualberta.med.biobank.views.CollectionView;
 
 public class CollectionEventAddHandler extends AbstractHandler {
 
@@ -20,8 +20,7 @@ public class CollectionEventAddHandler extends AbstractHandler {
     @Override
     public Object execute(ExecutionEvent event) throws ExecutionException {
         try {
-            PatientAdapter patientAdapter = PatientAdministrationView
-                .getCurrentPatient();
+            PatientAdapter patientAdapter = CollectionView.getCurrentPatient();
             CollectionEventWrapper ceWrapper = new CollectionEventWrapper(
                 SessionManager.getAppService());
             ceWrapper.setPatient(patientAdapter.getWrapper());
@@ -37,6 +36,6 @@ public class CollectionEventAddHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return SessionManager.canCreate(ProcessingEventWrapper.class, null);
+        return SessionManager.canCreate(ProcessingEventWrapper.class);
     }
 }

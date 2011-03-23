@@ -6,17 +6,20 @@ import java.util.Collections;
 import java.util.List;
 
 import edu.ualberta.med.biobank.common.exception.BiobankCheckException;
+import edu.ualberta.med.biobank.common.exception.BiobankDeleteException;
 import edu.ualberta.med.biobank.common.exception.BiobankException;
 import edu.ualberta.med.biobank.common.exception.BiobankFailedQueryException;
+import edu.ualberta.med.biobank.common.exception.BiobankQueryResultSizeException;
 import edu.ualberta.med.biobank.common.peer.ActivityStatusPeer;
 import edu.ualberta.med.biobank.common.wrappers.base.ActivityStatusBaseWrapper;
 import edu.ualberta.med.biobank.model.ActivityStatus;
 import edu.ualberta.med.biobank.model.AliquotedSpecimen;
+import edu.ualberta.med.biobank.model.Center;
 import edu.ualberta.med.biobank.model.Clinic;
+import edu.ualberta.med.biobank.model.CollectionEvent;
 import edu.ualberta.med.biobank.model.Container;
 import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.ProcessingEvent;
-import edu.ualberta.med.biobank.model.Site;
 import edu.ualberta.med.biobank.model.Specimen;
 import edu.ualberta.med.biobank.model.Study;
 import edu.ualberta.med.biobank.model.StudyEventAttr;
@@ -51,20 +54,21 @@ public class ActivityStatusWrapper extends ActivityStatusBaseWrapper {
     @Override
     public void deleteChecks() throws BiobankException, ApplicationException {
         if (isUsed()) {
-            throw new BiobankCheckException("Unable to delete activity status "
-                + getName()
-                + " since it is being used by other objects in the database.");
+            throw new BiobankDeleteException(
+                "Unable to delete activity status "
+                    + getName()
+                    + " since it is being used by other objects in the database.");
         }
     }
 
-    public boolean isUsed() throws ApplicationException, BiobankException {
+    private boolean isUsed() throws ApplicationException,
+        BiobankQueryResultSizeException {
+        Class<?>[] classes = new Class[] { StudyEventAttr.class, Study.class,
+            Specimen.class, ProcessingEvent.class, Clinic.class,
+            ContainerType.class, Container.class, CollectionEvent.class,
+            AliquotedSpecimen.class, Center.class };
+
         long usedCount = 0;
-
-        Class<?>[] classes = new Class[] { Specimen.class, Clinic.class,
-            Container.class, ContainerType.class, AliquotedSpecimen.class,
-            Site.class, Study.class, StudyEventAttr.class,
-            ProcessingEvent.class };
-
         for (Class<?> clazz : classes) {
             StringBuilder sb = new StringBuilder("select count(x) from ")
                 .append(clazz.getName()).append(

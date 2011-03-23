@@ -16,11 +16,12 @@ import org.eclipse.swt.widgets.Display;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.peer.PatientPeer;
+import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.validators.NonEmptyStringValidator;
-import edu.ualberta.med.biobank.views.PatientAdministrationView;
+import edu.ualberta.med.biobank.views.CollectionView;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.utils.ComboSelectionUpdate;
 
@@ -37,7 +38,7 @@ public class PatientEntryForm extends BiobankEntryForm {
     public static final String MSG_PATIENT_OK = Messages
         .getString("PatientEntryForm.edition.msg");
 
-    private PatientAdapter patientAdapter;
+    private PatientWrapper patient;
 
     private ComboViewer studiesViewer;
 
@@ -50,19 +51,23 @@ public class PatientEntryForm extends BiobankEntryForm {
             "Invalid editor input: object of type "
                 + adapter.getClass().getName());
 
-        patientAdapter = (PatientAdapter) adapter;
+        if (adapter.getModelObject().isNew())
+            patient = (PatientWrapper) adapter.getModelObject();
+        else
+            patient = (PatientWrapper) adapter.getModelObject()
+                .getDatabaseClone();
         retrievePatient();
         try {
-            patientAdapter.getWrapper().logEdit(null);
+            patient.logEdit(null);
         } catch (Exception e) {
             BiobankPlugin.openAsyncError("Log edit failed", e);
         }
         String tabName;
-        if (patientAdapter.getWrapper().isNew()) {
+        if (patient.isNew()) {
             tabName = Messages.getString("PatientEntryForm.new.title");
         } else {
             tabName = Messages.getString("PatientEntryForm.edit.title",
-                patientAdapter.getWrapper().getPnumber());
+                patient.getPnumber());
         }
         setPartName(tabName);
     }
@@ -75,7 +80,7 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         createPatientSection();
 
-        if (patientAdapter.getWrapper().isNew()) {
+        if (patient.isNew()) {
             setDirty(true);
         }
     }
@@ -91,12 +96,12 @@ public class PatientEntryForm extends BiobankEntryForm {
         List<StudyWrapper> studies = new ArrayList<StudyWrapper>(
             StudyWrapper.getAllStudies(appService));
         StudyWrapper selectedStudy = null;
-        if (patientAdapter.getWrapper().isNew()) {
+        if (patient.isNew()) {
             if (studies.size() == 1) {
                 selectedStudy = studies.get(0);
             }
         } else {
-            selectedStudy = patientAdapter.getWrapper().getStudy();
+            selectedStudy = patient.getStudy();
         }
 
         studiesViewer = createComboViewer(client,
@@ -106,8 +111,7 @@ public class PatientEntryForm extends BiobankEntryForm {
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
-                    patientAdapter.getWrapper().setStudy(
-                        (StudyWrapper) selectedObject);
+                    patient.setStudy((StudyWrapper) selectedObject);
                 }
             });
         setFirstControl(studiesViewer.getControl());
@@ -117,13 +121,12 @@ public class PatientEntryForm extends BiobankEntryForm {
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.NONE,
             Messages.getString("PatientEntryForm.field.pNumber.label"), null,
-            patientAdapter.getWrapper(), PatientPeer.PNUMBER.getName(),
-            pnumberNonEmptyValidator);
+            patient, PatientPeer.PNUMBER.getName(), pnumberNonEmptyValidator);
     }
 
     @Override
     protected String getOkMessage() {
-        if (patientAdapter.getWrapper().isNew()) {
+        if (patient.isNew()) {
             return MSG_NEW_PATIENT_OK;
         }
         return MSG_PATIENT_OK;
@@ -131,14 +134,13 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     @Override
     protected void saveForm() throws Exception {
-        patientAdapter.getWrapper().persist();
+        patient.persist();
         // to update patient view:
         Display.getDefault().syncExec(new Runnable() {
             @Override
             public void run() {
-                PatientAdministrationView.reloadCurrent();
-                PatientAdministrationView.showPatient(patientAdapter
-                    .getWrapper());
+                CollectionView.reloadCurrent();
+                CollectionView.showPatient(patient);
             }
         });
     }
@@ -150,23 +152,24 @@ public class PatientEntryForm extends BiobankEntryForm {
 
     private void retrievePatient() {
         try {
-            patientAdapter.getWrapper().reload();
+            patient.reload();
         } catch (Exception e) {
-            logger.error(Messages.getString(
-                "PatientEntryForm.retrieve.error.msg", patientAdapter
-                    .getWrapper().getPnumber()), e);
+            logger
+                .error(
+                    Messages.getString("PatientEntryForm.retrieve.error.msg",
+                        patient.getPnumber()), e);
         }
     }
 
     @Override
     public void reset() throws Exception {
         super.reset();
-        StudyWrapper study = patientAdapter.getWrapper().getStudy();
+        StudyWrapper study = patient.getStudy();
         if (study != null) {
             studiesViewer.setSelection(new StructuredSelection(study));
         }
         studiesViewer.setSelection(null);
-        patientAdapter.getWrapper().reset();
+        patient.reset();
         pnumberNonEmptyValidator.validate(null);
     }
 }

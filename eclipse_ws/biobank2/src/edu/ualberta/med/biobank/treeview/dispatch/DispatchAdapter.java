@@ -25,7 +25,7 @@ import edu.ualberta.med.biobank.forms.DispatchReceivingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchSendingEntryForm;
 import edu.ualberta.med.biobank.forms.DispatchViewForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
-import edu.ualberta.med.biobank.views.DispatchAdministrationView;
+import edu.ualberta.med.biobank.views.SpecimenTransitView;
 
 public class DispatchAdapter extends AdapterBase {
 
@@ -43,10 +43,10 @@ public class DispatchAdapter extends AdapterBase {
         if (getWrapper() != null) {
             return editable
                 && ((getWrapper().getSenderCenter().equals(
-                    SessionManager.getUser().getCurrentWorkingCentre()) && (getWrapper()
+                    SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
                     .isNew() || getWrapper().isInCreationState() || getWrapper()
                     .isInTransitState())) || (getWrapper().getReceiverCenter()
-                    .equals(SessionManager.getUser().getCurrentWorkingCentre()) && (getWrapper()
+                    .equals(SessionManager.getUser().getCurrentWorkingCenter()) && (getWrapper()
                     .isInReceivedState() || getWrapper().isInTransitState())));
         }
         return editable;
@@ -62,8 +62,8 @@ public class DispatchAdapter extends AdapterBase {
             label += shipment.getSenderCenter().getNameShort() + " -> "
                 + shipment.getReceiverCenter().getNameShort();
 
-        if (shipment.getDepartedAt() != null)
-            label += " [" + shipment.getFormattedDeparted() + "]";
+        if (shipment.getPackedAt() != null)
+            label += " [" + shipment.getFormattedPackedAt() + "]";
         return label;
 
     }
@@ -75,24 +75,19 @@ public class DispatchAdapter extends AdapterBase {
 
     @Override
     public boolean isDeletable() {
-        if (getCenterParent() != null)
-            return getCenterParent().equals(getWrapper().getSenderCenter())
+        if (SessionManager.getUser().getCurrentWorkingCenter() != null)
+            return SessionManager.getUser().getCurrentWorkingCenter()
+                .equals(getWrapper().getSenderCenter())
                 && getWrapper().canDelete(SessionManager.getUser())
                 && getWrapper().isInCreationState();
         else
             return false;
     }
 
-    private CenterWrapper<?> getCenterParent() {
-        if (getParent().getParent().getParent() != null)
-            return (CenterWrapper<?>) getParent().getParent().getParent()
-                .getModelObject();
-        return null;
-    }
-
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        CenterWrapper<?> siteParent = getCenterParent();
+        CenterWrapper<?> siteParent = SessionManager.getUser()
+            .getCurrentWorkingCenter();
         addViewMenu(menu, "Dispatch");
         try {
             if (isDeletable()) {
@@ -126,6 +121,14 @@ public class DispatchAdapter extends AdapterBase {
                     @Override
                     public void widgetSelected(SelectionEvent event) {
                         doReceiveAndProcess();
+                    }
+                });
+                mi = new MenuItem(menu, SWT.PUSH);
+                mi.setText("Mark as Lost");
+                mi.addSelectionListener(new SelectionAdapter() {
+                    @Override
+                    public void widgetSelected(SelectionEvent event) {
+                        doSetAsLost();
                     }
                 });
             }
@@ -170,7 +173,7 @@ public class DispatchAdapter extends AdapterBase {
 
     private void setDispatchAsCreation() {
         getWrapper().setState(DispatchState.CREATION);
-        getWrapper().setDepartedAt(null);
+        getWrapper().setPackedAt(null);
         persistDispatch();
     }
 
@@ -186,7 +189,7 @@ public class DispatchAdapter extends AdapterBase {
         } catch (Exception ex) {
             BiobankPlugin.openAsyncError("Save error", ex);
         }
-        DispatchAdministrationView.getCurrent().reload();
+        SpecimenTransitView.getCurrent().reload();
     }
 
     @Override
@@ -219,7 +222,7 @@ public class DispatchAdapter extends AdapterBase {
     public String getEntryFormId() {
         if (getWrapper().isInCreationState()
             || (getWrapper().isInTransitState() && SessionManager.getUser()
-                .getCurrentWorkingCentre()
+                .getCurrentWorkingCenter()
                 .equals(getWrapper().getSenderCenter())))
             return DispatchSendingEntryForm.ID;
         return DispatchReceivingEntryForm.ID;

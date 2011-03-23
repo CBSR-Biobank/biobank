@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.model;
 
+import org.hibernate.validator.NotNull;
 import org.hibernate.validator.NotEmpty;
 import java.util.Collection;
 
@@ -110,6 +111,7 @@ public class Specimen  implements Serializable
 	* 
 	**/
 	
+	@NotNull
 	public java.util.Date createdAt;
 	/**
 	* Retrieves the value of the createdAt attribute
@@ -151,6 +153,70 @@ public class Specimen  implements Serializable
 	}
 		
 	/**
+	* An associated edu.ualberta.med.biobank.model.ActivityStatus object
+	**/
+			
+	private ActivityStatus activityStatus;
+	/**
+	* Retrieves the value of the activityStatus attribute
+	* @return activityStatus
+	**/
+	
+	public ActivityStatus getActivityStatus(){
+		return activityStatus;
+	}
+	/**
+	* Sets the value of activityStatus attribute
+	**/
+
+	public void setActivityStatus(ActivityStatus activityStatus){
+		this.activityStatus = activityStatus;
+	}
+			
+	/**
+	* An associated edu.ualberta.med.biobank.model.Specimen object's collection 
+	**/
+			
+	private Collection<Specimen> childSpecimenCollection;
+	/**
+	* Retrieves the value of the childSpecimenCollection attribute
+	* @return childSpecimenCollection
+	**/
+
+	public Collection<Specimen> getChildSpecimenCollection(){
+		return childSpecimenCollection;
+	}
+
+	/**
+	* Sets the value of childSpecimenCollection attribute
+	**/
+
+	public void setChildSpecimenCollection(Collection<Specimen> childSpecimenCollection){
+		this.childSpecimenCollection = childSpecimenCollection;
+	}
+		
+	/**
+	* An associated edu.ualberta.med.biobank.model.OriginInfo object
+	**/
+			
+	private OriginInfo originInfo;
+	/**
+	* Retrieves the value of the originInfo attribute
+	* @return originInfo
+	**/
+	
+	public OriginInfo getOriginInfo(){
+		return originInfo;
+	}
+	/**
+	* Sets the value of originInfo attribute
+	**/
+
+	public void setOriginInfo(OriginInfo originInfo){
+		this.originInfo = originInfo;
+	}
+			
+	/**
 	* An associated edu.ualberta.med.biobank.model.DispatchSpecimen object's collection 
 	**/
 			
@@ -173,24 +239,66 @@ public class Specimen  implements Serializable
 	}
 		
 	/**
-	* An associated edu.ualberta.med.biobank.model.ActivityStatus object
+	* An associated edu.ualberta.med.biobank.model.Center object
 	**/
 			
-	private ActivityStatus activityStatus;
+	private Center currentCenter;
 	/**
-	* Retrieves the value of the activityStatus attribute
-	* @return activityStatus
+	* Retrieves the value of the currentCenter attribute
+	* @return currentCenter
 	**/
 	
-	public ActivityStatus getActivityStatus(){
-		return activityStatus;
+	public Center getCurrentCenter(){
+		return currentCenter;
 	}
 	/**
-	* Sets the value of activityStatus attribute
+	* Sets the value of currentCenter attribute
 	**/
 
-	public void setActivityStatus(ActivityStatus activityStatus){
-		this.activityStatus = activityStatus;
+	public void setCurrentCenter(Center currentCenter){
+		this.currentCenter = currentCenter;
+	}
+			
+	/**
+	* An associated edu.ualberta.med.biobank.model.CollectionEvent object
+	**/
+			
+	private CollectionEvent originalCollectionEvent;
+	/**
+	* Retrieves the value of the originalCollectionEvent attribute
+	* @return originalCollectionEvent
+	**/
+	
+	public CollectionEvent getOriginalCollectionEvent(){
+		return originalCollectionEvent;
+	}
+	/**
+	* Sets the value of originalCollectionEvent attribute
+	**/
+
+	public void setOriginalCollectionEvent(CollectionEvent originalCollectionEvent){
+		this.originalCollectionEvent = originalCollectionEvent;
+	}
+			
+	/**
+	* An associated edu.ualberta.med.biobank.model.ProcessingEvent object
+	**/
+			
+	private ProcessingEvent processingEvent;
+	/**
+	* Retrieves the value of the processingEvent attribute
+	* @return processingEvent
+	**/
+	
+	public ProcessingEvent getProcessingEvent(){
+		return processingEvent;
+	}
+	/**
+	* Sets the value of processingEvent attribute
+	**/
+
+	public void setProcessingEvent(ProcessingEvent processingEvent){
+		this.processingEvent = processingEvent;
 	}
 			
 	/**
@@ -218,63 +326,21 @@ public class Specimen  implements Serializable
 	* An associated edu.ualberta.med.biobank.model.CollectionEvent object
 	**/
 			
-	private CollectionEvent sourceCollectionEvent;
+	private CollectionEvent collectionEvent;
 	/**
-	* Retrieves the value of the sourceCollectionEvent attribute
-	* @return sourceCollectionEvent
+	* Retrieves the value of the collectionEvent attribute
+	* @return collectionEvent
 	**/
 	
-	public CollectionEvent getSourceCollectionEvent(){
-		return sourceCollectionEvent;
+	public CollectionEvent getCollectionEvent(){
+		return collectionEvent;
 	}
 	/**
-	* Sets the value of sourceCollectionEvent attribute
+	* Sets the value of collectionEvent attribute
 	**/
 
-	public void setSourceCollectionEvent(CollectionEvent sourceCollectionEvent){
-		this.sourceCollectionEvent = sourceCollectionEvent;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.ProcessingEvent object
-	**/
-			
-	private ProcessingEvent processingEvent;
-	/**
-	* Retrieves the value of the processingEvent attribute
-	* @return processingEvent
-	**/
-	
-	public ProcessingEvent getProcessingEvent(){
-		return processingEvent;
-	}
-	/**
-	* Sets the value of processingEvent attribute
-	**/
-
-	public void setProcessingEvent(ProcessingEvent processingEvent){
-		this.processingEvent = processingEvent;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.OriginInfo object
-	**/
-			
-	private OriginInfo originInfo;
-	/**
-	* Retrieves the value of the originInfo attribute
-	* @return originInfo
-	**/
-	
-	public OriginInfo getOriginInfo(){
-		return originInfo;
-	}
-	/**
-	* Sets the value of originInfo attribute
-	**/
-
-	public void setOriginInfo(OriginInfo originInfo){
-		this.originInfo = originInfo;
+	public void setCollectionEvent(CollectionEvent collectionEvent){
+		this.collectionEvent = collectionEvent;
 	}
 			
 	/**
@@ -296,70 +362,6 @@ public class Specimen  implements Serializable
 
 	public void setSpecimenType(SpecimenType specimenType){
 		this.specimenType = specimenType;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.CollectionEvent object
-	**/
-			
-	private CollectionEvent collectionEvent;
-	/**
-	* Retrieves the value of the collectionEvent attribute
-	* @return collectionEvent
-	**/
-	
-	public CollectionEvent getCollectionEvent(){
-		return collectionEvent;
-	}
-	/**
-	* Sets the value of collectionEvent attribute
-	**/
-
-	public void setCollectionEvent(CollectionEvent collectionEvent){
-		this.collectionEvent = collectionEvent;
-	}
-			
-	/**
-	* An associated edu.ualberta.med.biobank.model.Specimen object's collection 
-	**/
-			
-	private Collection<Specimen> childSpecimenCollection;
-	/**
-	* Retrieves the value of the childSpecimenCollection attribute
-	* @return childSpecimenCollection
-	**/
-
-	public Collection<Specimen> getChildSpecimenCollection(){
-		return childSpecimenCollection;
-	}
-
-	/**
-	* Sets the value of childSpecimenCollection attribute
-	**/
-
-	public void setChildSpecimenCollection(Collection<Specimen> childSpecimenCollection){
-		this.childSpecimenCollection = childSpecimenCollection;
-	}
-		
-	/**
-	* An associated edu.ualberta.med.biobank.model.Center object
-	**/
-			
-	private Center currentCenter;
-	/**
-	* Retrieves the value of the currentCenter attribute
-	* @return currentCenter
-	**/
-	
-	public Center getCurrentCenter(){
-		return currentCenter;
-	}
-	/**
-	* Sets the value of currentCenter attribute
-	**/
-
-	public void setCurrentCenter(Center currentCenter){
-		this.currentCenter = currentCenter;
 	}
 			
 	/**
@@ -388,7 +390,7 @@ public class Specimen  implements Serializable
 		return 0;
 	}
 
-			
+
 	private Specimen parentSpecimen;
 	public Specimen getParentSpecimen(){
 		return parentSpecimen;

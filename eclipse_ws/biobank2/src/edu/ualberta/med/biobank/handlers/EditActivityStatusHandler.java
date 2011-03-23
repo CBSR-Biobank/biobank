@@ -35,9 +35,9 @@ public class EditActivityStatusHandler extends AbstractHandler {
 
     @Override
     public boolean isEnabled() {
-        return (SessionManager.canCreate(ActivityStatusWrapper.class, null)
-            || SessionManager.canUpdate(ActivityStatusWrapper.class, null) || SessionManager
-            .canDelete(ActivityStatusWrapper.class, null))
+        return (SessionManager.canCreate(ActivityStatusWrapper.class)
+            || SessionManager.canUpdate(ActivityStatusWrapper.class) || SessionManager
+            .canDelete(ActivityStatusWrapper.class))
             && (SessionManager.getInstance().getSession() != null);
     }
 }

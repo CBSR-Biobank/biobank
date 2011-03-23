@@ -26,10 +26,10 @@ import edu.ualberta.med.biobank.common.peer.ShipmentInfoPeer;
 import edu.ualberta.med.biobank.common.util.DispatchState;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.DispatchSpecimenWrapper;
+import edu.ualberta.med.biobank.common.wrappers.DispatchWrapper.CheckStatus;
 import edu.ualberta.med.biobank.common.wrappers.ShippingMethodWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.dialogs.dispatch.DispatchCreateScanDialog;
-import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.DispatchAliquotsTreeTable;
 import edu.ualberta.med.biobank.widgets.infotables.DispatchAliquotListInfoTable;
@@ -39,8 +39,8 @@ import gov.nih.nci.system.applicationservice.ApplicationException;
 
 public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
-    private static BiobankLogger logger = BiobankLogger
-        .getLogger(DispatchSendingEntryForm.class.getName());
+    // private static BiobankLogger logger = BiobankLogger
+    // .getLogger(DispatchSendingEntryForm.class.getName());
 
     public static final String ID = "edu.ualberta.med.biobank.forms.DispatchSendingEntryForm";
 
@@ -81,7 +81,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
         if (dispatch.isNew()) {
             dispatch.setSenderCenter(SessionManager.getUser()
-                .getCurrentWorkingCentre());
+                .getCurrentWorkingCenter());
             dispatch.setState(DispatchState.CREATION);
         }
 
@@ -124,14 +124,15 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     private void createReceiverCombo(Composite client) {
         if (dispatch.isInTransitState()) {
             BiobankText receiverLabel = createReadOnlyLabelledField(client,
-                SWT.NONE, "Receiver Center");
+                SWT.NONE, "Receiver");
             setTextValue(receiverLabel, dispatch.getReceiverCenter()
                 .getNameShort());
         } else {
             try {
-                destSiteComboViewer = createComboViewer(client,
-                    "Receiver Site", CenterWrapper.getAllCenters(appService),
-                    null, "Dispatch must have an associated study",
+                destSiteComboViewer = createComboViewer(client, "Receiver",
+                    CenterWrapper.getOtherCenters(appService, SessionManager
+                        .getUser().getCurrentWorkingCenter()), null,
+                    "Dispatch must have a receiver",
                     new ComboSelectionUpdate() {
                         @Override
                         public void doSelection(Object selectedObject) {
@@ -153,9 +154,10 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void formClosed() {
         try {
-            dispatch.reload();
+            reset();
         } catch (Exception e) {
-            BiobankPlugin.openAsyncError("Error", "Unable to reload dispatch");
+            // TODO: how to handle?
+            e.printStackTrace();
         }
     }
 
@@ -220,7 +222,7 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     protected void openScanDialog() {
         DispatchCreateScanDialog dialog = new DispatchCreateScanDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            dispatch, SessionManager.getUser().getCurrentWorkingCentre());
+            dispatch, SessionManager.getUser().getCurrentWorkingCenter());
         dialog.open();
         setDirty(true); // FIXME need to do this better !
         reloadAliquots();
@@ -233,20 +235,20 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
 
     protected void addAliquot(String inventoryId) {
         if (!inventoryId.isEmpty()) {
+            SpecimenWrapper existingAliquot;
             try {
-                SpecimenWrapper existingAliquot = SpecimenWrapper.getSpecimen(
+                existingAliquot = SpecimenWrapper.getSpecimen(
                     dispatch.getAppService(), inventoryId,
                     SessionManager.getUser());
-                if (existingAliquot == null)
-                    BiobankPlugin.openError("Aliquot not found",
-                        "Aliquot with inventory id " + inventoryId
-                            + " has not been found.");
-                else
+                CheckStatus status = dispatch.checkCanAddSpecimen(
+                    existingAliquot, true);
+                if (status.ok)
                     addAliquot(existingAliquot);
-
-            } catch (Exception ae) {
-                BiobankPlugin.openAsyncError("Error while looking up patient",
-                    ae);
+                else
+                    BiobankPlugin.openAsyncError("Error", status.message);
+            } catch (Exception e) {
+                BiobankPlugin.openAsyncError("Error",
+                    "Unable to retrieve specimen info");
             }
         }
     }
@@ -280,9 +282,9 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        dispatch.resetMap();
+        dispatch.reset();
         dispatch.setSenderCenter(SessionManager.getUser()
-            .getCurrentWorkingCentre());
+            .getCurrentWorkingCenter());
         if (destSiteComboViewer != null) {
             CenterWrapper<?> destSite = dispatch.getReceiverCenter();
             if (destSite != null) {
@@ -319,8 +321,8 @@ public class DispatchSendingEntryForm extends AbstractShipmentEntryForm {
             label += dispatch.getSenderCenter().getNameShort() + " -> "
                 + dispatch.getReceiverCenter().getNameShort();
 
-            if (dispatch.getDepartedAt() != null)
-                label += "[" + dispatch.getFormattedDeparted() + "]";
+            if (dispatch.getPackedAt() != null)
+                label += "[" + dispatch.getFormattedPackedAt() + "]";
             return label;
         }
     }

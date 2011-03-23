@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.treeview.admin;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.Assert;
@@ -21,7 +22,7 @@ import edu.ualberta.med.biobank.treeview.listeners.AdapterChangedEvent;
 public class SiteGroup extends AdapterBase {
 
     public SiteGroup(SessionAdapter parent, int id) {
-        super(parent, id, "Sites", true, false);
+        super(parent, id, "All Sites", true, false);
     }
 
     @Override
@@ -41,7 +42,7 @@ public class SiteGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(SiteWrapper.class, null)) {
+        if (SessionManager.canCreate(SiteWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add Site");
             mi.addSelectionListener(new SelectionAdapter() {
@@ -77,7 +78,10 @@ public class SiteGroup extends AdapterBase {
     @Override
     protected Collection<? extends ModelWrapper<?>> getWrapperChildren()
         throws Exception {
-        return SiteWrapper.getSites(getAppService());
+        if (SessionManager.isSuperAdminMode()) {
+            return SiteWrapper.getSites(SessionManager.getAppService());
+        }
+        return Collections.emptyList();
     }
 
     @Override

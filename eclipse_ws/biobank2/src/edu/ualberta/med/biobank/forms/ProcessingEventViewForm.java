@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.Composite;
 import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
-import edu.ualberta.med.biobank.treeview.patient.ProcessingEventAdapter;
+import edu.ualberta.med.biobank.treeview.processing.ProcessingEventAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable;
 import edu.ualberta.med.biobank.widgets.infotables.SpecimenInfoTable.ColumnsShown;
@@ -24,7 +24,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
     private ProcessingEventAdapter pEventAdapter;
     private ProcessingEventWrapper pEvent;
 
-    private BiobankText centreLabel;
+    private BiobankText centerLabel;
 
     private BiobankText worksheetLabel;
 
@@ -43,7 +43,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
                 + adapter.getClass().getName());
 
         pEventAdapter = (ProcessingEventAdapter) adapter;
-        pEvent = pEventAdapter.getWrapper();
+        pEvent = (ProcessingEventWrapper) pEventAdapter.getWrapper();
         retrieveProcessingEvent();
         setPartName(Messages.getString("ProcessingEventViewForm.title", //$NON-NLS-1$
             pEvent.getFormattedCreatedAt()));
@@ -67,8 +67,8 @@ public class ProcessingEventViewForm extends BiobankViewForm {
         client.setLayoutData(new GridData(GridData.FILL_HORIZONTAL));
         toolkit.paintBordersFor(client);
 
-        centreLabel = createReadOnlyLabelledField(client, SWT.NONE,
-            Messages.getString("ProcessingEvent.field.centre.label")); //$NON-NLS-1$
+        centerLabel = createReadOnlyLabelledField(client, SWT.NONE,
+            Messages.getString("ProcessingEvent.field.center.label")); //$NON-NLS-1$
         worksheetLabel = createReadOnlyLabelledField(client, SWT.NONE,
             Messages.getString("ProcessingEvent.field.worksheet.label")); //$NON-NLS-1$
         dateCreationLabel = createReadOnlyLabelledField(client, SWT.NONE,
@@ -83,7 +83,7 @@ public class ProcessingEventViewForm extends BiobankViewForm {
     }
 
     private void setValues() {
-        setTextValue(centreLabel, pEvent.getCenter().getName());
+        setTextValue(centerLabel, pEvent.getCenter().getName());
         setTextValue(worksheetLabel, pEvent.getWorksheet());
         setTextValue(dateCreationLabel, pEvent.getFormattedCreatedAt());
         setTextValue(activityLabel, pEvent.getActivityStatus().getName());

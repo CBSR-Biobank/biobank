@@ -36,7 +36,8 @@ public interface BiobankApplicationService extends WritableApplicationService {
     public void modifyPassword(String oldPassword, String newPassword)
         throws ApplicationException;
 
-    public List<Group> getSecurityGroups() throws ApplicationException;
+    public List<Group> getSecurityGroups(boolean includeSuperAdmin)
+        throws ApplicationException;
 
     public List<User> getSecurityUsers() throws ApplicationException;
 
@@ -63,7 +64,10 @@ public interface BiobankApplicationService extends WritableApplicationService {
 
     public String getServerVersion();
 
-    public List<ProtectionGroupPrivilege> getSecurityFeatures()
+    public List<ProtectionGroupPrivilege> getSecurityGlobalFeatures()
+        throws ApplicationException;
+
+    public List<ProtectionGroupPrivilege> getSecurityCenterFeatures()
         throws ApplicationException;
 
     public QueryHandle createQuery(QueryCommand qc) throws Exception;

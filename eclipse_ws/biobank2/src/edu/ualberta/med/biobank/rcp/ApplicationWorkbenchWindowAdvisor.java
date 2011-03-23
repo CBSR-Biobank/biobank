@@ -43,7 +43,7 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 
     private String username = null;
 
-    private String currentCentreText = null;
+    private String currentCenterText = null;
 
     public ApplicationWorkbenchWindowAdvisor(
         IWorkbenchWindowConfigurer configurer) {
@@ -157,11 +157,11 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         this.server = server;
         if (user == null) {
             this.username = null;
-            this.currentCentreText = null;
+            this.currentCenterText = null;
         } else {
             this.username = user.getLogin();
-            CenterWrapper<?> centre = user.getCurrentWorkingCentre();
-            this.currentCentreText = centre == null ? null : centre
+            CenterWrapper<?> center = user.getCurrentWorkingCenter();
+            this.currentCenterText = center == null ? null : center
                 .getNameShort();
         }
         mainWindowUpdateTitle();
@@ -175,8 +175,8 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
         if ((server != null) && (username != null)) {
             newTitle += " - " + server + " [" + username + "]";
         }
-        if (currentCentreText != null) {
-            newTitle += " - Centre " + currentCentreText;
+        if (currentCenterText != null) {
+            newTitle += " - Center " + currentCenterText;
         }
 
         if (!newTitle.equals(oldTitle)) {

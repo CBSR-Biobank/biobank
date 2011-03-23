@@ -59,12 +59,12 @@ public class SessionState extends AbstractSourceProvider {
             isWebAdmin);
     }
 
-    public void setHasWorkingCentre(boolean hasWorkingCenter) {
+    public void setHasWorkingCenter(boolean hasWorkingCenter) {
         if (this.hasWorkingCenter == hasWorkingCenter)
             return; // no change
         this.hasWorkingCenter = hasWorkingCenter;
         fireSourceChanged(ISources.WORKBENCH, HAS_WORKING_CENTER_SOURCE_NAME,
-            isWebAdmin);
+            hasWorkingCenter);
     }
 
 }

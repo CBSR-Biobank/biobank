@@ -108,9 +108,9 @@ public class ShippingMethodEntryForm extends BiobankEntryForm {
 
     @Override
     protected void checkEditAccess() {
-        if (!SessionManager.canUpdate(ShippingMethodWrapper.class, null)
-            && !SessionManager.canCreate(ShippingMethodWrapper.class, null)
-            && !SessionManager.canDelete(ShippingMethodWrapper.class, null)) {
+        if (!SessionManager.canUpdate(ShippingMethodWrapper.class)
+            && !SessionManager.canCreate(ShippingMethodWrapper.class)
+            && !SessionManager.canDelete(ShippingMethodWrapper.class)) {
             BiobankPlugin.openAccessDeniedErrorMessage();
             throw new RuntimeException(
                 "Cannot access Shipping Method editor. Access Denied.");

@@ -1,5 +1,6 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
+import java.util.Date;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.IObservableValue;
@@ -41,16 +42,16 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
     public void addOrEditSpecimen(boolean add, SpecimenWrapper specimen,
         List<SourceSpecimenWrapper> studySourceTypes,
         List<SpecimenTypeWrapper> allSpecimenTypes,
-        final CollectionEventWrapper cEvent) {
+        final CollectionEventWrapper cEvent, final Date defaultTimeDrawn) {
         NewSpecimenListener newSpecimenListener = null;
         if (add)
             newSpecimenListener = new NewSpecimenListener() {
                 @Override
                 public void newSpecimenAdded(SpecimenWrapper spec) {
                     spec.setCollectionEvent(cEvent);
-                    spec.setSourceCollectionEvent(cEvent);
+                    spec.setOriginalCollectionEvent(cEvent);
                     spec.setCurrentCenter(SessionManager.getUser()
-                        .getCurrentWorkingCentre());
+                        .getCurrentWorkingCenter());
                     currentSpecimens.add(spec);
                     addedSpecimens.add(spec);
                     specimensAdded.setValue(true);
@@ -60,7 +61,8 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
             };
         CEventSourceSpecimenDialog dlg = new CEventSourceSpecimenDialog(
             PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            specimen, studySourceTypes, allSpecimenTypes, newSpecimenListener);
+            specimen, studySourceTypes, allSpecimenTypes, newSpecimenListener,
+            defaultTimeDrawn);
         int res = dlg.open();
         if (!add && res == Dialog.OK) {
             reloadCollection(currentSpecimens);
@@ -71,27 +73,27 @@ public class CEventSpecimenEntryInfoTable extends SpecimenEntryInfoTable {
     public void addEditSupport(
         final List<SourceSpecimenWrapper> studySourceTypes,
         final List<SpecimenTypeWrapper> allSpecimenTypes) {
-        if (SessionManager.canCreate(SpecimenWrapper.class, null)) {
+        if (SessionManager.canCreate(SpecimenWrapper.class)) {
             addAddItemListener(new IInfoTableAddItemListener() {
                 @Override
                 public void addItem(InfoTableEvent event) {
                     addOrEditSpecimen(true, null, studySourceTypes,
-                        allSpecimenTypes, null);
+                        allSpecimenTypes, null, null);
                 }
             });
         }
-        if (SessionManager.canUpdate(SpecimenWrapper.class, null)) {
+        if (SessionManager.canUpdate(SpecimenWrapper.class)) {
             addEditItemListener(new IInfoTableEditItemListener() {
                 @Override
                 public void editItem(InfoTableEvent event) {
                     SpecimenWrapper sw = getSelection();
                     if (sw != null)
                         addOrEditSpecimen(false, sw, studySourceTypes,
-                            allSpecimenTypes, null);
+                            allSpecimenTypes, null, null);
                 }
             });
         }
-        if (SessionManager.canDelete(SpecimenWrapper.class, null)) {
+        if (SessionManager.canDelete(SpecimenWrapper.class)) {
             addDeleteItemListener(new IInfoTableDeleteItemListener() {
                 @Override
                 public void deleteItem(InfoTableEvent event) {

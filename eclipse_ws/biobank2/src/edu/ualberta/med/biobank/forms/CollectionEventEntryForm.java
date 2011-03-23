@@ -26,6 +26,7 @@ import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 import edu.ualberta.med.biobank.common.peer.CollectionEventPeer;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.OriginInfoWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
@@ -85,6 +86,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     private CEventSpecimenEntryInfoTable specimensTable;
     private BiobankText visitNumberText;
 
+    private DateTimeWidget timeDrawnWidget;
+
     @Override
     public void init() throws Exception {
         Assert.isTrue(adapter instanceof CollectionEventAdapter,
@@ -92,7 +95,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         ceventAdapter = (CollectionEventAdapter) adapter;
-        cevent = ceventAdapter.getWrapper();
+        if (ceventAdapter.getWrapper().isNew())
+            cevent = ceventAdapter.getWrapper();
+        else
+            cevent = (CollectionEventWrapper) ceventAdapter.getWrapper()
+                .getDatabaseClone();
         patient = cevent.getPatient();
         retrieve();
         try {
@@ -103,6 +110,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         String tabName;
         if (cevent.isNew()) {
             tabName = Messages.getString("CollectionEventEntryForm.title.new");
+            cevent.setActivityStatus(ActivityStatusWrapper
+                .getActiveActivityStatus(appService));
         } else {
             tabName = Messages.getString("CollectionEventEntryForm.title.edit",
                 cevent.getVisitNumber());
@@ -170,11 +179,13 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         visitNumberText.addSelectionChangedListener(listener);
         setFirstControl(visitNumberText);
 
-        activityStatusComboViewer = createComboViewer(client,
+        activityStatusComboViewer = createComboViewer(
+            client,
             Messages.getString("label.activity"),
             ActivityStatusWrapper.getAllActivityStatuses(appService),
             cevent.getActivityStatus(),
-            "Patient visit must have an activity status",
+            Messages
+                .getString("CollectionEventEntryForm.field.activity.validation.msg"),
             new ComboSelectionUpdate() {
                 @Override
                 public void doSelection(Object selectedObject) {
@@ -188,6 +199,11 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                 cevent.getActivityStatus()));
         }
 
+        widgetCreator.createLabel(client,
+            Messages.getString("CollectionEventEntryForm.timeDrawn.label"));
+        timeDrawnWidget = new DateTimeWidget(client, SWT.DATE | SWT.TIME, null);
+        toolkit.adapt(timeDrawnWidget);
+
         createPvDataSection(client);
 
         createBoundWidgetWithLabel(client, BiobankText.class, SWT.MULTI,
@@ -199,7 +215,8 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         Section section = createSection(Messages
             .getString("CollectionEventEntryForm.specimens.title"));
         specimensTable = new CEventSpecimenEntryInfoTable(section,
-            cevent.getSourceSpecimenCollection(true), ColumnsShown.CEVENT_FORM);
+            cevent.getOriginalSpecimenCollection(true),
+            ColumnsShown.CEVENT_FORM);
         specimensTable.adaptToToolkit(toolkit, true);
         specimensTable.addSelectionChangedListener(listener);
 
@@ -217,7 +234,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
                         specimensTable.addOrEditSpecimen(true, null, cevent
                             .getPatient().getStudy()
                             .getSourceSpecimenCollection(true),
-                            allSpecimenTypes, cevent);
+                            allSpecimenTypes, cevent, timeDrawnWidget.getDate());
                     }
                 });
         } catch (ApplicationException e) {
@@ -253,23 +270,23 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
     private Control getControlForLabel(Composite client,
         FormPvCustomInfo pvCustomInfo) {
         Control control;
-        if (pvCustomInfo.getType().equals("number")) {
+        if (EventAttrTypeEnum.NUMBER == pvCustomInfo.getType()) {
             control = createBoundWidgetWithLabel(client, BiobankText.class,
                 SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
                 new DoubleNumberValidator("You should select a valid number"));
-        } else if (pvCustomInfo.getType().equals("text")) {
+        } else if (EventAttrTypeEnum.TEXT == pvCustomInfo.getType()) {
             control = createBoundWidgetWithLabel(client, BiobankText.class,
                 SWT.NONE, pvCustomInfo.getLabel(), null, pvCustomInfo, "value",
                 null);
-        } else if (pvCustomInfo.getType().equals("date_time")) {
+        } else if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType()) {
             control = createDateTimeWidget(client, pvCustomInfo.getLabel(),
                 DateFormatter.parseToDateTime(pvCustomInfo.getValue()), null,
                 null);
-        } else if (pvCustomInfo.getType().equals("select_single")) {
+        } else if (EventAttrTypeEnum.SELECT_SINGLE == pvCustomInfo.getType()) {
             control = createBoundWidgetWithLabel(client, Combo.class, SWT.NONE,
                 pvCustomInfo.getLabel(), pvCustomInfo.getAllowedValues(),
                 pvCustomInfo, "value", null);
-        } else if (pvCustomInfo.getType().equals("select_multiple")) {
+        } else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo.getType()) {
             createFieldLabel(client, pvCustomInfo.getLabel());
             SelectMultipleWidget s = new SelectMultipleWidget(client,
                 SWT.BORDER, pvCustomInfo.getAllowedValues(), selectionListener);
@@ -306,9 +323,9 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             .getParent();
         if (patientAdapter != null)
             cevent.setPatient(patientAdapter.getWrapper());
-        cevent
-            .addToSourceSpecimenCollection(specimensTable.getAddedSpecimens());
-        cevent.removeFromSourceSpecimenCollection(specimensTable
+        cevent.addToOriginalSpecimenCollection(specimensTable
+            .getAddedSpecimens());
+        cevent.removeFromOriginalSpecimenCollection(specimensTable
             .getRemovedSpecimens());
         savePvCustomInfo();
     }
@@ -320,7 +337,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             OriginInfoWrapper originInfo = new OriginInfoWrapper(
                 SessionManager.getAppService());
             originInfo.setCenter(SessionManager.getUser()
-                .getCurrentWorkingCentre());
+                .getCurrentWorkingCenter());
             originInfo.persist();
             for (SpecimenWrapper spec : specimensTable.getAddedSpecimens()) {
                 spec.setOriginInfo(originInfo);
@@ -374,7 +391,7 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
             activityStatusComboViewer.setSelection(new StructuredSelection(
                 cevent.getActivityStatus()));
         }
-        specimensTable.reload(cevent.getSourceSpecimenCollection(true));
+        specimensTable.reload(cevent.getOriginalSpecimenCollection(true));
         resetPvCustomInfo();
     }
 
@@ -387,11 +404,12 @@ public class CollectionEventEntryForm extends BiobankEntryForm {
         for (FormPvCustomInfo pvCustomInfo : pvCustomInfoList) {
             pvCustomInfo.setValue(cevent.getEventAttrValue(pvCustomInfo
                 .getLabel()));
-            if (pvCustomInfo.getType().equals("date_time")) {
+            if (EventAttrTypeEnum.DATE_TIME == pvCustomInfo.getType()) {
                 DateTimeWidget dateWidget = (DateTimeWidget) pvCustomInfo.control;
                 dateWidget.setDate(DateFormatter.parseToDateTime(pvCustomInfo
                     .getValue()));
-            } else if (pvCustomInfo.getType().equals("select_multiple")) {
+            } else if (EventAttrTypeEnum.SELECT_MULTIPLE == pvCustomInfo
+                .getType()) {
                 SelectMultipleWidget s = (SelectMultipleWidget) pvCustomInfo.control;
                 if (pvCustomInfo.getValue() != null) {
                     s.setSelections(pvCustomInfo.getValue().split(";"));

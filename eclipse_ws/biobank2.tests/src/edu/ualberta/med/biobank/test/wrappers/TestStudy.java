@@ -15,6 +15,7 @@ import edu.ualberta.med.biobank.common.exception.DuplicateEntryException;
 import edu.ualberta.med.biobank.common.wrappers.ActivityStatusWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ClinicWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ContactWrapper;
+import edu.ualberta.med.biobank.common.wrappers.EventAttrTypeEnum;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
@@ -341,20 +342,11 @@ public class TestStudy extends TestDatabase {
         Assert.assertTrue(types.contains("text"));
         Assert.assertTrue(types.contains("select_single"));
 
-        study.setStudyEventAttr("Worksheet", "text");
-        study.setStudyEventAttr("Visit Type", "select_single", new String[] {
-            "toto", "titi", "tata" });
+        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr("Visit Type", EventAttrTypeEnum.SELECT_SINGLE,
+            new String[] { "toto", "titi", "tata" });
         study.persist();
         study.reload();
-
-        // set non existing type, expect exception
-        try {
-            study.setStudyEventAttr(Utils.getRandomString(10, 15),
-                Utils.getRandomString(10, 15));
-            Assert.fail("call should generate an exception");
-        } catch (Exception e) {
-            Assert.assertTrue(true);
-        }
 
         Assert.assertEquals(2, study.getStudyEventAttrLabels().length);
 
@@ -367,7 +359,7 @@ public class TestStudy extends TestDatabase {
         Assert.assertEquals(0, study.getStudyEventAttrLabels().length);
 
         // add patient visit that uses the attribute and try to delete
-        study.setStudyEventAttr("Worksheet", "text");
+        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
         study.persist();
         study.reload();
         List<ProcessingEventWrapper> visits = studyAddProcessingEvents(study);
@@ -391,9 +383,9 @@ public class TestStudy extends TestDatabase {
         String name = "testGetSetStudyPvAttrLabels" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        study.setStudyEventAttr("Worksheet", "text");
-        study.setStudyEventAttr("Consent", "select_multiple", new String[] {
-            "a", "b" });
+        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr("Consent", EventAttrTypeEnum.SELECT_MULTIPLE,
+            new String[] { "a", "b" });
         Assert.assertEquals(2, study.getStudyEventAttrLabels().length);
 
         // test still ok after persist
@@ -407,9 +399,9 @@ public class TestStudy extends TestDatabase {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        study.setStudyEventAttr("Worksheet", "text");
-        study.setStudyEventAttr("Visit Type", "select_single", new String[] {
-            "toto", "titi", "tata" });
+        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr("Visit Type", EventAttrTypeEnum.SELECT_SINGLE,
+            new String[] { "toto", "titi", "tata" });
         study.persist();
 
         List<String> labels = Arrays.asList(study.getStudyEventAttrLabels());
@@ -434,7 +426,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        study.setStudyEventAttr("Worksheet", "text");
+        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
         String pvInfoLabel = "Visit Type";
 
         for (int i = 0; i < 4; ++i) {
@@ -454,7 +446,8 @@ public class TestStudy extends TestDatabase {
             default:
                 values = null;
             }
-            study.setStudyEventAttr(pvInfoLabel, "select_single", values);
+            study.setStudyEventAttr(pvInfoLabel,
+                EventAttrTypeEnum.SELECT_SINGLE, values);
             study.persist();
 
             study.reload();
@@ -483,7 +476,7 @@ public class TestStudy extends TestDatabase {
         String name = "testGetStudyPvAttrType" + r.nextInt();
         StudyWrapper study = StudyHelper.addStudy(name);
 
-        study.setStudyEventAttr("Worksheet", "text");
+        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
         study.persist();
         study.reload();
 
@@ -517,7 +510,7 @@ public class TestStudy extends TestDatabase {
             Assert.assertTrue(true);
         }
         // add patient visit that uses the locked attribute
-        study.setStudyEventAttr("Worksheet", "text");
+        study.setStudyEventAttr("Worksheet", EventAttrTypeEnum.TEXT);
         study.setStudyEventAttrActivityStatus("Worksheet",
             ActivityStatusWrapper.getActivityStatus(appService,
                 ActivityStatusWrapper.CLOSED_STATUS_STRING));
@@ -549,8 +542,8 @@ public class TestStudy extends TestDatabase {
             Assert.fail("Can't test without PvAttrTypes");
         }
 
-        study.setStudyEventAttr(name, "text");
-        study.setStudyEventAttr(name + "_2", "number");
+        study.setStudyEventAttr(name, EventAttrTypeEnum.TEXT);
+        study.setStudyEventAttr(name + "_2", EventAttrTypeEnum.NUMBER);
         study.persist();
 
         study.reload();

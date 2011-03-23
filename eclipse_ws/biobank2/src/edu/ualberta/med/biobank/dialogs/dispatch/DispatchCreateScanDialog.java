@@ -213,7 +213,7 @@ public class DispatchCreateScanDialog extends
                         List<SpecimenWrapper> currentAliquots = (currentShipment)
                             .getSpecimenCollection(false);
                         CheckStatus check = (currentShipment)
-                            .checkCanAddAliquot(foundAliquot, false);
+                            .checkCanAddSpecimen(foundAliquot, false);
                         if (check.ok) {
                             // aliquot scanned is already registered at this
                             // position (everything is ok !)
@@ -317,9 +317,8 @@ public class DispatchCreateScanDialog extends
         Map<RowColPos, PalletCell> map = new HashMap<RowColPos, PalletCell>();
         if (currentPallet == null) {
             Map<RowColPos, PalletCell> cells = PalletCell
-                .getRandomAliquotsAlreadyAssigned(SessionManager
-                    .getAppService(), (currentShipment).getSenderCenter()
-                    .getId());
+                .getRandomAliquotsNotAssigned(SessionManager.getAppService(),
+                    (currentShipment).getSenderCenter().getId());
             return cells;
         } else {
             for (SpecimenWrapper aliquot : currentPallet.getSpecimens()

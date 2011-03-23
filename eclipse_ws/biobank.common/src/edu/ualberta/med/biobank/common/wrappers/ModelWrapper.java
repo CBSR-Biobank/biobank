@@ -117,6 +117,16 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return null;
     }
 
+    public void setId(Integer id) {
+        Class<?> wrappedClass = wrappedObject.getClass();
+        try {
+            Method methodSetId = wrappedClass.getMethod("setId", Integer.class);
+            methodSetId.invoke(wrappedObject, id);
+        } catch (Exception e) {
+
+        }
+    }
+
     public WritableApplicationService getAppService() {
         return appService;
     }
@@ -504,26 +514,22 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
     /**
      * return true if the user can view this object
      */
-    public boolean canRead(User user, Integer siteId) {
-        return user.hasPrivilegeOnObject(Privilege.READ, siteId, this);
+    public boolean canRead(User user) {
+        return user.hasPrivilegeOnObject(Privilege.READ, getWrappedClass());
     }
 
     /**
      * return true if the user can edit this object
      */
     public boolean canUpdate(User user) {
-        CenterWrapper<?> site = getCenterLinkedToObject();
-        return user.hasPrivilegeOnObject(Privilege.UPDATE, site == null ? null
-            : site.getId(), this);
+        return user.hasPrivilegeOnObject(Privilege.UPDATE, getWrappedClass());
     }
 
     /**
      * return true if the user can delete this object
      */
     public boolean canDelete(User user) {
-        CenterWrapper<?> site = getCenterLinkedToObject();
-        return user.hasPrivilegeOnObject(Privilege.DELETE, site == null ? null
-            : site.getId(), this);
+        return user.hasPrivilegeOnObject(Privilege.DELETE, getWrappedClass());
     }
 
     public void addWrapperListener(WrapperListener listener) {
@@ -561,9 +567,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         setWrappedObject(otherWrapper.wrappedObject);
     }
 
-    public void logLookup(String centre) throws Exception {
+    public void logLookup(String center) throws Exception {
         ((BiobankApplicationService) appService).logActivity(getLogMessage(
-            "select", centre, getWrappedClass().getSimpleName() + " LOOKUP"));
+            "select", center, getWrappedClass().getSimpleName() + " LOOKUP"));
     }
 
     public void logEdit(String site) throws Exception {
@@ -584,17 +590,18 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         return this.getId().compareTo(arg0.getId());
     }
 
-    public CenterWrapper<?> getCenterLinkedToObject() {
-        return null;
-    }
+    // public CenterWrapper<?> getCenterLinkedToObjectForSecu() {
+    // return null;
+    // }
 
     /**
      * return true if access is authorized
      */
-    public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
-        @SuppressWarnings("unused") Integer siteId) {
-        return true;
-    }
+    // FIXME needed ?
+    // public boolean checkSpecificAccess(@SuppressWarnings("unused") User user,
+    // @SuppressWarnings("unused") CenterWrapper<?> center) {
+    // return true;
+    // }
 
     public static <W extends ModelWrapper<? extends M>, M> W wrapModel(
         WritableApplicationService appService, M model, Class<W> wrapperKlazz)
@@ -664,10 +671,9 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             return (one == null) ? -1 : 1;
         }
 
-        if (one == null && two == null) {
+        if (one == null || two == null) {
             return 0;
         }
-
         return one.compareTo(two);
     }
 
@@ -899,8 +905,7 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
             T tmp = (T) getter.invoke(model);
             value = tmp;
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+            throw new RuntimeException(e);
         }
 
         return value;
@@ -954,5 +959,44 @@ public abstract class ModelWrapper<E> implements Comparable<ModelWrapper<E>> {
         }
 
         return sb.toString();
+    }
+
+    public ModelWrapper<?> getDatabaseClone() {
+        ModelWrapper<?> wrapper = null;
+
+        try {
+            Constructor<?> c = getClass().getDeclaredConstructor(
+                WritableApplicationService.class);
+            Object[] arglist = new Object[] { appService };
+            try {
+                wrapper = (ModelWrapper<?>) c.newInstance(arglist);
+                wrapper.setId(getId());
+                try {
+                    wrapper.reload();
+                } catch (Exception e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
+                }
+            } catch (IllegalArgumentException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InstantiationException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (SecurityException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (NoSuchMethodException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return wrapper;
     }
 }

@@ -1,4 +1,4 @@
-package edu.ualberta.med.biobank.treeview.patient;
+package edu.ualberta.med.biobank.treeview.processing;
 
 import java.util.Collection;
 
@@ -54,8 +54,11 @@ public class ProcessingEventAdapter extends AdapterBase {
 
     @Override
     public String getTooltipText() {
-        return Messages.getString("ProvessingEventAdapter.tooltiptext",
-            getWrapper().getFormattedCreatedAt());
+        if (getWrapper() == null)
+            return Messages.getString("ProvessingEventAdapter.tooltiptext");
+        return Messages.getString(
+            "ProvessingEventAdapter.tooltiptext.withdate", getWrapper()
+                .getFormattedCreatedAt());
     }
 
     @Override

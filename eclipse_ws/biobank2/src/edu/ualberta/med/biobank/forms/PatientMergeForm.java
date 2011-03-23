@@ -25,7 +25,6 @@ import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
 import edu.ualberta.med.biobank.logs.BiobankLogger;
 import edu.ualberta.med.biobank.treeview.patient.PatientAdapter;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.infotables.AbstractInfoTableWidget;
 import edu.ualberta.med.biobank.widgets.infotables.ClinicVisitInfoTable;
 import gov.nih.nci.system.applicationservice.ApplicationException;
 
@@ -57,7 +56,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
     private IObservableValue patientNotNullValue;
 
-    private AbstractInfoTableWidget<CollectionEventWrapper> patient1VisitsTable;
+    private ClinicVisitInfoTable patient1VisitsTable;
 
     private boolean canMerge;
 
@@ -68,7 +67,11 @@ public class PatientMergeForm extends BiobankEntryForm {
                 + adapter.getClass().getName());
 
         patient1Adapter = (PatientAdapter) adapter;
-        patient1 = patient1Adapter.getWrapper();
+        if (patient1Adapter.getWrapper().isNew())
+            patient1 = patient1Adapter.getWrapper();
+        else
+            patient1 = (PatientWrapper) patient1Adapter.getWrapper()
+                .getDatabaseClone();
         String tabName = "Merging Patient " + patient1.getPnumber();
         setPartName(tabName);
         patientNotNullValue = new WritableValue(Boolean.FALSE, Boolean.class);
@@ -124,7 +127,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
         pnumber1Text = createReadOnlyLabelledField(patientArea1, SWT.NONE,
             "Patient Number");
-        pnumber1Text.setText(patient1Adapter.getWrapper().getPnumber());
+        pnumber1Text.setText(patient1.getPnumber());
 
         pnumber2Text = (BiobankText) createLabelledWidget(patientArea2,
             BiobankText.class, SWT.NONE, "Patient Number");
@@ -151,7 +154,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
         setFirstControl(pnumber2Text);
 
-        StudyWrapper selectedStudy = patient1Adapter.getWrapper().getStudy();
+        StudyWrapper selectedStudy = patient1.getStudy();
         study1Text = createReadOnlyLabelledField(patientArea1, SWT.NONE,
             "Study");
         study1Text.setText(selectedStudy.getNameShort());
@@ -160,7 +163,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             "Study");
 
         patient1VisitsTable = new ClinicVisitInfoTable(patientArea1,
-            patient1Adapter.getWrapper().getCollectionEventCollection(true));
+            patient1.getCollectionEventCollection(true));
         GridData gd1 = new GridData();
         gd1.horizontalSpan = 2;
         gd1.grabExcessHorizontalSpace = true;
@@ -197,7 +200,7 @@ public class PatientMergeForm extends BiobankEntryForm {
             return;
         }
 
-        if (patient2.equals(patient1Adapter.getWrapper())) {
+        if (patient2.equals(patient1)) {
             BiobankPlugin.openAsyncError("Duplicate Patient Number",
                 "Cannot merge a patient with himself");
             patient2VisitsTable.setCollection(newContents);
@@ -206,8 +209,7 @@ public class PatientMergeForm extends BiobankEntryForm {
 
         study2Text.setText(patient2.getStudy().getNameShort());
 
-        if (!patient2.getStudy()
-            .equals(patient1Adapter.getWrapper().getStudy())) {
+        if (!patient2.getStudy().equals(patient1.getStudy())) {
             patient2VisitsTable.setCollection(newContents);
             BiobankPlugin.openAsyncError("Invalid Patient Number",
                 "Patients from different studies cannot be merged");
@@ -245,12 +247,14 @@ public class PatientMergeForm extends BiobankEntryForm {
     protected void doBeforeSave() throws Exception {
         canMerge = false;
         if (patient2 != null) {
-            if (BiobankPlugin.openConfirm(
-                "Confirm Merge",
-                "Are you sure you want to merge patient "
-                    + patient2.getPnumber() + " into patient "
-                    + patient1Adapter.getWrapper().getPnumber()
-                    + "? All patient visits will be transferred.")) {
+            if (BiobankPlugin
+                .openConfirm(
+                    "Confirm Merge",
+                    "Are you sure you want to merge patient "
+                        + patient2.getPnumber()
+                        + " into patient "
+                        + patient1.getPnumber()
+                        + "? All collection events, source specimens, and aliquoted specimens will be transferred.")) {
                 canMerge = true;
             }
         }
@@ -266,10 +270,9 @@ public class PatientMergeForm extends BiobankEntryForm {
     @Override
     public void reset() throws Exception {
         super.reset();
-        pnumber1Text.setText(patient1Adapter.getWrapper().getPnumber());
-        study1Text.setText(patient1Adapter.getWrapper().getStudy()
-            .getNameShort());
-        patient1VisitsTable.setCollection(patient1Adapter.getWrapper()
+        pnumber1Text.setText(patient1.getPnumber());
+        study1Text.setText(patient1.getStudy().getNameShort());
+        patient1VisitsTable.setCollection(patient1
             .getCollectionEventCollection(true));
         pnumber2Text.setText("");
         study2Text.setText("");
@@ -281,8 +284,7 @@ public class PatientMergeForm extends BiobankEntryForm {
     @Override
     protected String getOkMessage() {
         return "Patient " + patient2.getPnumber()
-            + " will be merged into patient "
-            + patient1Adapter.getWrapper().getPnumber();
+            + " will be merged into patient " + patient1.getPnumber();
     }
 
     @Override

@@ -3,6 +3,8 @@ package edu.ualberta.med.biobank.common.security;
 import java.io.Serializable;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +13,8 @@ import edu.ualberta.med.biobank.common.util.NotAProxy;
 import edu.ualberta.med.biobank.common.wrappers.CenterWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SiteWrapper;
+import edu.ualberta.med.biobank.model.Container;
+import edu.ualberta.med.biobank.model.ContainerType;
 import edu.ualberta.med.biobank.model.Site;
 import gov.nih.nci.system.applicationservice.WritableApplicationService;
 
@@ -26,9 +30,59 @@ public class User implements Serializable, NotAProxy {
     private String email;
     private boolean isLockedOut;
 
-    private List<SiteWrapper> workingSites;
+    private List<CenterWrapper<?>> workingCenters;
 
-    private CenterWrapper<?> currentWorkingCentre;
+    private transient CenterWrapper<?> currentWorkingCenter;
+
+    /**
+     * [object type | privilege] = list of center class names
+     */
+    private static transient Map<TypePrivilegeKey, List<String>> specificRightsMapping;
+
+    private static class TypePrivilegeKey {
+        public String type;
+        public Privilege privilege;
+
+        public TypePrivilegeKey(String type, Privilege privilege) {
+            this.type = type;
+            this.privilege = privilege;
+        }
+
+        @Override
+        public boolean equals(Object object) {
+            if (object instanceof TypePrivilegeKey) {
+                TypePrivilegeKey tpk = (TypePrivilegeKey) object;
+                return type.equals(tpk.type) && privilege.equals(tpk.privilege);
+            }
+            return false;
+        }
+
+        @Override
+        public int hashCode() {
+            return type.hashCode() + privilege.hashCode();
+        }
+    }
+
+    static {
+        specificRightsMapping = new HashMap<TypePrivilegeKey, List<String>>();
+
+        addSpecificMappings(
+            Container.class.getName(),
+            Arrays.asList(Privilege.CREATE, Privilege.UPDATE, Privilege.DELETE),
+            Arrays.asList(Site.class.getName()));
+        addSpecificMappings(
+            ContainerType.class.getName(),
+            Arrays.asList(Privilege.CREATE, Privilege.UPDATE, Privilege.DELETE),
+            Arrays.asList(Site.class.getName()));
+    }
+
+    private static void addSpecificMappings(String objectType,
+        List<Privilege> privileges, List<String> centerClassNames) {
+        for (Privilege privilege : privileges) {
+            specificRightsMapping.put(new TypePrivilegeKey(objectType,
+                privilege), centerClassNames);
+        }
+    }
 
     public boolean isLockedOut() {
         return isLockedOut;
@@ -41,6 +95,8 @@ public class User implements Serializable, NotAProxy {
     private boolean needToChangePassword;
 
     private List<Group> groups = new ArrayList<Group>();
+
+    private List<Integer> workingCenterIds;
 
     public Long getId() {
         return id;
@@ -117,28 +173,9 @@ public class User implements Serializable, NotAProxy {
         groups = new ArrayList<Group>(user.getGroups());
     }
 
-    public boolean isWebsiteAdministrator() {
+    public boolean isSuperAdministrator() {
         for (Group group : groups) {
-            if (group.isWebsiteAdministrator()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public boolean isSiteAdministrator(SiteWrapper site) {
-        Integer id = null;
-        if (site != null)
-            id = site.getId();
-        return isSiteAdministrator(id);
-    }
-
-    public boolean isSiteAdministrator(Integer siteId) {
-        if (isWebsiteAdministrator()) {
-            return true;
-        }
-        for (Group group : groups) {
-            if (group.isSiteAdministrator(siteId)) {
+            if (group.isSuperAdministratorGroup()) {
                 return true;
             }
         }
@@ -146,50 +183,31 @@ public class User implements Serializable, NotAProxy {
     }
 
     /**
-     * Use to check if a user can modify objects inside a site
+     * Return true if this user is administrator for this center.
      */
-    public boolean canUpdateSite(SiteWrapper site) {
-        Integer id = null;
-        if (site != null)
-            id = site.getId();
-        return canUpdateSite(id);
-    }
-
-    /**
-     * Use to check if a user can modify objects inside a site
-     */
-    public boolean canUpdateSite(Integer siteId) {
-        if (siteId == null)
-            return false;
-        return hasPrivilegeOnObject(Privilege.UPDATE, Site.class.getName(),
-            siteId);
+    public boolean isAdministratorForCurrentCenter() {
+        for (Group group : groups) {
+            if (group.isAdministratorForCenter(currentWorkingCenter)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean hasPrivilegeOnProtectionGroup(Privilege privilege,
-        String protectionGroupName, Integer siteId) {
+        String protectionGroupName) {
         for (Group group : groups) {
             if (group.hasPrivilegeOnProtectionGroup(privilege,
-                protectionGroupName, siteId)) {
+                protectionGroupName, currentWorkingCenter)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
-        ModelWrapper<?> modelWrapper) {
-        boolean canCreateDeleteUpdate = true;
-        String type = modelWrapper.getWrappedClass().getName();
-        if (privilege != Privilege.READ && siteId != null)
-            canCreateDeleteUpdate = canUpdateSite(siteId);
-        canCreateDeleteUpdate = canCreateDeleteUpdate
-            && modelWrapper.checkSpecificAccess(this, siteId);
-        return canCreateDeleteUpdate
-            && hasPrivilegeOnObject(privilege, type, modelWrapper.getId());
-    }
-
-    public boolean hasPrivilegeOnObject(Privilege privilege, Integer siteId,
-        Class<?> objectClazz, Integer objectId) {
+    public boolean hasPrivilegeOnObject(Privilege privilege,
+        Class<?> objectClazz) {
+        String type = objectClazz.getName();
         if (ModelWrapper.class.isAssignableFrom(objectClazz)) {
             ModelWrapper<?> wrapper = null;
             try {
@@ -202,16 +220,24 @@ public class User implements Serializable, NotAProxy {
                 e.printStackTrace();
                 return false;
             }
-            return hasPrivilegeOnObject(privilege, siteId, wrapper);
+            type = wrapper.getWrappedClass().getName();
         }
-        String type = objectClazz.getName();
-        return hasPrivilegeOnObject(privilege, type, objectId);
+        boolean currentCenterRights = true;
+        CenterWrapper<?> currentCenter = getCurrentWorkingCenter();
+        if (currentCenter != null) {
+            List<String> centerSpecificRights = specificRightsMapping
+                .get(new TypePrivilegeKey(type, privilege));
+            if (centerSpecificRights != null) {
+                currentCenterRights = centerSpecificRights
+                    .contains(currentCenter.getWrappedClass().getName());
+            }
+        }
+        return currentCenterRights && hasPrivilegeOnObject(privilege, type);
     }
 
-    private boolean hasPrivilegeOnObject(Privilege privilege, String type,
-        Integer id) {
+    private boolean hasPrivilegeOnObject(Privilege privilege, String type) {
         for (Group group : groups) {
-            if (group.hasPrivilegeOnObject(privilege, type, id)) {
+            if (group.hasPrivilegeOnObject(privilege, type)) {
                 return true;
             }
         }
@@ -232,39 +258,57 @@ public class User implements Serializable, NotAProxy {
     }
 
     // FIXME list caching : what if a new site ? user should log off anyway ?
-    // Should return centres when the full security is set
-    public List<SiteWrapper> getWorkingCenters(
+    // Should return centers when the full security is set
+    public List<CenterWrapper<?>> getWorkingCenters(
         WritableApplicationService appService) throws Exception {
-        if (workingSites == null) {
-            List<SiteWrapper> allSites = SiteWrapper.getSites(appService);
-            workingSites = new ArrayList<SiteWrapper>();
-            for (SiteWrapper site : allSites) {
-                if (canUpdateSite(site.getId())) {
-                    workingSites.add(site);
+        if (workingCenters == null) {
+            List<CenterWrapper<?>> allCenters = CenterWrapper
+                .getCenters(appService);
+            workingCenters = new ArrayList<CenterWrapper<?>>();
+            for (CenterWrapper<?> center : allCenters) {
+                if (getWorkingCenterIds().contains(center.getId())) {
+                    workingCenters.add(center);
                 }
             }
         }
-        return workingSites;
+        return workingCenters;
     }
 
-    public void setCurrentWorkingCentre(CenterWrapper<?> centre) {
-        this.currentWorkingCentre = centre;
-    }
-
-    public CenterWrapper<?> getCurrentWorkingCentre() {
-        try {
-            if (currentWorkingCentre != null)
-                currentWorkingCentre.reload();
-        } catch (Exception e) {
-            // FIXME: how to handle?
-            e.printStackTrace();
+    private List<Integer> getWorkingCenterIds() {
+        if (workingCenterIds == null) {
+            workingCenterIds = new ArrayList<Integer>();
+            for (Group group : getGroups()) {
+                workingCenterIds.addAll(group.getWorkingCenterIds());
+            }
         }
-        return currentWorkingCentre;
+        return workingCenterIds;
+    }
+
+    public void setCurrentWorkingCenter(CenterWrapper<?> center) {
+        this.currentWorkingCenter = center;
+    }
+
+    public CenterWrapper<?> getCurrentWorkingCenter() {
+        // TODO: removed reload... called way too often, should manage reloads
+        // in forms
+        return currentWorkingCenter;
     }
 
     public SiteWrapper getCurrentWorkingSite() {
-        if (currentWorkingCentre instanceof SiteWrapper)
-            return (SiteWrapper) currentWorkingCentre;
+        if (currentWorkingCenter instanceof SiteWrapper)
+            return (SiteWrapper) currentWorkingCenter;
         return null;
+    }
+
+    // FIXME for now assume features are center features (so can use
+    // isAdministratorForCurrentCenter)
+    public boolean canPerformActions(Feature... features) {
+        boolean ok = isAdministratorForCurrentCenter();
+        for (Feature feature : features) {
+            ok = ok
+                || hasPrivilegeOnProtectionGroup(Privilege.UPDATE,
+                    feature.getName());
+        }
+        return ok;
     }
 }

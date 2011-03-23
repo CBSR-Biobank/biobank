@@ -19,7 +19,6 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.ISourceProviderListener;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PlatformUI;
@@ -32,7 +31,6 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.sourceproviders.SessionState;
 import edu.ualberta.med.biobank.utils.SearchType;
 import edu.ualberta.med.biobank.widgets.BiobankText;
-import edu.ualberta.med.biobank.widgets.utils.WidgetCreator;
 
 public class SearchView extends ViewPart {
 
@@ -43,13 +41,10 @@ public class SearchView extends ViewPart {
 
     private Button searchButton;
 
-    private WidgetCreator widgetCreator;
-
     protected static boolean loggedIn;
 
     @Override
     public void createPartControl(Composite parent) {
-        widgetCreator = new WidgetCreator(null);
         parent.setLayout(new GridLayout(2, false));
 
         IWorkbenchWindow window = PlatformUI.getWorkbench()
@@ -77,8 +72,6 @@ public class SearchView extends ViewPart {
                     }
                 }
             });
-
-        Label label = widgetCreator.createLabel(parent, "Repository Site");
 
         searchTypeCombo = new ComboViewer(parent);
         searchTypeCombo.setContentProvider(new ArrayContentProvider());
@@ -155,7 +148,7 @@ public class SearchView extends ViewPart {
                 try {
                     List<? extends ModelWrapper<?>> res = type.search(
                         searchString, SessionManager.getUser()
-                            .getCurrentWorkingCentre());
+                            .getCurrentWorkingCenter());
                     if (res != null && res.size() > 0) {
                         type.processResults(res);
                     } else {

@@ -62,7 +62,7 @@ public class BiobankJDBCAppender extends AppenderSkeleton {
         }
         Log log = populateObjectStateLogMesage(msg);
         java.util.Date d = new java.util.Date();
-        d.setTime(new Long(System.currentTimeMillis()).longValue());
+        d.setTime(System.currentTimeMillis());
         log.setCreatedAt(new Date());
         log.setUsername(userInfo.getUsername());
 

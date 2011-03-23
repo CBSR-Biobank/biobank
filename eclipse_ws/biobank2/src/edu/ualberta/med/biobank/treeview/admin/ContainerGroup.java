@@ -47,8 +47,7 @@ public class ContainerGroup extends AdapterBase {
 
     @Override
     public void popupMenu(TreeViewer tv, Tree tree, Menu menu) {
-        if (SessionManager.canCreate(ContainerWrapper.class,
-            getParentFromClass(SiteAdapter.class).getWrapper())) {
+        if (SessionManager.canCreate(ContainerWrapper.class)) {
             MenuItem mi = new MenuItem(menu, SWT.PUSH);
             mi.setText("Add a Container");
             mi.addSelectionListener(new SelectionAdapter() {
@@ -81,8 +80,9 @@ public class ContainerGroup extends AdapterBase {
                 } else {
                     List<ContainerWrapper> parents = new ArrayList<ContainerWrapper>();
                     ContainerWrapper currentContainer = container;
-                    while (currentContainer.hasParent()) {
-                        currentContainer = currentContainer.getParent();
+                    while (currentContainer.hasParentContainer()) {
+                        currentContainer = currentContainer
+                            .getParentContainer();
                         parents.add(currentContainer);
                     }
                     for (AdapterBase child : getChildren()) {

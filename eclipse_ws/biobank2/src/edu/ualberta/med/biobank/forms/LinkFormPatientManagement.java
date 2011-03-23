@@ -1,6 +1,7 @@
 package edu.ualberta.med.biobank.forms;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.databinding.observable.value.WritableValue;
@@ -22,7 +23,6 @@ import edu.ualberta.med.biobank.Messages;
 import edu.ualberta.med.biobank.common.wrappers.AliquotedSpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.CollectionEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.PatientWrapper;
-import edu.ualberta.med.biobank.common.wrappers.ProcessingEventWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenTypeWrapper;
 import edu.ualberta.med.biobank.common.wrappers.SpecimenWrapper;
 import edu.ualberta.med.biobank.common.wrappers.StudyWrapper;
@@ -99,7 +99,7 @@ public class LinkFormPatientManagement {
 
     protected void createCollectionEventWidgets(Composite compositeFields) {
         cEventComboLabel = widgetCreator.createLabel(compositeFields,
-            Messages.getString("ScanLink.visit.label.drawn")); //$NON-NLS-1$
+            Messages.getString("ScanLink.visit.number")); //$NON-NLS-1$
         viewerCollectionEvents = widgetCreator.createComboViewer(
             compositeFields, cEventComboLabel, null, null,
             Messages.getString("ScanLink.visit.validationMsg"), false, null, //$NON-NLS-1$
@@ -108,7 +108,7 @@ public class LinkFormPatientManagement {
                 public void doSelection(Object selectedObject) {
                     currentCEventSelected = (CollectionEventWrapper) selectedObject;
                 }
-            }); //$NON-NLS-1$
+            });
         GridData gridData = new GridData();
         gridData.grabExcessHorizontalSpace = true;
         gridData.horizontalAlignment = SWT.FILL;
@@ -123,13 +123,9 @@ public class LinkFormPatientManagement {
                     CollectionEventWrapper ce = (CollectionEventWrapper) selection
                         .getFirstElement();
                     if (ce != null) {
-                        // FIXME what correct message do we want ?
-                        // aliquotAdminForm.appendLogNLS(
-                        //                            "linkAssign.activitylog.visit.selection", ce //$NON-NLS-1$
-                        // .getCenter().getNameShort(), ce
-                        // .getFormattedDateDrawn(), ce
-                        // .getFormattedDateProcessed(), ce.getCenter()
-                        // .getName());
+                        aliquotAdminForm.appendLogNLS(
+                            "linkAssign.activitylog.visit.selection", ce //$NON-NLS-1$
+                                .getVisitNumber());
                     }
                 }
             }
@@ -189,9 +185,7 @@ public class LinkFormPatientManagement {
         patient.reload();
         this.currentPatient = patient;
         patientNumberText.setText(patient.getPnumber());
-        List<ProcessingEventWrapper> collection = patient
-            .getProcessingEventCollection();
-        viewerCollectionEvents.setInput(collection);
+        viewerCollectionEvents.setInput(Arrays.asList(cEvent));
         viewerCollectionEvents.setSelection(new StructuredSelection(cEvent));
         if (cEventText != null) {
             cEventText.setText(cEvent.getVisitNumber().toString());
@@ -287,11 +281,10 @@ public class LinkFormPatientManagement {
      */
     public List<SpecimenTypeWrapper> getStudyAliquotedTypes(
         List<SpecimenTypeWrapper> authorizedSpecimenTypesInContainer) {
-        // FIXME really need to reload ?
         StudyWrapper study = getCurrentPatient().getStudy();
         try {
             // need to reload study to avoid performance problem when using
-            // the same lots of time (like is try differents positions for
+            // the same lots of time (like is try different positions for
             // same patient)
             study.reload();
         } catch (Exception e) {
@@ -304,7 +297,8 @@ public class LinkFormPatientManagement {
             .getAliquotedSpecimenCollection(true)) {
             if (ss.getActivityStatus().isActive()) {
                 SpecimenTypeWrapper type = ss.getSpecimenType();
-                if (authorizedSpecimenTypesInContainer.contains(type)) {
+                if (authorizedSpecimenTypesInContainer == null
+                    || authorizedSpecimenTypesInContainer.contains(type)) {
                     studiesAliquotedTypes.add(type);
                 }
             }
