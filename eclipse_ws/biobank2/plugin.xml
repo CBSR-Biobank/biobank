@@ -1666,9 +1666,9 @@
             name="Specimen Entry">
       </editor>
       <editor
-            class="edu.ualberta.med.biobank.forms.SpecimenTypesEntryForm"
+            class="edu.ualberta.med.biobank.forms.SpecimenTypesViewForm"
             default="false"
-            id="edu.ualberta.med.biobank.forms.SpecimenTypesEntryForm"
+            id="edu.ualberta.med.biobank.forms.SpecimenTypesViewForm"
             name="Specimen Types Entry">
       </editor>
       <editor

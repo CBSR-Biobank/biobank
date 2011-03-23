@@ -1,6 +1,5 @@
 package edu.ualberta.med.biobank.widgets.infotables.entry;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.dialogs.Dialog;
@@ -33,11 +32,7 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
     private static BiobankLogger logger = BiobankLogger
         .getLogger(SpecimenTypeEntryInfoTable.class.getName());
 
-    private List<SpecimenTypeWrapper> selectedSpecimenTypes;
-
-    private List<SpecimenTypeWrapper> addedOrModifiedSpecimenTypes;
-
-    private List<SpecimenTypeWrapper> deletedSpecimenTypes;
+    List<SpecimenTypeWrapper> selectedSpecimenTypes;
 
     private String addMessage;
 
@@ -86,13 +81,17 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
                     // only add to the collection when adding and not editing
                     selectedSpecimenTypes.add(specimenType);
                 }
+                try {
+                    specimenType.persist();
+                } catch (Exception e) {
+                    BiobankPlugin.openAsyncError("Save Failed", e);
+                }
                 reloadCollection(selectedSpecimenTypes);
-                addedOrModifiedSpecimenTypes.add(specimenType);
-                notifyListeners();
                 return true;
             } else {
                 SpecimenTypeWrapper orig = dlg.getOrigSpecimenType();
                 specimenType.setName(orig.getName());
+                specimenType.setNameShort(orig.getNameShort());
                 reloadCollection(selectedSpecimenTypes);
             }
         }
@@ -143,10 +142,8 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
                         // equals method now compare toString() results if both
                         // ids are null.
                         selectedSpecimenTypes.remove(specType);
-
+                        specType.delete();
                         setCollection(selectedSpecimenTypes);
-                        deletedSpecimenTypes.add(specType);
-                        notifyListeners();
                     } catch (final RemoteConnectFailureException exp) {
                         BiobankPlugin.openRemoteConnectErrorMessage(exp);
                     } catch (Exception e) {
@@ -165,40 +162,16 @@ public class SpecimenTypeEntryInfoTable extends SpecimenTypeInfoTable {
                     && sv.getName().equals(type.getName()))
                     throw new BiobankCheckException(
                         "That specimen type has already been added.");
-            for (SpecimenTypeWrapper sv : addedOrModifiedSpecimenTypes)
-                if (sv.getId() != type.getId()
-                    && sv.getName().equals(type.getName()))
-                    throw new BiobankCheckException(
-                        "That specimen type has already been added.");
-            type.checkNameAndShortNameUnique();
         } catch (BiobankException bce) {
             BiobankPlugin.openAsyncError("Check error", bce);
-            return false;
-        } catch (ApplicationException e) {
-            BiobankPlugin.openAsyncError("Check error", e);
             return false;
         }
         return true;
     }
 
-    public List<SpecimenTypeWrapper> getAddedOrModifiedSpecimenTypes() {
-        return addedOrModifiedSpecimenTypes;
-    }
-
-    public List<SpecimenTypeWrapper> getDeletedSpecimenTypes() {
-        return deletedSpecimenTypes;
-    }
-
     public void setLists(List<SpecimenTypeWrapper> specimenTypeCollection) {
-        if (specimenTypeCollection == null) {
-            selectedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
-        } else {
-            selectedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>(
-                specimenTypeCollection);
-        }
+        selectedSpecimenTypes = specimenTypeCollection;
         reloadCollection(specimenTypeCollection);
-        addedOrModifiedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
-        deletedSpecimenTypes = new ArrayList<SpecimenTypeWrapper>();
     }
 
     public void reload() {
