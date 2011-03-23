@@ -1,8 +1,11 @@
 package edu.ualberta.med.biobank.reporting;
 
+import java.awt.Color;
 import java.io.File;
 import java.io.InputStream;
+import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,6 +13,7 @@ import javax.print.DocFlavor;
 import javax.print.PrintService;
 import javax.print.PrintServiceLookup;
 
+import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
 import net.sf.jasperreports.engine.JRExporter;
 import net.sf.jasperreports.engine.JRExporterParameter;
@@ -31,7 +35,15 @@ import org.eclipse.swt.printing.PrinterData;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.ui.PlatformUI;
 
+import ar.com.fdvs.dj.core.DynamicJasperHelper;
+import ar.com.fdvs.dj.core.layout.ClassicLayoutManager;
+import ar.com.fdvs.dj.domain.AutoText;
+import ar.com.fdvs.dj.domain.Style;
+import ar.com.fdvs.dj.domain.builders.FastReportBuilder;
+import ar.com.fdvs.dj.domain.constants.Border;
 import ar.com.fdvs.dj.domain.constants.Font;
+import ar.com.fdvs.dj.domain.constants.Transparency;
+import ar.com.fdvs.dj.domain.constants.VerticalAlign;
 import edu.ualberta.med.biobank.BiobankPlugin;
 import edu.ualberta.med.biobank.common.formatters.DateFormatter;
 
@@ -42,6 +54,48 @@ public class ReportingUtils {
     public static Font sansSerifBold = new Font(Font.MEDIUM, "SansSerif", true);
 
     public static PrinterData data;
+
+    public static JasperPrint createDynamicReport(String reportName,
+        List<String> description, List<String> columnInfo, List<?> list)
+        throws Exception {
+
+        FastReportBuilder drb = new FastReportBuilder();
+        for (int i = 0; i < columnInfo.size(); i++) {
+            drb.addColumn(columnInfo.get(i), columnInfo.get(i), String.class,
+                40, false).setPrintBackgroundOnOddRows(true)
+                .setUseFullPageWidth(true);
+        }
+
+        Map<String, Object> fields = new HashMap<String, Object>();
+        fields.put("title", reportName);
+        fields.put("infos", description);
+        URL reportURL = ReportingUtils.class.getResource("BasicReport.jrxml");
+        if (reportURL == null) {
+            throw new Exception("No report available with name BasicReport");
+        }
+        drb.setTemplateFile(reportURL.getFile());
+        drb.addAutoText(AutoText.AUTOTEXT_PAGE_X_OF_Y,
+            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_RIGHT, 200, 40);
+        drb.addAutoText(
+            "Printed on " + DateFormatter.formatAsDateTime(new Date()),
+            AutoText.POSITION_FOOTER, AutoText.ALIGNMENT_LEFT, 200);
+
+        Style headerStyle = new Style();
+        headerStyle.setFont(ReportingUtils.sansSerifBold);
+        // headerStyle.setHorizontalAlign(HorizontalAlign.CENTER);
+        headerStyle.setBorderBottom(Border.THIN);
+        headerStyle.setVerticalAlign(VerticalAlign.MIDDLE);
+        headerStyle.setBackgroundColor(Color.LIGHT_GRAY);
+        headerStyle.setTransparency(Transparency.OPAQUE);
+        Style detailStyle = new Style();
+        detailStyle.setFont(ReportingUtils.sansSerif);
+        drb.setDefaultStyles(null, null, headerStyle, detailStyle);
+
+        JRDataSource ds = new JRBeanCollectionDataSource(list);
+        JasperPrint jp = DynamicJasperHelper.generateJasperPrint(drb.build(),
+            new ClassicLayoutManager(), ds, fields);
+        return jp;
+    }
 
     public static JasperPrint createStandardReport(String reportName,
         Map<String, Object> parameters, List<?> list) throws Exception {

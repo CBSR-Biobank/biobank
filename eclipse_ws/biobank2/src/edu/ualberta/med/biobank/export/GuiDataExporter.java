@@ -1,0 +1,103 @@
+package edu.ualberta.med.biobank.export;
+
+import java.lang.reflect.InvocationTargetException;
+import java.util.Date;
+
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.dialogs.ProgressMonitorDialog;
+import org.eclipse.jface.operation.IRunnableContext;
+import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.viewers.ITableLabelProvider;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.Shell;
+
+import edu.ualberta.med.biobank.BiobankPlugin;
+import edu.ualberta.med.biobank.common.formatters.DateFormatter;
+
+public abstract class GuiDataExporter implements DataExporter {
+    private final String name;
+
+    public GuiDataExporter(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String getName() {
+        return name;
+    }
+
+    @Override
+    public void canExport(Data data) throws DataExportException {
+        if (data.getRows() == null || data.getRows().isEmpty()) {
+            throw new DataExportException("no results to export");
+        }
+    }
+
+    @Override
+    public final void export(final Data data,
+        final ITableLabelProvider labelProvider) throws DataExportException {
+        Shell shell = Display.getDefault().getActiveShell();
+        IRunnableContext context = new ProgressMonitorDialog(shell);
+        try {
+            context.run(true, true, new IRunnableWithProgress() {
+                @Override
+                public void run(final IProgressMonitor monitor) {
+                    monitor.beginTask("Exporting data...",
+                        IProgressMonitor.UNKNOWN);
+                    try {
+                        export(data, labelProvider, monitor);
+                    } catch (Exception e) {
+                        BiobankPlugin.openAsyncError("Error Exporting Data", e);
+                        return;
+                    }
+                }
+            });
+        } catch (InvocationTargetException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    protected abstract void export(Data data,
+        ITableLabelProvider labelProvider, IProgressMonitor monitor)
+        throws DataExportException;
+
+    /**
+     * Open a dialog to select a file path from.
+     * 
+     * @param data
+     * @param exts
+     * @return selected/ entered path
+     */
+    public static String getPath(Data data, String[] exts) {
+        String path = null;
+
+        if (exts != null) {
+            String defaultFilename = "output";
+
+            if (data.getTitle() != null) {
+                defaultFilename = data.getTitle().replaceAll(" ", "_");
+            }
+
+            defaultFilename += "_" + DateFormatter.formatAsDate(new Date());
+
+            Shell shell = Display.getDefault().getActiveShell();
+            if (shell != null) {
+                FileDialog fd = new FileDialog(shell, SWT.SAVE);
+                fd.setOverwrite(true);
+                fd.setText("Export as");
+                fd.setFilterExtensions(exts);
+                fd.setFileName(defaultFilename);
+
+                path = fd.open();
+            }
+        }
+
+        return path;
+    }
+}
