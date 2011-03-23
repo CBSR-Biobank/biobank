@@ -16,6 +16,7 @@ import edu.ualberta.med.biobank.common.wrappers.ModelWrapper;
 import edu.ualberta.med.biobank.common.wrappers.ReportWrapper;
 import edu.ualberta.med.biobank.forms.ReportEntryForm;
 import edu.ualberta.med.biobank.treeview.AdapterBase;
+import edu.ualberta.med.biobank.views.AdvancedReportsView;
 
 public class ReportAdapter extends AdapterBase {
     public ReportAdapter(AdapterBase parent, ReportWrapper report) {
@@ -67,6 +68,7 @@ public class ReportAdapter extends AdapterBase {
                     try {
                         modelObject.delete();
                         parent.removeChild(ReportAdapter.this);
+                        AdvancedReportsView.getCurrent().reload();
                     } catch (Exception e) {
                     }
                 }
